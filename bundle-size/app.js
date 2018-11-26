@@ -20,10 +20,6 @@ const path = require('path');
 const EMPTY_SHA = '0'.repeat(40);
 
 async function getBuildArtifactsFile(github, filename) {
-  if (filename == 'OWNERS') {
-    // Temporarily, until we add the OWNERS file to the build artifacts repo.
-    return 'choumx\ndanielrozenberg\njridgewell\nrsimha\n';
-  }
   return await github.repos.getContent({
     owner: 'ampproject',
     repo: 'amphtml-build-artifacts',
