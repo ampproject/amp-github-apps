@@ -52,7 +52,7 @@ module.exports = app => {
     context.log(`Pull request ${context.payload.number} created/updated`);
 
     const params = context.repo({
-      name: 'AMP bundle-size',
+      name: 'ampproject/bundle-size',
       head_sha: context.payload.pull_request.head.sha,
       output: {
         title: 'Calculating new bundle size for this PR…',
@@ -162,7 +162,7 @@ module.exports = app => {
       owner: check.owner,
       repo: check.repo,
       check_run_id: check.check_run_id,
-      name: 'AMP bundle-size',
+      name: 'ampproject/bundle-size',
       completed_at: new Date().toISOString(),
     };
     const github = await app.auth(check.installation_id);
