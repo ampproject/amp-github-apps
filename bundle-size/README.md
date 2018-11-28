@@ -51,6 +51,7 @@ Follow these setup instructions to start developing for this App locally:
 2. `npm install`
 3. Run a local instance of PostgreSQL, or use the
    [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy)
+   * While other database engines might work, we have only tested this on pg
 4. Start a new [Smee channel](https://smee.io/). This can be used to proxy
    GitHub webhooks to your local machine
 5. Create a new [GitHub App](https://github.com/settings/apps/new):
@@ -71,7 +72,9 @@ Follow these setup instructions to start developing for this App locally:
      `.pem` file you downloaded from the GitHub App page. On Linux/Mac you can
      convert that file by running `cat private-key-file.pem | base64` in a
      command line
-9. `npm run dev`
+9. Copy the `db-config.example.js` file to `db-config.js` and modify the fields
+   based on the connection information to your database
+10. `npm run dev`
    * This will reload the App on every file change. Quit the server with
      `<Ctrl> + C` or `<Cmd> + C`
 
