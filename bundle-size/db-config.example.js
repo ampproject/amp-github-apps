@@ -14,9 +14,20 @@
  */
 'use strict';
 
-const knex = require('knex');
-const {dbConfig} = require('./db-config.js');
+exports.dbConfig = {
+  client: 'pg',
+  connection: {
+    // host is used for local development using a standard instance of Postgres
+    // or a CloudSQL instance using the CloudSQL Proxy. Remove if using
+    // `socketPath` instead.
+    host: '127.0.0.1',
 
-exports.dbConnect = () => {
-  return knex(dbConfig);
+    // socketPath is used in AppEngine only. Remove if using `host` instead.
+    socketPath: '/cloudsql/[[instance_connection_name_from_cloudsql_panel]]',
+
+    user: 'postgres',
+    password: 'HelloWorld!',
+    database: 'postgres',
+
+  },
 }
