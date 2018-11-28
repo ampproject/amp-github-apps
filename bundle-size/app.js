@@ -110,6 +110,7 @@ module.exports = app => {
 
   const v0 = app.route('/v0');
   v0.use((request, response, next) => {
+    request.app.set('trust proxy', true);
     if ('TRAVIS_IP_ADDRESSES' in process.env &&
         !process.env['TRAVIS_IP_ADDRESSES'].includes(request.ip)) {
       app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
