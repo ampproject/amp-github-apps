@@ -20,7 +20,7 @@ const path = require('path');
 const EMPTY_SHA = '0'.repeat(40);
 
 async function getBuildArtifactsFile(github, filename) {
-  return await github.repos.getContent({
+  return await github.repos.getContents({
     owner: 'ampproject',
     repo: 'amphtml-build-artifacts',
     path: path.join('bundle-size', filename),
