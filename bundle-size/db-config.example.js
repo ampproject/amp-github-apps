@@ -17,13 +17,13 @@
 exports.dbConfig = {
   client: 'pg',
   connection: {
-    // host is used for local development using a standard instance of Postgres
-    // or a CloudSQL instance using the CloudSQL Proxy. Remove if using
-    // `socketPath` instead.
+    // host can be an IP address, e.g., when used for local development using a
+    // standard instance of Postgres or a CloudSQL instance using the CloudSQL
+    // Proxy.
     host: '127.0.0.1',
 
-    // socketPath is used in AppEngine only. Remove if using `host` instead.
-    socketPath: '/cloudsql/[[instance_connection_name_from_cloudsql_panel]]',
+    // Alternatively, host can be a UNIX socket, e.g., when used in AppEngine.
+    host: '/cloudsql/[[instance_connection_name_from_cloudsql_panel]]',
 
     user: 'postgres',
     password: 'HelloWorld!',
