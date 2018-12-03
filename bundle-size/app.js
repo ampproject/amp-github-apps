@@ -73,6 +73,14 @@ module.exports = app => {
     }
   }
 
+  /**
+   * Try to report the bundle size of a pull request to the GitHub check.
+   *
+   * @param {number} retriesLeft number of times to retry the report.
+   * @param {!Object} check GitHub Check object.
+   * @param {number} bundleSize the total bundle size in KB.
+   * @return {boolean} true if succeeded; false otherwise.
+   */
   async function tryReport(retriesLeft, check, bundleSize) {
     const github = await app.auth(check.installation_id);
     const updatedCheckOptions = {
