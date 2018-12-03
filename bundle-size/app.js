@@ -17,6 +17,9 @@
 const {dbConnect} = require('./db');
 const path = require('path');
 
+const RETRY_MILLIS = 60000;
+const RETRY_TIMES = 10;
+
 /**
  * Get a file from the bundle-size directory in the AMPHTML build artifacts
  * repository.
@@ -67,6 +70,69 @@ module.exports = app => {
       return results[0];
     } else {
       return null;
+    }
+  }
+
+  function tryReport(retriesLeft, check, bundleSize) {
+    const github = await app.auth(check.installation_id);
+    const updatedCheckOptions = {
+      owner: check.owner,
+      repo: check.repo,
+      check_run_id: check.check_run_id,
+      name: 'ampproject/bundle-size',
+      completed_at: new Date().toISOString(),
+    };
+
+    try {
+      const baseBundleSize = parseFloat(
+          await getBuildArtifactsFile(github, check.base_sha));
+      const bundleSizeDelta = bundleSize - baseBundleSize;
+      const bundleSizeDeltaFormatted = formatBundleSizeDelta(bundleSizeDelta);
+
+      await db('checks')
+          .update({delta: bundleSizeDelta})
+          .where({head_sha: check.head_sha});
+
+      if (bundleSizeDelta > process.env['MAX_ALLOWED_INCREASE']) {
+        Object.assign(updatedCheckOptions, {
+          conclusion: 'action_required',
+          output: {
+            title: `${bundleSizeDeltaFormatted} | approval required`,
+            summary: `${bundleSizeDeltaFormatted} | approval required`,
+          },
+        });
+      } else {
+        Object.assign(updatedCheckOptions, {
+          conclusion: 'success',
+          output: {
+            title: `${bundleSizeDeltaFormatted} | no approval necessary`,
+            summary: `${bundleSizeDeltaFormatted} | no approval necessary`,
+          },
+        });
+      }
+      await github.checks.update(updatedCheckOptions);
+      return true;
+    } catch (error) {
+      const partialBaseSha = check.base_sha.substr(0, 7);
+      app.log('ERROR: Failed to retrieve the bundle size of branch point ' +
+              `${partialBaseSha} from GitHub: ${error}`);
+      if (retriesLeft > 0) {
+        app.log(`Will retry ${RETRY_TIMES} more time(s) in ${RETRY_MILLIS} ms`);
+        setTimeout(tryReport, RETRY_MILLIS, retriesLeft - 1, check, bundleSize);
+      } else {
+        app.log('No more retries left. Reporting failure');
+        Object.assign(updatedCheckOptions, {
+          conclusion: 'action_required',
+          output: {
+            title: 'Failed to retrieve the bundle size of branch point ' +
+                partialBaseSha,
+            summary: 'bundle size check skipped for this PR. A member of the ' +
+                'bundle-size squad must approve this PR manually.',
+          },
+        });
+        await github.checks.update(updatedCheckOptions);
+      }
+      return false;
     }
   }
 
@@ -179,59 +245,11 @@ module.exports = app => {
     if (!check) {
       return response.status(404).end(`${headSha} not in database`);
     }
-    const partialBaseSha = check.base_sha.substr(0, 7);
 
-    const updatedCheckOptions = {
-      owner: check.owner,
-      repo: check.repo,
-      check_run_id: check.check_run_id,
-      name: 'ampproject/bundle-size',
-      completed_at: new Date().toISOString(),
-    };
-    const github = await app.auth(check.installation_id);
-
-    try {
-      const baseBundleSize = parseFloat(
-          await getBuildArtifactsFile(github, check.base_sha));
-      const bundleSizeDelta = bundleSize - baseBundleSize;
-      const bundleSizeDeltaFormatted = formatBundleSizeDelta(bundleSizeDelta);
-
-      await db('checks')
-          .update({delta: bundleSizeDelta})
-          .where({head_sha: headSha});
-
-      if (bundleSizeDelta > process.env['MAX_ALLOWED_INCREASE']) {
-        Object.assign(updatedCheckOptions, {
-          conclusion: 'action_required',
-          output: {
-            title: `${bundleSizeDeltaFormatted} | approval required`,
-            summary: `${bundleSizeDeltaFormatted} | approval required`,
-          },
-        });
-      } else {
-        Object.assign(updatedCheckOptions, {
-          conclusion: 'success',
-          output: {
-            title: `${bundleSizeDeltaFormatted} | no approval necessary`,
-            summary: `${bundleSizeDeltaFormatted} | no approval necessary`,
-          },
-        });
-      }
-    } catch (error) {
-      app.log('ERROR: Failed to retrieve the bundle size of branch point ' +
-              `${partialBaseSha} from GitHub: ${error}`);
-      Object.assign(updatedCheckOptions, {
-        conclusion: 'action_required',
-        output: {
-          title: 'Failed to retrieve the bundle size of branch point ' +
-              partialBaseSha,
-          summary: 'bundle size check skipped for this PR. A member of the ' +
-              'bundle-size squad must approve this PR manually.',
-        },
-      });
+    if (tryReport(RETRY_TIMES, check, bundleSize)) {
+      response.end();
+    } else {
+      response.status(202).end();
     }
-
-    await github.checks.update(updatedCheckOptions);
-    response.end();
   });
 };
