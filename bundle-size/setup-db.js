@@ -14,6 +14,8 @@
  */
 'use strict';
 
+const log = require('fancy-log');
+
 /**
  * This file creates the database table that will be used by the GitHub App.
  *
@@ -32,9 +34,9 @@ db.schema.createTable('checks', table => {
   table.integer('check_run_id');
   table.decimal('delta', 6, 2);
 }).then(() => {
-  console.log('Database table `checks` created.');
+  log.info('Database table `checks` created.');
 }).catch(error => {
-  console.error(error.message);
+  log.error(error.message);
 }).then(() => {
   return db.destroy();
 });

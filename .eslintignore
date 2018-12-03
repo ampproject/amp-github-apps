@@ -1,0 +1,2 @@
+bundle-size/node_modules/*
+bundle-size/*.example.js

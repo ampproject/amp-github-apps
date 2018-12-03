@@ -1,0 +1,46 @@
+{
+  "root": true,
+  "extends": ["eslint:recommended", "google"],
+  "plugins": [
+    "jsdoc"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "env": {
+    "node": true
+  },
+  "settings": {
+    "jsdoc": {
+      "tagNamePreference": {
+        "returns": "return",
+        "constant": "const",
+        "class": "constructor"
+      },
+      "additionalTagNames": {
+        "customTags": [
+          "deprecated",
+          "export",
+          "final",
+          "package",
+          "restricted",
+          "suppress",
+          "template",
+          "visibleForTesting"
+        ]
+      },
+      "allowOverrideWithoutParam" : true
+    }
+  },
+  "rules": {
+    "arrow-parens": [2, "as-needed"],
+    "indent": [2, 2, { "SwitchCase": 1, "VariableDeclarator": 2, "MemberExpression": 2, "ObjectExpression": 1, "CallExpression": { "arguments": 2 } }],
+    "jsdoc/check-param-names": 2,
+    "jsdoc/check-tag-names": 2,
+    "jsdoc/check-types": 2,
+    "jsdoc/require-param": 2,
+    "jsdoc/require-param-name": 2,
+    "jsdoc/require-param-type": 2,
+    "jsdoc/require-returns-type": 2
+  }
+}

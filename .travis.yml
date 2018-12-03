@@ -1,0 +1,15 @@
+language: node_js
+dist: xenial
+node_js:
+  - "lts/*"
+# notifications:
+#   email:
+#     recipients:
+#       - amp-build-cop@grotations.appspotmail.com
+#     on_success: change
+#     on_failure: change
+script: node pr-check.js
+branches:
+  only:
+    - master
+cache: npm
