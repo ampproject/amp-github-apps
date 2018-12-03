@@ -1,0 +1,5 @@
+path_classifiers:
+  docs:
+    - "**/*.md"
+  test:
+    - "**/test/**/*.js"

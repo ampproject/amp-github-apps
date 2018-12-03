@@ -14,9 +14,29 @@
  */
 'use strict';
 
-const knex = require('knex');
-const {dbConfig} = require('./db-config.js');
+const colors = require('ansi-colors');
+const {execOrDie} = require('./exec');
+const log = require('fancy-log');
 
-exports.dbConnect = () => {
-  return knex(dbConfig);
-};
+/**
+ * Execute a command, surrounded by start/end time logs.
+ *
+ * @param {string} cmd command to execute.
+ */
+function timedExecOrDie(cmd) {
+  log.info('Running', colors.cyan(cmd), '...');
+  execOrDie(cmd);
+  log.info('Done running', colors.cyan(cmd), '...');
+}
+
+/**
+ * Runs the checks.
+ *
+ * @return {number} process exit code.
+ */
+function main() {
+  timedExecOrDie('eslint .');
+  return 0;
+}
+
+process.exit(main());

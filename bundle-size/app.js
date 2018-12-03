@@ -17,8 +17,15 @@
 const {dbConnect} = require('./db');
 const path = require('path');
 
-const EMPTY_SHA = '0'.repeat(40);
-
+/**
+ * Get a file from the bundle-size directory in the AMPHTML build artifacts
+ * repository.
+ *
+ * @param {github} github an authenticated GitHub API object.
+ * @param {string} filename the name of the file to retrieve.
+ * @throws {Error} on any error.
+ * @return {string} the text contents of the file.
+ */
 async function getBuildArtifactsFile(github, filename) {
   return await github.repos.getContents({
     owner: 'ampproject',
@@ -29,6 +36,15 @@ async function getBuildArtifactsFile(github, filename) {
   });
 }
 
+/**
+ * Format the bundle size delta in "Δ 99.99KB" format.
+ *
+ * Always fixed with 2 digits after the dot. Adds a minus (-) sign for negative
+ * numbers, but no plus (+) sign for positive.
+ *
+ * @param {number} delta the bundle size delta.
+ * @return {string} formatted bundle size delta.
+ */
 function formatBundleSizeDelta(delta) {
   return 'Δ ' + (delta >= 0 ? '+' : '') + delta.toFixed(2) + 'KB';
 }
@@ -36,10 +52,16 @@ function formatBundleSizeDelta(delta) {
 module.exports = app => {
   const db = dbConnect();
 
+  /**
+   * Get the GitHub Check object from the database.
+   *
+   * @param {string} headSha commit SHA of the head commit of a pull request.
+   * @return {!Object} GitHub Check object.
+   */
   async function getCheckFromDatabase(headSha) {
     const results = await db('checks')
         .select('base_sha', 'pull_request_id', 'installation_id', 'owner',
-                'repo', 'check_run_id', 'delta')
+            'repo', 'check_run_id', 'delta')
         .where('head_sha', headSha);
     if (results.length > 0) {
       return results[0];
@@ -83,7 +105,7 @@ module.exports = app => {
           'approved by a bundle-size keeper');
 
       const check = await getCheckFromDatabase(
-        context.payload.pull_request.head.sha);
+          context.payload.pull_request.head.sha);
       if (!check || check.delta === null) {
         return;
       }
@@ -118,10 +140,10 @@ module.exports = app => {
     } else {
       next();
     }
-  })
+  });
   v0.use(require('express').json());
 
-  v0.post('/commit/:headSha/skip', async(request, response) => {
+  v0.post('/commit/:headSha/skip', async (request, response) => {
     const {headSha} = request.params;
     app.log(`Marking SHA ${headSha} for skip`);
 
@@ -144,21 +166,21 @@ module.exports = app => {
     response.end();
   });
 
-  v0.post('/commit/:headSha/report', async(request, response) => {
+  v0.post('/commit/:headSha/report', async (request, response) => {
     if (!('bundleSize' in request.body) ||
         typeof request.body.bundleSize != 'number') {
       return response.status(400).end(
-        'POST request to /report must have numeric field "bundleSize"');
+          'POST request to /report must have numeric field "bundleSize"');
     }
     const {headSha} = request.params;
     const {bundleSize} = request.body;
-    
+
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
       return response.status(404).end(`${headSha} not in database`);
     }
     const partialBaseSha = check.base_sha.substr(0, 7);
-    
+
     const updatedCheckOptions = {
       owner: check.owner,
       repo: check.repo,
@@ -169,7 +191,6 @@ module.exports = app => {
     const github = await app.auth(check.installation_id);
 
     try {
-
       const baseBundleSize = parseFloat(
           await getBuildArtifactsFile(github, check.base_sha));
       const bundleSizeDelta = bundleSize - baseBundleSize;
@@ -208,8 +229,8 @@ module.exports = app => {
               'bundle-size squad must approve this PR manually.',
         },
       });
-    };
-    
+    }
+
     await github.checks.update(updatedCheckOptions);
     response.end();
   });
