@@ -13,3 +13,5 @@
 
 runtime: nodejs
 env: flex
+beta_settings:
+  cloud_sql_instances: [[instance_connection_name_from_cloudsql_panel]]
