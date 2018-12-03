@@ -248,7 +248,7 @@ module.exports = app => {
       return response.status(404).end(`${headSha} not in database`);
     }
 
-    if (tryReport(RETRY_TIMES, check, bundleSize)) {
+    if (await tryReport(RETRY_TIMES, check, bundleSize)) {
       response.end();
     } else {
       response.status(202).end();
