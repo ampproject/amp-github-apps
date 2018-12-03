@@ -113,11 +113,13 @@ module.exports = app => {
       await github.checks.update(updatedCheckOptions);
       return true;
     } catch (error) {
+      const partialHeadSha = check.head_sha.substr(0, 7);
       const partialBaseSha = check.base_sha.substr(0, 7);
-      app.log('ERROR: Failed to retrieve the bundle size of branch point ' +
-              `${partialBaseSha} from GitHub: ${error}`);
+      app.log('ERROR: Failed to retrieve the bundle size of ' +
+              `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
+              `point ${partialBaseSha} from GitHub: ${error}`);
       if (retriesLeft > 0) {
-        app.log(`Will retry ${RETRY_TIMES} more time(s) in ${RETRY_MILLIS} ms`);
+        app.log(`Will retry ${retriesLeft} more time(s) in ${RETRY_MILLIS} ms`);
         setTimeout(tryReport, RETRY_MILLIS, retriesLeft - 1, check, bundleSize);
       } else {
         app.log('No more retries left. Reporting failure');
