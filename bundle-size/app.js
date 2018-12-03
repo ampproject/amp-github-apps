@@ -73,7 +73,7 @@ module.exports = app => {
     }
   }
 
-  function tryReport(retriesLeft, check, bundleSize) {
+  async function tryReport(retriesLeft, check, bundleSize) {
     const github = await app.auth(check.installation_id);
     const updatedCheckOptions = {
       owner: check.owner,
