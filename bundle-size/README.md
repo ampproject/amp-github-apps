@@ -89,4 +89,5 @@ review it.
 Deployment
 ----------
 
-This section to be updated once we deploy this App.
+This GitHub App is deployed on an AppEngine instance:
+https://amp-bundle-size-bot.appspot.com/
