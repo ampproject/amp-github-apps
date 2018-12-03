@@ -2,7 +2,7 @@ language: node_js
 dist: xenial
 node_js:
   - "lts/*"
-script: node pr-check.js
+script: node build-system/pr-check.js
 branches:
   only:
     - master
