@@ -63,8 +63,8 @@ module.exports = app => {
    */
   async function getCheckFromDatabase(headSha) {
     const results = await db('checks')
-        .select('base_sha', 'pull_request_id', 'installation_id', 'owner',
-            'repo', 'check_run_id', 'delta')
+        .select('head_sha', 'base_sha', 'pull_request_id', 'installation_id',
+            'owner', 'repo', 'check_run_id', 'delta')
         .where('head_sha', headSha);
     if (results.length > 0) {
       return results[0];
