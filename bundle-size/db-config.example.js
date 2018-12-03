@@ -19,11 +19,10 @@ exports.dbConfig = {
   connection: {
     // host can be an IP address, e.g., when used for local development using a
     // standard instance of Postgres or a CloudSQL instance using the CloudSQL
-    // Proxy.
-    host: '127.0.0.1',
-
-    // Alternatively, host can be a UNIX socket, e.g., when used in AppEngine.
+    // Proxy. Alternatively, host can be a UNIX socket, e.g., when used in
+    // AppEngine.
     host: '/cloudsql/[[instance_connection_name_from_cloudsql_panel]]',
+    // or host: '127.0.0.1',
 
     user: 'postgres',
     password: 'HelloWorld!',
