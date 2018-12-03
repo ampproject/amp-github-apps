@@ -18,7 +18,7 @@ const {dbConnect} = require('./db');
 const path = require('path');
 
 const RETRY_MILLIS = 60000;
-const RETRY_TIMES = 10;
+const RETRY_TIMES = 60;
 
 /**
  * Get a file from the bundle-size directory in the AMPHTML build artifacts
