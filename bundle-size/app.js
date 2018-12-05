@@ -16,6 +16,7 @@
 
 const db = require('./db').dbConnect();
 const path = require('path');
+const sleep = require('sleep-promise');
 
 const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
@@ -73,12 +74,12 @@ module.exports = app => {
   /**
    * Try to report the bundle size of a pull request to the GitHub check.
    *
-   * @param {number} retriesLeft number of times to retry the report.
    * @param {!Object} check GitHub Check object.
    * @param {number} bundleSize the total bundle size in KB.
+   * @param {boolean} lastAttempt true if this is the last retry.
    * @return {boolean} true if succeeded; false otherwise.
    */
-  async function tryReport(retriesLeft, check, bundleSize) {
+  async function tryReport(check, bundleSize, lastAttempt = false) {
     const github = await app.auth(check.installation_id);
     const updatedCheckOptions = {
       owner: check.owner,
@@ -123,10 +124,7 @@ module.exports = app => {
       app.log('ERROR: Failed to retrieve the bundle size of ' +
               `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
               `point ${partialBaseSha} from GitHub: ${error}`);
-      if (retriesLeft > 0) {
-        app.log(`Will retry ${retriesLeft} more time(s) in ${RETRY_MILLIS} ms`);
-        setTimeout(tryReport, RETRY_MILLIS, retriesLeft - 1, check, bundleSize);
-      } else {
+      if (lastAttempt) {
         app.log('No more retries left. Reporting failure');
         Object.assign(updatedCheckOptions, {
           conclusion: 'action_required',
@@ -253,10 +251,19 @@ module.exports = app => {
       return response.status(404).end(`${headSha} not in database`);
     }
 
-    if (await tryReport(RETRY_TIMES, check, bundleSize)) {
+    let reportSuccess = await tryReport(check, bundleSize);
+    if (reportSuccess) {
       response.end();
     } else {
       response.status(202).end();
+      let retriesLeft = RETRY_TIMES - 1;
+      do {
+        app.log(`Will retry ${retriesLeft} more time(s) in ${RETRY_MILLIS} ms`);
+        await sleep(RETRY_MILLIS);
+        retriesLeft--;
+        reportSuccess = await tryReport(
+            check, bundleSize, /* lastAttempt */ retriesLeft == 0);
+      } while (retriesLeft > 0 && !reportSuccess);
     }
   });
 };
