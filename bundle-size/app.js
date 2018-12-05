@@ -42,8 +42,7 @@ async function getBuildArtifactsFile(github, filename) {
 /**
  * Format the bundle size delta in "Δ 99.99KB" format.
  *
- * Always fixed with 2 digits after the dot. Adds a minus (-) sign for negative
- * numbers, but no plus (+) sign for positive.
+ * Always fixed with 2 digits after the dot, preceded with a plus or minus sign.
  *
  * @param {number} delta the bundle size delta.
  * @return {string} formatted bundle size delta.
