@@ -170,7 +170,7 @@ module.exports = app => {
   app.on('pull_request_review.submitted', async context => {
     const approver = context.payload.review.user.login;
     const owners = (await getBuildArtifactsFile(context.github, 'OWNERS'))
-        .trim().split('\n').filter(line => !line.startsWith('#'));
+        .trim().split('\n').filter(line => !line.startsWith('#') && !!line);
 
     if (context.payload.review.state == 'approved' &&
         owners.includes(approver)) {
