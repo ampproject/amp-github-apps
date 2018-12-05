@@ -14,7 +14,7 @@
  */
 'use strict';
 
-const {dbConnect} = require('./db');
+const db = require('./db').dbConnect();
 const path = require('path');
 
 const RETRY_MILLIS = 60000;
@@ -52,8 +52,6 @@ function formatBundleSizeDelta(delta) {
 }
 
 module.exports = app => {
-  const db = dbConnect();
-
   /**
    * Get the GitHub Check object from the database.
    *
