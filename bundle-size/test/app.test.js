@@ -63,7 +63,7 @@ describe('bundle-size', async () => {
     await db.destroy();
   });
 
-  test('new pull request opened', async () => {
+  test('create a new pending check when a pull request is opened', async () => {
     const payload = require('./fixtures/pull_request.opened');
 
     nock('https://api.github.com')
@@ -96,7 +96,7 @@ describe('bundle-size', async () => {
     ]);
   });
 
-  test('approved review submitted by an OWNERS person', async () => {
+  test('mark a check as successful when an OWNERS approves PR', async () => {
     const payload = require('./fixtures/pull_request_review.submitted');
 
     await db('checks').insert({
@@ -126,21 +126,21 @@ describe('bundle-size', async () => {
     await probot.receive({name: 'pull_request_review', payload});
   });
 
-  test('approved review submitted by a non-OWNERS person', async () => {
+  test('ignore an approved review by a non-OWNERS person', async () => {
     const payload = require('./fixtures/pull_request_review.submitted');
     payload.review.user.login = 'rsimha';
 
     await probot.receive({name: 'pull_request_review', payload});
   });
 
-  test('changes requested review submitted', async () => {
+  test('ignore a "changes requested" review', async () => {
     const payload = require('./fixtures/pull_request_review.submitted');
     payload.state = 'changes_requested';
 
     await probot.receive({name: 'pull_request_review', payload});
   });
 
-  test('approved review submitted by OWNERS for small delta', async () => {
+  test('ignore an approved review by an OWNERS for small delta', async () => {
     const payload = require('./fixtures/pull_request_review.submitted');
 
     await db('checks').insert({
@@ -157,13 +157,13 @@ describe('bundle-size', async () => {
     await probot.receive({name: 'pull_request_review', payload});
   });
 
-  test('approved review submitted by OWNERS for missing check', async () => {
+  test('ignore an approved review by an OWNERS for unknown PRs', async () => {
     const payload = require('./fixtures/pull_request_review.submitted');
 
     await probot.receive({name: 'pull_request_review', payload});
   });
 
-  test('mark the check to skipped', async () => {
+  test('mark a check "skipped"', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
       base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
@@ -193,7 +193,7 @@ describe('bundle-size', async () => {
         .expect(200);
   });
 
-  test('mark the check to skipped for a nonexistent head SHA', async () => {
+  test('ignore marking a check "skipped" for a missing head SHA', async () => {
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
         .expect(404);
@@ -204,7 +204,7 @@ describe('bundle-size', async () => {
     ['12.34KB', 'success', 'Δ +0.00KB | no approval necessary'],
     ['12.24KB', 'success', 'Δ +0.10KB | no approval necessary'],
     ['12.23KB', 'action_required', 'Δ +0.11KB | approval required'],
-  ])('report bundle-size with base size of %s',
+  ])('update a check on bundle-size report (report/base = 12.34KB/%s)',
       async (baseSize, conclusion, message) => {
         await db('checks').insert({
           head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
@@ -250,7 +250,7 @@ describe('bundle-size', async () => {
   test.each([
     ['12.34KB', 'success', 'Δ +0.00KB | no approval necessary'],
     ['12.23KB', 'action_required', 'Δ +0.11KB | approval required'],
-  ])('report bundle-size for delayed base size of %s',
+  ])('update check on bundle-size report (report/_delayed_-base = 12.34KB/%s)',
       async (baseSize, conclusion, message) => {
         await db('checks').insert({
           head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
@@ -299,7 +299,7 @@ describe('bundle-size', async () => {
         nocks.done();
       });
 
-  test('report bundle-size for a base size that never comes', async () => {
+  test('update check on bundle-size report on missing base size', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
       base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
@@ -340,7 +340,7 @@ describe('bundle-size', async () => {
     nocks.done();
   });
 
-  test('report bundle-size for a nonexistent head SHA', async () => {
+  test('ignore bundle-size report for a missing head SHA', async () => {
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send({bundleSize: 12.34})
@@ -353,7 +353,7 @@ describe('bundle-size', async () => {
     {},
     {aFieldThatIsNotBundleSize: 12.34},
     {bundleSize: '12.34'},
-  ])('report bundle-size with incorrect input: %p', async data => {
+  ])('ignore bundle-size report with incorrect input: %p', async data => {
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(data)
