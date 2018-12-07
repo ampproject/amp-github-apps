@@ -180,8 +180,8 @@ describe('bundle-size', async () => {
           expect(body).toMatchObject({
             conclusion: 'neutral',
             output: {
-              title: 'bundle size check skipped for this PR',
-              summary: 'bundle size check skipped for this PR',
+              title: 'check skipped because PR contains no runtime changes',
+              summary: 'check skipped because PR contains no runtime changes',
             },
           });
           return true;
