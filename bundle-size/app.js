@@ -232,8 +232,8 @@ module.exports = app => {
       conclusion: 'neutral',
       completed_at: new Date().toISOString(),
       output: {
-        title: 'bundle size check skipped for this PR',
-        summary: 'bundle size check skipped for this PR',
+        title: 'check skipped because PR contains no runtime changes',
+        summary: 'check skipped because PR contains no runtime changes',
       },
     });
     response.end();
