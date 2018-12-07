@@ -14,12 +14,14 @@
  */
 'use strict';
 
-const db = require('./db').dbConnect();
+const {dbConnect} = require('./db');
 const path = require('path');
 const sleep = require('sleep-promise');
 
 const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
+
+const db = dbConnect();
 
 /**
  * Get a file from the bundle-size directory in the AMPHTML build artifacts
