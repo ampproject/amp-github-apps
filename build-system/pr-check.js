@@ -36,6 +36,8 @@ function timedExecOrDie(cmd) {
  */
 function main() {
   timedExecOrDie('eslint .');
+  timedExecOrDie('cd bundle-size && npm ci');
+  timedExecOrDie('cd bundle-size && npm test -u');
   return 0;
 }
 

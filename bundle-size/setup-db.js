@@ -14,29 +14,43 @@
  */
 'use strict';
 
+const {dbConnect} = require('./db');
 const log = require('fancy-log');
+
+/**
+ * Setup up the database schema.
+ *
+ * @param {knex} db database handler.
+ * @return {Promise<knex>} database handler.
+ */
+function setupDb(db) {
+  return db.schema.createTable('checks', table => {
+    table.string('head_sha', 40).primary();
+    table.string('base_sha', 40);
+    table.string('owner');
+    table.string('repo');
+    table.integer('pull_request_id');
+    table.integer('installation_id');
+    table.integer('check_run_id');
+    table.decimal('delta', 6, 2);
+  });
+}
+
+module.exports = {setupDb};
 
 /**
  * This file creates the database table that will be used by the GitHub App.
  *
  * Execute this file by running `npm run setup-db`. Make sure you set up the
- * environment variable first. See .env.example for details.
+ * database connection first. See db-config.example.js for details.
  */
-
-const db = require('./db').dbConnect();
-db.schema.createTable('checks', table => {
-  table.string('head_sha', 40).primary();
-  table.string('base_sha', 40);
-  table.string('owner');
-  table.string('repo');
-  table.integer('pull_request_id');
-  table.integer('installation_id');
-  table.integer('check_run_id');
-  table.decimal('delta', 6, 2);
-}).then(() => {
-  log.info('Database table `checks` created.');
-}).catch(error => {
-  log.error(error.message);
-}).then(() => {
-  return db.destroy();
-});
+if (require.main === module) {
+  const db = dbConnect();
+  setupDb(db).then(() => {
+    log.info('Database table `checks` created.');
+  }).catch(error => {
+    log.error(error.message);
+  }).then(() => {
+    db.destroy();
+  });
+}
