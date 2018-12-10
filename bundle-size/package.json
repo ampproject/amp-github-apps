@@ -20,7 +20,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "knex": "0.15.2",
+    "knex": "0.16.2",
     "pg": "7.6.1",
     "probot": "7.4.0",
     "sleep-promise": "8.0.1"
