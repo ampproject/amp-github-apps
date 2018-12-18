@@ -53,7 +53,7 @@ async function getOwners(github) {
   return (await getBuildArtifactsFile(github, 'OWNERS'))
       .trim()
       .split('\n')
-      .filter(line => !line.startsWith('#') && !!line);
+      .filter(line => !!line && !line.startsWith('#'));
 }
 
 /**
