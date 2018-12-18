@@ -228,24 +228,32 @@ module.exports = app => {
   app.on('pull_request_review.submitted', async context => {
     const approver = context.payload.review.user.login;
     const owners = await getOwners(context.github);
+    const pullRequestId = context.payload.pull_request.number;
+    const headSha = context.payload.pull_request.head.sha;
 
     if (context.payload.review.state == 'approved' &&
         owners.includes(approver)) {
-      context.log(`Pull request ${context.payload.pull_request.number} ` +
-          'approved by a bundle-size keeper');
+      context.log(`Pull request ${pullRequestId} approved by a bundle-size ` +
+          'keeper');
 
-      const check = await getCheckFromDatabase(
-          context.payload.pull_request.head.sha);
-      if (!check || check.delta === null) {
+      const check = await getCheckFromDatabase(headSha);
+      if (!check) {
+        context.log(`Check ID for pull request ${pullRequestId} with head ` +
+            `SHA ${headSha} was not found in the database`);
         return;
       }
 
-      const bundleSizeDelta = parseFloat(check.delta);
-      if (bundleSizeDelta <= process.env['MAX_ALLOWED_INCREASE']) {
-        return;
+      let approvalMessagePrefix;
+      if (check.delta === null) {
+        approvalMessagePrefix = 'Δ ±?.??KB';
+      } else {
+        const bundleSizeDelta = parseFloat(check.delta);
+        if (bundleSizeDelta <= process.env['MAX_ALLOWED_INCREASE']) {
+          return;
+        }
+        approvalMessagePrefix = formatBundleSizeDelta(bundleSizeDelta);
       }
 
-      const bundleSizeDeltaFormatted = formatBundleSizeDelta(bundleSizeDelta);
       await context.github.checks.update({
         owner: check.owner,
         repo: check.repo,
@@ -253,8 +261,8 @@ module.exports = app => {
         conclusion: 'success',
         completed_at: new Date().toISOString(),
         output: {
-          title: `${bundleSizeDeltaFormatted} | approved by @${approver}`,
-          summary: `${bundleSizeDeltaFormatted} | approved by @${approver}`,
+          title: `${approvalMessagePrefix} | approved by @${approver}`,
+          summary: `${approvalMessagePrefix} | approved by @${approver}`,
         },
       });
     }

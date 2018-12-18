@@ -127,6 +127,37 @@ describe('bundle-size', async () => {
     await probot.receive({name: 'pull_request_review', payload});
   });
 
+  test('mark a check as successful when an OWNERS approves PR with missing ' +
+      'size delta', async () => {
+    const payload = require('./fixtures/pull_request_review.submitted');
+
+    await db('checks').insert({
+      head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+      owner: 'ampproject',
+      repo: 'amphtml',
+      pull_request_id: 19603,
+      installation_id: 123456,
+      check_run_id: 555555,
+      delta: null,
+    });
+
+    nock('https://api.github.com')
+        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+          expect(body).toMatchObject({
+            conclusion: 'success',
+            output: {
+              title: 'Δ ±?.??KB | approved by @aghassemi',
+              summary: 'Δ ±?.??KB | approved by @aghassemi',
+            },
+          });
+          return true;
+        })
+        .reply(200);
+
+    await probot.receive({name: 'pull_request_review', payload});
+  });
+
   test('ignore an approved review by a non-OWNERS person', async () => {
     const payload = require('./fixtures/pull_request_review.submitted');
     payload.review.user.login = 'rsimha';
