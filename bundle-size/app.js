@@ -43,6 +43,20 @@ async function getBuildArtifactsFile(github, filename) {
 }
 
 /**
+ * Get the list of OWNERS that can approve this PR.
+ *
+ * @param {github} github an authorized GitHub API object.
+ * @throws {Error} on any error.
+ * @return {!Array<string>} an array of OWNERS GitHub usernames.
+ */
+async function getOwners(github) {
+  return (await getBuildArtifactsFile(github, 'OWNERS'))
+      .trim()
+      .split('\n')
+      .filter(line => !!line && !line.startsWith('#'));
+}
+
+/**
  * Format the bundle size delta in "Δ 99.99KB" format.
  *
  * Always fixed with 2 digits after the dot, preceded with a plus or minus sign.
@@ -83,13 +97,15 @@ module.exports = app => {
    */
   async function tryReport(check, bundleSize, lastAttempt = false) {
     const github = await app.auth(check.installation_id);
-    const updatedCheckOptions = {
+    const githubOptions = {
       owner: check.owner,
       repo: check.repo,
+    };
+    const updatedCheckOptions = Object.assign({
       check_run_id: check.check_run_id,
       name: 'ampproject/bundle-size',
       completed_at: new Date().toISOString(),
-    };
+    }, githubOptions);
 
     try {
       const baseBundleSize = parseFloat(
@@ -101,7 +117,9 @@ module.exports = app => {
           .update({delta: bundleSizeDelta})
           .where({head_sha: check.head_sha});
 
-      if (bundleSizeDelta > process.env['MAX_ALLOWED_INCREASE']) {
+      const requiresApproval =
+          bundleSizeDelta > process.env['MAX_ALLOWED_INCREASE'];
+      if (requiresApproval) {
         Object.assign(updatedCheckOptions, {
           conclusion: 'action_required',
           output: {
@@ -119,6 +137,12 @@ module.exports = app => {
         });
       }
       await github.checks.update(updatedCheckOptions);
+
+      if (requiresApproval) {
+        await addOwnersReviewer(github,
+            Object.assign({number: check.pull_request_id}, githubOptions));
+      }
+
       return true;
     } catch (error) {
       const partialHeadSha = check.head_sha.substr(0, 7);
@@ -140,6 +164,40 @@ module.exports = app => {
         await github.checks.update(updatedCheckOptions);
       }
       return false;
+    }
+  }
+
+  /**
+   * Add an OWNERS reviewer to the pull request.
+   *
+   * Ignore errors as this is a non-critical action.
+   *
+   * @param {github} github an authenticated GitHub API object.
+   * @param {!Object} pullRequest GitHub Pull Request object.
+   */
+  async function addOwnersReviewer(github, pullRequest) {
+    try {
+      const owners = await getOwners(github);
+      const reviewersResponse = await github.pullRequests.listReviewRequests(
+          pullRequest);
+      const reviewers = new Set(
+          reviewersResponse.data.users.map(user => user.login));
+      if (owners.some(owner => reviewers.has(owner))) {
+        app.log(`INFO: Pull request ${pullRequest.number} already has an ` +
+                'OWNERS reviewer. Skipping...');
+        return;
+      }
+
+      // Choose a random OWNERS user and add them as a reviewer to the pull
+      // request.
+      const newReviewer = owners[Math.floor(Math.random() * owners.length)];
+      return await github.pullRequests.createReviewRequest(Object.assign({
+        reviewers: [newReviewer],
+      }, pullRequest));
+    } catch (error) {
+      app.log('ERROR: Failed to add a reviewer to pull request ' +
+              `${pullRequest.number}. Skipping...`);
+      app.log(`Error message: ${error}`);
     }
   }
 
@@ -169,8 +227,7 @@ module.exports = app => {
 
   app.on('pull_request_review.submitted', async context => {
     const approver = context.payload.review.user.login;
-    const owners = (await getBuildArtifactsFile(context.github, 'OWNERS'))
-        .trim().split('\n').filter(line => !line.startsWith('#') && !!line);
+    const owners = await getOwners(context.github);
 
     if (context.payload.review.state == 'approved' &&
         owners.includes(approver)) {
