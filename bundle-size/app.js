@@ -162,6 +162,8 @@ module.exports = app => {
           },
         });
         await github.checks.update(updatedCheckOptions);
+        await addOwnersReviewer(github,
+            Object.assign({number: check.pull_request_id}, githubOptions));
       }
       return false;
     }

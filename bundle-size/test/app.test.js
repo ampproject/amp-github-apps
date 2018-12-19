@@ -543,6 +543,18 @@ describe('bundle-size', async () => {
           });
           return true;
         })
+        .reply(200)
+        .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
+        .reply(200, getFixture('requested_reviewers'))
+        .post('/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
+            body => {
+              expect(body).toMatchObject({
+                reviewers: [
+                  expect.stringMatching(/aghassemi|choumx|danielrozenberg/),
+                ],
+              });
+              return true;
+            })
         .reply(200);
 
     await request(probot.server)
