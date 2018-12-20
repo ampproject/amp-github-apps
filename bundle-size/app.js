@@ -130,8 +130,8 @@ module.exports = app => {
               'reduce the bundle size, this change requires special approval.' +
               '\n' +
               'A member of the bundle-size group will be added automatically ' +
-              'review this PR. Only once this member approves this PR, can ' +
-              'it be merged. If you do not receive a response from this ' +
+              'to review this PR. Only once the member approves this PR, ' +
+              'can it be merged. If you do not receive a response from the ' +
               'group member, feel free to tag another person listed in the ' +
               'bundle-size [OWNERS](https://github.com/ampproject/' +
               'amphtml-build-artifacts/blob/master/bundle-size/OWNERS) file.',
@@ -178,8 +178,8 @@ module.exports = app => {
               'repository. This can happen due to failed or delayed Travis ' +
               'builds on said `master` commit.\n' +
               'A member of the bundle-size group will be added automatically ' +
-              'review this PR. Only once this member approves this PR, can ' +
-              'it be merged. If you do not receive a response from this ' +
+              'to review this PR. Only once the member approves this PR, ' +
+              'can it be merged. If you do not receive a response from the ' +
               'group member, feel free to tag another person listed in the ' +
               'bundle-size [OWNERS](https://github.com/ampproject/' +
               'amphtml-build-artifacts/blob/master/bundle-size/OWNERS) file.',
@@ -237,7 +237,7 @@ module.exports = app => {
         title: 'Calculating new bundle size for this PR…',
         summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
           'of this pull request is being calculated on the ' +
-          '`INTEGRATION_TESTS` shard of the Travis build.',
+          '`integration_tests` shard of the Travis build.',
       },
     });
     const check = await context.github.checks.create(params);
@@ -291,7 +291,7 @@ module.exports = app => {
         output: {
           title: `${approvalMessagePrefix} | approved by @${approver}`,
           summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
-            `of this pull request was specially approved by ${approver}`,
+            `of this pull request was approved by ${approver}`,
         },
       });
     }
