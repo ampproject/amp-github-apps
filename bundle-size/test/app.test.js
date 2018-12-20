@@ -104,7 +104,6 @@ describe('bundle-size', async () => {
             head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
             name: 'ampproject/bundle-size',
             output: {
-              summary: 'Calculating new bundle size for this PR…',
               title: 'Calculating new bundle size for this PR…',
             },
           });
@@ -149,7 +148,6 @@ describe('bundle-size', async () => {
             conclusion: 'success',
             output: {
               title: 'Δ +0.20KB | approved by @aghassemi',
-              summary: 'Δ +0.20KB | approved by @aghassemi',
             },
           });
           return true;
@@ -181,7 +179,6 @@ describe('bundle-size', async () => {
             conclusion: 'success',
             output: {
               title: 'Δ ±?.??KB | approved by @aghassemi',
-              summary: 'Δ ±?.??KB | approved by @aghassemi',
             },
           });
           return true;
@@ -247,7 +244,6 @@ describe('bundle-size', async () => {
             conclusion: 'neutral',
             output: {
               title: 'check skipped because PR contains no runtime changes',
-              summary: 'check skipped because PR contains no runtime changes',
             },
           });
           return true;
@@ -296,7 +292,6 @@ describe('bundle-size', async () => {
                 conclusion: 'success',
                 output: {
                   title: message,
-                  summary: message,
                 },
               });
               return true;
@@ -338,7 +333,6 @@ describe('bundle-size', async () => {
             conclusion: 'action_required',
             output: {
               title: 'Δ +0.34KB | approval required',
-              summary: 'Δ +0.34KB | approval required',
             },
           });
           return true;
@@ -394,7 +388,6 @@ describe('bundle-size', async () => {
             conclusion: 'action_required',
             output: {
               title: 'Δ +0.34KB | approval required',
-              summary: 'Δ +0.34KB | approval required',
             },
           });
           return true;
@@ -442,7 +435,6 @@ describe('bundle-size', async () => {
             conclusion: 'success',
             output: {
               title: 'Δ +0.00KB | no approval necessary',
-              summary: 'Δ +0.00KB | no approval necessary',
             },
           });
           return true;
@@ -488,7 +480,6 @@ describe('bundle-size', async () => {
             conclusion: 'action_required',
             output: {
               title: 'Δ +0.11KB | approval required',
-              summary: 'Δ +0.11KB | approval required',
             },
           });
           return true;

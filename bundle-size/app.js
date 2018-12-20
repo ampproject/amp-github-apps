@@ -124,7 +124,17 @@ module.exports = app => {
           conclusion: 'action_required',
           output: {
             title: `${bundleSizeDeltaFormatted} | approval required`,
-            summary: `${bundleSizeDeltaFormatted} | approval required`,
+            summary: 'This pull request has increased the bundle size ' +
+              '(gzipped compressed size of `v0.js`) by ' +
+              `${bundleSizeDeltaFormatted}. As part of an ongoing effort to ` +
+              'reduce the bundle size, this change requires special approval.' +
+              '\n' +
+              'A member of the bundle-size group will be added automatically ' +
+              'to review this PR. Only once the member approves this PR, ' +
+              'can it be merged. If you do not receive a response from the ' +
+              'group member, feel free to tag another person listed in the ' +
+              'bundle-size [OWNERS](https://github.com/ampproject/' +
+              'amphtml-build-artifacts/blob/master/bundle-size/OWNERS) file.',
           },
         });
       } else {
@@ -132,7 +142,10 @@ module.exports = app => {
           conclusion: 'success',
           output: {
             title: `${bundleSizeDeltaFormatted} | no approval necessary`,
-            summary: `${bundleSizeDeltaFormatted} | no approval necessary`,
+            summary: 'This pull request does not increase the bundle size ' +
+              '(gzipped compressed size of `v0.js`) by any significant ' +
+              'amount, so no special approval is necessary. The bundle size ' +
+              `change is ${bundleSizeDeltaFormatted}`,
           },
         });
       }
@@ -157,8 +170,19 @@ module.exports = app => {
           output: {
             title: 'Failed to retrieve the bundle size of branch point ' +
                 partialBaseSha,
-            summary: 'bundle size check skipped for this PR. A member of the ' +
-                'bundle-size squad must approve this PR manually.',
+            summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
+              'of this pull request could not be determined because the base ' +
+              'size (that is, the bundle size of the `master` commit that ' +
+              'this pull request was compared against) was not found in the ' +
+              '`https://github.com/ampproject/amphtml-build-artifacts` ' +
+              'repository. This can happen due to failed or delayed Travis ' +
+              'builds on said `master` commit.\n' +
+              'A member of the bundle-size group will be added automatically ' +
+              'to review this PR. Only once the member approves this PR, ' +
+              'can it be merged. If you do not receive a response from the ' +
+              'group member, feel free to tag another person listed in the ' +
+              'bundle-size [OWNERS](https://github.com/ampproject/' +
+              'amphtml-build-artifacts/blob/master/bundle-size/OWNERS) file.',
           },
         });
         await github.checks.update(updatedCheckOptions);
@@ -211,7 +235,9 @@ module.exports = app => {
       head_sha: context.payload.pull_request.head.sha,
       output: {
         title: 'Calculating new bundle size for this PR…',
-        summary: 'Calculating new bundle size for this PR…',
+        summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
+          'of this pull request is being calculated on the ' +
+          '`integration_tests` shard of the Travis build.',
       },
     });
     const check = await context.github.checks.create(params);
@@ -264,7 +290,8 @@ module.exports = app => {
         completed_at: new Date().toISOString(),
         output: {
           title: `${approvalMessagePrefix} | approved by @${approver}`,
-          summary: `${approvalMessagePrefix} | approved by @${approver}`,
+          summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
+            `of this pull request was approved by ${approver}`,
         },
       });
     }
@@ -300,7 +327,10 @@ module.exports = app => {
       completed_at: new Date().toISOString(),
       output: {
         title: 'check skipped because PR contains no runtime changes',
-        summary: 'check skipped because PR contains no runtime changes',
+        summary: 'An automated check has determined that the bundle size ' +
+          '(gzipped compressed size of `v0.js`) could not be affected by ' +
+          'the files that this pull request modifies, so this check was ' +
+          'marked as skipped.',
       },
     });
     response.end();
