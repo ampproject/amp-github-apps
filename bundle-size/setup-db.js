@@ -26,7 +26,6 @@ const log = require('fancy-log');
 function setupDb(db) {
   return db.schema.createTable('checks', table => {
     table.string('head_sha', 40).primary();
-    table.string('base_sha', 40);
     table.string('owner');
     table.string('repo');
     table.integer('pull_request_id');
