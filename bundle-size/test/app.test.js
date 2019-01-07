@@ -117,7 +117,6 @@ describe('bundle-size', async () => {
     expect(await db('checks').select('*')).toMatchObject([
       {
         head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
-        base_sha: '263a7fa1188b65d850e6742a63c38a216091d8b2',
         owner: 'ampproject',
         repo: 'amphtml',
         pull_request_id: 19621,
@@ -133,7 +132,6 @@ describe('bundle-size', async () => {
 
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
       owner: 'ampproject',
       repo: 'amphtml',
       pull_request_id: 19603,
@@ -164,7 +162,6 @@ describe('bundle-size', async () => {
 
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
       owner: 'ampproject',
       repo: 'amphtml',
       pull_request_id: 19603,
@@ -208,7 +205,6 @@ describe('bundle-size', async () => {
 
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
       owner: 'ampproject',
       repo: 'amphtml',
       pull_request_id: 19603,
@@ -229,7 +225,6 @@ describe('bundle-size', async () => {
   test('mark a check "skipped"', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
       owner: 'ampproject',
       repo: 'amphtml',
       pull_request_id: 19603,
@@ -270,7 +265,6 @@ describe('bundle-size', async () => {
       async (baseSize, message) => {
         await db('checks').insert({
           head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-          base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           owner: 'ampproject',
           repo: 'amphtml',
           pull_request_id: 19603,
@@ -300,7 +294,10 @@ describe('bundle-size', async () => {
 
         await request(probot.server)
             .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
-            .send({bundleSize: 12.34})
+            .send({
+              baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+              bundleSize: 12.34,
+            })
             .set('Content-Type', 'application/json')
             .set('Accept', 'application/json')
             .expect(200);
@@ -311,7 +308,6 @@ describe('bundle-size', async () => {
        '(report/base = 12.34KB/12.00KB)', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
       owner: 'ampproject',
       repo: 'amphtml',
       pull_request_id: 19603,
@@ -353,7 +349,10 @@ describe('bundle-size', async () => {
 
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
-        .send({bundleSize: 12.34})
+        .send({
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSize: 12.34,
+        })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
@@ -364,7 +363,6 @@ describe('bundle-size', async () => {
        '(report/base = 12.34KB/12.00KB)', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
       owner: 'ampproject',
       repo: 'amphtml',
       pull_request_id: 19603,
@@ -398,7 +396,10 @@ describe('bundle-size', async () => {
 
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
-        .send({bundleSize: 12.34})
+        .send({
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSize: 12.34,
+        })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
@@ -409,7 +410,6 @@ describe('bundle-size', async () => {
        '12.34KB/12.34KB)', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
       owner: 'ampproject',
       repo: 'amphtml',
       pull_request_id: 19603,
@@ -443,7 +443,10 @@ describe('bundle-size', async () => {
 
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
-        .send({bundleSize: 12.34})
+        .send({
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSize: 12.34,
+        })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(202);
@@ -454,7 +457,6 @@ describe('bundle-size', async () => {
        '12.34KB/12.23KB)', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
       owner: 'ampproject',
       repo: 'amphtml',
       pull_request_id: 19603,
@@ -500,7 +502,10 @@ describe('bundle-size', async () => {
 
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
-        .send({bundleSize: 12.34})
+        .send({
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSize: 12.34,
+        })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(202);
@@ -510,7 +515,6 @@ describe('bundle-size', async () => {
   test('update check on bundle-size report on missing base size', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      base_sha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
       owner: 'ampproject',
       repo: 'amphtml',
       pull_request_id: 19603,
@@ -550,7 +554,10 @@ describe('bundle-size', async () => {
 
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
-        .send({bundleSize: 12.34})
+        .send({
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSize: 12.34,
+        })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(202);
@@ -560,7 +567,10 @@ describe('bundle-size', async () => {
   test('ignore bundle-size report for a missing head SHA', async () => {
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
-        .send({bundleSize: 12.34})
+        .send({
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSize: 12.34,
+        })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(404);
@@ -569,7 +579,10 @@ describe('bundle-size', async () => {
   test.each([
     {},
     {aFieldThatIsNotBundleSize: 12.34},
-    {bundleSize: '12.34'},
+    {baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33', bundleSize: '12.34'},
+    {baseSha: '5f27002', bundleSize: 12.34},
+    {baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33'},
+    {bundleSize: 12.34},
   ])('ignore bundle-size report with incorrect input: %p', async data => {
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')

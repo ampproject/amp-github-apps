@@ -77,8 +77,8 @@ module.exports = app => {
    */
   async function getCheckFromDatabase(headSha) {
     const results = await db('checks')
-        .select('head_sha', 'base_sha', 'pull_request_id', 'installation_id',
-            'owner', 'repo', 'check_run_id', 'delta')
+        .select('head_sha', 'pull_request_id', 'installation_id', 'owner',
+            'repo', 'check_run_id', 'delta')
         .where('head_sha', headSha);
     if (results.length > 0) {
       return results[0];
@@ -91,11 +91,12 @@ module.exports = app => {
    * Try to report the bundle size of a pull request to the GitHub check.
    *
    * @param {!Object} check GitHub Check object.
+   * @param {string} baseSha commit SHA of the base commit being compared to.
    * @param {number} bundleSize the total bundle size in KB.
    * @param {boolean} lastAttempt true if this is the last retry.
    * @return {boolean} true if succeeded; false otherwise.
    */
-  async function tryReport(check, bundleSize, lastAttempt = false) {
+  async function tryReport(check, baseSha, bundleSize, lastAttempt = false) {
     const github = await app.auth(check.installation_id);
     const githubOptions = {
       owner: check.owner,
@@ -109,7 +110,7 @@ module.exports = app => {
 
     try {
       const baseBundleSize = parseFloat(
-          await getBuildArtifactsFile(github, check.base_sha));
+          await getBuildArtifactsFile(github, baseSha));
       const bundleSizeDelta = bundleSize - baseBundleSize;
       const bundleSizeDeltaFormatted = formatBundleSizeDelta(bundleSizeDelta);
 
@@ -159,7 +160,7 @@ module.exports = app => {
       return true;
     } catch (error) {
       const partialHeadSha = check.head_sha.substr(0, 7);
-      const partialBaseSha = check.base_sha.substr(0, 7);
+      const partialBaseSha = baseSha.substr(0, 7);
       app.log('ERROR: Failed to retrieve the bundle size of ' +
               `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
               `point ${partialBaseSha} from GitHub: ${error}`);
@@ -244,7 +245,6 @@ module.exports = app => {
     await db('checks')
         .insert({
           head_sha: context.payload.pull_request.head.sha,
-          base_sha: context.payload.pull_request.base.sha,
           pull_request_id: context.payload.number,
           installation_id: context.payload.installation.id,
           owner: params.owner,
@@ -337,20 +337,26 @@ module.exports = app => {
   });
 
   v0.post('/commit/:headSha/report', async (request, response) => {
+    if (!('baseSha' in request.body) ||
+        typeof request.body.baseSha != 'string' ||
+        !/^[0-9a-f]{40}$/.test(request.body.baseSha)) {
+      return response.status(400).end(
+          'POST request to /report must have commit SHA field "baseSha"');
+    }
     if (!('bundleSize' in request.body) ||
         typeof request.body.bundleSize != 'number') {
       return response.status(400).end(
           'POST request to /report must have numeric field "bundleSize"');
     }
     const {headSha} = request.params;
-    const {bundleSize} = request.body;
+    const {baseSha, bundleSize} = request.body;
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
       return response.status(404).end(`${headSha} not in database`);
     }
 
-    let reportSuccess = await tryReport(check, bundleSize);
+    let reportSuccess = await tryReport(check, baseSha, bundleSize);
     if (reportSuccess) {
       response.end();
     } else {
@@ -361,7 +367,7 @@ module.exports = app => {
         await sleep(RETRY_MILLIS);
         retriesLeft--;
         reportSuccess = await tryReport(
-            check, bundleSize, /* lastAttempt */ retriesLeft == 0);
+            check, baseSha, bundleSize, /* lastAttempt */ retriesLeft == 0);
       } while (retriesLeft > 0 && !reportSuccess);
     }
   });
