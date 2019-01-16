@@ -33,7 +33,7 @@
     "nodemon": "1.18.9",
     "smee-client": "1.0.2",
     "sqlite3": "4.0.6",
-    "supertest": "3.3.0"
+    "supertest": "3.4.1"
   },
   "jest": {
     "testEnvironment": "node"
