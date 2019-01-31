@@ -127,6 +127,48 @@ describe('bundle-size', async () => {
     ]);
   });
 
+  test('update a pending check when a pull request is synced', async () => {
+    await db('checks').insert({
+      head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
+      owner: 'ampproject',
+      repo: 'amphtml',
+      pull_request_id: 19621,
+      installation_id: 123456,
+      check_run_id: 444444,
+      delta: null,
+    });
+
+    const payload = getFixture('pull_request.opened');
+
+    const nocks = nock('https://api.github.com')
+        .post('/repos/ampproject/amphtml/check-runs', body => {
+          expect(body).toMatchObject({
+            head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
+            name: 'ampproject/bundle-size',
+            output: {
+              title: 'Calculating new bundle size for this PR…',
+            },
+          });
+          return true;
+        })
+        .reply(200, {id: 555555});
+
+    await probot.receive({name: 'pull_request', payload});
+    await waitUntilNockScopeIsDone(nocks);
+
+    expect(await db('checks').select('*')).toMatchObject([
+      {
+        head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19621,
+        installation_id: 123456,
+        check_run_id: 555555,
+        delta: null,
+      },
+    ]);
+  });
+
   test('mark a check as successful when an OWNERS approves PR', async () => {
     const payload = getFixture('pull_request_review.submitted');
 

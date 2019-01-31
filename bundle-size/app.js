@@ -231,9 +231,10 @@ module.exports = app => {
   app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
     context.log(`Pull request ${context.payload.number} created/updated`);
 
+    const headSha = context.payload.pull_request.head.sha;
     const params = context.repo({
       name: 'ampproject/bundle-size',
-      head_sha: context.payload.pull_request.head.sha,
+      head_sha: headSha,
       output: {
         title: 'Calculating new bundle size for this PR…',
         summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
@@ -242,15 +243,29 @@ module.exports = app => {
       },
     });
     const check = await context.github.checks.create(params);
-    await db('checks')
-        .insert({
-          head_sha: context.payload.pull_request.head.sha,
-          pull_request_id: context.payload.number,
-          installation_id: context.payload.installation.id,
-          owner: params.owner,
-          repo: params.repo,
-          check_run_id: check.data.id,
-        });
+
+    const checkRunId = check.data.id;
+    await db.transaction(trx => {
+      return trx('checks')
+          .first('head_sha')
+          .where('head_sha', headSha)
+          .then(existingRow => {
+            if (existingRow === undefined) {
+              return trx('checks').insert({
+                head_sha: headSha,
+                pull_request_id: context.payload.number,
+                installation_id: context.payload.installation.id,
+                owner: params.owner,
+                repo: params.repo,
+                check_run_id: checkRunId,
+              });
+            } else {
+              return trx('checks')
+                  .update({check_run_id: checkRunId})
+                  .where({head_sha: headSha});
+            }
+          }).then(trx.commit).catch(trx.rollback);
+    });
   });
 
   app.on('pull_request_review.submitted', async context => {
