@@ -28,7 +28,7 @@
   "devDependencies": {
     "deepcopy": "1.0.1",
     "fancy-log": "1.3.3",
-    "jest": "24.0.0",
+    "jest": "24.1.0",
     "nock": "10.0.6",
     "nodemon": "1.18.9",
     "smee-client": "1.0.2",
