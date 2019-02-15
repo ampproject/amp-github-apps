@@ -239,7 +239,7 @@ module.exports = app => {
         title: 'Calculating new bundle size for this PR…',
         summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
           'of this pull request is being calculated on Travis. Look for the ' +
-          'shard that contains "Bundle Size" its title.',
+          'shard that contains "Bundle Size" in its title.',
       },
     });
     const check = await context.github.checks.create(params);
