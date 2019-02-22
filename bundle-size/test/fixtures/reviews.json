@@ -1,0 +1,41 @@
+[
+  {
+    "id": 181373596,
+    "node_id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MTgxMzczNTk2",
+    "user": {
+      "login": "erwinmombay",
+      "id": 2099009,
+      "node_id": "MDQ6VXNlcjIwOTkwMDk=",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/2099009?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/erwinmombay",
+      "html_url": "https://github.com/erwinmombay",
+      "followers_url": "https://api.github.com/users/erwinmombay/followers",
+      "following_url": "https://api.github.com/users/erwinmombay/following{/other_user}",
+      "gists_url": "https://api.github.com/users/erwinmombay/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/erwinmombay/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/erwinmombay/subscriptions",
+      "organizations_url": "https://api.github.com/users/erwinmombay/orgs",
+      "repos_url": "https://api.github.com/users/erwinmombay/repos",
+      "events_url": "https://api.github.com/users/erwinmombay/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/erwinmombay/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "",
+    "state": "CHANGES_REQUESTED",
+    "html_url": "https://github.com/ampproject/amphtml/pull/19603#pullrequestreview-181373596",
+    "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/19603",
+    "author_association": "MEMBER",
+    "_links": {
+      "html": {
+        "href": "https://github.com/ampproject/amphtml/pull/19603#pullrequestreview-181373596"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/ampproject/amphtml/pulls/19603"
+      }
+    },
+    "submitted_at": "2018-12-04T17:06:43Z",
+    "commit_id": "26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa"
+  }
+]

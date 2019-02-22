@@ -22,7 +22,7 @@ const request = require('supertest');
 const {setupDb} = require('../setup-db');
 
 const nockRetryTimeoutMs = 100;
-const nockMaxTimeoutMs = 5000;
+const nockMaxTimeoutMs = 10000;
 
 nock.disableNetConnect();
 nock.enableNetConnect('127.0.0.1');
@@ -378,6 +378,8 @@ describe('bundle-size', async () => {
         .reply(200)
         .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
         .reply(200, getFixture('requested_reviewers'))
+        .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+        .reply(200, getFixture('reviews'))
         .post('/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
             body => {
               expect(body).toMatchObject({
@@ -401,8 +403,8 @@ describe('bundle-size', async () => {
     await waitUntilNockScopeIsDone(nocks);
   });
 
-  test('update a check on bundle-size report with an OWNERS reviewer ' +
-       '(report/base = 12.34KB/12.00KB)', async () => {
+  test('update a check on bundle-size report with an OWNERS requested ' +
+       'reviewer (report/base = 12.34KB/12.00KB)', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
       owner: 'ampproject',
@@ -434,7 +436,58 @@ describe('bundle-size', async () => {
         })
         .reply(200)
         .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
-        .reply(200, requestedReviewers);
+        .reply(200, requestedReviewers)
+        .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+        .reply(200, getFixture('reviews'));
+
+    await request(probot.server)
+        .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
+        .send({
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSize: 12.34,
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(200);
+    await waitUntilNockScopeIsDone(nocks);
+  });
+
+  test('update a check on bundle-size report with an OWNERS existing ' +
+       'reviewer (report/base = 12.34KB/12.00KB)', async () => {
+    await db('checks').insert({
+      head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+      owner: 'ampproject',
+      repo: 'amphtml',
+      pull_request_id: 19603,
+      installation_id: 123456,
+      check_run_id: 555555,
+      delta: null,
+    });
+
+    const baseBundleSizeFixture = getFixture(
+        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33');
+    baseBundleSizeFixture.content = Buffer.from('12.00KB')
+        .toString('base64');
+    const reviews = getFixture('reviews');
+    reviews[0].user.login = 'choumx';
+    const nocks = nock('https://api.github.com')
+        .get('/repos/ampproject/amphtml-build-artifacts/contents/' +
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33')
+        .reply(200, baseBundleSizeFixture)
+        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+          expect(body).toMatchObject({
+            conclusion: 'action_required',
+            output: {
+              title: 'Δ +0.34KB | approval required',
+            },
+          });
+          return true;
+        })
+        .reply(200)
+        .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
+        .reply(200, getFixture('requested_reviewers'))
+        .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+        .reply(200, reviews);
 
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -531,6 +584,8 @@ describe('bundle-size', async () => {
         .reply(200)
         .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
         .reply(200, getFixture('requested_reviewers'))
+        .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+        .reply(200, getFixture('reviews'))
         .post('/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
             body => {
               expect(body).toMatchObject({
@@ -583,6 +638,8 @@ describe('bundle-size', async () => {
         .reply(200)
         .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
         .reply(200, getFixture('requested_reviewers'))
+        .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+        .reply(200, getFixture('reviews'))
         .post('/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
             body => {
               expect(body).toMatchObject({

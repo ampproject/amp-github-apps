@@ -205,10 +205,14 @@ module.exports = app => {
   async function addOwnersReviewer(github, pullRequest) {
     try {
       const owners = await getOwners(github);
-      const reviewersResponse = await github.pullRequests.listReviewRequests(
-          pullRequest);
-      const reviewers = new Set(
-          reviewersResponse.data.users.map(user => user.login));
+      const requestedReviewersResponse =
+          await github.pullRequests.listReviewRequests(pullRequest);
+      const reviewsResponse =
+          await github.pullRequests.listReviews(pullRequest);
+      const reviewers = new Set([
+        ...requestedReviewersResponse.data.users.map(user => user.login),
+        ...reviewsResponse.data.map(review => review.user.login),
+      ]);
       if (owners.some(owner => reviewers.has(owner))) {
         app.log(`INFO: Pull request ${pullRequest.number} already has an ` +
                 'OWNERS reviewer. Skipping...');
