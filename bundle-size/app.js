@@ -337,7 +337,7 @@ module.exports = app => {
         output: {
           title: 'Check skipped because this is a merged commit',
           summary: 'The bundle-size of merged commits does not affect the ' +
-            'status of these commit. However, since this is a required check ' +
+            'status of this commit. However, since this is a required check ' +
             'on GitHub, a check is still created and must be resolved. You ' +
             'may safely ignore this bundle-size check.\n' +
             'To see the bundle-size at this commit, see ' +
