@@ -691,6 +691,64 @@ describe('bundle-size', async () => {
         .expect(400);
   });
 
+  test('ignore closed (not merged) pull request', async () => {
+    const pullRequestPayload = getFixture('pull_request.opened');
+    pullRequestPayload.action = 'closed';
+
+    await probot.receive({name: 'pull_request', payload: pullRequestPayload});
+    expect(await db('merges').select('*')).toMatchObject([]);
+
+    const checkRunPayload = getFixture('check_run.created');
+
+    await probot.receive({name: 'check_run', payload: checkRunPayload});
+  });
+
+  test('skip the check on a merged pull request', async () => {
+    const pullRequestPayload = getFixture('pull_request.opened');
+    pullRequestPayload.action = 'closed';
+    pullRequestPayload.pull_request.merged_at = '2019-02-25T20:21:58Z';
+    pullRequestPayload.pull_request.merge_commit_sha =
+        '4ba02c691d1a3014f70a7521c07d775dc6a1e355';
+
+    await probot.receive({name: 'pull_request', payload: pullRequestPayload});
+    expect(await db('merges').select('*')).toMatchObject([
+      {merge_commit_sha: '4ba02c691d1a3014f70a7521c07d775dc6a1e355'},
+    ]);
+
+    const checkRunPayload = getFixture('check_run.created');
+
+    const nocks = nock('https://api.github.com')
+        .patch('/repos/ampproject/amphtml/check-runs/68609861', body => {
+          expect(body).toMatchObject({
+            conclusion: 'neutral',
+            output: {
+              title: 'Check skipped because this is a merged commit',
+            },
+          });
+          return true;
+        })
+        .reply(200);
+
+    await probot.receive({name: 'check_run', payload: checkRunPayload});
+    expect(await db('merges').select('*')).toMatchObject([]);
+    await waitUntilNockScopeIsDone(nocks);
+  });
+
+  test('fail when a pull request is reported as merged twice', async () => {
+    const pullRequestPayload = getFixture('pull_request.opened');
+    pullRequestPayload.action = 'closed';
+    pullRequestPayload.pull_request.merged_at = '2019-02-25T20:21:58Z';
+    pullRequestPayload.pull_request.merge_commit_sha =
+        '4ba02c691d1a3014f70a7521c07d775dc6a1e355';
+
+    await probot.receive({name: 'pull_request', payload: pullRequestPayload});
+    try {
+      await probot.receive({name: 'pull_request', payload: pullRequestPayload});
+    } catch (e) {
+      expect(e.message).toContain('UNIQUE constraint failed');
+    }
+  });
+
   test('reject non-Travis IP addresses', async () => {
     process.env['TRAVIS_IP_ADDRESSES'] = '999.999.999.999,123.456.789.012';
     await request(probot.server)

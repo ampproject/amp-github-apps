@@ -32,6 +32,8 @@ function setupDb(db) {
     table.integer('installation_id');
     table.integer('check_run_id');
     table.decimal('delta', 6, 2);
+  }).createTable('merges', table => {
+    table.string('merge_commit_sha', 40).primary();
   });
 }
 

@@ -272,6 +272,14 @@ module.exports = app => {
     });
   });
 
+  app.on('pull_request.closed', async context => {
+    if (context.payload.pull_request.merged_at !== null) {
+      await db('merges').insert({
+        merge_commit_sha: context.payload.pull_request.merge_commit_sha,
+      });
+    }
+  });
+
   app.on('pull_request_review.submitted', async context => {
     const approver = context.payload.review.user.login;
     const owners = await getOwners(context.github);
@@ -313,6 +321,30 @@ module.exports = app => {
             `of this pull request was approved by ${approver}`,
         },
       });
+    }
+  });
+
+  app.on('check_run.created', async context => {
+    const mergeCommitSha = context.payload.check_run.head_sha;
+
+    const numDeleted = await db('merges').del()
+        .where({merge_commit_sha: mergeCommitSha});
+    if (numDeleted > 0) {
+      await context.github.checks.update(context.repo({
+        check_run_id: context.payload.check_run.id,
+        conclusion: 'neutral',
+        completed_at: new Date().toISOString(),
+        output: {
+          title: 'Check skipped because this is a merged commit',
+          summary: 'The bundle-size of merged commits does not affect the ' +
+            'status of these commit. However, since this is a required check ' +
+            'on GitHub, a check is still created and must be resolved. You ' +
+            'may safely ignore this bundle-size check.\n' +
+            'To see the bundle-size at this commit, see ' +
+            'https://github.com/ampproject/amphtml-build-artifacts/blob/' +
+            `master/bundle-size/${mergeCommitSha}`,
+        },
+      }));
     }
   });
 
