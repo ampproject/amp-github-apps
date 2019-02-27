@@ -76,7 +76,7 @@ function formatBundleSizeDelta(delta) {
  *
  * @param {number} delta bundle size delta.
  * @param {string} deltaFormatted bundle size delta from `formatBundleSizeDelta`
- * @param {string} encouragementEmoji bring in those 絵文字 !
+ * @param {string=} encouragementEmoji bring in those 絵文字 ! default is '🎉'.
  * @return {string} successful title message.
  */
 function successfulTitleMsg(delta, deltaFormatted, encouragementEmoji = '🎉') {
