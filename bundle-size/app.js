@@ -100,7 +100,7 @@ function successfulSummaryMessage(delta, deltaFormatted) {
       `necessary. The bundle size change is ${deltaFormatted}.`;
   }
 
-  return 'This pull request does not increase the bundle size ' +
+  return 'This pull request does not change the bundle size ' +
     '(gzipped compressed size of `v0.js`) by any significant amount, so no ' +
     'special approval is necessary. ' +
     `The bundle size change is ${deltaFormatted}.`;
