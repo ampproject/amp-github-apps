@@ -78,12 +78,11 @@ function formatBundleSizeDelta(delta) {
  * @param {string} deltaFormatted bundle size delta from `formatBundleSizeDelta`
  * @return {string} successful title message.
  */
-function successfulTitleMsg(delta, deltaFormatted) {
-  const noApprovalNecessaryDesc = 'no approval necessary';
+function successfulTitleMessage(delta, deltaFormatted) {
   if (delta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
-    return `${deltaFormatted} 🎉 | ${noApprovalNecessaryDesc}`;
+    return `${deltaFormatted} 🎉 | no approval necessary`;
   }
-  return `${deltaFormatted} | ${noApprovalNecessaryDesc}`;
+  return `${deltaFormatted} | no approval necessary`;
 }
 
 /**
@@ -94,18 +93,17 @@ function successfulTitleMsg(delta, deltaFormatted) {
  * @param {string} deltaFormatted bundle size delta from `formatBundleSizeDelta`
  * @return {string} successful summary message.
  */
-function successfulSummaryMsg(delta, deltaFormatted) {
-  const sizeDesc = 'gzipped compressed size of `v0.js`';
-  const deltaDesc = `The bundle size change is ${deltaFormatted}.`;
-
+function successfulSummaryMessage(delta, deltaFormatted) {
   if (delta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
-    return `This pull request *reduces* the bundle size (${sizeDesc}), so no ` +
-      `special approval is necessary. ${deltaDesc}`;
+    return 'This pull request *reduces* the bundle size ' +
+      '(gzipped compressed size of `v0.js`), so no special approval is ' +
+      `necessary. The bundle size change is ${deltaFormatted}.`;
   }
 
-  return `This pull request does not increase the bundle size (${sizeDesc})` +
-    'by any significant amount, so no special approval is necessary. ' +
-    deltaDesc;
+  return 'This pull request does not increase the bundle size ' +
+    '(gzipped compressed size of `v0.js`) by any significant amount, so no ' +
+    'special approval is necessary. ' +
+    `The bundle size change is ${deltaFormatted}.`;
 }
 
 module.exports = app => {
@@ -180,9 +178,9 @@ module.exports = app => {
         });
       } else {
         const title =
-            successfulTitleMsg(bundleSizeDelta, bundleSizeDeltaFormatted);
+            successfulTitleMessage(bundleSizeDelta, bundleSizeDeltaFormatted);
         const summary =
-            successfulSummaryMsg(bundleSizeDelta, bundleSizeDeltaFormatted);
+            successfulSummaryMessage(bundleSizeDelta, bundleSizeDeltaFormatted);
         Object.assign(updatedCheckOptions, {
           conclusion: 'success',
           output: {title, summary},
