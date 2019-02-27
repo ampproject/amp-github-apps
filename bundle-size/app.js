@@ -21,6 +21,8 @@ const sleep = require('sleep-promise');
 const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
 
+const HUMAN_ENCOURAGEMENT_MAX_DELTA = -0.03;
+
 const db = dbConnect();
 
 /**
@@ -66,6 +68,42 @@ async function getOwners(github) {
  */
 function formatBundleSizeDelta(delta) {
   return 'Δ ' + (delta >= 0 ? '+' : '') + delta.toFixed(2) + 'KB';
+}
+
+/**
+ * Returns an encouraging result title when the bundle size is reduced.
+ * Otherwise the title is neutral, but not discouraging.
+ *
+ * @param {number} delta bundle size delta.
+ * @param {string} deltaFormatted bundle size delta from `formatBundleSizeDelta`
+ * @return {string} successful title message.
+ */
+function successfulTitleMessage(delta, deltaFormatted) {
+  if (delta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
+    return `${deltaFormatted} 🎉 | no approval necessary`;
+  }
+  return `${deltaFormatted} | no approval necessary`;
+}
+
+/**
+ * Returns an encouraging result summary when the bundle size is reduced.
+ * Otherwise the summary is neutral, but not discouraging.
+ *
+ * @param {number} delta bundle size delta.
+ * @param {string} deltaFormatted bundle size delta from `formatBundleSizeDelta`
+ * @return {string} successful summary message.
+ */
+function successfulSummaryMessage(delta, deltaFormatted) {
+  if (delta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
+    return 'This pull request *reduces* the bundle size ' +
+      '(gzipped compressed size of `v0.js`), so no special approval is ' +
+      `necessary. The bundle size change is ${deltaFormatted}.`;
+  }
+
+  return 'This pull request does not change the bundle size ' +
+    '(gzipped compressed size of `v0.js`) by any significant amount, so no ' +
+    'special approval is necessary. ' +
+    `The bundle size change is ${deltaFormatted}.`;
 }
 
 module.exports = app => {
@@ -139,15 +177,13 @@ module.exports = app => {
           },
         });
       } else {
+        const title =
+            successfulTitleMessage(bundleSizeDelta, bundleSizeDeltaFormatted);
+        const summary =
+            successfulSummaryMessage(bundleSizeDelta, bundleSizeDeltaFormatted);
         Object.assign(updatedCheckOptions, {
           conclusion: 'success',
-          output: {
-            title: `${bundleSizeDeltaFormatted} | no approval necessary`,
-            summary: 'This pull request does not increase the bundle size ' +
-              '(gzipped compressed size of `v0.js`) by any significant ' +
-              'amount, so no special approval is necessary. The bundle size ' +
-              `change is ${bundleSizeDeltaFormatted}`,
-          },
+          output: {title, summary},
         });
       }
       await github.checks.update(updatedCheckOptions);
