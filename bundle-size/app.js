@@ -80,7 +80,7 @@ function formatBundleSizeDelta(delta) {
  */
 function successfulTitleMessage(delta, deltaFormatted) {
   if (delta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
-    return `${deltaFormatted} 🎉 | no approval necessary`;
+    return `${deltaFormatted} (shrunk!) | no approval necessary`;
   }
   return `${deltaFormatted} | no approval necessary`;
 }
