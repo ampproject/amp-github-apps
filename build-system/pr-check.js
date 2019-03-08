@@ -35,9 +35,12 @@ function timedExecOrDie(cmd) {
  * @return {number} process exit code.
  */
 function main() {
+  // TODO(danielrozenberg): conditional test running
   timedExecOrDie('eslint .');
   timedExecOrDie('cd bundle-size && npm ci');
   timedExecOrDie('cd bundle-size && npm test -u');
+  timedExecOrDie('cd test-status && npm ci');
+  timedExecOrDie('cd test-status && npm test -u');
   return 0;
 }
 
