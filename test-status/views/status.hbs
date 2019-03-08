@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" class="height-full">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMP Test Status | {{ short_head_sha }}/{{ type }}</title>
+    <link rel="shortcut icon" href="/static/amp_favicon.png">
+    <link rel="stylesheet" href="/probot/static/primer.css">
+    <style>
+      .data-table tbody tr td:first-child {
+        font-weight: bold;
+      }
+
+      .zero-passed {
+        color: red;
+      }
+
+      .passed {
+        color: green;
+      }
+
+      .zero-failed {
+        color: green;
+      }
+
+      .failed {
+        color: red;
+      }
+    </style>
+  </head>
+  <body class="height-full bg-gray-light">
+    <div class="d-flex flex-column flex-justify-center flex-items-center text-center height-full">
+      <div class="box-shadow rounded-2 border p-6 bg-white">
+        <h1>AMP Test Status</h1>
+        <table class="data-table">
+          <tbody>
+            <tr>
+              <td>Pull request</td>
+              <td><a href="https://github.com/{{ owner }}/{{ repo }}/pull/{{ pull_request_id }}">#{{ pull_request_id }}</a></td>
+            </tr>
+            <tr>
+              <td>Head SHA</td>
+              <td><a href="https://github.com/{{ owner }}/{{ repo }}/commit/{{ head_sha }}">{{ short_head_sha }}</a></td>
+            </tr>
+            <tr>
+              <td>Test type</td>
+              <td>{{ type }}</td>
+            </tr>
+            <tr>
+              <td>passed / failed</td>
+              <td><span class="{{#unless passed }}zero-{{/unless}}passed">{{ passed }}</span> / <span class="{{#unless failed }}zero-{{/unless}}failed">{{ failed }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="mt-4">
+          <div class="d-flex flex-justify-center mt-2">
+            {{#if is_skipping }}
+            <form action="/tests/{{ head_sha }}/{{ type }}/skip" method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
+              <p>Skip these tests?</p>
+              <dl class="form-group{{#if errors.reason }} errored{{/if}}">
+                <dt><label for="reason">Reason for skipping</label></dt>
+                <dd><input id="reason" type="text" maxlength="255" class="form-control input-lg input-block" name="reason" placeholder="Reason for skipping?" required></dd>
+                {{#if errors.reason }}<dd class="error">{{ errors.reason.msg }}</dd>{{/if}}
+              </dl>
+              <input type="submit" value="Really skip!" class="btn btn-outline">
+            </form>
+            {{else if failed }}
+            <a href="/tests/{{ head_sha }}/{{ type }}/skip" class="btn btn-outline">Skip these tests?</a>
+            {{else}}
+            <p>No test failures reported for {{ type }} tests!</p>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
