@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-const {dbConnect} = require('../db');
+const {dbConnect} = require('../db-connect');
 const deepcopy = require('deepcopy');
 const {installGitHubWebhooks} = require('../webhooks');
 const nock = require('nock');
 const {Probot} = require('probot');
 const {setupDb} = require('../setup-db');
 
-jest.mock('../db-config');
+jest.mock('../db-connect');
 jest.setTimeout(5000);
 nock.disableNetConnect();
 

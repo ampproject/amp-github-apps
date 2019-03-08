@@ -14,15 +14,9 @@
  */
 'use strict';
 
-const {dbConnect} = require('./db-connect');
-const {installApiRouter} = require('./api');
-const {installGitHubWebhooks} = require('./webhooks');
-const {installWebUiRouter} = require('./web');
+const knex = require('knex');
+const {dbConfig} = require('./db-config.js');
 
-const db = dbConnect();
-
-module.exports = app => {
-  installGitHubWebhooks(app, db);
-  installWebUiRouter(app, db);
-  installApiRouter(app, db);
+exports.dbConnect = () => {
+  return knex(dbConfig);
 };

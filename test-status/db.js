@@ -14,13 +14,6 @@
  */
 'use strict';
 
-const knex = require('knex');
-const {dbConfig} = require('./db-config.js');
-
-exports.dbConnect = () => {
-  return knex(dbConfig);
-};
-
 /**
  * Get the pull request snapshot object from its head SHA.
  *

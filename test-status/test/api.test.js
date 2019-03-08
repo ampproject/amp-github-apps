@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-const {dbConnect} = require('../db');
+const {dbConnect} = require('../db-connect');
 const {installApiRouter} = require('../api');
 const nock = require('nock');
 const {Probot} = require('probot');
@@ -23,7 +23,7 @@ const {waitUntilNockScopeIsDone} = require('./_test_helper');
 
 const HEAD_SHA = '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa';
 
-jest.mock('../db-config');
+jest.mock('../db-connect');
 jest.setTimeout(5000);
 nock.disableNetConnect();
 nock.enableNetConnect('127.0.0.1');

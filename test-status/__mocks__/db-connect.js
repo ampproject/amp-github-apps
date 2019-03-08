@@ -14,8 +14,12 @@
  */
 'use strict';
 
-exports.dbConfig = {
+const knex = require('knex');
+
+const db = knex({
   client: 'sqlite3',
   connection: ':memory:',
   useNullAsDefault: true,
-};
+});
+
+exports.dbConnect = () => db;

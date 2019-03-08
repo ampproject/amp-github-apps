@@ -14,7 +14,7 @@
  */
 'use strict';
 
-const {dbConnect} = require('./db');
+const {dbConnect} = require('./db-connect');
 const log = require('fancy-log');
 
 /**
