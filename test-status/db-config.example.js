@@ -29,4 +29,4 @@ exports.dbConfig = {
     database: 'postgres',
 
   },
-}
+};
