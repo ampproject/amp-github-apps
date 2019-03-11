@@ -34,7 +34,8 @@ from this comma separated list of IP addresses will be processed.
     check green
   * If `failed` ≥ 1, sets the check's conclusion to `action_required`, which
     turns the check red. It also sets a URL to resolve the issue back to the web
-    interface of this app, which can only be accessed by the weekly build cop
+    interface of this app, which can only be accessed by the weekly build cop or
+    a fixed set of authorized users
 
 ### Web UI
 
