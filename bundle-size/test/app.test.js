@@ -57,7 +57,7 @@ async function waitUntilNockScopeIsDone(nocks) {
   nocks.done();
 }
 
-describe('bundle-size', async () => {
+describe('bundle-size', () => {
   let probot;
   let app;
   const db = dbConnect();
