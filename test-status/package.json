@@ -14,7 +14,7 @@
   },
   "scripts": {
     "dev": "nodemon",
-    "deploy": "gcloud app deploy",
+    "deploy": "gcloud --project amp-test-status-bot app deploy",
     "setup-db": "node ./setup-db.js",
     "start": "probot run ./app.js",
     "test": "jest"
