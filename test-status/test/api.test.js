@@ -28,7 +28,7 @@ jest.setTimeout(5000);
 nock.disableNetConnect();
 nock.enableNetConnect('127.0.0.1');
 
-describe('test-status/api', async () => {
+describe('test-status/api', () => {
   let probot;
   let app;
   const db = dbConnect();

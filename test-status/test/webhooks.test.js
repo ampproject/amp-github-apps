@@ -38,7 +38,7 @@ function getFixture(name) {
   return deepcopy(require(`./fixtures/${name}`));
 }
 
-describe('test-status/webhooks', async () => {
+describe('test-status/webhooks', () => {
   let probot;
   let app;
   const db = dbConnect();
