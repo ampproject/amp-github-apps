@@ -76,13 +76,15 @@ Follow these setup instructions to start developing for this App locally:
    * Give your app a name
    * Set the _Homepage_ and _Webhook URL_ fields to the Smee channel that you
      created above
+   * Set the _User authorization callback URL_ to
+     `http://localhost:3000/login/callback`
    * Set the _Webhook secret_ to a random, secure value
    * Give the App _Read & Write_ permissions on **Checks**, and _Read only_ on
      **Pull requests**
    * Subscribe to the **Pull request** events
    * None of the other fields are required
 6. After creating the application, generate and download a private key. Also
-   take note of the App ID
+   take note of the App ID, Client ID, and Client secret
 7. Install the application on a GitHub repository that you want to use for
    testing. You might want to create a new repository for this purpose.
 8. Copy the `.env.example` file to `.env` and modify the fields based on the
