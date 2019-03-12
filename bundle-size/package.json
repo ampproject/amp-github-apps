@@ -14,7 +14,7 @@
   },
   "scripts": {
     "dev": "nodemon",
-    "deploy": "gcloud config set project amp-bundle-size-bot && gcloud app deploy",
+    "deploy": "gcloud --project amp-bundle-size-bot app deploy",
     "setup-db": "node ./setup-db.js",
     "start": "probot run ./app.js",
     "test": "jest"
