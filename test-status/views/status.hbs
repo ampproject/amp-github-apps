@@ -48,7 +48,11 @@
             </tr>
             <tr>
               <td>passed / failed</td>
+              {{#if errored }}
+              <td>Errored!</td>
+              {{^}}
               <td><span class="{{#unless passed }}zero-{{/unless}}passed">{{ passed }}</span> / <span class="{{#unless failed }}zero-{{/unless}}failed">{{ failed }}</span></td>
+              {{/if}}
             </tr>
           </tbody>
         </table>
@@ -66,6 +70,8 @@
               <input type="submit" value="Really skip!" class="btn btn-outline">
             </form>
             {{else if failed }}
+            <a href="/tests/{{ head_sha }}/{{ type }}/skip" class="btn btn-outline">Skip these tests?</a>
+            {{else if errored }}
             <a href="/tests/{{ head_sha }}/{{ type }}/skip" class="btn btn-outline">Skip these tests?</a>
             {{else}}
             <p>No test failures reported for {{ type }} tests!</p>

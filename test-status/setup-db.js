@@ -40,6 +40,7 @@ function setupDb(db) {
     table.integer('check_run_id');
     table.integer('passed');
     table.integer('failed');
+    table.boolean('errored');
 
     table.primary(['head_sha', 'type']);
     table.foreign('head_sha')

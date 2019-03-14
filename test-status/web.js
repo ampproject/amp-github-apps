@@ -25,6 +25,42 @@ const {
 
 let EXPRESS_SETTING_ARE_SET = false;
 
+/**
+ * Create a parameters object for reporting a skipped tests status to an
+ * existing GitHub status check
+ *
+ * @param {!Request} request web Request object.
+ * @return {!Object} a parameters object for github.checks.update.
+ */
+function createSkippedCheckParams(request) {
+  const {type, passed, failed, errored} = request.check;
+  const {user} = request.session.passport;
+  const {reason} = request.body;
+
+  let text = '';
+  const summaryVerb = errored ? 'errored' : 'failed';
+  if (!errored) {
+    text = `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n` +
+      `* *${failed}* test${failed != 1 ? 's' : ''} FAILED\n\n`;
+  }
+  text += `The ${summaryVerb} ${type} tests were skipped by @${user}.\n` +
+    `The reason given was: *${reason}*`;
+
+  return {
+    owner: request.check.owner,
+    repo: request.check.repo,
+    check_run_id: request.check.check_run_id,
+    completed_at: new Date().toISOString(),
+    conclusion: 'success',
+    output: {
+      title: `Skipped by @${user}`,
+      summary: `The ${type} tests have previously ${summaryVerb} on Travis.`,
+      text,
+    },
+  };
+}
+
+
 exports.installWebUiRouter = (app, db) => {
   const root = app.route();
   installRootAuthentications(root);
@@ -59,7 +95,9 @@ exports.installWebUiRouter = (app, db) => {
         const {headSha, type} = request.params;
         request.short_head_sha = headSha.substr(0, 7);
         const check = await getCheckRunResults(db, headSha, type);
-        if (check === null || check.passed === null || check.failed === null) {
+        if (check === null ||
+            (!check.errored &&
+              (check.passed === null || check.failed === null))) {
           return response.status(404).render('404', {
             headSha: request.short_head_sha,
             type,
@@ -97,10 +135,6 @@ exports.installWebUiRouter = (app, db) => {
   tests.post('/:headSha/:type/skip', [
     body('reason').isLength({min: 1}).withMessage('Reason must not be empty.'),
   ], async (request, response) => {
-    const {passed, failed, type} = request.check;
-    const {user} = request.session.passport;
-    const {reason} = request.body;
-
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
       response.render('status', Object.assign({
@@ -111,22 +145,9 @@ exports.installWebUiRouter = (app, db) => {
       return;
     }
 
+    const params = createSkippedCheckParams(request);
     const github = await app.auth(request.check.installation_id);
-    await github.checks.update({
-      owner: request.check.owner,
-      repo: request.check.repo,
-      check_run_id: request.check.check_run_id,
-      completed_at: new Date().toISOString(),
-      conclusion: 'success',
-      output: {
-        title: `Skipped by @${user}`,
-        summary: `The ${type} tests finished running on Travis.`,
-        text: `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n` +
-        `* *${failed}* test${failed != 1 ? 's' : ''} FAILED\n\n` +
-        `The failing tests were skipped by @${user}.\n` +
-        `The reason given was: *${reason}*`,
-      },
-    });
+    await github.checks.update(params);
 
     response.redirect(
         `https://github.com/${request.check.owner}/${request.check.repo}` +

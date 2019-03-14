@@ -129,6 +129,39 @@ function createReportedCheckParams(
   return params;
 }
 
+/**
+ * Create a parameters object for reporting an errored test to an existing
+ * GitHub status check.
+ *
+ * @param {string} pullRequestSnapshot pull request snapshot from database.
+ * @param {string} type tests type slug.
+ * @param {number} checkRunId the existing check run ID.
+ * @return {!Object} a parameters object for github.checks.update.
+ */
+function createErroredCheckParams(pullRequestSnapshot, type, checkRunId) {
+  const {owner, repo, head_sha: headSha} = pullRequestSnapshot;
+  const detailsUrl = new URL(
+      `/tests/${headSha}/${type}/status`, process.env.WEB_UI_BASE_URL);
+  return {
+    owner,
+    repo,
+    check_run_id: checkRunId,
+    status: 'completed',
+    completed_at: new Date().toISOString(),
+    details_url: detailsUrl.href,
+    conclusion: 'action_required',
+    output: {
+      title: `${type} tests have errored`,
+      summary: `An unexpected error occurred while running ${type} tests.`,
+      text: 'Please inspect the Travis build for the details.\n\n' +
+        'If you believe that this pull request was not the cause of this ' +
+        // TODO(danielrozenberg): say who the weekly build cop is inline here:
+        'error, please contact the weekly build cop, who can advise on how ' +
+        'to proceed, or skip this test run for you.',
+    },
+  };
+}
+
 exports.installApiRouter = (app, db) => {
   const v0 = app.route('/v0');
   v0.use((request, response, next) => {
@@ -205,9 +238,34 @@ exports.installApiRouter = (app, db) => {
         await github.checks.update(params);
 
         await db('checks')
-            .update({passed, failed})
+            .update({passed, failed, errored: false})
             .where({head_sha: headSha, type});
 
         return response.end();
       });
+
+  v0.post('/tests/:headSha/:type/report/errored', async (request, response) => {
+    const {headSha, type} = request.params;
+    app.log(
+        `Reporting that ${type} tests have errored to the GitHub check ` +
+        `for pull request with head commit SHA ${headSha}`);
+
+    const pullRequestSnapshot = await getPullRequestSnapshot(db, headSha);
+    const checkRunId = await getCheckRunId(db, headSha, type);
+    if (pullRequestSnapshot === undefined || checkRunId === null) {
+      return response.status(404).end(
+          `No existing status check was found for ${headSha}/${type}`);
+    }
+
+    const params = createErroredCheckParams(
+        pullRequestSnapshot, type, checkRunId);
+    const github = await app.auth(pullRequestSnapshot.installation_id);
+    await github.checks.update(params);
+
+    await db('checks')
+        .update({passed: null, failed: null, errored: true})
+        .where({head_sha: headSha, type});
+
+    return response.end();
+  });
 };
