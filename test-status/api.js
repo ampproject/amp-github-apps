@@ -155,10 +155,9 @@ function createErroredCheckParams(pullRequestSnapshot, type, checkRunId) {
       summary: `An unexpected error occurred while running ${type} tests.`,
       text: 'Please inspect the Travis build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
-        'test error (i.e., this is a flaky test) please contact the weekly ' +
         // TODO(danielrozenberg): say who the weekly build cop is inline here:
-        'build cop, who can advise on how to proceed, or skip this test run ' +
-        'for you.',
+        'error, please contact the weekly build cop, who can advise on how ' +
+        'to proceed, or skip this test run for you.',
     },
   };
 }
