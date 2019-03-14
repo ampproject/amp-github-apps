@@ -19,7 +19,6 @@ const nock = require('nock');
 const {Probot} = require('probot');
 const request = require('supertest');
 const {setupDb} = require('../setup-db');
-const {waitUntilNockScopeIsDone} = require('./_test_helper');
 
 const HEAD_SHA = '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa';
 
@@ -50,6 +49,9 @@ describe('test-status/web', () => {
     process.env = {
       APPROVING_USERS: 'buildcop',
     };
+    nock('https://api.github.com')
+        .post('/app/installations/123456/access_tokens')
+        .reply(200, {token: 'test'});
   });
 
   afterEach(async () => {
@@ -81,6 +83,7 @@ describe('test-status/web', () => {
           check_run_id: 555555,
           passed,
           failed,
+          errored: false,
         });
 
         await request(probot.server)
@@ -88,6 +91,29 @@ describe('test-status/web', () => {
             .auth('buildcop')
             .expect(200, bodyMatches);
       });
+
+  test('Request status page of a check that errored', async () => {
+    await db('pull_request_snapshots').insert({
+      head_sha: HEAD_SHA,
+      owner: 'ampproject',
+      repo: 'amphtml',
+      pull_request_id: 19621,
+      installation_id: 123456,
+    });
+    await db('checks').insert({
+      head_sha: HEAD_SHA,
+      type: 'unit',
+      check_run_id: 555555,
+      passed: null,
+      failed: null,
+      errored: true,
+    });
+
+    await request(probot.server)
+        .get(`/tests/${HEAD_SHA}/unit/status`)
+        .auth('buildcop')
+        .expect(200, /Errored!/);
+  });
 
   test('Request skip page for a check with failures', async () => {
     await db('pull_request_snapshots').insert({
@@ -103,6 +129,7 @@ describe('test-status/web', () => {
       check_run_id: 555555,
       passed: 10,
       failed: 10,
+      errored: false,
     });
 
     await request(probot.server)
@@ -111,7 +138,12 @@ describe('test-status/web', () => {
         .expect(200, /Really skip!/);
   });
 
-  test('Post skip form', async () => {
+  test.each([
+    ['10 failed tests', 10, 10, false,
+      'The unit tests have previously failed on Travis.'],
+    ['tests have errored', null, null, true,
+      'The unit tests have previously errored on Travis.'],
+  ])('Post skip form on %s', async (_, passed, failed, errored, summary) => {
     await db('pull_request_snapshots').insert({
       head_sha: HEAD_SHA,
       owner: 'ampproject',
@@ -123,18 +155,18 @@ describe('test-status/web', () => {
       head_sha: HEAD_SHA,
       type: 'unit',
       check_run_id: 555555,
-      passed: 10,
-      failed: 10,
+      passed,
+      failed,
+      errored,
     });
 
-    const nocks = nock('https://api.github.com')
-        .post('/app/installations/123456/access_tokens')
-        .reply(200, {token: 'test'})
+    nock('https://api.github.com')
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
           expect(body).toMatchObject({
             conclusion: 'success',
             output: {
               title: 'Skipped by @buildcop',
+              summary,
               text:
                 expect.stringContaining('The reason given was: *flaky tests*'),
             },
@@ -153,7 +185,6 @@ describe('test-status/web', () => {
           expect(response.get('location'))
               .toBe('https://github.com/ampproject/amphtml/pull/19621');
         });
-    await waitUntilNockScopeIsDone(nocks);
   });
 
   test('Post skip form with missing reason', async () => {
@@ -170,6 +201,7 @@ describe('test-status/web', () => {
       check_run_id: 555555,
       passed: 10,
       failed: 10,
+      errored: false,
     });
 
     await request(probot.server)
@@ -192,6 +224,7 @@ describe('test-status/web', () => {
       check_run_id: 555555,
       passed: 10,
       failed: 0,
+      errored: false,
     });
 
     await request(probot.server)
@@ -223,6 +256,7 @@ describe('test-status/web', () => {
           check_run_id: 555555,
           passed: null,
           failed: null,
+          errored: null,
         });
 
         await request(probot.server)

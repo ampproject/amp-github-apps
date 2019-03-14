@@ -60,12 +60,15 @@ exports.getCheckRunResults = async (db, headSha, type) => {
       .join('pull_request_snapshots',
           'checks.head_sha', 'pull_request_snapshots.head_sha')
       .first([
-        'checks.head_sha', 'type', 'check_run_id', 'passed', 'failed', 'owner',
-        'repo', 'pull_request_id', 'installation_id'])
+        'checks.head_sha', 'type', 'check_run_id', 'passed', 'failed',
+        'errored', 'owner', 'repo', 'pull_request_id', 'installation_id'])
       .where({'checks.head_sha': headSha, type});
   if (existingCheck === undefined) {
     return null;
   } else {
+    if (typeof existingCheck.errored === 'number') {
+      existingCheck.errored = Boolean(existingCheck.errored);
+    }
     return existingCheck;
   }
 };

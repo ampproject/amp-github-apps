@@ -100,6 +100,7 @@ describe('test-status/api', () => {
       check_run_id: 555555,
       passed: null,
       failed: null,
+      errored: null,
     }]);
 
     await waitUntilNockScopeIsDone(nocks);
@@ -117,8 +118,6 @@ describe('test-status/api', () => {
       head_sha: HEAD_SHA,
       type: 'unit',
       check_run_id: 555555,
-      passed: null,
-      failed: null,
     });
 
     const nocks = nock('https://api.github.com')
@@ -160,8 +159,6 @@ describe('test-status/api', () => {
           head_sha: HEAD_SHA,
           type: 'unit',
           check_run_id: 555555,
-          passed: null,
-          failed: null,
         });
 
         const nocks = nock('https://api.github.com')
@@ -192,16 +189,62 @@ describe('test-status/api', () => {
           check_run_id: 555555,
           passed,
           failed,
+          errored: 0,
         }]);
 
         await waitUntilNockScopeIsDone(nocks);
       });
+
+  test('Update an existing check with /report/errored action', async () => {
+    await db('pull_request_snapshots').insert({
+      head_sha: HEAD_SHA,
+      owner: 'ampproject',
+      repo: 'amphtml',
+      pull_request_id: 19621,
+      installation_id: 123456,
+    });
+    await db('checks').insert({
+      head_sha: HEAD_SHA,
+      type: 'unit',
+      check_run_id: 555555,
+    });
+
+    const nocks = nock('https://api.github.com')
+        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+          expect(body).toMatchObject({
+            status: 'completed',
+            conclusion: 'action_required',
+            details_url: `http://localhost:3000/tests/${HEAD_SHA}/unit/status`,
+            output: {
+              title: 'unit tests have errored',
+            },
+          });
+          return true;
+        })
+        .reply(200);
+
+    await request(probot.server)
+        .post(`/v0/tests/${HEAD_SHA}/unit/report/errored`)
+        .expect(200);
+
+    expect(await db('checks').select('*')).toMatchObject([{
+      head_sha: HEAD_SHA,
+      type: 'unit',
+      check_run_id: 555555,
+      passed: null,
+      failed: null,
+      errored: 1,
+    }]);
+
+    await waitUntilNockScopeIsDone(nocks);
+  });
 
   test.each([
     'queued',
     'started',
     'skipped',
     'report/5/0',
+    'report/errored',
   ])('404 for /%s action when pull request was not created', async action => {
     await request(probot.server)
         .post(`/v0/tests/${HEAD_SHA}/unit/${action}`)
