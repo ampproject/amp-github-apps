@@ -300,7 +300,7 @@ describe('bundle-size', () => {
   });
 
   test.each([
-    ['12.44KB', 'Δ -0.10KB 🎉 | no approval necessary'],
+    ['12.44KB', 'Δ -0.10KB | no approval necessary'],
     ['12.34KB', 'Δ +0.00KB | no approval necessary'],
     ['12.24KB', 'Δ +0.10KB | no approval necessary'],
   ])('update a check on bundle-size report (report/base = 12.34KB/%s)',

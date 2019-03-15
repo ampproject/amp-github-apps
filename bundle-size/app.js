@@ -71,21 +71,6 @@ function formatBundleSizeDelta(delta) {
 }
 
 /**
- * Returns an encouraging result title when the bundle size is reduced.
- * Otherwise the title is neutral, but not discouraging.
- *
- * @param {number} delta bundle size delta.
- * @param {string} deltaFormatted bundle size delta from `formatBundleSizeDelta`
- * @return {string} successful title message.
- */
-function successfulTitleMessage(delta, deltaFormatted) {
-  if (delta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
-    return `${deltaFormatted} 🎉 | no approval necessary`;
-  }
-  return `${deltaFormatted} | no approval necessary`;
-}
-
-/**
  * Returns an encouraging result summary when the bundle size is reduced.
  * Otherwise the summary is neutral, but not discouraging.
  *
@@ -177,8 +162,7 @@ module.exports = app => {
           },
         });
       } else {
-        const title =
-            successfulTitleMessage(bundleSizeDelta, bundleSizeDeltaFormatted);
+        const title = `${bundleSizeDeltaFormatted} | no approval necessary`;
         const summary =
             successfulSummaryMessage(bundleSizeDelta, bundleSizeDeltaFormatted);
         Object.assign(updatedCheckOptions, {
