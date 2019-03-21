@@ -37,12 +37,13 @@ function setupDb(db) {
     table.comment('Checks (status lines) created on GitHub, referenced by ID');
     table.string('head_sha', 40);
     table.string('type', 255);
+    table.string('subType', 255);
     table.integer('check_run_id');
     table.integer('passed');
     table.integer('failed');
     table.boolean('errored');
 
-    table.primary(['head_sha', 'type']);
+    table.primary(['head_sha', 'type', 'subType']);
     table.foreign('head_sha')
         .references('pull_request_snapshots.head_sha')
         .onDelete('CASCADE');

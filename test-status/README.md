@@ -25,10 +25,10 @@ The App has the following API points, which are to be triggered from Travis CI
 runs. If the `TRAVIS_IP_ADDRESSES` environment variable is set, only requests
 from this comma separated list of IP addresses will be processed.
 
-* `POST /v0/tests/:headSha/:type/:status(queued|started|skipped)`
+* `POST /v0/tests/:headSha/:type/:subType/:status(queued|started|skipped)`
   * Creates a new check on the supplied head commit (for `status` = `queued` or
-    `skipped`) or reports that the `type` tests have started running.
-* `POST /v0/tests/:headSha/:type/report/:passed/:failed`
+    `skipped`) or reports that the `type/subType` tests have started running.
+* `POST /v0/tests/:headSha/:type/:subType/report/:passed/:failed`
   * Updates the equivalent check with the number of `passed` and `failed` tests
   * If `failed` is 0, sets the check's conclusion to `success`, which turns the
     check green
@@ -46,13 +46,13 @@ error page.
 
 The interface has the following paths:
 
-* `GET /:headSha/:type/status`
+* `GET /:headSha/:type/:subType/status`
   * Displays the status of the check as reported from Travis, and provides a
     link to skip these test
-* `GET /:headSha/:type/skip`
+* `GET /:headSha/:type/:subType/skip`
   * Displays the above, plus a form to add a reason for why they are skipping
     the tests
-* `POST /:headSha/:type/skip`
+* `POST /:headSha/:type/:subType/skip`
   * Updates the equivalent check's conclusion to `success` with the provided
     explanation from the form, and redirects the build cop back to the pull
     request

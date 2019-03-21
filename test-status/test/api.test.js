@@ -65,8 +65,8 @@ describe('test-status/api', () => {
   });
 
   test.each([
-    ['queued', 'queued', 'unit tests are queued on Travis'],
-    ['skipped', 'completed', 'unit tests were not required'],
+    ['queued', 'queued', 'Tests are queued on Travis'],
+    ['skipped', 'completed', 'Tests were not required'],
   ])('Create a new check with /%s action', async (action, status, title) => {
     await db('pull_request_snapshots').insert({
       head_sha: HEAD_SHA,
@@ -79,7 +79,7 @@ describe('test-status/api', () => {
     const nocks = nock('https://api.github.com')
         .post('/repos/ampproject/amphtml/check-runs', body => {
           expect(body).toMatchObject({
-            name: 'ampproject/tests/unit',
+            name: 'ampproject/tests/unit (saucelabs)',
             head_sha: HEAD_SHA,
             status,
             output: {
@@ -91,12 +91,13 @@ describe('test-status/api', () => {
         .reply(200, {id: 555555});
 
     await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/${action}`)
+        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
         .expect(200);
 
     expect(await db('checks').select('*')).toMatchObject([{
       head_sha: HEAD_SHA,
       type: 'unit',
+      subType: 'saucelabs',
       check_run_id: 555555,
       passed: null,
       failed: null,
@@ -117,6 +118,7 @@ describe('test-status/api', () => {
     await db('checks').insert({
       head_sha: HEAD_SHA,
       type: 'unit',
+      subType: 'saucelabs',
       check_run_id: 555555,
     });
 
@@ -126,7 +128,7 @@ describe('test-status/api', () => {
             head_sha: HEAD_SHA,
             status: 'in_progress',
             output: {
-              title: 'unit tests are running on Travis',
+              title: 'Tests are running on Travis',
             },
           });
           return true;
@@ -134,18 +136,18 @@ describe('test-status/api', () => {
         .reply(200);
 
     await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/started`)
+        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/started`)
         .expect(200);
     await waitUntilNockScopeIsDone(nocks);
   });
 
   test.each([
-    [0, 0, 'success', '0 unit tests passed', null],
-    [1, 0, 'success', '1 unit test passed', null],
-    [5, 5, 'action_required', '5 unit tests failed',
-      `http://localhost:3000/tests/${HEAD_SHA}/unit/status`],
-    [0, 1, 'action_required', '1 unit test failed',
-      `http://localhost:3000/tests/${HEAD_SHA}/unit/status`],
+    [0, 0, 'success', '0 tests passed', null],
+    [1, 0, 'success', '1 test passed', null],
+    [5, 5, 'action_required', '5 tests failed',
+      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
+    [0, 1, 'action_required', '1 test failed',
+      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
   ])('Update an existing check with /report/%d/%d action',
       async (passed, failed, conclusion, title, detailsUrl) => {
         await db('pull_request_snapshots').insert({
@@ -158,6 +160,7 @@ describe('test-status/api', () => {
         await db('checks').insert({
           head_sha: HEAD_SHA,
           type: 'unit',
+          subType: 'saucelabs',
           check_run_id: 555555,
         });
 
@@ -180,12 +183,14 @@ describe('test-status/api', () => {
             .reply(200);
 
         await request(probot.server)
-            .post(`/v0/tests/${HEAD_SHA}/unit/report/${passed}/${failed}`)
+            .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/` +
+                  `${failed}`)
             .expect(200);
 
         expect(await db('checks').select('*')).toMatchObject([{
           head_sha: HEAD_SHA,
           type: 'unit',
+          subType: 'saucelabs',
           check_run_id: 555555,
           passed,
           failed,
@@ -206,6 +211,7 @@ describe('test-status/api', () => {
     await db('checks').insert({
       head_sha: HEAD_SHA,
       type: 'unit',
+      subType: 'saucelabs',
       check_run_id: 555555,
     });
 
@@ -214,9 +220,10 @@ describe('test-status/api', () => {
           expect(body).toMatchObject({
             status: 'completed',
             conclusion: 'action_required',
-            details_url: `http://localhost:3000/tests/${HEAD_SHA}/unit/status`,
+            details_url: `http://localhost:3000/tests/${HEAD_SHA}/unit/` +
+              'saucelabs/status',
             output: {
-              title: 'unit tests have errored',
+              title: 'Tests have errored',
             },
           });
           return true;
@@ -224,12 +231,13 @@ describe('test-status/api', () => {
         .reply(200);
 
     await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/report/errored`)
+        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/errored`)
         .expect(200);
 
     expect(await db('checks').select('*')).toMatchObject([{
       head_sha: HEAD_SHA,
       type: 'unit',
+      subType: 'saucelabs',
       check_run_id: 555555,
       passed: null,
       failed: null,
@@ -247,14 +255,14 @@ describe('test-status/api', () => {
     'report/errored',
   ])('404 for /%s action when pull request was not created', async action => {
     await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/${action}`)
+        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
         .expect(404, new RegExp(HEAD_SHA));
   });
 
   test('reject non-Travis IP addresses', async () => {
     process.env['TRAVIS_IP_ADDRESSES'] = '999.999.999.999,123.456.789.012';
     await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/queued`)
+        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/queued`)
         .expect(403, 'You are not Travis!');
   });
 });
