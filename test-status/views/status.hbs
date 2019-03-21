@@ -44,7 +44,7 @@
             </tr>
             <tr>
               <td>Test type</td>
-              <td>{{ type }}</td>
+              <td>{{ type }} ({{ subType }})</td>
             </tr>
             <tr>
               <td>passed / failed</td>
@@ -60,7 +60,7 @@
         <div class="mt-4">
           <div class="d-flex flex-justify-center mt-2">
             {{#if is_skipping }}
-            <form action="/tests/{{ head_sha }}/{{ type }}/skip" method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
+            <form action="/tests/{{ head_sha }}/{{ type }}/{{ subType }}/skip" method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
               <p>Skip these tests?</p>
               <dl class="form-group{{#if errors.reason }} errored{{/if}}">
                 <dt><label for="reason">Reason for skipping</label></dt>
@@ -70,11 +70,11 @@
               <input type="submit" value="Really skip!" class="btn btn-outline">
             </form>
             {{else if failed }}
-            <a href="/tests/{{ head_sha }}/{{ type }}/skip" class="btn btn-outline">Skip these tests?</a>
+            <a href="/tests/{{ head_sha }}/{{ type }}/{{ subType }}/skip" class="btn btn-outline">Skip these tests?</a>
             {{else if errored }}
-            <a href="/tests/{{ head_sha }}/{{ type }}/skip" class="btn btn-outline">Skip these tests?</a>
+            <a href="/tests/{{ head_sha }}/{{ type }}/{{ subType }}/skip" class="btn btn-outline">Skip these tests?</a>
             {{else}}
-            <p>No test failures reported for {{ type }} tests!</p>
+            <p>No test failures reported for {{ type }} tests ({{ subType }})!</p>
             {{/if}}
           </div>
         </div>

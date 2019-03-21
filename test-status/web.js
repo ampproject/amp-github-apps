@@ -33,7 +33,7 @@ let EXPRESS_SETTING_ARE_SET = false;
  * @return {!Object} a parameters object for github.checks.update.
  */
 function createSkippedCheckParams(request) {
-  const {type, passed, failed, errored} = request.check;
+  const {type, subType, passed, failed, errored} = request.check;
   const {user} = request.session.passport;
   const {reason} = request.body;
 
@@ -43,7 +43,8 @@ function createSkippedCheckParams(request) {
     text = `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n` +
       `* *${failed}* test${failed != 1 ? 's' : ''} FAILED\n\n`;
   }
-  text += `The ${summaryVerb} ${type} tests were skipped by @${user}.\n` +
+  text += `The ${summaryVerb} ${type} tests (${subType}) were skipped by ` +
+    `@${user}.\n` +
     `The reason given was: *${reason}*`;
 
   return {
@@ -54,7 +55,8 @@ function createSkippedCheckParams(request) {
     conclusion: 'success',
     output: {
       title: `Skipped by @${user}`,
-      summary: `The ${type} tests have previously ${summaryVerb} on Travis.`,
+      summary: `The ${type} tests (${subType}) have previously ` +
+        `${summaryVerb} on Travis.`,
       text,
     },
   };
@@ -90,49 +92,51 @@ exports.installWebUiRouter = (app, db) => {
     }
   });
 
-  tests.all('/:headSha/:type/:action(status|skip)',
+  tests.all('/:headSha/:type/:subType/:action(status|skip)',
       async (request, response, next) => {
-        const {headSha, type} = request.params;
+        const {headSha, type, subType} = request.params;
         request.short_head_sha = headSha.substr(0, 7);
-        const check = await getCheckRunResults(db, headSha, type);
+        const check = await getCheckRunResults(db, headSha, type, subType);
         if (check === null ||
             (!check.errored &&
               (check.passed === null || check.failed === null))) {
           return response.status(404).render('404', {
             headSha: request.short_head_sha,
             type,
+            subType,
           });
         }
         request.check = check;
         next();
       });
 
-  tests.get('/:headSha/:type/status', async (request, response) => {
+  tests.get('/:headSha/:type/:subType/status', async (request, response) => {
     response.render('status', Object.assign({
       short_head_sha: request.short_head_sha,
       is_skipping: false,
     }, request.check));
   });
 
-  tests.all('/:headSha/:type/skip', async (request, response, next) => {
-    if (request.check.failed == 0) {
-      return response.status(400).render('400', {
-        message:
-            `${request.params.type} tests for ${request.short_head_sha} have ` +
-            'no failures',
+  tests.all('/:headSha/:type/:subType/skip',
+      async (request, response, next) => {
+        if (request.check.failed == 0) {
+          return response.status(400).render('400', {
+            message:
+                `${request.params.type} tests (${request.params.subType}) ` +
+                `for ${request.short_head_sha} have no failures`,
+          });
+        }
+        next();
       });
-    }
-    next();
-  });
 
-  tests.get('/:headSha/:type/skip', async (request, response) => {
+  tests.get('/:headSha/:type/:subType/skip', async (request, response) => {
     response.render('status', Object.assign({
       short_head_sha: request.short_head_sha,
       is_skipping: true,
     }, request.check));
   });
 
-  tests.post('/:headSha/:type/skip', [
+  tests.post('/:headSha/:type/:subType/skip', [
     body('reason').isLength({min: 1}).withMessage('Reason must not be empty.'),
   ], async (request, response) => {
     const errors = validationResult(request);

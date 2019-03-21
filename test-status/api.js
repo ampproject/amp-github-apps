@@ -20,15 +20,16 @@ const {getCheckRunId, getPullRequestSnapshot} = require('./db');
  * Create a parameters object for a new status check line.
  *
  * @param {string} pullRequestSnapshot pull request snapshot from database.
- * @param {string} type tests type slug.
+ * @param {string} type major tests type slug (e.g., unit, integration).
+ * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {string} status status action.
  * @return {!Object} a parameters object for github.checks.create|update.
  */
-function createNewCheckParams(pullRequestSnapshot, type, status) {
+function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
   const params = {
     owner: pullRequestSnapshot.owner,
     repo: pullRequestSnapshot.repo,
-    name: `ampproject/tests/${type}`,
+    name: `ampproject/tests/${type} (${subType})`,
     head_sha: pullRequestSnapshot.head_sha,
   };
   switch (status) {
@@ -36,9 +37,9 @@ function createNewCheckParams(pullRequestSnapshot, type, status) {
       Object.assign(params, {
         status: 'queued',
         output: {
-          title: `${type} tests are queued on Travis`,
-          summary: `The ${type} tests are queued to run on Travis. Watch ` +
-            'this space for results in a few minutes!',
+          title: 'Tests are queued on Travis',
+          summary: `The ${type} tests (${subType}) are queued to run on ` +
+            'Travis. Watch this space for results in a few minutes!',
         },
       });
       break;
@@ -48,9 +49,9 @@ function createNewCheckParams(pullRequestSnapshot, type, status) {
         status: 'in_progress',
         started_at: new Date().toISOString(),
         output: {
-          title: `${type} tests are running on Travis`,
-          summary: `The ${type} tests are running on Travis. Watch this ` +
-            'space for results in a few minutes!',
+          title: 'Tests are running on Travis',
+          summary: `The ${type} tests (${subType}) are running on Travis. ` +
+          'Watch this space for results in a few minutes!',
         },
       });
       break;
@@ -61,9 +62,9 @@ function createNewCheckParams(pullRequestSnapshot, type, status) {
         conclusion: 'neutral',
         completed_at: new Date().toISOString(),
         output: {
-          title: `${type} tests were not required`,
-          summary: `The ${type} tests were not required to run for this pull ` +
-            'request.',
+          title: 'Tests were not required',
+          summary: `The ${type} tests (${subType}) were not required to run ` +
+            'for this pull request.',
         },
       });
       break;
@@ -80,14 +81,15 @@ function createNewCheckParams(pullRequestSnapshot, type, status) {
  * an existing GitHub status check.
  *
  * @param {string} pullRequestSnapshot pull request snapshot from database.
- * @param {string} type tests type slug.
+ * @param {string} type major tests type slug (e.g., unit, integration).
+ * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {number} checkRunId the existing check run ID.
  * @param {number} passed number of tests that passed.
  * @param {number} failed number of tests that failed.
  * @return {!Object} a parameters object for github.checks.update.
  */
 function createReportedCheckParams(
-  pullRequestSnapshot, type, checkRunId, passed, failed) {
+  pullRequestSnapshot, type, subType, checkRunId, passed, failed) {
   const {owner, repo, head_sha: headSha} = pullRequestSnapshot;
   const params = {
     owner,
@@ -98,13 +100,14 @@ function createReportedCheckParams(
   };
   if (failed > 0) {
     const detailsUrl = new URL(
-        `/tests/${headSha}/${type}/status`, process.env.WEB_UI_BASE_URL);
+        `/tests/${headSha}/${type}/${subType}/status`,
+        process.env.WEB_UI_BASE_URL);
     Object.assign(params, {
       details_url: detailsUrl.href,
       conclusion: 'action_required',
       output: {
-        title: `${failed} ${type} test${failed != 1 ? 's' : ''} failed`,
-        summary: `The ${type} tests finished running on Travis.`,
+        title: `${failed} test${failed != 1 ? 's' : ''} failed`,
+        summary: `The ${type} tests (${subType}) finished running on Travis.`,
         text: `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n` +
           `* *${failed}* test${failed != 1 ? 's' : ''} FAILED\n\n` +
           'Please inspect the Travis build and fix any code changes that ' +
@@ -120,8 +123,8 @@ function createReportedCheckParams(
     Object.assign(params, {
       conclusion: 'success',
       output: {
-        title: `${passed} ${type} test${passed != 1 ? 's' : ''} passed`,
-        summary: `The ${type} tests finished running on Travis.`,
+        title: `${passed} test${passed != 1 ? 's' : ''} passed`,
+        summary: `The ${type} tests (${subType}) finished running on Travis.`,
         text: `* *${passed}* test${passed != 1 ? 's' : ''} PASSED`,
       },
     });
@@ -134,14 +137,16 @@ function createReportedCheckParams(
  * GitHub status check.
  *
  * @param {string} pullRequestSnapshot pull request snapshot from database.
- * @param {string} type tests type slug.
+ * @param {string} type major tests type slug (e.g., unit, integration).
+ * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {number} checkRunId the existing check run ID.
  * @return {!Object} a parameters object for github.checks.update.
  */
-function createErroredCheckParams(pullRequestSnapshot, type, checkRunId) {
+function createErroredCheckParams(
+  pullRequestSnapshot, type, subType, checkRunId) {
   const {owner, repo, head_sha: headSha} = pullRequestSnapshot;
-  const detailsUrl = new URL(
-      `/tests/${headSha}/${type}/status`, process.env.WEB_UI_BASE_URL);
+  const detailsUrl = new URL(`/tests/${headSha}/${type}/${subType}/status`,
+      process.env.WEB_UI_BASE_URL);
   return {
     owner,
     repo,
@@ -151,8 +156,9 @@ function createErroredCheckParams(pullRequestSnapshot, type, checkRunId) {
     details_url: detailsUrl.href,
     conclusion: 'action_required',
     output: {
-      title: `${type} tests have errored`,
-      summary: `An unexpected error occurred while running ${type} tests.`,
+      title: `Tests have errored`,
+      summary: `An unexpected error occurred while running ${type} ` +
+        `tests (${subType}).`,
       text: 'Please inspect the Travis build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
         // TODO(danielrozenberg): say who the weekly build cop is inline here:
@@ -175,13 +181,13 @@ exports.installApiRouter = (app, db) => {
     }
   });
 
-  v0.post('/tests/:headSha/:type/:status(queued|started|skipped)',
+  v0.post('/tests/:headSha/:type/:subType/:status(queued|started|skipped)',
       async (request, response) => {
-        const {headSha, type, status} = request.params;
+        const {headSha, type, subType, status} = request.params;
         app.log(
-            `Creating/updating a new GitHub check for the ${type} tests for ` +
-            `pull request with head commit SHA ${headSha}, with a status of ` +
-            `'${status}'`);
+            `Creating/updating a new GitHub check for the ${type} ` +
+            `tests (${subType}) for pull request with head commit SHA ` +
+            `${headSha}, with a status of '${status}'`);
 
         const pullRequestSnapshot = await getPullRequestSnapshot(db, headSha);
         if (pullRequestSnapshot === undefined) {
@@ -190,11 +196,12 @@ exports.installApiRouter = (app, db) => {
 
         // Get the existing check run ID, or `undefined` if this is the first
         // time this head SHA is reported for this test type.
-        const checkRunId = await getCheckRunId(db, headSha, type);
+        const checkRunId = await getCheckRunId(db, headSha, type, subType);
 
         let params;
         try {
-          params = createNewCheckParams(pullRequestSnapshot, type, status);
+          params = createNewCheckParams(
+              pullRequestSnapshot, type, subType, status);
         } catch (error) {
           app.log(`ERROR: ${error}`);
           return response.status(400).end(error);
@@ -206,6 +213,7 @@ exports.installApiRouter = (app, db) => {
           await db('checks').insert({
             head_sha: headSha,
             type: type,
+            subType,
             check_run_id: check.data.id,
           });
         } else {
@@ -217,55 +225,58 @@ exports.installApiRouter = (app, db) => {
         return response.end();
       });
 
-  v0.post('/tests/:headSha/:type/report/:passed/:failed',
+  v0.post('/tests/:headSha/:type/:subType/report/:passed/:failed',
       async (request, response) => {
-        const {headSha, type, passed, failed} = request.params;
+        const {headSha, type, subType, passed, failed} = request.params;
         app.log(
-            `Reporting the results of the ${type} tests to the GitHub check ` +
-            `for pull request with head commit SHA ${headSha}`);
+            `Reporting the results of the ${type} tests (${subType}) to the ` +
+            `GitHub check for pull request with head commit SHA ${headSha}`);
         app.log(`Passed: ${passed} | Failed: ${failed}`);
 
         const pullRequestSnapshot = await getPullRequestSnapshot(db, headSha);
-        const checkRunId = await getCheckRunId(db, headSha, type);
+        const checkRunId = await getCheckRunId(db, headSha, type, subType);
         if (pullRequestSnapshot === undefined || checkRunId === null) {
           return response.status(404).end(
-              `No existing status check was found for ${headSha}/${type}`);
+              'No existing status check was found for ' +
+              `${headSha}/${type}/${subType}`);
         }
 
         const params = createReportedCheckParams(
-            pullRequestSnapshot, type, checkRunId, passed, failed);
+            pullRequestSnapshot, type, subType, checkRunId, passed, failed);
         const github = await app.auth(pullRequestSnapshot.installation_id);
         await github.checks.update(params);
 
         await db('checks')
             .update({passed, failed, errored: false})
-            .where({head_sha: headSha, type});
+            .where({head_sha: headSha, type, subType});
 
         return response.end();
       });
 
-  v0.post('/tests/:headSha/:type/report/errored', async (request, response) => {
-    const {headSha, type} = request.params;
-    app.log(
-        `Reporting that ${type} tests have errored to the GitHub check ` +
-        `for pull request with head commit SHA ${headSha}`);
+  v0.post('/tests/:headSha/:type/:subType/report/errored',
+      async (request, response) => {
+        const {headSha, type, subType} = request.params;
+        app.log(
+            `Reporting that ${type} tests (${subType}) have errored to the ` +
+            `GitHub check for pull request with head commit SHA ${headSha}`);
 
-    const pullRequestSnapshot = await getPullRequestSnapshot(db, headSha);
-    const checkRunId = await getCheckRunId(db, headSha, type);
-    if (pullRequestSnapshot === undefined || checkRunId === null) {
-      return response.status(404).end(
-          `No existing status check was found for ${headSha}/${type}`);
-    }
+        const pullRequestSnapshot = await getPullRequestSnapshot(db, headSha);
+        const checkRunId = await getCheckRunId(db, headSha, type, subType);
+        if (pullRequestSnapshot === undefined || checkRunId === null) {
+          return response.status(404).end(
+              'No existing status check was found for ' +
+              `${headSha}/${type}/${subType}`);
+        }
 
-    const params = createErroredCheckParams(
-        pullRequestSnapshot, type, checkRunId);
-    const github = await app.auth(pullRequestSnapshot.installation_id);
-    await github.checks.update(params);
+        const params = createErroredCheckParams(
+            pullRequestSnapshot, type, subType, checkRunId);
+        const github = await app.auth(pullRequestSnapshot.installation_id);
+        await github.checks.update(params);
 
-    await db('checks')
-        .update({passed: null, failed: null, errored: true})
-        .where({head_sha: headSha, type});
+        await db('checks')
+            .update({passed: null, failed: null, errored: true})
+            .where({head_sha: headSha, type, subType});
 
-    return response.end();
-  });
+        return response.end();
+      });
 };

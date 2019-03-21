@@ -33,13 +33,18 @@ exports.getPullRequestSnapshot = async (db, headSha) => {
  *
  * @param {!Knex} db instantiated database connection.
  * @param {string} headSha SHA of a pull request's head commit.
- * @param {string} type tests type slug.
+ * @param {string} type major tests type slug (e.g., unit, integration).
+ * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @return {?number} the check run ID or null if not found.
  */
-exports.getCheckRunId = async (db, headSha, type) => {
+exports.getCheckRunId = async (db, headSha, type, subType) => {
   const existingCheck = await db('checks')
       .first('check_run_id')
-      .where({head_sha: headSha, type});
+      .where({
+        head_sha: headSha,
+        type,
+        subType,
+      });
   if (existingCheck === undefined) {
     return null;
   } else {
@@ -52,17 +57,24 @@ exports.getCheckRunId = async (db, headSha, type) => {
  *
  * @param {!Knex} db instantiated database connection.
  * @param {string} headSha SHA of a pull request's head commit.
- * @param {string} type tests type slug.
+ * @param {string} type major tests type slug (e.g., unit, integration).
+ * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @return {?number} the full check results or null if not found.
  */
-exports.getCheckRunResults = async (db, headSha, type) => {
+exports.getCheckRunResults = async (db, headSha, type, subType) => {
   const existingCheck = await db('checks')
       .join('pull_request_snapshots',
           'checks.head_sha', 'pull_request_snapshots.head_sha')
       .first([
-        'checks.head_sha', 'type', 'check_run_id', 'passed', 'failed',
-        'errored', 'owner', 'repo', 'pull_request_id', 'installation_id'])
-      .where({'checks.head_sha': headSha, type});
+        'checks.head_sha', 'type', 'subType', 'check_run_id', 'passed',
+        'failed', 'errored', 'owner', 'repo', 'pull_request_id',
+        'installation_id',
+      ])
+      .where({
+        'checks.head_sha': headSha,
+        type,
+        'checks.subType': subType,
+      });
   if (existingCheck === undefined) {
     return null;
   } else {
