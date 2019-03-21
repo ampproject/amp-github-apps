@@ -62,7 +62,7 @@ describe('test-status/webhooks', () => {
   });
 
   afterEach(async () => {
-    await db('pull_request_snapshots').truncate();
+    await db('pullRequestSnapshots').truncate();
     await db('checks').truncate();
   });
 
@@ -76,13 +76,13 @@ describe('test-status/webhooks', () => {
       payload: getFixture('pull_request.opened'),
     });
 
-    expect(await db('pull_request_snapshots').select('*')).toMatchObject([
+    expect(await db('pullRequestSnapshots').select('*')).toMatchObject([
       {
-        head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
+        headSha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
         owner: 'ampproject',
         repo: 'amphtml',
-        pull_request_id: 19621,
-        installation_id: 123456,
+        pullRequestId: 19621,
+        installationId: 123456,
       },
     ]);
     expect(await db('checks').select('*')).toHaveLength(0);

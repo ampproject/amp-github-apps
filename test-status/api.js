@@ -30,7 +30,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
     owner: pullRequestSnapshot.owner,
     repo: pullRequestSnapshot.repo,
     name: `ampproject/tests/${type} (${subType})`,
-    head_sha: pullRequestSnapshot.head_sha,
+    head_sha: pullRequestSnapshot.headSha,
   };
   switch (status) {
     case 'queued':
@@ -90,7 +90,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
  */
 function createReportedCheckParams(
   pullRequestSnapshot, type, subType, checkRunId, passed, failed) {
-  const {owner, repo, head_sha: headSha} = pullRequestSnapshot;
+  const {owner, repo, headSha} = pullRequestSnapshot;
   const params = {
     owner,
     repo,
@@ -144,7 +144,7 @@ function createReportedCheckParams(
  */
 function createErroredCheckParams(
   pullRequestSnapshot, type, subType, checkRunId) {
-  const {owner, repo, head_sha: headSha} = pullRequestSnapshot;
+  const {owner, repo, headSha} = pullRequestSnapshot;
   const detailsUrl = new URL(`/tests/${headSha}/${type}/${subType}/status`,
       process.env.WEB_UI_BASE_URL);
   return {
@@ -207,14 +207,14 @@ exports.installApiRouter = (app, db) => {
           return response.status(400).end(error);
         }
 
-        const github = await app.auth(pullRequestSnapshot.installation_id);
+        const github = await app.auth(pullRequestSnapshot.installationId);
         if (checkRunId === null) {
           const check = await github.checks.create(params);
           await db('checks').insert({
-            head_sha: headSha,
+            headSha,
             type: type,
             subType,
-            check_run_id: check.data.id,
+            checkRunId: check.data.id,
           });
         } else {
           await github.checks.update(Object.assign(params, {
@@ -243,12 +243,12 @@ exports.installApiRouter = (app, db) => {
 
         const params = createReportedCheckParams(
             pullRequestSnapshot, type, subType, checkRunId, passed, failed);
-        const github = await app.auth(pullRequestSnapshot.installation_id);
+        const github = await app.auth(pullRequestSnapshot.installationId);
         await github.checks.update(params);
 
         await db('checks')
             .update({passed, failed, errored: false})
-            .where({head_sha: headSha, type, subType});
+            .where({headSha, type, subType});
 
         return response.end();
       });
@@ -270,12 +270,12 @@ exports.installApiRouter = (app, db) => {
 
         const params = createErroredCheckParams(
             pullRequestSnapshot, type, subType, checkRunId);
-        const github = await app.auth(pullRequestSnapshot.installation_id);
+        const github = await app.auth(pullRequestSnapshot.installationId);
         await github.checks.update(params);
 
         await db('checks')
             .update({passed: null, failed: null, errored: true})
-            .where({head_sha: headSha, type, subType});
+            .where({headSha, type, subType});
 
         return response.end();
       });

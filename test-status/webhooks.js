@@ -21,10 +21,10 @@ exports.installGitHubWebhooks = (app, db) => {
 
     const headSha = context.payload.pull_request.head.sha;
     try {
-      await db('pull_request_snapshots').insert(context.repo({
-        head_sha: headSha,
-        pull_request_id: pullRequestId,
-        installation_id: context.payload.installation.id,
+      await db('pullRequestSnapshots').insert(context.repo({
+        headSha,
+        pullRequestId,
+        installationId: context.payload.installation.id,
       }));
     } catch (error) {
       // Usually this is the result of duplicate webhook calls, and thus is a

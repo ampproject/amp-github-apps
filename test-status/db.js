@@ -22,10 +22,10 @@
  * @return {!Object} a pull request request snapshot information.
  */
 exports.getPullRequestSnapshot = async (db, headSha) => {
-  return await db('pull_request_snapshots')
+  return await db('pullRequestSnapshots')
       .first(
-          ['head_sha', 'owner', 'repo', 'pull_request_id', 'installation_id'])
-      .where({head_sha: headSha});
+          ['headSha', 'owner', 'repo', 'pullRequestId', 'installationId'])
+      .where({headSha});
 };
 
 /**
@@ -39,16 +39,16 @@ exports.getPullRequestSnapshot = async (db, headSha) => {
  */
 exports.getCheckRunId = async (db, headSha, type, subType) => {
   const existingCheck = await db('checks')
-      .first('check_run_id')
+      .first('checkRunId')
       .where({
-        head_sha: headSha,
+        headSha,
         type,
         subType,
       });
   if (existingCheck === undefined) {
     return null;
   } else {
-    return existingCheck.check_run_id;
+    return existingCheck.checkRunId;
   }
 };
 
@@ -63,15 +63,14 @@ exports.getCheckRunId = async (db, headSha, type, subType) => {
  */
 exports.getCheckRunResults = async (db, headSha, type, subType) => {
   const existingCheck = await db('checks')
-      .join('pull_request_snapshots',
-          'checks.head_sha', 'pull_request_snapshots.head_sha')
+      .join('pullRequestSnapshots',
+          'checks.headSha', 'pullRequestSnapshots.headSha')
       .first([
-        'checks.head_sha', 'type', 'subType', 'check_run_id', 'passed',
-        'failed', 'errored', 'owner', 'repo', 'pull_request_id',
-        'installation_id',
+        'checks.headSha', 'type', 'subType', 'checkRunId', 'passed', 'failed',
+        'errored', 'owner', 'repo', 'pullRequestId', 'installationId',
       ])
       .where({
-        'checks.head_sha': headSha,
+        'checks.headSha': headSha,
         type,
         'checks.subType': subType,
       });

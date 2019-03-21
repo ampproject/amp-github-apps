@@ -55,7 +55,7 @@ describe('test-status/web', () => {
   });
 
   afterEach(async () => {
-    await db('pull_request_snapshots').truncate();
+    await db('pullRequestSnapshots').truncate();
     await db('checks').truncate();
   });
 
@@ -70,18 +70,18 @@ describe('test-status/web', () => {
     [10, 10, /Skip these tests\?/],
   ])('Request status page of a check with passed/failed = %d/%d',
       async (passed, failed, bodyMatches) => {
-        await db('pull_request_snapshots').insert({
-          head_sha: HEAD_SHA,
+        await db('pullRequestSnapshots').insert({
+          headSha: HEAD_SHA,
           owner: 'ampproject',
           repo: 'amphtml',
-          pull_request_id: 19621,
-          installation_id: 123456,
+          pullRequestId: 19621,
+          installationId: 123456,
         });
         await db('checks').insert({
-          head_sha: HEAD_SHA,
+          headSha: HEAD_SHA,
           type: 'unit',
           subType: 'saucelabs',
-          check_run_id: 555555,
+          checkRunId: 555555,
           passed,
           failed,
           errored: false,
@@ -94,18 +94,18 @@ describe('test-status/web', () => {
       });
 
   test('Request status page of a check that errored', async () => {
-    await db('pull_request_snapshots').insert({
-      head_sha: HEAD_SHA,
+    await db('pullRequestSnapshots').insert({
+      headSha: HEAD_SHA,
       owner: 'ampproject',
       repo: 'amphtml',
-      pull_request_id: 19621,
-      installation_id: 123456,
+      pullRequestId: 19621,
+      installationId: 123456,
     });
     await db('checks').insert({
-      head_sha: HEAD_SHA,
+      headSha: HEAD_SHA,
       type: 'unit',
       subType: 'saucelabs',
-      check_run_id: 555555,
+      checkRunId: 555555,
       passed: null,
       failed: null,
       errored: true,
@@ -118,18 +118,18 @@ describe('test-status/web', () => {
   });
 
   test('Request skip page for a check with failures', async () => {
-    await db('pull_request_snapshots').insert({
-      head_sha: HEAD_SHA,
+    await db('pullRequestSnapshots').insert({
+      headSha: HEAD_SHA,
       owner: 'ampproject',
       repo: 'amphtml',
-      pull_request_id: 19621,
-      installation_id: 123456,
+      pullRequestId: 19621,
+      installationId: 123456,
     });
     await db('checks').insert({
-      head_sha: HEAD_SHA,
+      headSha: HEAD_SHA,
       type: 'unit',
       subType: 'saucelabs',
-      check_run_id: 555555,
+      checkRunId: 555555,
       passed: 10,
       failed: 10,
       errored: false,
@@ -147,18 +147,18 @@ describe('test-status/web', () => {
     ['tests have errored', null, null, true,
       'The unit tests (saucelabs) have previously errored on Travis.'],
   ])('Post skip form on %s', async (_, passed, failed, errored, summary) => {
-    await db('pull_request_snapshots').insert({
-      head_sha: HEAD_SHA,
+    await db('pullRequestSnapshots').insert({
+      headSha: HEAD_SHA,
       owner: 'ampproject',
       repo: 'amphtml',
-      pull_request_id: 19621,
-      installation_id: 123456,
+      pullRequestId: 19621,
+      installationId: 123456,
     });
     await db('checks').insert({
-      head_sha: HEAD_SHA,
+      headSha: HEAD_SHA,
       type: 'unit',
       subType: 'saucelabs',
-      check_run_id: 555555,
+      checkRunId: 555555,
       passed,
       failed,
       errored,
@@ -192,18 +192,18 @@ describe('test-status/web', () => {
   });
 
   test('Post skip form with missing reason', async () => {
-    await db('pull_request_snapshots').insert({
-      head_sha: HEAD_SHA,
+    await db('pullRequestSnapshots').insert({
+      headSha: HEAD_SHA,
       owner: 'ampproject',
       repo: 'amphtml',
-      pull_request_id: 19621,
-      installation_id: 123456,
+      pullRequestId: 19621,
+      installationId: 123456,
     });
     await db('checks').insert({
-      head_sha: HEAD_SHA,
+      headSha: HEAD_SHA,
       type: 'unit',
       subType: 'saucelabs',
-      check_run_id: 555555,
+      checkRunId: 555555,
       passed: 10,
       failed: 10,
       errored: false,
@@ -216,18 +216,18 @@ describe('test-status/web', () => {
   });
 
   test('Request skip page of a check that has no failures', async () => {
-    await db('pull_request_snapshots').insert({
-      head_sha: HEAD_SHA,
+    await db('pullRequestSnapshots').insert({
+      headSha: HEAD_SHA,
       owner: 'ampproject',
       repo: 'amphtml',
-      pull_request_id: 19621,
-      installation_id: 123456,
+      pullRequestId: 19621,
+      installationId: 123456,
     });
     await db('checks').insert({
-      head_sha: HEAD_SHA,
+      headSha: HEAD_SHA,
       type: 'unit',
       subType: 'saucelabs',
-      check_run_id: 555555,
+      checkRunId: 555555,
       passed: 10,
       failed: 0,
       errored: false,
@@ -249,18 +249,18 @@ describe('test-status/web', () => {
     'skip',
   ])('Request %s page of a check that was created, but no results reported yet',
       async action => {
-        await db('pull_request_snapshots').insert({
-          head_sha: HEAD_SHA,
+        await db('pullRequestSnapshots').insert({
+          headSha: HEAD_SHA,
           owner: 'ampproject',
           repo: 'amphtml',
-          pull_request_id: 19621,
-          installation_id: 123456,
+          pullRequestId: 19621,
+          installationId: 123456,
         });
         await db('checks').insert({
-          head_sha: HEAD_SHA,
+          headSha: HEAD_SHA,
           type: 'unit',
           subType: 'saucelabs',
-          check_run_id: 555555,
+          checkRunId: 555555,
           passed: null,
           failed: null,
           errored: null,
