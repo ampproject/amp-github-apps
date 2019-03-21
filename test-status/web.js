@@ -43,7 +43,7 @@ function createSkippedCheckParams(request) {
     text = `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n` +
       `* *${failed}* test${failed != 1 ? 's' : ''} FAILED\n\n`;
   }
-  text += `The ${summaryVerb} ${type} (${subType}) tests were skipped by ` +
+  text += `The ${summaryVerb} ${type} tests (${subType}) were skipped by ` +
     `@${user}.\n` +
     `The reason given was: *${reason}*`;
 
@@ -55,7 +55,7 @@ function createSkippedCheckParams(request) {
     conclusion: 'success',
     output: {
       title: `Skipped by @${user}`,
-      summary: `The ${type} (${subType}) tests have previously ` +
+      summary: `The ${type} tests (${subType}) have previously ` +
         `${summaryVerb} on Travis.`,
       text,
     },
@@ -122,7 +122,7 @@ exports.installWebUiRouter = (app, db) => {
         if (request.check.failed == 0) {
           return response.status(400).render('400', {
             message:
-                `${request.params.type} (${request.params.subType}) tests ` +
+                `${request.params.type} tests (${request.params.subType}) ` +
                 `for ${request.short_head_sha} have no failures`,
           });
         }

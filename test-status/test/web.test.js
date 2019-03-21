@@ -64,8 +64,8 @@ describe('test-status/web', () => {
   });
 
   test.each([
-    [0, 0, /No test failures reported for unit \(saucelabs\) tests!/],
-    [10, 0, /No test failures reported for unit \(saucelabs\) tests!/],
+    [0, 0, /No test failures reported for unit tests \(saucelabs\)!/],
+    [10, 0, /No test failures reported for unit tests \(saucelabs\)!/],
     [0, 10, /Skip these tests\?/],
     [10, 10, /Skip these tests\?/],
   ])('Request status page of a check with passed/failed = %d/%d',
@@ -143,9 +143,9 @@ describe('test-status/web', () => {
 
   test.each([
     ['10 failed tests', 10, 10, false,
-      'The unit (saucelabs) tests have previously failed on Travis.'],
+      'The unit tests (saucelabs) have previously failed on Travis.'],
     ['tests have errored', null, null, true,
-      'The unit (saucelabs) tests have previously errored on Travis.'],
+      'The unit tests (saucelabs) have previously errored on Travis.'],
   ])('Post skip form on %s', async (_, passed, failed, errored, summary) => {
     await db('pull_request_snapshots').insert({
       head_sha: HEAD_SHA,
@@ -236,12 +236,12 @@ describe('test-status/web', () => {
     await request(probot.server)
         .get(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
         .auth('buildcop')
-        .expect(400, /unit \(saucelabs\) tests for 26ddec3 have no failures/);
+        .expect(400, /unit tests \(saucelabs\) for 26ddec3 have no failures/);
 
     await request(probot.server)
         .post(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
         .auth('buildcop')
-        .expect(400, /unit \(saucelabs\) tests for 26ddec3 have no failures/);
+        .expect(400, /unit tests \(saucelabs\) for 26ddec3 have no failures/);
   });
 
   test.each([

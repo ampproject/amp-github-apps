@@ -38,7 +38,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
         status: 'queued',
         output: {
           title: 'Tests are queued on Travis',
-          summary: `The ${type} (${subType}) tests are queued to run on ` +
+          summary: `The ${type} tests (${subType}) are queued to run on ` +
             'Travis. Watch this space for results in a few minutes!',
         },
       });
@@ -50,7 +50,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
         started_at: new Date().toISOString(),
         output: {
           title: 'Tests are running on Travis',
-          summary: `The ${type} (${subType}) tests are running on Travis. ` +
+          summary: `The ${type} tests (${subType}) are running on Travis. ` +
           'Watch this space for results in a few minutes!',
         },
       });
@@ -63,7 +63,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
         completed_at: new Date().toISOString(),
         output: {
           title: 'Tests were not required',
-          summary: `The ${type} (${subType}) tests were not required to run ` +
+          summary: `The ${type} tests (${subType}) were not required to run ` +
             'for this pull request.',
         },
       });
@@ -107,7 +107,7 @@ function createReportedCheckParams(
       conclusion: 'action_required',
       output: {
         title: `${failed} test${failed != 1 ? 's' : ''} failed`,
-        summary: `The ${type} (${subType}) tests finished running on Travis.`,
+        summary: `The ${type} tests (${subType}) finished running on Travis.`,
         text: `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n` +
           `* *${failed}* test${failed != 1 ? 's' : ''} FAILED\n\n` +
           'Please inspect the Travis build and fix any code changes that ' +
@@ -124,7 +124,7 @@ function createReportedCheckParams(
       conclusion: 'success',
       output: {
         title: `${passed} test${passed != 1 ? 's' : ''} passed`,
-        summary: `The ${type} (${subType}) tests finished running on Travis.`,
+        summary: `The ${type} tests (${subType}) finished running on Travis.`,
         text: `* *${passed}* test${passed != 1 ? 's' : ''} PASSED`,
       },
     });
@@ -158,7 +158,7 @@ function createErroredCheckParams(
     output: {
       title: `Tests have errored`,
       summary: `An unexpected error occurred while running ${type} ` +
-        `(${subType}) tests.`,
+        `tests (${subType}).`,
       text: 'Please inspect the Travis build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
         // TODO(danielrozenberg): say who the weekly build cop is inline here:
@@ -186,7 +186,7 @@ exports.installApiRouter = (app, db) => {
         const {headSha, type, subType, status} = request.params;
         app.log(
             `Creating/updating a new GitHub check for the ${type} ` +
-            `(${subType}) tests for pull request with head commit SHA ` +
+            `tests (${subType}) for pull request with head commit SHA ` +
             `${headSha}, with a status of '${status}'`);
 
         const pullRequestSnapshot = await getPullRequestSnapshot(db, headSha);
@@ -229,7 +229,7 @@ exports.installApiRouter = (app, db) => {
       async (request, response) => {
         const {headSha, type, subType, passed, failed} = request.params;
         app.log(
-            `Reporting the results of the ${type} (${subType}) tests to the ` +
+            `Reporting the results of the ${type} tests (${subType}) to the ` +
             `GitHub check for pull request with head commit SHA ${headSha}`);
         app.log(`Passed: ${passed} | Failed: ${failed}`);
 
@@ -257,7 +257,7 @@ exports.installApiRouter = (app, db) => {
       async (request, response) => {
         const {headSha, type, subType} = request.params;
         app.log(
-            `Reporting that ${type} (${subType}) tests have errored to the ` +
+            `Reporting that ${type} tests (${subType}) have errored to the ` +
             `GitHub check for pull request with head commit SHA ${headSha}`);
 
         const pullRequestSnapshot = await getPullRequestSnapshot(db, headSha);
