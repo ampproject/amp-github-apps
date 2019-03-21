@@ -113,7 +113,7 @@ exports.installWebUiRouter = (app, db) => {
   tests.get('/:headSha/:type/:subType/status', async (request, response) => {
     response.render('status', Object.assign({
       shortHeadSha: request.shortHeadSha,
-      is_skipping: false,
+      isSkipping: false,
     }, request.check));
   });
 
@@ -132,7 +132,7 @@ exports.installWebUiRouter = (app, db) => {
   tests.get('/:headSha/:type/:subType/skip', async (request, response) => {
     response.render('status', Object.assign({
       shortHeadSha: request.shortHeadSha,
-      is_skipping: true,
+      isSkipping: true,
     }, request.check));
   });
 
@@ -143,7 +143,7 @@ exports.installWebUiRouter = (app, db) => {
     if (!errors.isEmpty()) {
       response.render('status', Object.assign({
         shortHeadSha: request.shortHeadSha,
-        is_skipping: true,
+        isSkipping: true,
         errors: errors.mapped(),
       }, request.check));
       return;

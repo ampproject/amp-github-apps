@@ -59,7 +59,7 @@
 
         <div class="mt-4">
           <div class="d-flex flex-justify-center mt-2">
-            {{#if is_skipping }}
+            {{#if isSkipping }}
             <form action="/tests/{{ headSha }}/{{ type }}/{{ subType }}/skip" method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
               <p>Skip these tests?</p>
               <dl class="form-group{{#if errors.reason }} errored{{/if}}">
