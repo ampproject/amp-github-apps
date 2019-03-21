@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMP Test Status | {{ short_head_sha }}/{{ type }}</title>
+    <title>AMP Test Status | {{ shortHeadSha }}/{{ type }}</title>
     <link rel="shortcut icon" href="/static/amp_favicon.png">
     <link rel="stylesheet" href="/probot/static/primer.css">
     <style>
@@ -36,11 +36,11 @@
           <tbody>
             <tr>
               <td>Pull request</td>
-              <td><a href="https://github.com/{{ owner }}/{{ repo }}/pull/{{ pull_request_id }}">#{{ pull_request_id }}</a></td>
+              <td><a href="https://github.com/{{ owner }}/{{ repo }}/pull/{{ pullRequestId }}">#{{ pullRequestId }}</a></td>
             </tr>
             <tr>
               <td>Head SHA</td>
-              <td><a href="https://github.com/{{ owner }}/{{ repo }}/commit/{{ head_sha }}">{{ short_head_sha }}</a></td>
+              <td><a href="https://github.com/{{ owner }}/{{ repo }}/commit/{{ headSha }}">{{ shortHeadSha }}</a></td>
             </tr>
             <tr>
               <td>Test type</td>
@@ -59,8 +59,8 @@
 
         <div class="mt-4">
           <div class="d-flex flex-justify-center mt-2">
-            {{#if is_skipping }}
-            <form action="/tests/{{ head_sha }}/{{ type }}/{{ subType }}/skip" method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
+            {{#if isSkipping }}
+            <form action="/tests/{{ headSha }}/{{ type }}/{{ subType }}/skip" method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
               <p>Skip these tests?</p>
               <dl class="form-group{{#if errors.reason }} errored{{/if}}">
                 <dt><label for="reason">Reason for skipping</label></dt>
@@ -70,9 +70,9 @@
               <input type="submit" value="Really skip!" class="btn btn-outline">
             </form>
             {{else if failed }}
-            <a href="/tests/{{ head_sha }}/{{ type }}/{{ subType }}/skip" class="btn btn-outline">Skip these tests?</a>
+            <a href="/tests/{{ headSha }}/{{ type }}/{{ subType }}/skip" class="btn btn-outline">Skip these tests?</a>
             {{else if errored }}
-            <a href="/tests/{{ head_sha }}/{{ type }}/{{ subType }}/skip" class="btn btn-outline">Skip these tests?</a>
+            <a href="/tests/{{ headSha }}/{{ type }}/{{ subType }}/skip" class="btn btn-outline">Skip these tests?</a>
             {{else}}
             <p>No test failures reported for {{ type }} tests ({{ subType }})!</p>
             {{/if}}

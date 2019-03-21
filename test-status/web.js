@@ -50,7 +50,7 @@ function createSkippedCheckParams(request) {
   return {
     owner: request.check.owner,
     repo: request.check.repo,
-    check_run_id: request.check.check_run_id,
+    check_run_id: request.check.checkRunId,
     completed_at: new Date().toISOString(),
     conclusion: 'success',
     output: {
@@ -95,13 +95,13 @@ exports.installWebUiRouter = (app, db) => {
   tests.all('/:headSha/:type/:subType/:action(status|skip)',
       async (request, response, next) => {
         const {headSha, type, subType} = request.params;
-        request.short_head_sha = headSha.substr(0, 7);
+        request.shortHeadSha = headSha.substr(0, 7);
         const check = await getCheckRunResults(db, headSha, type, subType);
         if (check === null ||
             (!check.errored &&
               (check.passed === null || check.failed === null))) {
           return response.status(404).render('404', {
-            headSha: request.short_head_sha,
+            headSha: request.shortHeadSha,
             type,
             subType,
           });
@@ -112,8 +112,8 @@ exports.installWebUiRouter = (app, db) => {
 
   tests.get('/:headSha/:type/:subType/status', async (request, response) => {
     response.render('status', Object.assign({
-      short_head_sha: request.short_head_sha,
-      is_skipping: false,
+      shortHeadSha: request.shortHeadSha,
+      isSkipping: false,
     }, request.check));
   });
 
@@ -123,7 +123,7 @@ exports.installWebUiRouter = (app, db) => {
           return response.status(400).render('400', {
             message:
                 `${request.params.type} tests (${request.params.subType}) ` +
-                `for ${request.short_head_sha} have no failures`,
+                `for ${request.shortHeadSha} have no failures`,
           });
         }
         next();
@@ -131,8 +131,8 @@ exports.installWebUiRouter = (app, db) => {
 
   tests.get('/:headSha/:type/:subType/skip', async (request, response) => {
     response.render('status', Object.assign({
-      short_head_sha: request.short_head_sha,
-      is_skipping: true,
+      shortHeadSha: request.shortHeadSha,
+      isSkipping: true,
     }, request.check));
   });
 
@@ -142,19 +142,19 @@ exports.installWebUiRouter = (app, db) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
       response.render('status', Object.assign({
-        short_head_sha: request.short_head_sha,
-        is_skipping: true,
+        shortHeadSha: request.shortHeadSha,
+        isSkipping: true,
         errors: errors.mapped(),
       }, request.check));
       return;
     }
 
     const params = createSkippedCheckParams(request);
-    const github = await app.auth(request.check.installation_id);
+    const github = await app.auth(request.check.installationId);
     await github.checks.update(params);
 
     response.redirect(
         `https://github.com/${request.check.owner}/${request.check.repo}` +
-        `/pull/${request.check.pull_request_id}`);
+        `/pull/${request.check.pullRequestId}`);
   });
 };

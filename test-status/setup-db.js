@@ -24,28 +24,28 @@ const log = require('fancy-log');
  * @return {Promise<knex>} database handler.
  */
 function setupDb(db) {
-  return db.schema.createTable('pull_request_snapshots', table => {
+  return db.schema.createTable('pullRequestSnapshots', table => {
     table.comment('Snapshots of pull requests referenced by their head SHA');
 
-    table.string('head_sha', 40).primary();
+    table.string('headSha', 40).primary();
     table.string('owner');
     table.string('repo');
-    table.integer('pull_request_id');
-    table.integer('installation_id')
+    table.integer('pullRequestId');
+    table.integer('installationId')
         .comment('Required to create checks (status lines) on GitHub');
   }).createTable('checks', table => {
     table.comment('Checks (status lines) created on GitHub, referenced by ID');
-    table.string('head_sha', 40);
+    table.string('headSha', 40);
     table.string('type', 255);
     table.string('subType', 255);
-    table.integer('check_run_id');
+    table.integer('checkRunId');
     table.integer('passed');
     table.integer('failed');
     table.boolean('errored');
 
-    table.primary(['head_sha', 'type', 'subType']);
-    table.foreign('head_sha')
-        .references('pull_request_snapshots.head_sha')
+    table.primary(['headSha', 'type', 'subType']);
+    table.foreign('headSha')
+        .references('pullRequestSnapshots.headSha')
         .onDelete('CASCADE');
   });
 }

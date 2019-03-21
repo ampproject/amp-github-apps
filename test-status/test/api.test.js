@@ -56,7 +56,7 @@ describe('test-status/api', () => {
   });
 
   afterEach(async () => {
-    await db('pull_request_snapshots').truncate();
+    await db('pullRequestSnapshots').truncate();
     await db('checks').truncate();
   });
 
@@ -68,12 +68,12 @@ describe('test-status/api', () => {
     ['queued', 'queued', 'Tests are queued on Travis'],
     ['skipped', 'completed', 'Tests were not required'],
   ])('Create a new check with /%s action', async (action, status, title) => {
-    await db('pull_request_snapshots').insert({
-      head_sha: HEAD_SHA,
+    await db('pullRequestSnapshots').insert({
+      headSha: HEAD_SHA,
       owner: 'ampproject',
       repo: 'amphtml',
-      pull_request_id: 19621,
-      installation_id: 123456,
+      pullRequestId: 19621,
+      installationId: 123456,
     });
 
     const nocks = nock('https://api.github.com')
@@ -95,10 +95,10 @@ describe('test-status/api', () => {
         .expect(200);
 
     expect(await db('checks').select('*')).toMatchObject([{
-      head_sha: HEAD_SHA,
+      headSha: HEAD_SHA,
       type: 'unit',
       subType: 'saucelabs',
-      check_run_id: 555555,
+      checkRunId: 555555,
       passed: null,
       failed: null,
       errored: null,
@@ -108,18 +108,18 @@ describe('test-status/api', () => {
   });
 
   test('Update an existing check with /started action', async () => {
-    await db('pull_request_snapshots').insert({
-      head_sha: HEAD_SHA,
+    await db('pullRequestSnapshots').insert({
+      headSha: HEAD_SHA,
       owner: 'ampproject',
       repo: 'amphtml',
-      pull_request_id: 19621,
-      installation_id: 123456,
+      pullRequestId: 19621,
+      installationId: 123456,
     });
     await db('checks').insert({
-      head_sha: HEAD_SHA,
+      headSha: HEAD_SHA,
       type: 'unit',
       subType: 'saucelabs',
-      check_run_id: 555555,
+      checkRunId: 555555,
     });
 
     const nocks = nock('https://api.github.com')
@@ -150,18 +150,18 @@ describe('test-status/api', () => {
       `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
   ])('Update an existing check with /report/%d/%d action',
       async (passed, failed, conclusion, title, detailsUrl) => {
-        await db('pull_request_snapshots').insert({
-          head_sha: HEAD_SHA,
+        await db('pullRequestSnapshots').insert({
+          headSha: HEAD_SHA,
           owner: 'ampproject',
           repo: 'amphtml',
-          pull_request_id: 19621,
-          installation_id: 123456,
+          pullRequestId: 19621,
+          installationId: 123456,
         });
         await db('checks').insert({
-          head_sha: HEAD_SHA,
+          headSha: HEAD_SHA,
           type: 'unit',
           subType: 'saucelabs',
-          check_run_id: 555555,
+          checkRunId: 555555,
         });
 
         const nocks = nock('https://api.github.com')
@@ -188,10 +188,10 @@ describe('test-status/api', () => {
             .expect(200);
 
         expect(await db('checks').select('*')).toMatchObject([{
-          head_sha: HEAD_SHA,
+          headSha: HEAD_SHA,
           type: 'unit',
           subType: 'saucelabs',
-          check_run_id: 555555,
+          checkRunId: 555555,
           passed,
           failed,
           errored: 0,
@@ -201,18 +201,18 @@ describe('test-status/api', () => {
       });
 
   test('Update an existing check with /report/errored action', async () => {
-    await db('pull_request_snapshots').insert({
-      head_sha: HEAD_SHA,
+    await db('pullRequestSnapshots').insert({
+      headSha: HEAD_SHA,
       owner: 'ampproject',
       repo: 'amphtml',
-      pull_request_id: 19621,
-      installation_id: 123456,
+      pullRequestId: 19621,
+      installationId: 123456,
     });
     await db('checks').insert({
-      head_sha: HEAD_SHA,
+      headSha: HEAD_SHA,
       type: 'unit',
       subType: 'saucelabs',
-      check_run_id: 555555,
+      checkRunId: 555555,
     });
 
     const nocks = nock('https://api.github.com')
@@ -235,10 +235,10 @@ describe('test-status/api', () => {
         .expect(200);
 
     expect(await db('checks').select('*')).toMatchObject([{
-      head_sha: HEAD_SHA,
+      headSha: HEAD_SHA,
       type: 'unit',
       subType: 'saucelabs',
-      check_run_id: 555555,
+      checkRunId: 555555,
       passed: null,
       failed: null,
       errored: 1,
