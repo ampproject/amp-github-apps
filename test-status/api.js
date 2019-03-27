@@ -104,7 +104,8 @@ function createReportedCheckParams(
         process.env.WEB_UI_BASE_URL);
     Object.assign(params, {
       details_url: detailsUrl.href,
-      conclusion: 'action_required',
+      // TODO(#102, danielrozenberg): restore this to 'action_required'
+      conclusion: 'neutral',
       output: {
         title: `${failed} test${failed != 1 ? 's' : ''} failed`,
         summary: `The ${type} tests (${subType}) finished running on Travis.`,
@@ -154,7 +155,8 @@ function createErroredCheckParams(
     status: 'completed',
     completed_at: new Date().toISOString(),
     details_url: detailsUrl.href,
-    conclusion: 'action_required',
+    // TODO(#102, danielrozenberg): restore this to 'action_required'
+    conclusion: 'neutral',
     output: {
       title: `Tests have errored`,
       summary: `An unexpected error occurred while running ${type} ` +
