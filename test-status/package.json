@@ -28,7 +28,7 @@
     "pg": "7.9.0",
     "passport": "0.4.0",
     "passport-github2": "0.1.11",
-    "probot": "7.5.1"
+    "probot": "7.5.3"
   },
   "devDependencies": {
     "deepcopy": "2.0.0",
