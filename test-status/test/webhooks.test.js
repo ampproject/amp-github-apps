@@ -52,7 +52,9 @@ describe('test-status/webhooks', () => {
     });
 
     // Return a test token.
-    app.app = () => 'test';
+    app.app = {
+      getInstallationAccessToken: () => Promise.resolve('test'),
+    };
   });
 
   beforeEach(async () => {
