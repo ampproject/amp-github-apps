@@ -174,7 +174,7 @@ module.exports = app => {
 
       if (requiresApproval) {
         await addOwnersReviewer(github,
-            Object.assign({number: check.pull_request_id}, githubOptions));
+            Object.assign({pull_number: check.pull_request_id}, githubOptions));
       }
 
       return true;
@@ -208,7 +208,7 @@ module.exports = app => {
         });
         await github.checks.update(updatedCheckOptions);
         await addOwnersReviewer(github,
-            Object.assign({number: check.pull_request_id}, githubOptions));
+            Object.assign({pull_number: check.pull_request_id}, githubOptions));
       }
       return false;
     }
