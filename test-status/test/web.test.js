@@ -42,7 +42,9 @@ describe('test-status/web', () => {
     });
 
     // Return a test token.
-    app.app = () => 'test';
+    app.app = {
+      getInstallationAccessToken: () => Promise.resolve('test'),
+    };
   });
 
   beforeEach(async () => {
