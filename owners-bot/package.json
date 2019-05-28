@@ -1,0 +1,46 @@
+{
+  "name": "github-owners-bot",
+  "author": "Google Inc.",
+  "private": true,
+  "version": "0.0.1",
+  "repository": "http://github.com/ampproject/github-owners-bot",
+  "description": "A web service that suggests approvers for a GitHub pull request based on OWNERS files and enforces reviews by OWNERS as a GitHub status check.",
+  "engines": {
+    "node": "^10.11"
+  },
+  "scripts": {
+    "dev": "nodemon",
+    "start": "probot run ./index.js",
+    "test": "jest",
+    "test:watch": "jest --watch --notify --notifyMode=change"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lodash": "4.17.11",
+    "probot": "7.5.0",
+    "sleep-promise": "8.0.1",
+    "yamljs": "0.3.0"
+  },
+  "devDependencies": {
+    "jest": "23.6.0",
+    "nock": "10.0.6",
+    "nodemon": "1.18.9",
+    "sinon": "7.2.3",
+    "smee-client": "1.0.2"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
+  "nodemonConfig": {
+    "exec": "npm start",
+    "watch": [
+      ".env",
+      "."
+    ]
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
