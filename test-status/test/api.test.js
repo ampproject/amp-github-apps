@@ -146,11 +146,9 @@ describe('test-status/api', () => {
   test.each([
     [0, 0, 'success', '0 tests passed', null],
     [1, 0, 'success', '1 test passed', null],
-    // TODO(#102, danielrozenberg): restore this to 'action_required'
-    [5, 5, 'neutral', '5 tests failed',
+    [5, 5, 'action_required', '5 tests failed',
       `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
-    // TODO(#102, danielrozenberg): restore this to 'action_required'
-    [0, 1, 'neutral', '1 test failed',
+    [0, 1, 'action_required', '1 test failed',
       `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
   ])('Update an existing check with /report/%d/%d action',
       async (passed, failed, conclusion, title, detailsUrl) => {
@@ -223,8 +221,7 @@ describe('test-status/api', () => {
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
           expect(body).toMatchObject({
             status: 'completed',
-            // TODO(#102, danielrozenberg): restore this to 'action_required'
-            conclusion: 'neutral',
+            conclusion: 'action_required',
             details_url: `http://localhost:3000/tests/${HEAD_SHA}/unit/` +
               'saucelabs/status',
             output: {
