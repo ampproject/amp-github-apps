@@ -1,9 +1,9 @@
 {
-  "name": "github-owners-bot",
+  "name": "owners",
   "author": "Google Inc.",
   "private": true,
   "version": "0.0.1",
-  "repository": "http://github.com/ampproject/github-owners-bot",
+  "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "A web service that suggests approvers for a GitHub pull request based on OWNERS files and enforces reviews by OWNERS as a GitHub status check.",
   "engines": {
     "node": "^10.11"
