@@ -11,7 +11,6 @@ import os
 from typing import Any, Mapping, Sequence, Text
 import yaml
 
-
 ENV_YAML_PATH = os.path.join(os.path.dirname(__file__), 'env.yaml')
 
 
