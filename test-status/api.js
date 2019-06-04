@@ -23,7 +23,7 @@ const {getCheckRunId, getPullRequestSnapshot} = require('./db');
  * @param {string} type major tests type slug (e.g., unit, integration).
  * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {string} status status action.
- * @return {!Object} a parameters object for github.checks.create|update.
+ * @return {!object} a parameters object for github.checks.create|update.
  */
 function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
   const params = {
@@ -86,7 +86,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
  * @param {number} checkRunId the existing check run ID.
  * @param {number} passed number of tests that passed.
  * @param {number} failed number of tests that failed.
- * @return {!Object} a parameters object for github.checks.update.
+ * @return {!object} a parameters object for github.checks.update.
  */
 function createReportedCheckParams(
   pullRequestSnapshot, type, subType, checkRunId, passed, failed) {
@@ -140,7 +140,7 @@ function createReportedCheckParams(
  * @param {string} type major tests type slug (e.g., unit, integration).
  * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {number} checkRunId the existing check run ID.
- * @return {!Object} a parameters object for github.checks.update.
+ * @return {!object} a parameters object for github.checks.update.
  */
 function createErroredCheckParams(
   pullRequestSnapshot, type, subType, checkRunId) {

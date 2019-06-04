@@ -28,8 +28,8 @@ const shellFlag = (process.platform == 'win32') ? '/C' : '-c';
  * Spawns the given command in a child process with the given options.
  *
  * @param {string} cmd
- * @param {Object} options
- * @return {Object} Process info.
+ * @param {object} options
+ * @return {object} Process info.
  */
 function spawnProcess(cmd, options) {
   return childProcess.spawnSync(shellCmd, [shellFlag, cmd], options);
@@ -40,8 +40,8 @@ function spawnProcess(cmd, options) {
  * object.
  *
  * @param {string} cmd Command line to execute.
- * @param {Object} options
- * @return {Object} Process info.
+ * @param {object} options
+ * @return {object} Process info.
  */
 exports.exec = function(cmd, options) {
   options = options || {'stdio': 'inherit'};
@@ -52,7 +52,7 @@ exports.exec = function(cmd, options) {
  * Executes the provided command, and terminates the program in case of failure.
  *
  * @param {string} cmd Command line to execute.
- * @param {Object} options Extra options to send to the process.
+ * @param {object} options Extra options to send to the process.
  */
 exports.execOrDie = function(cmd, options) {
   const p = exports.exec(cmd, options);

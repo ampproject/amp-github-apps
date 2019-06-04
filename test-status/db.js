@@ -19,7 +19,7 @@
  *
  * @param {!Knex} db instantiated database connection.
  * @param {string} headSha SHA of a pull request's head commit.
- * @return {!Object} a pull request request snapshot information.
+ * @return {!object} a pull request request snapshot information.
  */
 exports.getPullRequestSnapshot = async (db, headSha) => {
   return await db('pullRequestSnapshots')
