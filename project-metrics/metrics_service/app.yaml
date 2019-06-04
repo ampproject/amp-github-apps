@@ -1,2 +1,6 @@
 runtime: python37
 entrypoint: python server.py --port $PORT
+
+handlers:
+- url: /.*
+  script: auto
