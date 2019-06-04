@@ -21,7 +21,6 @@ const path = require('path');
  * This is hydrated from the github pull request api.
  */
 class RepoFile {
-
   constructor(filePath) {
     // We want it have the leading ./ to evaluate `.` later on
     this.path = /^\./.test(filePath) ? filePath : `.${path.sep}${filePath}`;

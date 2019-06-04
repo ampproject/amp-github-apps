@@ -25,7 +25,6 @@ const path = require('path');
  * Represents an OWNER file found in the repo.
  */
 class Owner {
-
   constructor(config, pathToRepoDir, filePath) {
     // We want it have the leading ./ to evaluate `.` later on
     this.path = /^\./.test(filePath) ? filePath : `.${path.sep}${filePath}`;
@@ -60,7 +59,7 @@ class Owner {
     const promises = Promise.all([
       pr.listFiles(),
       git.getOwnersFilesForBranch(pr.author, process.env.GITHUB_REPO_DIR,
-          'master'),
+        'master'),
     ]);
     const res = await promises;
     const [files, ownersMap] = res;

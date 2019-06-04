@@ -29,7 +29,6 @@ function yamlReader(str) {
 }
 
 class Git {
-
   constructor(context) {
     this.context = context;
   }

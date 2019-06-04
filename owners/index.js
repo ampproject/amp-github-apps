@@ -17,8 +17,8 @@
 const {PullRequest, Teams} = require('./src/github');
 
 module.exports = app => {
-  app.on(['pull_request.opened', 'pull_request.synchronized'], onPullRequest)
-  app.on('check_run.rerequested', onCheckRunRerequest)
+  app.on(['pull_request.opened', 'pull_request.synchronized'], onPullRequest);
+  app.on('check_run.rerequested', onCheckRunRerequest);
   app.on('pull_request_review.submitted', onPullRequestReview);
 
   // Probot does not stream properly to GCE logs so we need to hook into
@@ -54,4 +54,4 @@ module.exports = app => {
 
     return await processPullRequest(context, pr.data);
   }
-}
+};

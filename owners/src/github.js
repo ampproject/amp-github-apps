@@ -25,9 +25,7 @@ const sleep = require('sleep-promise');
  * Maps the github json payload to a simpler data structure.
  */
 class PullRequest {
-
   constructor(context, pr) {
-
     this.name = 'ampproject/owners-check';
 
     this.nameMatcher = new RegExp('owners bot|owners-check', 'i');
@@ -68,7 +66,7 @@ class PullRequest {
     const {hasCheckRun, checkRun} = this.hasCheckRun(checkRuns);
     if (hasCheckRun) {
       return this.updateCheckRun(checkRun, checkOutputText,
-          prInfo.approvalsMet);
+        prInfo.approvalsMet);
     }
     return this.createCheckRun(checkOutputText, prInfo.approvalsMet);
   }
@@ -99,7 +97,7 @@ class PullRequest {
 
   async getUniqueReviews() {
     const reviews = await this.getReviews();
-      // This should always pick out the first instance.
+    // This should always pick out the first instance.
     return _.uniqBy(reviews, 'username');
   }
 
@@ -161,7 +159,7 @@ class PullRequest {
         title: this.name,
         summary: `The check was a ${conclusion}!`,
         text,
-      }
+      },
     }));
   }
 
@@ -178,7 +176,7 @@ class PullRequest {
         title: this.name,
         summary: `The check was a ${conclusion}!`,
         text,
-      }
+      },
     }));
   }
 
@@ -209,11 +207,11 @@ class PullRequest {
    * @return {string}
    */
   buildCheckOutput(prInfo) {
-    let text = Object.values(prInfo.fileOwners)
+    const text = Object.values(prInfo.fileOwners)
       .filter(fileOwner => {
         // Omit sections that has a required reviewer who has approved.
         return !_.intersection(prInfo.reviewersWhoApproved,
-            fileOwner.owner.dirOwners).length;
+          fileOwner.owner.dirOwners).length;
       }).map(fileOwner => {
         const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(', ')}`;
         const files = fileOwner.files.map(file => {
@@ -233,7 +231,6 @@ class PullRequest {
 }
 
 class PullRequestComment {
-
   constructor(json) {
     this.id = json.id;
     this.type = 'pull_request_review_id' in json ? 'pulls' : 'issues';
@@ -246,7 +243,6 @@ class PullRequestComment {
 }
 
 class Label {
-
   constructor(json) {
     this.id = json.id;
     this.url = json.url;
@@ -257,14 +253,12 @@ class Label {
 }
 
 class Sender {
-
   constructor(json) {
     this.username = json.login;
   }
 }
 
 class Review {
-
   constructor(json) {
     this.id = json.id;
     this.username = json.user.login;
@@ -278,7 +272,6 @@ class Review {
 }
 
 class Teams {
-
   constructor(context) {
     this.context = context;
     this.github = context.github;
