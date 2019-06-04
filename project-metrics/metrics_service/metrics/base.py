@@ -15,36 +15,35 @@ class Metric(object):
   def __init__(self):
     self._result = None
 
-    class_name = self.__class__.__name__
-    if class_name.endswith('Metric'):
-      class_name = class_name[:-6]
-
-    self.label = stringcase.titlecase(class_name)
-    self.name = stringcase.snakecase(class_name)
-
   def __str__(self) -> Text:
     return '%s: %s' % (self.label, self.formatted_result)
 
   @property
+  def name(self):
+    """Metric name to use as DB identifier when storing results."""
+    return self.__class__.__name__
+
+  @property
+  def label(self) -> Text:
+    """Label for the metric (ex. TestCoverageMetric -> "Test Coverage")."""
+    return stringcase.titlecase(
+        self.name[:-6] if self.name.endswith('Metric') else self.name)
+
+  @property
   def formatted_result(self) -> Text:
     """The formatted result value (ex. 3w, 80%, 100PRs)."""
-    if self._result is None:
-      return '?'
-    return self._format_value(self.result.value)
+    return self._format_value(self._result.value) if self._result else '?'
 
   @property
   def result(self) -> Optional[models.MetricResult]:
     """The result of a computation of the metric."""
-    if self._result is None:
-      self._result = self._fetch_result()
     return self._result
 
   @property
   def score(self) -> models.MetricScore:
     """The 0-4 score for the metric."""
-    if self.result:
-      return self._score_value(self.result.value)
-    return models.MetricScore.UNKNOWN
+    return self._score_value(
+        self._result.value) if self._result else models.MetricScore.UNKNOWN
 
   def recompute(self) -> None:
     """Computes the metric and records the result in the `metrics` table."""

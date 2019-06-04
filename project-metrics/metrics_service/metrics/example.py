@@ -1,21 +1,13 @@
-"""Dummy/example metric.
-
-This metric is not going to stick around. It will live here temporarily as an
-example of how to implement a metric, and it will allow development of
-surrounding infrastructure (serving REST APIs, Cron job configuration, etc.).
-Once one or two real metrics are implemented, this can be removed.
-
-TODO (rcebulko): Remove once other metrics are in place.
-"""
+"""Dummy/example metric."""
 
 import datetime
 from typing import Text
 
-import metric_base
+from metrics import base
 import models
 
 
-class IdentityMetric(metric_base.PercentageMetric):
+class IdentityMetric(base.PercentageMetric):
   """A metric which reports the value it is initialized with."""
 
   def __init__(self, value: float):
