@@ -1,7 +1,7 @@
 """Provides the database engine for the CloudSQL instance."""
 
 import sqlalchemy
-from sqlalchemy.orm import session
+from sqlalchemy import orm
 import functools
 import env
 
@@ -15,11 +15,13 @@ def get_engine() -> sqlalchemy.engine.Engine:
           password=env.get('DB_PASS'),
           database=env.get('DB_NAME'),
           query={
-              'unix_socket': '%s/%s' % (
-                  env.get('CLOUD_SQL_SOCKET'),
-                  env.get('CLOUD_SQL_INSTANCE_NAME')),
-              'charset': 'utf8mb4',
-          }
-      ), echo=True)
+              'unix_socket':
+                  '%s/%s' % (env.get('CLOUD_SQL_SOCKET'),
+                             env.get('CLOUD_SQL_INSTANCE_NAME')),
+              'charset':
+                  'utf8mb4',
+          }),
+      echo=True)
 
-get_session = session.sessionmaker(bind=get_engine())
+
+get_session = orm.scoped_session(orm.sessionmaker(bind=get_engine()))
