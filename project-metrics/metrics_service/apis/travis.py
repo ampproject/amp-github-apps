@@ -4,7 +4,7 @@ from agithub import base as agithub_base
 from flask_api import status
 import functools
 import logging
-from typing import Any, Dict, Text
+from typing import Any, Dict, Sequence, Text
 
 import env
 
@@ -91,6 +91,37 @@ class TravisApi(agithub_base.API):
     if after_number:
       params['after_number'] = after_number
     status_code, response = self.repo.builds.get(**params)
+    if status_code is status.HTTP_200_OK:
+      return response
+    raise TravisApiError(
+        status_code,
+        'Travis Builds API request failed with response: %s' % response)
+
+  def fetch_jobs(self, job_ids: Sequence[Text]) -> Dict[Text, Any]:
+    """Fetches a list of jobs.
+
+    Args:
+      job_ids: a list of job IDs.
+
+    Raises:
+      TravisApiError: if the call to the Travis Jobs API fails.
+
+    Returns:
+      The API response containing a `jobs` list.
+      See https://docs.travis-ci.com/api/#jobs
+    """
+
+    if not job_ids:
+      raise ValueError(
+          'Must provide non-empty list of Travis job IDs to fetch.')
+
+    # The Travis API has a bug where it does not accept `ids` as the payload in
+    # the POST request for the Jobs endpoint (see https://github.com/travis-ci/travis-ci/issues/5457).
+    # The workaround is to manually contruct a URL-encoding for the list, as
+    # described in the issue above.
+    id_list_param = 'ids[]=%s' % '&ids[]='.join(str(jid) for jid in job_ids)
+    status_code, response = self.client.get('%s?%s' %
+                                            (self.jobs.url, id_list_param))
     if status_code is status.HTTP_200_OK:
       return response
     raise TravisApiError(
