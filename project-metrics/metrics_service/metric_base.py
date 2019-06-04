@@ -49,7 +49,7 @@ class Metric(object):
   def recompute(self) -> None:
     """Computes the metric and records the result in the `metrics` table."""
     self._result = models.MetricResult(
-      value=self._compute_value(), name=self.name)
+        value=self._compute_value(), name=self.name)
     # TODO(rcebulko): Insert row into `metrics` table
 
   def _fetch_result(self) -> Optional[models.MetricResult]:
@@ -89,3 +89,10 @@ class Metric(object):
       The result of the metric computation.
     """
     pass
+
+
+class PercentageMetric(Metric):
+  """Abstract base class for a metric with a percentage value."""
+
+  def _format_value(self, percentage: float) -> Text:
+    return '%.1f%%' % (percentage * 100)
