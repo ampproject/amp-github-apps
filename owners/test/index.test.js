@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+/* eslint max-len: 0 */
 const nock = require('nock');
 const owners = require('..');
 const {Probot} = require('probot');
 const Git = require('../src/git').Git;
-const Owner = require('../src/owner').Owner;
 const sinon = require('sinon');
 
 const opened35 = require('./fixtures/actions/opened.35');
@@ -34,9 +34,11 @@ const reviews35 = require('./fixtures/reviews/reviews.35');
 const reviews35Approved = require('./fixtures/reviews/reviews.35.approved');
 
 const checkruns35 = require('./fixtures/check-runs/check-runs.get.35');
-const checkruns35Multiple = require('./fixtures/check-runs/check-runs.get.35.multiple');
-const checkruns35Empty = require('./fixtures/check-runs/check-runs.get.35.empty');
-const checkRunsCreate = require('./fixtures/check-runs/check-runs.create');
+const checkruns35Multiple = require(
+  './fixtures/check-runs/check-runs.get.35.multiple');
+const checkruns35Empty = require(
+  './fixtures/check-runs/check-runs.get.35.empty');
+// const checkRunsCreate = require('./fixtures/check-runs/check-runs.create');
 
 const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 
@@ -371,27 +373,29 @@ describe('owners bot', () => {
         .reply(200, reviews35Approved);
 
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs')
+        .get('/repos/erwinmombay/github-owners-bot-test-repo/commits/' +
+            '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs')
         .reply(200, checkruns35Empty);
 
       // Test that a check-run is created
       nock('https://api.github.com')
-        .post('/repos/erwinmombay/github-owners-bot-test-repo/check-runs', body => {
-          expect(body).toMatchObject({
-            name: 'ampproject/owners-check',
-            head_branch: opened35.pull_request.head.ref,
-            head_sha: opened35.pull_request.head.sha,
-            status: 'completed',
-            // conclusion: 'success',
-            conclusion: 'neutral',
-            output: {
-              title: 'ampproject/owners-check',
-              summary: 'The check was a success!',
-              text: '',
-            },
-          });
-          return true;
-        }).reply(200);
+        .post(
+          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs', body => {
+            expect(body).toMatchObject({
+              name: 'ampproject/owners-check',
+              head_branch: opened35.pull_request.head.ref,
+              head_sha: opened35.pull_request.head.sha,
+              status: 'completed',
+              // conclusion: 'success',
+              conclusion: 'neutral',
+              output: {
+                title: 'ampproject/owners-check',
+                summary: 'The check was a success!',
+                text: '',
+              },
+            });
+            return true;
+          }).reply(200);
 
       await probot.receive({event: 'pull_request', payload: opened35});
     });
@@ -418,27 +422,29 @@ describe('owners bot', () => {
         .reply(200, reviews35);
 
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/commits/c7fdbd7f947fca608b20006da8535af5384ab699/check-runs')
+        .get('/repos/erwinmombay/github-owners-bot-test-repo/commits/' +
+          'c7fdbd7f947fca608b20006da8535af5384ab699/check-runs')
         .reply(200, checkruns35Empty);
 
       // // Test that a check-run is created
       nock('https://api.github.com')
-        .post('/repos/erwinmombay/github-owners-bot-test-repo/check-runs', body => {
-          expect(body).toMatchObject({
-            name: 'ampproject/owners-check',
-            head_branch: opened36.pull_request.head.ref,
-            head_sha: opened36.pull_request.head.sha,
-            status: 'completed',
-            // conclusion: 'success',
-            conclusion: 'neutral',
-            output: {
-              title: 'ampproject/owners-check',
-              summary: 'The check was a success!',
-              text: '',
-            },
-          });
-          return true;
-        }).reply(200);
+        .post(
+          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs', body => {
+            expect(body).toMatchObject({
+              name: 'ampproject/owners-check',
+              head_branch: opened36.pull_request.head.ref,
+              head_sha: opened36.pull_request.head.sha,
+              status: 'completed',
+              // conclusion: 'success',
+              conclusion: 'neutral',
+              output: {
+                title: 'ampproject/owners-check',
+                summary: 'The check was a success!',
+                text: '',
+              },
+            });
+            return true;
+          }).reply(200);
 
       await probot.receive({event: 'pull_request', payload: opened36});
     });
@@ -471,27 +477,29 @@ describe('owners bot', () => {
         .reply(200, reviews35Approved);
 
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs')
+        .get('/repos/erwinmombay/github-owners-bot-test-repo/commits/' +
+            '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs')
         .reply(200, checkruns35Empty);
 
       // Test that a check-run is created
       nock('https://api.github.com')
-        .post('/repos/erwinmombay/github-owners-bot-test-repo/check-runs', body => {
-          expect(body).toMatchObject({
-            name: 'ampproject/owners-check',
-            head_branch: opened35.pull_request.head.ref,
-            head_sha: opened35.pull_request.head.sha,
-            status: 'completed',
-            // conclusion: 'success',
-            conclusion: 'neutral',
-            output: {
-              title: 'ampproject/owners-check',
-              summary: 'The check was a success!',
-              text: '',
-            },
-          });
-          return true;
-        }).reply(200);
+        .post(
+          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs', body => {
+            expect(body).toMatchObject({
+              name: 'ampproject/owners-check',
+              head_branch: opened35.pull_request.head.ref,
+              head_sha: opened35.pull_request.head.sha,
+              status: 'completed',
+              // conclusion: 'success',
+              conclusion: 'neutral',
+              output: {
+                title: 'ampproject/owners-check',
+                summary: 'The check was a success!',
+                text: '',
+              },
+            });
+            return true;
+          }).reply(200);
 
       await probot.receive({event: 'pull_request_review', payload: review35});
     });

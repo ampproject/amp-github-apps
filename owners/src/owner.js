@@ -25,6 +25,13 @@ const path = require('path');
  * Represents an OWNER file found in the repo.
  */
 class Owner {
+
+  /**
+   * @param {!Array} config
+   * @param {string} pathToRepoDir
+   * @param {string} filePath
+   * @constructor
+   */
   constructor(config, pathToRepoDir, filePath) {
     // We want it have the leading ./ to evaluate `.` later on
     this.path = /^\./.test(filePath) ? filePath : `.${path.sep}${filePath}`;
@@ -38,7 +45,7 @@ class Owner {
   }
 
   /**
-   * @param {!Object} config
+   * @param {!Array} config
    */
   parseConfig_(config) {
     config.forEach(entry => {
@@ -52,6 +59,7 @@ class Owner {
   /**
    * @param {!Git} git
    * @param {!PullRequest} pr
+   * @return {!Object}
    */
   static async getOwners(git, pr) {
     // Update the local target repository of the latest from master
@@ -73,6 +81,9 @@ class Owner {
  * Returns a list of github usernames that can be "approvers" for the set
  * of files. It first tries to find the interection across the files and if
  * there are none it will return the union across usernames.
+ * @param {!Array} files
+ * @param {!Object} ownersMap
+ * @return {!Object}
  */
 function findOwners(files, ownersMap) {
   const fileOwners = Object.create(null);
@@ -94,6 +105,10 @@ function findOwners(files, ownersMap) {
  * Using the `ownersMap` key which is the path to the actual OWNER file
  * in the repo, we simulate a folder traversal by splitting the path and
  * finding the closest OWNER file for a RepoFile.
+ *
+ * @param {!./src/repo-file.RepoFile} file
+ * @param {!Object} ownersMap
+ * @return {!Object}
  */
 function findClosestOwnersFile(file, ownersMap) {
   let dirname = file.dirname;
@@ -107,6 +122,10 @@ function findClosestOwnersFile(file, ownersMap) {
   return owner;
 }
 
+/**
+ * @param {!Array} owners
+ * @return {!Object}
+ */
 function createOwnersMap(owners) {
   return owners.reduce((ownersMap, owner) => {
     // Handles empty OWNERS.yaml files.
