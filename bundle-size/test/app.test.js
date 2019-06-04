@@ -38,7 +38,7 @@ jest.setTimeout(30000);
  * return the previously modified object.
  *
  * @param {!string} name name of the JSON fixture file (without .json).
- * @return {!Object} the named JSON test fixture file.
+ * @return {!object} the named JSON test fixture file.
  */
 function getFixture(name) {
   return deepcopy(require(`./fixtures/${name}`));

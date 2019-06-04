@@ -30,7 +30,7 @@ let EXPRESS_SETTING_ARE_SET = false;
  * existing GitHub status check
  *
  * @param {!Request} request web Request object.
- * @return {!Object} a parameters object for github.checks.update.
+ * @return {!object} a parameters object for github.checks.update.
  */
 function createSkippedCheckParams(request) {
   const {type, subType, passed, failed, errored} = request.check;

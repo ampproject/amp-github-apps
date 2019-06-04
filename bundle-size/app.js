@@ -96,7 +96,7 @@ module.exports = app => {
    * Get the GitHub Check object from the database.
    *
    * @param {string} headSha commit SHA of the head commit of a pull request.
-   * @return {!Object} GitHub Check object.
+   * @return {!object} GitHub Check object.
    */
   async function getCheckFromDatabase(headSha) {
     const results = await db('checks')
@@ -113,7 +113,7 @@ module.exports = app => {
   /**
    * Try to report the bundle size of a pull request to the GitHub check.
    *
-   * @param {!Object} check GitHub Check object.
+   * @param {!object} check GitHub Check object.
    * @param {string} baseSha commit SHA of the base commit being compared to.
    * @param {number} bundleSize the total bundle size in KB.
    * @param {boolean} lastAttempt true if this is the last retry.
@@ -220,7 +220,7 @@ module.exports = app => {
    * Ignore errors as this is a non-critical action.
    *
    * @param {github} github an authenticated GitHub API object.
-   * @param {!Object} pullRequest GitHub Pull Request object.
+   * @param {!object} pullRequest GitHub Pull Request object.
    */
   async function addOwnersReviewer(github, pullRequest) {
     try {
