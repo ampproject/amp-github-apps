@@ -1,8 +1,17 @@
-"""Base interface for metrics to implement."""
+"""Base interface for metrics to implement.
+
+To create a new metric:
+1. Subclass `Metric` or `PercentMetric`
+2. Implement `_score_value`, `_compute_value`, and (unless you're using
+   `PercentMetric`) `_format_value`
+3. Call `metrics.base.Metric.register(YourNewMetric)`
+4. Add `from . import your_new_metric` to `__init__.py`
+"""
 
 import abc
-from typing import Optional, Sequence, Text, Type, TypeVar
+import sqlalchemy
 import stringcase
+from typing import Optional, Sequence, Text, Type, TypeVar
 
 import db_engine
 import models
@@ -76,7 +85,23 @@ class Metric(MetricDisplay):
   def get_latest(cls) -> Sequence['Metric']:
     """Fetch the latest result for each metric."""
     # TODO(rcebulko): Query DB.
-    latest_results = []
+    metric_results = models.MetricResult.__table__
+    session = db_engine.get_session()
+
+    max_dates = session.query(
+        metric_results.c.name,
+        sqlalchemy.func.max(
+            metric_results.c.computed_at).label('max_computed_at')).group_by(
+                metric_results.c.name).filter(
+                    metric_results.c.name.in_(
+                        cls.__active_metrics.keys())).subquery('latest')
+
+    latest_results = session.query(models.MetricResult).join(
+        max_dates,
+        sqlalchemy.and_(
+            metric_results.c.name == max_dates.c.name,
+            metric_results.c.computed_at == max_dates.c.max_computed_at))
+
     return [cls.__from_result(result) for result in latest_results]
 
   def __init__(self, result: Optional[models.MetricResult] = None):
