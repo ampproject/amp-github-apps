@@ -4,6 +4,7 @@ import abc
 from typing import Sequence, Optional, Text
 import stringcase
 
+import db_engine
 import models
 
 
@@ -52,6 +53,9 @@ class Metric(MetricDisplay):
     self.result = models.MetricResult(
         value=self._compute_value(), name=self.name)
     # TODO(rcebulko): Insert row into `metrics` table
+    session = db_engine.get_session()
+    session.add(self.result)
+    session.commit()
 
   @abc.abstractmethod
   def _format_value(self, value: float) -> Text:
