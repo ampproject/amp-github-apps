@@ -7,13 +7,11 @@ import stringcase
 import models
 
 
-class Metric(object):
-  """Abstract base class for health metrics."""
+class MetricDisplay(object):
+  """Mixin providing generic display/format logic for metrics.
 
-  __metaclass__ = abc.ABCMeta
-
-  def __init__(self):
-    self._result = None
+  Separated out so the Metric class can handle core metric logic.
+  """
 
   def __str__(self) -> Text:
     return '%s: %s' % (self.label, self.formatted_result)
@@ -32,29 +30,28 @@ class Metric(object):
   @property
   def formatted_result(self) -> Text:
     """The formatted result value (ex. 3w, 80%, 100PRs)."""
-    return self._format_value(self._result.value) if self._result else '?'
-
-  @property
-  def result(self) -> Optional[models.MetricResult]:
-    """The result of a computation of the metric."""
-    return self._result
+    return self._format_value(self.result.value) if self.result else '?'
 
   @property
   def score(self) -> models.MetricScore:
     """The 0-4 score for the metric."""
     return self._score_value(
-        self._result.value) if self._result else models.MetricScore.UNKNOWN
+        self.result.value) if self.result else models.MetricScore.UNKNOWN
+
+
+class Metric(MetricDisplay):
+  """Abstract base class for health metrics."""
+
+  __metaclass__ = abc.ABCMeta
+
+  def __init__(self, result: Optional[models.MetricResult] = None):
+    self.result = result
 
   def recompute(self) -> None:
     """Computes the metric and records the result in the `metrics` table."""
-    self._result = models.MetricResult(
+    self.result = models.MetricResult(
         value=self._compute_value(), name=self.name)
     # TODO(rcebulko): Insert row into `metrics` table
-
-  def _fetch_result(self) -> Optional[models.MetricResult]:
-    """Gets the most recent result for the metric from the DB."""
-    # TODO(rcebulko): Query latest matching result from DB
-    return None
 
   @abc.abstractmethod
   def _format_value(self, value: float) -> Text:
