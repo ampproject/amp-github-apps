@@ -40,5 +40,5 @@ class MetricResult(Base):
       default=datetime.datetime.utcnow)  # type: datetime.datetime
 
   def __repr__(self) -> Text:
-    return "<Metric(name='%s', value='%.1f', computed_at='%s')>" % (
+    return "<Metric(name='%s', value='%.3g', computed_at='%s')>" % (
         self.name, self.value, self.computed_at)
