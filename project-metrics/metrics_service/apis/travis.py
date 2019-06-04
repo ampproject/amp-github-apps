@@ -4,7 +4,7 @@ from agithub import base as agithub_base
 from flask_api import status
 import functools
 import logging
-from typing import Text
+from typing import Any, Dict, Text
 
 import env
 
@@ -68,3 +68,31 @@ class TravisApi(agithub_base.API):
     raise TravisApiError(
         status_code,
         'Travis Auth API request failed with response: %s' % response)
+
+  @property
+  def repo(self) -> agithub_base.IncompleteRequest:
+    """Returns a partial Travis request for the repository in env.yaml."""
+    return self.repos[env.get('GITHUB_REPO')]
+
+  def fetch_builds(self, after_number: int = None) -> Dict[Text, Any]:
+    """Fetches pull request builds from Travis.
+
+    Args:
+      after_number: build number to start from (for paging).
+
+    Raises:
+      TravisApiError: if the call to the Travis Builds API fails.
+
+    Returns:
+      The API response containing a `builds` list and associated `commits` list.
+      See https://docs.travis-ci.com/api/#builds
+    """
+    params = {'event_type': 'pull_request'}
+    if after_number:
+      params['after_number'] = after_number
+    status_code, response = self.repo.builds.get(**params)
+    if status_code is status.HTTP_200_OK:
+      return response
+    raise TravisApiError(
+        status_code,
+        'Travis Builds API request failed with response: %s' % response)
