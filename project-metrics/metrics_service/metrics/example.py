@@ -26,3 +26,6 @@ class IdentityMetric(base.PercentageMetric):
 
   def _compute_value(self) -> models.MetricResult:
     return self._value
+
+
+base.Metric.register(IdentityMetric)

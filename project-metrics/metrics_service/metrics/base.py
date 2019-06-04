@@ -1,7 +1,7 @@
 """Base interface for metrics to implement."""
 
 import abc
-from typing import Sequence, Optional, Text
+from typing import Optional, Sequence, Text, Type, TypeVar
 import stringcase
 
 import db_engine
@@ -44,6 +44,40 @@ class Metric(MetricDisplay):
   """Abstract base class for health metrics."""
 
   __metaclass__ = abc.ABCMeta
+  __active_metrics = {}
+
+  @classmethod
+  def register(cls, metric_cls: Type[TypeVar('U', bound='Metric')]):
+    """Register a metric to be included in result fetching.
+
+    Args:
+      metric_cls: metric implementation to make active.
+    """
+    cls.__active_metrics[metric_cls.__name__] = metric_cls
+
+  @classmethod
+  def __from_result(cls, result: models.MetricResult):
+    """Wraps a result in its metric class for display/processing.
+
+    Expects that the result is for an active metric.
+
+    Raises:
+      KeyError: if the result is for an inactive or non-existent metric.
+
+    Args:
+      result: metric result retrieved from the DB.
+
+    Returns:
+      A metric implementation holding the result.
+    """
+    return cls.__active_metrics[result.name](result=result)
+
+  @classmethod
+  def get_latest(cls) -> Sequence['Metric']:
+    """Fetch the latest result for each metric."""
+    # TODO(rcebulko): Query DB.
+    latest_results = []
+    return [cls.__from_result(result) for result in latest_results]
 
   def __init__(self, result: Optional[models.MetricResult] = None):
     self.result = result
@@ -52,7 +86,7 @@ class Metric(MetricDisplay):
     """Computes the metric and records the result in the `metrics` table."""
     self.result = models.MetricResult(
         value=self._compute_value(), name=self.name)
-    # TODO(rcebulko): Insert row into `metrics` table
+
     session = db_engine.get_session()
     session.add(self.result)
     session.commit()
