@@ -1,0 +1,9 @@
+# Private configuration files
+env.yaml
+
+# Third-party Python modules
+third_party/
+
+# Build/dev files
+__pycache__
+.pytype

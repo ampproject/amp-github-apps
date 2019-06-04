@@ -1,0 +1,2 @@
+runtime: python37
+entrypoint: python server.py --port $PORT
