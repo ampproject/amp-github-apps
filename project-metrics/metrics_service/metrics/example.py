@@ -10,8 +10,8 @@ import models
 class IdentityMetric(base.PercentageMetric):
   """A metric which reports the value it is initialized with."""
 
-  def __init__(self, value: float):
-    super(IdentityMetric, self).__init__()
+  def __init__(self, result: models.MetricResult = None, value: float):
+    super(IdentityMetric, self).__init__(result)
     self._value = value
 
   def _score_value(self, percentage: float) -> models.MetricScore:
@@ -26,3 +26,6 @@ class IdentityMetric(base.PercentageMetric):
 
   def _compute_value(self) -> models.MetricResult:
     return self._value
+
+
+base.Metric.register(IdentityMetric)

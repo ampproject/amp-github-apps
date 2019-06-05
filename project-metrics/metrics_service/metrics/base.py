@@ -1,19 +1,80 @@
-"""Base interface for metrics to implement."""
+"""Base interface for metrics to implement.
+
+To create a new metric:
+1. Subclass `Metric` or `PercentMetric`
+2. Implement `_score_value`, `_compute_value`, and (unless you're using
+   `PercentMetric`) `_format_value`
+3. Call `metrics.base.Metric.register(YourNewMetric)`
+4. Add `from . import your_new_metric` to `__init__.py`
+"""
 
 import abc
-from typing import Sequence, Optional, Text
+import sqlalchemy
 import stringcase
+from typing import Optional, Sequence, Text, Type, TypeVar
 
+import db_engine
 import models
 
 
-class Metric(object):
+class Metric(MetricDisplay):
   """Abstract base class for health metrics."""
 
   __metaclass__ = abc.ABCMeta
+  _active_metrics = {}
 
-  def __init__(self):
-    self._result = None
+  @classmethod
+  def register(cls, metric_cls: Type[TypeVar('U', bound='Metric')]):
+    """Register a metric to be included in result fetching.
+
+    Args:
+      metric_cls: metric implementation to make active.
+    """
+    cls._active_metrics[metric_cls.__name__] = metric_cls
+
+  @classmethod
+  def __from_result(cls, result: models.MetricResult):
+    """Wraps a result in its metric class for display/processing.
+
+    Expects that the result is for an active metric.
+
+    Raises:
+      KeyError: if the result is for an inactive or non-existent metric.
+
+    Args:
+      result: metric result retrieved from the DB.
+
+    Returns:
+      A metric implementation holding the result.
+    """
+    return cls._active_metrics[result.name](result=result)
+
+  @classmethod
+  def get_latest(cls) -> Sequence['Metric']:
+    """Fetch the latest result for each metric."""
+    # TODO(rcebulko): Query DB.
+    metric_results = models.MetricResult.__table__
+    session = db_engine.get_session()
+    active_metrics_names = cls._active_metrics.keys()
+
+    max_dates_query = session.query(
+        metric_results.c.name,
+        sqlalchemy.func.max(metric_results.c.computed_at
+                           ).label('max_computed_at')
+        ).group_by(metric_results.c.name
+        ).filter(metric_results.c.name.in_(active_metrics_names)
+        ).subquery('latest')
+
+    latest_results_query = session.query(models.MetricResult).join(
+        max_dates_query,
+        sqlalchemy.and_(
+            metric_results.c.name == max_dates_query.c.name,
+            metric_results.c.computed_at == max_dates_query.c.max_computed_at))
+
+    return [cls.__from_result(result) for result in latest_results_query]
+
+  def __init__(self, result: Optional[models.MetricResult] = None):
+    self.result = result
 
   def __str__(self) -> Text:
     return '%s: %s' % (self.label, self.formatted_result)
@@ -32,29 +93,22 @@ class Metric(object):
   @property
   def formatted_result(self) -> Text:
     """The formatted result value (ex. 3w, 80%, 100PRs)."""
-    return self._format_value(self._result.value) if self._result else '?'
-
-  @property
-  def result(self) -> Optional[models.MetricResult]:
-    """The result of a computation of the metric."""
-    return self._result
+    return self._format_value(self.result.value) if self.result else '?'
 
   @property
   def score(self) -> models.MetricScore:
     """The 0-4 score for the metric."""
     return self._score_value(
-        self._result.value) if self._result else models.MetricScore.UNKNOWN
+        self.result.value) if self.result else models.MetricScore.UNKNOWN
 
   def recompute(self) -> None:
     """Computes the metric and records the result in the `metrics` table."""
-    self._result = models.MetricResult(
+    self.result = models.MetricResult(
         value=self._compute_value(), name=self.name)
-    # TODO(rcebulko): Insert row into `metrics` table
 
-  def _fetch_result(self) -> Optional[models.MetricResult]:
-    """Gets the most recent result for the metric from the DB."""
-    # TODO(rcebulko): Query latest matching result from DB
-    return None
+    session = db_engine.get_session()
+    session.add(self.result)
+    session.commit()
 
   @abc.abstractmethod
   def _format_value(self, value: float) -> Text:
