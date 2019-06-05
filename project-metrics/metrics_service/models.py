@@ -1,12 +1,29 @@
 """Defines ORM models for interactions with the DB."""
 
-from typing import Text
+from typing import Text, Type, TypeVar
 import datetime
 import enum
 import sqlalchemy
 from sqlalchemy.ext import declarative
+import timedelta
 
 Base = declarative.declarative_base()
+
+
+def is_last_n_days(
+  timestamp_column: sqlalchemy.orm.attributes.InstrumentedAttribute, days: int
+  ) -> sqlalchemy.sql.elements.BinaryExpression:
+  """Produces the filter expression for the last N days of a model.
+
+  Args:
+    timestamp_column: model column to filter by.
+    days: number of days back to filter by.
+
+  Returns:
+    A binary expression which can be passed to a query's `.filter()` method.
+  """
+  n_days_ago = datetime.datetime.now() - timedelta.Timedelta(days=days)
+  return timestamp_column > n_days_ago
 
 
 class MetricScore(enum.Enum):
@@ -62,6 +79,22 @@ class Build(Base):
   """A Travis build."""
 
   __tablename__ = 'travis_builds'
+
+  @classmethod
+  def last_90_days(cls, session, negate=False) -> sqlalchemy.orm.query.Query:
+    """To query builds younger than 90 days.
+
+    Args:
+      session: SQL Alchemy database session.
+      negate: if true, returns builds older than 90 days
+
+    Returns:
+      Build query with filter applied.
+    """
+    filter_test = is_last_n_days(timestamp_column=cls.started_at, days=90)
+    if negate:
+      filter_test = sqlalchemy.not_(filter_test)
+    return session.query(cls).filter(filter_test)
 
   id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
   number = sqlalchemy.Column(sqlalchemy.Integer)
