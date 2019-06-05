@@ -42,3 +42,33 @@ class MetricResult(Base):
   def __repr__(self) -> Text:
     return "<Metric(name='%s', value='%.3g', computed_at='%s')>" % (
         self.name, self.value, self.computed_at)
+
+
+class TravisState(enum.Enum):
+  """A state of a Travis build or job.
+
+  Based on https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/job/test.rb#L21
+  """
+  CREATED = 0
+  QUEUED = 1
+  PENDING = 2
+  PASSED = 3
+  FAILED = 4
+  ERRORED = 5
+  CANCELLED = 6
+
+
+class Build(Base):
+  """A Travis build."""
+
+  __tablename__ = 'travis_builds'
+
+  id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+  number = sqlalchemy.Column(sqlalchemy.Integer)
+  duration = sqlalchemy.Column(sqlalchemy.Integer)
+  state = sqlalchemy.Column(sqlalchemy.Enum(TravisState))
+  started_at = sqlalchemy.Column(sqlalchemy.DateTime)
+
+  def __repr__(self) -> Text:
+    return "<Build(number=%d, duration=%d, state=%s, started_at=%s)>" % (
+        self.number, self.duration, self.state.name, self.started_at)
