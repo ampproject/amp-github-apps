@@ -1,4 +1,4 @@
-"""Dummy/example metric."""
+"""Travis-Greenness metric."""
 
 import datetime
 import sqlalchemy
