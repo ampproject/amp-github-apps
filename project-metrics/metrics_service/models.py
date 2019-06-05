@@ -45,13 +45,17 @@ class MetricResult(Base):
 
 
 class TravisState(enum.Enum):
-  """A state of a Travis build or job."""
+  """A state of a Travis build or job.
+
+  Based on https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/job/test.rb#L21
+  """
   CREATED = 0
-  PENDING = 1
-  PASSED = 2
-  FAILED = 3
-  ERRORED = 4
-  CANCELLED = 5
+  QUEUED = 1
+  PENDING = 2
+  PASSED = 3
+  FAILED = 4
+  ERRORED = 5
+  CANCELLED = 6
 
 
 class Build(Base):
@@ -66,5 +70,5 @@ class Build(Base):
   started_at = sqlalchemy.Column(sqlalchemy.DateTime)
 
   def __repr__(self) -> Text:
-    return "<Build(number='%d', duration='%d', state='%s', started_at='%s')>" % (
+    return "<Build(number=%d, duration=%d, state=%s, started_at=%s)>" % (
         self.number, self.duration, self.state.name, self.started_at)
