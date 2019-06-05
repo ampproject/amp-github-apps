@@ -48,7 +48,7 @@ class TravisState(enum.Enum):
   """A state of a Travis build or job."""
   CREATED = 0
   PENDING = 1
-  PPASSED = 2
+  PASSED = 2
   FAILED = 3
   ERRORED = 4
   CANCELLED = 5
