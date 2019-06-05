@@ -28,13 +28,13 @@ class TravisGreennessMetric(base.PercentageMetric):
     session = db_engine.get_session()
     count_query = session.query(
         models.Build.state,
-        sqlalchemy.func.count().label('state_count')).group_by(
-            models.Build.state).filter(
-                models.Build.state.in_([
-                    models.TravisState.PASSED,
-                    models.TravisState.FAILED,
-                    models.TravisState.ERRORED,
-                ]))
+        sqlalchemy.func.count().label('state_count')
+        ).group_by(models.Build.state
+        ).filter(models.Build.state.in_([
+            models.TravisState.PASSED,
+            models.TravisState.FAILED,
+            models.TravisState.ERRORED,
+        ]))
     state_counts = count_query.all()
     return dict(state_counts)
 
