@@ -88,5 +88,5 @@ class Job(Base):
                                sqlalchemy.ForeignKey('travis_builds.id'))
 
   def __repr__(self) -> Text:
-    return "<Job(number='%d', state='%s', started_at='%s')>" % (
+    return "<Job(number=%d, state=%s, started_at=%s)>" % (
         self.number, self.state.name, self.started_at)
