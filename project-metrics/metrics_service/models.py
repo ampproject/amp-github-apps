@@ -68,7 +68,25 @@ class Build(Base):
   duration = sqlalchemy.Column(sqlalchemy.Integer)
   state = sqlalchemy.Column(sqlalchemy.Enum(TravisState))
   started_at = sqlalchemy.Column(sqlalchemy.DateTime)
+  jobs = sqlalchemy.orm.relationship('Job', backref='build')
 
   def __repr__(self) -> Text:
     return "<Build(number=%d, duration=%d, state=%s, started_at=%s)>" % (
         self.number, self.duration, self.state.name, self.started_at)
+
+
+class Job(Base):
+  """A Travis job."""
+
+  __tablename__ = 'travis_jobs'
+
+  id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+  number = sqlalchemy.Column(sqlalchemy.Integer)
+  state = sqlalchemy.Column(sqlalchemy.Enum(TravisState))
+  started_at = sqlalchemy.Column(sqlalchemy.DateTime)
+  build_id = sqlalchemy.Column(sqlalchemy.Integer,
+                               sqlalchemy.ForeignKey('travis_builds.id'))
+
+  def __repr__(self) -> Text:
+    return "<Job(number='%d', state='%s', started_at='%s')>" % (
+        self.number, self.state.name, self.started_at)
