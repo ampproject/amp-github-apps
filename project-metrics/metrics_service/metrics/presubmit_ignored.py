@@ -8,6 +8,9 @@ import models
 class PresubmitIgnoredMetric(base.Metric):
   """A metric tracking the number of PRs that submitted with failing builds."""
 
+  def _format_value(self, ignored: float):
+    return '1PR/90d' if ignored == 1 else '%dPRs/90d' % ignored
+
   def _score_value(self, ignored: float) -> models.MetricScore:
     if ignored > 20:
       return models.MetricScore.POOR
