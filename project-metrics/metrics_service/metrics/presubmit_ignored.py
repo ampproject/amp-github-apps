@@ -1,9 +1,5 @@
 """Presubmit-Ignored metric."""
 
-import datetime
-import sqlalchemy
-from typing import Dict, Text
-
 import db_engine
 from metrics import base
 import models
