@@ -1,0 +1,45 @@
+"""Presubmit-Latency metric."""
+
+import sqlalchemy
+from typing import Text
+
+import db_engine
+from metrics import base
+import models
+
+
+class PresubmitLatencyMetric(base.Metric):
+  """A metric tracking the average duration of Travis builds."""
+
+  def _format_value(self, avg_seconds: float) -> Text:
+    return '%dm' % (avg_seconds // 60)
+
+  def _score_value(self, avg_seconds: float) -> models.MetricScore:
+    if avg_seconds > 25:
+      return models.MetricScore.POOR
+    elif avg_seconds > 15:
+      return models.MetricScore.MODERATE
+    elif avg_seconds > 10:
+      return models.MetricScore.GOOD
+    else:
+      return models.MetricScore.EXCELLENT
+
+
+  def _compute_value(self) -> float:
+    """Computes the average duration of all completed builds.
+
+    Excludes builds that are newly created, pending, cancelled, or errored since
+    these either have no duration or are not representative of a real build.
+
+    Raises:
+      ValueError: if no builds exist.
+
+    Returns:
+      The percentage of passing builds.
+    """
+    session = db_engine.get_session()
+    avg_seconds = session.query(sqlalchemy.func.avg(models.Build.duration)
+                               ).scalar()
+    if avg_seconds:
+      return float(avg_seconds)
+    raise ValueError('No Travis builds to process.')
