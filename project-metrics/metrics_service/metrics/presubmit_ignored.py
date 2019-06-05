@@ -19,7 +19,7 @@ class PresubmitIgnoredMetric(base.Metric):
       return models.MetricScore.EXCELLENT
 
   def _compute_value(self) -> float:
-    """Computes the percentage of completed builds which passed.
+    """Computes the number of PR builds which ended up with a failing state.
 
     Excludes builds that are newly created, pending, or cancelled.
 
@@ -27,7 +27,7 @@ class PresubmitIgnoredMetric(base.Metric):
       ValueError: if no builds exist.
 
     Returns:
-      The percentage of passing builds.
+      The number of failed or errored builds.
     """
     session = db_engine.get_session()
     return session.query(models.Build).filter(
