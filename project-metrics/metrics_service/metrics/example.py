@@ -10,7 +10,7 @@ import models
 class IdentityMetric(base.PercentageMetric):
   """A metric which reports the value it is initialized with."""
 
-  def __init__(self, result: models.MetricResult = None, value: float = 0.5):
+  def __init__(self, result: models.MetricResult = None, value: float):
     super(IdentityMetric, self).__init__(result)
     self._value = value
 

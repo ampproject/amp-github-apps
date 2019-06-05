@@ -17,11 +17,64 @@ import db_engine
 import models
 
 
-class MetricDisplay(object):
-  """Mixin providing generic display/format logic for metrics.
+class Metric(MetricDisplay):
+  """Abstract base class for health metrics."""
 
-  Separated out so the Metric class can handle core metric logic.
-  """
+  __metaclass__ = abc.ABCMeta
+  _active_metrics = {}
+
+  @classmethod
+  def register(cls, metric_cls: Type[TypeVar('U', bound='Metric')]):
+    """Register a metric to be included in result fetching.
+
+    Args:
+      metric_cls: metric implementation to make active.
+    """
+    cls._active_metrics[metric_cls.__name__] = metric_cls
+
+  @classmethod
+  def __from_result(cls, result: models.MetricResult):
+    """Wraps a result in its metric class for display/processing.
+
+    Expects that the result is for an active metric.
+
+    Raises:
+      KeyError: if the result is for an inactive or non-existent metric.
+
+    Args:
+      result: metric result retrieved from the DB.
+
+    Returns:
+      A metric implementation holding the result.
+    """
+    return cls._active_metrics[result.name](result=result)
+
+  @classmethod
+  def get_latest(cls) -> Sequence['Metric']:
+    """Fetch the latest result for each metric."""
+    # TODO(rcebulko): Query DB.
+    metric_results = models.MetricResult.__table__
+    session = db_engine.get_session()
+    active_metrics_names = cls._active_metrics.keys()
+
+    max_dates_query = session.query(
+        metric_results.c.name,
+        sqlalchemy.func.max(metric_results.c.computed_at
+                           ).label('max_computed_at')
+        ).group_by(metric_results.c.name
+        ).filter(metric_results.c.name.in_(active_metrics_names)
+        ).subquery('latest')
+
+    latest_results_query = session.query(models.MetricResult).join(
+        max_dates_query,
+        sqlalchemy.and_(
+            metric_results.c.name == max_dates_query.c.name,
+            metric_results.c.computed_at == max_dates_query.c.max_computed_at))
+
+    return [cls.__from_result(result) for result in latest_results_query]
+
+  def __init__(self, result: Optional[models.MetricResult] = None):
+    self.result = result
 
   def __str__(self) -> Text:
     return '%s: %s' % (self.label, self.formatted_result)
@@ -47,65 +100,6 @@ class MetricDisplay(object):
     """The 0-4 score for the metric."""
     return self._score_value(
         self.result.value) if self.result else models.MetricScore.UNKNOWN
-
-
-class Metric(MetricDisplay):
-  """Abstract base class for health metrics."""
-
-  __metaclass__ = abc.ABCMeta
-  __active_metrics = {}
-
-  @classmethod
-  def register(cls, metric_cls: Type[TypeVar('U', bound='Metric')]):
-    """Register a metric to be included in result fetching.
-
-    Args:
-      metric_cls: metric implementation to make active.
-    """
-    cls.__active_metrics[metric_cls.__name__] = metric_cls
-
-  @classmethod
-  def __from_result(cls, result: models.MetricResult):
-    """Wraps a result in its metric class for display/processing.
-
-    Expects that the result is for an active metric.
-
-    Raises:
-      KeyError: if the result is for an inactive or non-existent metric.
-
-    Args:
-      result: metric result retrieved from the DB.
-
-    Returns:
-      A metric implementation holding the result.
-    """
-    return cls.__active_metrics[result.name](result=result)
-
-  @classmethod
-  def get_latest(cls) -> Sequence['Metric']:
-    """Fetch the latest result for each metric."""
-    # TODO(rcebulko): Query DB.
-    metric_results = models.MetricResult.__table__
-    session = db_engine.get_session()
-
-    max_dates = session.query(
-        metric_results.c.name,
-        sqlalchemy.func.max(
-            metric_results.c.computed_at).label('max_computed_at')).group_by(
-                metric_results.c.name).filter(
-                    metric_results.c.name.in_(
-                        cls.__active_metrics.keys())).subquery('latest')
-
-    latest_results = session.query(models.MetricResult).join(
-        max_dates,
-        sqlalchemy.and_(
-            metric_results.c.name == max_dates.c.name,
-            metric_results.c.computed_at == max_dates.c.max_computed_at))
-
-    return [cls.__from_result(result) for result in latest_results]
-
-  def __init__(self, result: Optional[models.MetricResult] = None):
-    self.result = result
 
   def recompute(self) -> None:
     """Computes the metric and records the result in the `metrics` table."""
