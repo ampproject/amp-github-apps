@@ -26,7 +26,8 @@ class TravisApiError(Exception):
 class TravisApi(agithub_base.API):
   """Travis API interface."""
 
-  def __init__(self, travis_token: Text = None, *args, **kwargs):
+  def __init__(self, *args, **kwargs):
+
     extra_headers = {
         'User-Agent': 'AMPProjectMetrics/1.0.0',
         'Accept': 'application/vnd.travis-ci.2.1+json',
@@ -39,11 +40,7 @@ class TravisApi(agithub_base.API):
     self.setClient(agithub_base.Client(*args, **kwargs))
     self.setConnectionProperties(props)
 
-    if travis_token:
-      self._token = travis_token
-    else:
-      self._token = self._get_travis_token(env.get('GITHUB_API_ACCESS_TOKEN'))
-
+    self._token = self._get_travis_token(env.get('GITHUB_API_ACCESS_TOKEN'))
     extra_headers['Authorization'] = 'token %s' % self._token
 
   @functools.lru_cache()
