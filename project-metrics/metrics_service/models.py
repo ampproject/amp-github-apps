@@ -63,7 +63,8 @@ class Build(Base):
   number = sqlalchemy.Column(sqlalchemy.Integer)
   duration = sqlalchemy.Column(sqlalchemy.Integer)
   state = sqlalchemy.Column(sqlalchemy.Enum(TravisState))
+  started_at = sqlalchemy.Column(sqlalchemy.DateTime)
 
   def __repr__(self) -> Text:
-    return "<Build(number='%d', duration='%d', state='%s')>" % (
-        self.number, self.duration, self.state.name)
+    return "<Build(number='%d', duration='%d', state='%s', started_at='%s')>" % (
+        self.number, self.duration, self.state.name, self.started_at)
