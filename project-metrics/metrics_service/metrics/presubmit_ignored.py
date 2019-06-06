@@ -1,4 +1,4 @@
-"""Presubmit-Ignored metric."""
+"""Presubmit Ignored metric."""
 
 import db_engine
 from metrics import base
@@ -33,8 +33,11 @@ class PresubmitIgnoredMetric(base.Metric):
       The number of failed or errored builds.
     """
     session = db_engine.get_session()
-    return session.query(models.Build).filter(
+    return models.Build.last_90_days(session).filter(
         models.Build.state.in_([
             models.TravisState.FAILED,
             models.TravisState.ERRORED,
         ])).count()
+
+
+base.Metric.register(PresubmitIgnoredMetric)
