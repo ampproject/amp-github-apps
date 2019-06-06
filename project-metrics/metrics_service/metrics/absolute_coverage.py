@@ -1,4 +1,4 @@
-"""Absolute-Coverage metric."""
+"""Absolute Coverage metric."""
 
 from apis import codecov
 from metrics import base
@@ -25,3 +25,6 @@ class AbsoluteCoverageMetric(base.PercentageMetric):
       The percentage of lines tested in HEAD.
     """
     return codecov.CodecovApi().get_absolute_coverage() / 100
+
+
+models.Metric.register(AbsoluteCoverageMetric)
