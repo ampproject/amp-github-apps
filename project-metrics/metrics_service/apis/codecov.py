@@ -54,6 +54,6 @@ class CodecovApi(agithub_base.API):
       Code coverage percentage in the range [0-100].
     """
     status_code, response = self.repo.branch.master.get(limit=1)
-    if status_code is status.HTTP_200_OK:
+    if status_code == status.HTTP_200_OK:
       return float(response['commit']['totals']['c'])
     raise CodecovApiError(status_code, response['error']['reason'])

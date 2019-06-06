@@ -60,7 +60,7 @@ class TravisApi(agithub_base.API):
     """
     logging.info('Exchanging GitHub API token for Travis API token')
     status_code, response = self.auth.github.post(github_token=github_token)
-    if status_code is status.HTTP_200_OK:
+    if status_code == status.HTTP_200_OK:
       return response['access_token']
     raise TravisApiError(
         status_code,
@@ -88,7 +88,7 @@ class TravisApi(agithub_base.API):
     if after_number:
       params['after_number'] = after_number
     status_code, response = self.repo.builds.get(**params)
-    if status_code is status.HTTP_200_OK:
+    if status_code == status.HTTP_200_OK:
       return response
     raise TravisApiError(
         status_code,
