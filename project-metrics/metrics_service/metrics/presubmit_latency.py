@@ -1,4 +1,4 @@
-"""Presubmit-Latency metric."""
+"""Presubmit Latency metric."""
 
 import sqlalchemy
 from typing import Text
@@ -24,7 +24,6 @@ class PresubmitLatencyMetric(base.Metric):
     else:
       return models.MetricScore.EXCELLENT
 
-
   def _compute_value(self) -> float:
     """Computes the average duration of all completed builds.
 
@@ -38,8 +37,11 @@ class PresubmitLatencyMetric(base.Metric):
       The percentage of passing builds.
     """
     session = db_engine.get_session()
-    avg_seconds = session.query(sqlalchemy.func.avg(models.Build.duration)
-                               ).scalar()
+    avg_seconds = session.query(sqlalchemy.func.avg(
+        models.Build.duration)).filter(models.Build.is_last_90_days()).scalar()
     if avg_seconds:
       return float(avg_seconds)
     raise ValueError('No Travis builds to process.')
+
+
+base.Metric.register(PresubmitLatencyMetric)
