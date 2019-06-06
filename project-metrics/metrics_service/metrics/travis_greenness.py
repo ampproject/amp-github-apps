@@ -25,7 +25,7 @@ class TravisGreennessMetric(base.PercentageMetric):
   def _count_states(self) -> Dict[models.TravisState, int]:
     """Counts the number of builds for each relevant build state."""
     logging.info('Counting successful builds')
-    session = db_engine.get_session()
+    session = db_engine.Session()
     count_query = session.query(
         models.Build.state,
         sqlalchemy.func.count().label('state_count')
