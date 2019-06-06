@@ -4,9 +4,9 @@ import logging
 import sqlalchemy
 from typing import Dict
 
-import db_engine
+from database import db_engine
+from database import models
 from metrics import base
-import models
 
 
 class TravisGreennessMetric(base.PercentageMetric):

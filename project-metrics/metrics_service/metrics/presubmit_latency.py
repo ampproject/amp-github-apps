@@ -3,9 +3,9 @@
 import sqlalchemy
 from typing import Text
 
-import db_engine
+from database import db_engine
+from database import models
 from metrics import base
-import models
 
 
 class PresubmitLatencyMetric(base.Metric):

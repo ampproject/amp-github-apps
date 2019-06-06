@@ -1,8 +1,8 @@
 """Presubmit Ignored metric."""
 
-import db_engine
+from database import db_engine
+from database import models
 from metrics import base
-import models
 
 
 class PresubmitIgnoredMetric(base.Metric):

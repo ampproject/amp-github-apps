@@ -15,8 +15,8 @@ import sqlalchemy
 import stringcase
 from typing import Optional, Sequence, Text, Type, TypeVar
 
-import db_engine
-import models
+from database import db_engine
+from database import models
 
 
 class Metric(object):
