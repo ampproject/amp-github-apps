@@ -28,5 +28,16 @@ def recompute(metric_cls_name):
   return 'Successfully recomputed %s.' % metric_cls_name, status.HTTP_200_OK
 
 
+@app.route('/api/metrics')
+def list_metrics():
+  try:
+    results = base.Metric.get_latest()
+  except Exception as error:
+    return flask.jsonify({'error': error.message}, status.HTTP_500_SERVER_ERROR)
+
+  return flask.jsonify({'metrics': [metric.serializable for metric in results]},
+                       status.HTTP_200_OK)
+
+
 if __name__ == '__main__':
   app.run(port=os.environ.get('PORT', 8080), debug=True)
