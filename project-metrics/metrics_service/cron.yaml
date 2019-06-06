@@ -10,3 +10,7 @@ cron:
 - description: "Update presubmit-latency metric."
   url: /_cron/recompute/PresubmitLatencyMetric
   schedule: every 24 hours
+
+- description: "Update travis-greenness metric."
+  url: /_cron/recompute/TravisGreennessMetric
+  schedule: every 24 hours
