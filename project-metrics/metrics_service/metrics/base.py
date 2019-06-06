@@ -6,9 +6,11 @@ To create a new metric:
    `PercentMetric`) `_format_value`
 3. Call `metrics.base.Metric.register(YourNewMetric)`
 4. Add `from . import your_new_metric` to `__init__.py`
+5. Define the update frequency with a job in `cron.yaml`
 """
 
 import abc
+import logging
 import sqlalchemy
 import stringcase
 from typing import Optional, Sequence, Text, Type, TypeVar
@@ -30,6 +32,7 @@ class Metric(MetricDisplay):
     Args:
       metric_cls: metric implementation to make active.
     """
+    logging.info('Registered metric: %s', metric_cls.__name__)
     cls._active_metrics[metric_cls.__name__] = metric_cls
 
   @classmethod
@@ -53,6 +56,7 @@ class Metric(MetricDisplay):
   def get_latest(cls) -> Sequence['Metric']:
     """Fetch the latest result for each metric."""
     # TODO(rcebulko): Query DB.
+    logging.debug('Fetching latest metric results')
     metric_results = models.MetricResult.__table__
     session = db_engine.get_session()
     active_metrics_names = cls._active_metrics.keys()
@@ -103,9 +107,12 @@ class Metric(MetricDisplay):
 
   def recompute(self) -> None:
     """Computes the metric and records the result in the `metrics` table."""
+    logging.info('Recomputing metric %s', self.name)
     self.result = models.MetricResult(
         value=self._compute_value(), name=self.name)
 
+    logging.info('Updating metric %s value to %.3g', self.name,
+                 self.result.value)
     session = db_engine.get_session()
     session.add(self.result)
     session.commit()

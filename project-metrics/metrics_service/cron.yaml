@@ -1,0 +1,4 @@
+cron:
+- description: "Update dummy metric."
+  url: /_cron/recompute/IdentityMetric
+  schedule: every 6 hours
