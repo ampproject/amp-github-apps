@@ -1,8 +1,8 @@
-"""Travis-Greenness metric."""
+"""Travis Greenness metric."""
 
-import datetime
+import logging
 import sqlalchemy
-from typing import Dict, Text
+from typing import Dict
 
 import db_engine
 from metrics import base
@@ -29,6 +29,7 @@ class TravisGreennessMetric(base.PercentageMetric):
     count_query = session.query(
         models.Build.state,
         sqlalchemy.func.count().label('state_count')
+        ).filter(models.Build.is_last_90_days()
         ).group_by(models.Build.state
         ).filter(models.Build.state.in_([
             models.TravisState.PASSED,
@@ -59,3 +60,6 @@ class TravisGreennessMetric(base.PercentageMetric):
     if total:
       return passed / total
     raise ValueError('No Travis builds to process.')
+
+
+models.Metric.register(TravisGreennessMetric)

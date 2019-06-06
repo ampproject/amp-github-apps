@@ -19,7 +19,7 @@ import db_engine
 import models
 
 
-class Metric(MetricDisplay):
+class Metric(object):
   """Abstract base class for health metrics."""
 
   __metaclass__ = abc.ABCMeta

@@ -9,6 +9,22 @@ from sqlalchemy.ext import declarative
 Base = declarative.declarative_base()
 
 
+def is_last_n_days(
+    timestamp_column: sqlalchemy.orm.attributes.InstrumentedAttribute,
+    days: int) -> sqlalchemy.sql.elements.BinaryExpression:
+  """Produces the filter expression for the last N days of a model.
+
+   Args:
+    timestamp_column: model column to filter by.
+    days: number of days back to filter by.
+
+   Returns:
+    A binary expression which can be passed to a query's `.filter()` method.
+  """
+  n_days_ago = datetime.datetime.now() - datetime.timedelta(days=days)
+  return timestamp_column >= n_days_ago
+
+
 class MetricScore(enum.Enum):
   """The computed score of a metric."""
   UNKNOWN = 0
@@ -47,7 +63,8 @@ class MetricResult(Base):
 class TravisState(enum.Enum):
   """A state of a Travis build or job.
 
-  Based on https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/job/test.rb#L21
+  Based on
+  https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/job/test.rb#L21
   """
   CREATED = 0
   QUEUED = 1
@@ -63,6 +80,26 @@ class Build(Base):
 
   __tablename__ = 'travis_builds'
 
+  @classmethod
+  def is_last_90_days(cls):
+    return is_last_n_days(timestamp_column=cls.started_at, days=90)
+
+  @classmethod
+  def last_90_days(cls, session, negate=False) -> sqlalchemy.orm.query.Query:
+    """To query builds younger than 90 days.
+
+     Args:
+      session: SQL Alchemy database session.
+      negate: if true, returns builds older than 90 days
+
+     Returns:
+      Build query with filter applied.
+    """
+    filter_test = cls.is_last_90_days()
+    if negate:
+      filter_test = sqlalchemy.not_(filter_test)
+    return session.query(cls).filter(filter_test)
+
   id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
   number = sqlalchemy.Column(sqlalchemy.Integer)
   duration = sqlalchemy.Column(sqlalchemy.Integer)
@@ -70,5 +107,5 @@ class Build(Base):
   started_at = sqlalchemy.Column(sqlalchemy.DateTime)
 
   def __repr__(self) -> Text:
-    return "<Build(number=%d, duration=%d, state=%s, started_at=%s)>" % (
+    return '<Build(number=%d, duration=%d, state=%s, started_at=%s)>' % (
         self.number, self.duration, self.state.name, self.started_at)
