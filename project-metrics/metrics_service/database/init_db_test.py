@@ -17,6 +17,7 @@ FLAGS(sys.argv)
 class TestInitDb(unittest.TestCase):
 
   def setUp(self):
+    super(TestInitDb, self).setUp()
     self.engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=True)
 
   def testMainNoDropFlag(self):

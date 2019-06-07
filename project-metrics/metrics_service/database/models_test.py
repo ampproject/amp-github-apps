@@ -16,10 +16,12 @@ FLAGS = flags.FLAGS
 FLAGS(sys.argv)
 
 
-class TestInitDb(unittest.TestCase):
+class TestBuild(unittest.TestCase):
 
   @classmethod
   def setUpClass(cls):
+    super(TestBuild, cls).setUpClass()
+
     engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=True)
     init_db.init_db(engine)
     cls.Session = orm.scoped_session(orm.sessionmaker(bind=engine))
@@ -28,6 +30,8 @@ class TestInitDb(unittest.TestCase):
     cls.FAKE_90_DAYS_AGO = cls.FAKE_NOW - datetime.timedelta(days=90)
 
   def setUp(self):
+    super(TestBuild, self).setUp()
+
     self.session = self.Session()
     self.old_build = models.Build(
         number=1,
@@ -44,6 +48,8 @@ class TestInitDb(unittest.TestCase):
     mock.patch.object(datetime.datetime, 'now', return_value=self.FAKE_NOW)
 
   def tearDown(self):
+    super(TestBuild, self).tearDown()
+
     mock.patch.stopall()
     self.session.query(models.Build).delete()
     self.session.commit()
