@@ -31,8 +31,11 @@ class TestAbsoluteCoverageMetric(metric_test_case.MetricTestCase):
     self.assertEqual(self.metric.score, models.MetricScore.UNKNOWN)
     self.assertScores([
         (0.5, models.MetricScore.POOR),
+        (0.6, models.MetricScore.MODERATE),
         (0.7, models.MetricScore.MODERATE),
+        (0.75, models.MetricScore.GOOD),
         (0.8, models.MetricScore.GOOD),
+        (0.9, models.MetricScore.EXCELLENT),
         (0.95, models.MetricScore.EXCELLENT),
     ])
 

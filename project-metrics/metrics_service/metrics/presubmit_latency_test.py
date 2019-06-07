@@ -52,8 +52,11 @@ class TestPresubmitLatencyMetric(metric_test_case.MetricTestCase):
     self.assertEqual(self.metric.score, models.MetricScore.UNKNOWN)
     self.assertScores([
         (30, models.MetricScore.POOR),
+        (25, models.MetricScore.MODERATE),
         (20, models.MetricScore.MODERATE),
+        (15, models.MetricScore.GOOD),
         (12, models.MetricScore.GOOD),
+        (10, models.MetricScore.EXCELLENT),
         (5, models.MetricScore.EXCELLENT),
     ])
 

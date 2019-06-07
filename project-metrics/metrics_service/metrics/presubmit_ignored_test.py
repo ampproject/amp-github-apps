@@ -48,8 +48,11 @@ class TestPresubmitIgnoredMetric(metric_test_case.MetricTestCase):
     self.assertEqual(self.metric.score, models.MetricScore.UNKNOWN)
     self.assertScores([
         (25, models.MetricScore.POOR),
+        (20, models.MetricScore.MODERATE),
         (10, models.MetricScore.MODERATE),
+        (6, models.MetricScore.GOOD),
         (4, models.MetricScore.GOOD),
+        (3, models.MetricScore.EXCELLENT),
         (2, models.MetricScore.EXCELLENT),
     ])
 
