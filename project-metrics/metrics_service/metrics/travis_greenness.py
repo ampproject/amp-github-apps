@@ -62,4 +62,4 @@ class TravisGreennessMetric(base.PercentageMetric):
     raise ValueError('No Travis builds to process.')
 
 
-models.Metric.register(TravisGreennessMetric)
+base.Metric.register(TravisGreennessMetric)
