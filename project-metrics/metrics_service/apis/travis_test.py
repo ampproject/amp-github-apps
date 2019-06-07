@@ -5,8 +5,8 @@ from unittest import mock
 from agithub import base as agithub_base
 
 from apis import travis
-import env
 from database import models
+import env
 
 
 class TestTravisApi(unittest.TestCase):
@@ -43,7 +43,7 @@ class TestTravisApi(unittest.TestCase):
         travis.TravisApiError,
         r'Travis API Exception \(HTTP 403\): Travis Auth API request failed with response: Unauthorized\.'
     ):
-      unused = travis.TravisApi()
+      travis.TravisApi()
 
   @mock.patch.object(
       travis.TravisApi, '_get_travis_token', return_value='__travis_token__')
@@ -84,4 +84,4 @@ class TestTravisApi(unittest.TestCase):
         travis.TravisApiError,
         r'Travis API Exception \(HTTP 500\): Travis Builds API request failed with response: Server error\.'
     ):
-      unused = travis_api.fetch_builds(after_number=3)
+      travis_api.fetch_builds(after_number=3)
