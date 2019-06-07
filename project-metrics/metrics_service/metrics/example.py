@@ -4,7 +4,7 @@ import datetime
 from typing import Text
 
 from metrics import base
-import models
+from database import models
 
 
 class IdentityMetric(base.PercentageMetric):

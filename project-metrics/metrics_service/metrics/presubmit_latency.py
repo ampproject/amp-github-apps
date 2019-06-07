@@ -3,9 +3,9 @@
 import sqlalchemy
 from typing import Text
 
-import db_engine
+from database import db
+from database import models
 from metrics import base
-import models
 
 
 class PresubmitLatencyMetric(base.Metric):
@@ -36,7 +36,7 @@ class PresubmitLatencyMetric(base.Metric):
     Returns:
       The percentage of passing builds.
     """
-    session = db_engine.get_session()
+    session = db.Session()
     avg_seconds = session.query(sqlalchemy.func.avg(
         models.Build.duration)).filter(models.Build.is_last_90_days()).scalar()
     if avg_seconds:

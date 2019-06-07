@@ -15,8 +15,8 @@ import sqlalchemy
 import stringcase
 from typing import Optional, Sequence, Text, Type, TypeVar
 
-import db_engine
-import models
+from database import db
+from database import models
 
 
 class Metric(object):
@@ -58,7 +58,7 @@ class Metric(object):
     # TODO(rcebulko): Query DB.
     logging.debug('Fetching latest metric results')
     metric_results = models.MetricResult.__table__
-    session = db_engine.get_session()
+    session = db.Session()
     active_metrics_names = cls._active_metrics.keys()
 
     max_dates_query = session.query(
@@ -113,7 +113,7 @@ class Metric(object):
 
     logging.info('Updating metric %s value to %.3g', self.name,
                  self.result.value)
-    session = db_engine.get_session()
+    session = db.Session()
     session.add(self.result)
     session.commit()
 

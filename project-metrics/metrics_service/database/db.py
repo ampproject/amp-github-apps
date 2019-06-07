@@ -24,4 +24,4 @@ def get_engine() -> sqlalchemy.engine.Engine:
       echo=True)
 
 
-get_session = orm.scoped_session(orm.sessionmaker(bind=get_engine()))
+Session = orm.scoped_session(orm.sessionmaker(bind=get_engine()))
