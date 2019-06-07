@@ -35,7 +35,8 @@ class TestPresubmitLatencyMetric(metric_test_case.MetricTestCase):
     ])
     session.commit()
 
-    self.assertRecomputedResultEquals(3000)
+    self.metric.recompute()
+    self.assertLatestResultEquals(3000)
 
   def testRecomputeNoBuilds(self):
     with self.assertRaisesRegex(ValueError, 'No Travis builds to process.'):

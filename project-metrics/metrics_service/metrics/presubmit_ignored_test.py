@@ -35,7 +35,8 @@ class TestPresubmitIgnoredMetric(metric_test_case.MetricTestCase):
     ])
     session.commit()
 
-    self.assertRecomputedResultEquals(2)
+    self.metric.recompute()
+    self.assertLatestResultEquals(2)
 
   def testName(self):
     self.assertEqual(self.metric.name, 'PresubmitIgnoredMetric')

@@ -17,7 +17,8 @@ class TestAbsoluteCoverageMetric(metric_test_case.MetricTestCase):
   @mock.patch.object(
       codecov.CodecovApi, 'get_absolute_coverage', return_value=42)
   def testRecompute(self, mock_get_absolute_coverage):
-    self.assertRecomputedResultEquals(0.42)
+    self.metric.recompute()
+    self.assertLatestResultEquals(0.42)
     mock_get_absolute_coverage.assert_called_once()
 
   def testName(self):

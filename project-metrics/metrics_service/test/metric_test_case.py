@@ -52,8 +52,7 @@ class MetricTestCase(unittest.TestCase):
     """Returns a new instance of the metric class under test."""
     pass
 
-  def assertRecomputedResultEquals(self, result_value):
-    self.metric.recompute()
+  def assertLatestResultEquals(self, result_value):
     latest_result = base.Metric.get_latest()[self.metric.name].result
     self.assertEqual(latest_result.value, result_value)
 
