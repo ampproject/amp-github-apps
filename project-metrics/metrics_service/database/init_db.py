@@ -12,22 +12,22 @@ from database import db
 # models.
 from database import models  # pylint: disable=unused-import
 
-
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('drop_schema', False, 'Drop all tables before creating.')
 
 
+def init_db(engine):
+  if FLAGS.drop_schema:
+    logging.warning('Dropping all tables on database `%s`', engine.url.database)
+    models.Base.metadata.drop_all(engine)
+
+  logging.info('Creating all tables on database `%s`', engine.url.database)
+  models.Base.metadata.create_all(engine)
+
+
 def main(argv):
   del argv  # Unused.
-
-  if FLAGS.drop_schema:
-    logging.warning('Dropping all tables on database `%s`',
-                    db.get_engine().url.database)
-    models.Base.metadata.drop_all(db.get_engine())
-
-  logging.info('Creating all tables on database `%s`',
-               db.get_engine().url.database)
-  models.Base.metadata.create_all(db.get_engine())
+  init_db(db.get_engine())
 
 
 if __name__ == '__main__':
