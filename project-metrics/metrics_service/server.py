@@ -31,7 +31,7 @@ def recompute(metric_cls_name):
 @app.route('/api/metrics')
 def list_metrics():
   try:
-    results = base.Metric.get_latest()
+    results = base.Metric.get_latest().values()
   except Exception as error:
     return flask.jsonify({'error': error.message}, status.HTTP_500_SERVER_ERROR)
 
