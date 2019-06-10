@@ -9,7 +9,7 @@ from sqlalchemy.ext import declarative
 Base = declarative.declarative_base()
 
 
-def is_last_n_days(
+def _is_last_n_days(
     timestamp_column: sqlalchemy.orm.attributes.InstrumentedAttribute,
     days: int) -> sqlalchemy.sql.elements.BinaryExpression:
   """Produces the filter expression for the last N days of a model.
@@ -82,7 +82,7 @@ class Build(Base):
 
   @classmethod
   def is_last_90_days(cls):
-    return is_last_n_days(timestamp_column=cls.started_at, days=90)
+    return _is_last_n_days(timestamp_column=cls.started_at, days=90)
 
   @classmethod
   def last_90_days(cls, session, negate=False) -> sqlalchemy.orm.query.Query:
