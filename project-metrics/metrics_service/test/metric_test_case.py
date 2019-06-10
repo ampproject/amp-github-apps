@@ -14,38 +14,24 @@ class MetricTestCase(unittest.TestCase):
 
   __metaclass__ = abc.ABCMeta
 
-  @classmethod
-  def setUpClass(cls):
-    super(MetricTestCase, cls).setUpClass()
-
-    cls.engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=True)
-    cls.Session = orm.scoped_session(orm.sessionmaker(bind=cls.engine))
-
-    cls.mock_get_engine = mock.patch(
-        'database.db.get_engine', return_value=cls.engine).start()
-    cls.mock_session = mock.patch(
-        'database.db.Session', return_value=cls.Session).start()
-
-    models.Base.metadata.create_all(cls.engine)
-
-  @classmethod
-  def tearDownClass(cls):
-    super(MetricTestCase, cls).tearDownClass()
-
-    cls.mock_get_engine.stop()
-    cls.mock_session.stop()
-
-    models.Base.metadata.drop_all(cls.engine)
-
   def setUp(self):
     super(MetricTestCase, self).setUp()
+
     self.metric = self.new_metric_under_test()
+    self.engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=True)
+    self.Session = orm.scoped_session(orm.sessionmaker(bind=self.engine))
+    models.Base.metadata.create_all(self.engine)
+
+    self.mock_get_engine = mock.patch(
+        'database.db.get_engine', return_value=self.engine).start()
+    self.mock_session = mock.patch(
+        'database.db.Session', return_value=self.Session).start()
 
   def tearDown(self):
     super(MetricTestCase, self).tearDown()
-    session = self.Session()
-    session.query(models.MetricResult).delete()
-    session.commit()
+    models.Base.metadata.drop_all(self.engine)
+    self.mock_get_engine.stop()
+    self.mock_session.stop()
 
   @abc.abstractmethod
   def new_metric_under_test(self):
@@ -56,17 +42,8 @@ class MetricTestCase(unittest.TestCase):
     latest_result = base.Metric.get_latest()[self.metric.name].result
     self.assertEqual(latest_result.value, result_value)
 
-  def assertScores(self, expected_result_scores):
-    """Checks that result values are scored as expected.
-
-    Args:
-      expected_result_scores: list of (result_value, expected_score) pairs.
-    """
-    for value, score in expected_result_scores:
-      with self.subTest(
-          'Result value %.3g gets score %s' % (value, score),
-          value=value,
-          score=score):
-        self.metric.result = models.MetricResult(
-            name=self.metric.name, value=value)
-        self.assertEqual(self.metric.score, score)
+  def assertValueHasScore(self, result_value, score):
+    """Checks that result values are scored as expected."""
+    self.metric.result = models.MetricResult(
+        name=self.metric.name, value=result_value)
+    self.assertEqual(self.metric.score, score)

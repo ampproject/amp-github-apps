@@ -10,32 +10,27 @@ from test import metric_test_case
 
 class TestPresubmitIgnoredMetric(metric_test_case.MetricTestCase):
 
-  def tearDown(self):
-    super(TestPresubmitIgnoredMetric, self).tearDown()
-    session = self.Session()
-    session.query(models.Build).delete()
-    session.commit()
-
   def new_metric_under_test(self):
     return presubmit_ignored.PresubmitIgnoredMetric()
 
   def testRecompute(self):
-    default_values = {
+    common_values = {
         'started_at': datetime.datetime.now(),
         'number': 1,
         'duration': 1000,
     }
     session = self.Session()
     session.add_all([
-        models.Build(state=models.TravisState.PASSED, **default_values),
-        models.Build(state=models.TravisState.CANCELLED, **default_values),
-        models.Build(state=models.TravisState.PASSED, **default_values),
-        models.Build(state=models.TravisState.ERRORED, **default_values),
-        models.Build(state=models.TravisState.FAILED, **default_values),
+        models.Build(state=models.TravisState.PASSED, **common_values),
+        models.Build(state=models.TravisState.CANCELLED, **common_values),
+        models.Build(state=models.TravisState.PASSED, **common_values),
+        models.Build(state=models.TravisState.ERRORED, **common_values),
+        models.Build(state=models.TravisState.FAILED, **common_values),
     ])
     session.commit()
 
     self.metric.recompute()
+    # value = (1 FAILED) + (1 ERRORED)
     self.assertLatestResultEquals(2)
 
   def testName(self):
@@ -46,15 +41,13 @@ class TestPresubmitIgnoredMetric(metric_test_case.MetricTestCase):
 
   def testScore(self):
     self.assertEqual(self.metric.score, models.MetricScore.UNKNOWN)
-    self.assertScores([
-        (25, models.MetricScore.POOR),
-        (20, models.MetricScore.MODERATE),
-        (10, models.MetricScore.MODERATE),
-        (6, models.MetricScore.GOOD),
-        (4, models.MetricScore.GOOD),
-        (3, models.MetricScore.EXCELLENT),
-        (2, models.MetricScore.EXCELLENT),
-    ])
+    self.assertValueHasScore(25, models.MetricScore.POOR)
+    self.assertValueHasScore(20, models.MetricScore.MODERATE)
+    self.assertValueHasScore(10, models.MetricScore.MODERATE)
+    self.assertValueHasScore(6, models.MetricScore.GOOD)
+    self.assertValueHasScore(4, models.MetricScore.GOOD)
+    self.assertValueHasScore(3, models.MetricScore.EXCELLENT)
+    self.assertValueHasScore(2, models.MetricScore.EXCELLENT)
 
   def testFormattedResult(self):
     self.assertEqual(self.metric.formatted_result, '?')

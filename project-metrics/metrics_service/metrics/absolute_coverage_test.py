@@ -29,15 +29,13 @@ class TestAbsoluteCoverageMetric(metric_test_case.MetricTestCase):
 
   def testScore(self):
     self.assertEqual(self.metric.score, models.MetricScore.UNKNOWN)
-    self.assertScores([
-        (0.5, models.MetricScore.POOR),
-        (0.6, models.MetricScore.MODERATE),
-        (0.7, models.MetricScore.MODERATE),
-        (0.75, models.MetricScore.GOOD),
-        (0.8, models.MetricScore.GOOD),
-        (0.9, models.MetricScore.EXCELLENT),
-        (0.95, models.MetricScore.EXCELLENT),
-    ])
+    self.assertValueHasScore(0.5, models.MetricScore.POOR)
+    self.assertValueHasScore(0.6, models.MetricScore.MODERATE)
+    self.assertValueHasScore(0.7, models.MetricScore.MODERATE)
+    self.assertValueHasScore(0.75, models.MetricScore.GOOD)
+    self.assertValueHasScore(0.8, models.MetricScore.GOOD)
+    self.assertValueHasScore(0.9, models.MetricScore.EXCELLENT)
+    self.assertValueHasScore(0.95, models.MetricScore.EXCELLENT)
 
   def testFormattedResult(self):
     self.assertEqual(self.metric.formatted_result, '?')
