@@ -13,7 +13,7 @@ import abc
 import logging
 import sqlalchemy
 import stringcase
-from typing import Optional, Sequence, Text, Type, TypeVar
+from typing import Dict, Iterable, Optional, Text, Type, TypeVar
 
 from database import db
 from database import models
@@ -53,9 +53,12 @@ class Metric(object):
     return cls._active_metrics[result.name](result=result)
 
   @classmethod
-  def get_latest(cls) -> Sequence['Metric']:
-    """Fetch the latest result for each metric."""
-    # TODO(rcebulko): Query DB.
+  def get_latest(cls) -> Dict[Text, 'Metric']:
+    """Fetch the latest result for each metric.
+
+    Returns:
+      Mapping of metric names to the latest result for each.
+    """
     logging.debug('Fetching latest metric results')
     metric_results = models.MetricResult.__table__
     session = db.Session()
@@ -63,11 +66,9 @@ class Metric(object):
 
     max_dates_query = session.query(
         metric_results.c.name,
-        sqlalchemy.func.max(metric_results.c.computed_at
-                           ).label('max_computed_at')
-        ).group_by(metric_results.c.name
-        ).filter(metric_results.c.name.in_(active_metrics_names)
-        ).subquery('latest')
+        sqlalchemy.func.max(metric_results.c.computed_at)
+        .label('max_computed_at')).group_by(metric_results.c.name).filter(
+            metric_results.c.name.in_(active_metrics_names)).subquery('latest')
 
     latest_results_query = session.query(models.MetricResult).join(
         max_dates_query,
@@ -75,7 +76,10 @@ class Metric(object):
             metric_results.c.name == max_dates_query.c.name,
             metric_results.c.computed_at == max_dates_query.c.max_computed_at))
 
-    return [cls.__from_result(result) for result in latest_results_query]
+    return {
+        result.name: cls.__from_result(result)
+        for result in latest_results_query
+    }
 
   def __init__(self, result: Optional[models.MetricResult] = None):
     self.result = result

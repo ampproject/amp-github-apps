@@ -2,7 +2,7 @@
 
 from apis import codecov
 from metrics import base
-import models
+from database import models
 
 
 class AbsoluteCoverageMetric(base.PercentageMetric):
@@ -27,4 +27,4 @@ class AbsoluteCoverageMetric(base.PercentageMetric):
     return codecov.CodecovApi().get_absolute_coverage() / 100
 
 
-models.Metric.register(AbsoluteCoverageMetric)
+base.Metric.register(AbsoluteCoverageMetric)
