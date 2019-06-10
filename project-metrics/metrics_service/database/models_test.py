@@ -26,26 +26,22 @@ class TestBuild(unittest.TestCase):
     init_db.init_db(engine)
     cls.Session = orm.scoped_session(orm.sessionmaker(bind=engine))
 
-    cls.FAKE_NOW = datetime.datetime(2019, 6, 1)
-    cls.FAKE_90_DAYS_AGO = cls.FAKE_NOW - datetime.timedelta(days=90)
-
   def setUp(self):
     super(TestBuild, self).setUp()
 
     self.session = self.Session()
+
     self.old_build = models.Build(
         number=1,
-        started_at=self.FAKE_90_DAYS_AGO - datetime.timedelta(days=1),
+        started_at=datetime.datetime.now() - datetime.timedelta(days=91),
         duration=1000,
         state=models.TravisState.PASSED)
     self.new_build = models.Build(
         number=2,
-        started_at=self.FAKE_NOW - datetime.timedelta(days=1),
+        started_at=datetime.datetime.now() - datetime.timedelta(days=1),
         duration=1000,
         state=models.TravisState.PASSED)
     self.session.add_all([self.old_build, self.new_build])
-
-    mock.patch.object(datetime.datetime, 'now', return_value=self.FAKE_NOW)
 
   def tearDown(self):
     super(TestBuild, self).tearDown()
