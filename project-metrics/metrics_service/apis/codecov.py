@@ -18,8 +18,8 @@ class CodecovApiError(Exception):
       status_code: HTTP status return code of the Codecov API response.
       err_msg: error message provided by the API.
     """
-    super(CodecovApiError, self).__init__('Codecov API Exception (HTTP %d): %s' %
-                                          (status_code, err_msg))
+    super(CodecovApiError, self).__init__(
+        'Codecov API Exception (HTTP %d): %s' % (status_code, err_msg))
 
 
 class CodecovApi(agithub_base.API):
