@@ -41,7 +41,8 @@ class TestTravisApi(unittest.TestCase):
 
     with self.assertRaisesRegex(
         travis.TravisApiError,
-        r'Travis API Exception \(HTTP 403\): Travis Auth API request failed with response: Unauthorized\.'
+        (r'Travis API Exception \(HTTP 403\): '
+          'Travis Auth API request failed with response: Unauthorized\.')
     ):
       travis.TravisApi()
 
@@ -82,6 +83,7 @@ class TestTravisApi(unittest.TestCase):
 
     with self.assertRaisesRegex(
         travis.TravisApiError,
-        r'Travis API Exception \(HTTP 500\): Travis Builds API request failed with response: Server error\.'
+        (r'Travis API Exception \(HTTP 500\): '
+          'Travis Builds API request failed with response: Server error\.')
     ):
       travis_api.fetch_builds(after_number=3)

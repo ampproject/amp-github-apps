@@ -25,11 +25,7 @@ class TestCodecovApi(unittest.TestCase):
 
   def testGetAbsoluteCoverage(self):
     self.mock_request.return_value = (200, {
-        'commit': {
-            'totals': {
-                'c': '13.37'
-            }
-        }
+        'commit': {'totals': {'c': '13.37'} }
     })
     coverage = self.codecov_api.get_absolute_coverage()
 
