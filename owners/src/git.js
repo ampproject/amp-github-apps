@@ -15,7 +15,6 @@
  */
 
 const {Owner, createOwnersMap} = require('./owner');
-const child_process = require('child_process');
 const yaml = require('yamljs');
 const path = require('path');
 const util = require('util');
@@ -24,11 +23,21 @@ const fs = require('fs').promises;
 
 const matcher = /your branch is up-to-date|your branch is up to date/i;
 
+/**
+ * @param {string} str
+ * @return {!Object}
+ */
 function yamlReader(str) {
   return yaml.parse(str);
 }
 
+/**
+ * Git Interface.
+ */
 class Git {
+  /**
+   * @param {!Object} context
+   */
   constructor(context) {
     this.context = context;
   }
@@ -36,6 +45,10 @@ class Git {
   /**
    * Reads the actual OWNER file on the file system and parses it using the
    * passed in `formatReader` and returns an `OwnersMap`.
+   *
+   * @param {function(string):!Object} formatReader
+   * @param {string} pathToRepoDir
+   * @param {!Array<string>} ownersPaths
    */
   async ownersParser(formatReader, pathToRepoDir, ownersPaths) {
     const promises = ownersPaths.map(ownerPath => {
@@ -56,6 +69,9 @@ class Git {
 
   /**
    * Retrieves all the OWNERS paths inside a repository.
+   * @param {string} author
+   * @param {string} dirPath
+   * @param {string} targetBranch
    * @return {!Promise<!OwnersMap>}
    */
   async getOwnersFilesForBranch(author, dirPath, targetBranch) {
@@ -74,12 +90,17 @@ class Git {
     const ownersPaths = stdoutToArray(stdout)
       // Remove unneeded string. We only want the file paths.
       .filter(x => !(matcher.test(x)));
+    // TODO: author does not seem be used here. Re-evaluate.
     return this.ownersParser(yamlReader, dirPath, ownersPaths, author);
   }
 
   /**
    * cd's into an assumed git directory on the file system and does a hard
    * reset to the remote branch.
+   * @param {string} dirPath
+   * @param {string} remote
+   * @param {string} branch
+   * @return {!ChildProcess}
    */
   pullLatestForRepo(dirPath, remote, branch) {
     const cmd = `cd ${dirPath} && git fetch ${remote} ${branch} && ` +
@@ -88,6 +109,10 @@ class Git {
   }
 }
 
+/**
+ * @param {string} res
+ * @return {!Array<string>}
+ */
 function stdoutToArray(res) {
   return res.split('\n').filter(x => !!x);
 }

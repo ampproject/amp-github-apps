@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const {PullRequest, Teams} = require('./src/github');
+const {PullRequest} = require('./src/github');
 
 module.exports = app => {
   app.on(['pull_request.opened', 'pull_request.synchronized'], onPullRequest);
@@ -29,24 +29,43 @@ module.exports = app => {
     level: process.LOG_LEVEL || 'info',
   });
 
+  /**
+   * @param {!Context} context
+   * @param {!JsonObject} pullRequest
+   * @return {!Promise}
+   */
   async function processPullRequest(context, pullRequest) {
     const pr = new PullRequest(context, pullRequest);
-    const teams = await new Teams(context).list();
+    // TODO: evaluate if we still need teams.
+    // const teams = await new Teams(context).list();
     return await pr.processOpened();
   }
 
+  /**
+   * @param {!Context} context
+   * @return {!Promise}
+   */
   async function onPullRequest(context) {
     return await processPullRequest(context, context.payload.pull_request);
   }
 
+  /**
+   * @param {!Context} context
+   * @return {!Promise}
+   */
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
     const pr = await PullRequest.get(context, payload.repository.owner.login,
-      payload.repository.name, payload.check_run.check_suite.pull_requests[0].number);
+      payload.repository.name,
+      payload.check_run.check_suite.pull_requests[0].number);
 
     return await processPullRequest(context, pr.data);
   }
 
+  /**
+   * @param {!Context} context
+   * @return {!Promise}
+   */
   async function onPullRequestReview(context) {
     const payload = context.payload;
     const pr = await PullRequest.get(context, payload.repository.owner.login,

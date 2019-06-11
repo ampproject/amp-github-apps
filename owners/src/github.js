@@ -25,6 +25,10 @@ const sleep = require('sleep-promise');
  * Maps the github json payload to a simpler data structure.
  */
 class PullRequest {
+  /**
+   * @param {!Object} context
+   * @param {!PullRequest} pr
+   */
   constructor(context, pr) {
     this.name = 'ampproject/owners-check';
 
@@ -55,12 +59,19 @@ class PullRequest {
     };
   }
 
+  /**
+   * Runs the steps to create a new check run on a newly opened Pull Request
+   * on GitHub.
+   */
   async processOpened() {
     const prInfo = await this.getMeta();
+    // TODO: Revieweres here is to be assigned to the Pull Request.
+    /* eslint no-unused-vars: 0 */
     let reviewers = Object.values(prInfo.fileOwners).map(fileOwner => {
       return fileOwner.owner.dirOwners;
     });
     reviewers = _.union(...reviewers);
+    /* eslint no-unused-vars: 1 */
     const checkOutputText = this.buildCheckOutput(prInfo);
     const checkRuns = await this.getCheckRun();
     const {hasCheckRun, checkRun} = this.hasCheckRun(checkRuns);
@@ -71,6 +82,9 @@ class PullRequest {
     return this.createCheckRun(checkOutputText, prInfo.approvalsMet);
   }
 
+  /**
+   * Retrieve the metadata we need to evaluate a Pull Request.
+   */
   async getMeta() {
     const fileOwners = await Owner.getOwners(this.git, this);
     const reviews = await this.getUniqueReviews();
@@ -95,12 +109,24 @@ class PullRequest {
     return res.data.map(item => new RepoFile(item.filename));
   }
 
+  /**
+   * Filters out duplicate reviews on a Pull Request. A Pull Request can be
+   * reviewed by a single user multiple times (ex. disapproved then
+   * subsequently approves.)
+   *
+   * @return {!Array<!Object>}
+   */
   async getUniqueReviews() {
     const reviews = await this.getReviews();
     // This should always pick out the first instance.
     return _.uniqBy(reviews, 'username');
   }
 
+  /**
+   * Retrives the Reviews from GitHub.
+   *
+   * @return {!Array<!Object>}
+   */
   async getReviews() {
     const res = await this.github.pullRequests.listReviews({
       number: this.id,
@@ -116,12 +142,18 @@ class PullRequest {
   }
 
   /**
-   * @param {!Array<string>}
+   * @param {!Array<string>} reviewers
    * @return {!Promise}
    */
   async setReviewers(reviewers) {
+    // Stub
   }
 
+  /**
+   * @param {!Object} fileOwners
+   * @param {!Array<!Object>} reviews
+   * @return {boolean}
+   */
   areAllApprovalsMet(fileOwners, reviews) {
     const reviewersWhoApproved = this.getReviewersWhoApproved(reviews);
     return Object.keys(fileOwners).every(path => {
@@ -132,6 +164,10 @@ class PullRequest {
     });
   }
 
+  /**
+   * @param {!Array<!Object>} reviews
+   * @return {!Array<!Object>}
+   */
   getReviewersWhoApproved(reviews) {
     const reviewersWhoApproved = reviews.filter(x => {
       return x.state === 'approved';
@@ -142,7 +178,11 @@ class PullRequest {
     return reviewersWhoApproved;
   }
 
-
+  /**
+   * @param {string} text
+   * @param {boolean} areApprovalsMet
+   * @return {!Promise}
+   */
   async createCheckRun(text, areApprovalsMet) {
     // We need to add a delay on the PR creation and check creation since
     // GitHub might not be ready.
@@ -163,6 +203,12 @@ class PullRequest {
     }));
   }
 
+  /**
+   * @param {!Object} checkRun
+   * @param {string} text
+   * @param {boolean} areApprovalsMet
+   * @return {!Promise}
+   */
   async updateCheckRun(checkRun, text, areApprovalsMet) {
     this.context.log.debug('[updateCheckRun]', checkRun);
     const conclusion = areApprovalsMet ? 'success' : 'failure';
@@ -180,6 +226,11 @@ class PullRequest {
     }));
   }
 
+  /**
+   * Retrieves a check run from the GitHub API.
+   *
+   * @return {!Promise}
+   */
   async getCheckRun() {
     const res = await this.github.checks.listForRef({
       owner: this.owner,
@@ -191,7 +242,8 @@ class PullRequest {
   }
 
   /**
-   * @return {{hasChecRun: boolean, checkRun: !Object|undefined}}
+   * @param {!Object} checkRuns
+   * @return {!Object}
    */
   hasCheckRun(checkRuns) {
     const hasCheckRun = checkRuns.total_count > 0;
@@ -204,6 +256,7 @@ class PullRequest {
   }
 
   /**
+   * @param {!Object} prInfo
    * @return {string}
    */
   buildCheckOutput(prInfo) {
@@ -213,7 +266,8 @@ class PullRequest {
         return !_.intersection(prInfo.reviewersWhoApproved,
           fileOwner.owner.dirOwners).length;
       }).map(fileOwner => {
-        const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(', ')}`;
+        const fileOwnerHeader = '## possible reviewers: ' +
+            `${fileOwner.owner.dirOwners.join(', ')}`;
         const files = fileOwner.files.map(file => {
           return ` - ${file.path}\n`;
         }).join('');
@@ -223,14 +277,24 @@ class PullRequest {
     return text;
   }
 
-  static async get(context, owner, repo, number) {
+  /**
+   * @param {!Object} context
+   * @param {number} number
+   */
+  static async get(context, number) {
     return await context.github.pullRequests.get(context.repo({
       number,
     }));
   }
 }
 
+/**
+ * A comment on a GitHub Pull Request.
+ */
 class PullRequestComment {
+  /**
+   * @param {!Object} json
+   */
   constructor(json) {
     this.id = json.id;
     this.type = 'pull_request_review_id' in json ? 'pulls' : 'issues';
@@ -242,7 +306,13 @@ class PullRequestComment {
   }
 }
 
+/**
+ * A Label on a GitHub Pull Request.
+ */
 class Label {
+  /**
+   * @param {!Object} json
+   */
   constructor(json) {
     this.id = json.id;
     this.url = json.url;
@@ -252,13 +322,25 @@ class Label {
   }
 }
 
+/**
+ * Represents the sender on GitHub API responses.
+ */
 class Sender {
+  /**
+   * @param {!Object} json
+   */
   constructor(json) {
     this.username = json.login;
   }
 }
 
+/**
+ * A Review action on a GitHub Pull Request. (approve, disapprove)
+ */
 class Review {
+  /**
+   * @param {!Object} json
+   */
   constructor(json) {
     this.id = json.id;
     this.username = json.user.login;
@@ -266,20 +348,40 @@ class Review {
     this.submitted_at = new Date(json.submitted_at);
   }
 
+  /**
+   * @return {boolean}
+   */
   isApproved() {
     return this.state == 'approved';
   }
 }
 
+/**
+ * Teams API on GitHub.
+ */
 class Teams {
+  /**
+   * @param {!Object} context
+   */
   constructor(context) {
     this.context = context;
     this.github = context.github;
   }
 
+  /**
+   * return the teams from the GitHub API.
+   * @return {!Promise}
+   */
   async list() {
     return this.github.repos.listTeams(this.context.repo());
   }
 }
 
-module.exports = {PullRequest, PullRequestComment, Label, Sender, Review, Teams};
+module.exports = {
+  PullRequest,
+  PullRequestComment,
+  Label,
+  Sender,
+  Review,
+  Teams,
+};

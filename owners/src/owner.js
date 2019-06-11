@@ -25,7 +25,6 @@ const path = require('path');
  * Represents an OWNER file found in the repo.
  */
 class Owner {
-
   /**
    * @param {!Array} config
    * @param {string} pathToRepoDir
@@ -106,7 +105,7 @@ function findOwners(files, ownersMap) {
  * in the repo, we simulate a folder traversal by splitting the path and
  * finding the closest OWNER file for a RepoFile.
  *
- * @param {!./src/repo-file.RepoFile} file
+ * @param {!RepoFile} file
  * @param {!Object} ownersMap
  * @return {!Object}
  */
