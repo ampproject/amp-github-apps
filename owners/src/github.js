@@ -26,7 +26,7 @@ const sleep = require('sleep-promise');
  */
 class PullRequest {
   /**
-   * @param {!Object} context
+   * @param {!Context} context
    * @param {!PullRequest} pr
    */
   constructor(context, pr) {
@@ -114,7 +114,7 @@ class PullRequest {
    * reviewed by a single user multiple times (ex. disapproved then
    * subsequently approves.)
    *
-   * @return {!Array<!Object>}
+   * @return {!Array<object>}
    */
   async getUniqueReviews() {
     const reviews = await this.getReviews();
@@ -125,7 +125,7 @@ class PullRequest {
   /**
    * Retrives the Reviews from GitHub.
    *
-   * @return {!Array<!Object>}
+   * @return {!Array<object>}
    */
   async getReviews() {
     const res = await this.github.pullRequests.listReviews({
@@ -150,8 +150,8 @@ class PullRequest {
   }
 
   /**
-   * @param {!Object} fileOwners
-   * @param {!Array<!Object>} reviews
+   * @param {object} fileOwners
+   * @param {!Array<object>} reviews
    * @return {boolean}
    */
   areAllApprovalsMet(fileOwners, reviews) {
@@ -165,8 +165,8 @@ class PullRequest {
   }
 
   /**
-   * @param {!Array<!Object>} reviews
-   * @return {!Array<!Object>}
+   * @param {!Array<object>} reviews
+   * @return {!Array<object>}
    */
   getReviewersWhoApproved(reviews) {
     const reviewersWhoApproved = reviews.filter(x => {
@@ -204,7 +204,7 @@ class PullRequest {
   }
 
   /**
-   * @param {!Object} checkRun
+   * @param {object} checkRun
    * @param {string} text
    * @param {boolean} areApprovalsMet
    * @return {!Promise}
@@ -242,8 +242,8 @@ class PullRequest {
   }
 
   /**
-   * @param {!Object} checkRuns
-   * @return {!Object}
+   * @param {object} checkRuns
+   * @return {object}
    */
   hasCheckRun(checkRuns) {
     const hasCheckRun = checkRuns.total_count > 0;
@@ -256,7 +256,7 @@ class PullRequest {
   }
 
   /**
-   * @param {!Object} prInfo
+   * @param {object} prInfo
    * @return {string}
    */
   buildCheckOutput(prInfo) {
@@ -278,7 +278,7 @@ class PullRequest {
   }
 
   /**
-   * @param {!Object} context
+   * @param {object} context
    * @param {number} number
    */
   static async get(context, number) {
@@ -293,7 +293,7 @@ class PullRequest {
  */
 class PullRequestComment {
   /**
-   * @param {!Object} json
+   * @param {object} json
    */
   constructor(json) {
     this.id = json.id;
@@ -311,7 +311,7 @@ class PullRequestComment {
  */
 class Label {
   /**
-   * @param {!Object} json
+   * @param {object} json
    */
   constructor(json) {
     this.id = json.id;
@@ -327,7 +327,7 @@ class Label {
  */
 class Sender {
   /**
-   * @param {!Object} json
+   * @param {object} json
    */
   constructor(json) {
     this.username = json.login;
@@ -339,7 +339,7 @@ class Sender {
  */
 class Review {
   /**
-   * @param {!Object} json
+   * @param {object} json
    */
   constructor(json) {
     this.id = json.id;
@@ -361,7 +361,7 @@ class Review {
  */
 class Teams {
   /**
-   * @param {!Object} context
+   * @param {object} context
    */
   constructor(context) {
     this.context = context;

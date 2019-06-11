@@ -58,7 +58,7 @@ class Owner {
   /**
    * @param {!Git} git
    * @param {!PullRequest} pr
-   * @return {!Object}
+   * @return {object}
    */
   static async getOwners(git, pr) {
     // Update the local target repository of the latest from master
@@ -81,8 +81,8 @@ class Owner {
  * of files. It first tries to find the interection across the files and if
  * there are none it will return the union across usernames.
  * @param {!Array} files
- * @param {!Object} ownersMap
- * @return {!Object}
+ * @param {object} ownersMap
+ * @return {object}
  */
 function findOwners(files, ownersMap) {
   const fileOwners = Object.create(null);
@@ -106,8 +106,8 @@ function findOwners(files, ownersMap) {
  * finding the closest OWNER file for a RepoFile.
  *
  * @param {!RepoFile} file
- * @param {!Object} ownersMap
- * @return {!Object}
+ * @param {object} ownersMap
+ * @return {object}
  */
 function findClosestOwnersFile(file, ownersMap) {
   let dirname = file.dirname;
@@ -123,7 +123,7 @@ function findClosestOwnersFile(file, ownersMap) {
 
 /**
  * @param {!Array} owners
- * @return {!Object}
+ * @return {object}
  */
 function createOwnersMap(owners) {
   return owners.reduce((ownersMap, owner) => {

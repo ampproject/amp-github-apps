@@ -25,7 +25,7 @@ const matcher = /your branch is up-to-date|your branch is up to date/i;
 
 /**
  * @param {string} str
- * @return {!Object}
+ * @return {object}
  */
 function yamlReader(str) {
   return yaml.parse(str);
@@ -36,7 +36,7 @@ function yamlReader(str) {
  */
 class Git {
   /**
-   * @param {!Object} context
+   * @param {object} context
    */
   constructor(context) {
     this.context = context;
@@ -46,7 +46,7 @@ class Git {
    * Reads the actual OWNER file on the file system and parses it using the
    * passed in `formatReader` and returns an `OwnersMap`.
    *
-   * @param {function(string):!Object} formatReader
+   * @param {function(string):object} formatReader
    * @param {string} pathToRepoDir
    * @param {!Array<string>} ownersPaths
    */
