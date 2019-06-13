@@ -7,10 +7,6 @@ cron:
   url: /_cron/recompute/AbsoluteCoverageMetric
   schedule: every 6 hours
 
-- description: "Update presubmit-ignored metric."
-  url: /_cron/recompute/PresubmitIgnoredMetric
-  schedule: every 24 hours
-
 - description: "Update presubmit-latency metric."
   url: /_cron/recompute/PresubmitLatencyMetric
   schedule: every 24 hours
