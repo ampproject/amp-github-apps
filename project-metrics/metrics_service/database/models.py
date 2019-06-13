@@ -109,3 +109,30 @@ class Build(Base):
   def __repr__(self) -> Text:
     return '<Build(number=%d, duration=%d, state=%s, started_at=%s)>' % (
         self.number, self.duration, self.state.name, self.started_at)
+
+
+class PullRequestStatus(enum.Enum):
+  """A status state for a pull request.
+
+  See https://developer.github.com/v4/enum/statusstate/
+  """
+  ERROR = 0
+  EXPECTED = 1
+  FAILURE = 2
+  PENDING = 3
+  SUCCESS = 4
+
+
+class Commit(Base):
+  """A commit on the master branch of the repo."""
+
+  __tablename__ = 'commits'
+
+  hash = sqlalchemy.Column(sqlalchemy.Unicode(40), primary_key=True)
+  committed_at = sqlalchemy.Column(sqlalchemy.DateTime)
+  pull_request = sqlalchemy.Column(sqlalchemy.Integer)
+  pull_request_status = sqlalchemy.Column(sqlalchemy.Enum(PullRequestStatus))
+
+  def __repr__(self) -> Text:
+    return '<Build(hash=%s, committed_at=%s, status=%s, pull_request=%d)>' % (
+      self.hash, self.committed_at, self.status.name, self.pull_request)
