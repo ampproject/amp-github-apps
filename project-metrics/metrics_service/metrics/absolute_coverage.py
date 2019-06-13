@@ -6,7 +6,7 @@ from database import models
 
 
 class AbsoluteCoverageMetric(base.PercentageMetric):
-  """A metric tracking the percentage of green Travis builds."""
+  """A metric tracking absolute code coverage via Codecov."""
 
   def _score_value(self, percentage: float) -> models.MetricScore:
     if percentage < 0.6:
