@@ -7,3 +7,4 @@ third_party/
 # Build/dev files
 __pycache__
 .pytype
+.pyc
