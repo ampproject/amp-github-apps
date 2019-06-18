@@ -49,8 +49,11 @@ describe('test-status/web', () => {
 
   beforeEach(async () => {
     process.env = {
-      APPROVING_USERS: 'buildcop',
+      APPROVING_USERS: 'infrauser,anotherinfrauser',
     };
+
+    await db('buildCop').update({username: 'buildcop'});
+
     nock('https://api.github.com')
         .post('/app/installations/123456/access_tokens')
         .reply(200, {token: 'test'});
@@ -95,7 +98,11 @@ describe('test-status/web', () => {
             .expect(200, bodyMatches);
       });
 
-  test('Request status page of a check that errored', async () => {
+  test.each([
+    'buildcop',
+    'infrauser',
+    'anotherinfrauser',
+  ])('Request status page of a check that errored as %s', async username => {
     await db('pullRequestSnapshots').insert({
       headSha: HEAD_SHA,
       owner: 'ampproject',
@@ -115,7 +122,7 @@ describe('test-status/web', () => {
 
     await request(probot.server)
         .get(`/tests/${HEAD_SHA}/unit/saucelabs/status`)
-        .auth('buildcop')
+        .auth(username)
         .expect(200, /Errored!/);
   });
 
