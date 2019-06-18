@@ -14,7 +14,7 @@
  */
 'use strict';
 
-const {getCheckRunId, getPullRequestSnapshot} = require('./db');
+const {getBuildCop, getCheckRunId, getPullRequestSnapshot} = require('./db');
 
 /**
  * Create a parameters object for a new status check line.
@@ -86,10 +86,11 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
  * @param {number} checkRunId the existing check run ID.
  * @param {number} passed number of tests that passed.
  * @param {number} failed number of tests that failed.
+ * @param {string} buildCop the GitHub username of the current build cop.
  * @return {!object} a parameters object for github.checks.update.
  */
 function createReportedCheckParams(
-  pullRequestSnapshot, type, subType, checkRunId, passed, failed) {
+  pullRequestSnapshot, type, subType, checkRunId, passed, failed, buildCop) {
   const {owner, repo, headSha} = pullRequestSnapshot;
   const params = {
     owner,
@@ -114,9 +115,8 @@ function createReportedCheckParams(
           'resulted in test breakage or fix the broken tests.\n\n' +
           'If you believe that this pull request was not the cause of this ' +
           'test breakage (i.e., this is a flaky test) please contact the ' +
-          // TODO(danielrozenberg): say who the weekly build cop is inline here:
-          'weekly build cop, who can advise on how to proceed, or skip this ' +
-          'test run for you.',
+          `weekly build cop (@${buildCop}) who can advise on how to proceed, ` +
+          'or skip this test run for you.',
       },
     });
   } else {
@@ -140,10 +140,11 @@ function createReportedCheckParams(
  * @param {string} type major tests type slug (e.g., unit, integration).
  * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {number} checkRunId the existing check run ID.
+ * @param {string} buildCop the GitHub username of the current build cop.
  * @return {!object} a parameters object for github.checks.update.
  */
 function createErroredCheckParams(
-  pullRequestSnapshot, type, subType, checkRunId) {
+  pullRequestSnapshot, type, subType, checkRunId, buildCop) {
   const {owner, repo, headSha} = pullRequestSnapshot;
   const detailsUrl = new URL(`/tests/${headSha}/${type}/${subType}/status`,
       process.env.WEB_UI_BASE_URL);
@@ -161,9 +162,8 @@ function createErroredCheckParams(
         `tests (${subType}).`,
       text: 'Please inspect the Travis build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
-        // TODO(danielrozenberg): say who the weekly build cop is inline here:
-        'error, please contact the weekly build cop, who can advise on how ' +
-        'to proceed, or skip this test run for you.',
+        `error, please contact the weekly build cop (@${buildCop}), who can ` +
+        'advise on how to proceed, or skip this test run for you.',
     },
   };
 }
@@ -228,6 +228,7 @@ exports.installApiRouter = (app, db) => {
   tests.post('/:headSha/:type/:subType/report/:passed/:failed',
       async (request, response) => {
         const {headSha, type, subType, passed, failed} = request.params;
+        const buildCop = await getBuildCop(db);
         app.log(
             `Reporting the results of the ${type} tests (${subType}) to the ` +
             `GitHub check for pull request with head commit SHA ${headSha}`);
@@ -242,7 +243,8 @@ exports.installApiRouter = (app, db) => {
         }
 
         const params = createReportedCheckParams(
-            pullRequestSnapshot, type, subType, checkRunId, passed, failed);
+            pullRequestSnapshot, type, subType, checkRunId, passed, failed,
+            buildCop);
         const github = await app.auth(pullRequestSnapshot.installationId);
         await github.checks.update(params);
 
@@ -256,6 +258,7 @@ exports.installApiRouter = (app, db) => {
   tests.post('/:headSha/:type/:subType/report/errored',
       async (request, response) => {
         const {headSha, type, subType} = request.params;
+        const buildCop = await getBuildCop(db);
         app.log(
             `Reporting that ${type} tests (${subType}) have errored to the ` +
             `GitHub check for pull request with head commit SHA ${headSha}`);
@@ -269,7 +272,7 @@ exports.installApiRouter = (app, db) => {
         }
 
         const params = createErroredCheckParams(
-            pullRequestSnapshot, type, subType, checkRunId);
+            pullRequestSnapshot, type, subType, checkRunId, buildCop);
         const github = await app.auth(pullRequestSnapshot.installationId);
         await github.checks.update(params);
 
