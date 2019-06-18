@@ -169,8 +169,8 @@ function createErroredCheckParams(
 }
 
 exports.installApiRouter = (app, db) => {
-  const v0 = app.route('/v0');
-  v0.use((request, response, next) => {
+  const tests = app.route('/v0/tests');
+  tests.use((request, response, next) => {
     request.app.set('trust proxy', true);
     if ('TRAVIS_IP_ADDRESSES' in process.env &&
       !process.env.TRAVIS_IP_ADDRESSES.includes(request.ip)) {
@@ -181,7 +181,7 @@ exports.installApiRouter = (app, db) => {
     }
   });
 
-  v0.post('/tests/:headSha/:type/:subType/:status(queued|started|skipped)',
+  tests.post('/:headSha/:type/:subType/:status(queued|started|skipped)',
       async (request, response) => {
         const {headSha, type, subType, status} = request.params;
         app.log(
@@ -225,7 +225,7 @@ exports.installApiRouter = (app, db) => {
         return response.end();
       });
 
-  v0.post('/tests/:headSha/:type/:subType/report/:passed/:failed',
+  tests.post('/:headSha/:type/:subType/report/:passed/:failed',
       async (request, response) => {
         const {headSha, type, subType, passed, failed} = request.params;
         app.log(
@@ -253,7 +253,7 @@ exports.installApiRouter = (app, db) => {
         return response.end();
       });
 
-  v0.post('/tests/:headSha/:type/:subType/report/errored',
+  tests.post('/:headSha/:type/:subType/report/errored',
       async (request, response) => {
         const {headSha, type, subType} = request.params;
         app.log(
@@ -279,4 +279,27 @@ exports.installApiRouter = (app, db) => {
 
         return response.end();
       });
+
+  const buildCop = app.route('/v0/build-cop');
+  buildCop.use(require('express').json());
+  buildCop.use((request, response, next) => {
+    if (!('accessToken' in request.body) ||
+        request.body.accessToken != process.env.BUILD_COP_UPDATE_TOKEN) {
+      app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
+      response.status(403).end('Access token missing or not authorized');
+    } else {
+      next();
+    }
+  });
+
+  buildCop.post('/update', async (request, response) => {
+    if (!('username' in request.body)) {
+      return response.status(400).end(
+          'POST request to /build-cop must contain field "username"');
+    }
+
+    await db('buildCop').update({username: request.body.username});
+
+    return response.end();
+  });
 };

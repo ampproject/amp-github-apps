@@ -37,6 +37,18 @@ from this comma separated list of IP addresses will be processed.
     interface of this app, which can only be accessed by the weekly build cop or
     a fixed set of authorized users
 
+### API for Build Cop updates
+
+The App has the following API point, which are to be triggered by a cron script
+from the build cop rotation tool. The `BUILD_COP_UPDATE_TOKEN` environment
+variable must be set to a unique token, to be sent in the JSON POST requests
+for validation.
+
+* `POST /v0/build-cop/update`
+  * Receives a JSON object with two fields: `accessToken` (which must be set to
+    the same value as the `BUILD_COP_UPDATE_TOKEN` environment variable) and
+    `username`, which is the GitHub username of the current build cop
+
 ### Web UI
 
 The App provides a web interface for the weekly build cop. Login is performed

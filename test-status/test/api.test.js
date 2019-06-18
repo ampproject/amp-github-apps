@@ -50,7 +50,10 @@ describe('test-status/api', () => {
   beforeEach(async () => {
     process.env = {
       WEB_UI_BASE_URL: 'http://localhost:3000/',
+      BUILD_COP_UPDATE_TOKEN: '1a2b3c',
     };
+
+    await db('buildCop').update({username: 'agithuber'});
 
     nock('https://api.github.com')
         .post('/app/installations/123456/access_tokens')
@@ -266,5 +269,75 @@ describe('test-status/api', () => {
     await request(probot.server)
         .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/queued`)
         .expect(403, 'You are not Travis!');
+  });
+
+  test('update build cop', async () => {
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+
+    await request(probot.server)
+        .post('/v0/build-cop/update')
+        .send({
+          accessToken: '1a2b3c',
+          username: 'anothergithuber',
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(200);
+
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['anothergithuber']);
+  });
+
+  test('reject missing access token for build cop updates', async () => {
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+
+    await request(probot.server)
+        .post('/v0/build-cop/update')
+        .send({
+          username: 'anothergithuber',
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(403);
+
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+  });
+
+  test('reject incorrect access token for build cop updates', async () => {
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+
+    await request(probot.server)
+        .post('/v0/build-cop/update')
+        .send({
+          accessToken: 'THIS ACCESS TOKEN IS INCORRECT',
+          username: 'anothergithuber',
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(403);
+
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+  });
+
+  test('reject missing username for build cop updates', async () => {
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+
+    await request(probot.server)
+        .post('/v0/build-cop/update')
+        .send({
+          accessToken: '1a2b3c',
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(400);
+
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
   });
 });
