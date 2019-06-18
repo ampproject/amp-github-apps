@@ -83,3 +83,15 @@ exports.getCheckRunResults = async (db, headSha, type, subType) => {
     return existingCheck;
   }
 };
+
+/**
+ * Get the GitHub username of the current build cop.
+ *
+ * @param {!Knex} db instantiated database connection.
+ * @return {string} the GitHub username of the current build cop.
+ */
+exports.getBuildCop = async db => {
+  return await db('buildCop')
+      .pluck('username')
+      .then(usernames => usernames[0]);
+};
