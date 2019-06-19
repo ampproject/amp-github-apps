@@ -17,7 +17,7 @@
 const {body, validationResult} = require('express-validator/check');
 const bodyParser = require('body-parser');
 const express = require('express');
-const {getCheckRunResults} = require('./db');
+const {getBuildCop, getCheckRunResults} = require('./db');
 const {
   installRootAuthentications,
   installRouteAuthentications,
@@ -81,15 +81,18 @@ exports.installWebUiRouter = (app, db) => {
   });
   installRouteAuthentications(tests);
   tests.use(bodyParser.urlencoded({extended: false}));
-  tests.use((request, response, next) => {
+  tests.use(async (request, response, next) => {
     const {user} = request.session.passport;
-    // TODO(danielrozenberg): also include a check for the current build cop.
     if (process.env.APPROVING_USERS.split(',').includes(user)) {
       return next();
-    } else {
-      // TODO(danielrozenberg): add buildCop.
-      response.status(403).render('403', {user});
     }
+
+    const buildCop = await getBuildCop(db);
+    if (user == buildCop) {
+      return next();
+    }
+
+    response.status(403).render('403', {user, buildCop});
   });
 
   tests.all('/:headSha/:type/:subType/:action(status|skip)',

@@ -50,7 +50,10 @@ describe('test-status/api', () => {
   beforeEach(async () => {
     process.env = {
       WEB_UI_BASE_URL: 'http://localhost:3000/',
+      BUILD_COP_UPDATE_TOKEN: '1a2b3c',
     };
+
+    await db('buildCop').update({username: 'agithuber'});
 
     nock('https://api.github.com')
         .post('/app/installations/123456/access_tokens')
@@ -144,14 +147,10 @@ describe('test-status/api', () => {
   });
 
   test.each([
-    [0, 0, 'success', '0 tests passed', null],
-    [1, 0, 'success', '1 test passed', null],
-    [5, 5, 'action_required', '5 tests failed',
-      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
-    [0, 1, 'action_required', '1 test failed',
-      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
-  ])('Update an existing check with /report/%d/%d action',
-      async (passed, failed, conclusion, title, detailsUrl) => {
+    [0, 0, '0 tests passed'],
+    [1, 0, '1 test passed'],
+  ])('Update a successful existing check with /report/%d/%d action',
+      async (passed, failed, title) => {
         await db('pullRequestSnapshots').insert({
           headSha: HEAD_SHA,
           owner: 'ampproject',
@@ -170,16 +169,66 @@ describe('test-status/api', () => {
             .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
               expect(body).toMatchObject({
                 status: 'completed',
-                conclusion,
+                conclusion: 'success',
                 output: {
                   title,
                 },
               });
-              if (detailsUrl) {
-                expect(body).toMatchObject({
-                  details_url: detailsUrl,
-                });
-              }
+              return true;
+            })
+            .reply(200);
+
+        await request(probot.server)
+            .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/` +
+                  `${failed}`)
+            .expect(200);
+
+        expect(await db('checks').select('*')).toMatchObject([{
+          headSha: HEAD_SHA,
+          type: 'unit',
+          subType: 'saucelabs',
+          checkRunId: 555555,
+          passed,
+          failed,
+          errored: 0,
+        }]);
+
+        await waitUntilNockScopeIsDone(nocks);
+      });
+
+  test.each([
+    [5, 5, '5 tests failed',
+      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
+    [0, 1, '1 test failed',
+      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
+  ])('Update a failed existing check with /report/%d/%d action',
+      async (passed, failed, title, detailsUrl) => {
+        await db('pullRequestSnapshots').insert({
+          headSha: HEAD_SHA,
+          owner: 'ampproject',
+          repo: 'amphtml',
+          pullRequestId: 19621,
+          installationId: 123456,
+        });
+        await db('checks').insert({
+          headSha: HEAD_SHA,
+          type: 'unit',
+          subType: 'saucelabs',
+          checkRunId: 555555,
+        });
+
+        const nocks = nock('https://api.github.com')
+            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+              expect(body).toMatchObject({
+                status: 'completed',
+                conclusion: 'action_required',
+                details_url: detailsUrl,
+                output: {
+                  title,
+                },
+              });
+              expect(body.output.text).toContain(
+                  'Contact the weekly build cop (@agithuber)');
               return true;
             })
             .reply(200);
@@ -228,6 +277,8 @@ describe('test-status/api', () => {
               title: 'Tests have errored',
             },
           });
+          expect(body.output.text)
+              .toContain('Contact the weekly build cop (@agithuber)');
           return true;
         })
         .reply(200);
@@ -266,5 +317,75 @@ describe('test-status/api', () => {
     await request(probot.server)
         .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/queued`)
         .expect(403, 'You are not Travis!');
+  });
+
+  test('update build cop', async () => {
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+
+    await request(probot.server)
+        .post('/v0/build-cop/update')
+        .send({
+          accessToken: '1a2b3c',
+          username: 'anothergithuber',
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(200);
+
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['anothergithuber']);
+  });
+
+  test('reject missing access token for build cop updates', async () => {
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+
+    await request(probot.server)
+        .post('/v0/build-cop/update')
+        .send({
+          username: 'anothergithuber',
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(403);
+
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+  });
+
+  test('reject incorrect access token for build cop updates', async () => {
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+
+    await request(probot.server)
+        .post('/v0/build-cop/update')
+        .send({
+          accessToken: 'THIS ACCESS TOKEN IS INCORRECT',
+          username: 'anothergithuber',
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(403);
+
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+  });
+
+  test('reject missing username for build cop updates', async () => {
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
+
+    await request(probot.server)
+        .post('/v0/build-cop/update')
+        .send({
+          accessToken: '1a2b3c',
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(400);
+
+    expect(await db('buildCop').pluck('username'))
+        .toMatchObject(['agithuber']);
   });
 });

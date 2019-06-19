@@ -35,6 +35,7 @@ function setupDb(db) {
         .comment('Required to create checks (status lines) on GitHub');
   }).createTable('checks', table => {
     table.comment('Checks (status lines) created on GitHub, referenced by ID');
+
     table.string('headSha', 40);
     table.string('type', 255);
     table.string('subType', 255);
@@ -47,6 +48,15 @@ function setupDb(db) {
     table.foreign('headSha')
         .references('pullRequestSnapshots.headSha')
         .onDelete('CASCADE');
+  }).createTable('buildCop', table => {
+    table.comment(
+        'Singleton table to store the GitHub username of active build cop');
+
+    table.string('username', 255);
+  }).then(() => {
+    return db('buildCop').insert({
+      username: 'UNINITIALIZED',
+    });
   });
 }
 

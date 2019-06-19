@@ -14,7 +14,7 @@
  */
 'use strict';
 
-const {getCheckRunId, getPullRequestSnapshot} = require('./db');
+const {getBuildCop, getCheckRunId, getPullRequestSnapshot} = require('./db');
 
 /**
  * Create a parameters object for a new status check line.
@@ -86,10 +86,11 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
  * @param {number} checkRunId the existing check run ID.
  * @param {number} passed number of tests that passed.
  * @param {number} failed number of tests that failed.
+ * @param {string} buildCop the GitHub username of the current build cop.
  * @return {!object} a parameters object for github.checks.update.
  */
 function createReportedCheckParams(
-  pullRequestSnapshot, type, subType, checkRunId, passed, failed) {
+  pullRequestSnapshot, type, subType, checkRunId, passed, failed, buildCop) {
   const {owner, repo, headSha} = pullRequestSnapshot;
   const params = {
     owner,
@@ -113,10 +114,12 @@ function createReportedCheckParams(
           'Please inspect the Travis build and fix any code changes that ' +
           'resulted in test breakage or fix the broken tests.\n\n' +
           'If you believe that this pull request was not the cause of this ' +
-          'test breakage (i.e., this is a flaky test) please contact the ' +
-          // TODO(danielrozenberg): say who the weekly build cop is inline here:
-          'weekly build cop, who can advise on how to proceed, or skip this ' +
-          'test run for you.',
+          'test breakage (i.e., this is a flaky test) error please try the ' +
+          'following steps:\n' +
+          '1. Restart the failed Travis job\n' +
+          '2. Rebase your pull request on the latest `master` branch\n' +
+          `3. Contact the weekly build cop (@${buildCop}), who can advise ` +
+          'you how to proceed, or skip this test run for you.',
       },
     });
   } else {
@@ -140,10 +143,11 @@ function createReportedCheckParams(
  * @param {string} type major tests type slug (e.g., unit, integration).
  * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {number} checkRunId the existing check run ID.
+ * @param {string} buildCop the GitHub username of the current build cop.
  * @return {!object} a parameters object for github.checks.update.
  */
 function createErroredCheckParams(
-  pullRequestSnapshot, type, subType, checkRunId) {
+  pullRequestSnapshot, type, subType, checkRunId, buildCop) {
   const {owner, repo, headSha} = pullRequestSnapshot;
   const detailsUrl = new URL(`/tests/${headSha}/${type}/${subType}/status`,
       process.env.WEB_UI_BASE_URL);
@@ -161,16 +165,18 @@ function createErroredCheckParams(
         `tests (${subType}).`,
       text: 'Please inspect the Travis build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
-        // TODO(danielrozenberg): say who the weekly build cop is inline here:
-        'error, please contact the weekly build cop, who can advise on how ' +
-        'to proceed, or skip this test run for you.',
+        'error, please try the following steps:\n' +
+        '1. Restart the failed Travis job\n' +
+        '2. Rebase your pull request on the latest `master` branch\n' +
+        `3. Contact the weekly build cop (@${buildCop}), who can advise you ` +
+        'how to proceed, or skip this test run for you.',
     },
   };
 }
 
 exports.installApiRouter = (app, db) => {
-  const v0 = app.route('/v0');
-  v0.use((request, response, next) => {
+  const tests = app.route('/v0/tests');
+  tests.use((request, response, next) => {
     request.app.set('trust proxy', true);
     if ('TRAVIS_IP_ADDRESSES' in process.env &&
       !process.env.TRAVIS_IP_ADDRESSES.includes(request.ip)) {
@@ -181,7 +187,7 @@ exports.installApiRouter = (app, db) => {
     }
   });
 
-  v0.post('/tests/:headSha/:type/:subType/:status(queued|started|skipped)',
+  tests.post('/:headSha/:type/:subType/:status(queued|started|skipped)',
       async (request, response) => {
         const {headSha, type, subType, status} = request.params;
         app.log(
@@ -225,9 +231,10 @@ exports.installApiRouter = (app, db) => {
         return response.end();
       });
 
-  v0.post('/tests/:headSha/:type/:subType/report/:passed/:failed',
+  tests.post('/:headSha/:type/:subType/report/:passed/:failed',
       async (request, response) => {
         const {headSha, type, subType, passed, failed} = request.params;
+        const buildCop = await getBuildCop(db);
         app.log(
             `Reporting the results of the ${type} tests (${subType}) to the ` +
             `GitHub check for pull request with head commit SHA ${headSha}`);
@@ -242,7 +249,8 @@ exports.installApiRouter = (app, db) => {
         }
 
         const params = createReportedCheckParams(
-            pullRequestSnapshot, type, subType, checkRunId, passed, failed);
+            pullRequestSnapshot, type, subType, checkRunId, passed, failed,
+            buildCop);
         const github = await app.auth(pullRequestSnapshot.installationId);
         await github.checks.update(params);
 
@@ -253,9 +261,10 @@ exports.installApiRouter = (app, db) => {
         return response.end();
       });
 
-  v0.post('/tests/:headSha/:type/:subType/report/errored',
+  tests.post('/:headSha/:type/:subType/report/errored',
       async (request, response) => {
         const {headSha, type, subType} = request.params;
+        const buildCop = await getBuildCop(db);
         app.log(
             `Reporting that ${type} tests (${subType}) have errored to the ` +
             `GitHub check for pull request with head commit SHA ${headSha}`);
@@ -269,7 +278,7 @@ exports.installApiRouter = (app, db) => {
         }
 
         const params = createErroredCheckParams(
-            pullRequestSnapshot, type, subType, checkRunId);
+            pullRequestSnapshot, type, subType, checkRunId, buildCop);
         const github = await app.auth(pullRequestSnapshot.installationId);
         await github.checks.update(params);
 
@@ -279,4 +288,27 @@ exports.installApiRouter = (app, db) => {
 
         return response.end();
       });
+
+  const buildCop = app.route('/v0/build-cop');
+  buildCop.use(require('express').json());
+  buildCop.use((request, response, next) => {
+    if (!('accessToken' in request.body) ||
+        request.body.accessToken != process.env.BUILD_COP_UPDATE_TOKEN) {
+      app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
+      response.status(403).end('Access token missing or not authorized');
+    } else {
+      next();
+    }
+  });
+
+  buildCop.post('/update', async (request, response) => {
+    if (!('username' in request.body) || !request.body.username) {
+      return response.status(400).end(
+          'POST request to /build-cop must contain field "username"');
+    }
+
+    await db('buildCop').update({username: request.body.username});
+
+    return response.end();
+  });
 };
