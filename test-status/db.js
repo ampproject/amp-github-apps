@@ -92,6 +92,6 @@ exports.getCheckRunResults = async (db, headSha, type, subType) => {
  */
 exports.getBuildCop = async db => {
   return await db('buildCop')
-      .pluck('username')
-      .then(usernames => usernames[0]);
+      .first('username')
+      .then(row => row['username']);
 };
