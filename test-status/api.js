@@ -302,7 +302,7 @@ exports.installApiRouter = (app, db) => {
   });
 
   buildCop.post('/update', async (request, response) => {
-    if (!('username' in request.body)) {
+    if (!('username' in request.body) || !request.body.username) {
       return response.status(400).end(
           'POST request to /build-cop must contain field "username"');
     }
