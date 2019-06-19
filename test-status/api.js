@@ -114,9 +114,12 @@ function createReportedCheckParams(
           'Please inspect the Travis build and fix any code changes that ' +
           'resulted in test breakage or fix the broken tests.\n\n' +
           'If you believe that this pull request was not the cause of this ' +
-          'test breakage (i.e., this is a flaky test) please contact the ' +
-          `weekly build cop (@${buildCop}) who can advise on how to proceed, ` +
-          'or skip this test run for you.',
+          'test breakage (i.e., this is a flaky test) you may attempt one of ' +
+          'the following:\n' +
+          '1. Restart the failed Travis job' +
+          '2. Rebase your pull request on the latest `master` branch\n' +
+          `3. Contact the weekly build cop (@${buildCop}), who can advise ` +
+          'you how to proceed, or skip this test run for you.',
       },
     });
   } else {
@@ -162,8 +165,11 @@ function createErroredCheckParams(
         `tests (${subType}).`,
       text: 'Please inspect the Travis build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
-        `error, please contact the weekly build cop (@${buildCop}), who can ` +
-        'advise on how to proceed, or skip this test run for you.',
+        'error you may attempt one of the following:\n' +
+        '1. Restart the failed Travis job' +
+        '2. Rebase your pull request on the latest `master` branch\n' +
+        `3. Contact the weekly build cop (@${buildCop}), who can advise you ` +
+        'how to proceed, or skip this test run for you.',
     },
   };
 }
