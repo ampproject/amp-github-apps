@@ -228,7 +228,7 @@ describe('test-status/api', () => {
                 },
               });
               expect(body.output.text).toContain(
-                  'please contact the weekly build cop (@agithuber)');
+                  'Contact the weekly build cop (@agithuber)');
               return true;
             })
             .reply(200);
@@ -278,7 +278,7 @@ describe('test-status/api', () => {
             },
           });
           expect(body.output.text)
-              .toContain('please contact the weekly build cop (@agithuber)');
+              .toContain('Contact the weekly build cop (@agithuber)');
           return true;
         })
         .reply(200);
