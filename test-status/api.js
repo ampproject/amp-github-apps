@@ -165,7 +165,7 @@ function createErroredCheckParams(
         `tests (${subType}).`,
       text: 'Please inspect the Travis build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
-        'error please try the following steps:\n' +
+        'error, please try the following steps:\n' +
         '1. Restart the failed Travis job\n' +
         '2. Rebase your pull request on the latest `master` branch\n' +
         `3. Contact the weekly build cop (@${buildCop}), who can advise you ` +
