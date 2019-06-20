@@ -1,0 +1,16 @@
+{
+  "name": "amp-pr-deploy-app",
+  "description": "A GitHub App that deploys a PR branch when you ask it to",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "The AMP HTML Authors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ampproject/amp-github-apps.git"
+  },
+  "engines": {
+    "node": "^10.15.3"
+  }
+}
+  
