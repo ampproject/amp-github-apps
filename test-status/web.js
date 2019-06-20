@@ -14,7 +14,7 @@
  */
 'use strict';
 
-const {body, validationResult} = require('express-validator/check');
+const {body, validationResult} = require('express-validator');
 const bodyParser = require('body-parser');
 const express = require('express');
 const {getBuildCop, getCheckRunResults} = require('./db');
