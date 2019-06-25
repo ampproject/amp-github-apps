@@ -56,8 +56,8 @@ module.exports = app => {
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
     const pr = await PullRequest.get(
-        context,
-        payload.check_run.check_suite.pull_requests[0].number);
+      context,
+      payload.check_run.check_suite.pull_requests[0].number);
 
     return await processPullRequest(context, pr.data);
   }
