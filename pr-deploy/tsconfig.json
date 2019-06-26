@@ -3,7 +3,7 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "es6",
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
@@ -11,7 +11,7 @@
     "paths": {
       "*": [
         "node_modules/*",
-        "node_modules/@google-cloud/storage/build/src/*"
+        "src/types/*",
       ]
     }
   },

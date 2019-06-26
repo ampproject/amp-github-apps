@@ -23,8 +23,8 @@
  * with the amp-pr-deploy GitHub app.
  */
 
-const unzip = require('unzip-stream');
-const {Storage} = require('@google-cloud/storage');
+import unzip from 'unzip-stream';
+import {Storage} from '@google-cloud/storage';
 
 const PROJECT_ID = 'amp-travis-build-storage';
 const PROJECT_KEY_PATH = './src/function/sa-pr-deploy-key.json';
@@ -34,7 +34,7 @@ const BUILD_BUCKET = 'amp-travis-builds'
 const unzipAndMove = function() {
   authenticate_();
 
-  const storage = new Storage({PROJECT_ID});
+  const storage = new Storage({projectId: PROJECT_ID});
   const serveBucket = storage.bucket(SERVE_BUCKET);
   const serveDir = 'site-d/';
 
@@ -54,10 +54,7 @@ const unzipAndMove = function() {
             console.log('write stream finished');
           })
       );  
-    })
-    .on('finish', () => {
-      console.log('read stream finished');
-    });
+    });  
 };
 
 function authenticate_() {
