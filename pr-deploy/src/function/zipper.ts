@@ -26,19 +26,11 @@
 import unzip from 'unzip-stream';
 import {Storage} from '@google-cloud/storage';
 
-const PROJECT_ID = 'amp-travis-build-storage';
-const PROJECT_KEY_PATH = './src/function/sa-pr-deploy-key.json';
-const SERVE_BUCKET = 'amp-test-website-1';
-const BUILD_BUCKET = 'amp-travis-builds'
-
 const unzipAndMove = function() {
-  authenticate_();
-
-  const storage = new Storage({projectId: PROJECT_ID});
-  const serveBucket = storage.bucket(SERVE_BUCKET);
+  const storage = new Storage({projectId: process.env.PROJECT_ID});
+  const serveBucket = storage.bucket(process.env.SERVE_BUCKET);
   const serveDir = 'site-d/';
-
-  const buildFile = storage.bucket(BUILD_BUCKET).file('amp_build_59289.zip');
+  const buildFile = storage.bucket(process.env.BUILD_BUCKET).file('amp_build_59289.zip');
   
   buildFile.createReadStream().pipe(unzip.Parse())
     .on('entry', entry => {
@@ -53,16 +45,11 @@ const unzipAndMove = function() {
           .on('finish', () => {
             console.log('write stream finished');
           })
-      );  
-    });  
+      );
+    });
 };
-
-function authenticate_() {
-  process.env.GOOGLE_APPLICATION_CREDENTIALS = PROJECT_KEY_PATH;
-}
-
-unzipAndMove();
 
 module.exports = {
   unzipAndMove,
 }
+
