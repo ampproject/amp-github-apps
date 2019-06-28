@@ -28,32 +28,30 @@ export async function unzipAndMove(prId: number): Promise<void> {
   const buildFile =
     storage.bucket(process.env.BUILD_BUCKET).file(`amp_dist_${prId}.zip`);
 
-  let resolver: () => void;
-  const deferred = new Promise<void>(resolver);
-
-  buildFile.createReadStream()
-    .pipe(unzip.Parse())
-    .on('entry', entry => {
-      const servePath = serveDir + entry.path;
-      const serveFile = serveBucket.file(servePath);
-      entry.pipe(serveFile.createWriteStream()
-        .on('error', error => {
-          console.log(error);
-        })
-        .on('finish', () => {
-          console.log(`Uploaded ${servePath}`);
-        })
-      );
-    })
-    .on('finish', () => {
-      console.log('on unzip.Parse finish');
-    })
-    .on('close', () => {
-      console.log('on unzip.Parse close');
-      return resolver();
-    });
-
-  return deferred;
+  return new Promise<void>((resolve, reject) => {
+    buildFile.createReadStream()
+      .pipe(unzip.Parse())
+      .on('entry', entry => {
+        const servePath = serveDir + entry.path;
+        const serveFile = serveBucket.file(servePath);
+        entry.pipe(serveFile.createWriteStream()
+          .on('error', error => {
+            console.log(error);
+            return reject;
+          })
+          .on('finish', () => {
+            console.log(`Uploaded ${servePath}`);
+          })
+        );
+      })
+      .on('finish', () => {
+        console.log('on unzip.Parse finish');
+      })
+      .on('close', async() => {
+        console.log('on unzip.Parse close');
+        return resolve;
+      });
+  });
 };
 
 module.exports = {
