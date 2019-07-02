@@ -1,5 +1,3 @@
-bundle-size/node_modules/*
+*/node_modules/*
 bundle-size/*.example.js
-node_modules/*
-test-status/node_modules/*
 test-status/*.example.js
