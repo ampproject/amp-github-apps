@@ -16,7 +16,7 @@
     "start": "node build-system/pr-check.js"
   },
   "devDependencies": {
-    "ansi-colors": "4.0.1",
+    "ansi-colors": "4.1.0",
     "babel-eslint": "10.0.2",
     "eslint": "5.16.0",
     "eslint-config-google": "0.13.0",
