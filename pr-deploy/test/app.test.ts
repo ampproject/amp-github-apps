@@ -17,7 +17,7 @@
 // mock unzipAndMove dependency before importing '../src/app'
 jest.mock('../src/zipper', () => {
   return {
-    unzipAndMove: jest.fn().mockReturnValue(Promise.resolve(1)),
+    unzipAndMove: jest.fn().mockReturnValue(Promise.resolve('gs://serving-bucket/prId')),
   };
 });
 
@@ -33,7 +33,6 @@ describe('test pr deploy app', () => {
   let app: Application;
   let github: any;
   let server: express.Application;
-  jest.mock('../src/zipper');
 
   beforeEach(() => {
     github = {
