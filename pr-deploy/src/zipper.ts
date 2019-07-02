@@ -22,14 +22,14 @@ import {Storage} from '@google-cloud/storage';
  * AMP Travis Build Storage bucket, unzips and writes to
  * a test website bucket that serves the files publicly.
  */
-export async function unzipAndMove(prId: number): Promise<void> {
+export async function unzipAndMove(prId: number): Promise<string> {
   const storage = new Storage({projectId: process.env.PROJECT_ID});
   const serveBucket = storage.bucket(process.env.SERVE_BUCKET);
-  const serveDir = 'site-d/';
+  const serveDir = `${prId}/`;
   const buildFile =
     storage.bucket(process.env.BUILD_BUCKET).file(`amp_dist_${prId}.zip`);
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     buildFile.createReadStream()
       .pipe(unzip.Parse())
       .on('entry', entry => {
@@ -50,7 +50,7 @@ export async function unzipAndMove(prId: number): Promise<void> {
       })
       .on('close', async() => {
         FancyLog('on unzip.Parse close');
-        return resolve;
+        return resolve('');
       });
   });
 };

@@ -41,6 +41,7 @@ function main() {
   timedExecOrDie('cd bundle-size && npm test -u');
   timedExecOrDie('cd test-status && npm ci');
   timedExecOrDie('cd test-status && npm test -u');
+  timedExecOrDie('cd pr-deploy && npm test -u');
   return 0;
 }
 
