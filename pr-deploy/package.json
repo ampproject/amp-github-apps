@@ -10,7 +10,7 @@
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
   "engines": {
-    "node": "10.15.3"
+    "node": "10.16.0"
   },
   "scripts": {
     "test": "jest"
