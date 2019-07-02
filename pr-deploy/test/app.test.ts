@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// mock unzipAndMove dependency before importing '../src/app'
 jest.mock('../src/zipper', () => {
   return {
     unzipAndMove: jest.fn().mockReturnValue(Promise.resolve(1)),

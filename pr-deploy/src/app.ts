@@ -29,7 +29,6 @@ function initializeCheck(app: Application) {
     'pull_request.synchronize',
     'pull_request.reopened',
   ], async context => {
-    //TODO: fix this context typing becuase merge_commit_sha IS NULL!
     const pr = new PullRequest(
       context.github,
       context.payload.pull_request.head.sha,
