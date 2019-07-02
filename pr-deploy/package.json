@@ -16,7 +16,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@google-cloud/storage": "2.5.0",
+    "@google-cloud/storage": "3.0.2",
     "express": "4.17.1",
     "probot": "9.2.15",
     "unzip-stream": "0.3.0"
