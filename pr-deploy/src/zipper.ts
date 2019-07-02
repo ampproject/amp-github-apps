@@ -50,6 +50,7 @@ export async function unzipAndMove(prId: number): Promise<string> {
       })
       .on('close', async() => {
         FancyLog('on unzip.Parse close');
+        //TODO(estherkim): return uploaded URL
         return resolve('');
       });
   });
