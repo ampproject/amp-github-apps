@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import FancyLog from 'fancy-log';
 import unzip from 'unzip-stream';
 import {Storage} from '@google-cloud/storage';
 
@@ -36,19 +37,19 @@ export async function unzipAndMove(prId: number): Promise<void> {
         const serveFile = serveBucket.file(servePath);
         entry.pipe(serveFile.createWriteStream()
           .on('error', error => {
-            console.log(error);
+            FancyLog(error);
             return reject;
           })
           .on('finish', () => {
-            console.log(`Uploaded ${servePath}`);
+            FancyLog(`Uploaded ${servePath}`);
           })
         );
       })
       .on('finish', () => {
-        console.log('on unzip.Parse finish');
+        FancyLog('on unzip.Parse finish');
       })
       .on('close', async() => {
-        console.log('on unzip.Parse close');
+        FancyLog('on unzip.Parse close');
         return resolve;
       });
   });
