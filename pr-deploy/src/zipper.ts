@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import FancyLog from 'fancy-log';
+import mime from 'mime-types';
 import unzip from 'unzip-stream';
 import {Storage} from '@google-cloud/storage';
 
@@ -22,35 +23,36 @@ import {Storage} from '@google-cloud/storage';
  * AMP Travis Build Storage bucket, unzips and writes to
  * a test website bucket that serves the files publicly.
  */
-export async function unzipAndMove(prId: number): Promise<void> {
+export async function unzipAndMove(prId: number): Promise<string> {
   const storage = new Storage({projectId: process.env.PROJECT_ID});
   const serveBucket = storage.bucket(process.env.SERVE_BUCKET);
-  const serveDir = 'site-d/';
+  const buildFileName = `amp_dist_${prId}`;
   const buildFile =
-    storage.bucket(process.env.BUILD_BUCKET).file(`amp_dist_${prId}.zip`);
+    storage.bucket(process.env.BUILD_BUCKET).file(`${buildFileName}.zip`);
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     buildFile.createReadStream()
       .pipe(unzip.Parse())
       .on('entry', entry => {
-        const servePath = serveDir + entry.path;
-        const serveFile = serveBucket.file(servePath);
-        entry.pipe(serveFile.createWriteStream()
+        const serveFileName = entry.path;
+        const serveFile = serveBucket.file(serveFileName);
+        entry.pipe(serveFile.createWriteStream({
+          metadata: {
+            contentType: mime.lookup(serveFileName),
+          },
+        })
           .on('error', error => {
             FancyLog(error);
             return reject;
           })
           .on('finish', () => {
-            FancyLog(`Uploaded ${servePath}`);
+            FancyLog(`Uploaded ${serveFileName}`);
           })
         );
       })
-      .on('finish', () => {
-        FancyLog('on unzip.Parse finish');
-      })
       .on('close', async() => {
-        FancyLog('on unzip.Parse close');
-        return resolve;
+        //TODO(estherkim): return uploaded URL (point to examples?)
+        return resolve(`https://storage.googleapis.com/${process.env.SERVE_BUCKET}/${buildFileName}/view.html`);
       });
   });
 };

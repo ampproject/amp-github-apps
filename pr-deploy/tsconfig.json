@@ -10,12 +10,13 @@
     "baseUrl": ".",
     "paths": {
       "*": [
-        "node_modules/*",
+        "node_modules/*",        
+        "node_modules/@types/*",
         "src/types/*",
       ]
     }
   },
-  "include": [
+  "include": [    
     "src/**/*",
     "test/*",
   ]

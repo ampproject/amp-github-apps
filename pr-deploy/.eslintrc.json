@@ -3,6 +3,7 @@
   "plugins": ["@typescript-eslint"],
   "env": {
     "es6": true,
+    "jest": true,
     "node": true
   },
   "parser": "@typescript-eslint/parser",
