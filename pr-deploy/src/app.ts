@@ -15,7 +15,7 @@
  */
 
 import {Application, ApplicationFunction} from 'probot';
-import {IRouter} from 'express';
+import express, {IRouter} from 'express';
 import {PullRequest} from './github';
 import {unzipAndMove} from './zipper';
 
@@ -46,10 +46,10 @@ function initializeCheck(app: Application) {
  */
 function initializeRouter(app: Application) {
   const router: IRouter<void> = app.route('/pr-deploy');
-  router.use(require('express').json());
+  router.use(express.json());
   router.post('/owners/:owner/repos/:repo/headshas/:headSha',
     async(request, response) => {
-      const github = await app.auth();
+      const github = await app.auth(Number(process.env.INSTALLATION_ID));
       const {headSha, owner, repo} = request.params;
       const pr = new PullRequest(github, headSha, owner, repo);
       await pr.enableDeploymentCheck();
@@ -62,10 +62,6 @@ function initializeRouter(app: Application) {
  */
 function initializeDeployment(app: Application) {
   app.on('check_run.requested_action', async context => {
-    if (context.payload.action != 'deploy-me-action') {
-      return;
-    }
-
     const pr = new PullRequest(
       context.github,
       context.payload.check_run.head_sha,
@@ -75,17 +71,21 @@ function initializeDeployment(app: Application) {
 
     pr.inProgressDeploymentCheck();
 
-    const pullRequestId = context.payload.repository.id;
-    const serveUrl = await unzipAndMove(pullRequestId);
+    const pullRequest = context.payload.check_run.pull_requests
+      .find(pull_request => {
+        return pull_request.head.sha === pr.headSha;
+      });
+    const serveUrl = await unzipAndMove(pullRequest.number);
 
     pr.completeDeploymentCheck(serveUrl);
   });
 }
 
-export const prDeployAppFn: ApplicationFunction = (app: Application) => {
+const prDeployAppFn = (app: Application) => {
   initializeCheck(app);
   initializeRouter(app);
   initializeDeployment(app);
 };
 
-module.exports = {prDeployAppFn};
+export default prDeployAppFn;
+module.exports = prDeployAppFn;

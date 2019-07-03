@@ -21,7 +21,7 @@ import {GitHubAPI} from 'probot/lib/github';
 export class PullRequest {
   private check: string;
   private github: GitHubAPI;
-  private headSha: string;
+  public headSha: string;
   private owner: string;
   private repo: string;
 
@@ -57,6 +57,11 @@ export class PullRequest {
         title: 'Your PR was compiled!',
         summary: 'Please click \'Deploy Me!\' to test it on a live demo site',
       },
+      actions: [{
+        label: 'Deploy me!',
+        description: 'Trigger PR deployment',
+        identifier: 'deploy-me-action',
+      }],
     };
 
     return this.github.checks.update(params);
@@ -112,11 +117,6 @@ export class PullRequest {
       name: this.check,
       head_sha: this.headSha,
       status: 'queued',
-      actions: [{
-        label: 'Deploy me!',
-        description: 'Trigger PR deployment',
-        identifier: 'deploy-me-action',
-      }],
     };
 
     return this.github.checks.create(params);

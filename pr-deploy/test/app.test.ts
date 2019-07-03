@@ -22,7 +22,7 @@ jest.mock('../src/zipper', () => {
 });
 
 import {Application} from 'probot';
-import {prDeployAppFn} from '../src/app';
+import prDeployAppFn from '../src/app';
 import express from 'express';
 import request from 'supertest';
 import Webhooks, {
@@ -104,7 +104,7 @@ describe('test pr deploy app', () => {
       name: 'check_run.requested_action',
       payload: {
         action: 'deploy-me-action',
-        check_run: {head_sha: '12345'},
+        check_run: {head_sha: 'abcde', pull_requests: [{head: {sha: 'abcde'}}]},
         repository: {owner: {name: 'repoOwner'}, name: 'existingRepo'},
       } as WebhookPayloadCheckRun,
     };
