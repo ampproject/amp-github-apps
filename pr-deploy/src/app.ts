@@ -47,7 +47,7 @@ function initializeCheck(app: Application) {
 function initializeRouter(app: Application) {
   const router: IRouter<void> = app.route('/v0/pr-deploy');
   router.use(express.json());
-  router.post('/:owner/:repo/:headSha',
+  router.post('/owners/:owner/repos/:repo/headshas/:headSha',
     async(request, response) => {
       const github = await app.auth(Number(process.env.INSTALLATION_ID));
       const {headSha, owner, repo} = request.params;
