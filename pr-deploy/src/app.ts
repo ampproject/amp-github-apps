@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Application, ApplicationFunction} from 'probot';
+import {Application} from 'probot';
 import express, {IRouter} from 'express';
 import {PullRequest} from './github';
 import {unzipAndMove} from './zipper';
@@ -45,9 +45,9 @@ function initializeCheck(app: Application) {
  * so that the check run action to deploy site is enabled.
  */
 function initializeRouter(app: Application) {
-  const router: IRouter<void> = app.route('/pr-deploy');
+  const router: IRouter<void> = app.route('/v0/pr-deploy');
   router.use(express.json());
-  router.post('/owners/:owner/repos/:repo/headshas/:headSha',
+  router.post('/:owner/:repo/:headSha',
     async(request, response) => {
       const github = await app.auth(Number(process.env.INSTALLATION_ID));
       const {headSha, owner, repo} = request.params;

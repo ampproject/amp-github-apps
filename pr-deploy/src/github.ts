@@ -38,7 +38,7 @@ export class PullRequest {
    */
   async createOrResetCheck(): Promise<void> {
     const check = await this.getCheck_();
-    !check ? await this.createCheck_() : await this.resetCheck_(check);
+    check ? await this.resetCheck_(check) : await this.createCheck_();
   }
 
   /**
@@ -117,6 +117,11 @@ export class PullRequest {
       name: this.check,
       head_sha: this.headSha,
       status: 'queued',
+      output: {
+        title: 'Your PR is compiling...',
+        summary: 'When Travis is done compiling your PR, ' +
+          'a "Deploy Me!" button will appear here.',
+      },
     };
 
     return this.github.checks.create(params);

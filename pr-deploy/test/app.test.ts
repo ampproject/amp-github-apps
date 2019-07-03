@@ -39,14 +39,7 @@ describe('test pr deploy app', () => {
       checks: {
         create: jest.fn().mockReturnValue(Promise.resolve()),
         update: jest.fn().mockReturnValue(Promise.resolve()),
-        listForRef: jest.fn().mockImplementation(
-          params => {
-            if (params.repo == 'newRepo') {
-              return null;
-            } else {
-              return {data: {total_count: 1, check_runs: [{id: 12345}]}};
-            }
-          }),
+        listForRef: jest.fn(),
       },
     };
 
@@ -59,6 +52,9 @@ describe('test pr deploy app', () => {
   });
 
   test('creates a check when a pull request is opened', async() => {
+    // make sure no checks already exist
+    github.checks.listForRef.mockReturnValue(null);
+
     const prOpenedEvent: Webhooks.WebhookEvent<WebhookPayloadPullRequest> = {
       id: 'prId',
       name: 'pull_request.opened',
@@ -75,6 +71,11 @@ describe('test pr deploy app', () => {
 
   test('refreshes the check when a pull request is synchronized or reopened',
     async() => {
+      // make sure a check already exists
+      github.checks.listForRef.mockReturnValue(
+        {data: {total_count: 1, check_runs: [{id: 12345}]}}
+      );
+
       const prSynchronizedEvent:
       Webhooks.WebhookEvent<WebhookPayloadPullRequest> = {
         id: 'prId',
@@ -91,6 +92,11 @@ describe('test pr deploy app', () => {
     });
 
   test('enables deployment action when post is received', async done => {
+    // make sure a check already exists
+    github.checks.listForRef.mockReturnValue(
+      {data: {total_count: 1, check_runs: [{id: 12345}]}}
+    );
+
     request(server)
       .post('/pr-deploy/owners/1/repos/2/headshas/3')
       .expect(() => { expect(github.checks.update).toHaveBeenCalledTimes(1);})
@@ -98,6 +104,11 @@ describe('test pr deploy app', () => {
   });
 
   test('deploys the PR check when action is triggered', async() => {
+    // make sure a check already exists
+    github.checks.listForRef.mockReturnValue(
+      {data: {total_count: 1, check_runs: [{id: 12345}]}}
+    );
+
     const requestedActionEvent:
     Webhooks.WebhookEvent<WebhookPayloadCheckRun> = {
       id: 'prId',
