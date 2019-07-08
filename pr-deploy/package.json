@@ -24,7 +24,7 @@
     "fancy-log": "1.3.3",
     "mime-types": "2.1.24",
     "probot": "9.2.15",    
-    "typescript": "3.5.2",
+    "typescript": "3.5.3",
     "unzip-stream": "0.3.0"
   },
   "devDependencies": {
