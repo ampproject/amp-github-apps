@@ -64,7 +64,7 @@ class TravisState(enum.Enum):
   """A state of a Travis build or job.
 
   Based on
-  https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/job/test.rb#L21
+  https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/build/states.rb#L25
   """
   CREATED = 'created'
   RECEIVED = 'received'
@@ -114,10 +114,10 @@ class Build(Base):
   commit = sqlalchemy.orm.relationship('Commit', backref='builds')
 
   def __repr__(self) -> Text:
-    return ('<Build(number=%d, duration=%ds, state=%s, started_at=%s, '
-            'commit_hash=%s)>') % (
-        self.number, self.duration, self.state.name, self.started_at,
-        self.commit_hash)
+    return ('<Build(number=%d, duration=%ss, state=%s, started_at=%s, '
+            'commit_hash=%s)>') % (self.number, self.duration or
+                                   '?', self.state.name, self.started_at,
+                                   self.commit_hash)
 
 
 class PullRequestStatus(enum.Enum):
