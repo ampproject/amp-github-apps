@@ -64,21 +64,26 @@ class TravisState(enum.Enum):
   """A state of a Travis build or job.
 
   Based on
-  https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/job/test.rb#L21
+  https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/build/states.rb#L25
   """
-  CREATED = 0
-  QUEUED = 1
-  PENDING = 2
-  PASSED = 3
-  FAILED = 4
-  ERRORED = 5
-  CANCELLED = 6
+  CREATED = 'created'
+  RECEIVED = 'received'
+  STARTED = 'started'
+  PASSED = 'passed'
+  FAILED = 'failed'
+  ERRORED = 'errored'
+  CANCELED = 'canceled'
 
 
 class Build(Base):
   """A Travis build."""
 
   __tablename__ = 'travis_builds'
+
+  @classmethod
+  def in_commit_order(cls, session):
+    return session.query(cls).join(Commit.hash).order_by(
+        Commit.committed_at.desc())
 
   @classmethod
   def is_last_90_days(cls):
@@ -98,17 +103,21 @@ class Build(Base):
     filter_test = cls.is_last_90_days()
     if negate:
       filter_test = sqlalchemy.not_(filter_test)
-    return session.query(cls).filter(filter_test)
+    return cls.in_commit_order(session).filter(filter_test)
 
   id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
   number = sqlalchemy.Column(sqlalchemy.Integer)
   duration = sqlalchemy.Column(sqlalchemy.Integer)
   state = sqlalchemy.Column(sqlalchemy.Enum(TravisState))
   started_at = sqlalchemy.Column(sqlalchemy.DateTime)
+  commit_hash = sqlalchemy.Column(sqlalchemy.ForeignKey('commits.hash'))
+  commit = sqlalchemy.orm.relationship('Commit', backref='builds')
 
   def __repr__(self) -> Text:
-    return '<Build(number=%d, duration=%d, state=%s, started_at=%s)>' % (
-        self.number, self.duration, self.state.name, self.started_at)
+    return ('<Build(number=%d, duration=%ss, state=%s, started_at=%s, '
+            'commit_hash=%s)>') % (self.number, self.duration or
+                                   '?', self.state.name, self.started_at,
+                                   self.commit_hash)
 
 
 class PullRequestStatus(enum.Enum):
@@ -116,11 +125,11 @@ class PullRequestStatus(enum.Enum):
 
   See https://developer.github.com/v4/enum/statusstate/
   """
-  ERROR = 0
-  EXPECTED = 1
-  FAILURE = 2
-  PENDING = 3
-  SUCCESS = 4
+  ERROR = 'error'
+  EXPECTED = 'expected'
+  FAILURE = 'failure'
+  PENDING = 'pending'
+  SUCCESS = 'success'
 
 
 class Commit(Base):
@@ -134,5 +143,5 @@ class Commit(Base):
   pull_request_status = sqlalchemy.Column(sqlalchemy.Enum(PullRequestStatus))
 
   def __repr__(self) -> Text:
-    return '<Build(hash=%s, committed_at=%s, status=%s, pull_request=%d)>' % (
-      self.hash, self.committed_at, self.status.name, self.pull_request)
+    return '<Commit(hash=%s, committed_at=%s, status=%s, pull_request=%d)>' % (
+        self.hash, self.committed_at, self.status.name, self.pull_request)
