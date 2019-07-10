@@ -111,7 +111,7 @@ class Metric(object):
 
   @property
   def score(self) -> models.MetricScore:
-    """The 0-4 score for the metric."""
+    """The 1-5 score for the metric."""
     return self._score_value(
         self.result.value) if self.result else models.MetricScore.UNKNOWN
 
