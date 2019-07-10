@@ -14,7 +14,8 @@ import env
 GraphQL = Text
 JsonDict = Dict[Text, Any]
 
-PAGING_INFO = '''
+MAX_PAGE_SIZE = 100
+PAGING_INFO = """
 pageInfo {
   hasPreviousPage
   hasNextPage
@@ -22,7 +23,7 @@ pageInfo {
   startCursor
 }
 totalCount
-'''
+"""
 GRAPHQL_API_URI = 'https://api.github.com/graphql'
 GITHUB_REPO = env.get('GITHUB_REPO')
 GITHUB_REPO_OWNER, GITHUB_REPO_NAME = GITHUB_REPO.split('/')
@@ -36,8 +37,8 @@ class Timestamp(object):
     if isinstance(timestamp, datetime.datetime):
       self.datetime = timestamp
     else:
-      self.datetime = datetime.datetime.strptime(
-          timestamp, '%Y-%m-%dT%H:%M:%SZ')
+      self.datetime = datetime.datetime.strptime(timestamp,
+                                                 '%Y-%m-%dT%H:%M:%SZ')
 
   def __str__(self):
     return str(self.datetime)
@@ -51,7 +52,8 @@ class Timestamp(object):
 class GitHubGraphQL(object):
   """Interface class for executing GraphQL queries against the GitHub API."""
 
-  def __init__(self, repository: Text = GITHUB_REPO,
+  def __init__(self,
+               repository: Text = GITHUB_REPO,
                token: Text = GITHUB_API_ACCESS_TOKEN):
     self._repository = repository
     self._token = token
@@ -111,15 +113,12 @@ class GitHubGraphQL(object):
       The unwrapped portion of the response within the ampproject/amphtml
       repository.
     """
-    return self.query('''repository(owner: "{owner}", name: "{name}") {{
+    return self.query("""repository(owner: "{owner}", name: "{name}") {{
       {query}
-    }}'''.format(
-        owner=GITHUB_REPO_OWNER,
-        name=GITHUB_REPO_NAME,
-        query=graphql))['repository']
+    }}""".format(owner=GITHUB_REPO_OWNER, name=GITHUB_REPO_NAME,
+                 query=graphql))['repository']
 
-  def query_master_branch(self,
-                          graphql: GraphQL) -> JsonDict:
+  def query_master_branch(self, graphql: GraphQL) -> JsonDict:
     """Executes a non-mutation query on the repository's master branch.
 
     Args:
@@ -129,9 +128,9 @@ class GitHubGraphQL(object):
       The unwrapped portion of the response within the master branch of the
       repository.
     """
-    return self.query_repo('''defaultBranchRef {{
+    return self.query_repo("""defaultBranchRef {{
       {query}
-    }}'''.format(query=graphql))['defaultBranchRef']
+    }}""".format(query=graphql))['defaultBranchRef']
 
   class GraphQLError(Exception):
     """Errors returned by the GitHub API."""

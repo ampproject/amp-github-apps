@@ -120,11 +120,12 @@ class Build(Base):
                                    self.commit_hash)
 
 
-class PullRequestStatus(enum.Enum):
+class CommitStatus(enum.Enum):
   """A status state for a pull request.
 
   See https://developer.github.com/v4/enum/statusstate/
   """
+  UNKNOWN = 'unknown'
   ERROR = 'error'
   EXPECTED = 'expected'
   FAILURE = 'failure'
@@ -140,7 +141,7 @@ class Commit(Base):
   hash = sqlalchemy.Column(sqlalchemy.Unicode(40), primary_key=True)
   committed_at = sqlalchemy.Column(sqlalchemy.DateTime)
   pull_request = sqlalchemy.Column(sqlalchemy.Integer)
-  pull_request_status = sqlalchemy.Column(sqlalchemy.Enum(PullRequestStatus))
+  status = sqlalchemy.Column(sqlalchemy.Enum(CommitStatus))
 
   def __repr__(self) -> Text:
     return '<Commit(hash=%s, committed_at=%s, status=%s, pull_request=%d)>' % (
