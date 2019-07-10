@@ -1,11 +1,12 @@
 cron:
-- description: "Update dummy metric."
-  url: /_cron/recompute/IdentityMetric
-  schedule: every 6 hours
+- description: "Scrape latest commits from GitHub"
+  url: /_cron/update_data/commits
+  schedule: every 4 hours from 8:00 to 19:00
+
 
 - description: "Update absolute-coverage metric."
   url: /_cron/recompute/AbsoluteCoverageMetric
-  schedule: every 6 hours
+  schedule: every 4 hours from 8:00 to 19:00
 
 - description: "Update presubmit-latency metric."
   url: /_cron/recompute/PresubmitLatencyMetric

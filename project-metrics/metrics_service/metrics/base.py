@@ -5,7 +5,7 @@ To create a new metric:
 2. Implement `_score_value`, `_compute_value`, and (unless you're using
    `PercentMetric`) `_format_value`
 3. Call `metrics.base.Metric.register(YourNewMetric)`
-4. Add `from . import your_new_metric` to `__init__.py`
+4. Import the metric in __init__.py so it can register itself
 5. Define the update frequency with a job in `cron.yaml`
 """
 
@@ -13,10 +13,12 @@ import abc
 import logging
 import sqlalchemy
 import stringcase
-from typing import Dict, Iterable, Optional, Text, Type, TypeVar
+from typing import Any, Dict, Iterable, Optional, Text, Type, TypeVar
 
 from database import db
 from database import models
+
+MetricImplementation = Type[TypeVar('U', bound='Metric')]
 
 
 class Metric(object):
@@ -26,7 +28,7 @@ class Metric(object):
   _active_metrics = {}
 
   @classmethod
-  def register(cls, metric_cls: Type[TypeVar('U', bound='Metric')]):
+  def register(cls, metric_cls: MetricImplementation):
     """Register a metric to be included in result fetching.
 
     Args:
@@ -36,7 +38,7 @@ class Metric(object):
     cls._active_metrics[metric_cls.__name__] = metric_cls
 
   @classmethod
-  def __from_result(cls, result: models.MetricResult):
+  def __from_result(cls, result: models.MetricResult) -> MetricImplementation:
     """Wraps a result in its metric class for display/processing.
 
     Expects that the result is for an active metric.
@@ -53,7 +55,7 @@ class Metric(object):
     return cls._active_metrics[result.name](result=result)
 
   @classmethod
-  def get_latest(cls) -> Dict[Text, 'Metric']:
+  def get_latest(cls) -> Dict[Text, MetricImplementation]:
     """Fetch the latest result for each metric.
 
     Returns:
@@ -80,6 +82,10 @@ class Metric(object):
         result.name: cls.__from_result(result)
         for result in latest_results_query
     }
+
+  @classmethod
+  def get_metric(cls, metric_cls_name) -> models.MetricResult:
+    return cls._active_metrics[metric_cls_name]
 
   def __init__(self, result: Optional[models.MetricResult] = None):
     self.result = result
@@ -108,6 +114,15 @@ class Metric(object):
     """The 0-4 score for the metric."""
     return self._score_value(
         self.result.value) if self.result else models.MetricScore.UNKNOWN
+
+  @property
+  def serializable(self) -> Dict[Text, Any]:
+    return {
+        'name': self.name,
+        'label': self.label,
+        'formatted_result': self.formatted_result,
+        'score': self.score.name,
+    }
 
   def recompute(self) -> None:
     """Computes the metric and records the result in the `metrics` table."""

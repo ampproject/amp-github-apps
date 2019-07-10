@@ -4,13 +4,26 @@
 Used to launch the REST and Cron servers.
 """
 
+import logging
+import os
 import flask
 from flask_api import status
-import os
 
 from metrics import base
+from database import commit_scraper
 
+logging.getLogger().setLevel(logging.INFO)
 app = flask.Flask(__name__)
+
+
+@app.route('/_cron/update_data/commits')
+def scrape_latest_commits():
+  # This header is added to cron requests by GAE, and stripped from any external
+  # requests. See https://cloud.google.com/appengine/docs/standard/python3/scheduling-jobs-with-cron-yaml#validating_cron_requests
+  if not flask.request.headers.get('X-Appengine-Cron'):
+    return 'Attempted to access internal endpoint.', status.HTTP_403_FORBIDDEN
+  commit_scraper.CommitScraper().scrape_since_latest()
+  return 'Successfully scraped latest commits.', status.HTTP_200_OK
 
 
 @app.route('/_cron/recompute/<metric_cls_name>')
@@ -20,11 +33,17 @@ def recompute(metric_cls_name):
   if not flask.request.headers.get('X-Appengine-Cron'):
     return 'Attempted to access internal endpoint.', status.HTTP_403_FORBIDDEN
   try:
-    metric_cls = base.Metric.active_metrics[metric_cls_name]
+    metric_cls = base.Metric.get_metric(metric_cls_name)
   except KeyError:
+    logging.error('No active metric found for %s.', metric_cls_name)
     return ('No active metric found for %s.' % metric_cls_name,
             status.HTTP_404_NOT_FOUND)
-  metric_cls().recompute()
+  logging.info('Recomputing %s.', metric_cls_name)
+  try:
+    metric_cls().recompute()
+  except Exception as error:
+    logging.error(error)
+    return str(error), status.HTTP_500_SERVER_ERROR
   return 'Successfully recomputed %s.' % metric_cls_name, status.HTTP_200_OK
 
 

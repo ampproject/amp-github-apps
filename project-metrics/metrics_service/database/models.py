@@ -125,6 +125,7 @@ class PullRequestStatus(enum.Enum):
 
   See https://developer.github.com/v4/enum/statusstate/
   """
+  UNKNOWN = 'unknown'
   ERROR = 'error'
   EXPECTED = 'expected'
   FAILURE = 'failure'
@@ -143,5 +144,7 @@ class Commit(Base):
   pull_request_status = sqlalchemy.Column(sqlalchemy.Enum(PullRequestStatus))
 
   def __repr__(self) -> Text:
-    return '<Commit(hash=%s, committed_at=%s, status=%s, pull_request=%d)>' % (
-        self.hash, self.committed_at, self.status.name, self.pull_request)
+    return ('<Commit(hash=%s, committed_at=%s, pull_request_status=%s, '
+            'pull_request=%d)>') % (
+        self.hash, self.committed_at, self.pull_request_status.name,
+        self.pull_request)

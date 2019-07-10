@@ -21,7 +21,7 @@ def get_engine() -> sqlalchemy.engine.Engine:
               'charset':
                   'utf8mb4',
           }),
-      echo=True)
+        echo=True)
 
 
 Session = orm.scoped_session(orm.sessionmaker(bind=get_engine()))
