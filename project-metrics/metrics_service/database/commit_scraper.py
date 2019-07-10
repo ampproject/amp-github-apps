@@ -51,7 +51,6 @@ class CommitScraper(object):
         nodes {{
           oid
           committedDate
-          status {{ state }}
           associatedPullRequests(first: 1) {{
             nodes {{ 
               number
@@ -69,12 +68,13 @@ class CommitScraper(object):
     for commit in commit_history['nodes']:
       try:
         pull_request = commit['associatedPullRequests']['nodes'][0]
-        status = commit['status']['state'] or 'UNKNOWN'
+        pull_request_status = 'UNKNOWN'
+        # TODO(rcebulko): Scrape CheckSuite runs and set the status
         yield models.Commit(
             hash=commit['oid'],
             committed_at=github.Timestamp(commit['committedDate']).datetime,
             pull_request=pull_request['number'],
-            status=models.CommitStatus[status])
+            pull_request_status=models.PullRequestStatus.UNKNOWN)
       except IndexError:
         logging.warn('No pull request found for commit %s', commit['oid'][:7])
 
@@ -97,7 +97,7 @@ class CommitScraper(object):
             'hash': commit.hash,
             'committed_at': commit.committed_at,
             'pull_request': commit.pull_request,
-            'status': commit.status,
+            'pull_request_status': commit.pull_request_status,
         } for commit in commits]
         logging.info('Scraped %d commits', len(commit_dicts))
 
