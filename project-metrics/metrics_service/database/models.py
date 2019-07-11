@@ -82,20 +82,30 @@ class Build(Base):
   __tablename__ = 'travis_builds'
 
   @classmethod
-  def in_commit_order(cls, session):
-    return session.query(cls).join(Commit.hash).order_by(
-        Commit.committed_at.desc())
+  def last_builds(cls, session):
+    """Subquery selecting the last build for each pull request."""
+    return session.query(
+        cls.pull_request,
+        sqlalchemy.func.max(cls.started_at).label('started_at')).group_by(
+            cls.pull_request)
+
+  @classmethod
+  def in_commit_order(cls, base_query):
+    """Orders builds by commit time."""
+    return base_query.join(Commit,
+                           Commit.pull_request == cls.pull_request).order_by(
+                               Commit.committed_at.desc())
 
   @classmethod
   def is_last_90_days(cls):
     return _is_last_n_days(timestamp_column=cls.started_at, days=90)
 
   @classmethod
-  def last_90_days(cls, session, negate=False) -> sqlalchemy.orm.query.Query:
+  def last_90_days(cls, base_query, negate=False) -> sqlalchemy.orm.query.Query:
     """To query builds younger than 90 days.
 
      Args:
-      session: SQL Alchemy database session.
+      base_query: Query to filter.
       negate: if true, returns builds older than 90 days
 
      Returns:
@@ -104,21 +114,41 @@ class Build(Base):
     filter_test = cls.is_last_90_days()
     if negate:
       filter_test = sqlalchemy.not_(filter_test)
-    return cls.in_commit_order(session).filter(filter_test)
+    return base_query.filter(filter_test)
+
+  @classmethod
+  def scope(cls, session):
+    """Default scoped query.
+
+    Args:
+      session: SQL Alchemy database session.
+
+    Returns:
+      The last build from each PR from the last 90 days in commit order.
+    """
+    last_builds_subquery = cls.last_builds(session).subquery()
+    query = session.query(cls).join(
+        last_builds_subquery,
+        (cls.pull_request == last_builds_subquery.c.pull_request) &
+        (cls.started_at == last_builds_subquery.c.started_at))
+    query = cls.last_90_days(query)
+    return cls.in_commit_order(query)
 
   id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
   number = sqlalchemy.Column(sqlalchemy.Integer)
   duration = sqlalchemy.Column(sqlalchemy.Integer)
   state = sqlalchemy.Column(sqlalchemy.Enum(TravisState))
   started_at = sqlalchemy.Column(sqlalchemy.DateTime)
-  commit_hash = sqlalchemy.Column(sqlalchemy.ForeignKey('commits.hash'))
+  commit_hash = sqlalchemy.Column(sqlalchemy.Unicode(40), unique=True)
+  pull_request = sqlalchemy.Column(
+      sqlalchemy.Integer, sqlalchemy.ForeignKey('commits.pull_request'))
   commit = sqlalchemy.orm.relationship('Commit', backref='builds')
 
   def __repr__(self) -> Text:
     return ('<Build(number=%d, duration=%ss, state=%s, started_at=%s, '
-            'commit_hash=%s)>') % (self.number, self.duration or
-                                   '?', self.state.name, self.started_at,
-                                   self.commit_hash)
+            'pull_request=%s, commit_hash=%s)>') % (
+                self.number, self.duration or '?', self.state.name,
+                self.started_at, self.pull_request, self.commit_hash)
 
 
 class PullRequestStatus(enum.Enum):
@@ -141,7 +171,8 @@ class Commit(Base):
 
   hash = sqlalchemy.Column(sqlalchemy.Unicode(40), primary_key=True)
   committed_at = sqlalchemy.Column(sqlalchemy.DateTime)
-  pull_request = sqlalchemy.Column(sqlalchemy.Integer)
+  pull_request = sqlalchemy.Column(
+      sqlalchemy.Integer, unique=True, nullable=False)
   pull_request_status = sqlalchemy.Column(sqlalchemy.Enum(PullRequestStatus))
 
   def __repr__(self) -> Text:

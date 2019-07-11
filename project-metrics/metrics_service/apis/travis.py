@@ -36,7 +36,7 @@ class TravisApi(agithub_base.API):
         'User-Agent': 'AMPProjectMetrics/1.0.0',
         'Content-Type': 'application/json',
         'Authorization': 'token %s' % env.get('TRAVIS_API_ACCESS_TOKEN'),
-        'Travis-API-Version': '3'
+        'Travis-API-Version': '3',
     }
 
     props = agithub_base.ConnectionProperties(
@@ -61,6 +61,7 @@ class TravisApi(agithub_base.API):
         duration=json_build['duration'],
         state=models.TravisState(json_build['state']),
         started_at=started_at,
+        pull_request=json_build['pull_request_number'],
         commit_hash=json_build['commit']['sha'])
 
   def fetch_builds(self, page_num: int = 0) -> Sequence[models.Build]:
@@ -73,8 +74,7 @@ class TravisApi(agithub_base.API):
       TravisApiError: if the call to the Travis Builds API fails.
 
     Returns:
-      The API response containing a `builds` list and associated `commits` list.
-      See https://docs.travis-ci.com/api/#builds
+      A list of the fetched builds.
     """
     params = {
         'event_type': 'pull_request',
