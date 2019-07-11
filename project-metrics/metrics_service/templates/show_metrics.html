@@ -17,6 +17,8 @@
     .metric {
       display: inline-block;
       padding-top: 50px;
+      text-align: center;
+      margin: 0 25px;
     }
 
     .metric-guage {
@@ -25,8 +27,8 @@
       overflow: hidden;
       text-align: center;
       transform: translate(-50%, -50%);
-      margin-left: 100px;
-      margin-bottom: -50px;
+      margin-left: 50%;
+      margin-bottom: -25%;
     }
 
     .metric-gauge-arc-fill,
@@ -109,10 +111,7 @@
   {% if metrics %}
   <ul class='metric-list'>
     {% for metric in metrics %}
-    <li class='metric'>
-      {{ metric_guage(metric) }}
-      <h3>{{ metric.label }}</h3>
-    </li>
+    <li class='metric'>{{ metric_guage(metric) }}</li>
     {% endfor %}
   </ul>
   {% else %}
