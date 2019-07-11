@@ -9,6 +9,7 @@ import os
 import flask
 from flask_api import status
 
+import env
 from metrics import base
 from database import commit_scraper
 from database import build_scraper
@@ -45,11 +46,7 @@ def recompute(metric_cls_name):
     return ('No active metric found for %s.' % metric_cls_name,
             status.HTTP_404_NOT_FOUND)
   logging.info('Recomputing %s.', metric_cls_name)
-  try:
-    metric_cls().recompute()
-  except Exception as error:
-    logging.error(error)
-    return str(error), status.HTTP_500_SERVER_ERROR
+  metric_cls().recompute()
   return 'Successfully recomputed %s.' % metric_cls_name, status.HTTP_200_OK
 
 
@@ -62,6 +59,13 @@ def list_metrics():
 
   return flask.jsonify({'metrics': [metric.serializable for metric in results]
                        }), status.HTTP_200_OK
+
+
+@app.route('/')
+def show_metrics():
+  metrics = base.Metric.get_latest().values()
+  return flask.render_template(
+      'show_metrics.html', github_repo=env.get('GITHUB_REPO'), metrics=metrics)
 
 
 if __name__ == '__main__':
