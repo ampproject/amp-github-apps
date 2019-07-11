@@ -1,5 +1,5 @@
 runtime: python37
-entrypoint: python server.py --port $PORT
+entrypoint: python server.py
 
 handlers:
 - url: /.*
