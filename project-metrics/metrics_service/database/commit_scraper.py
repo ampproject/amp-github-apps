@@ -104,7 +104,6 @@ class CommitScraper(object):
         db.get_engine().execute(
             models.Commit.__table__.insert().prefix_with('IGNORE'),
             commit_dicts)
-        self.session.commit()
 
         page_count += 1
         time.sleep(SCRAPE_INTERVAL_SECONDS)
