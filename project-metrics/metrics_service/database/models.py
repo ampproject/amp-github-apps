@@ -28,10 +28,11 @@ def _is_last_n_days(
 class MetricScore(enum.Enum):
   """The computed score of a metric."""
   UNKNOWN = 0
-  POOR = 1
-  MODERATE = 2
-  GOOD = 3
-  EXCELLENT = 4
+  CRITICAL = 1
+  POOR = 2
+  MODERATE = 3
+  GOOD = 4
+  EXCELLENT = 5
 
 
 class MetricResult(Base):
@@ -145,6 +146,6 @@ class Commit(Base):
 
   def __repr__(self) -> Text:
     return ('<Commit(hash=%s, committed_at=%s, pull_request_status=%s, '
-            'pull_request=%d)>') % (
-        self.hash, self.committed_at, self.pull_request_status.name,
-        self.pull_request)
+            'pull_request=%d)>') % (self.hash, self.committed_at,
+                                    self.pull_request_status.name,
+                                    self.pull_request)

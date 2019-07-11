@@ -14,10 +14,12 @@ class TravisGreennessMetric(base.PercentageMetric):
 
   def _score_value(self, percentage: float) -> models.MetricScore:
     if percentage < 0.6:
+      return models.MetricScore.CRITICAL
+    elif percentage < 0.74:
       return models.MetricScore.POOR
-    elif percentage < 0.75:
-      return models.MetricScore.MODERATE
     elif percentage < 0.90:
+      return models.MetricScore.MODERATE
+    elif percentage < 0.95:
       return models.MetricScore.GOOD
     else:
       return models.MetricScore.EXCELLENT
@@ -28,14 +30,13 @@ class TravisGreennessMetric(base.PercentageMetric):
     session = db.Session()
     count_query = session.query(
         models.Build.state,
-        sqlalchemy.func.count().label('state_count')
-        ).filter(models.Build.is_last_90_days()
-        ).group_by(models.Build.state
-        ).filter(models.Build.state.in_([
-            models.TravisState.PASSED,
-            models.TravisState.FAILED,
-            models.TravisState.ERRORED,
-        ]))
+        sqlalchemy.func.count().label('state_count')).filter(
+            models.Build.is_last_90_days()).group_by(models.Build.state).filter(
+                models.Build.state.in_([
+                    models.TravisState.PASSED,
+                    models.TravisState.FAILED,
+                    models.TravisState.ERRORED,
+                ]))
     state_counts = count_query.all()
     return dict(state_counts)
 

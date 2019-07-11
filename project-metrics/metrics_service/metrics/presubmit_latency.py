@@ -15,7 +15,9 @@ class PresubmitLatencyMetric(base.Metric):
     return '%dm' % (avg_seconds // 60)
 
   def _score_value(self, avg_seconds: float) -> models.MetricScore:
-    if avg_seconds > 25:
+    if avg_seconds > 35:
+      return models.MetricScore.CRITICAL
+    elif avg_seconds > 25:
       return models.MetricScore.POOR
     elif avg_seconds > 15:
       return models.MetricScore.MODERATE

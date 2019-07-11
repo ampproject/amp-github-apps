@@ -22,7 +22,7 @@ class TestTravisGreennessMetric(metric_test_case.MetricTestCase):
     session = self.Session()
     session.add_all([
         models.Build(state=models.TravisState.PASSED, **common_values),
-        models.Build(state=models.TravisState.CANCELLED, **common_values),
+        models.Build(state=models.TravisState.CANCELED, **common_values),
         models.Build(state=models.TravisState.PASSED, **common_values),
         models.Build(state=models.TravisState.ERRORED, **common_values),
         models.Build(state=models.TravisState.FAILED, **common_values),
@@ -45,13 +45,15 @@ class TestTravisGreennessMetric(metric_test_case.MetricTestCase):
 
   def testScore(self):
     self.assertEqual(self.metric.score, models.MetricScore.UNKNOWN)
-    self.assertValueHasScore(0.5, models.MetricScore.POOR)
-    self.assertValueHasScore(0.6, models.MetricScore.MODERATE)
-    self.assertValueHasScore(0.7, models.MetricScore.MODERATE)
-    self.assertValueHasScore(0.75, models.MetricScore.GOOD)
-    self.assertValueHasScore(0.8, models.MetricScore.GOOD)
-    self.assertValueHasScore(0.99, models.MetricScore.EXCELLENT)
+    self.assertValueHasScore(0.5, models.MetricScore.CRITICAL)
+    self.assertValueHasScore(0.6, models.MetricScore.POOR)
+    self.assertValueHasScore(0.7, models.MetricScore.POOR)
+    self.assertValueHasScore(0.74, models.MetricScore.MODERATE)
+    self.assertValueHasScore(0.8, models.MetricScore.MODERATE)
+    self.assertValueHasScore(0.90, models.MetricScore.GOOD)
+    self.assertValueHasScore(0.93, models.MetricScore.GOOD)
     self.assertValueHasScore(0.95, models.MetricScore.EXCELLENT)
+    self.assertValueHasScore(0.99, models.MetricScore.EXCELLENT)
 
   def testFormattedResult(self):
     self.assertEqual(self.metric.formatted_result, '?')
