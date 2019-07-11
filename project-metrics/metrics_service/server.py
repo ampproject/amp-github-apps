@@ -11,19 +11,25 @@ from flask_api import status
 
 from metrics import base
 from database import commit_scraper
+from database import build_scraper
 
 logging.getLogger().setLevel(logging.INFO)
 app = flask.Flask(__name__)
 
+scrapers = {
+    'commits': commit_scraper.CommitScraper(),
+    'builds': build_scraper.BuildScraper(),
+}
 
-@app.route('/_cron/update_data/commits')
-def scrape_latest_commits():
+
+@app.route('/_cron/scrape/<scrape_target>')
+def scrape_latest(scrape_target):
   # This header is added to cron requests by GAE, and stripped from any external
   # requests. See https://cloud.google.com/appengine/docs/standard/python3/scheduling-jobs-with-cron-yaml#validating_cron_requests
   if not flask.request.headers.get('X-Appengine-Cron'):
     return 'Attempted to access internal endpoint.', status.HTTP_403_FORBIDDEN
-  commit_scraper.CommitScraper().scrape_since_latest()
-  return 'Successfully scraped latest commits.', status.HTTP_200_OK
+  scrapers[scrape_target].scrape_since_latest()
+  return 'Successfully scraped latest %s.' % scrape_target, status.HTTP_200_OK
 
 
 @app.route('/_cron/recompute/<metric_cls_name>')
