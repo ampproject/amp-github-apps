@@ -17,6 +17,14 @@ from database import build_scraper
 logging.getLogger().setLevel(logging.INFO)
 app = flask.Flask(__name__)
 
+BADGE_COLORS = [
+    '#EEEEEE',
+    'indianred',
+    'orange',
+    'yellow',
+    'green',
+    'forestgreen',
+]
 scrapers = {
     'commits': commit_scraper.CommitScraper(),
     'builds': build_scraper.BuildScraper(),
@@ -75,14 +83,7 @@ def metric_badge(metric_cls_name):
   }
   try:
     metric = base.Metric.get_latest()[metric_cls_name]
-    response['color'] = [
-        '#EEEEEE',
-        'indianred',
-        'orange',
-        'greenyellow',
-        'lawngreen',
-        'forestgreen',
-    ][metric.score.value]
+    response['color'] = BADGE_COLORS[metric.score.value]
     response['label'] = metric.label
     response['message'] = metric.formatted_result
   except KeyError:
