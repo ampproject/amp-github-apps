@@ -55,17 +55,17 @@ class TravisApi(agithub_base.API):
     started_at = datetime.datetime.strptime(
         json_build['started_at'],
         '%Y-%m-%dT%H:%M:%SZ') if json_build['started_at'] else None
+
     return models.Build(
         id=json_build['id'],
         number=int(json_build['number']),
         duration=json_build['duration'],
         state=models.TravisState(json_build['state']),
         started_at=started_at,
-        pull_request=json_build['pull_request_number'],
         commit_hash=json_build['commit']['sha'])
 
   def fetch_builds(self, page_num: int = 0) -> Sequence[models.Build]:
-    """Fetches pull request builds from Travis.
+    """Fetches push builds from Travis.
 
     Args:
       page_num: zero-indexed page number to fetch.
@@ -77,7 +77,7 @@ class TravisApi(agithub_base.API):
       A list of the fetched builds.
     """
     params = {
-        'event_type': 'pull_request',
+        'event_type': 'push',
         'sort_by': 'id:desc',
         'offset': page_num * TRAVIS_PAGE_SIZE,
         'limit': TRAVIS_PAGE_SIZE,

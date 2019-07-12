@@ -82,19 +82,10 @@ class Build(Base):
   __tablename__ = 'travis_builds'
 
   @classmethod
-  def last_builds(cls, session):
-    """Subquery selecting the last build for each pull request."""
-    return session.query(
-        cls.pull_request,
-        sqlalchemy.func.max(cls.started_at).label('started_at')).group_by(
-            cls.pull_request)
-
-  @classmethod
   def in_commit_order(cls, base_query):
     """Orders builds by commit time."""
-    return base_query.join(Commit,
-                           Commit.pull_request == cls.pull_request).order_by(
-                               Commit.committed_at.desc())
+    return base_query.join(Commit, Commit.hash == cls.commit_hash).order_by(
+        Commit.committed_at.desc())
 
   @classmethod
   def is_last_90_days(cls):
@@ -126,29 +117,22 @@ class Build(Base):
     Returns:
       The last build from each PR from the last 90 days in commit order.
     """
-    last_builds_subquery = cls.last_builds(session).subquery()
-    query = session.query(cls).join(
-        last_builds_subquery,
-        (cls.pull_request == last_builds_subquery.c.pull_request) &
-        (cls.started_at == last_builds_subquery.c.started_at))
-    query = cls.last_90_days(query)
-    return cls.in_commit_order(query)
+    return cls.in_commit_order(cls.last_90_days(session.query(cls)))
 
   id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
   number = sqlalchemy.Column(sqlalchemy.Integer)
   duration = sqlalchemy.Column(sqlalchemy.Integer)
   state = sqlalchemy.Column(sqlalchemy.Enum(TravisState))
   started_at = sqlalchemy.Column(sqlalchemy.DateTime)
-  commit_hash = sqlalchemy.Column(sqlalchemy.Unicode(40), unique=True)
-  pull_request = sqlalchemy.Column(
-      sqlalchemy.Integer, sqlalchemy.ForeignKey('commits.pull_request'))
+  commit_hash = sqlalchemy.Column(
+      sqlalchemy.Unicode(40), sqlalchemy.ForeignKey('commits.hash'))
   commit = sqlalchemy.orm.relationship('Commit', backref='builds')
 
   def __repr__(self) -> Text:
     return ('<Build(number=%d, duration=%ss, state=%s, started_at=%s, '
-            'pull_request=%s, commit_hash=%s)>') % (
-                self.number, self.duration or '?', self.state.name,
-                self.started_at, self.pull_request, self.commit_hash)
+            'commit_hash=%s)>') % (self.number, self.duration or
+                                   '?', self.state.name, self.started_at,
+                                   self.commit_hash)
 
 
 class PullRequestStatus(enum.Enum):
