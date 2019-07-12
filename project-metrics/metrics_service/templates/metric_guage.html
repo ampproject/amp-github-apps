@@ -1,0 +1,9 @@
+{% macro metric_guage(metric) -%}
+<div class="metric-guage metric-score-{{ metric.score.name.lower() }}">
+  <div class="metric-gauge-arc-background"></div>
+  <div class="metric-gauge-arc-fill"></div>
+  <div class="metric-gauge-center"></div>
+  <div class="metric-gauge-result">{{ metric.formatted_result }}</div>
+</div>
+<h3 class="metric-guage-label">{{ metric.label }}</h3>
+{%- endmacro %}

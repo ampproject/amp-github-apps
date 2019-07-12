@@ -1,0 +1,121 @@
+{% from 'metric_guage.html' import metric_guage %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Metrics: {{ github_repo }}</title>
+
+  <style type="text/css">
+    body {
+      font-family: sans-serif;
+    }
+
+    .metric-list {
+      list-style: none;
+    }
+
+    .metric {
+      display: inline-block;
+      padding-top: 50px;
+      text-align: center;
+      margin: 0 25px;
+    }
+
+    .metric-guage {
+      width: 200px;
+      height: 100px;
+      overflow: hidden;
+      text-align: center;
+      transform: translate(-50%, -50%);
+      margin-left: 50%;
+      margin-bottom: -25%;
+    }
+
+    .metric-gauge-arc-fill,
+    .metric-gauge-arc-background {
+      z-index: 1;
+      position: absolute;
+      background-color: #EEEEEE;
+      width: 200px;
+      height: 100px;
+      top: 100px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 0 0 100px 100px;
+      transform-origin: center top;
+    }
+
+    .metric-gauge-arc-fill {
+      z-index: 2;
+      transition: all 1.3s ease-in-out;
+    }
+    
+    .metric-gauge-arc-background {
+      transform: rotate(.5turn);
+    }
+
+    .metric-gauge-center {
+      z-index: 3;
+      position: absolute;
+      background-color: #DDDDDD;
+      width: 125px;
+      height: 67.5px;
+      top: 37.5px;
+      margin-left: 37.5px;
+      margin-right: auto;
+      border-radius: 125px 125px 0 0;
+    }
+
+    .metric-score-critical .metric-gauge-arc-fill {
+      transform:rotate(.1turn);
+      background-color: indianred;
+    }
+    .metric-score-poor .metric-gauge-arc-fill {
+      transform:rotate(.2turn);
+      background-color: orange;
+    }
+    .metric-score-moderate .metric-gauge-arc-fill {
+      transform:rotate(.3turn);
+      background-color: greenyellow;
+    }
+    .metric-score-good .metric-gauge-arc-fill {
+      transform:rotate(.4turn);
+      background-color: lawngreen;
+    }
+    .metric-score-excellent .metric-gauge-arc-fill {
+      transform:rotate(.5turn);
+      background-color: forestgreen;
+    }
+
+
+    .metric-gauge-result {
+      z-index: 4;
+      color: #333333;
+      font-size: 1.5em;
+      font-weight: bold;
+      line-height: 25px;
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      top: 65px;
+      margin-left: auto;
+      margin-right: auto;
+      transition: all 1s ease-out;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Project Metrics</h1>
+  <h2>{{ github_repo }}</h2>
+  {% if metrics %}
+  <ul class="metric-list">
+    {% for metric in metrics %}
+    <li class="metric">{{ metric_guage(metric) }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <strong>No metrics available to display.</strong>
+  {% endif %}
+</body>
+</html>
