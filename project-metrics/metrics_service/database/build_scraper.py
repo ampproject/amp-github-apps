@@ -9,7 +9,7 @@ from apis import travis
 from database import db
 from database import models
 
-SCRAPE_INTERVAL_SECONDS = 5
+SCRAPE_INTERVAL_SECONDS = 2
 
 
 def timestamp_90_days_ago() -> datetime.datetime:
@@ -50,9 +50,7 @@ class BuildScraper(object):
           'duration': build.duration,
           'state': build.state,
           'started_at': build.started_at,
-          'pull_request': build.pull_request,
           'commit_hash': build.commit_hash,
-          'commit': build.commit,
       } for build in builds]
       logging.info('Scraped %d builds', len(build_dicts))
 
