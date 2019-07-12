@@ -41,7 +41,7 @@
       top: 100px;
       margin-left: auto;
       margin-right: auto;
-      border-radius: 0px 0px 100px 100px;
+      border-radius: 0 0 100px 100px;
       transform-origin: center top;
     }
 
@@ -63,7 +63,7 @@
       top: 37.5px;
       margin-left: 37.5px;
       margin-right: auto;
-      border-radius: 125px 125px 0px 0px;
+      border-radius: 125px 125px 0 0;
     }
 
     .metric-score-critical .metric-gauge-arc-fill {
@@ -109,9 +109,9 @@
   <h1>Project Metrics</h1>
   <h2>{{ github_repo }}</h2>
   {% if metrics %}
-  <ul class='metric-list'>
+  <ul class="metric-list">
     {% for metric in metrics %}
-    <li class='metric'>{{ metric_guage(metric) }}</li>
+    <li class="metric">{{ metric_guage(metric) }}</li>
     {% endfor %}
   </ul>
   {% else %}
