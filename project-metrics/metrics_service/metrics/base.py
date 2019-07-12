@@ -7,6 +7,9 @@ To create a new metric:
 3. Call `metrics.base.Metric.register(YourNewMetric)`
 4. Import the metric in __init__.py so it can register itself
 5. Define the update frequency with a job in `cron.yaml`
+6. Once the metric has been computed at least once, add a corresponding badge to
+   the metrics section of
+   https://github.com/ampproject/amphtml/blob/master/README.md
 """
 
 import abc
