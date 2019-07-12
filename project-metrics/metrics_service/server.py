@@ -61,6 +61,36 @@ def list_metrics():
                        }), status.HTTP_200_OK
 
 
+@app.route('/api/badge/<metric_cls_name>')
+def metric_badge(metric_cls_name):
+  """Provides a response for sheilds.io to render a badge for GitHub.
+
+  See https://shields.io/endpoint.
+  """
+  response = {
+      'schemaVersion': 1,
+      'color': 'lightgray',
+      'label': 'Unknown',
+      'message': '?',
+  }
+  try:
+    metric = base.Metric.get_latest()[metric_cls_name]
+    response['color'] = [
+        '#EEEEEE',
+        'indianred',
+        'orange',
+        'greenyellow',
+        'lawngreen',
+        'forestgreen',
+    ][metric.score.value]
+    response['label'] = metric.label
+    response['message'] = metric.formatted_result
+  except KeyError:
+    logging.error('No active metric found for %s.', metric_cls_name)
+  finally:
+    return flask.jsonify(response), status.HTTP_200_OK
+
+
 @app.route('/')
 def show_metrics():
   metrics = base.Metric.get_latest().values()
