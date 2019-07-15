@@ -100,7 +100,7 @@ class ReleaseScraper(object):
         if release.published_at:
           last_date = release.published_at
 
-      if last_date < (latest_timestamp or ninety_days_ago):
+      if last_date < latest_timestamp:
         break
 
       page_num += 1
