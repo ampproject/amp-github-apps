@@ -174,6 +174,10 @@ class Release(Base):
   published_at = sqlalchemy.Column(sqlalchemy.DateTime)
   name = sqlalchemy.Column(sqlalchemy.Unicode(255))
 
+  @classmethod
+  def is_last_90_days(cls):
+    return _is_last_n_days(timestamp_column=cls.published_at, days=90)
+
   def __repr__(self) -> Text:
     return ('<Release(id=%s, published_at=%s, name=%s)>') % (
         self.id, self.published_at, self.name)
