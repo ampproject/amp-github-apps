@@ -50,10 +50,6 @@ class TestReleaseGranularityMetric(metric_test_case.MetricTestCase):
     # value = 4 / (3 - 1)
     self.assertLatestResultEquals(2)
 
-  def testRecomputeNoBuilds(self):
-    with self.assertRaisesRegex(ValueError, 'No releases to process.'):
-      self.metric.recompute()
-
   def testRecomputeFewBuilds(self):
     session = self.Session()
     session.add(

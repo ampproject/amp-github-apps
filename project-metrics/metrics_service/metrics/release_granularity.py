@@ -28,9 +28,7 @@ class ReleaseGranularityMetric(base.Metric):
       return models.MetricScore.EXCELLENT
 
   def _compute_value(self) -> float:
-    """Computes the average number of commits between releases over the last 90
-
-    days.
+    """Computes the average number of commits per release over the last 90 days.
 
     Considering only production releases, we can just count all commits
     committed between the first and last release of the 90-day window, and
@@ -48,8 +46,6 @@ class ReleaseGranularityMetric(base.Metric):
         models.Release.is_last_90_days()).all()
     release_count = len(releases)
 
-    if release_count == 0:
-      raise ValueError('No releases to process.')
     if release_count < 2:
       raise ValueError('Not enough releases to determine a range of commits.')
 
