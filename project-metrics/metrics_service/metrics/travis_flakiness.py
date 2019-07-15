@@ -55,8 +55,8 @@ class TravisFlakinessMetric(base.PercentageMetric):
     flakes = 0
     build_triples = zip(builds[:-2], builds[1:-1], builds[2:])
     for prev_build, curr_build, next_build in build_triples:
-      if (curr_build.state != models.TravisState.PASSED and
-          prev_build.state == models.TravisState.PASSED and
+      if (prev_build.state == models.TravisState.PASSED and
+          curr_build.state != models.TravisState.PASSED and
           next_build.state == models.TravisState.PASSED):
         flakes += 1
 
