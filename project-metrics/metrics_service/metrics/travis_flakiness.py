@@ -28,10 +28,8 @@ class TravisFlakinessMetric(base.PercentageMetric):
     """Computes the percentage of flaky builds.
 
     A flaky build is defined here as any failing build surrounded by two passing
-    builds (Pass-Fail-Pass) based on this doc:
-    g3doc/testing/findflaky/g3doc/detection-overview#detecting-flakes
-
-    Excludes builds that are newly created, pending, or cancelled.
+    builds (Pass-Fail-Pass). Excludes builds that are newly created, pending, or
+    cancelled.
 
     Raises:
       ValueError: if no builds exist.
