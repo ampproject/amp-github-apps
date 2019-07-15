@@ -55,11 +55,15 @@ class TravisApi(agithub_base.API):
     started_at = datetime.datetime.strptime(
         json_build['started_at'],
         '%Y-%m-%dT%H:%M:%SZ') if json_build['started_at'] else None
+    finished_at = datetime.datetime.strptime(
+        json_build['finished_at'],
+        '%Y-%m-%dT%H:%M:%SZ') if json_build['finished_at'] else None
+    duration = finished_at - started_at if started_at and finished_at else None
 
     return models.Build(
         id=json_build['id'],
         number=int(json_build['number']),
-        duration=json_build['duration'],
+        duration=duration.seconds if duration else None,
         state=models.TravisState(json_build['state']),
         started_at=started_at,
         commit_hash=json_build['commit']['sha'])
