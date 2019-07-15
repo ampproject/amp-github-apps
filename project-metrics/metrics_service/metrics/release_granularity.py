@@ -40,7 +40,7 @@ class ReleaseGranularityMetric(base.Metric):
       ValueError: if less than two releases exist.
 
     Returns:
-      The percentage of passing builds.
+      The average number of commits per release.
     """
     logging.info('Counting commits per release')
     session = db.Session()
