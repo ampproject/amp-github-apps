@@ -78,7 +78,7 @@ def metric_badge(metric_cls_name):
   response = {
       'schemaVersion': 1,
       'color': 'lightgray',
-      'label': 'Unknown',
+      'label': metric_cls_name,
       'message': '?',
   }
   try:
