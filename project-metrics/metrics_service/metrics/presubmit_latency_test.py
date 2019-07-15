@@ -45,15 +45,15 @@ class TestPresubmitLatencyMetric(metric_test_case.MetricTestCase):
 
   def testScore(self):
     self.assertEqual(self.metric.score, models.MetricScore.UNKNOWN)
-    self.assertValueHasScore(40, models.MetricScore.CRITICAL)
-    self.assertValueHasScore(35, models.MetricScore.POOR)
-    self.assertValueHasScore(30, models.MetricScore.POOR)
-    self.assertValueHasScore(25, models.MetricScore.MODERATE)
-    self.assertValueHasScore(20, models.MetricScore.MODERATE)
-    self.assertValueHasScore(15, models.MetricScore.GOOD)
-    self.assertValueHasScore(12, models.MetricScore.GOOD)
-    self.assertValueHasScore(10, models.MetricScore.EXCELLENT)
-    self.assertValueHasScore(5, models.MetricScore.EXCELLENT)
+    self.assertValueHasScore(60 * 40, models.MetricScore.CRITICAL)
+    self.assertValueHasScore(60 * 35, models.MetricScore.POOR)
+    self.assertValueHasScore(60 * 30, models.MetricScore.POOR)
+    self.assertValueHasScore(60 * 25, models.MetricScore.MODERATE)
+    self.assertValueHasScore(60 * 20, models.MetricScore.MODERATE)
+    self.assertValueHasScore(60 * 15, models.MetricScore.GOOD)
+    self.assertValueHasScore(60 * 12, models.MetricScore.GOOD)
+    self.assertValueHasScore(60 * 10, models.MetricScore.EXCELLENT)
+    self.assertValueHasScore(60 * 5, models.MetricScore.EXCELLENT)
 
   def testFormattedResult(self):
     self.assertEqual(self.metric.formatted_result, '?')
