@@ -1,5 +1,5 @@
 import datetime
-from typing import Sequence
+from typing import Iterable
 import logging
 import time
 import sqlalchemy
@@ -27,8 +27,9 @@ class CommitScraper(object):
         models.Commit.committed_at.desc()).first()
     return commit.committed_at if commit else timestamp_90_days_ago()
 
-  def scrape_page(self, since: str,
-                  after: str = None) -> Sequence[models.Commit]:
+  def scrape_page(self,
+                  since: str,
+                  after: str = None) -> Iterable[models.Commit]:
     """Fetch a page of commits from the repository.
 
     Updates the cursor with the `after` field from the paging info.
