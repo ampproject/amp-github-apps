@@ -177,3 +177,18 @@ class Release(Base):
   def __repr__(self) -> Text:
     return ('<Release(id=%s, published_at=%s, name=%s)>') % (
         self.id, self.published_at, self.name)
+
+
+class Cherrypick(Base):
+  """A cherry-pick request/PR."""
+
+  __tablename__ = 'cherrypicks'
+
+  issue_number = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+  pull_request_number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+  published_at = sqlalchemy.Column(sqlalchemy.DateTime)
+
+  def __repr__(self) -> Text:
+    return (
+        '<CherryPick(issue_number=%s, pull_request_number=%s, published_at=%s)>'
+    ) % (self.issue_number, self.pull_request_number, self.published_at)
