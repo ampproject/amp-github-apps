@@ -13,6 +13,7 @@ import env
 from metrics import base
 from database import commit_scraper
 from database import build_scraper
+from database import release_scraper
 
 logging.getLogger().setLevel(logging.INFO)
 app = flask.Flask(__name__)
@@ -28,6 +29,7 @@ BADGE_COLORS = [
 scrapers = {
     'commits': commit_scraper.CommitScraper(),
     'builds': build_scraper.BuildScraper(),
+    'releases': release_scraper.ReleaseScraper(),
 }
 
 
