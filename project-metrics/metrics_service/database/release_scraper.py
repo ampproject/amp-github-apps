@@ -38,7 +38,9 @@ class ReleaseScraper(object):
     Returns:
       The list of returned releases.
     """
-    releases_args = 'first: %d' % github.MAX_PAGE_SIZE
+    releases_args = (
+        'orderBy: {field: CREATED_AT, direction: DESC}, first: %d' %
+        github.MAX_PAGE_SIZE)
     if after:
       releases_args += ', after: "%s"' % after
     logging.info('Querying GitHub for releases with args: %s', releases_args)
