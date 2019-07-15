@@ -155,8 +155,7 @@ class Commit(Base):
 
   hash = sqlalchemy.Column(sqlalchemy.Unicode(40), primary_key=True)
   committed_at = sqlalchemy.Column(sqlalchemy.DateTime)
-  pull_request = sqlalchemy.Column(
-      sqlalchemy.Integer, unique=True, nullable=False)
+  pull_request = sqlalchemy.Column(sqlalchemy.Integer, unique=True)
   pull_request_status = sqlalchemy.Column(sqlalchemy.Enum(PullRequestStatus))
 
   def __repr__(self) -> Text:
