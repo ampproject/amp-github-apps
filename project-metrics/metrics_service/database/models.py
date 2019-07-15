@@ -185,8 +185,12 @@ class Cherrypick(Base):
   __tablename__ = 'cherrypicks'
 
   issue_number = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-  pull_request_number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+  pull_request_number = sqlalchemy.Column(
+      sqlalchemy.Integer,
+      sqlalchemy.ForeignKey('commits.pull_request'),
+      nullable=False)
   published_at = sqlalchemy.Column(sqlalchemy.DateTime)
+  commit = sqlalchemy.orm.relationship('Commit', backref='cherrypicks')
 
   def __repr__(self) -> Text:
     return (
