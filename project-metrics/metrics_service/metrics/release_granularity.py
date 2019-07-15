@@ -37,7 +37,7 @@ class ReleaseGranularityMetric(base.Metric):
     divide be the number of releases (excluding the last one).
 
     Raises:
-      ValueError: if no releases exist.
+      ValueError: if less than two releases exist.
 
     Returns:
       The percentage of passing builds.
