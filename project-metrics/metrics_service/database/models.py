@@ -173,6 +173,7 @@ class Release(Base):
   id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
   published_at = sqlalchemy.Column(sqlalchemy.DateTime)
   name = sqlalchemy.Column(sqlalchemy.Unicode(255))
-  commit_hash = sqlalchemy.Column(
-      sqlalchemy.Unicode(40), sqlalchemy.ForeignKey('commits.hash'))
-  commit = sqlalchemy.orm.relationship('Commit', backref='releases')
+
+  def __repr__(self) -> Text:
+    return ('<Release(id=%s, published_at=%s, name=%s)>') % (
+        self.id, self.published_at, self.name)
