@@ -86,7 +86,7 @@ class TestReleaseGranularityMetric(metric_test_case.MetricTestCase):
 
     self.metric.result = models.MetricResult(
         name='ReleaseGranularityMetric', value=15.6)
-    self.assertEqual(self.metric.formatted_result, '16 commits')
+    self.assertEqual(self.metric.formatted_result, '16 c/r')
 
 
 if __name__ == '__main__':

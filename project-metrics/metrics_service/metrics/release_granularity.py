@@ -13,7 +13,7 @@ class ReleaseGranularityMetric(base.Metric):
   """A metric tracking the average number of commits between releases."""
 
   def _format_value(self, avg_commits: float) -> Text:
-    return '%d commits' % round(avg_commits)
+    return '%d c/r' % round(avg_commits)
 
   def _score_value(self, avg_commits: float) -> models.MetricScore:
     if avg_commits > 1000:
