@@ -48,9 +48,6 @@ class TravisFlakinessMetric(base.PercentageMetric):
             models.TravisState.ERRORED,
         ])).all()
     build_count = len(builds)
-    print('>>>>>>>>>>> BUILDS: %d' % build_count)
-    print(session.query(models.Build).count())
-    print(models.Build.scope(session).count())
 
     if build_count == 0:
       raise ValueError('No Travis builds to process.')
