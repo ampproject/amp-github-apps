@@ -19,13 +19,20 @@ import {ChecksListForRefParams, ChecksUpdateParams} from '@octokit/rest';
 import {GitHubAPI} from 'probot/lib/github';
 
 export class PullRequest {
+  public headSha: string;
+  private action: Octokit.ChecksUpdateParamsActions;
   private check: string;
   private github: GitHubAPI;
-  public headSha: string;
   private owner: string;
   private repo: string;
 
   constructor(github: GitHubAPI, headSha: string, owner: string, repo: string) {
+    this.action = {
+      label: 'Create a test site!',
+      description: 'Serves the minified output of this PR along with ' +
+        'examples from examples/ and test/manual/.',
+      identifier: 'deploy-me-action',
+    };
     this.check = 'pr-deploy-check';
     this.github = github;
     this.headSha = headSha;
@@ -54,14 +61,12 @@ export class PullRequest {
       status: 'completed',
       conclusion: 'neutral',
       output: {
-        title: 'Your PR was compiled!',
-        summary: 'Please click \'Deploy Me!\' to test it on a live demo site',
+        title: 'Ready to create to a test site.',
+        summary: 'Please click \'Create a test site!\' to serve the ' +
+        'minified output of this PR along with examples from `examples/` ' +
+        'and `test/manual/`. It should only take a minute.',
       },
-      actions: [{
-        label: 'Deploy me!',
-        description: 'Trigger PR deployment',
-        identifier: 'deploy-me-action',
-      }],
+      actions: [this.action],
     };
 
     return this.github.checks.update(params);
@@ -78,6 +83,11 @@ export class PullRequest {
       repo: this.repo,
       check_run_id: check.id,
       status: 'in_progress',
+      output: {
+        title: 'Creating a test site...',
+        summary: 'Please wait a minute while a test site is being created. ' +
+          'When finished, a link will appear here.',
+      },
     };
 
     return this.github.checks.update(params);
@@ -99,9 +109,52 @@ export class PullRequest {
       conclusion: 'success',
       details_url: serveUrl,
       output: {
-        title: 'Your PR was deployed!',
+        title: 'Success! A test site was created.',
         summary: `You can find it here: ${serveUrl}`,
       },
+    };
+
+    return this.github.checks.update(params);
+  }
+
+
+  async errorCompilationCheck() {
+    const check = await this.getCheck_();
+
+    const params: ChecksUpdateParams = {
+      owner: this.owner,
+      repo: this.repo,
+      check_run_id: check.id,
+      status: 'completed',
+      conclusion: 'neutral',
+      output: {
+        title: 'Build error.',
+        summary: 'Sorry, a test site cannot be created because this PR ' +
+        'failed to build. Please check the Travis logs for more information.',
+      },
+    };
+
+    return this.github.checks.update(params);
+  }
+  /**
+   * Fail the check if any part of the deployment fails
+   * @param check
+   */
+  async errorDeploymentCheck(error: Error) {
+    const check = await this.getCheck_();
+
+    const params: ChecksUpdateParams = {
+      owner: this.owner,
+      repo: this.repo,
+      check_run_id: check.id,
+      status: 'completed',
+      conclusion: 'neutral',
+      output: {
+        title: 'Deployment error.',
+        summary: 'Sorry, there was an error creating a test site.',
+        text: error.message,
+      },
+      actions: [this.action],
     };
 
     return this.github.checks.update(params);
@@ -118,9 +171,9 @@ export class PullRequest {
       head_sha: this.headSha,
       status: 'queued',
       output: {
-        title: 'Your PR is compiling...',
-        summary: 'When Travis is done compiling your PR, ' +
-          'a "Deploy Me!" button will appear here.',
+        title: 'Waiting for the build to finish...',
+        summary: 'When Travis is finished compiling this PR, ' +
+          'a "Create a test site!" button will appear here.',
       },
     };
 

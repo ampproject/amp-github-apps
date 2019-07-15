@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import FancyLog from 'fancy-log';
+
 import mime from 'mime-types';
 import unzip from 'unzip-stream';
 import {Storage} from '@google-cloud/storage';
@@ -32,6 +32,9 @@ export async function unzipAndMove(prId: number): Promise<string> {
 
   return new Promise<string>((resolve, reject) => {
     buildFile.createReadStream()
+      .on('error', error => {
+        return reject(error);
+      })
       .pipe(unzip.Parse())
       .on('entry', entry => {
         const serveFileName = entry.path;
@@ -42,11 +45,7 @@ export async function unzipAndMove(prId: number): Promise<string> {
           },
         })
           .on('error', error => {
-            FancyLog(error);
-            return reject;
-          })
-          .on('finish', () => {
-            FancyLog(`Uploaded ${serveFileName}`);
+            return reject(error);
           })
         );
       })
