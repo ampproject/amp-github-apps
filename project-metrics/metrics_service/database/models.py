@@ -163,3 +163,16 @@ class Commit(Base):
             'pull_request=%d)>') % (self.hash, self.committed_at,
                                     self.pull_request_status.name,
                                     self.pull_request)
+
+
+class Release(Base):
+  """A production release cut."""
+
+  __tablename__ = 'releases'
+
+  id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+  published_at = sqlalchemy.Column(sqlalchemy.DateTime)
+  name = sqlalchemy.Column(sqlalchemy.Unicode(255))
+  commit_hash = sqlalchemy.Column(
+      sqlalchemy.Unicode(40), sqlalchemy.ForeignKey('commits.hash'))
+  commit = sqlalchemy.orm.relationship('Commit', backref='releases')
