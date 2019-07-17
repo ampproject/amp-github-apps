@@ -28,9 +28,8 @@ export class PullRequest {
 
   constructor(github: GitHubAPI, headSha: string, owner: string, repo: string) {
     this.action = {
-      label: 'Create a test site!',
-      description: 'Serves the minified output of this PR along with ' +
-        'examples from examples/ and test/manual/.',
+      label: 'Create a test site',
+      description: 'Serves the minified output of this PR.',
       identifier: 'deploy-me-action',
     };
     this.check = 'pr-deploy-check';
@@ -61,10 +60,10 @@ export class PullRequest {
       status: 'completed',
       conclusion: 'neutral',
       output: {
-        title: 'Ready to create to a test site.',
-        summary: 'Please click \'Create a test site!\' to serve the ' +
-        'minified output of this PR along with examples from `examples/` ' +
-        'and `test/manual/`. It should only take a minute.',
+        title: 'Ready to create a test site.',
+        summary: 'Please click the `Create a test site` button above to ' +
+        'deploy the minified build of this PR along with examples from ' +
+        '`examples/` and `test/manual/`. It should only take a minute.',
       },
       actions: [this.action],
     };
@@ -85,7 +84,7 @@ export class PullRequest {
       status: 'in_progress',
       output: {
         title: 'Creating a test site...',
-        summary: 'Please wait a minute while a test site is being created. ' +
+        summary: 'Please wait while a test site is being created. ' +
           'When finished, a link will appear here.',
       },
     };
@@ -111,6 +110,7 @@ export class PullRequest {
       output: {
         title: 'Success! A test site was created.',
         summary: `You can find it here: ${serveUrl}`,
+        text: serveUrl,
       },
     };
 
@@ -185,11 +185,22 @@ export class PullRequest {
    */
   private async resetCheck_(
     check: Octokit.ChecksListForRefResponseCheckRunsItem) {
+    let output: Octokit.ChecksListForRefResponseCheckRunsItemOutput;
+    if (check.status == 'completed'
+      && check.conclusion == 'success' && check.output.text) {
+      output = {
+        title: 'A new build is being compiled...',
+        summary: `To view the existing test site, visit ${check.output.text} ` +
+        'This site will be overwritten if you recreate the test site.',
+      } as Octokit.ChecksListForRefResponseCheckRunsItemOutput;
+    }
+
     const params: ChecksUpdateParams = {
       owner: this.owner,
       repo: this.repo,
       check_run_id: check.id,
       status: 'queued',
+      output: output,
     };
     return this.github.checks.update(params);
   }

@@ -16,7 +16,7 @@
     "build": "node ~/src/TypeScript/built/local/tsc.js ./src/*.ts --esModuleInterop",
     "dev": "nodemon",
     "start": "probot run ./src/app.js",
-    "test": "jest --verbose=false"    
+    "test": "jest --verbose=false"
   },
   "dependencies": {
     "@google-cloud/storage": "3.0.2",
