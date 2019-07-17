@@ -4,8 +4,6 @@ from typing import Sequence, Text
 
 import env
 
-MERGE_BASE_BRANCH = 'origin/canary'
-
 
 class GitRepo(object):
 
