@@ -19,7 +19,7 @@ grpc-google-iam-v1==0.11.4
 grpcio==1.21.1
 idna==2.8
 importlab==0.5.1
-importlib-metadata==0.17
+importlib-metadata==0.18
 itsdangerous==1.1.0
 Jinja2==2.10.1
 MarkupSafe==1.1.1
@@ -34,10 +34,10 @@ pyasn1==0.4.5
 pyasn1-modules==0.2.5
 PyMySQL==0.9.3
 pyparsing==2.4.0
-pytest==4.6.2
+pytest==4.6.3
 pytest-rerunfailures==7.0
 pytz==2019.1
-PyYAML==5.1
+PyYAML==5.1.1
 requests==2.22.0
 rsa==4.0
 six==1.12.0
