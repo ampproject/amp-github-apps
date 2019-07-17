@@ -32,22 +32,15 @@ export async function unzipAndMove(prId: number): Promise<string> {
 
   return new Promise<string>((resolve, reject) => {
     buildFile.createReadStream()
-      .on('error', error => {
-        return reject(error);
-      })
+      .on('error', reject)
       .pipe(unzip.Parse())
       .on('entry', entry => {
         const serveFileName = entry.path;
         const serveFile = serveBucket.file(serveFileName);
-        entry.pipe(serveFile.createWriteStream({
-          metadata: {
-            contentType: mime.lookup(serveFileName),
-          },
-        })
-          .on('error', error => {
-            return reject(error);
-          })
-        );
+        entry.pipe(
+          serveFile.createWriteStream(
+            {metadata: {contentType: mime.lookup(serveFileName)}})
+            .on('error', reject));
       })
       .on('close', async() => {
         //TODO(estherkim): return uploaded URL (point to examples?)
