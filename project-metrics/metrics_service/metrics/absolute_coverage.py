@@ -24,6 +24,7 @@ class AbsoluteCoverageMetric(base.PercentageMetric):
     Returns:
       The percentage of lines tested in HEAD.
     """
+    # TODO(rcebulko): enable support for historical coverage
     return codecov.CodecovApi().get_absolute_coverage() / 100
 
 

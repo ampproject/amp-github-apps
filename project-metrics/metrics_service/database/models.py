@@ -1,6 +1,6 @@
 """Defines ORM models for interactions with the DB."""
 
-from typing import Text
+from typing import Optional, Text
 import datetime
 import enum
 import sqlalchemy
