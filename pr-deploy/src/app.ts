@@ -29,12 +29,9 @@ function initializeCheck(app: Application) {
     'pull_request.synchronize',
     'pull_request.reopened',
   ], async context => {
-    const {owner, repo} = context.repo();
     const pr = new PullRequest(
       context.github,
       context.payload.pull_request.head.sha,
-      owner,
-      repo,
     );
     return pr.createOrResetCheck();
   });
@@ -48,14 +45,14 @@ function initializeCheck(app: Application) {
 function initializeRouter(app: Application) {
   const router: IRouter<void> = app.route('/v0/pr-deploy');
   router.use(express.json());
-  router.post('/owners/:owner/repos/:repo/headshas/:headSha/:exitCode',
+  router.post('/travisbuilds/:travisBuild/headshas/:headSha/:exitCode',
     async(request, response) => {
+      const {travisBuild, headSha, exitCode} = request.params;
       const github = await app.auth(Number(process.env.INSTALLATION_ID));
-      const {headSha, owner, repo, exitCode} = request.params;
-      const pr = new PullRequest(github, headSha, owner, repo);
+      const pr = new PullRequest(github, headSha);
 
       exitCode == 0
-        ? await pr.enableDeploymentCheck()
+        ? await pr.enableDeploymentCheck(travisBuild)
         : await pr.errorCompilationCheck();
       response.send({status: 200});
     });
@@ -67,22 +64,15 @@ function initializeRouter(app: Application) {
  */
 function initializeDeployment(app: Application) {
   app.on('check_run.requested_action', async context => {
-    const {owner, repo} = context.repo();
     const pr = new PullRequest(
       context.github,
       context.payload.check_run.head_sha,
-      owner,
-      repo,
     );
 
-    pr.inProgressDeploymentCheck();
+    await pr.inProgressDeploymentCheck();
+    const travisBuildNumber = await pr.getTravisBuildNumber();
 
-    const pullRequest = context.payload.check_run.pull_requests
-      .find(pull_request => {
-        return pull_request.head.sha === pr.headSha;
-      });
-
-    unzipAndMove(pullRequest.number)
+    unzipAndMove(travisBuildNumber)
       .then(serveUrl => {
         pr.completeDeploymentCheck(serveUrl);
       })

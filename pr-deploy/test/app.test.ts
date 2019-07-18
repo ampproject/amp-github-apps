@@ -17,7 +17,7 @@
 // mock unzipAndMove dependency before importing '../src/app'
 jest.mock('../src/zipper', () => {
   return {
-    unzipAndMove: jest.fn().mockReturnValue(Promise.resolve('gs://serving-bucket/prId')),
+    unzipAndMove: jest.fn().mockReturnValue(Promise.resolve('gs://serving-bucket/travisBuildNumber')),
   };
 });
 
@@ -98,7 +98,7 @@ describe('test pr deploy app', () => {
     );
 
     request(server)
-      .post('/v0/pr-deploy/owners/1/repos/2/headshas/3/0')
+      .post('/v0/pr-deploy/travisbuilds/1/headshas/3/0')
       .expect(() => { expect(github.checks.update).toHaveBeenCalledTimes(1);})
       .expect(200, done);
   });
@@ -106,7 +106,9 @@ describe('test pr deploy app', () => {
   test('deploys the PR check when action is triggered', async() => {
     // make sure a check already exists
     github.checks.listForRef.mockReturnValue(
-      {data: {total_count: 1, check_runs: [{id: 12345}]}}
+      {data: {total_count: 1, check_runs: [
+        {id: 12345, output: {text: 'Travis build number: 3'}},
+      ]}}
     );
 
     const requestedActionEvent:

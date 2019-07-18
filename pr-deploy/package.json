@@ -1,5 +1,5 @@
 {
-  "name": "amp-pr-deploy-app",
+  "name": "amp-pr-deploy-bot",
   "description": "A GitHub App that deploys a PR branch when you ask it to",
   "version": "0.0.1",
   "private": true,
@@ -10,7 +10,7 @@
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
   "engines": {
-    "node": "10.16.0"
+    "node": "^10.0.0"
   },
   "scripts": {
     "build": "node ~/src/TypeScript/built/local/tsc.js ./src/*.ts --esModuleInterop",
