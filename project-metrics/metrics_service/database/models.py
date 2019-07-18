@@ -181,3 +181,17 @@ class Release(Base):
   def __repr__(self) -> Text:
     return ('<Release(id=%s, published_at=%s, name=%s)>') % (
         self.id, self.published_at, self.name)
+
+
+class Cherrypick(Base):
+  """A cherry-picked commit."""
+
+  __tablename__ = 'cherrypicks'
+
+  hash = sqlalchemy.Column(sqlalchemy.Unicode(40), primary_key=True)
+  release_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                 sqlalchemy.ForeignKey('releases.id'))
+  release = sqlalchemy.orm.relationship('Release', backref='cherrypicks')
+
+  def __repr__(self) -> Text:
+    return '<Cherrypick(hash=%s, release_id=%s)>' % self.hash, self.release_id
