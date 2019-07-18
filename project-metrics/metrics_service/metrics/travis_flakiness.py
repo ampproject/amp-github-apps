@@ -32,7 +32,7 @@ class TravisFlakinessMetric(base.PercentageMetric):
     cancelled.
 
     Raises:
-      ValueError: if no builds exist.
+      ValueError: if no builds or too few builds exist.
 
     Returns:
       The percentage of passing builds.

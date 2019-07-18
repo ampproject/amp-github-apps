@@ -163,3 +163,36 @@ class Commit(Base):
             'pull_request=%d)>') % (self.hash, self.committed_at,
                                     self.pull_request_status.name,
                                     self.pull_request)
+
+
+class Release(Base):
+  """A production release cut."""
+
+  __tablename__ = 'releases'
+
+  id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+  published_at = sqlalchemy.Column(sqlalchemy.DateTime)
+  name = sqlalchemy.Column(sqlalchemy.Unicode(255))
+  scraped_cherrypicks = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+
+  @classmethod
+  def is_last_90_days(cls):
+    return _is_last_n_days(timestamp_column=cls.published_at, days=90)
+
+  def __repr__(self) -> Text:
+    return ('<Release(id=%s, published_at=%s, name=%s)>') % (
+        self.id, self.published_at, self.name)
+
+
+class Cherrypick(Base):
+  """A cherry-picked commit."""
+
+  __tablename__ = 'cherrypicks'
+
+  hash = sqlalchemy.Column(sqlalchemy.Unicode(40), primary_key=True)
+  release_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                 sqlalchemy.ForeignKey('releases.id'))
+  release = sqlalchemy.orm.relationship('Release', backref='cherrypicks')
+
+  def __repr__(self) -> Text:
+    return '<Cherrypick(hash=%s, release_id=%s)>' % (self.hash, self.release_id)
