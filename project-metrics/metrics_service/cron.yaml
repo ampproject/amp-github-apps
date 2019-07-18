@@ -6,6 +6,10 @@ cron:
 - description: "Scrape latest releases from GitHub"
   url: /_cron/scrape/releases
   schedule: every 72 hours
+
+- description: "Scrape cherry-picks on recent releases"
+  url: /_cron/scrape/cherrypicks
+  schedule: every 72 hours
   
 - description: "Scrape latest builds from Travis"
   url: /_cron/scrape/builds
