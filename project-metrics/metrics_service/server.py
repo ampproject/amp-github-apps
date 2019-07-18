@@ -14,6 +14,7 @@ from metrics import base
 from database import commit_scraper
 from database import build_scraper
 from database import release_scraper
+from database import cherrypick_scraper
 
 logging.getLogger().setLevel(logging.INFO)
 app = flask.Flask(__name__)
@@ -27,9 +28,10 @@ BADGE_COLORS = [
     'forestgreen',
 ]
 scrapers = {
-    'commits': commit_scraper.CommitScraper(),
-    'builds': build_scraper.BuildScraper(),
-    'releases': release_scraper.ReleaseScraper(),
+    'commits': commit_scraper.CommitScraper,
+    'builds': build_scraper.BuildScraper,
+    'releases': release_scraper.ReleaseScraper,
+    'cherrypicks': cherrypick_scraper.CherrypickScraper,
 }
 
 
@@ -39,7 +41,7 @@ def scrape_latest(scrape_target):
   # requests. See https://cloud.google.com/appengine/docs/standard/python3/scheduling-jobs-with-cron-yaml#validating_cron_requests
   if not flask.request.headers.get('X-Appengine-Cron'):
     return 'Attempted to access internal endpoint.', status.HTTP_403_FORBIDDEN
-  scrapers[scrape_target].scrape_since_latest()
+  scrapers[scrape_target].scrape()
   return 'Successfully scraped latest %s.' % scrape_target, status.HTTP_200_OK
 
 
