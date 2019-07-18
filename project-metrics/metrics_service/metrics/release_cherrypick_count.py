@@ -13,7 +13,8 @@ class ReleaseCherrypickCountMetric(base.Metric):
   """A metric tracking the number of cherry-picks in releases."""
 
   def _format_value(self, num_cherrypicks: float) -> Text:
-    return '%d PR%s/90d' % (num_cherrypicks, 's' if num_cherrypicks > 1 else '')
+    return '%d PR%s/90d' % (num_cherrypicks,
+                            ('s' if num_cherrypicks > 1 else ''))
 
   def _score_value(self, num_cherrypicks: float) -> models.MetricScore:
     if num_cherrypicks > 10:
