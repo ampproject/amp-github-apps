@@ -18,21 +18,21 @@ import {Octokit} from 'probot';
 import {ChecksListForRefParams, ChecksUpdateParams} from '@octokit/rest';
 import {GitHubAPI} from 'probot/lib/github';
 
+const ACTION: Octokit.ChecksUpdateParamsActions = {
+  label: 'Create a test site',
+  description: 'Serves the minified output of this PR.',
+  identifier: 'deploy-me-action',
+};
+
+const CHECK_NAME: string = 'pr-deploy-check';
+
 export class PullRequest {
   public headSha: string;
-  private action: Octokit.ChecksUpdateParamsActions;
-  private check: string;
   private github: GitHubAPI;
   private owner: string;
   private repo: string;
 
   constructor(github: GitHubAPI, headSha: string, owner: string, repo: string) {
-    this.action = {
-      label: 'Create a test site',
-      description: 'Serves the minified output of this PR.',
-      identifier: 'deploy-me-action',
-    };
-    this.check = 'pr-deploy-check';
     this.github = github;
     this.headSha = headSha;
     this.owner = owner;
@@ -65,7 +65,7 @@ export class PullRequest {
         'deploy the minified build of this PR along with examples from ' +
         '`examples/` and `test/manual/`. It should only take a minute.',
       },
-      actions: [this.action],
+      actions: [ACTION],
     };
 
     return this.github.checks.update(params);
@@ -154,7 +154,7 @@ export class PullRequest {
         summary: 'Sorry, there was an error creating a test site.',
         text: error.message,
       },
-      actions: [this.action],
+      actions: [ACTION],
     };
 
     return this.github.checks.update(params);
@@ -167,7 +167,7 @@ export class PullRequest {
     const params: Octokit.ChecksCreateParams = {
       owner: this.owner,
       repo: this.repo,
-      name: this.check,
+      name: CHECK_NAME,
       head_sha: this.headSha,
       status: 'queued',
       output: {
@@ -200,7 +200,7 @@ export class PullRequest {
       repo: this.repo,
       check_run_id: check.id,
       status: 'queued',
-      output: output,
+      output,
     };
     return this.github.checks.update(params);
   }
@@ -213,7 +213,7 @@ export class PullRequest {
       owner: this.owner,
       repo: this.repo,
       ref: this.headSha,
-      check_name: this.check,
+      check_name: CHECK_NAME,
     };
 
     const checks = await this.github.checks.listForRef(params);

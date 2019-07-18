@@ -54,13 +54,10 @@ function initializeRouter(app: Application) {
       const {headSha, owner, repo, exitCode} = request.params;
       const pr = new PullRequest(github, headSha, owner, repo);
 
-      if (exitCode != 0) {
-        await pr.errorCompilationCheck();
-        response.send({status: 500});
-      } else {
-        await pr.enableDeploymentCheck();
-        response.send({status: 200});
-      }
+      exitCode == 0
+        ? await pr.enableDeploymentCheck()
+        : await pr.errorCompilationCheck();
+      response.send({status: 200});
     });
 }
 
