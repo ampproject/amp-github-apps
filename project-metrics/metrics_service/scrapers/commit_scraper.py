@@ -27,7 +27,8 @@ class CommitScraper(object):
         models.Commit.committed_at.desc()).first()
     return commit.committed_at if commit else timestamp_90_days_ago()
 
-  def scrape_page(self, since: str,
+  def scrape_page(self,
+                  since: str,
                   after: str = None) -> Sequence[models.Commit]:
     """Fetch a page of commits from the repository.
 
@@ -109,3 +110,7 @@ class CommitScraper(object):
         time.sleep(SCRAPE_INTERVAL_SECONDS)
     except IndexError:
       logging.info('Completed scraping %d pages of commits', page_count)
+
+  @classmethod
+  def scrape(cls):
+    cls().scrape_since_latest()

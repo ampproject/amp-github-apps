@@ -73,3 +73,7 @@ class CherrypickScraper(object):
                      len(cherrypicks))
       except github.GitHubGraphQL.GraphQLError:
         logging.warn('Could not find release with tag name "%s"', release.name)
+
+  @classmethod
+  def scrape(cls):
+    cls().scrape_recent_release_cherrypicks()

@@ -107,3 +107,7 @@ class ReleaseScraper(object):
       time.sleep(SCRAPE_INTERVAL_SECONDS)
 
     logging.info('Completed scraping %d page(s) of releases', page_num + 1)
+
+  @classmethod
+  def scrape(cls):
+    cls().scrape_since_latest()

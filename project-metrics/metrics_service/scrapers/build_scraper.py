@@ -75,3 +75,7 @@ class BuildScraper(object):
 
       page_num += 1
       time.sleep(SCRAPE_INTERVAL_SECONDS)
+
+  @classmethod
+  def scrape(cls):
+    cls().scrape_since_latest()
