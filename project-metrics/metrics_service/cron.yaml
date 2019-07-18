@@ -20,9 +20,13 @@ cron:
   url: /_cron/recompute/PresubmitLatencyMetric
   schedule: every 24 hours
 
+- description: "Update release-cherrypick-count metric."
+  url: /_cron/recompute/ReleaseCherrypickCountMetric
+  schedule: every Saturday 0:00
+
 - description: "Update release-granularity metric."
   url: /_cron/recompute/ReleaseGranularityMetric
-  schedule: every 24 hours
+  schedule: every Saturday 0:00
 
 - description: "Update travis-greenness metric."
   url: /_cron/recompute/TravisGreennessMetric
