@@ -18,15 +18,21 @@ import {Octokit} from 'probot';
 import {ChecksListForRefParams, ChecksUpdateParams} from '@octokit/rest';
 import {GitHubAPI} from 'probot/lib/github';
 
+const ACTION: Octokit.ChecksUpdateParamsActions = {
+  label: 'Create a test site',
+  description: 'Serves the minified output of this PR.',
+  identifier: 'deploy-me-action',
+};
+
+const CHECK_NAME: string = 'pr-deploy-check';
+
 export class PullRequest {
-  private check: string;
-  private github: GitHubAPI;
   public headSha: string;
+  private github: GitHubAPI;
   private owner: string;
   private repo: string;
 
   constructor(github: GitHubAPI, headSha: string, owner: string, repo: string) {
-    this.check = 'pr-deploy-check';
     this.github = github;
     this.headSha = headSha;
     this.owner = owner;
@@ -54,14 +60,12 @@ export class PullRequest {
       status: 'completed',
       conclusion: 'neutral',
       output: {
-        title: 'Your PR was compiled!',
-        summary: 'Please click \'Deploy Me!\' to test it on a live demo site',
+        title: 'Ready to create a test site.',
+        summary: 'Please click the `Create a test site` button above to ' +
+        'deploy the minified build of this PR along with examples from ' +
+        '`examples/` and `test/manual/`. It should only take a minute.',
       },
-      actions: [{
-        label: 'Deploy me!',
-        description: 'Trigger PR deployment',
-        identifier: 'deploy-me-action',
-      }],
+      actions: [ACTION],
     };
 
     return this.github.checks.update(params);
@@ -78,6 +82,11 @@ export class PullRequest {
       repo: this.repo,
       check_run_id: check.id,
       status: 'in_progress',
+      output: {
+        title: 'Creating a test site...',
+        summary: 'Please wait while a test site is being created. ' +
+          'When finished, a link will appear here.',
+      },
     };
 
     return this.github.checks.update(params);
@@ -99,9 +108,53 @@ export class PullRequest {
       conclusion: 'success',
       details_url: serveUrl,
       output: {
-        title: 'Your PR was deployed!',
+        title: 'Success! A test site was created.',
         summary: `You can find it here: ${serveUrl}`,
+        text: serveUrl,
       },
+    };
+
+    return this.github.checks.update(params);
+  }
+
+
+  async errorCompilationCheck() {
+    const check = await this.getCheck_();
+
+    const params: ChecksUpdateParams = {
+      owner: this.owner,
+      repo: this.repo,
+      check_run_id: check.id,
+      status: 'completed',
+      conclusion: 'neutral',
+      output: {
+        title: 'Build error.',
+        summary: 'Sorry, a test site cannot be created because this PR ' +
+        'failed to build. Please check the Travis logs for more information.',
+      },
+    };
+
+    return this.github.checks.update(params);
+  }
+  /**
+   * Fail the check if any part of the deployment fails
+   * @param check
+   */
+  async errorDeploymentCheck(error: Error) {
+    const check = await this.getCheck_();
+
+    const params: ChecksUpdateParams = {
+      owner: this.owner,
+      repo: this.repo,
+      check_run_id: check.id,
+      status: 'completed',
+      conclusion: 'neutral',
+      output: {
+        title: 'Deployment error.',
+        summary: 'Sorry, there was an error creating a test site.',
+        text: error.message,
+      },
+      actions: [ACTION],
     };
 
     return this.github.checks.update(params);
@@ -114,13 +167,13 @@ export class PullRequest {
     const params: Octokit.ChecksCreateParams = {
       owner: this.owner,
       repo: this.repo,
-      name: this.check,
+      name: CHECK_NAME,
       head_sha: this.headSha,
       status: 'queued',
       output: {
-        title: 'Your PR is compiling...',
-        summary: 'When Travis is done compiling your PR, ' +
-          'a "Deploy Me!" button will appear here.',
+        title: 'Waiting for the build to finish...',
+        summary: 'When Travis is finished compiling this PR, ' +
+          'a "Create a test site!" button will appear here.',
       },
     };
 
@@ -132,11 +185,22 @@ export class PullRequest {
    */
   private async resetCheck_(
     check: Octokit.ChecksListForRefResponseCheckRunsItem) {
+    let output: Octokit.ChecksListForRefResponseCheckRunsItemOutput;
+    if (check.status == 'completed'
+      && check.conclusion == 'success' && check.output.text) {
+      output = {
+        title: 'A new build is being compiled...',
+        summary: `To view the existing test site, visit ${check.output.text} ` +
+        'This site will be overwritten if you recreate the test site.',
+      } as Octokit.ChecksListForRefResponseCheckRunsItemOutput;
+    }
+
     const params: ChecksUpdateParams = {
       owner: this.owner,
       repo: this.repo,
       check_run_id: check.id,
       status: 'queued',
+      output,
     };
     return this.github.checks.update(params);
   }
@@ -149,7 +213,7 @@ export class PullRequest {
       owner: this.owner,
       repo: this.repo,
       ref: this.headSha,
-      check_name: this.check,
+      check_name: CHECK_NAME,
     };
 
     const checks = await this.github.checks.listForRef(params);

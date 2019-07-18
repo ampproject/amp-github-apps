@@ -16,7 +16,7 @@
       ]
     }
   },
-  "include": [    
+  "include": [
     "src/**/*",
     "test/*",
   ]
