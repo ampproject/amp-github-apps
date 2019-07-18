@@ -173,6 +173,7 @@ class Release(Base):
   id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
   published_at = sqlalchemy.Column(sqlalchemy.DateTime)
   name = sqlalchemy.Column(sqlalchemy.Unicode(255))
+  scraped_cherrypicks = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
   @classmethod
   def is_last_90_days(cls):
@@ -194,4 +195,4 @@ class Cherrypick(Base):
   release = sqlalchemy.orm.relationship('Release', backref='cherrypicks')
 
   def __repr__(self) -> Text:
-    return '<Cherrypick(hash=%s, release_id=%s)>' % self.hash, self.release_id
+    return '<Cherrypick(hash=%s, release_id=%s)>' % (self.hash, self.release_id)
