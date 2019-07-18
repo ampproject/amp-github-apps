@@ -23,9 +23,13 @@ class TestCodecovApi(unittest.TestCase):
 
     self.codecov_api = codecov.CodecovApi()
 
-  def testGetAbsoluteCoverage(self):
+  def testGetAbsoluteCoverageForHead(self):
     self.mock_request.return_value = (200, {
-        'commit': {'totals': {'c': '13.37'} }
+        'commit': {
+            'totals': {
+                'c': '13.37'
+            }
+        }
     })
     coverage = self.codecov_api.get_absolute_coverage()
 
@@ -33,6 +37,21 @@ class TestCodecovApi(unittest.TestCase):
     self.mock_request.assert_called_once_with(
         self.codecov_api.client, 'GET', '/__repo__/branch/master?limit=1',
         mock.ANY, mock.ANY)
+
+  def testGetAbsoluteCoverageForCommit(self):
+    self.mock_request.return_value = (200, {
+        'commit': {
+            'totals': {
+                'c': '13.37'
+            }
+        }
+    })
+    coverage = self.codecov_api.get_absolute_coverage('test_commit_hash')
+
+    self.assertEqual(coverage, 13.37)
+    self.mock_request.assert_called_once_with(
+        self.codecov_api.client, 'GET',
+        '/__repo__/commits/test_commit_hash?limit=1', mock.ANY, mock.ANY)
 
   def testGetAbsoluteCoverageError(self):
     self.mock_request.return_value = (404, {'error': {'reason': 'Not found.'}})
