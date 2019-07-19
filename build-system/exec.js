@@ -16,7 +16,7 @@
 'use strict';
 
 /**
- * @fileoverview Provides functions for executing tasks in a child process.
+ * @file Provides functions for executing tasks in a child process.
  */
 
 const childProcess = require('child_process');
