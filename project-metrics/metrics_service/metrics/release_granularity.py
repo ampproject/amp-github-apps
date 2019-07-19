@@ -43,14 +43,15 @@ class ReleaseGranularityMetric(base.Metric):
     logging.info('Counting commits per release')
     session = db.Session()
     releases = session.query(models.Release).filter(
-        models.Release.is_last_90_days(base_time=self.base_time)).all()
+        models.Release.is_last_90_days(base_time=self.base_time)).order_by(
+            models.Release.published_at.desc()).all()
     release_count = len(releases)
 
     if release_count < 2:
       raise ValueError('Not enough releases to determine a range of commits.')
 
-    first_release_date = releases[0].published_at
-    last_release_date = releases[-1].published_at
+    last_release_date = releases[0].published_at
+    first_release_date = releases[-1].published_at
 
     commits_count = session.query(models.Commit).filter(
         models.Commit.committed_at.between(first_release_date,
