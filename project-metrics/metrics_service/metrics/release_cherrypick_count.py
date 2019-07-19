@@ -12,6 +12,8 @@ from metrics import base
 class ReleaseCherrypickCountMetric(base.Metric):
   """A metric tracking the number of cherry-picks in releases."""
 
+  UNIT = 'PRs/90d'
+
   def _format_value(self, num_cherrypicks: float) -> Text:
     return '%d PR%s/90d' % (num_cherrypicks,
                             ('s' if num_cherrypicks > 1 else ''))
