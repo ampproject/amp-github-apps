@@ -17,7 +17,7 @@ import datetime
 import logging
 import sqlalchemy
 import stringcase
-from typing import Any, Dict, Iterable, Optional, Text, Type, TypeVar
+from typing import Any, Dict, Iterable, Optional, Sequence, Text, Type, TypeVar
 
 from database import db
 from database import models
@@ -90,6 +90,10 @@ class Metric(object):
   @classmethod
   def get_metric(cls, metric_cls_name) -> models.MetricResult:
     return cls._active_metrics[metric_cls_name]
+
+  @classmethod
+  def get_active_metrics(cls) -> Sequence[models.MetricResult]:
+    return list(cls._active_metrics.values())
 
   def __init__(self,
                result: Optional[models.MetricResult] = None,

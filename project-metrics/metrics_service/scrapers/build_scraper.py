@@ -29,7 +29,8 @@ class BuildScraper(object):
 
   def _get_oldest_build_timestamp(self) -> Optional[int]:
     build = self.session.query(models.Build).order_by(
-        models.Build.started_at.asc()).first()
+        models.Build.started_at.asc()).filter(
+            models.Build.started_at != None).first()
     return build.started_at if build else datetime.now()
 
   def scrape_since_latest(self):
