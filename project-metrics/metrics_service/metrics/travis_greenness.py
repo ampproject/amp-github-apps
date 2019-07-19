@@ -31,7 +31,7 @@ class TravisGreennessMetric(base.PercentageMetric):
     count_query = session.query(
         models.Build.state,
         sqlalchemy.func.count().label('state_count')).filter(
-            models.Build.is_last_90_days(now=self.now)).group_by(
+            models.Build.is_last_90_days(base_time=self.base_time)).group_by(
                 models.Build.state).filter(
                     models.Build.state.in_([
                         models.TravisState.PASSED,
