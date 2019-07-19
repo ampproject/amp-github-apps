@@ -43,7 +43,7 @@ class ReleaseGranularityMetric(base.Metric):
     logging.info('Counting commits per release')
     session = db.Session()
     releases = session.query(models.Release).filter(
-        models.Release.is_last_90_days()).all()
+        models.Release.is_last_90_days(base_time=self.base_time)).all()
     release_count = len(releases)
 
     if release_count < 2:

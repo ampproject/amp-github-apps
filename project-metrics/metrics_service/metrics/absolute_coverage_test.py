@@ -1,5 +1,6 @@
 """Tests for absolute-coverage metric."""
 
+import datetime
 import unittest
 from unittest import mock
 
@@ -17,9 +18,20 @@ class TestAbsoluteCoverageMetric(metric_test_case.MetricTestCase):
   @mock.patch.object(
       codecov.CodecovApi, 'get_absolute_coverage', return_value=42)
   def testRecompute(self, mock_get_absolute_coverage):
+    session = self.Session()
+    session.add(
+        models.Commit(
+            hash='test_hash',
+            committed_at=datetime.datetime.now() - datetime.timedelta(days=10)))
+    session.commit()
+
     self.metric.recompute()
     self.assertLatestResultEquals(0.42)
-    mock_get_absolute_coverage.assert_called_once()
+    mock_get_absolute_coverage.assert_called_once_with('test_hash')
+
+  def testRecomputeNoCommits(self):
+    with self.assertRaisesRegex(ValueError, 'No commit available before '):
+      self.metric.recompute()
 
   def testName(self):
     self.assertEqual(self.metric.name, 'AbsoluteCoverageMetric')

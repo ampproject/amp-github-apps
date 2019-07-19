@@ -13,6 +13,7 @@ To create a new metric:
 """
 
 import abc
+import datetime
 import logging
 import sqlalchemy
 import stringcase
@@ -90,8 +91,11 @@ class Metric(object):
   def get_metric(cls, metric_cls_name) -> models.MetricResult:
     return cls._active_metrics[metric_cls_name]
 
-  def __init__(self, result: Optional[models.MetricResult] = None):
+  def __init__(self,
+               result: Optional[models.MetricResult] = None,
+               base_time: Optional[datetime.datetime] = None):
     self.result = result
+    self.base_time = base_time or datetime.datetime.now()
 
   def __str__(self) -> Text:
     return '%s: %s' % (self.label, self.formatted_result)
@@ -125,13 +129,14 @@ class Metric(object):
         'label': self.label,
         'formatted_result': self.formatted_result,
         'score': self.score.name,
+        'computed_at': str(self.result.computed_at),
     }
 
   def recompute(self) -> None:
     """Computes the metric and records the result in the `metrics` table."""
-    logging.info('Recomputing metric %s', self.name)
+    logging.info('Recomputing metric %s at %s', self.name, self.base_time)
     self.result = models.MetricResult(
-        value=self._compute_value(), name=self.name)
+        value=self._compute_value(), name=self.name, computed_at=self.base_time)
 
     logging.info('Updating metric %s value to %.3g', self.name,
                  self.result.value)

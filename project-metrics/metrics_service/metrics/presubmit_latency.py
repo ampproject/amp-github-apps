@@ -41,7 +41,8 @@ class PresubmitLatencyMetric(base.Metric):
     """
     session = db.Session()
     avg_seconds = session.query(sqlalchemy.func.avg(
-        models.Build.duration)).filter(models.Build.is_last_90_days()).scalar()
+        models.Build.duration)).filter(
+            models.Build.is_last_90_days(base_time=self.base_time)).scalar()
     if avg_seconds:
       return float(avg_seconds)
     raise ValueError('No Travis builds to process.')

@@ -3,7 +3,7 @@
 from agithub import base as agithub_base
 from flask_api import status
 import logging
-from typing import Any, Dict, Text
+from typing import Any, Dict, Optional, Text
 
 import env
 
@@ -44,8 +44,11 @@ class CodecovApi(agithub_base.API):
     """Returns a partial Codecov request for the repository in env.yaml."""
     return self[env.get('GITHUB_REPO')]
 
-  def get_absolute_coverage(self) -> float:
+  def get_absolute_coverage(self, commit_hash: Optional[Text] = None) -> float:
     """Fetch the absolute coverage at HEAD.
+
+    Args:
+      commit_hash: hash of commit to fetch coverage for (default HEAD)
 
     Raises:
       CodecovApiError: if the call to the Codecov API fails.
@@ -53,7 +56,11 @@ class CodecovApi(agithub_base.API):
     Returns:
       Code coverage percentage in the range [0-100].
     """
-    status_code, response = self.repo.branch.master.get(limit=1)
+    endpoint = (
+        self.repo.commits[commit_hash]
+        if commit_hash else self.repo.branch.master)
+
+    status_code, response = endpoint.get(limit=1)
     if status_code == status.HTTP_200_OK:
       return float(response['commit']['totals']['c'])
     raise CodecovApiError(status_code, response['error']['reason'])

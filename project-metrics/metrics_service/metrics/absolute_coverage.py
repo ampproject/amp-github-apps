@@ -2,6 +2,7 @@
 
 from apis import codecov
 from metrics import base
+from database import db
 from database import models
 
 
@@ -24,7 +25,13 @@ class AbsoluteCoverageMetric(base.PercentageMetric):
     Returns:
       The percentage of lines tested in HEAD.
     """
-    return codecov.CodecovApi().get_absolute_coverage() / 100
+    session = db.Session()
+    head_commit = session.query(models.Commit).filter(
+        models.Commit.committed_at < self.base_time).order_by(
+            models.Commit.committed_at.desc()).first()
+    if not head_commit:
+      raise ValueError('No commit available before %s' % self.base_time)
+    return codecov.CodecovApi().get_absolute_coverage(head_commit.hash) / 100
 
 
 base.Metric.register(AbsoluteCoverageMetric)
