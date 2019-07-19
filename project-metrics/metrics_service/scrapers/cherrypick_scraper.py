@@ -1,4 +1,5 @@
 from typing import Sequence
+import datetime
 import logging
 import time
 import sqlalchemy
@@ -46,20 +47,27 @@ class CherrypickScraper(object):
           }}
         }}
       }}""".format(release_name=release.name))
-    commits = response['release']['tag']['target']['history']['nodes']
-    commit_hashes = [commit['oid'] for commit in commits]
 
+    try:
+      commits = response['release']['tag']['target']['history']['nodes']
+    except KeyError:
+      return []
+
+    commit_hashes = [commit['oid'] for commit in commits]
     return [
         models.Cherrypick(hash=commit_hash, release_id=release.id)
         for commit_hash in commit_hashes
         if commit_hash not in self.seen_commit_hashes
     ]
 
-  def scrape_recent_release_cherrypicks(self):
+  def scrape_cherrypicks(self, release_filter=None):
+    full_release_filter = ~models.Release.scraped_cherrypicks
+    if release_filter is not None:
+      full_release_filter = full_release_filter & release_filter
+
     releases = self.session.query(models.Release).order_by(
-        models.Release.published_at.asc()).filter(
-            models.Release.is_last_90_days()
-            & ~models.Release.scraped_cherrypicks).all()
+        models.Release.published_at.asc()).filter(full_release_filter).all()
+
     logging.info('Scraping cherrypicks for %d releases', len(releases))
     for release in releases:
       try:
@@ -73,6 +81,20 @@ class CherrypickScraper(object):
                      len(cherrypicks))
       except github.GitHubGraphQL.GraphQLError:
         logging.warn('Could not find release with tag name "%s"', release.name)
+
+      time.sleep(SCRAPE_INTERVAL_SECONDS)
+
+  def scrape_recent_release_cherrypicks(self):
+    self.scrape_cherrypicks(models.Release.is_last_90_days())
+
+  def scrape_historical(self, unused_since: datetime.datetime):
+    """Scrape historical cherry-picks for all releases in the DB.
+
+    Args:
+      unused_since: not used; exists to unify scrape_historical API across
+        scrapers
+    """
+    self.scrape_cherrypicks()
 
   @classmethod
   def scrape(cls):

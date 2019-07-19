@@ -27,8 +27,14 @@ class CommitScraper(object):
         models.Commit.committed_at.desc()).first()
     return commit.committed_at if commit else timestamp_90_days_ago()
 
+  def _get_oldest_commit_timestamp(self) -> datetime.datetime:
+    commit = self.session.query(models.Commit).order_by(
+        models.Commit.committed_at.asc()).first()
+    return commit.committed_at if commit else datetime.now()
+
   def scrape_page(self,
                   since: str,
+                  until: str = None,
                   after: str = None) -> Sequence[models.Commit]:
     """Fetch a page of commits from the repository.
 
@@ -36,6 +42,7 @@ class CommitScraper(object):
 
     Args:
       since: timestamp to start scraping at.
+      until: timestamp to end scraping at.
       after: end cursor returned by GraaphQL paging info
 
     Returns:
@@ -44,6 +51,8 @@ class CommitScraper(object):
     history_args = 'since: "%s"' % github.Timestamp(since).git_timestamp
     if after:
       history_args += ', after: "%s"' % after
+    if until:
+      history_args += ', until: "%s"' % github.Timestamp(until).git_timestamp
     logging.info('Querying GitHub for commits with args: %s', history_args)
 
     response = self.github.query_master_branch("""target {{ ... on Commit {{
@@ -86,6 +95,7 @@ class CommitScraper(object):
     days. Otherwise, it will scrape commits since the latest commit currently in
     the DB.
     """
+    self.cursor = None
     latest_timestamp = self._get_latest_commit_timestamp()
     page_count = 1
 
@@ -110,6 +120,41 @@ class CommitScraper(object):
         time.sleep(SCRAPE_INTERVAL_SECONDS)
     except IndexError:
       logging.info('Completed scraping %d pages of commits', page_count)
+
+  def scrape_historical(self, since: datetime.datetime):
+    """Scrapes historical commits going back as far as is specified.
+
+    Args:
+      since: datetime to scrape backwards in commit history until
+    """
+    self.cursor = None
+    oldest_timestamp = self._get_oldest_commit_timestamp()
+    page_count = 1
+
+    try:
+      while True:
+        logging.info('Fetching page %d of historical commits from GitHub',
+                     page_count)
+
+        commits = self.scrape_page(
+            since=since, until=oldest_timestamp, after=self.cursor)
+        commit_dicts = [{
+            'hash': commit.hash,
+            'committed_at': commit.committed_at,
+            'pull_request': commit.pull_request,
+            'pull_request_status': commit.pull_request_status,
+        } for commit in commits]
+        logging.info('Scraped %d commits', len(commit_dicts))
+
+        db.get_engine().execute(
+            models.Commit.__table__.insert().prefix_with('IGNORE'),
+            commit_dicts)
+
+        page_count += 1
+        time.sleep(SCRAPE_INTERVAL_SECONDS)
+    except IndexError:
+      logging.info('Completed scraping %d pages of historical commits',
+                   page_count)
 
   @classmethod
   def scrape(cls):

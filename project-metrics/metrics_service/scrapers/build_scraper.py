@@ -21,12 +21,16 @@ class BuildScraper(object):
   def __init__(self):
     self.travis = travis.TravisApi()
     self.session = db.Session()
-    self.cursor = None
 
   def _get_latest_build_number(self) -> Optional[int]:
     build = self.session.query(models.Build).order_by(
         models.Build.number.desc()).first()
     return build.number if build else None
+
+  def _get_oldest_build_timestamp(self) -> Optional[int]:
+    build = self.session.query(models.Build).order_by(
+        models.Build.started_at.asc()).first()
+    return build.started_at if build else datetime.now()
 
   def scrape_since_latest(self):
     """Scrapes latest builds from Travis and saves them to the DB.
@@ -71,6 +75,51 @@ class BuildScraper(object):
         last_data = builds[-1].started_at
       if (latest_build_num is None and last_date < ninety_days_ago) or (
           latest_build_num and builds[-1].number < latest_build_num):
+        break
+
+      page_num += 1
+      time.sleep(SCRAPE_INTERVAL_SECONDS)
+
+  def scrape_historical(self, since: datetime.datetime):
+    """Scrapes historical builds from Travis.
+
+    Args:
+      sinc: datetime to scrape backwards in commit history until
+    """
+    earliest_date = self._get_oldest_build_timestamp()
+    page_num = 0
+
+    while True:
+      logging.info('Fetching page %d of historical builds from Travis',
+                   page_num)
+
+      builds = self.travis.fetch_builds(page_num)
+      build_dicts = [{
+          'id': build.id,
+          'number': build.number,
+          'duration': build.duration,
+          'state': build.state,
+          'started_at': build.started_at,
+          'commit_hash': build.commit_hash,
+      } for build in builds]
+      logging.info('Scraped %d builds', len(build_dicts))
+
+      for build in builds:
+        try:
+          self.session.add(build)
+          self.session.flush()
+        except sqlalchemy.exc.IntegrityError as e:
+          logging.warn(e)
+          # Drop builds already in the DB or those for commits not in the DB
+          self.session.rollback()
+        else:
+          self.session.commit()
+          logging.debug('Saved %r', build)
+
+        if build.started_at:
+          earliest_date = min(earliest_date, build.started_at)
+
+      if earliest_date < since:
         break
 
       page_num += 1
