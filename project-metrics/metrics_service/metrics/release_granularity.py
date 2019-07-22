@@ -56,6 +56,7 @@ class ReleaseGranularityMetric(base.Metric):
     commits_count = session.query(models.Commit).filter(
         models.Commit.committed_at.between(first_release_date,
                                            last_release_date)).count()
+    session.close()
 
     # Subtract one from release count since commits from the last release are
     # not included.

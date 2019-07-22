@@ -82,10 +82,12 @@ class Metric(object):
             metric_results.c.name == max_dates_query.c.name,
             metric_results.c.computed_at == max_dates_query.c.max_computed_at))
 
-    return {
+    results = {
         result.name: cls.__from_result(result)
         for result in latest_results_query
     }
+    session.close()
+    return results
 
   @classmethod
   def get_metric(cls, metric_cls_name) -> models.MetricResult:
@@ -147,6 +149,7 @@ class Metric(object):
     session = db.Session()
     session.add(self.result)
     session.commit()
+    session.close()
 
   @abc.abstractmethod
   def _format_value(self, value: float) -> Text:

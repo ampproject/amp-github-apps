@@ -21,6 +21,9 @@ class CherrypickScraper(object):
         self.session.query(models.Cherrypick.hash)).all()
     self.seen_commit_hashes = set(commit.hash for commit in commits)
 
+  def __del__(self):
+    self.session.close()
+
   def scrape_release_cherrypicks(
       self, release: models.Release) -> Sequence[models.Cherrypick]:
     """Determines the commit SHAs of cherrypick commits in a release.

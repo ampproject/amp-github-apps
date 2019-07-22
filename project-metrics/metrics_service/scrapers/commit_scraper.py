@@ -22,6 +22,9 @@ class CommitScraper(object):
     self.session = db.Session()
     self.cursor = None
 
+  def __del__(self):
+    self.session.close()
+
   def _get_latest_commit_timestamp(self) -> datetime.datetime:
     commit = self.session.query(models.Commit).order_by(
         models.Commit.committed_at.desc()).first()

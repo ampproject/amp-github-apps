@@ -24,6 +24,9 @@ class ReleaseScraper(object):
     self.session = db.Session()
     self.cursor = None
 
+  def __del__(self):
+    self.session.close()
+
   def _get_latest_release_timestamp(self) -> datetime.datetime:
     release = self.session.query(models.Release).order_by(
         models.Release.published_at.desc()).first()

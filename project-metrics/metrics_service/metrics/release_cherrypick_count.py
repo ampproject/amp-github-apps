@@ -36,8 +36,10 @@ class ReleaseCherrypickCountMetric(base.Metric):
     """
     logging.info('Counting cherry-picks')
     session = db.Session()
-    return session.query(models.Cherrypick).join(models.Release).filter(
+    result = session.query(models.Cherrypick).join(models.Release).filter(
         models.Release.is_last_90_days(base_time=self.base_time)).count()
+    session.close()
+    return result
 
 
 base.Metric.register(ReleaseCherrypickCountMetric)

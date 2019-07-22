@@ -72,12 +72,15 @@ def _compute_all_at_time(metrics: Sequence[base_metric.MetricImplementation],
 def compute_all(metrics: Sequence[base_metric.MetricImplementation]):
   """Compute metric results for each week going back one year."""
   one_year_ago = datetime.datetime.now() - ONE_YEAR
+  metric_names = [metric.name for metric in metrics]
   logging.info('Backfilling results to %s', one_year_ago.strftime('%Y-%m-%d'))
 
-  metric_names = [metric.name for metric in metrics]
-  earliest_result = db.Session().query(models.MetricResult).filter(
+  session = db.Session()
+  earliest_result = session.query(models.MetricResult).filter(
       models.MetricResult.name in metric_names).order_by(
           models.MetricResult.computed_at.asc()).first()
+  session.close()
+
   earliest_result_time = (
       earliest_result.computed_at
       if earliest_result else datetime.datetime.now())

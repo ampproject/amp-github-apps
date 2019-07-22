@@ -46,6 +46,7 @@ class TravisFlakinessMetric(base.PercentageMetric):
                 models.TravisState.FAILED,
                 models.TravisState.ERRORED,
             ])).all()
+    session.close()
     build_count = len(builds)
 
     if build_count == 0:
