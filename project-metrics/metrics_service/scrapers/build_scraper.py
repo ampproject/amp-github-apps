@@ -22,6 +22,9 @@ class BuildScraper(object):
     self.travis = travis.TravisApi()
     self.session = db.Session()
 
+  def __del__(self):
+    self.session.close()
+
   def _get_latest_build_number(self) -> Optional[int]:
     build = self.session.query(models.Build).order_by(
         models.Build.number.desc()).first()

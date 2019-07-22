@@ -39,6 +39,8 @@ class TravisGreennessMetric(base.PercentageMetric):
                         models.TravisState.ERRORED,
                     ]))
     state_counts = count_query.all()
+
+    session.close()
     return dict(state_counts)
 
   def _compute_value(self) -> float:
