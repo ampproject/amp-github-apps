@@ -11,6 +11,8 @@ from metrics import base
 class PresubmitLatencyMetric(base.Metric):
   """A metric tracking the average duration of Travis PR builds."""
 
+  UNIT = 'seconds'
+
   def _format_value(self, avg_seconds: float) -> Text:
     return '%dm' % (avg_seconds // 60)
 

@@ -12,6 +12,8 @@ from metrics import base
 class ReleaseGranularityMetric(base.Metric):
   """A metric tracking the average number of commits between releases."""
 
+  UNIT = 'commits/release'
+
   def _format_value(self, avg_commits: float) -> Text:
     return '%d c/r' % round(avg_commits)
 

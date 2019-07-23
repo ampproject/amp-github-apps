@@ -3,7 +3,7 @@
 To create a new metric:
 1. Subclass `Metric` or `PercentMetric`
 2. Implement `_score_value`, `_compute_value`, and (unless you're using
-   `PercentMetric`) `_format_value`
+   `PercentMetric`) `_format_value` and define the UNIT (for history plots)
 3. Call `metrics.base.Metric.register(YourNewMetric)`
 4. Import the metric in __init__.py so it can register itself
 5. Define the update frequency with a job in `cron.yaml`
@@ -187,6 +187,8 @@ class Metric(object):
 
 class PercentageMetric(Metric):
   """Abstract base class for a metric with a percentage value."""
+
+  UNIT = '%'
 
   def _format_value(self, percentage: float) -> Text:
     return '%.1f%%' % (percentage * 100)
