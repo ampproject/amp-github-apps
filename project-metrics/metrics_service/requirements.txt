@@ -17,7 +17,7 @@ google-cloud-core==1.0.2
 google-cloud-storage==1.16.1
 google-resumable-media==0.3.2
 googleapis-common-protos==1.6.0
-grpc-google-iam-v1==0.11.4
+grpc-google-iam-v1==0.12.3
 grpcio==1.21.1
 idna==2.8
 importlab==0.5.1
