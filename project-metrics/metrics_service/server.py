@@ -51,7 +51,7 @@ def _get_from_cloud(filename: Text) -> bytes:
   """Download data from a Google Cloud Storage blob.
 
   Args:
-    filename: key under which the file in the Cloud Storage bucket is stored\
+    filename: key under which the file in the Cloud Storage bucket is stored
 
   Returns:
     The blob data as a byte-string.
