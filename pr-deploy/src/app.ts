@@ -48,20 +48,20 @@ function initializeCheck(app: Application) {
 function initializeRouter(app: Application) {
   const router: IRouter<void> = app.route('/v0/pr-deploy');
   router.use(express.json());
-  router.post('/owners/:owner/repos/:repo/headshas/:headSha/:exitCode',
+  router.post('/owners/:owner/repos/:repo/headshas/:headSha/:result',
     async(request, response) => {
       const github = await app.auth(Number(process.env.INSTALLATION_ID));
-      const {headSha, owner, repo, exitCode} = request.params;
+      const {headSha, owner, repo, result} = request.params;
       const pr = new PullRequest(github, headSha, owner, repo);
 
-      switch (exitCode) {
-        case (0):
+      switch (result) {
+        case ('success'):
           await pr.buildCompleted();
           break;
-        case (1):
+        case ('errored'):
           await pr.buildErrored();
           break;
-        case (2):
+        case ('skipped'):
         default:
           await pr.buildSkipped();
           break;
