@@ -48,33 +48,9 @@ export class PullRequest {
   }
 
   /**
-   * Set check to 'completed' to enable the 'Deploy Me' action.
-   */
-  async enableDeploymentCheck() {
-    const check = await this.getCheck_();
-
-    const params: ChecksUpdateParams = {
-      owner: this.owner,
-      repo: this.repo,
-      check_run_id: check.id,
-      status: 'completed',
-      conclusion: 'neutral',
-      output: {
-        title: 'Ready to create a test site.',
-        summary: 'Please click the `Create a test site` button above to ' +
-        'deploy the minified build of this PR along with examples from ' +
-        '`examples/` and `test/manual/`. It should only take a minute.',
-      },
-      actions: [ACTION],
-    };
-
-    return this.github.checks.update(params);
-  }
-
-  /**
    * Set check to 'in_progress' while files are being uploaded.
    */
-  async inProgressDeploymentCheck() {
+  async deploymentInProgress() {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
@@ -96,7 +72,7 @@ export class PullRequest {
    * Set check to 'completed' and remove the 'Deploy Me' action once
    * deployment is finished. Display the serve url in the check's output.
    */
-  async completeDeploymentCheck(serveUrl: string) {
+  async deploymentCompleted(serveUrl: string) {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
@@ -117,8 +93,57 @@ export class PullRequest {
     return this.github.checks.update(params);
   }
 
+  /**
+   * Fail the check if any part of the deployment fails
+   */
+  async deploymentErrored(error: Error) {
+    const check = await this.getCheck_();
 
-  async errorCompilationCheck() {
+    const params: ChecksUpdateParams = {
+      owner: this.owner,
+      repo: this.repo,
+      check_run_id: check.id,
+      status: 'completed',
+      conclusion: 'neutral',
+      output: {
+        title: 'Deployment error.',
+        summary: 'Sorry, there was an error creating a test site.',
+        text: error.message,
+      },
+      actions: [ACTION],
+    };
+
+    return this.github.checks.update(params);
+  }
+
+  /**
+   * Set check to 'completed' to enable the 'Deploy Me' action.
+   */
+  async buildCompleted() {
+    const check = await this.getCheck_();
+
+    const params: ChecksUpdateParams = {
+      owner: this.owner,
+      repo: this.repo,
+      check_run_id: check.id,
+      status: 'completed',
+      conclusion: 'neutral',
+      output: {
+        title: 'Ready to create a test site.',
+        summary: 'Please click the `Create a test site` button above to ' +
+        'deploy the minified build of this PR along with examples from ' +
+        '`examples/` and `test/manual/`. It should only take a minute.',
+      },
+      actions: [ACTION],
+    };
+
+    return this.github.checks.update(params);
+  }
+
+  /**
+   * Set check to 'neutral' if dist fails
+   */
+  async buildErrored() {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
@@ -136,11 +161,11 @@ export class PullRequest {
 
     return this.github.checks.update(params);
   }
+
   /**
-   * Fail the check if any part of the deployment fails
-   * @param check
+   * Set check to 'neutral' if dist is skipped
    */
-  async errorDeploymentCheck(error: Error) {
+  async buildSkipped() {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
@@ -150,11 +175,12 @@ export class PullRequest {
       status: 'completed',
       conclusion: 'neutral',
       output: {
-        title: 'Deployment error.',
-        summary: 'Sorry, there was an error creating a test site.',
-        text: error.message,
+        title: 'Build skipped.',
+        summary: 'Sorry, a test site cannot be created because the ' +
+         'compilation step was skipped in Travis. This happens if ' +
+         'a PR only includes documentation changes. Please check the Travis ' +
+         'logs for more information.',
       },
-      actions: [ACTION],
     };
 
     return this.github.checks.update(params);

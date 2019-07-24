@@ -54,9 +54,18 @@ function initializeRouter(app: Application) {
       const {headSha, owner, repo, exitCode} = request.params;
       const pr = new PullRequest(github, headSha, owner, repo);
 
-      exitCode == 0
-        ? await pr.enableDeploymentCheck()
-        : await pr.errorCompilationCheck();
+      switch (exitCode) {
+        case (0):
+          await pr.buildCompleted();
+          break;
+        case (1):
+          await pr.buildErrored();
+          break;
+        case (2):
+        default:
+          await pr.buildSkipped();
+          break;
+      }
       response.send({status: 200});
     });
 }
@@ -75,7 +84,7 @@ function initializeDeployment(app: Application) {
       repo,
     );
 
-    pr.inProgressDeploymentCheck();
+    pr.deploymentInProgress();
 
     const pullRequest = context.payload.check_run.pull_requests
       .find(pull_request => {
@@ -84,10 +93,10 @@ function initializeDeployment(app: Application) {
 
     unzipAndMove(pullRequest.number)
       .then(serveUrl => {
-        pr.completeDeploymentCheck(serveUrl);
+        pr.deploymentCompleted(serveUrl);
       })
       .catch(e => {
-        pr.errorDeploymentCheck(e);
+        pr.deploymentErrored(e);
       });
   });
 }
