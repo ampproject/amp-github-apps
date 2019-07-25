@@ -23,10 +23,10 @@ import {Storage} from '@google-cloud/storage';
  * AMP Travis Build Storage bucket, unzips and writes to
  * a test website bucket that serves the files publicly.
  */
-export async function unzipAndMove(prId: number): Promise<string> {
+export async function unzipAndMove(id: number): Promise<string> {
   const storage = new Storage({projectId: process.env.PROJECT_ID});
   const serveBucket = storage.bucket(process.env.SERVE_BUCKET);
-  const buildFileName = `amp_dist_${prId}`;
+  const buildFileName = `amp_dist_${id}`;
   const buildFile =
     storage.bucket(process.env.BUILD_BUCKET).file(`${buildFileName}.zip`);
 
