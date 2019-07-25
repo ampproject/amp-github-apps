@@ -24,19 +24,17 @@ const ACTION: Octokit.ChecksUpdateParamsActions = {
   identifier: 'deploy-me-action',
 };
 
-const CHECK_NAME: string = 'pr-deploy-check';
+const check_name = process.env.GH_CHECK;
+const owner = process.env.GH_OWNER;
+const repo = process.env.GH_REPO;
 
 export class PullRequest {
-  public headSha: string;
   private github: GitHubAPI;
-  private owner: string;
-  private repo: string;
+  private headSha: string;
 
-  constructor(github: GitHubAPI, headSha: string, owner: string, repo: string) {
+  constructor(github: GitHubAPI, headSha: string) {
     this.github = github;
     this.headSha = headSha;
-    this.owner = owner;
-    this.repo = repo;
   }
 
   /**
@@ -54,14 +52,15 @@ export class PullRequest {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
-      owner: this.owner,
-      repo: this.repo,
+      owner,
+      repo,
       check_run_id: check.id,
       status: 'in_progress',
       output: {
         title: 'Creating a test site...',
         summary: 'Please wait while a test site is being created. ' +
           'When finished, a link will appear here.',
+        text: check.output.text,
       },
     };
 
@@ -76,8 +75,8 @@ export class PullRequest {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
-      owner: this.owner,
-      repo: this.repo,
+      owner,
+      repo,
       check_run_id: check.id,
       status: 'completed',
       actions: [],
@@ -100,8 +99,8 @@ export class PullRequest {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
-      owner: this.owner,
-      repo: this.repo,
+      owner,
+      repo,
       check_run_id: check.id,
       status: 'completed',
       conclusion: 'neutral',
@@ -119,12 +118,12 @@ export class PullRequest {
   /**
    * Set check to 'completed' to enable the 'Deploy Me' action.
    */
-  async buildCompleted() {
+  async buildCompleted(id: number) {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
-      owner: this.owner,
-      repo: this.repo,
+      owner,
+      repo,
       check_run_id: check.id,
       status: 'completed',
       conclusion: 'neutral',
@@ -133,6 +132,7 @@ export class PullRequest {
         summary: 'Please click the `Create a test site` button above to ' +
         'deploy the minified build of this PR along with examples from ' +
         '`examples/` and `test/manual/`. It should only take a minute.',
+        text: `Travis build number: ${id}`,
       },
       actions: [ACTION],
     };
@@ -147,8 +147,8 @@ export class PullRequest {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
-      owner: this.owner,
-      repo: this.repo,
+      owner,
+      repo,
       check_run_id: check.id,
       status: 'completed',
       conclusion: 'neutral',
@@ -169,8 +169,8 @@ export class PullRequest {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
-      owner: this.owner,
-      repo: this.repo,
+      owner,
+      repo,
       check_run_id: check.id,
       status: 'completed',
       conclusion: 'neutral',
@@ -186,14 +186,24 @@ export class PullRequest {
     return this.github.checks.update(params);
   }
 
+  async getTravisBuildNumber() {
+    const check = await this.getCheck_();
+
+    if (!check.output || !check.output.text) {
+      return -1;
+    }
+
+    return Number(check.output.text.replace(/\D/g, ''));
+  }
+
   /**
    * Create the check and set it to 'queued'.
    */
   private async createCheck_() {
     const params: Octokit.ChecksCreateParams = {
-      owner: this.owner,
-      repo: this.repo,
-      name: CHECK_NAME,
+      owner,
+      repo,
+      name: check_name,
       head_sha: this.headSha,
       status: 'queued',
       output: {
@@ -222,8 +232,8 @@ export class PullRequest {
     }
 
     const params: ChecksUpdateParams = {
-      owner: this.owner,
-      repo: this.repo,
+      owner,
+      repo,
       check_run_id: check.id,
       status: 'queued',
       output,
@@ -236,10 +246,10 @@ export class PullRequest {
    */
   private async getCheck_() {
     const params: ChecksListForRefParams = {
-      owner: this.owner,
-      repo: this.repo,
+      owner,
+      repo,
       ref: this.headSha,
-      check_name: CHECK_NAME,
+      check_name,
     };
 
     const checks = await this.github.checks.listForRef(params);

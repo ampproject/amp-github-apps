@@ -39,12 +39,14 @@ class TravisFlakinessMetric(base.PercentageMetric):
     """
     logging.info('Counting flaky builds')
     session = db.Session()
-    builds = models.Build.scope(session).filter(
-        models.Build.state.in_([
-            models.TravisState.PASSED,
-            models.TravisState.FAILED,
-            models.TravisState.ERRORED,
-        ])).all()
+    builds = models.Build.scope(
+        session, base_time=self.base_time).filter(
+            models.Build.state.in_([
+                models.TravisState.PASSED,
+                models.TravisState.FAILED,
+                models.TravisState.ERRORED,
+            ])).all()
+    session.close()
     build_count = len(builds)
 
     if build_count == 0:

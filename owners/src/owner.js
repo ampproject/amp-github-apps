@@ -17,7 +17,7 @@
 const path = require('path');
 
 /**
- * @fileoverview Contains classes and functions in relation to "OWNER" files
+ * @file Contains classes and functions in relation to "OWNER" files
  * and theyre evaluation.
  */
 

@@ -31,13 +31,16 @@ class TravisGreennessMetric(base.PercentageMetric):
     count_query = session.query(
         models.Build.state,
         sqlalchemy.func.count().label('state_count')).filter(
-            models.Build.is_last_90_days()).group_by(models.Build.state).filter(
-                models.Build.state.in_([
-                    models.TravisState.PASSED,
-                    models.TravisState.FAILED,
-                    models.TravisState.ERRORED,
-                ]))
+            models.Build.is_last_90_days(base_time=self.base_time)).group_by(
+                models.Build.state).filter(
+                    models.Build.state.in_([
+                        models.TravisState.PASSED,
+                        models.TravisState.FAILED,
+                        models.TravisState.ERRORED,
+                    ]))
     state_counts = count_query.all()
+
+    session.close()
     return dict(state_counts)
 
   def _compute_value(self) -> float:

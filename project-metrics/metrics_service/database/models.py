@@ -1,6 +1,6 @@
 """Defines ORM models for interactions with the DB."""
 
-from typing import Text
+from typing import Optional, Text
 import datetime
 import enum
 import sqlalchemy
@@ -11,17 +11,22 @@ Base = declarative.declarative_base()
 
 def _is_last_n_days(
     timestamp_column: sqlalchemy.orm.attributes.InstrumentedAttribute,
-    days: int) -> sqlalchemy.sql.elements.BinaryExpression:
+    days: int,
+    base_time: Optional[datetime.datetime] = None
+) -> sqlalchemy.sql.elements.BinaryExpression:
   """Produces the filter expression for the last N days of a model.
 
    Args:
     timestamp_column: model column to filter by.
     days: number of days back to filter by.
+    base_time: start date to look back from (default datetime.datetime.now())
 
    Returns:
     A binary expression which can be passed to a query's `.filter()` method.
   """
-  n_days_ago = datetime.datetime.now() - datetime.timedelta(days=days)
+  if base_time is None:
+    base_time = datetime.datetime.now()
+  n_days_ago = base_time - datetime.timedelta(days=days)
   return timestamp_column >= n_days_ago
 
 
@@ -88,11 +93,15 @@ class Build(Base):
         Commit.committed_at.desc())
 
   @classmethod
-  def is_last_90_days(cls):
-    return _is_last_n_days(timestamp_column=cls.started_at, days=90)
+  def is_last_90_days(cls, base_time=None):
+    return _is_last_n_days(
+        timestamp_column=cls.started_at, days=90, base_time=base_time)
 
   @classmethod
-  def last_90_days(cls, base_query, negate=False) -> sqlalchemy.orm.query.Query:
+  def last_90_days(cls,
+                   base_query,
+                   negate=False,
+                   base_time=None) -> sqlalchemy.orm.query.Query:
     """To query builds younger than 90 days.
 
      Args:
@@ -102,13 +111,13 @@ class Build(Base):
      Returns:
       Build query with filter applied.
     """
-    filter_test = cls.is_last_90_days()
+    filter_test = cls.is_last_90_days(base_time=base_time)
     if negate:
       filter_test = sqlalchemy.not_(filter_test)
     return base_query.filter(filter_test)
 
   @classmethod
-  def scope(cls, session):
+  def scope(cls, session, base_time=None):
     """Default scoped query.
 
     Args:
@@ -117,7 +126,8 @@ class Build(Base):
     Returns:
       The last build from each PR from the last 90 days in commit order.
     """
-    return cls.in_commit_order(cls.last_90_days(session.query(cls)))
+    return cls.in_commit_order(
+        cls.last_90_days(session.query(cls), base_time=base_time))
 
   id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
   number = sqlalchemy.Column(sqlalchemy.Integer)
@@ -176,8 +186,9 @@ class Release(Base):
   scraped_cherrypicks = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
   @classmethod
-  def is_last_90_days(cls):
-    return _is_last_n_days(timestamp_column=cls.published_at, days=90)
+  def is_last_90_days(cls, base_time=None):
+    return _is_last_n_days(
+        timestamp_column=cls.published_at, days=90, base_time=base_time)
 
   def __repr__(self) -> Text:
     return ('<Release(id=%s, published_at=%s, name=%s)>') % (
