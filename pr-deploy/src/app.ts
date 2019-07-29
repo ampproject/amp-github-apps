@@ -72,6 +72,10 @@ function initializeRouter(app: Application) {
  */
 function initializeDeployment(app: Application) {
   app.on('check_run.requested_action', async context => {
+        if (context.payload.check_run.name != process.env.GH_CHECK){
+      return;
+    }
+    
     const pr = new PullRequest(
       context.github,
       context.payload.check_run.head_sha,
