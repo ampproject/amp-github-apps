@@ -93,7 +93,7 @@ export class PullRequest {
   }
 
   /**
-   * Fail the check if any part of the deployment fails
+   * Fail the check if any part of the deployment fails.
    */
   async deploymentErrored(error: Error) {
     const check = await this.getCheck_();
@@ -106,7 +106,7 @@ export class PullRequest {
       conclusion: 'neutral',
       output: {
         title: 'Deployment error.',
-        summary: 'Sorry, there was an error creating a test site.',
+        summary: 'There was an error creating a test site.',
         text: error.message,
       },
       actions: [ACTION],
@@ -141,7 +141,7 @@ export class PullRequest {
   }
 
   /**
-   * Set check to 'neutral' if dist fails
+   * Set check to 'neutral' if dist fails.
    */
   async buildErrored() {
     const check = await this.getCheck_();
@@ -154,7 +154,7 @@ export class PullRequest {
       conclusion: 'neutral',
       output: {
         title: 'Build error.',
-        summary: 'Sorry, a test site cannot be created because this PR ' +
+        summary: 'A test site cannot be created because this PR ' +
         'failed to build. Please check the Travis logs for more information.',
       },
     };
@@ -163,7 +163,7 @@ export class PullRequest {
   }
 
   /**
-   * Set check to 'neutral' if dist is skipped
+   * Set check to 'neutral' if dist is skipped.
    */
   async buildSkipped() {
     const check = await this.getCheck_();
@@ -176,10 +176,10 @@ export class PullRequest {
       conclusion: 'neutral',
       output: {
         title: 'Build skipped.',
-        summary: 'Sorry, a test site cannot be created because the ' +
-         'compilation step was skipped in Travis. This happens if ' +
-         'a PR only includes documentation changes. Please check the Travis ' +
-         'logs for more information.',
+        summary: 'A test site cannot be created because the ' +
+         'compilation step was skipped in Travis. This happens when ' +
+         'a PR only includes non-code changes, such as documentation. ' +
+         'Please check the Travis logs for more information.',
       },
     };
 

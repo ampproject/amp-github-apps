@@ -51,13 +51,13 @@ function initializeRouter(app: Application) {
       const github = await app.auth(Number(process.env.INSTALLATION_ID));
       const pr = new PullRequest(github, headSha);
       switch (result) {
-        case ('success'):
+        case 'success':
           await pr.buildCompleted(travisBuild);
           break;
-        case ('errored'):
+        case 'errored':
           await pr.buildErrored();
           break;
-        case ('skipped'):
+        case 'skipped':
         default:
           await pr.buildSkipped();
           break;
@@ -72,7 +72,7 @@ function initializeRouter(app: Application) {
  */
 function initializeDeployment(app: Application) {
   app.on('check_run.requested_action', async context => {
-        if (context.payload.check_run.name != process.env.GH_CHECK){
+        if (context.payload.check_run.name != process.env.GH_CHECK) {
       return;
     }
     
