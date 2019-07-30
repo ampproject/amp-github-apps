@@ -19,7 +19,7 @@
     "test": "jest --verbose=false"
   },
   "dependencies": {
-    "@google-cloud/storage": "3.0.3",
+    "@google-cloud/storage": "3.0.4",
     "dotenv": "8.0.0",
     "express": "4.17.1",
     "mime-types": "2.1.24",
