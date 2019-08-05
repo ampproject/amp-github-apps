@@ -29,6 +29,7 @@
     ]
   },
   "dependencies": {
+    "@google-cloud/storage": "^3.0.4",
     "express": "^4.17.1"
   }
 }
