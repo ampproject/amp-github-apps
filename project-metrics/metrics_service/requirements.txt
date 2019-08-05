@@ -42,7 +42,7 @@ pyparsing==2.4.2
 pytest==5.0.1
 pytest-rerunfailures==7.0
 python-dateutil==2.8.0
-pytz==2019.1
+pytz==2019.2
 PyYAML==5.1.2
 requests==2.22.0
 rsa==4.0
