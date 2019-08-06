@@ -262,8 +262,8 @@ module.exports = app => {
       ]);
       for (const reviewer of reviewers) {
         if (await isBundleSizeApprover(github, reviewer)) {
-          app.log(`INFO: Pull request ${pullRequest.number} already has an ` +
-                  'OWNERS reviewer. Skipping...');
+          app.log(`INFO: Pull request ${pullRequest.pull_number} already has ` +
+                  'a bundle-size capable reviewer. Skipping...');
           return;
         }
       }
@@ -276,7 +276,7 @@ module.exports = app => {
       }, pullRequest));
     } catch (error) {
       app.log('ERROR: Failed to add a reviewer to pull request ' +
-              `${pullRequest.number}. Skipping...`);
+              `${pullRequest.pull_number}. Skipping...`);
       app.log(`Error message: ${error}`);
     }
   }
