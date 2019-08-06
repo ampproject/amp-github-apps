@@ -27,7 +27,7 @@ class CloudStorage {
    * @param contents data to upload, as a string.
    */
   async upload(name, contents) {
-    console.log(`Uploading ${contests.length} bytes to file "${name}":`);
+    console.log(`Uploading ${contents.length} bytes to file "${name}":`);
     await this.bucket.file(name).save(contents, {resumable: false});
   }
 
