@@ -14,14 +14,35 @@
  */
 'use strict';
 
-const express = require('express')
-const app = express()
-
+require('dotenv').config();
 if (process.argv.length < 3) {
-  console.error('No port specified; please run `node app.js <PORT>`')
+  console.error('No port specified; please run `node app.js <PORT>`');
 }
-const PORT = process.argv[2]
+const PORT = process.argv[2];
+const CLOUD_STORAGE_BUCKET = process.env.CLOUD_STORAGE_BUCKET;
 
-app.get('/_cron/refresh_ips', (req, res) => res.send('Refreshed!'))
+const express = require('express');
+const {Storage} = require('@google-cloud/storage');
+const {TravisIpList} = require('./travis-ip-list.js');
+const {fetchTravisIps} = require('./travis-ip-lookup.js');
+
+const app = express();
+const storage = new Storage();
+const bucket = storage.bucket(CLOUD_STORAGE_BUCKET);
+
+
+app.get('/_cron/refresh_travis_ip_list', async (req, res) => {
+  let travisIps = await fetchTravisIps(); 
+  let ipList = new TravisIpList(bucket);
+  await ipList.save(travisIps);
+  res.send(`Refreshed IPs in Cloud Storage bucket ${CLOUD_STORAGE_BUCKET}!`);
+});
+
+app.get('/travis_ip_list.json', async (req, res) => {
+  let ipList = new TravisIpList(bucket);
+  let travisIps = await ipList.fetch();
+  res.setHeader('Content-type', 'application/json');
+  res.end(JSON.stringify(travisIps));
+});
 
 app.listen(PORT, () => console.log(`Travis IP Monitor running on port ${PORT}`))
