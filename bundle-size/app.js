@@ -45,17 +45,45 @@ async function getBuildArtifactsFile(github, filename) {
 }
 
 /**
- * Get the list of OWNERS that can approve this PR.
+ * Check whether the user is allowed to approve a bundle size change.
+ *
+ * @param {github} github an authorized GitHub API object.
+ * @param {string} username the username to check.
+ * @return {boolean} true if the user is allowed to approve bundle size changes.
+ */
+async function isBundleSizeApprover(github, username) {
+  // TODO(danielrozenberg): replace this logic with Promise.any when it exists.
+  for (const teamId of process.env.APPROVER_TEAMS.split(',')) {
+    try {
+      await github.teams.getMembership({
+        team_id: teamId,
+        username,
+      });
+      return true;
+    } catch (error) {
+      // Ignore...
+    }
+  }
+  return false;
+}
+
+/**
+ * Get a random reviewer from the approved teams.
  *
  * @param {github} github an authorized GitHub API object.
  * @throws {Error} on any error.
- * @return {!Array<string>} an array of OWNERS GitHub usernames.
+ * @return {string} a username of someone who can approve a bundle size change.
  */
-async function getOwners(github) {
-  return (await getBuildArtifactsFile(github, 'OWNERS'))
-      .trim()
-      .split('\n')
-      .filter(line => !!line && !line.startsWith('#'));
+async function getRandomReviewer(github) {
+  const reviewerTeamIds = process.env.REVIEWER_TEAMS.split('‚');
+  const reviewerTeamId = reviewerTeamIds[
+      Math.floor(Math.random() * reviewerTeamIds.length)];
+
+  const members = await github.teams.listMembers({
+    team_id: reviewerTeamId,
+  }).then(response => response.data);
+  const member = members[Math.floor(Math.random() * members.length)];
+  return member.login;
 }
 
 /**
@@ -224,7 +252,6 @@ module.exports = app => {
    */
   async function addOwnersReviewer(github, pullRequest) {
     try {
-      const owners = await getOwners(github);
       const requestedReviewersResponse =
           await github.pullRequests.listReviewRequests(pullRequest);
       const reviewsResponse =
@@ -233,15 +260,17 @@ module.exports = app => {
         ...requestedReviewersResponse.data.users.map(user => user.login),
         ...reviewsResponse.data.map(review => review.user.login),
       ]);
-      if (owners.some(owner => reviewers.has(owner))) {
-        app.log(`INFO: Pull request ${pullRequest.number} already has an ` +
-                'OWNERS reviewer. Skipping...');
-        return;
+      for (const reviewer of reviewers) {
+        if (await isBundleSizeApprover(github, reviewer)) {
+          app.log(`INFO: Pull request ${pullRequest.number} already has an ` +
+                  'OWNERS reviewer. Skipping...');
+          return;
+        }
       }
 
-      // Choose a random OWNERS user and add them as a reviewer to the pull
+      // Choose a random capable username and add them as a reviewer to the pull
       // request.
-      const newReviewer = owners[Math.floor(Math.random() * owners.length)];
+      const newReviewer = await getRandomReviewer(github);
       return await github.pullRequests.createReviewRequest(Object.assign({
         reviewers: [newReviewer],
       }, pullRequest));
@@ -302,12 +331,11 @@ module.exports = app => {
 
   app.on('pull_request_review.submitted', async context => {
     const approver = context.payload.review.user.login;
-    const owners = await getOwners(context.github);
     const pullRequestId = context.payload.pull_request.number;
     const headSha = context.payload.pull_request.head.sha;
 
     if (context.payload.review.state == 'approved' &&
-        owners.includes(approver)) {
+        await isBundleSizeApprover(context.github, approver)) {
       context.log(`Pull request ${pullRequestId} approved by a bundle-size ` +
           'keeper');
 
