@@ -87,10 +87,12 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
  * @param {number} passed number of tests that passed.
  * @param {number} failed number of tests that failed.
  * @param {string} buildCop the GitHub username of the current build cop.
+ * @param {string?} travisJobUrl optional Travis job URL.
  * @return {!object} a parameters object for github.checks.update.
  */
 function createReportedCheckParams(
-  pullRequestSnapshot, type, subType, checkRunId, passed, failed, buildCop) {
+  pullRequestSnapshot, type, subType, checkRunId, passed, failed, buildCop,
+  travisJobUrl) {
   const {owner, repo, headSha} = pullRequestSnapshot;
   const params = {
     owner,
@@ -116,7 +118,8 @@ function createReportedCheckParams(
           'If you believe that this pull request was not the cause of this ' +
           'test breakage (i.e., this is a flaky test) error please try the ' +
           'following steps:\n' +
-          '1. Restart the failed Travis job\n' +
+          '1. Restart the failed ' +
+          (travisJobUrl ? `[Travis job](${travisJobUrl})\n` : 'Travis job\n') +
           '2. Rebase your pull request on the latest `master` branch\n' +
           `3. Contact the weekly build cop (@${buildCop}), who can advise ` +
           'you how to proceed, or skip this test run for you.',
@@ -176,6 +179,7 @@ function createErroredCheckParams(
 
 exports.installApiRouter = (app, db) => {
   const tests = app.route('/v0/tests');
+  tests.use(require('express').json());
   tests.use((request, response, next) => {
     request.app.set('trust proxy', true);
     if ('TRAVIS_IP_ADDRESSES' in process.env &&
@@ -234,6 +238,8 @@ exports.installApiRouter = (app, db) => {
   tests.post('/:headSha/:type/:subType/report/:passed/:failed',
       async (request, response) => {
         const {headSha, type, subType, passed, failed} = request.params;
+        const travisJobUrl = ('travisJobUrl' in request.body)
+          ? request.body.travisJobUrl : null;
         const buildCop = await getBuildCop(db);
         app.log(
             `Reporting the results of the ${type} tests (${subType}) to the ` +
@@ -250,7 +256,7 @@ exports.installApiRouter = (app, db) => {
 
         const params = createReportedCheckParams(
             pullRequestSnapshot, type, subType, checkRunId, passed, failed,
-            buildCop);
+            buildCop, travisJobUrl);
         const github = await app.auth(pullRequestSnapshot.installationId);
         await github.checks.update(params);
 
