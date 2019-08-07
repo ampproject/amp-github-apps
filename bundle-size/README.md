@@ -60,6 +60,7 @@ Follow these setup instructions to start developing for this App locally:
      created above
    * Set the _Webhook secret_ to a random, secure value
    * Give the App _Read & Write_ permissions on **Checks** and **Pull requests**
+   * Give the App _Read-only_ permissions on **Organization members**
    * Subscribe to the **Pull request** and **Pull request review** events
    * None of the other fields are required
 6. After creating the application, generate and download a private key. Also
