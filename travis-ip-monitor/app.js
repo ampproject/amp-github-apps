@@ -15,10 +15,15 @@
 'use strict';
 
 require('dotenv').config();
-if (process.argv.length < 3) {
-  console.error('No port specified; please run `node app.js <PORT>`');
+
+let PORT = process.env.PORT
+if (!process.env.PORT) {
+  if (process.argv.length < 3) {
+    console.error('No port specified; please run `node app.js <PORT>`');
+  }
+  PORT = process.argv[2];
 }
-const PORT = process.argv[2];
+
 const CLOUD_STORAGE_BUCKET = process.env.CLOUD_STORAGE_BUCKET;
 
 const express = require('express');
@@ -34,13 +39,19 @@ const bucket = storage.bucket(CLOUD_STORAGE_BUCKET);
 app.get('/_cron/refresh_travis_ip_list', async (req, res) => {
   let travisIps = await fetchTravisIps(); 
   let ipList = new TravisIpList(bucket);
+
   await ipList.save(travisIps);
   res.send(`Refreshed IPs in Cloud Storage bucket ${CLOUD_STORAGE_BUCKET}!`);
 });
 
 app.get('/travis_ip_list.json', async (req, res) => {
   let ipList = new TravisIpList(bucket);
-  let travisIps = await ipList.fetch();
+  let travisIps = [];
+  
+  try {
+    travisIps = await ipList.fetch();
+  } catch (e) {}
+
   res.setHeader('Content-type', 'application/json');
   res.end(JSON.stringify(travisIps));
 });
