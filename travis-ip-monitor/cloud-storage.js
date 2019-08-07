@@ -35,14 +35,14 @@ class CloudStorage {
    * Download an object from the Cloud Storage bucket.
    *
    * @param name file name to download.
-   * @returns a promise holding the contents of the specified file.
+   * @returns the contents of the specified file.
    */
-  download(name) {
+  async download(name) {
     console.log(`Downloading file "${name}"`);
     const chunks = [];
     const ipListFile = this.bucket.file(name)
 
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       ipListFile.createReadStream()
         .on('error', (err) => {
           console.error(err);
