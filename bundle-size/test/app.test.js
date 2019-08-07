@@ -77,6 +77,8 @@ describe('bundle-size', () => {
   beforeEach(async () => {
     process.env = {
       MAX_ALLOWED_INCREASE: '0.1',
+      APPROVER_TEAMS: '123,234',
+      REVIEWER_TEAMS: '123',
     };
 
     nock('https://api.github.com')
@@ -84,12 +86,21 @@ describe('bundle-size', () => {
         .reply(200, {token: 'test'});
 
     nock('https://api.github.com')
-        .get('/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/' +
-             'OWNERS')
-        .reply(200, getFixture('OWNERS'));
+        .persist()
+        .get('/teams/123/memberships/aghassemi')
+        .reply(404)
+        .get('/teams/234/memberships/aghassemi')
+        .reply(200)
+        .get(/teams\/\d+\/memberships\/\w+$/)
+        .reply(404)
+        .get('/teams/123/members')
+        .reply(200, getFixture('teams.123.members'))
+        .get('/teams/234/members')
+        .reply(200, getFixture('teams.234.members'));
   });
 
   afterEach(async () => {
+    nock.cleanAll();
     await db('checks').truncate();
   });
 
@@ -171,37 +182,38 @@ describe('bundle-size', () => {
     ]);
   });
 
-  test('mark a check as successful when an OWNERS approves PR', async () => {
-    const payload = getFixture('pull_request_review.submitted');
+  test('mark a check as successful when a capable user approves the PR',
+      async () => {
+        const payload = getFixture('pull_request_review.submitted');
 
-    await db('checks').insert({
-      head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      owner: 'ampproject',
-      repo: 'amphtml',
-      pull_request_id: 19603,
-      installation_id: 123456,
-      check_run_id: 555555,
-      delta: 0.2,
-    });
+        await db('checks').insert({
+          head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          owner: 'ampproject',
+          repo: 'amphtml',
+          pull_request_id: 19603,
+          installation_id: 123456,
+          check_run_id: 555555,
+          delta: 0.2,
+        });
 
-    const nocks = nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'success',
-            output: {
-              title: 'Δ +0.20KB | approved by @aghassemi',
-            },
-          });
-          return true;
-        })
-        .reply(200);
+        const nocks = nock('https://api.github.com')
+            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+              expect(body).toMatchObject({
+                conclusion: 'success',
+                output: {
+                  title: 'Δ +0.20KB | approved by @aghassemi',
+                },
+              });
+              return true;
+            })
+            .reply(200);
 
-    await probot.receive({name: 'pull_request_review', payload});
-    await waitUntilNockScopeIsDone(nocks);
-  });
+        await probot.receive({name: 'pull_request_review', payload});
+        await waitUntilNockScopeIsDone(nocks);
+      });
 
-  test('mark a check as successful when an OWNERS approves PR with missing ' +
-      'size delta', async () => {
+  test('mark a check as successful when  a capable user approves the PR with ' +
+      'missing size delta', async () => {
     const payload = getFixture('pull_request_review.submitted');
 
     await db('checks').insert({
@@ -230,9 +242,8 @@ describe('bundle-size', () => {
     await waitUntilNockScopeIsDone(nocks);
   });
 
-  test('ignore an approved review by a non-OWNERS person', async () => {
+  test('ignore an approved review by a non-capable reviewer', async () => {
     const payload = getFixture('pull_request_review.submitted');
-    payload.review.user.login = 'rsimha';
 
     await probot.receive({name: 'pull_request_review', payload});
   });
@@ -244,27 +255,29 @@ describe('bundle-size', () => {
     await probot.receive({name: 'pull_request_review', payload});
   });
 
-  test('ignore an approved review by an OWNERS for small delta', async () => {
-    const payload = getFixture('pull_request_review.submitted');
+  test('ignore an approved review by a capable reviewer for small delta',
+      async () => {
+        const payload = getFixture('pull_request_review.submitted');
 
-    await db('checks').insert({
-      head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-      owner: 'ampproject',
-      repo: 'amphtml',
-      pull_request_id: 19603,
-      installation_id: 123456,
-      check_run_id: 555555,
-      delta: 0.05,
-    });
+        await db('checks').insert({
+          head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          owner: 'ampproject',
+          repo: 'amphtml',
+          pull_request_id: 19603,
+          installation_id: 123456,
+          check_run_id: 555555,
+          delta: 0.05,
+        });
 
-    await probot.receive({name: 'pull_request_review', payload});
-  });
+        await probot.receive({name: 'pull_request_review', payload});
+      });
 
-  test('ignore an approved review by an OWNERS for unknown PRs', async () => {
-    const payload = getFixture('pull_request_review.submitted');
+  test('ignore an approved review by a capable reviewer for unknown PRs',
+      async () => {
+        const payload = getFixture('pull_request_review.submitted');
 
-    await probot.receive({name: 'pull_request_review', payload});
-  });
+        await probot.receive({name: 'pull_request_review', payload});
+      });
 
   test('mark a check "skipped"', async () => {
     await db('checks').insert({
@@ -348,7 +361,7 @@ describe('bundle-size', () => {
         await waitUntilNockScopeIsDone(nocks);
       });
 
-  test('update a check on bundle-size report with no OWNERS reviewers ' +
+  test('update a check on bundle-size report with no capable reviewers ' +
        '(report/base = 12.34KB/12.00KB)', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
@@ -386,7 +399,7 @@ describe('bundle-size', () => {
             body => {
               expect(body).toMatchObject({
                 reviewers: [
-                  expect.stringMatching(/aghassemi|choumx|danielrozenberg/),
+                  expect.stringMatching(/erwinmombay|estherkim/),
                 ],
               });
               return true;
@@ -405,8 +418,8 @@ describe('bundle-size', () => {
     await waitUntilNockScopeIsDone(nocks);
   });
 
-  test('update a check on bundle-size report with an OWNERS requested ' +
-       'reviewer (report/base = 12.34KB/12.00KB)', async () => {
+  test('update a check on bundle-size report with a capable reviewer ' +
+       '(report/base = 12.34KB/12.00KB)', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
       owner: 'ampproject',
@@ -421,8 +434,6 @@ describe('bundle-size', () => {
         '5f27002526a808c5c1ad5d0f1ab1cec471af0a33');
     baseBundleSizeFixture.content = Buffer.from('12.00KB')
         .toString('base64');
-    const requestedReviewers = getFixture('requested_reviewers');
-    requestedReviewers.users[0].login = 'choumx';
     const nocks = nock('https://api.github.com')
         .get('/repos/ampproject/amphtml-build-artifacts/contents/' +
             'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33')
@@ -438,9 +449,19 @@ describe('bundle-size', () => {
         })
         .reply(200)
         .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
-        .reply(200, requestedReviewers)
+        .reply(200, getFixture('requested_reviewers'))
         .get('/repos/ampproject/amphtml/pulls/19603/reviews')
-        .reply(200, getFixture('reviews'));
+        .reply(200, getFixture('reviews'))
+        .post('/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
+            body => {
+              expect(body).toMatchObject({
+                reviewers: [
+                  expect.stringMatching(/erwinmombay|estherkim/),
+                ],
+              });
+              return true;
+            })
+        .reply(200);
 
     await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -454,7 +475,7 @@ describe('bundle-size', () => {
     await waitUntilNockScopeIsDone(nocks);
   });
 
-  test('update a check on bundle-size report with an OWNERS existing ' +
+  test('update a check on bundle-size report with an existing capable ' +
        'reviewer (report/base = 12.34KB/12.00KB)', async () => {
     await db('checks').insert({
       head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
@@ -471,7 +492,7 @@ describe('bundle-size', () => {
     baseBundleSizeFixture.content = Buffer.from('12.00KB')
         .toString('base64');
     const reviews = getFixture('reviews');
-    reviews[0].user.login = 'choumx';
+    reviews[0].user.login = 'aghassemi';
     const nocks = nock('https://api.github.com')
         .get('/repos/ampproject/amphtml-build-artifacts/contents/' +
             'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33')
@@ -592,7 +613,7 @@ describe('bundle-size', () => {
             body => {
               expect(body).toMatchObject({
                 reviewers: [
-                  expect.stringMatching(/aghassemi|choumx|danielrozenberg/),
+                  expect.stringMatching(/erwinmombay|estherkim/),
                 ],
               });
               return true;
@@ -646,7 +667,7 @@ describe('bundle-size', () => {
             body => {
               expect(body).toMatchObject({
                 reviewers: [
-                  expect.stringMatching(/aghassemi|choumx|danielrozenberg/),
+                  expect.stringMatching(/erwinmombay|estherkim/),
                 ],
               });
               return true;
