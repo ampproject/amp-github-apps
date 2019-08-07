@@ -56,7 +56,7 @@ async function isBundleSizeApprover(github, username) {
   for (const teamId of process.env.APPROVER_TEAMS.split(',')) {
     try {
       await github.teams.getMembership({
-        team_id: teamId,
+        team_id: parseInt(teamId),
         username,
       });
       return true;
@@ -76,8 +76,8 @@ async function isBundleSizeApprover(github, username) {
  */
 async function getRandomReviewer(github) {
   const reviewerTeamIds = process.env.REVIEWER_TEAMS.split('‚');
-  const reviewerTeamId = reviewerTeamIds[
-      Math.floor(Math.random() * reviewerTeamIds.length)];
+  const reviewerTeamId = parseInt(reviewerTeamIds[
+      Math.floor(Math.random() * reviewerTeamIds.length)]);
 
   const members = await github.teams.listMembers({
     team_id: reviewerTeamId,
