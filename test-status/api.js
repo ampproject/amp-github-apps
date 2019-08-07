@@ -147,10 +147,11 @@ function createReportedCheckParams(
  * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {number} checkRunId the existing check run ID.
  * @param {string} buildCop the GitHub username of the current build cop.
+ * @param {string?} travisJobUrl optional Travis job URL.
  * @return {!object} a parameters object for github.checks.update.
  */
 function createErroredCheckParams(
-  pullRequestSnapshot, type, subType, checkRunId, buildCop) {
+  pullRequestSnapshot, type, subType, checkRunId, buildCop, travisJobUrl) {
   const {owner, repo, headSha} = pullRequestSnapshot;
   const detailsUrl = new URL(`/tests/${headSha}/${type}/${subType}/status`,
       process.env.WEB_UI_BASE_URL);
@@ -169,8 +170,9 @@ function createErroredCheckParams(
       text: 'Please inspect the Travis build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
         'error, please try the following steps:\n' +
-        '1. Restart the failed Travis job\n' +
-        '2. Rebase your pull request on the latest `master` branch\n' +
+        '1. Restart the failed ' +
+          (travisJobUrl ? `[Travis job](${travisJobUrl})\n` : 'Travis job\n') +
+          '2. Rebase your pull request on the latest `master` branch\n' +
         `3. Contact the weekly build cop (@${buildCop}), who can advise you ` +
         'how to proceed, or skip this test run for you.',
     },
@@ -270,6 +272,8 @@ exports.installApiRouter = (app, db) => {
   tests.post('/:headSha/:type/:subType/report/errored',
       async (request, response) => {
         const {headSha, type, subType} = request.params;
+        const travisJobUrl = ('travisJobUrl' in request.body)
+          ? request.body.travisJobUrl : null;
         const buildCop = await getBuildCop(db);
         app.log(
             `Reporting that ${type} tests (${subType}) have errored to the ` +
@@ -284,7 +288,8 @@ exports.installApiRouter = (app, db) => {
         }
 
         const params = createErroredCheckParams(
-            pullRequestSnapshot, type, subType, checkRunId, buildCop);
+            pullRequestSnapshot, type, subType, checkRunId, buildCop,
+            travisJobUrl);
         const github = await app.auth(pullRequestSnapshot.installationId);
         await github.checks.update(params);
 
