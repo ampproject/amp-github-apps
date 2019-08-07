@@ -15,7 +15,8 @@
 'use strict';
 
 const {CloudStorage} = require('./cloud-storage.js')
-const TRAVIS_IP_FILENAME = process.env.TRAVIS_IP_FILENAME
+const {Storage} = require('@google-cloud/storage');
+const TRAVIS_IP_FILENAME = 'travis_ips.json'
 
 
 class TravisIpList {
@@ -44,4 +45,19 @@ class TravisIpList {
   }
 }
 
-module.exports = {TravisIpList}
+/**
+ * Creates a TravisIpList object referencing the Travis IP Monitor app.
+ * 
+ * @param projectId the Travis IP Monitor app ID.
+ * @param keyFilename file path to GAE service account key JSON file.
+ * @param bucketName name of the Cloud Storage bucket holding the IP list.
+ * @returns a TravisIpList reading from the app storage bucket.
+ */
+function getTravisIpList({projectId, keyFilename, bucketName}) {
+  const storage = new Storage({projectId, keyFilename});
+  const bucket = storage.bucket(bucketName);
+  return new TravisIpList(bucket);
+}
+
+
+module.exports = {TravisIpList, getTravisIpList}

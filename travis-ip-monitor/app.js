@@ -24,28 +24,25 @@ if (!process.env.PORT) {
   PORT = process.argv[2];
 }
 
-const CLOUD_STORAGE_BUCKET = process.env.CLOUD_STORAGE_BUCKET;
-
-const express = require('express');
-const {Storage} = require('@google-cloud/storage');
-const {TravisIpList} = require('./travis-ip-list.js');
+const {getTravisIpList} = require('./travis-ip-list.js');
 const {fetchTravisIps} = require('./travis-ip-lookup.js');
+const express = require('express');
 
 const app = express();
-const storage = new Storage();
-const bucket = storage.bucket(CLOUD_STORAGE_BUCKET);
 
+let ipList = getTravisIpList({
+    projectId: process.env.PROJECT_ID,
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    bucketName: process.env.CLOUD_STORAGE_BUCKET,    
+  });
 
 app.get('/_cron/refresh_travis_ip_list', async (req, res) => {
   let travisIps = await fetchTravisIps(); 
-  let ipList = new TravisIpList(bucket);
-
   await ipList.save(travisIps);
-  res.send(`Refreshed IPs in Cloud Storage bucket ${CLOUD_STORAGE_BUCKET}!`);
+  res.send(`Refreshed IPs in bucket ${process.env.CLOUD_STORAGE_BUCKET}!`);
 });
 
 app.get('/travis_ip_list.json', async (req, res) => {
-  let ipList = new TravisIpList(bucket);
   let travisIps = [];
   
   try {
