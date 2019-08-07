@@ -184,9 +184,8 @@ module.exports = app => {
               'A member of the bundle-size group will be added automatically ' +
               'to review this PR. Only once the member approves this PR, ' +
               'can it be merged. If you do not receive a response from the ' +
-              'group member, feel free to tag another person listed in the ' +
-              'bundle-size [OWNERS](https://github.com/ampproject/' +
-              'amphtml-build-artifacts/blob/master/bundle-size/OWNERS) file.',
+              'group member, feel free to tag another person in ' +
+              process.env.REVIEWER_TEAM_NAMES,
           },
         });
       } else {
@@ -229,9 +228,8 @@ module.exports = app => {
               'A member of the bundle-size group will be added automatically ' +
               'to review this PR. Only once the member approves this PR, ' +
               'can it be merged. If you do not receive a response from the ' +
-              'group member, feel free to tag another person listed in the ' +
-              'bundle-size [OWNERS](https://github.com/ampproject/' +
-              'amphtml-build-artifacts/blob/master/bundle-size/OWNERS) file.',
+              'group member, feel free to tag another person in ' +
+              process.env.REVIEWER_TEAM_NAMES,
           },
         });
         await github.checks.update(updatedCheckOptions);
