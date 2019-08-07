@@ -65,17 +65,21 @@ Follow these setup instructions to start developing for this App locally:
    * None of the other fields are required
 6. After creating the application, generate and download a private key. Also
    take note of the App ID
-7. Install the application on a GitHub repository that you want to use for
+7. Create a personal access token belonging to a GitHub _user_ with the
+   `public_repo` and `read:org` permissions and nore its access token.
+8. Install the application on a GitHub repository that you want to use for
    testing. You might want to create a new repository for this purpose.
-8. Copy the `.env.example` file to `.env` and modify the fields based on the
+9. Copy the `.env.example` file to `.env` and modify the fields based on the
    instructions in that file and the values from the GitHub App page
    * The value for the `PRIVATE_KEY` field is a base64 representation of the
      `.pem` file you downloaded from the GitHub App page. On Linux/Mac you can
      convert that file by running `cat private-key-file.pem | base64` in a
      command line
-9. Copy the `db-config.example.js` file to `db-config.js` and modify the fields
-   based on the connection information to your database
-10. `npm run dev`
+   * The value for the `ACCESS_TOKEN` field is the personal access token from
+     the precending step
+10. Copy the `db-config.example.js` file to `db-config.js` and modify the fields
+    based on the connection information to your database
+11. `npm run dev`
    * This will reload the App on every file change. Quit the server with
      `<Ctrl> + C` or `<Cmd> + C`
 

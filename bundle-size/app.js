@@ -15,6 +15,7 @@
 'use strict';
 
 const {dbConnect} = require('./db');
+const Octokit = require('@octokit/rest');
 const path = require('path');
 const sleep = require('sleep-promise');
 
@@ -120,6 +121,10 @@ function successfulSummaryMessage(delta, deltaFormatted) {
 }
 
 module.exports = app => {
+  const userBasedGithub = new Octokit({
+    'auth': process.env.ACCESS_TOKEN,
+  });
+
   /**
    * Get the GitHub Check object from the database.
    *
@@ -258,7 +263,7 @@ module.exports = app => {
       ...reviewsResponse.data.map(review => review.user.login),
     ]);
     for (const reviewer of reviewers) {
-      if (await isBundleSizeApprover(github, reviewer)) {
+      if (await isBundleSizeApprover(userBasedGithub, reviewer)) {
         app.log(`INFO: Pull request ${pullRequest.pull_number} already has ` +
                 'a bundle-size capable reviewer. Skipping...');
         return;
@@ -268,7 +273,7 @@ module.exports = app => {
     try {
       // Choose a random capable username and add them as a reviewer to the pull
       // request.
-      const newReviewer = await getRandomReviewer(github);
+      const newReviewer = await getRandomReviewer(userBasedGithub);
       return await github.pullRequests.createReviewRequest(Object.assign({
         reviewers: [newReviewer],
       }, pullRequest));
@@ -334,7 +339,7 @@ module.exports = app => {
     const headSha = context.payload.pull_request.head.sha;
 
     if (context.payload.review.state == 'approved' &&
-        await isBundleSizeApprover(context.github, approver)) {
+        await isBundleSizeApprover(userBasedGithub, approver)) {
       context.log(`Pull request ${pullRequestId} approved by a bundle-size ` +
           'keeper');
 
