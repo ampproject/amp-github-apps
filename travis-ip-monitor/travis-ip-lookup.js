@@ -19,16 +19,20 @@ const request = require('request');
 /**
  * Fetches the list of Travis API IP addresses from the Travis API.
  *
- * @returns the list of IP addresses
+ * @return {string[]} the list of IP addresses
  */
 async function fetchTravisIps() {
   return await new Promise((resolve, reject) => {
-    request('https://dnsjson.com/nat.travisci.net/A.json', { json: true },
-      (err, res, body) => {
-        if (err) { reject(err); }
-        if (!body.success) { reject(body.message); }
-        resolve(body.results.records);
-      });
+    request('https://dnsjson.com/nat.travisci.net/A.json', {json: true},
+        (err, res, body) => {
+          if (err) {
+            reject(err);
+          }
+          if (!body.success) {
+            reject(body.message);
+          }
+          resolve(body.results.records);
+        });
   });
 }
 

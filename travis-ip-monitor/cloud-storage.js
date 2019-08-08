@@ -12,10 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-
+/**
+ * Google Cloud Storage interface to upload and download objects.
+ */
 class CloudStorage {
+  /**
+   * Constructor.
+   *
+   * @param {any} bucket Cloud Storage bucket to hold the IP list.
+   */
   constructor(bucket) {
     this.bucket = bucket;
   }
@@ -23,8 +29,8 @@ class CloudStorage {
   /**
    * Upload data to the Cloud Storage bucket.
    *
-   * @param name file name to upload to.
-   * @param contents data to upload, as a string.
+   * @param {string} name file name to upload to.
+   * @param {string} contents data to upload.
    */
   async upload(name, contents) {
     console.log(`Uploading ${contents.length} bytes to file "${name}":`);
@@ -34,27 +40,27 @@ class CloudStorage {
   /**
    * Download an object from the Cloud Storage bucket.
    *
-   * @param name file name to download.
-   * @returns the contents of the specified file.
+   * @param {string} name file name to download.
+   * @return {string} the contents of the specified file.
    */
   async download(name) {
     console.log(`Downloading file "${name}"`);
     const chunks = [];
-    const ipListFile = this.bucket.file(name)
+    const ipListFile = this.bucket.file(name);
 
     return await new Promise((resolve, reject) => {
       ipListFile.createReadStream()
-        .on('error', (err) => {
-          console.error(err);
-        })
-        .on('data', (chunk) => {
-          chunks.push(chunk);
-        })
-        .on('end', () => {
-          resolve(Buffer.concat(chunks).toString());
-        });
+          .on('error', err => {
+            console.error(err);
+          })
+          .on('data', chunk => {
+            chunks.push(chunk);
+          })
+          .on('end', () => {
+            resolve(Buffer.concat(chunks).toString());
+          });
     });
   }
 }
 
-module.exports = {CloudStorage}
+module.exports = {CloudStorage};

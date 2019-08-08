@@ -14,12 +14,20 @@
  */
 'use strict';
 
-const {CloudStorage} = require('./cloud-storage.js')
+const {CloudStorage} = require('./cloud-storage.js');
 const {Storage} = require('@google-cloud/storage');
-const TRAVIS_IP_FILENAME = 'travis_ips.json'
+const TRAVIS_IP_FILENAME = 'travis_ips.json';
 
 
+/**
+ * Interface for fetching and updating the Travis IP list.
+ */
 class TravisIpList {
+  /**
+   * Constructor.
+   *
+   * @param {any} bucket Cloud Storage bucket to hold the IP list.
+   */
   constructor(bucket) {
     this.cloudStorage = new CloudStorage(bucket);
   }
@@ -27,7 +35,7 @@ class TravisIpList {
   /**
    * Store the Travis IP list.
    *
-   * @param ipList list of Travis API IP addresses.
+   * @param {string[]} ipList list of Travis API IP addresses.
    */
   async save(ipList) {
     const jsonString = JSON.stringify(ipList);
@@ -37,7 +45,7 @@ class TravisIpList {
   /**
    * Fetch the Travis IP list.
    *
-   * @returns the list of Travis API IP addresses.
+   * @return {string[]} the list of Travis API IP addresses.
    */
   async fetch() {
     const jsonString = await this.cloudStorage.download(TRAVIS_IP_FILENAME);
@@ -47,11 +55,11 @@ class TravisIpList {
 
 /**
  * Creates a TravisIpList object referencing the Travis IP Monitor app.
- * 
- * @param projectId the Travis IP Monitor app ID.
- * @param keyFilename file path to GAE service account key JSON file.
- * @param bucketName name of the Cloud Storage bucket holding the IP list.
- * @returns a TravisIpList reading from the app storage bucket.
+ *
+ * @param {string} projectId the Travis IP Monitor app ID.
+ * @param {string} keyFilename file path to GAE service account key JSON file.
+ * @param {string} bucketName Cloud Storage bucket holding the IP list.
+ * @return {TravisIpList} a TravisIpList reading from the app storage bucket.
  */
 function getTravisIpList(projectId, keyFilename, bucketName) {
   const storage = new Storage({projectId, keyFilename});
@@ -60,4 +68,4 @@ function getTravisIpList(projectId, keyFilename, bucketName) {
 }
 
 
-module.exports = {TravisIpList, getTravisIpList}
+module.exports = {TravisIpList, getTravisIpList};

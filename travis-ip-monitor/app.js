@@ -30,27 +30,31 @@ const express = require('express');
 
 const app = express();
 
-let ipList = getTravisIpList(
-  process.env.PROJECT_ID,
-  process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  process.env.CLOUD_STORAGE_BUCKET,    
+const ipList = getTravisIpList(
+    process.env.PROJECT_ID,
+    process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    process.env.CLOUD_STORAGE_BUCKET,
 );
 
 app.get('/_cron/refresh_travis_ip_list', async (req, res) => {
-  let travisIps = await fetchTravisIps(); 
+  const travisIps = await fetchTravisIps();
   await ipList.save(travisIps);
   res.send(`Refreshed IPs in bucket ${process.env.CLOUD_STORAGE_BUCKET}!`);
 });
 
 app.get('/travis_ip_list.json', async (req, res) => {
   let travisIps = [];
-  
+
   try {
     travisIps = await ipList.fetch();
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 
   res.setHeader('Content-type', 'application/json');
   res.end(JSON.stringify(travisIps));
 });
 
-app.listen(PORT, () => console.log(`Travis IP Monitor running on port ${PORT}`))
+app.listen(PORT, () => {
+  console.log(`Travis IP Monitor running on port ${PORT}`);
+});
