@@ -53,7 +53,7 @@ class TravisIpList {
  * @param bucketName name of the Cloud Storage bucket holding the IP list.
  * @returns a TravisIpList reading from the app storage bucket.
  */
-function getTravisIpList({projectId, keyFilename, bucketName}) {
+function getTravisIpList(projectId, keyFilename, bucketName) {
   const storage = new Storage({projectId, keyFilename});
   const bucket = storage.bucket(bucketName);
   return new TravisIpList(bucket);

@@ -16,7 +16,7 @@
 
 require('dotenv').config();
 
-let PORT = process.env.PORT
+let PORT = process.env.PORT;
 if (!process.env.PORT) {
   if (process.argv.length < 3) {
     console.error('No port specified; please run `node app.js <PORT>`');
@@ -30,11 +30,11 @@ const express = require('express');
 
 const app = express();
 
-let ipList = getTravisIpList({
-    projectId: process.env.PROJECT_ID,
-    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-    bucketName: process.env.CLOUD_STORAGE_BUCKET,    
-  });
+let ipList = getTravisIpList(
+  process.env.PROJECT_ID,
+  process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  process.env.CLOUD_STORAGE_BUCKET,    
+);
 
 app.get('/_cron/refresh_travis_ip_list', async (req, res) => {
   let travisIps = await fetchTravisIps(); 
