@@ -42,8 +42,6 @@ const checkruns35Empty = require(
 
 const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 
-const teams = require('./fixtures/teams/teams');
-
 
 nock.disableNetConnect();
 jest.setTimeout(30000);
@@ -97,6 +95,7 @@ describe('owners bot', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    // Disabled execution of `git pull` for testing.
     sandbox.stub(Git.prototype, 'pullLatestForRepo').returns(null);
     sandbox.stub(Git.prototype, 'getOwnersFilesForBranch')
       .returns(ownersYamlStruct);
@@ -123,10 +122,6 @@ describe('owners bot', () => {
       nock('https://api.github.com')
         .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
-
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/teams')
-        .reply(200, teams);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
@@ -168,10 +163,6 @@ describe('owners bot', () => {
       nock('https://api.github.com')
         .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
-
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/teams')
-        .reply(200, teams);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
@@ -219,10 +210,6 @@ describe('owners bot', () => {
         .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
 
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/teams')
-        .reply(200, teams);
-
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
@@ -261,10 +248,6 @@ describe('owners bot', () => {
       nock('https://api.github.com')
         .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35Multiple);
-
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/teams')
-        .reply(200, teams);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
@@ -306,10 +289,6 @@ describe('owners bot', () => {
       nock('https://api.github.com')
         .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35')
         .reply(200, pullRequest35);
-
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/teams')
-        .reply(200, teams);
 
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
@@ -362,10 +341,6 @@ describe('owners bot', () => {
         .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
 
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/teams')
-        .reply(200, teams);
-
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
@@ -410,10 +385,6 @@ describe('owners bot', () => {
       nock('https://api.github.com')
         .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/36/files')
         .reply(200, files36);
-
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/teams')
-        .reply(200, teams);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
@@ -465,10 +436,6 @@ describe('owners bot', () => {
       nock('https://api.github.com')
         .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
-
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/teams')
-        .reply(200, teams);
 
       // We need the reviews to check if a pull request has been approved or
       // not.

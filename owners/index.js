@@ -55,8 +55,8 @@ module.exports = app => {
    */
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
-    const pr = await PullRequest.get(context, payload.repository.owner.login,
-      payload.repository.name,
+    const pr = await PullRequest.get(
+      context,
       payload.check_run.check_suite.pull_requests[0].number);
 
     return await processPullRequest(context, pr.data);
@@ -68,8 +68,8 @@ module.exports = app => {
    */
   async function onPullRequestReview(context) {
     const payload = context.payload;
-    const pr = await PullRequest.get(context, payload.repository.owner.login,
-      payload.repository.name, payload.pull_request.number);
+    context.log('number', payload.pull_request.number);
+    const pr = await PullRequest.get(context, payload.pull_request.number);
 
     return await processPullRequest(context, pr.data);
   }
