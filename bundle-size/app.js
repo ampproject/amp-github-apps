@@ -186,7 +186,7 @@ module.exports = app => {
 
     try {
       const baseBundleSize = parseFloat(
-        await getBuildArtifactsFile(github, baseSha)
+        await getBuildArtifactsFile(github, `${baseSha}.br`)
       );
       const bundleSizeDelta = bundleSize - baseBundleSize;
       const bundleSizeDeltaFormatted = formatBundleSizeDelta(bundleSizeDelta);
@@ -507,15 +507,20 @@ module.exports = app => {
         .end('POST request to /report must have commit SHA field "baseSha"');
     }
     if (
-      !('bundleSize' in request.body) ||
-      typeof request.body.bundleSize != 'number'
+      !('brotliBundleSize' in request.body) ||
+      typeof request.body.brotliBundleSize != 'number'
     ) {
       return response
         .status(400)
-        .end('POST request to /report must have numeric field "bundleSize"');
+        .end(
+          'POST request to /report must have numeric field "brotliBundleSize"'
+        );
     }
     const {headSha} = request.params;
-    const {baseSha, bundleSize} = request.body;
+    // TODO(#142): restore the default bundleSize field name here once the
+    // ampproject/amphtml runner starts reporting Brotli sizes in the bundleSize
+    // field.
+    const {baseSha, brotliBundleSize: bundleSize} = request.body;
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
