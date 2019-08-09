@@ -36,7 +36,7 @@ export async function unzipAndMove(id: number): Promise<string> {
       .pipe(unzip.Parse())
       .on('entry', entry => {
         const serveFileName = entry.path;
-        const serveFile = serveBucket.file(serveFileName);
+        const serveFile = serveBucket.file(`${buildFileName}/${serveFileName}`);
         entry.pipe(
           serveFile.createWriteStream(
             {metadata: {contentType: mime.lookup(serveFileName)}})

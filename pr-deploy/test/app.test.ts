@@ -98,7 +98,7 @@ describe('test pr deploy app', () => {
     );
 
     request(server)
-      .post('/v0/pr-deploy/travisbuilds/1/headshas/3/0')
+      .post('/v0/pr-deploy/travisbuilds/1/headshas/3/success')
       .expect(() => { expect(github.checks.update).toHaveBeenCalledTimes(1);})
       .expect(200, done);
   });

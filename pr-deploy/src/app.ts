@@ -45,15 +45,23 @@ function initializeCheck(app: Application) {
 function initializeRouter(app: Application) {
   const router: IRouter<void> = app.route('/v0/pr-deploy');
   router.use(express.json());
-  router.post('/travisbuilds/:travisBuild/headshas/:headSha/:exitCode',
+  router.post('/travisbuilds/:travisBuild/headshas/:headSha/:result',
     async(request, response) => {
-      const {travisBuild, headSha, exitCode} = request.params;
+      const {travisBuild, headSha, result} = request.params;
       const github = await app.auth(Number(process.env.INSTALLATION_ID));
       const pr = new PullRequest(github, headSha);
-
-      exitCode == 0
-        ? await pr.enableDeploymentCheck(travisBuild)
-        : await pr.errorCompilationCheck();
+      switch (result) {
+        case 'success':
+          await pr.buildCompleted(travisBuild);
+          break;
+        case 'errored':
+          await pr.buildErrored();
+          break;
+        case 'skipped':
+        default:
+          await pr.buildSkipped();
+          break;
+      }
       response.send({status: 200});
     });
 }
@@ -64,20 +72,22 @@ function initializeRouter(app: Application) {
  */
 function initializeDeployment(app: Application) {
   app.on('check_run.requested_action', async context => {
+    if (context.payload.check_run.name != process.env.GH_CHECK) {
+      return;
+    }
+
     const pr = new PullRequest(
       context.github,
       context.payload.check_run.head_sha,
     );
-
-    await pr.inProgressDeploymentCheck();
-    const travisBuildNumber = await pr.getTravisBuildNumber();
-
-    unzipAndMove(travisBuildNumber)
+    await pr.deploymentInProgress();
+    const travisBuild = await pr.getTravisBuildNumber();
+    unzipAndMove(travisBuild)
       .then(serveUrl => {
-        pr.completeDeploymentCheck(serveUrl);
+        pr.deploymentCompleted(serveUrl);
       })
       .catch(e => {
-        pr.errorDeploymentCheck(e);
+        pr.deploymentErrored(e);
       });
   });
 }
