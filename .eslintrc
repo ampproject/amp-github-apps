@@ -2,7 +2,8 @@
   "root": true,
   "extends": ["eslint:recommended", "google"],
   "plugins": [
-    "jsdoc"
+    "jsdoc",
+    "prettier"
   ],
   "parserOptions": {
     "ecmaVersion": 2018
@@ -44,6 +45,7 @@
     "jsdoc/require-param-name": 2,
     "jsdoc/require-param-type": 2,
     "jsdoc/require-returns-type": 2,
+    "prettier/prettier": 1,
     "require-atomic-updates": 1
   }
 }
