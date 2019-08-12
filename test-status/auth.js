@@ -14,11 +14,14 @@
  */
 'use strict';
 
+const connectSessionKnex = require('connect-session-knex');
 const passport = require('passport');
 const session = require('express-session');
 const {Strategy: GitHubStrategy} = require('passport-github2');
 
-exports.installRootAuthentications = root => {
+const KnexSessionStore = connectSessionKnex(session);
+
+exports.installRootAuthentications = (root, db) => {
   passport.serializeUser((user, done) => {
     done(null, user.username);
   });
@@ -36,9 +39,10 @@ exports.installRootAuthentications = root => {
   }));
 
   root.use(session({
-    // Randomize secret means this will log out all users after the server
-    // restart. This is fine.
-    secret: Math.random().toString(36),
+    secret: process.env.GITHUB_CLIENT_SECRET,
+    store: new KnexSessionStore({
+      knex: db,
+    }),
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -52,11 +56,10 @@ exports.installRootAuthentications = root => {
   root.get('/login', passport.authenticate('github'), () => {});
 
   root.get('/login/callback',
-      passport.authenticate('github', {failureRedirect: '/login'}),
+      passport.authenticate('github'),
       async (request, response) => {
         const {redirectTo} = request.session;
         if (redirectTo !== undefined) {
-          delete request.session.redirectTo;
           response.redirect(redirectTo);
         } else {
           response.end(
@@ -75,6 +78,7 @@ exports.installRootAuthentications = root => {
 exports.installRouteAuthentications = route => {
   route.use((request, response, next) => {
     if (request.isAuthenticated()) {
+      delete request.session.redirectTo;
       return next();
     }
     request.session.redirectTo = request.originalUrl;
