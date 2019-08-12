@@ -40,7 +40,7 @@ exports.installRootAuthentications = root => {
     // restart. This is fine.
     secret: Math.random().toString(36),
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
       secure: process.env.NODE_ENV === 'production',
