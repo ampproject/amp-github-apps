@@ -22,7 +22,6 @@ const {Strategy: GitHubStrategy} = require('passport-github2');
 const KnexSessionStore = connectSessionKnex(session);
 
 exports.installRootAuthentications = (root, db) => {
-
   passport.serializeUser((user, done) => {
     done(null, user.username);
   });
