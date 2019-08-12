@@ -65,7 +65,7 @@ function createSkippedCheckParams(request) {
 
 exports.installWebUiRouter = (app, db) => {
   const root = app.route();
-  installRootAuthentications(root);
+  installRootAuthentications(root, db);
 
   root.use('/static', express.static('./static'));
 
