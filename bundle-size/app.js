@@ -59,7 +59,7 @@ async function isBundleSizeApprover(github, username) {
   for (const teamId of process.env.APPROVER_TEAMS.split(',')) {
     try {
       await github.teams.getMembership({
-        team_id: parseInt(teamId),
+        team_id: parseInt(teamId, 10),
         username,
       });
       return true;
@@ -80,7 +80,8 @@ async function isBundleSizeApprover(github, username) {
 async function getRandomReviewer(github) {
   const reviewerTeamIds = process.env.REVIEWER_TEAMS.split('‚');
   const reviewerTeamId = parseInt(
-    reviewerTeamIds[Math.floor(Math.random() * reviewerTeamIds.length)]
+    reviewerTeamIds[Math.floor(Math.random() * reviewerTeamIds.length)],
+    10
   );
 
   const members = await github.teams
@@ -386,7 +387,7 @@ module.exports = app => {
       (await isBundleSizeApprover(userBasedGithub, approver))
     ) {
       context.log(
-        `Pull request ${pullRequestId} approved by a bundle-size ` + 'keeper'
+        `Pull request ${pullRequestId} approved by a bundle-size keeper`
       );
 
       const check = await getCheckFromDatabase(headSha);

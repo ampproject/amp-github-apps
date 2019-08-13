@@ -48,7 +48,7 @@ class CloudStorage {
     const chunks = [];
     const ipListFile = this.bucket.file(name);
 
-    return await new Promise((resolve, reject) => {
+    return await new Promise((resolve, unusedReject) => {
       ipListFile
         .createReadStream()
         .on('error', err => {

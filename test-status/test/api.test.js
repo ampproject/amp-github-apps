@@ -179,9 +179,7 @@ describe('test-status/api', () => {
         .reply(200);
 
       await request(probot.server)
-        .post(
-          `/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/` + `${failed}`
-        )
+        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
         .expect(200);
 
       expect(await db('checks').select('*')).toMatchObject([
@@ -248,9 +246,7 @@ describe('test-status/api', () => {
         .reply(200);
 
       await request(probot.server)
-        .post(
-          `/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/` + `${failed}`
-        )
+        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
         .expect(200);
 
       expect(await db('checks').select('*')).toMatchObject([

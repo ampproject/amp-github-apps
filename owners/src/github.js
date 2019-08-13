@@ -279,8 +279,9 @@ class PullRequest {
         ).length;
       })
       .map(fileOwner => {
-        const fileOwnerHeader =
-          '## possible reviewers: ' + `${fileOwner.owner.dirOwners.join(', ')}`;
+        const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(
+          ', '
+        )}`;
         const files = fileOwner.files
           .map(file => {
             return ` - ${file.path}\n`;
