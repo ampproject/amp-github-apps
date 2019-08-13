@@ -1,10 +1,11 @@
 {
   "root": true,
-  "extends": ["eslint:recommended", "google"],
-  "plugins": [
-    "jsdoc",
+  "extends": [
+    "eslint:recommended",
+    "google",
     "prettier"
   ],
+  "plugins": ["prettier"],
   "parserOptions": {
     "ecmaVersion": 2018
   },
@@ -13,39 +14,37 @@
     "jest": true,
     "node": true
   },
-  "settings": {
-    "jsdoc": {
-      "tagNamePreference": {
-        "returns": "return",
-        "constant": "const",
-        "class": "constructor"
-      },
-      "additionalTagNames": {
-        "customTags": [
-          "deprecated",
-          "export",
-          "final",
-          "package",
-          "restricted",
-          "suppress",
-          "template",
-          "visibleForTesting"
-        ]
-      },
-      "allowOverrideWithoutParam" : true
-    }
-  },
-  "rules": {
-    "arrow-parens": [2, "as-needed"],
-    "indent": [2, 2, { "SwitchCase": 1, "VariableDeclarator": 2, "MemberExpression": 2, "ObjectExpression": 1, "CallExpression": { "arguments": 2 } }],
-    "jsdoc/check-param-names": 2,
-    "jsdoc/check-tag-names": 2,
-    "jsdoc/check-types": 2,
-    "jsdoc/require-param": 2,
-    "jsdoc/require-param-name": 2,
-    "jsdoc/require-param-type": 2,
-    "jsdoc/require-returns-type": 2,
+"rules": {
+    "no-alert": 1,
+    "no-cond-assign": 1,
+    "no-debugger": 1,
+    "no-div-regex": 1,
+    "no-dupe-keys": 1,
+    "no-eval": 1,
+    "no-extend-native": 1,
+    "no-extra-bind": 1,
+    "no-implicit-coercion": [1, { "boolean": false }],
+    "no-implied-eval": 1,
+    "no-iterator": 1,
+    "no-lone-blocks": 1,
+    "no-native-reassign": 1,
+    "no-redeclare": 1,
+    "no-restricted-globals": [1, "error", "event"],
+    "no-script-url": 1,
+    "no-self-compare": 1,
+    "no-sequences": 1,
+    "no-throw-literal": 1,
+    "no-unused-expressions": 0,
+    "no-unused-vars": [1, { "argsIgnorePattern": "^(var_args$|opt_|unused)" }],
+    "no-useless-call": 1,
+    "no-useless-concat": 1,
+    "no-undef": 1,
+    "no-var": 1,
+    "no-warning-comments": [1, { "terms": ["do not submit"], "location": "anywhere" }],
+    "object-shorthand": [1, "properties", { "avoidQuotes": true }],
+    "prefer-const": 1,
     "prettier/prettier": 1,
+    "radix": 1,
     "require-atomic-updates": 1
   }
 }

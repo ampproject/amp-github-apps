@@ -1,3 +1,4 @@
 */node_modules/*
 bundle-size/*.example.js
 test-status/*.example.js
+project-metrics/metrics_service/third_party/*
