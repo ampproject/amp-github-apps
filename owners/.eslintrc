@@ -4,10 +4,7 @@
     "google",
     "prettier"
   ],
-  "plugins": [
-    "jsdoc",
-    "prettier"
-  ],
+  "plugins": ["prettier"],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 6,
