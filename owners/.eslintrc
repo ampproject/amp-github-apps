@@ -1,4 +1,13 @@
 {
+  "extends": [
+    "eslint:recommended",
+    "google",
+    "prettier"
+  ],
+  "plugins": [
+    "jsdoc",
+    "prettier"
+  ],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 6,
