@@ -56,8 +56,8 @@ describe('test-status/api', () => {
     await db('buildCop').update({username: 'agithuber'});
 
     nock('https://api.github.com')
-        .post('/app/installations/123456/access_tokens')
-        .reply(200, {token: 'test'});
+      .post('/app/installations/123456/access_tokens')
+      .reply(200, {token: 'test'});
   });
 
   afterEach(async () => {
@@ -82,32 +82,34 @@ describe('test-status/api', () => {
     });
 
     const nocks = nock('https://api.github.com')
-        .post('/repos/ampproject/amphtml/check-runs', body => {
-          expect(body).toMatchObject({
-            name: 'ampproject/tests/unit (saucelabs)',
-            head_sha: HEAD_SHA,
-            status,
-            output: {
-              title,
-            },
-          });
-          return true;
-        })
-        .reply(200, {id: 555555});
+      .post('/repos/ampproject/amphtml/check-runs', body => {
+        expect(body).toMatchObject({
+          name: 'ampproject/tests/unit (saucelabs)',
+          head_sha: HEAD_SHA,
+          status,
+          output: {
+            title,
+          },
+        });
+        return true;
+      })
+      .reply(200, {id: 555555});
 
     await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
-        .expect(200);
+      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
+      .expect(200);
 
-    expect(await db('checks').select('*')).toMatchObject([{
-      headSha: HEAD_SHA,
-      type: 'unit',
-      subType: 'saucelabs',
-      checkRunId: 555555,
-      passed: null,
-      failed: null,
-      errored: null,
-    }]);
+    expect(await db('checks').select('*')).toMatchObject([
+      {
+        headSha: HEAD_SHA,
+        type: 'unit',
+        subType: 'saucelabs',
+        checkRunId: 555555,
+        passed: null,
+        failed: null,
+        errored: null,
+      },
+    ]);
 
     await waitUntilNockScopeIsDone(nocks);
   });
@@ -128,62 +130,60 @@ describe('test-status/api', () => {
     });
 
     const nocks = nock('https://api.github.com')
+      .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+        expect(body).toMatchObject({
+          head_sha: HEAD_SHA,
+          status: 'in_progress',
+          output: {
+            title: 'Tests are running on Travis',
+          },
+        });
+        return true;
+      })
+      .reply(200);
+
+    await request(probot.server)
+      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/started`)
+      .expect(200);
+    await waitUntilNockScopeIsDone(nocks);
+  });
+
+  test.each([[0, 0, '0 tests passed'], [1, 0, '1 test passed']])(
+    'Update a successful existing check with /report/%d/%d action',
+    async (passed, failed, title) => {
+      await db('pullRequestSnapshots').insert({
+        headSha: HEAD_SHA,
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pullRequestId: 19621,
+        installationId: 123456,
+      });
+      await db('checks').insert({
+        headSha: HEAD_SHA,
+        type: 'unit',
+        subType: 'saucelabs',
+        checkRunId: 555555,
+      });
+
+      const nocks = nock('https://api.github.com')
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
           expect(body).toMatchObject({
-            head_sha: HEAD_SHA,
-            status: 'in_progress',
+            status: 'completed',
+            conclusion: 'success',
             output: {
-              title: 'Tests are running on Travis',
+              title,
             },
           });
           return true;
         })
         .reply(200);
 
-    await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/started`)
+      await request(probot.server)
+        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
         .expect(200);
-    await waitUntilNockScopeIsDone(nocks);
-  });
 
-  test.each([
-    [0, 0, '0 tests passed'],
-    [1, 0, '1 test passed'],
-  ])('Update a successful existing check with /report/%d/%d action',
-      async (passed, failed, title) => {
-        await db('pullRequestSnapshots').insert({
-          headSha: HEAD_SHA,
-          owner: 'ampproject',
-          repo: 'amphtml',
-          pullRequestId: 19621,
-          installationId: 123456,
-        });
-        await db('checks').insert({
-          headSha: HEAD_SHA,
-          type: 'unit',
-          subType: 'saucelabs',
-          checkRunId: 555555,
-        });
-
-        const nocks = nock('https://api.github.com')
-            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-              expect(body).toMatchObject({
-                status: 'completed',
-                conclusion: 'success',
-                output: {
-                  title,
-                },
-              });
-              return true;
-            })
-            .reply(200);
-
-        await request(probot.server)
-            .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/` +
-                  `${failed}`)
-            .expect(200);
-
-        expect(await db('checks').select('*')).toMatchObject([{
+      expect(await db('checks').select('*')).toMatchObject([
+        {
           headSha: HEAD_SHA,
           type: 'unit',
           subType: 'saucelabs',
@@ -191,54 +191,66 @@ describe('test-status/api', () => {
           passed,
           failed,
           errored: 0,
-        }]);
+        },
+      ]);
 
-        await waitUntilNockScopeIsDone(nocks);
-      });
+      await waitUntilNockScopeIsDone(nocks);
+    }
+  );
 
   test.each([
-    [5, 5, '5 tests failed',
-      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
-    [0, 1, '1 test failed',
-      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`],
-  ])('Update a failed existing check with /report/%d/%d action',
-      async (passed, failed, title, detailsUrl) => {
-        await db('pullRequestSnapshots').insert({
-          headSha: HEAD_SHA,
-          owner: 'ampproject',
-          repo: 'amphtml',
-          pullRequestId: 19621,
-          installationId: 123456,
-        });
-        await db('checks').insert({
-          headSha: HEAD_SHA,
-          type: 'unit',
-          subType: 'saucelabs',
-          checkRunId: 555555,
-        });
+    [
+      5,
+      5,
+      '5 tests failed',
+      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`,
+    ],
+    [
+      0,
+      1,
+      '1 test failed',
+      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`,
+    ],
+  ])(
+    'Update a failed existing check with /report/%d/%d action',
+    async (passed, failed, title, detailsUrl) => {
+      await db('pullRequestSnapshots').insert({
+        headSha: HEAD_SHA,
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pullRequestId: 19621,
+        installationId: 123456,
+      });
+      await db('checks').insert({
+        headSha: HEAD_SHA,
+        type: 'unit',
+        subType: 'saucelabs',
+        checkRunId: 555555,
+      });
 
-        const nocks = nock('https://api.github.com')
-            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-              expect(body).toMatchObject({
-                status: 'completed',
-                conclusion: 'action_required',
-                details_url: detailsUrl,
-                output: {
-                  title,
-                },
-              });
-              expect(body.output.text).toContain(
-                  'Contact the weekly build cop (@agithuber)');
-              return true;
-            })
-            .reply(200);
+      const nocks = nock('https://api.github.com')
+        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+          expect(body).toMatchObject({
+            status: 'completed',
+            conclusion: 'action_required',
+            details_url: detailsUrl,
+            output: {
+              title,
+            },
+          });
+          expect(body.output.text).toContain(
+            'Contact the weekly build cop (@agithuber)'
+          );
+          return true;
+        })
+        .reply(200);
 
-        await request(probot.server)
-            .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/` +
-                  `${failed}`)
-            .expect(200);
+      await request(probot.server)
+        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
+        .expect(200);
 
-        expect(await db('checks').select('*')).toMatchObject([{
+      expect(await db('checks').select('*')).toMatchObject([
+        {
           headSha: HEAD_SHA,
           type: 'unit',
           subType: 'saucelabs',
@@ -246,10 +258,12 @@ describe('test-status/api', () => {
           passed,
           failed,
           errored: 0,
-        }]);
+        },
+      ]);
 
-        await waitUntilNockScopeIsDone(nocks);
-      });
+      await waitUntilNockScopeIsDone(nocks);
+    }
+  );
 
   test('Update an existing check with /report/errored action', async () => {
     await db('pullRequestSnapshots').insert({
@@ -267,125 +281,120 @@ describe('test-status/api', () => {
     });
 
     const nocks = nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            status: 'completed',
-            conclusion: 'action_required',
-            details_url: `http://localhost:3000/tests/${HEAD_SHA}/unit/` +
-              'saucelabs/status',
-            output: {
-              title: 'Tests have errored',
-            },
-          });
-          expect(body.output.text)
-              .toContain('Contact the weekly build cop (@agithuber)');
-          return true;
-        })
-        .reply(200);
+      .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+        expect(body).toMatchObject({
+          status: 'completed',
+          conclusion: 'action_required',
+          details_url:
+            `http://localhost:3000/tests/${HEAD_SHA}/unit/` +
+            'saucelabs/status',
+          output: {
+            title: 'Tests have errored',
+          },
+        });
+        expect(body.output.text).toContain(
+          'Contact the weekly build cop (@agithuber)'
+        );
+        return true;
+      })
+      .reply(200);
 
     await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/errored`)
-        .expect(200);
+      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/errored`)
+      .expect(200);
 
-    expect(await db('checks').select('*')).toMatchObject([{
-      headSha: HEAD_SHA,
-      type: 'unit',
-      subType: 'saucelabs',
-      checkRunId: 555555,
-      passed: null,
-      failed: null,
-      errored: 1,
-    }]);
+    expect(await db('checks').select('*')).toMatchObject([
+      {
+        headSha: HEAD_SHA,
+        type: 'unit',
+        subType: 'saucelabs',
+        checkRunId: 555555,
+        passed: null,
+        failed: null,
+        errored: 1,
+      },
+    ]);
 
     await waitUntilNockScopeIsDone(nocks);
   });
 
-  test.each([
-    'queued',
-    'started',
-    'skipped',
-    'report/5/0',
-    'report/errored',
-  ])('404 for /%s action when pull request was not created', async action => {
-    await request(probot.server)
+  test.each(['queued', 'started', 'skipped', 'report/5/0', 'report/errored'])(
+    '404 for /%s action when pull request was not created',
+    async action => {
+      await request(probot.server)
         .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
         .expect(404, new RegExp(HEAD_SHA));
-  });
+    }
+  );
 
   test('reject non-Travis IP addresses', async () => {
     process.env['TRAVIS_IP_ADDRESSES'] = '999.999.999.999,123.456.789.012';
     await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/queued`)
-        .expect(403, 'You are not Travis!');
+      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/queued`)
+      .expect(403, 'You are not Travis!');
   });
 
   test('update build cop', async () => {
-    expect(await db('buildCop').pluck('username'))
-        .toMatchObject(['agithuber']);
+    expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
 
     await request(probot.server)
-        .post('/v0/build-cop/update')
-        .send({
-          accessToken: '1a2b3c',
-          username: 'anothergithuber',
-        })
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
-        .expect(200);
+      .post('/v0/build-cop/update')
+      .send({
+        accessToken: '1a2b3c',
+        username: 'anothergithuber',
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(200);
 
-    expect(await db('buildCop').pluck('username'))
-        .toMatchObject(['anothergithuber']);
+    expect(await db('buildCop').pluck('username')).toMatchObject([
+      'anothergithuber',
+    ]);
   });
 
   test('reject missing access token for build cop updates', async () => {
-    expect(await db('buildCop').pluck('username'))
-        .toMatchObject(['agithuber']);
+    expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
 
     await request(probot.server)
-        .post('/v0/build-cop/update')
-        .send({
-          username: 'anothergithuber',
-        })
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
-        .expect(403);
+      .post('/v0/build-cop/update')
+      .send({
+        username: 'anothergithuber',
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(403);
 
-    expect(await db('buildCop').pluck('username'))
-        .toMatchObject(['agithuber']);
+    expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
   });
 
   test('reject incorrect access token for build cop updates', async () => {
-    expect(await db('buildCop').pluck('username'))
-        .toMatchObject(['agithuber']);
+    expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
 
     await request(probot.server)
-        .post('/v0/build-cop/update')
-        .send({
-          accessToken: 'THIS ACCESS TOKEN IS INCORRECT',
-          username: 'anothergithuber',
-        })
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
-        .expect(403);
+      .post('/v0/build-cop/update')
+      .send({
+        accessToken: 'THIS ACCESS TOKEN IS INCORRECT',
+        username: 'anothergithuber',
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(403);
 
-    expect(await db('buildCop').pluck('username'))
-        .toMatchObject(['agithuber']);
+    expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
   });
 
   test('reject missing username for build cop updates', async () => {
-    expect(await db('buildCop').pluck('username'))
-        .toMatchObject(['agithuber']);
+    expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
 
     await request(probot.server)
-        .post('/v0/build-cop/update')
-        .send({
-          accessToken: '1a2b3c',
-        })
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
-        .expect(400);
+      .post('/v0/build-cop/update')
+      .send({
+        accessToken: '1a2b3c',
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(400);
 
-    expect(await db('buildCop').pluck('username'))
-        .toMatchObject(['agithuber']);
+    expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
   });
 });

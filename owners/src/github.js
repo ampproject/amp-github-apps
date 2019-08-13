@@ -20,7 +20,6 @@ const {Git} = require('./git');
 const _ = require('lodash');
 const sleep = require('sleep-promise');
 
-
 /**
  * Maps the github json payload to a simpler data structure.
  */
@@ -65,19 +64,21 @@ class PullRequest {
    */
   async processOpened() {
     const prInfo = await this.getMeta();
-    // TODO: Revieweres here is to be assigned to the Pull Request.
-    /* eslint no-unused-vars: 0 */
+    // TODO: Reviewers here is to be assigned to the Pull Request.
+    /* eslint-disable-next-line no-unused-vars */
     let reviewers = Object.values(prInfo.fileOwners).map(fileOwner => {
       return fileOwner.owner.dirOwners;
     });
     reviewers = _.union(...reviewers);
-    /* eslint no-unused-vars: 1 */
     const checkOutputText = this.buildCheckOutput(prInfo);
     const checkRuns = await this.getCheckRun();
     const {hasCheckRun, checkRun} = this.hasCheckRun(checkRuns);
     if (hasCheckRun) {
-      return this.updateCheckRun(checkRun, checkOutputText,
-        prInfo.approvalsMet);
+      return this.updateCheckRun(
+        checkRun,
+        checkOutputText,
+        prInfo.approvalsMet
+      );
     }
     return this.createCheckRun(checkOutputText, prInfo.approvalsMet);
   }
@@ -135,9 +136,11 @@ class PullRequest {
     this.context.log.debug('[getReviews]', res.data);
     // Sort by latest submitted_at date first since users and state
     // are not unique.
-    const reviews = res.data.map(x => new Review(x)).sort((a, b) => {
-      return b.submitted_at - a.submitted_at;
-    });
+    const reviews = res.data
+      .map(x => new Review(x))
+      .sort((a, b) => {
+        return b.submitted_at - a.submitted_at;
+      });
     return reviews;
   }
 
@@ -169,9 +172,11 @@ class PullRequest {
    * @return {!Array<object>}
    */
   getReviewersWhoApproved(reviews) {
-    const reviewersWhoApproved = reviews.filter(x => {
-      return x.state === 'approved';
-    }).map(x => x.username);
+    const reviewersWhoApproved = reviews
+      .filter(x => {
+        return x.state === 'approved';
+      })
+      .map(x => x.username);
     // If you're the author, then you yourself are assumed to approve your own
     // PR.
     reviewersWhoApproved.push(this.author);
@@ -188,19 +193,21 @@ class PullRequest {
     // GitHub might not be ready.
     await sleep(2000);
     const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.checks.create(this.context.repo({
-      name: this.name,
-      head_branch: this.headRef,
-      head_sha: this.headSha,
-      status: 'completed',
-      conclusion: 'neutral',
-      completed_at: new Date(),
-      output: {
-        title: this.name,
-        summary: `The check was a ${conclusion}!`,
-        text,
-      },
-    }));
+    return this.github.checks.create(
+      this.context.repo({
+        name: this.name,
+        head_branch: this.headRef,
+        head_sha: this.headSha,
+        status: 'completed',
+        conclusion: 'neutral',
+        completed_at: new Date(),
+        output: {
+          title: this.name,
+          summary: `The check was a ${conclusion}!`,
+          text,
+        },
+      })
+    );
   }
 
   /**
@@ -212,18 +219,20 @@ class PullRequest {
   async updateCheckRun(checkRun, text, areApprovalsMet) {
     this.context.log.debug('[updateCheckRun]', checkRun);
     const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.checks.update(this.context.repo({
-      check_run_id: checkRun.id,
-      status: 'completed',
-      conclusion: 'neutral',
-      name: this.name,
-      completed_at: new Date(),
-      output: {
-        title: this.name,
-        summary: `The check was a ${conclusion}!`,
-        text,
-      },
-    }));
+    return this.github.checks.update(
+      this.context.repo({
+        check_run_id: checkRun.id,
+        status: 'completed',
+        conclusion: 'neutral',
+        name: this.name,
+        completed_at: new Date(),
+        output: {
+          title: this.name,
+          summary: `The check was a ${conclusion}!`,
+          text,
+        },
+      })
+    );
   }
 
   /**
@@ -263,16 +272,23 @@ class PullRequest {
     const text = Object.values(prInfo.fileOwners)
       .filter(fileOwner => {
         // Omit sections that has a required reviewer who has approved.
-        return !_.intersection(prInfo.reviewersWhoApproved,
-          fileOwner.owner.dirOwners).length;
-      }).map(fileOwner => {
-        const fileOwnerHeader = '## possible reviewers: ' +
-            `${fileOwner.owner.dirOwners.join(', ')}`;
-        const files = fileOwner.files.map(file => {
-          return ` - ${file.path}\n`;
-        }).join('');
+        return !_.intersection(
+          prInfo.reviewersWhoApproved,
+          fileOwner.owner.dirOwners
+        ).length;
+      })
+      .map(fileOwner => {
+        const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(
+          ', '
+        )}`;
+        const files = fileOwner.files
+          .map(file => {
+            return ` - ${file.path}\n`;
+          })
+          .join('');
         return `\n${fileOwnerHeader}\n${files}`;
-      }).join('');
+      })
+      .join('');
     this.context.log.debug('[buildCheckOutput]', text);
     return text;
   }
@@ -282,9 +298,11 @@ class PullRequest {
    * @param {number} number
    */
   static async get(context, number) {
-    return await context.github.pullRequests.get(context.repo({
-      number,
-    }));
+    return await context.github.pullRequests.get(
+      context.repo({
+        number,
+      })
+    );
   }
 }
 

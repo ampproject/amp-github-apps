@@ -36,13 +36,15 @@ const db = dbConnect();
  * @return {string} the text contents of the file.
  */
 async function getBuildArtifactsFile(github, filename) {
-  return await github.repos.getContents({
-    owner: 'ampproject',
-    repo: 'amphtml-build-artifacts',
-    path: path.join('bundle-size', filename),
-  }).then(result => {
-    return Buffer.from(result.data.content, 'base64').toString();
-  });
+  return await github.repos
+    .getContents({
+      owner: 'ampproject',
+      repo: 'amphtml-build-artifacts',
+      path: path.join('bundle-size', filename),
+    })
+    .then(result => {
+      return Buffer.from(result.data.content, 'base64').toString();
+    });
 }
 
 /**
@@ -57,7 +59,7 @@ async function isBundleSizeApprover(github, username) {
   for (const teamId of process.env.APPROVER_TEAMS.split(',')) {
     try {
       await github.teams.getMembership({
-        team_id: parseInt(teamId),
+        team_id: parseInt(teamId, 10),
         username,
       });
       return true;
@@ -77,12 +79,16 @@ async function isBundleSizeApprover(github, username) {
  */
 async function getRandomReviewer(github) {
   const reviewerTeamIds = process.env.REVIEWER_TEAMS.split('‚');
-  const reviewerTeamId = parseInt(reviewerTeamIds[
-      Math.floor(Math.random() * reviewerTeamIds.length)]);
+  const reviewerTeamId = parseInt(
+    reviewerTeamIds[Math.floor(Math.random() * reviewerTeamIds.length)],
+    10
+  );
 
-  const members = await github.teams.listMembers({
-    team_id: reviewerTeamId,
-  }).then(response => response.data);
+  const members = await github.teams
+    .listMembers({
+      team_id: reviewerTeamId,
+    })
+    .then(response => response.data);
   const member = members[Math.floor(Math.random() * members.length)];
   return member.login;
 }
@@ -109,15 +115,19 @@ function formatBundleSizeDelta(delta) {
  */
 function successfulSummaryMessage(delta, deltaFormatted) {
   if (delta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
-    return 'This pull request *reduces* the bundle size ' +
+    return (
+      'This pull request *reduces* the bundle size ' +
       '(gzipped compressed size of `v0.js`), so no special approval is ' +
-      `necessary. The bundle size change is ${deltaFormatted}.`;
+      `necessary. The bundle size change is ${deltaFormatted}.`
+    );
   }
 
-  return 'This pull request does not change the bundle size ' +
+  return (
+    'This pull request does not change the bundle size ' +
     '(gzipped compressed size of `v0.js`) by any significant amount, so no ' +
     'special approval is necessary. ' +
-    `The bundle size change is ${deltaFormatted}.`;
+    `The bundle size change is ${deltaFormatted}.`
+  );
 }
 
 module.exports = app => {
@@ -133,9 +143,16 @@ module.exports = app => {
    */
   async function getCheckFromDatabase(headSha) {
     const results = await db('checks')
-        .select('head_sha', 'pull_request_id', 'installation_id', 'owner',
-            'repo', 'check_run_id', 'delta')
-        .where('head_sha', headSha);
+      .select(
+        'head_sha',
+        'pull_request_id',
+        'installation_id',
+        'owner',
+        'repo',
+        'check_run_id',
+        'delta'
+      )
+      .where('head_sha', headSha);
     if (results.length > 0) {
       return results[0];
     } else {
@@ -158,30 +175,35 @@ module.exports = app => {
       owner: check.owner,
       repo: check.repo,
     };
-    const updatedCheckOptions = Object.assign({
-      check_run_id: check.check_run_id,
-      name: 'ampproject/bundle-size',
-      completed_at: new Date().toISOString(),
-    }, githubOptions);
+    const updatedCheckOptions = Object.assign(
+      {
+        check_run_id: check.check_run_id,
+        name: 'ampproject/bundle-size',
+        completed_at: new Date().toISOString(),
+      },
+      githubOptions
+    );
 
     try {
       const baseBundleSize = parseFloat(
-          await getBuildArtifactsFile(github, baseSha));
+        await getBuildArtifactsFile(github, baseSha)
+      );
       const bundleSizeDelta = bundleSize - baseBundleSize;
       const bundleSizeDeltaFormatted = formatBundleSizeDelta(bundleSizeDelta);
 
       await db('checks')
-          .update({delta: bundleSizeDelta})
-          .where({head_sha: check.head_sha});
+        .update({delta: bundleSizeDelta})
+        .where({head_sha: check.head_sha});
 
       const requiresApproval =
-          bundleSizeDelta > process.env['MAX_ALLOWED_INCREASE'];
+        bundleSizeDelta > process.env['MAX_ALLOWED_INCREASE'];
       if (requiresApproval) {
         Object.assign(updatedCheckOptions, {
           conclusion: 'action_required',
           output: {
             title: `${bundleSizeDeltaFormatted} | approval required`,
-            summary: 'This pull request has increased the bundle size ' +
+            summary:
+              'This pull request has increased the bundle size ' +
               '(gzipped compressed size of `v0.js`) by ' +
               `${bundleSizeDeltaFormatted}. As part of an ongoing effort to ` +
               'reduce the bundle size, this change requires special approval.' +
@@ -195,8 +217,10 @@ module.exports = app => {
         });
       } else {
         const title = `${bundleSizeDeltaFormatted} | no approval necessary`;
-        const summary =
-            successfulSummaryMessage(bundleSizeDelta, bundleSizeDeltaFormatted);
+        const summary = successfulSummaryMessage(
+          bundleSizeDelta,
+          bundleSizeDeltaFormatted
+        );
         Object.assign(updatedCheckOptions, {
           conclusion: 'success',
           output: {title, summary},
@@ -205,25 +229,31 @@ module.exports = app => {
       await github.checks.update(updatedCheckOptions);
 
       if (requiresApproval) {
-        await addBundleSizeReviewer(github,
-            Object.assign({pull_number: check.pull_request_id}, githubOptions));
+        await addBundleSizeReviewer(
+          github,
+          Object.assign({pull_number: check.pull_request_id}, githubOptions)
+        );
       }
 
       return true;
     } catch (error) {
       const partialHeadSha = check.head_sha.substr(0, 7);
       const partialBaseSha = baseSha.substr(0, 7);
-      app.log('ERROR: Failed to retrieve the bundle size of ' +
-              `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
-              `point ${partialBaseSha} from GitHub: ${error}`);
+      app.log(
+        'ERROR: Failed to retrieve the bundle size of ' +
+          `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
+          `point ${partialBaseSha} from GitHub: ${error}`
+      );
       if (lastAttempt) {
         app.log('No more retries left. Reporting failure');
         Object.assign(updatedCheckOptions, {
           conclusion: 'action_required',
           output: {
-            title: 'Failed to retrieve the bundle size of branch point ' +
-                partialBaseSha,
-            summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
+            title:
+              'Failed to retrieve the bundle size of branch point ' +
+              partialBaseSha,
+            summary:
+              'The bundle size (gzipped compressed size of `v0.js`) ' +
               'of this pull request could not be determined because the base ' +
               'size (that is, the bundle size of the `master` commit that ' +
               'this pull request was compared against) was not found in the ' +
@@ -238,8 +268,10 @@ module.exports = app => {
           },
         });
         await github.checks.update(updatedCheckOptions);
-        await addBundleSizeReviewer(github,
-            Object.assign({pull_number: check.pull_request_id}, githubOptions));
+        await addBundleSizeReviewer(
+          github,
+          Object.assign({pull_number: check.pull_request_id}, githubOptions)
+        );
       }
       return false;
     }
@@ -254,18 +286,20 @@ module.exports = app => {
    * @param {!object} pullRequest GitHub Pull Request object.
    */
   async function addBundleSizeReviewer(github, pullRequest) {
-    const requestedReviewersResponse =
-        await github.pullRequests.listReviewRequests(pullRequest);
-    const reviewsResponse =
-        await github.pullRequests.listReviews(pullRequest);
+    const requestedReviewersResponse = await github.pullRequests.listReviewRequests(
+      pullRequest
+    );
+    const reviewsResponse = await github.pullRequests.listReviews(pullRequest);
     const reviewers = new Set([
       ...requestedReviewersResponse.data.users.map(user => user.login),
       ...reviewsResponse.data.map(review => review.user.login),
     ]);
     for (const reviewer of reviewers) {
       if (await isBundleSizeApprover(userBasedGithub, reviewer)) {
-        app.log(`INFO: Pull request ${pullRequest.pull_number} already has ` +
-                'a bundle-size capable reviewer. Skipping...');
+        app.log(
+          `INFO: Pull request ${pullRequest.pull_number} already has ` +
+            'a bundle-size capable reviewer. Skipping...'
+        );
         return;
       }
     }
@@ -274,12 +308,19 @@ module.exports = app => {
       // Choose a random capable username and add them as a reviewer to the pull
       // request.
       const newReviewer = await getRandomReviewer(userBasedGithub);
-      return await github.pullRequests.createReviewRequest(Object.assign({
-        reviewers: [newReviewer],
-      }, pullRequest));
+      return await github.pullRequests.createReviewRequest(
+        Object.assign(
+          {
+            reviewers: [newReviewer],
+          },
+          pullRequest
+        )
+      );
     } catch (error) {
-      app.log('ERROR: Failed to add a reviewer to pull request ' +
-              `${pullRequest.pull_number}. Skipping...`);
+      app.log(
+        'ERROR: Failed to add a reviewer to pull request ' +
+          `${pullRequest.pull_number}. Skipping...`
+      );
       app.log(`Error message: ${error}`);
       throw error;
     }
@@ -294,7 +335,8 @@ module.exports = app => {
       head_sha: headSha,
       output: {
         title: 'Calculating new bundle size for this PR…',
-        summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
+        summary:
+          'The bundle size (gzipped compressed size of `v0.js`) ' +
           'of this pull request is being calculated on Travis. Look for the ' +
           'shard that contains "Bundle Size" in its title.',
       },
@@ -304,24 +346,26 @@ module.exports = app => {
     const checkRunId = check.data.id;
     await db.transaction(trx => {
       return trx('checks')
-          .first('head_sha')
-          .where('head_sha', headSha)
-          .then(existingRow => {
-            if (existingRow === undefined) {
-              return trx('checks').insert({
-                head_sha: headSha,
-                pull_request_id: context.payload.number,
-                installation_id: context.payload.installation.id,
-                owner: params.owner,
-                repo: params.repo,
-                check_run_id: checkRunId,
-              });
-            } else {
-              return trx('checks')
-                  .update({check_run_id: checkRunId})
-                  .where({head_sha: headSha});
-            }
-          }).then(trx.commit).catch(trx.rollback);
+        .first('head_sha')
+        .where('head_sha', headSha)
+        .then(existingRow => {
+          if (existingRow === undefined) {
+            return trx('checks').insert({
+              head_sha: headSha,
+              pull_request_id: context.payload.number,
+              installation_id: context.payload.installation.id,
+              owner: params.owner,
+              repo: params.repo,
+              check_run_id: checkRunId,
+            });
+          } else {
+            return trx('checks')
+              .update({check_run_id: checkRunId})
+              .where({head_sha: headSha});
+          }
+        })
+        .then(trx.commit)
+        .catch(trx.rollback);
     });
   });
 
@@ -338,15 +382,20 @@ module.exports = app => {
     const pullRequestId = context.payload.pull_request.number;
     const headSha = context.payload.pull_request.head.sha;
 
-    if (context.payload.review.state == 'approved' &&
-        await isBundleSizeApprover(userBasedGithub, approver)) {
-      context.log(`Pull request ${pullRequestId} approved by a bundle-size ` +
-          'keeper');
+    if (
+      context.payload.review.state == 'approved' &&
+      (await isBundleSizeApprover(userBasedGithub, approver))
+    ) {
+      context.log(
+        `Pull request ${pullRequestId} approved by a bundle-size keeper`
+      );
 
       const check = await getCheckFromDatabase(headSha);
       if (!check) {
-        context.log(`Check ID for pull request ${pullRequestId} with head ` +
-            `SHA ${headSha} was not found in the database`);
+        context.log(
+          `Check ID for pull request ${pullRequestId} with head ` +
+            `SHA ${headSha} was not found in the database`
+        );
         return;
       }
 
@@ -369,7 +418,8 @@ module.exports = app => {
         completed_at: new Date().toISOString(),
         output: {
           title: `${approvalMessagePrefix} | approved by @${approver}`,
-          summary: 'The bundle size (gzipped compressed size of `v0.js`) ' +
+          summary:
+            'The bundle size (gzipped compressed size of `v0.js`) ' +
             `of this pull request was approved by ${approver}`,
         },
       });
@@ -379,32 +429,38 @@ module.exports = app => {
   app.on('check_run.created', async context => {
     const mergeCommitSha = context.payload.check_run.head_sha;
 
-    const numDeleted = await db('merges').del()
-        .where({merge_commit_sha: mergeCommitSha});
+    const numDeleted = await db('merges')
+      .del()
+      .where({merge_commit_sha: mergeCommitSha});
     if (numDeleted > 0) {
-      await context.github.checks.update(context.repo({
-        check_run_id: context.payload.check_run.id,
-        conclusion: 'neutral',
-        completed_at: new Date().toISOString(),
-        output: {
-          title: 'Check skipped because this is a merged commit',
-          summary: 'The bundle-size of merged commits does not affect the ' +
-            'status of this commit. However, since this is a required check ' +
-            'on GitHub, a check is still created and must be resolved. You ' +
-            'may safely ignore this bundle-size check.\n' +
-            'To see the bundle-size at this commit, see ' +
-            'https://github.com/ampproject/amphtml-build-artifacts/blob/' +
-            `master/bundle-size/${mergeCommitSha}`,
-        },
-      }));
+      await context.github.checks.update(
+        context.repo({
+          check_run_id: context.payload.check_run.id,
+          conclusion: 'neutral',
+          completed_at: new Date().toISOString(),
+          output: {
+            title: 'Check skipped because this is a merged commit',
+            summary:
+              'The bundle-size of merged commits does not affect the ' +
+              'status of this commit. However, since this is a required check ' +
+              'on GitHub, a check is still created and must be resolved. You ' +
+              'may safely ignore this bundle-size check.\n' +
+              'To see the bundle-size at this commit, see ' +
+              'https://github.com/ampproject/amphtml-build-artifacts/blob/' +
+              `master/bundle-size/${mergeCommitSha}`,
+          },
+        })
+      );
     }
   });
 
   const v0 = app.route('/v0');
   v0.use((request, response, next) => {
     request.app.set('trust proxy', true);
-    if ('TRAVIS_IP_ADDRESSES' in process.env &&
-        !process.env['TRAVIS_IP_ADDRESSES'].includes(request.ip)) {
+    if (
+      'TRAVIS_IP_ADDRESSES' in process.env &&
+      !process.env['TRAVIS_IP_ADDRESSES'].includes(request.ip)
+    ) {
       app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
       response.status(403).end('You are not Travis!');
     } else {
@@ -430,7 +486,8 @@ module.exports = app => {
       completed_at: new Date().toISOString(),
       output: {
         title: 'check skipped because PR contains no runtime changes',
-        summary: 'An automated check has determined that the bundle size ' +
+        summary:
+          'An automated check has determined that the bundle size ' +
           '(gzipped compressed size of `v0.js`) could not be affected by ' +
           'the files that this pull request modifies, so this check was ' +
           'marked as skipped.',
@@ -440,16 +497,22 @@ module.exports = app => {
   });
 
   v0.post('/commit/:headSha/report', async (request, response) => {
-    if (!('baseSha' in request.body) ||
-        typeof request.body.baseSha != 'string' ||
-        !/^[0-9a-f]{40}$/.test(request.body.baseSha)) {
-      return response.status(400).end(
-          'POST request to /report must have commit SHA field "baseSha"');
+    if (
+      !('baseSha' in request.body) ||
+      typeof request.body.baseSha != 'string' ||
+      !/^[0-9a-f]{40}$/.test(request.body.baseSha)
+    ) {
+      return response
+        .status(400)
+        .end('POST request to /report must have commit SHA field "baseSha"');
     }
-    if (!('bundleSize' in request.body) ||
-        typeof request.body.bundleSize != 'number') {
-      return response.status(400).end(
-          'POST request to /report must have numeric field "bundleSize"');
+    if (
+      !('bundleSize' in request.body) ||
+      typeof request.body.bundleSize != 'number'
+    ) {
+      return response
+        .status(400)
+        .end('POST request to /report must have numeric field "bundleSize"');
     }
     const {headSha} = request.params;
     const {baseSha, bundleSize} = request.body;
@@ -470,7 +533,11 @@ module.exports = app => {
         await sleep(RETRY_MILLIS);
         retriesLeft--;
         reportSuccess = await tryReport(
-            check, baseSha, bundleSize, /* lastAttempt */ retriesLeft == 0);
+          check,
+          baseSha,
+          bundleSize,
+          /* lastAttempt */ retriesLeft == 0
+        );
       } while (retriesLeft > 0 && !reportSuccess);
     }
   });

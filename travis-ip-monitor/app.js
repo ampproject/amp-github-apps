@@ -31,9 +31,9 @@ const express = require('express');
 const app = express();
 
 const ipList = getTravisIpList(
-    process.env.PROJECT_ID,
-    process.env.GOOGLE_APPLICATION_CREDENTIALS,
-    process.env.CLOUD_STORAGE_BUCKET,
+  process.env.PROJECT_ID,
+  process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  process.env.CLOUD_STORAGE_BUCKET
 );
 
 app.get('/_cron/refresh_travis_ip_list', async (req, res) => {

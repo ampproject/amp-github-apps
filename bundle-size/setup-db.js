@@ -24,17 +24,19 @@ const log = require('fancy-log');
  * @return {Promise<knex>} database handler.
  */
 function setupDb(db) {
-  return db.schema.createTable('checks', table => {
-    table.string('head_sha', 40).primary();
-    table.string('owner');
-    table.string('repo');
-    table.integer('pull_request_id');
-    table.integer('installation_id');
-    table.integer('check_run_id');
-    table.decimal('delta', 6, 2);
-  }).createTable('merges', table => {
-    table.string('merge_commit_sha', 40).primary();
-  });
+  return db.schema
+    .createTable('checks', table => {
+      table.string('head_sha', 40).primary();
+      table.string('owner');
+      table.string('repo');
+      table.integer('pull_request_id');
+      table.integer('installation_id');
+      table.integer('check_run_id');
+      table.decimal('delta', 6, 2);
+    })
+    .createTable('merges', table => {
+      table.string('merge_commit_sha', 40).primary();
+    });
 }
 
 module.exports = {setupDb};
@@ -47,11 +49,14 @@ module.exports = {setupDb};
  */
 if (require.main === module) {
   const db = dbConnect();
-  setupDb(db).then(() => {
-    log.info('Database tables created.');
-  }).catch(error => {
-    log.error(error.message);
-  }).then(() => {
-    db.destroy();
-  });
+  setupDb(db)
+    .then(() => {
+      log.info('Database tables created.');
+    })
+    .catch(error => {
+      log.error(error.message);
+    })
+    .then(() => {
+      db.destroy();
+    });
 }

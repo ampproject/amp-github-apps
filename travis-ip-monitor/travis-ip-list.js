@@ -18,7 +18,6 @@ const {CloudStorage} = require('./cloud-storage.js');
 const {Storage} = require('@google-cloud/storage');
 const TRAVIS_IP_FILENAME = 'travis_ips.json';
 
-
 /**
  * Interface for fetching and updating the Travis IP list.
  */
@@ -66,6 +65,5 @@ function getTravisIpList(projectId, keyFilename, bucketName) {
   const bucket = storage.bucket(bucketName);
   return new TravisIpList(bucket);
 }
-
 
 module.exports = {TravisIpList, getTravisIpList};

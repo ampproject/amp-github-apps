@@ -17,23 +17,27 @@
 const session = require('express-session');
 
 exports.installRootAuthentications = root => {
-  root.use(session({
-    secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    },
-  }));
+  root.use(
+    session({
+      secret: 'keyboard cat',
+      resave: false,
+      saveUninitialized: true,
+      cookie: {
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+      },
+    })
+  );
 };
 
 exports.installRouteAuthentications = route => {
   route.use((request, response, next) => {
     if (request.headers.authorization) {
       const user = Buffer.from(
-          request.headers.authorization.substring(6), 'base64')
-          .toString()
-          .slice(0, -1);
+        request.headers.authorization.substring(6),
+        'base64'
+      )
+        .toString()
+        .slice(0, -1);
       request.session.passport = {user};
       return next();
     }
