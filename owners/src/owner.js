@@ -65,8 +65,11 @@ class Owner {
     git.pullLatestForRepo(process.env.GITHUB_REPO_DIR, 'origin', 'master');
     const promises = Promise.all([
       pr.listFiles(),
-      git.getOwnersFilesForBranch(pr.author, process.env.GITHUB_REPO_DIR,
-        'master'),
+      git.getOwnersFilesForBranch(
+        pr.author,
+        process.env.GITHUB_REPO_DIR,
+        'master'
+      ),
     ]);
     const res = await promises;
     const [files, ownersMap] = res;

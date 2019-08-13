@@ -57,7 +57,8 @@ module.exports = app => {
     const payload = context.payload;
     const pr = await PullRequest.get(
       context,
-      payload.check_run.check_suite.pull_requests[0].number);
+      payload.check_run.check_suite.pull_requests[0].number
+    );
 
     return await processPullRequest(context, pr.data);
   }

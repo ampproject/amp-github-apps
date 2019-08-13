@@ -49,16 +49,17 @@ class CloudStorage {
     const ipListFile = this.bucket.file(name);
 
     return await new Promise((resolve, reject) => {
-      ipListFile.createReadStream()
-          .on('error', err => {
-            console.error(err);
-          })
-          .on('data', chunk => {
-            chunks.push(chunk);
-          })
-          .on('end', () => {
-            resolve(Buffer.concat(chunks).toString());
-          });
+      ipListFile
+        .createReadStream()
+        .on('error', err => {
+          console.error(err);
+        })
+        .on('data', chunk => {
+          chunks.push(chunk);
+        })
+        .on('end', () => {
+          resolve(Buffer.concat(chunks).toString());
+        });
     });
   }
 }

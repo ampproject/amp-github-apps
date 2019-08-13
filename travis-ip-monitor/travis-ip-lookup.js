@@ -23,16 +23,19 @@ const request = require('request');
  */
 async function fetchTravisIps() {
   return await new Promise((resolve, reject) => {
-    request('https://dnsjson.com/nat.travisci.net/A.json', {json: true},
-        (err, res, body) => {
-          if (err) {
-            reject(err);
-          }
-          if (!body.success) {
-            reject(body.message);
-          }
-          resolve(body.results.records);
-        });
+    request(
+      'https://dnsjson.com/nat.travisci.net/A.json',
+      {json: true},
+      (err, res, body) => {
+        if (err) {
+          reject(err);
+        }
+        if (!body.success) {
+          reject(body.message);
+        }
+        resolve(body.results.records);
+      }
+    );
   });
 }
 

@@ -24,40 +24,49 @@ const log = require('fancy-log');
  * @return {Promise<knex>} database handler.
  */
 function setupDb(db) {
-  return db.schema.createTable('pullRequestSnapshots', table => {
-    table.comment('Snapshots of pull requests referenced by their head SHA');
+  return db.schema
+    .createTable('pullRequestSnapshots', table => {
+      table.comment('Snapshots of pull requests referenced by their head SHA');
 
-    table.string('headSha', 40).primary();
-    table.string('owner');
-    table.string('repo');
-    table.integer('pullRequestId');
-    table.integer('installationId')
+      table.string('headSha', 40).primary();
+      table.string('owner');
+      table.string('repo');
+      table.integer('pullRequestId');
+      table
+        .integer('installationId')
         .comment('Required to create checks (status lines) on GitHub');
-  }).createTable('checks', table => {
-    table.comment('Checks (status lines) created on GitHub, referenced by ID');
+    })
+    .createTable('checks', table => {
+      table.comment(
+        'Checks (status lines) created on GitHub, referenced by ID'
+      );
 
-    table.string('headSha', 40);
-    table.string('type', 255);
-    table.string('subType', 255);
-    table.integer('checkRunId');
-    table.integer('passed');
-    table.integer('failed');
-    table.boolean('errored');
+      table.string('headSha', 40);
+      table.string('type', 255);
+      table.string('subType', 255);
+      table.integer('checkRunId');
+      table.integer('passed');
+      table.integer('failed');
+      table.boolean('errored');
 
-    table.primary(['headSha', 'type', 'subType']);
-    table.foreign('headSha')
+      table.primary(['headSha', 'type', 'subType']);
+      table
+        .foreign('headSha')
         .references('pullRequestSnapshots.headSha')
         .onDelete('CASCADE');
-  }).createTable('buildCop', table => {
-    table.comment(
-        'Singleton table to store the GitHub username of active build cop');
+    })
+    .createTable('buildCop', table => {
+      table.comment(
+        'Singleton table to store the GitHub username of active build cop'
+      );
 
-    table.string('username', 255);
-  }).then(() => {
-    return db('buildCop').insert({
-      username: 'UNINITIALIZED',
+      table.string('username', 255);
+    })
+    .then(() => {
+      return db('buildCop').insert({
+        username: 'UNINITIALIZED',
+      });
     });
-  });
 }
 
 module.exports = {setupDb};
@@ -70,11 +79,14 @@ module.exports = {setupDb};
  */
 if (require.main === module) {
   const db = dbConnect();
-  setupDb(db).then(() => {
-    log.info('Database tables created.');
-  }).catch(error => {
-    log.error(error.message);
-  }).then(() => {
-    db.destroy();
-  });
+  setupDb(db)
+    .then(() => {
+      log.info('Database tables created.');
+    })
+    .catch(error => {
+      log.error(error.message);
+    })
+    .then(() => {
+      db.destroy();
+    });
 }

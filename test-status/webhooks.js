@@ -21,17 +21,20 @@ exports.installGitHubWebhooks = (app, db) => {
 
     const headSha = context.payload.pull_request.head.sha;
     try {
-      await db('pullRequestSnapshots').insert(context.repo({
-        headSha,
-        pullRequestId,
-        installationId: context.payload.installation.id,
-      }));
+      await db('pullRequestSnapshots').insert(
+        context.repo({
+          headSha,
+          pullRequestId,
+          installationId: context.payload.installation.id,
+        })
+      );
     } catch (error) {
       // Usually this is the result of duplicate webhook calls, and thus is a
       // non-fatal failure.
       context.log(
-          `ERROR: failed to add snapshot of pull request ${pullRequestId} ` +
-          `with head SHA ${headSha} to database: ${error}`);
+        `ERROR: failed to add snapshot of pull request ${pullRequestId} ` +
+          `with head SHA ${headSha} to database: ${error}`
+      );
     }
   });
 };

@@ -77,9 +77,10 @@ class Git {
   async getOwnersFilesForBranch(author, dirPath, targetBranch) {
     // NOTE: for some reason `git ls-tree --full-tree -r HEAD **/OWNERS*
     // doesn't work from here.
-    const cmd = `cd ${dirPath} && git checkout ${targetBranch} ` +
-        '&& git ls-tree --full-tree -r HEAD | ' +
-        'cut -f2 | grep OWNERS.yaml$';
+    const cmd =
+      `cd ${dirPath} && git checkout ${targetBranch} ` +
+      '&& git ls-tree --full-tree -r HEAD | ' +
+      'cut -f2 | grep OWNERS.yaml$';
     const {stdout, stderr} = await exec(cmd);
     if (stderr) {
       // TODO: Usually stderr here might occur when branch is already master.
@@ -89,7 +90,7 @@ class Git {
     // Construct the owners map.
     const ownersPaths = stdoutToArray(stdout)
       // Remove unneeded string. We only want the file paths.
-      .filter(x => !(matcher.test(x)));
+      .filter(x => !matcher.test(x));
     // TODO: author does not seem be used here. Re-evaluate.
     return this.ownersParser(yamlReader, dirPath, ownersPaths, author);
   }
@@ -103,8 +104,9 @@ class Git {
    * @return {!ChildProcess}
    */
   pullLatestForRepo(dirPath, remote, branch) {
-    const cmd = `cd ${dirPath} && git fetch ${remote} ${branch} && ` +
-        `git checkout -B ${branch} ${remote}/${branch}`;
+    const cmd =
+      `cd ${dirPath} && git fetch ${remote} ${branch} && ` +
+      `git checkout -B ${branch} ${remote}/${branch}`;
     return exec(cmd);
   }
 }

@@ -59,8 +59,8 @@ describe('test-status/webhooks', () => {
 
   beforeEach(async () => {
     nock('https://api.github.com')
-        .post('/app/installations/123456/access_tokens')
-        .reply(200, {token: 'test'});
+      .post('/app/installations/123456/access_tokens')
+      .reply(200, {token: 'test'});
   });
 
   afterEach(async () => {

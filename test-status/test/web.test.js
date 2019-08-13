@@ -55,8 +55,8 @@ describe('test-status/web', () => {
     await db('buildCop').update({username: 'buildcop'});
 
     nock('https://api.github.com')
-        .post('/app/installations/123456/access_tokens')
-        .reply(200, {token: 'test'});
+      .post('/app/installations/123456/access_tokens')
+      .reply(200, {token: 'test'});
   });
 
   afterEach(async () => {
@@ -73,58 +73,59 @@ describe('test-status/web', () => {
     [10, 0, /No test failures reported for unit tests \(saucelabs\)!/],
     [0, 10, /Skip these tests\?/],
     [10, 10, /Skip these tests\?/],
-  ])('Request status page of a check with passed/failed = %d/%d',
-      async (passed, failed, bodyMatches) => {
-        await db('pullRequestSnapshots').insert({
-          headSha: HEAD_SHA,
-          owner: 'ampproject',
-          repo: 'amphtml',
-          pullRequestId: 19621,
-          installationId: 123456,
-        });
-        await db('checks').insert({
-          headSha: HEAD_SHA,
-          type: 'unit',
-          subType: 'saucelabs',
-          checkRunId: 555555,
-          passed,
-          failed,
-          errored: false,
-        });
-
-        await request(probot.server)
-            .get(`/tests/${HEAD_SHA}/unit/saucelabs/status`)
-            .auth('buildcop')
-            .expect(200, bodyMatches);
+  ])(
+    'Request status page of a check with passed/failed = %d/%d',
+    async (passed, failed, bodyMatches) => {
+      await db('pullRequestSnapshots').insert({
+        headSha: HEAD_SHA,
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pullRequestId: 19621,
+        installationId: 123456,
+      });
+      await db('checks').insert({
+        headSha: HEAD_SHA,
+        type: 'unit',
+        subType: 'saucelabs',
+        checkRunId: 555555,
+        passed,
+        failed,
+        errored: false,
       });
 
-  test.each([
-    'buildcop',
-    'infrauser',
-    'anotherinfrauser',
-  ])('Request status page of a check that errored as %s', async username => {
-    await db('pullRequestSnapshots').insert({
-      headSha: HEAD_SHA,
-      owner: 'ampproject',
-      repo: 'amphtml',
-      pullRequestId: 19621,
-      installationId: 123456,
-    });
-    await db('checks').insert({
-      headSha: HEAD_SHA,
-      type: 'unit',
-      subType: 'saucelabs',
-      checkRunId: 555555,
-      passed: null,
-      failed: null,
-      errored: true,
-    });
+      await request(probot.server)
+        .get(`/tests/${HEAD_SHA}/unit/saucelabs/status`)
+        .auth('buildcop')
+        .expect(200, bodyMatches);
+    }
+  );
 
-    await request(probot.server)
+  test.each(['buildcop', 'infrauser', 'anotherinfrauser'])(
+    'Request status page of a check that errored as %s',
+    async username => {
+      await db('pullRequestSnapshots').insert({
+        headSha: HEAD_SHA,
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pullRequestId: 19621,
+        installationId: 123456,
+      });
+      await db('checks').insert({
+        headSha: HEAD_SHA,
+        type: 'unit',
+        subType: 'saucelabs',
+        checkRunId: 555555,
+        passed: null,
+        failed: null,
+        errored: true,
+      });
+
+      await request(probot.server)
         .get(`/tests/${HEAD_SHA}/unit/saucelabs/status`)
         .auth(username)
         .expect(200, /Errored!/);
-  });
+    }
+  );
 
   test('Request skip page for a check with failures', async () => {
     await db('pullRequestSnapshots').insert({
@@ -145,16 +146,26 @@ describe('test-status/web', () => {
     });
 
     await request(probot.server)
-        .get(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
-        .auth('buildcop')
-        .expect(200, /Really skip!/);
+      .get(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
+      .auth('buildcop')
+      .expect(200, /Really skip!/);
   });
 
   test.each([
-    ['10 failed tests', 10, 10, false,
-      'The unit tests (saucelabs) have previously failed on Travis.'],
-    ['tests have errored', null, null, true,
-      'The unit tests (saucelabs) have previously errored on Travis.'],
+    [
+      '10 failed tests',
+      10,
+      10,
+      false,
+      'The unit tests (saucelabs) have previously failed on Travis.',
+    ],
+    [
+      'tests have errored',
+      null,
+      null,
+      true,
+      'The unit tests (saucelabs) have previously errored on Travis.',
+    ],
   ])('Post skip form on %s', async (_, passed, failed, errored, summary) => {
     await db('pullRequestSnapshots').insert({
       headSha: HEAD_SHA,
@@ -174,30 +185,32 @@ describe('test-status/web', () => {
     });
 
     nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'success',
-            output: {
-              title: 'Skipped by @buildcop',
-              summary,
-              text:
-                expect.stringContaining('The reason given was: *flaky tests*'),
-            },
-          });
-          return true;
-        })
-        .reply(200);
+      .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+        expect(body).toMatchObject({
+          conclusion: 'success',
+          output: {
+            title: 'Skipped by @buildcop',
+            summary,
+            text: expect.stringContaining(
+              'The reason given was: *flaky tests*'
+            ),
+          },
+        });
+        return true;
+      })
+      .reply(200);
 
     await request(probot.server)
-        .post(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
-        .type('form')
-        .send({reason: 'flaky tests'})
-        .auth('buildcop')
-        .expect(response => {
-          expect(response.status).toBe(302);
-          expect(response.get('location'))
-              .toBe('https://github.com/ampproject/amphtml/pull/19621');
-        });
+      .post(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
+      .type('form')
+      .send({reason: 'flaky tests'})
+      .auth('buildcop')
+      .expect(response => {
+        expect(response.status).toBe(302);
+        expect(response.get('location')).toBe(
+          'https://github.com/ampproject/amphtml/pull/19621'
+        );
+      });
   });
 
   test('Post skip form with missing reason', async () => {
@@ -219,9 +232,9 @@ describe('test-status/web', () => {
     });
 
     await request(probot.server)
-        .post(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
-        .auth('buildcop')
-        .expect(200, /Reason must not be empty/);
+      .post(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
+      .auth('buildcop')
+      .expect(200, /Reason must not be empty/);
   });
 
   test('Request skip page of a check that has no failures', async () => {
@@ -243,82 +256,81 @@ describe('test-status/web', () => {
     });
 
     await request(probot.server)
-        .get(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
-        .auth('buildcop')
-        .expect(400, /unit tests \(saucelabs\) for 26ddec3 have no failures/);
+      .get(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
+      .auth('buildcop')
+      .expect(400, /unit tests \(saucelabs\) for 26ddec3 have no failures/);
 
     await request(probot.server)
-        .post(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
-        .auth('buildcop')
-        .expect(400, /unit tests \(saucelabs\) for 26ddec3 have no failures/);
+      .post(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
+      .auth('buildcop')
+      .expect(400, /unit tests \(saucelabs\) for 26ddec3 have no failures/);
   });
 
-  test.each([
-    'status',
-    'skip',
-  ])('Request %s page of a check that was created, but no results reported yet',
-      async action => {
-        await db('pullRequestSnapshots').insert({
-          headSha: HEAD_SHA,
-          owner: 'ampproject',
-          repo: 'amphtml',
-          pullRequestId: 19621,
-          installationId: 123456,
-        });
-        await db('checks').insert({
-          headSha: HEAD_SHA,
-          type: 'unit',
-          subType: 'saucelabs',
-          checkRunId: 555555,
-          passed: null,
-          failed: null,
-          errored: null,
-        });
-
-        await request(probot.server)
-            .get(`/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
-            .auth('buildcop')
-            .expect(404, /have not yet been reported/);
+  test.each(['status', 'skip'])(
+    'Request %s page of a check that was created, but no results reported yet',
+    async action => {
+      await db('pullRequestSnapshots').insert({
+        headSha: HEAD_SHA,
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pullRequestId: 19621,
+        installationId: 123456,
+      });
+      await db('checks').insert({
+        headSha: HEAD_SHA,
+        type: 'unit',
+        subType: 'saucelabs',
+        checkRunId: 555555,
+        passed: null,
+        failed: null,
+        errored: null,
       });
 
-  test.each([
-    'status',
-    'skip',
-  ])('Request %s page of a head SHA that does not exist', async action => {
-    await request(probot.server)
+      await request(probot.server)
         .get(`/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
         .auth('buildcop')
         .expect(404, /have not yet been reported/);
-  });
+    }
+  );
 
-  test.each([
-    'status',
-    'skip',
-  ])('Request %s page when not logged in', async action => {
-    await request(probot.server)
+  test.each(['status', 'skip'])(
+    'Request %s page of a head SHA that does not exist',
+    async action => {
+      await request(probot.server)
+        .get(`/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
+        .auth('buildcop')
+        .expect(404, /have not yet been reported/);
+    }
+  );
+
+  test.each(['status', 'skip'])(
+    'Request %s page when not logged in',
+    async action => {
+      await request(probot.server)
         .get(`/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
         .expect(response => {
           expect(response.status).toBe(302);
           expect(response.get('location')).toBe('/login');
         });
-  });
+    }
+  );
 
-  test.each([
-    'status',
-    'skip',
-  ])('Request %s page when logged in, but not as buildcop', async action => {
-    await request(probot.server)
+  test.each(['status', 'skip'])(
+    'Request %s page when logged in, but not as buildcop',
+    async action => {
+      await request(probot.server)
         .get(`/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
         .auth('notbuildcop')
         .expect(403, /You are logged in as <em>notbuildcop<\/em>/);
-  });
+    }
+  );
 
   test('Post to skip page when not logged in', async () => {
     await request(probot.server)
-        .post(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
-        .expect(response => {
-          expect(response.status).toBe(302);
-          expect(response.get('location')).toBe('/login');
-        });
+      .post(`/tests/${HEAD_SHA}/unit/saucelabs/skip`)
+      .expect(response => {
+        expect(response.status).toBe(302);
+        expect(response.get('location')).toBe('/login');
+      });
   });
 });

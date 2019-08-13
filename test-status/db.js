@@ -23,9 +23,8 @@
  */
 exports.getPullRequestSnapshot = async (db, headSha) => {
   return await db('pullRequestSnapshots')
-      .first(
-          ['headSha', 'owner', 'repo', 'pullRequestId', 'installationId'])
-      .where({headSha});
+    .first(['headSha', 'owner', 'repo', 'pullRequestId', 'installationId'])
+    .where({headSha});
 };
 
 /**
@@ -39,12 +38,12 @@ exports.getPullRequestSnapshot = async (db, headSha) => {
  */
 exports.getCheckRunId = async (db, headSha, type, subType) => {
   const existingCheck = await db('checks')
-      .first('checkRunId')
-      .where({
-        headSha,
-        type,
-        subType,
-      });
+    .first('checkRunId')
+    .where({
+      headSha,
+      type,
+      subType,
+    });
   if (existingCheck === undefined) {
     return null;
   } else {
@@ -63,17 +62,29 @@ exports.getCheckRunId = async (db, headSha, type, subType) => {
  */
 exports.getCheckRunResults = async (db, headSha, type, subType) => {
   const existingCheck = await db('checks')
-      .join('pullRequestSnapshots',
-          'checks.headSha', 'pullRequestSnapshots.headSha')
-      .first([
-        'checks.headSha', 'type', 'subType', 'checkRunId', 'passed', 'failed',
-        'errored', 'owner', 'repo', 'pullRequestId', 'installationId',
-      ])
-      .where({
-        'checks.headSha': headSha,
-        type,
-        'checks.subType': subType,
-      });
+    .join(
+      'pullRequestSnapshots',
+      'checks.headSha',
+      'pullRequestSnapshots.headSha'
+    )
+    .first([
+      'checks.headSha',
+      'type',
+      'subType',
+      'checkRunId',
+      'passed',
+      'failed',
+      'errored',
+      'owner',
+      'repo',
+      'pullRequestId',
+      'installationId',
+    ])
+    .where({
+      'checks.headSha': headSha,
+      type,
+      'checks.subType': subType,
+    });
   if (existingCheck === undefined) {
     return null;
   } else {
@@ -92,6 +103,6 @@ exports.getCheckRunResults = async (db, headSha, type, subType) => {
  */
 exports.getBuildCop = async db => {
   return await db('buildCop')
-      .first('username')
-      .then(row => row['username']);
+    .first('username')
+    .then(row => row['username']);
 };

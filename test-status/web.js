@@ -40,10 +40,12 @@ function createSkippedCheckParams(request) {
   let text = '';
   const summaryVerb = errored ? 'errored' : 'failed';
   if (!errored) {
-    text = `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n` +
+    text =
+      `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n` +
       `* *${failed}* test${failed != 1 ? 's' : ''} FAILED\n\n`;
   }
-  text += `The ${summaryVerb} ${type} tests (${subType}) were skipped by ` +
+  text +=
+    `The ${summaryVerb} ${type} tests (${subType}) were skipped by ` +
     `@${user}.\n` +
     `The reason given was: *${reason}*`;
 
@@ -55,13 +57,13 @@ function createSkippedCheckParams(request) {
     conclusion: 'success',
     output: {
       title: `Skipped by @${user}`,
-      summary: `The ${type} tests (${subType}) have previously ` +
+      summary:
+        `The ${type} tests (${subType}) have previously ` +
         `${summaryVerb} on Travis.`,
       text,
     },
   };
 }
-
 
 exports.installWebUiRouter = (app, db) => {
   const root = app.route();
@@ -95,69 +97,99 @@ exports.installWebUiRouter = (app, db) => {
     response.status(403).render('403', {user, buildCop});
   });
 
-  tests.all('/:headSha/:type/:subType/:action(status|skip)',
-      async (request, response, next) => {
-        const {headSha, type, subType} = request.params;
-        request.shortHeadSha = headSha.substr(0, 7);
-        const check = await getCheckRunResults(db, headSha, type, subType);
-        if (check === null ||
-            (!check.errored &&
-              (check.passed === null || check.failed === null))) {
-          return response.status(404).render('404', {
-            headSha: request.shortHeadSha,
-            type,
-            subType,
-          });
-        }
-        request.check = check;
-        next();
-      });
+  tests.all(
+    '/:headSha/:type/:subType/:action(status|skip)',
+    async (request, response, next) => {
+      const {headSha, type, subType} = request.params;
+      request.shortHeadSha = headSha.substr(0, 7);
+      const check = await getCheckRunResults(db, headSha, type, subType);
+      if (
+        check === null ||
+        (!check.errored && (check.passed === null || check.failed === null))
+      ) {
+        return response.status(404).render('404', {
+          headSha: request.shortHeadSha,
+          type,
+          subType,
+        });
+      }
+      request.check = check;
+      next();
+    }
+  );
 
   tests.get('/:headSha/:type/:subType/status', async (request, response) => {
-    response.render('status', Object.assign({
-      shortHeadSha: request.shortHeadSha,
-      isSkipping: false,
-    }, request.check));
+    response.render(
+      'status',
+      Object.assign(
+        {
+          shortHeadSha: request.shortHeadSha,
+          isSkipping: false,
+        },
+        request.check
+      )
+    );
   });
 
-  tests.all('/:headSha/:type/:subType/skip',
-      async (request, response, next) => {
-        if (request.check.failed == 0) {
-          return response.status(400).render('400', {
-            message:
-                `${request.params.type} tests (${request.params.subType}) ` +
-                `for ${request.shortHeadSha} have no failures`,
-          });
-        }
-        next();
-      });
+  tests.all(
+    '/:headSha/:type/:subType/skip',
+    async (request, response, next) => {
+      if (request.check.failed == 0) {
+        return response.status(400).render('400', {
+          message:
+            `${request.params.type} tests (${request.params.subType}) ` +
+            `for ${request.shortHeadSha} have no failures`,
+        });
+      }
+      next();
+    }
+  );
 
   tests.get('/:headSha/:type/:subType/skip', async (request, response) => {
-    response.render('status', Object.assign({
-      shortHeadSha: request.shortHeadSha,
-      isSkipping: true,
-    }, request.check));
+    response.render(
+      'status',
+      Object.assign(
+        {
+          shortHeadSha: request.shortHeadSha,
+          isSkipping: true,
+        },
+        request.check
+      )
+    );
   });
 
-  tests.post('/:headSha/:type/:subType/skip', [
-    body('reason').isLength({min: 1}).withMessage('Reason must not be empty.'),
-  ], async (request, response) => {
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-      response.render('status', Object.assign({
-        shortHeadSha: request.shortHeadSha,
-        isSkipping: true,
-        errors: errors.mapped(),
-      }, request.check));
-      return;
-    }
+  tests.post(
+    '/:headSha/:type/:subType/skip',
+    [
+      body('reason')
+        .isLength({min: 1})
+        .withMessage('Reason must not be empty.'),
+    ],
+    async (request, response) => {
+      const errors = validationResult(request);
+      if (!errors.isEmpty()) {
+        response.render(
+          'status',
+          Object.assign(
+            {
+              shortHeadSha: request.shortHeadSha,
+              isSkipping: true,
+              errors: errors.mapped(),
+            },
+            request.check
+          )
+        );
+        return;
+      }
 
-    const params = createSkippedCheckParams(request);
-    const github = await app.auth(request.check.installationId);
-    await github.checks.update(params);
+      const params = createSkippedCheckParams(request);
+      const github = await app.auth(request.check.installationId);
+      await github.checks.update(params);
 
-    response.redirect(
+      response.redirect(
         `https://github.com/${request.check.owner}/${request.check.repo}` +
-        `/pull/${request.check.pullRequestId}`);
-  });
+          `/pull/${request.check.pullRequestId}`
+      );
+    }
+  );
 };
