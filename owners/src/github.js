@@ -65,12 +65,12 @@ class PullRequest {
   async processOpened() {
     const prInfo = await this.getMeta();
     // TODO: Revieweres here is to be assigned to the Pull Request.
-    /* eslint no-unused-vars: 0 */
+    /* eslint-disable no-unused-vars */
     let reviewers = Object.values(prInfo.fileOwners).map(fileOwner => {
       return fileOwner.owner.dirOwners;
     });
     reviewers = _.union(...reviewers);
-    /* eslint no-unused-vars: 1 */
+    /* eslint-enable no-unused-vars */
     const checkOutputText = this.buildCheckOutput(prInfo);
     const checkRuns = await this.getCheckRun();
     const {hasCheckRun, checkRun} = this.hasCheckRun(checkRuns);
