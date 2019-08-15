@@ -15,6 +15,7 @@
  */
 
 const path = require('path');
+const {LocalRepository} = require('./local_repo');
 
 /**
  * @file Contains classes and functions in relation to "OWNER" files
@@ -62,18 +63,15 @@ class Owner {
    */
   static async getOwners(git, pr) {
     // Update the local target repository of the latest from master
-    git.pullLatestForRepo(process.env.GITHUB_REPO_DIR, 'origin', 'master');
-    const promises = Promise.all([
+    const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
+    await git.pullLatestForRepo(localRepo);
+
+    const [files, ownersMap] = await Promise.all([
       pr.listFiles(),
-      git.getOwnersFilesForBranch(
-        pr.author,
-        process.env.GITHUB_REPO_DIR,
-        'master'
-      ),
+      git.getOwnersFilesForBranch(localRepo),
     ]);
-    const res = await promises;
-    const [files, ownersMap] = res;
     const owners = findOwners(files, ownersMap);
+    
     pr.context.log.debug('[getOwners]', owners);
     return owners;
   }

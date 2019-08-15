@@ -18,10 +18,11 @@ const {Owner, createOwnersMap} = require('./owner');
 const yaml = require('yamljs');
 const path = require('path');
 const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+const child_process = require('child_process');
+const exec = util.promisify(child_process.exec);
 const fs = require('fs').promises;
 
-const matcher = /your branch is up-to-date|your branch is up to date/i;
+const BRANCH_UP_TO_DATE_REGEX = /your branch is up-?to-?date/i;
 
 /**
  * @param {string} str
@@ -46,77 +47,47 @@ class Git {
    * Reads the actual OWNER file on the file system and parses it using the
    * passed in `formatReader` and returns an `OwnersMap`.
    *
-   * @param {function(string):object} formatReader
-   * @param {string} pathToRepoDir
-   * @param {!Array<string>} ownersPaths
+   * @param {!function(string):object} formatReader config file format parser.
+   * @param {!LocalRepository} localRepo local repository to read from.
+   * @param {!string[]} ownersPaths list of relative paths to OWNERS files
+   * @return {object} map of directory paths to their owners
    */
-  async ownersParser(formatReader, pathToRepoDir, ownersPaths) {
-    const promises = ownersPaths.map(ownerPath => {
-      const fullPath = path.resolve(pathToRepoDir, ownerPath);
-      return fs.readFile(fullPath).then(file => {
-        const config = formatReader(file.toString());
-        if (!config) {
-          const str = `No config found for ${fullPath}`;
-          this.context.log.error(str);
-          // This handles OWNERS.yaml files that are empty.
-          return null;
-        }
-        return new Owner(config, pathToRepoDir, ownerPath);
-      });
+  async ownersParser(formatReader, localRepo, ownersPaths) {
+    const ownersList = await ownersPaths.map(async (ownerPath) => {
+      const fileContents = await localRepo.readFile(ownerPath);
+      const config = formatReader(fileContents);
+
+      if (!config) {
+        const str = `No config found for ${fullPath}`;
+        this.context.log.error(str);
+        // This handles OWNERS.yaml files that are empty.
+        return null;
+      }
+
+      return new Owner(config, localRepo.rootDir, ownerPath);
     });
-    return Promise.all(promises).then(createOwnersMap);
+
+    return createOwnersMap(ownersList);
   }
 
   /**
    * Retrieves all the OWNERS paths inside a repository.
-   * @param {string} author
-   * @param {string} dirPath
-   * @param {string} targetBranch
+   * @param {!LocalRepository} localRepo local repository to read from.
    * @return {!Promise<!OwnersMap>}
    */
-  async getOwnersFilesForBranch(author, dirPath, targetBranch) {
-    // NOTE: for some reason `git ls-tree --full-tree -r HEAD **/OWNERS*
-    // doesn't work from here.
-    const cmd =
-      `cd ${dirPath} && git checkout ${targetBranch} ` +
-      '&& git ls-tree --full-tree -r HEAD | ' +
-      'cut -f2 | grep OWNERS.yaml$';
-    const {stdout, stderr} = await exec(cmd);
-    if (stderr) {
-      // TODO: Usually stderr here might occur when branch is already master.
-      this.context.log.warn(['getOwnersFilesForBranch'], stderr);
-    }
-    this.context.log.debug('[getOwnersFilesForBranch]', stdout);
-    // Construct the owners map.
-    const ownersPaths = stdoutToArray(stdout)
-      // Remove unneeded string. We only want the file paths.
-      .filter(x => !matcher.test(x));
-    // TODO: author does not seem be used here. Re-evaluate.
-    return this.ownersParser(yamlReader, dirPath, ownersPaths, author);
+  async getOwnersFilesForBranch(localRepo) {
+    const ownersPaths = await localRepo.findOwnersFiles();
+    return this.ownersParser(yamlReader, localRepo.rootDir, ownersPaths);
   }
 
   /**
    * cd's into an assumed git directory on the file system and does a hard
    * reset to the remote branch.
-   * @param {string} dirPath
-   * @param {string} remote
-   * @param {string} branch
-   * @return {!ChildProcess}
+   * @param {!LocalRepository} localRepo local repository to checkout into.
    */
-  pullLatestForRepo(dirPath, remote, branch) {
-    const cmd =
-      `cd ${dirPath} && git fetch ${remote} ${branch} && ` +
-      `git checkout -B ${branch} ${remote}/${branch}`;
-    return exec(cmd);
+  pullLatestForRepo(localRepo) {
+    localRepo.checkout();
   }
-}
-
-/**
- * @param {string} res
- * @return {!Array<string>}
- */
-function stdoutToArray(res) {
-  return res.split('\n').filter(x => !!x);
 }
 
 module.exports = {Git};
