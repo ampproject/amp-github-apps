@@ -20,6 +20,7 @@ const child_process = require('child_process');
 const util = require('util');
 const exec = util.promisify(child_process.exec);
 
+
 /**
  * Execute raw shell commands.
  *
@@ -120,5 +121,6 @@ class LocalRepository {
     return ownersFiles.trim().split('\n');
   }
 }
+
 
 module.exports = {LocalRepository};

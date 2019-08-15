@@ -84,9 +84,7 @@ describe('owners parser', () => {
     parser = new OwnersParser(repo);
   });
 
-  afterEach(() => {
-    sandbox.restore()
-  });
+  afterEach(() => {sandbox.restore()});
 
   describe('parseOwnersFile', () => {
     it('reads the file from the local repository', () => {
@@ -111,6 +109,23 @@ describe('owners parser', () => {
       sandbox.stub(repo, 'readFile').returns('- user1\n# comment\n\n- user2\n');
       const rule = await parser.parseOwnersFile('');
       expect(rule.owners).toEqual(['user1', 'user2']);
+    });
+  });
+
+  describe('parseAllOwners', () => {
+    it('reads all owners files in the repo', async () => {
+      sandbox.stub(repo, 'findOwnersFiles').returns([
+        'OWNERS.yaml', 'foo/OWNERS.yaml'
+      ]);
+      const readFileStub = sandbox.stub(repo, 'readFile')
+      readFileStub.onCall(0).returns('- user1\n- user2\n');
+      readFileStub.onCall(1).returns('- user3\n- user4\n');
+      const rules = await parser.parseAllOwners();
+
+      expect(rules[0].dirPath).toEqual('.');
+      expect(rules[1].dirPath).toEqual('foo');
+      expect(rules[0].owners).toEqual(['user1', 'user2']);
+      expect(rules[1].owners).toEqual(['user3', 'user4']);
     });
   });
 });
