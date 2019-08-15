@@ -112,7 +112,7 @@ class OwnersParser {
    *
    * @return {OwnersRule[]} a list of all rules defined in the local repo.
    */
-  async parseAllOwners() {
+  async parseAllOwnersRules() {
     const ownersPaths = await this.localRepo.findOwnersFiles();
     return await Promise.all(ownersPaths.map(
         ownersPath => this.parseOwnersFile(ownersPath)));

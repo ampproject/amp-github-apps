@@ -38,7 +38,7 @@ class Git {
    */
   async getOwnersFilesForBranch(localRepo) {
     const parser = new OwnersParser(localRepo);
-    const ownersRules = await parser.parseAllOwners();
+    const ownersRules = await parser.parseAllOwnersRules();
     const ownersList = ownersRules.map(
         rule => Owner(rule.owners, localRepo.rootDir, rule.filePath))
 

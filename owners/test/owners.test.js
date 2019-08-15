@@ -112,7 +112,7 @@ describe('owners parser', () => {
     });
   });
 
-  describe('parseAllOwners', () => {
+  describe('parseAllOwnersRules', () => {
     it('reads all owners files in the repo', async () => {
       sandbox.stub(repo, 'findOwnersFiles').returns([
         'OWNERS.yaml', 'foo/OWNERS.yaml'
@@ -120,7 +120,7 @@ describe('owners parser', () => {
       const readFileStub = sandbox.stub(repo, 'readFile')
       readFileStub.onCall(0).returns('- user1\n- user2\n');
       readFileStub.onCall(1).returns('- user3\n- user4\n');
-      const rules = await parser.parseAllOwners();
+      const rules = await parser.parseAllOwnersRules();
 
       expect(rules[0].dirPath).toEqual('.');
       expect(rules[1].dirPath).toEqual('foo');
