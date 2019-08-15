@@ -37,14 +37,14 @@ export async function unzipAndMove(id: number): Promise<string> {
       .on('entry', entry => {
         const serveFileName = entry.path;
         const serveFile = serveBucket.file(`${buildFileName}/${serveFileName}`);
+        const contentType =
+          mime.lookup(serveFileName) || 'application/octet-stream';
         entry.pipe(
-          serveFile.createWriteStream(
-            {metadata: {contentType: mime.lookup(serveFileName)}})
+          serveFile.createWriteStream({metadata: {contentType}})
             .on('error', reject));
       })
       .on('close', async() => {
-        //TODO(estherkim): return uploaded URL (point to examples?)
-        return resolve(`https://storage.googleapis.com/${process.env.SERVE_BUCKET}/${buildFileName}/view.html`);
+        return resolve(`https://console.cloud.google.com/storage/browser/${process.env.SERVE_BUCKET}/${buildFileName}`);
       });
   });
 };
