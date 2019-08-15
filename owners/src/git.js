@@ -16,21 +16,7 @@
 
 const {Owner, createOwnersMap} = require('./owner');
 const yaml = require('yamljs');
-const path = require('path');
-const util = require('util');
-const child_process = require('child_process');
-const exec = util.promisify(child_process.exec);
-const fs = require('fs').promises;
 
-const BRANCH_UP_TO_DATE_REGEX = /your branch is up-?to-?date/i;
-
-/**
- * @param {string} str
- * @return {object}
- */
-function yamlReader(str) {
-  return yaml.parse(str);
-}
 
 /**
  * Git Interface.
@@ -44,18 +30,14 @@ class Git {
   }
 
   /**
-   * Reads the actual OWNER file on the file system and parses it using the
-   * passed in `formatReader` and returns an `OwnersMap`.
+   * Parses an OWNER file.
    *
-   * @param {!function(string):object} formatReader config file format parser.
-   * @param {!LocalRepository} localRepo local repository to read from.
-   * @param {!string[]} ownersPaths list of relative paths to OWNERS files
-   * @return {object} map of directory paths to their owners
+   * @param ownersPath relative repo path for an OWNERS file.
+   * @return {Owner} the OWNERS file.
    */
-  async ownersParser(formatReader, localRepo, ownersPaths) {
-    const ownersList = await ownersPaths.map(async (ownerPath) => {
+  async parseOwnerFile(localRepo, ownersPath) {
       const fileContents = await localRepo.readFile(ownerPath);
-      const config = formatReader(fileContents);
+      const config = yaml.parse(fileContents);
 
       if (!config) {
         const str = `No config found for ${fullPath}`;
@@ -65,8 +47,21 @@ class Git {
       }
 
       return new Owner(config, localRepo.rootDir, ownerPath);
-    });
+  }
 
+  /**
+   * Reads the actual OWNER file on the file system and parses it using the
+   * passed in `formatReader` and returns an `OwnersMap`.
+   *
+   * @param {!function(string):object} formatReader config file format parser.
+   * @param {!LocalRepository} localRepo local repository to read from.
+   * @param {!string[]} ownersPaths list of relative paths to OWNERS files
+   * @return {object} map of directory paths to their owners
+   */
+  async ownersParser(formatReader, localRepo, ownersPaths) {
+    const ownersList = await ownersPaths.map(ownersPath => {
+      return this.parseOwnerFile(localRepo, ownersPath);
+    });
     return createOwnersMap(ownersList);
   }
 
