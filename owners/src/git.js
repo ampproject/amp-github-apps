@@ -31,37 +31,24 @@ class Git {
   }
 
   /**
-   * Reads the actual OWNER file on the file system and parses it using the
-   * passed in `formatReader` and returns an `OwnersMap`.
+   * Retrieves all the OWNERS rules inside the local repository.
    *
-   * @param {!function(string):object} formatReader config file format parser.
    * @param {!LocalRepository} localRepo local repository to read from.
-   * @param {!string[]} ownersPaths list of relative paths to OWNERS files
-   * @return {object} map of directory paths to their owners
+   * @return {Map<string, Owner>} a map from directories to their owners.
    */
-  async parseOwners(formatReader, localRepo, ownersPaths) {
+  async getOwnersFilesForBranch(localRepo) {
     const parser = new OwnersParser(localRepo);
-    const ownersList = await ownersPaths.map(ownersPath => {
-      const ownersRule = await parser.parseOwnersFile(ownersPath);
-      return new Owner(ownersRule.owners, localRepo.rootDir, ownersPath);
-    });
+    const ownersRules = await parser.parseAllOwners();
+    const ownersList = ownersRules.map(
+        rule => Owner(rule.owners, localRepo.rootDir, rule.filePath))
+
     return createOwnersMap(ownersList);
   }
 
   /**
-   * Retrieves all the OWNERS paths inside a repository.
-   * @param {!LocalRepository} localRepo local repository to read from.
-   * @return {!Promise<!OwnersMap>}
-   */
-  async getOwnersFilesForBranch(localRepo) {
-    const ownersPaths = await localRepo.findOwnersFiles();
-    return this.parseOwners(yamlReader, localRepo.rootDir, ownersPaths);
-  }
-
-  /**
-   * cd's into an assumed git directory on the file system and does a hard
-   * reset to the remote branch.
-   * @param {!LocalRepository} localRepo local repository to checkout into.
+   * Checks out the repository.
+   *
+   * @param {!LocalRepository} localRepo local repository to checkout.
    */
   pullLatestForRepo(localRepo) {
     localRepo.checkout();

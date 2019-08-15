@@ -34,6 +34,15 @@ class OwnersRule {
   }
 
   /**
+   * Gets the full (relative) OWNERS.yaml file path.
+   *
+   * @return {string} relative file path.
+   */
+  get filePath() {
+    return path.join(`${this.dirPath}`, 'OWNERS.yaml');
+  }
+
+  /**
    * Determines the directory tree depth of the OWNERS file.
    *
    * Used to determine precedence. The root OWNERS file has a depth of 0.
