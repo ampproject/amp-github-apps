@@ -16,7 +16,6 @@
 
 const {RepoFile} = require('./repo-file');
 const {Owner} = require('./owner');
-const {Git} = require('./git');
 const _ = require('lodash');
 const sleep = require('sleep-promise');
 
