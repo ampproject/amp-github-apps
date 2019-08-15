@@ -15,6 +15,7 @@
  */
 
 const {Owner, createOwnersMap} = require('./owner');
+const {OwnersParser} = require('./owners');
 const yaml = require('yamljs');
 
 
@@ -23,30 +24,10 @@ const yaml = require('yamljs');
  */
 class Git {
   /**
-   * @param {object} context
+   * @param {!object} context Probot request context (for logging).
    */
   constructor(context) {
     this.context = context;
-  }
-
-  /**
-   * Parses an OWNER file.
-   *
-   * @param ownersPath relative repo path for an OWNERS file.
-   * @return {Owner} the OWNERS file.
-   */
-  async parseOwnerFile(localRepo, ownersPath) {
-      const fileContents = await localRepo.readFile(ownerPath);
-      const config = yaml.parse(fileContents);
-
-      if (!config) {
-        const str = `No config found for ${fullPath}`;
-        this.context.log.error(str);
-        // This handles OWNERS.yaml files that are empty.
-        return null;
-      }
-
-      return new Owner(config, localRepo.rootDir, ownerPath);
   }
 
   /**
@@ -58,9 +39,11 @@ class Git {
    * @param {!string[]} ownersPaths list of relative paths to OWNERS files
    * @return {object} map of directory paths to their owners
    */
-  async ownersParser(formatReader, localRepo, ownersPaths) {
+  async parseOwners(formatReader, localRepo, ownersPaths) {
+    const parser = new OwnersParser(localRepo);
     const ownersList = await ownersPaths.map(ownersPath => {
-      return this.parseOwnerFile(localRepo, ownersPath);
+      const ownersRule = await parser.parseOwnersFile(ownersPath);
+      return new Owner(ownersRule.owners, localRepo.rootDir, ownersPath);
     });
     return createOwnersMap(ownersList);
   }
@@ -72,7 +55,7 @@ class Git {
    */
   async getOwnersFilesForBranch(localRepo) {
     const ownersPaths = await localRepo.findOwnersFiles();
-    return this.ownersParser(yamlReader, localRepo.rootDir, ownersPaths);
+    return this.parseOwners(yamlReader, localRepo.rootDir, ownersPaths);
   }
 
   /**
