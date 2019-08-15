@@ -71,7 +71,7 @@ export class PullRequest {
    * Set check to 'completed' and remove the 'Deploy Me' action once
    * deployment is finished. Display the serve url in the check's output.
    */
-  async deploymentCompleted(serveUrl: string, travisBuild: number) {
+  async deploymentCompleted(serveUrl: string) {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
@@ -84,7 +84,7 @@ export class PullRequest {
       details_url: serveUrl,
       output: {
         title: 'Success! A test site was created.',
-        summary: `You can find it under amp_dist_${travisBuild}: ${serveUrl}`,
+        summary: `You can find it here: ${serveUrl}`,
         text: serveUrl,
       },
     };

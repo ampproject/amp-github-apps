@@ -44,7 +44,7 @@ export async function unzipAndMove(id: number): Promise<string> {
             .on('error', reject));
       })
       .on('close', async() => {
-        return resolve('https://console.cloud.google.com/storage/browser/amp-test-website-1');
+        return resolve(`https://console.cloud.google.com/storage/browser/amp-test-website-1/${buildFileName}`);
       });
   });
 };
