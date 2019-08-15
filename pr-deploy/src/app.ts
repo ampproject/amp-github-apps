@@ -82,9 +82,9 @@ function initializeDeployment(app: Application) {
     );
     await pr.deploymentInProgress();
     const travisBuild = await pr.getTravisBuildNumber();
-    unzipAndMove(travisBuild)
+    await unzipAndMove(travisBuild)
       .then(serveUrl => {
-        pr.deploymentCompleted(serveUrl);
+        pr.deploymentCompleted(serveUrl, travisBuild);
       })
       .catch(e => {
         pr.deploymentErrored(e);
