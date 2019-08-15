@@ -16,27 +16,103 @@
 
 const {LocalRepository} = require('../src/local_repo');
 const sinon = require('sinon');
-const {OwnersParser, OwnersRule} = require('../src/owners');
+const {OwnersParser, OwnersRule, OwnersTree} = require('../src/owners');
 
-describe('owners rules', () => {
+describe('owners tree', () => {
+  let tree;
+  const rootDirRule = new OwnersRule('OWNERS.yaml', ['root']);
+  const childDirRule = new OwnersRule('foo/OWNERS.yaml', ['child']);
+  const otherChildDirRule = new OwnersRule('biz/OWNERS.yaml', ['child']);
+  const ancestorDirRule =
+      new OwnersRule('foo/bar/baz/OWNERS.yaml', ['ancestor']);
+
+  beforeEach(() => {
+    tree = new OwnersTree();
+  });
+
+  describe('addRule', () => {
+    it('adds rules to the tree structure', () => {
+      tree.addRule(rootDirRule);
+      expect(tree.rules).toContain(rootDirRule);
+    });
+
+    it('adds rules to subdirectories', () => {
+      tree.addRule(childDirRule);
+      tree.addRule(otherChildDirRule);
+      expect(tree.children.foo.rules).toContain(childDirRule);
+      expect(tree.children.biz.rules).toContain(otherChildDirRule);
+    });
+
+    it('adds rules to nested subdirectories', () => {
+      tree.addRule(ancestorDirRule);
+      expect(tree.children.foo.children.bar.children.baz.rules)
+          .toContain(ancestorDirRule);
+    });
+  });
+
   describe('depth', () => {
-    it('should return 0 for files at the root', () => {
-      const rule = new OwnersRule('OWNERS.yaml', []);
-      expect(rule.depth).toEqual(0);
+    it('should return 0 for the root', () => {
+      expect(tree.depth).toEqual(0);
     });
 
 
     it('should return tree depth for files not at the root', () => {
-      const ruleOne = new OwnersRule('src/OWNERS.yaml', []);
-      const ruleTwo = new OwnersRule('foo/bar/OWNERS.yaml', []);
-      const ruleFive = new OwnersRule('foo/bar/baz/biz/buzz/OWNERS.yaml', []);
+      tree.addRule(childDirRule);
+      tree.addRule(otherChildDirRule);
+      tree.addRule(ancestorDirRule);
 
-      expect(ruleOne.depth).toEqual(1);
-      expect(ruleTwo.depth).toEqual(2);
-      expect(ruleFive.depth).toEqual(5);
+      expect(tree.children.foo.depth).toEqual(1);
+      expect(tree.children.biz.depth).toEqual(1);
+      expect(tree.children.foo.children.bar.children.baz.depth).toEqual(3);
     });
   });
 
+  describe('rulesForFile', () => {
+    it('should include rules for the directory', () => {
+      tree.addRule(childDirRule);
+      tree.addRule(otherChildDirRule);
+      expect(tree.rulesForFile('foo/bar.txt')).toContain(childDirRule);
+      expect(tree.rulesForFile('biz/bar.txt')).toContain(otherChildDirRule);
+    });
+
+    it('should include rules for the parent directories', () => {
+      tree.addRule(rootDirRule);
+      expect(tree.rulesForFile('foo/bar.txt')).toContain(rootDirRule);
+    });
+
+    it('should include rules in descending order of depth', () => {
+      tree.addRule(rootDirRule);
+      tree.addRule(childDirRule);
+      tree.addRule(ancestorDirRule);
+      expect(tree.rulesForFile('foo/bar/baz/buzz.txt')).toEqual([
+        ancestorDirRule, childDirRule, rootDirRule
+      ]);
+    });
+  });
+
+  describe('toString', () => {
+    it('should draw the tree', () => {
+      tree.addRule(rootDirRule);
+      tree.addRule(childDirRule);
+      tree.addRule(otherChildDirRule);
+      tree.addRule(ancestorDirRule);
+
+      expect(tree.toString()).toEqual([
+        'ROOT',
+        '- root',
+        '└---foo',
+        '- child',
+        '    └---bar',
+        '        └---baz',
+        '        - ancestor',
+        '└---biz',
+        '- child',
+      ].join('\n'))
+    });
+  });
+});
+
+describe('owners rules', () => {
   describe('matchesFile', () => {
     expect.extend({
       toMatchFile(receivedOwnersPath, filePath) {

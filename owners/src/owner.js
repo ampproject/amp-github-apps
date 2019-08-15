@@ -16,7 +16,6 @@
 
 const path = require('path');
 const {LocalRepository} = require('./local_repo');
-const {Owner, createOwnersMap} = require('./owner');
 
 /**
  * @file Contains classes and functions in relation to "OWNER" files
