@@ -33,7 +33,6 @@ class PullRequest {
 
     this.nameMatcher = new RegExp('owners bot|owners-check', 'i');
 
-    this.git = new Git(context);
     this.context = context;
     this.github = context.github;
 
@@ -87,7 +86,7 @@ class PullRequest {
    * Retrieve the metadata we need to evaluate a Pull Request.
    */
   async getMeta() {
-    const fileOwners = await Owner.getOwners(this.git, this);
+    const fileOwners = await Owner.getOwners(this);
     const reviews = await this.getUniqueReviews();
     this.context.log.debug('[getMeta]', reviews);
     const approvalsMet = this.areAllApprovalsMet(fileOwners, reviews);

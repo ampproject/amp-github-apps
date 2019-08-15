@@ -16,6 +16,7 @@
 
 const path = require('path');
 const {LocalRepository} = require('./local_repo');
+const {Owner, createOwnersMap} = require('./owner');
 
 /**
  * @file Contains classes and functions in relation to "OWNER" files
@@ -57,21 +58,34 @@ class Owner {
   }
 
   /**
-   * @param {!Git} git
+   * Parse all OWNERS files into Owner objects.
+   *
+   * @param {LocalRepository} localRepo local repository to read from.
+   * @return {!Owner[]} list of owners.
+   */
+  static async parseOwnersMap(localRepo) {
+    const parser = new OwnersParser(localRepo);
+    const ownersRules = await parser.parseAllOwnersRules();
+    const ownersList = ownersRules.map(
+        rule => Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath));
+    return createOwnersMap(ownersList);
+  }
+
+  /**
    * @param {!PullRequest} pr
    * @return {object}
    */
-  static async getOwners(git, pr) {
+  static async getOwners(pr) {
     // Update the local target repository of the latest from master
     const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
-    await git.pullLatestForRepo(localRepo);
+    await localRepo.checkout();
 
     const [files, ownersMap] = await Promise.all([
       pr.listFiles(),
-      git.getOwnersFilesForBranch(localRepo),
+      this.parseOwnersMap(localRepo),
     ]);
     const owners = findOwners(files, ownersMap);
-    
+
     pr.context.log.debug('[getOwners]', owners);
     return owners;
   }
@@ -139,4 +153,9 @@ function createOwnersMap(owners) {
   }, Object.create(null));
 }
 
-module.exports = {Owner, findOwners, findClosestOwnersFile, createOwnersMap};
+module.exports = {
+  Owner,
+  findOwners,
+  findClosestOwnersFile,
+  createOwnersMap
+};

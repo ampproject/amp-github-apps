@@ -18,7 +18,6 @@
 const nock = require('nock');
 const owners = require('..');
 const {Probot} = require('probot');
-const Git = require('../src/git').Git;
 const sinon = require('sinon');
 
 const opened35 = require('./fixtures/actions/opened.35');
@@ -88,9 +87,9 @@ describe('owners bot', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     // Disabled execution of `git pull` for testing.
-    sandbox.stub(Git.prototype, 'pullLatestForRepo').returns(null);
+    sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox
-      .stub(Git.prototype, 'getOwnersFilesForBranch')
+      .stub(Owner, 'parseOwnersMap')
       .returns(ownersYamlStruct);
 
     probot = new Probot({});
