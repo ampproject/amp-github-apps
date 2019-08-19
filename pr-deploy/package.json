@@ -37,7 +37,7 @@
     "@typescript-eslint/eslint-plugin": "2.0.0",
     "@typescript-eslint/parser": "2.0.0",
     "eslint": "6.2.0",
-    "jest": "24.8.0",
+    "jest": "24.9.0",
     "nodemon": "1.19.1",
     "smee-client": "1.1.0",
     "supertest": "4.0.2",
