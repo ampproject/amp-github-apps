@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@octokit/rest": "16.28.7",
-    "knex": "0.19.1",
+    "knex": "0.19.2",
     "pg": "7.12.1",
     "probot": "9.2.13",
     "sleep-promise": "8.0.1"
