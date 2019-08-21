@@ -16,7 +16,7 @@
 
 const {LocalRepository} = require('../src/local_repo');
 const sinon = require('sinon');
-const fs = require('fs').promises;
+const fs = require('fs');
 
 
 describe('local repository', () => {
@@ -81,17 +81,17 @@ describe('local repository', () => {
     const FAKE_OWNERS_CONTENTS = 'user1\nuser2\nuser3\n';
 
     beforeEach(() => {
-      sandbox.stub(fs, 'readFile').returns(FAKE_OWNERS_CONTENTS);
+      sandbox.stub(fs, 'readFileSync').returns(FAKE_OWNERS_CONTENTS);
     });
 
-    it('reads from the absolute file path', async () => {
-      await repo.readFile('my/file.txt');
+    it('reads from the absolute file path', () => {
+      repo.readFile('my/file.txt');
       sandbox.assert.calledWith(
-          fs.readFile, 'path/to/repo/my/file.txt', {encoding: 'utf8'});
+          fs.readFileSync, 'path/to/repo/my/file.txt', {encoding: 'utf8'});
     });
 
-    it('returns the contents of the file', async () => {
-      const contents = await repo.readFile('');
+    it('returns the contents of the file', () => {
+      const contents = repo.readFile('');
       expect(contents).toEqual(FAKE_OWNERS_CONTENTS);
     });
   });

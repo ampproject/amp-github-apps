@@ -15,7 +15,7 @@
  */
 
 const path = require('path');
-const fs = require('fs').promises;
+const fs = require('fs');
 const child_process = require('child_process');
 const util = require('util');
 const exec = util.promisify(child_process.exec);
@@ -94,9 +94,9 @@ class LocalRepository {
    * @param {!string} relativePath file to read.
    * @return {string} file contents.
    */
-  async readFile(relativePath) {
+  readFile(relativePath) {
     const filePath = this.getAbsolutePath(relativePath);
-    return await fs.readFile(filePath, {encoding: 'utf8'});
+    return fs.readFileSync(filePath, {encoding: 'utf8'});
   }
 
   /**

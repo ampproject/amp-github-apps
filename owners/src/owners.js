@@ -215,8 +215,8 @@ class OwnersParser {
    * @param {!string} ownersPath OWNERS.yaml file path.
    * @return {OwnersRule} parsed OWNERS file rule.
    */
-  async parseOwnersFile(ownersPath) {
-    const contents = await this.localRepo.readFile(ownersPath);
+  parseOwnersFile(ownersPath) {
+    const contents = this.localRepo.readFile(ownersPath);
     const ownersList = yaml.parse(contents);
 
     return new OwnersRule(ownersPath, ownersList);
@@ -230,10 +230,9 @@ class OwnersParser {
    *
    * @return {OwnersRule[]} a list of all rules defined in the local repo.
    */
-  async parseAllOwnersRules() {
-    const ownersPaths = await this.localRepo.findOwnersFiles();
-    return await Promise.all(
-        ownersPaths.map(ownersPath => this.parseOwnersFile(ownersPath)));
+  parseAllOwnersRules() {
+    const ownersPaths = this.localRepo.findOwnersFiles();
+    return ownersPaths.map(ownersPath => this.parseOwnersFile(ownersPath));
   }
 }
 
