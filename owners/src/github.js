@@ -86,9 +86,6 @@ class PullRequest {
     this.author = pr.user.login;
     this.state = pr.state;
 
-    this.owner = pr.base.repo.owner.login;
-    this.repo = pr.base.repo.name;
-
     // Ref here is the branch name
     this.headRef = pr.head.ref;
     this.headSha = pr.head.sha;
@@ -96,11 +93,6 @@ class PullRequest {
     // Base is usually master
     this.baseRef = pr.base.ref;
     this.baseSha = pr.base.sha;
-
-    this.options = {
-      owner: this.owner,
-      repo: this.repo,
-    };
   }
 
   /**
@@ -149,7 +141,7 @@ class PullRequest {
   async listFiles() {
     const res = await this.github.client.pullRequests.listFiles({
       number: this.id,
-      ...this.options,
+      ...this.github.repo(),
     });
     this.logger.debug('[listFiles]', res.data);
     return res.data.map(item => new RepoFile(item.filename));
@@ -176,7 +168,7 @@ class PullRequest {
   async getReviews() {
     const res = await this.github.client.pullRequests.listReviews({
       number: this.id,
-      ...this.options,
+      ...this.github.repo(),
     });
     this.logger.debug('[getReviews]', res.data);
     // Sort by latest submitted_at date first since users and state
@@ -286,11 +278,8 @@ class PullRequest {
    * @return {!Promise}
    */
   async getCheckRun() {
-    const res = await this.github.client.checks.listForRef({
-      owner: this.owner,
-      repo: this.repo,
-      ref: this.headSha,
-    });
+    const res = await this.github.client.checks.listForRef(
+      this.github.repo({ref: this.headSha});
     this.logger.debug('[getCheckRun]', res);
     return res.data;
   }
