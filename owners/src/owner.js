@@ -87,7 +87,7 @@ class Owner {
     ]);
     const owners = findOwners(files, ownersMap);
 
-    pr.context.log.debug('[getOwners]', owners);
+    pr.logger.debug('[getOwners]', owners);
     return owners;
   }
 }

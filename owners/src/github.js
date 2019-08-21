@@ -18,6 +18,7 @@ const {RepoFile} = require('./repo-file');
 const {Owner} = require('./owner');
 const _ = require('lodash');
 const sleep = require('sleep-promise');
+const {Logger} = require('./types');
 
 /**
  * Maps the github json payload to a simpler data structure.
@@ -32,7 +33,8 @@ class PullRequest {
 
     this.nameMatcher = new RegExp('owners bot|owners-check', 'i');
 
-    this.context = context;
+    this.logger = context.log;  /* type: Logger */
+    this.inRepo = obj => context.repo(obj);
     this.github = context.github;
 
     this.id = pr.number;
@@ -87,7 +89,7 @@ class PullRequest {
   async getMeta() {
     const fileOwners = await Owner.getOwners(this);
     const reviews = await this.getUniqueReviews();
-    this.context.log.debug('[getMeta]', reviews);
+    this.logger.debug('[getMeta]', reviews);
     const approvalsMet = this.areAllApprovalsMet(fileOwners, reviews);
     const reviewersWhoApproved = this.getReviewersWhoApproved(reviews);
     return {fileOwners, reviews, approvalsMet, reviewersWhoApproved};
@@ -104,7 +106,7 @@ class PullRequest {
       number: this.id,
       ...this.options,
     });
-    this.context.log.debug('[listFiles]', res.data);
+    this.logger.debug('[listFiles]', res.data);
     return res.data.map(item => new RepoFile(item.filename));
   }
 
@@ -131,7 +133,7 @@ class PullRequest {
       number: this.id,
       ...this.options,
     });
-    this.context.log.debug('[getReviews]', res.data);
+    this.logger.debug('[getReviews]', res.data);
     // Sort by latest submitted_at date first since users and state
     // are not unique.
     const reviews = res.data
@@ -192,7 +194,7 @@ class PullRequest {
     await sleep(2000);
     const conclusion = areApprovalsMet ? 'success' : 'failure';
     return this.github.checks.create(
-      this.context.repo({
+      this.inRepo({
         name: this.name,
         head_branch: this.headRef,
         head_sha: this.headSha,
@@ -215,10 +217,10 @@ class PullRequest {
    * @return {!Promise}
    */
   async updateCheckRun(checkRun, text, areApprovalsMet) {
-    this.context.log.debug('[updateCheckRun]', checkRun);
+    this.logger.debug('[updateCheckRun]', checkRun);
     const conclusion = areApprovalsMet ? 'success' : 'failure';
     return this.github.checks.update(
-      this.context.repo({
+      this.inRepo({
         check_run_id: checkRun.id,
         status: 'completed',
         conclusion: 'neutral',
@@ -244,7 +246,7 @@ class PullRequest {
       repo: this.repo,
       ref: this.headSha,
     });
-    this.context.log.debug('[getCheckRun]', res);
+    this.logger.debug('[getCheckRun]', res);
     return res.data;
   }
 
@@ -258,7 +260,7 @@ class PullRequest {
       return x.head_sha === this.headSha && this.nameMatcher.test(x.name);
     });
     const tuple = {hasCheckRun: hasCheckRun && !!checkRun, checkRun};
-    this.context.log.debug('[hasCheckRun]', tuple);
+    this.logger.debug('[hasCheckRun]', tuple);
     return tuple;
   }
 
@@ -287,7 +289,7 @@ class PullRequest {
         return `\n${fileOwnerHeader}\n${files}`;
       })
       .join('');
-    this.context.log.debug('[buildCheckOutput]', text);
+    this.logger.debug('[buildCheckOutput]', text);
     return text;
   }
 
@@ -389,7 +391,7 @@ class Teams {
    * @return {!Promise}
    */
   async list() {
-    return this.github.repos.listTeams(this.context.repo());
+    return this.github.repos.listTeams(this.inRepo());
   }
 }
 
