@@ -225,6 +225,9 @@ class OwnersParser {
   /**
    * Parse all OWNERS rules in the repo.
    *
+   * TODO: Replace this with `parseAllOwnersRulesForFiles` to reduce OWNERS file
+   * reads
+   *
    * @return {OwnersRule[]} a list of all rules defined in the local repo.
    */
   async parseAllOwnersRules() {
