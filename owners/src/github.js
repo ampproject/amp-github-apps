@@ -20,6 +20,49 @@ const _ = require('lodash');
 const sleep = require('sleep-promise');
 const {Logger} = require('./types');
 
+
+/**
+ * Interface for working with the GitHub API.
+ */
+class GitHub {
+  /**
+   * Constructor.
+   *
+   * @param {!GitHubAPI} client Probot GitHub client (see
+   *     https://probot.github.io/api/latest/interfaces/githubapi.html).
+   * @param {!string} owner GitHub repository owner.
+   * @param {!string} repository GitHub repository name.
+   * @param {!Logger} logger logging interface.
+   */
+  constructor(client, owner, repository, logger) {
+   this.client = client;
+   this.owner = owner;
+   this.repository = repository;
+   this.logger = logger;
+  }
+
+  /**
+   * Creates a GitHub API interface from a Probot request context.
+   *
+   * @param {!Context} context Probot request context.
+   * @return {GitHub} a GitHub API interface.
+   */
+  static fromContext(context) {
+    const {repo, owner} = context.repo();
+    return new GitHub(context.github, owner, repo, context.log);
+  }
+
+  /**
+   * Adds the owner and repo name to an object.
+   *
+   * @param {?object} obj object to add fields to.
+   * @return {object} object with owner and repo fields set.
+   */
+  repo(obj) {
+    return Object.assign({}, obj, {repo: this.repository, owner: this.owner});
+  }
+}
+
 /**
  * Maps the github json payload to a simpler data structure.
  */
@@ -34,8 +77,7 @@ class PullRequest {
     this.nameMatcher = new RegExp('owners bot|owners-check', 'i');
 
     this.logger = context.log;  /* type: Logger */
-    this.inRepo = obj => context.repo(obj);
-    this.github = context.github;
+    this.github = GitHub.fromContext(context);
 
     this.id = pr.number;
     this.author = pr.user.login;
@@ -102,7 +144,7 @@ class PullRequest {
    * @return {!Promise<!Array<!RepoFile>>}
    */
   async listFiles() {
-    const res = await this.github.pullRequests.listFiles({
+    const res = await this.github.client.pullRequests.listFiles({
       number: this.id,
       ...this.options,
     });
@@ -129,7 +171,7 @@ class PullRequest {
    * @return {!Array<object>}
    */
   async getReviews() {
-    const res = await this.github.pullRequests.listReviews({
+    const res = await this.github.client.pullRequests.listReviews({
       number: this.id,
       ...this.options,
     });
@@ -193,8 +235,8 @@ class PullRequest {
     // GitHub might not be ready.
     await sleep(2000);
     const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.checks.create(
-      this.inRepo({
+    return this.github.client.checks.create(
+      this.github.repo({
         name: this.name,
         head_branch: this.headRef,
         head_sha: this.headSha,
@@ -219,8 +261,8 @@ class PullRequest {
   async updateCheckRun(checkRun, text, areApprovalsMet) {
     this.logger.debug('[updateCheckRun]', checkRun);
     const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.checks.update(
-      this.inRepo({
+    return this.github.client.checks.update(
+      this.github.repo({
         check_run_id: checkRun.id,
         status: 'completed',
         conclusion: 'neutral',
@@ -241,7 +283,7 @@ class PullRequest {
    * @return {!Promise}
    */
   async getCheckRun() {
-    const res = await this.github.checks.listForRef({
+    const res = await this.github.client.checks.listForRef({
       owner: this.owner,
       repo: this.repo,
       ref: this.headSha,
