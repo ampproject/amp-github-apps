@@ -66,7 +66,8 @@ class Owner {
     const parser = new OwnersParser(localRepo);
     const ownersRules = await parser.parseAllOwnersRules();
     const ownersList = ownersRules.map(
-        rule => Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath));
+        rule =>
+            new Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath));
     return createOwnersMap(ownersList);
   }
 

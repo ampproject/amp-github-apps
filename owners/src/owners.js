@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Google Inc.
+ * Copyright 2019 The AMP HTML Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,7 +159,7 @@ class OwnersRule {
    * @return {string} relative file path.
    */
   get filePath() {
-    return path.join(`${this.dirPath}`, 'OWNERS.yaml');
+    return path.join(this.dirPath, 'OWNERS.yaml');
   }
 
   /**
