@@ -30,28 +30,29 @@ module.exports = app => {
   });
 
   /**
-   * @param {!Context} context
-   * @param {!JsonObject} pullRequest
-   * @return {!Promise}
+   * Process a pull request and take any necessary actions.
+   *
+   * @param {!Context} context Probot request context (for logging and GitHub).
+   * @param {!JsonObject} pullRequest GitHub Pull Request JSON object.
    */
   async function processPullRequest(context, pullRequest) {
     const pr = new PullRequest(context, pullRequest);
-    // TODO: evaluate if we still need teams.
-    // const teams = await new Teams(context).list();
-    return await pr.processOpened();
+    await pr.processOpened();
   }
 
   /**
-   * @param {!Context} context
-   * @return {!Promise}
+   * Probot handler for newly opened pull request.
+   *
+   * @param {!Context} context Probot request context.
    */
   async function onPullRequest(context) {
-    return await processPullRequest(context, context.payload.pull_request);
+    await processPullRequest(context, context.payload.pull_request);
   }
 
   /**
-   * @param {!Context} context
-   * @return {!Promise}
+   * Probot handler for check-run re-requests.
+   *
+   * @param {!Context} context Probot request context.
    */
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
@@ -60,18 +61,18 @@ module.exports = app => {
       payload.check_run.check_suite.pull_requests[0].number
     );
 
-    return await processPullRequest(context, pr.data);
+    await processPullRequest(context, pr.data);
   }
 
   /**
-   * @param {!Context} context
-   * @return {!Promise}
+   * Probot handler for after a PR review is submitted.
+   *
+   * @param {!Context} context Probot request context.
    */
   async function onPullRequestReview(context) {
     const payload = context.payload;
-    context.log('number', payload.pull_request.number);
     const pr = await PullRequest.get(context, payload.pull_request.number);
 
-    return await processPullRequest(context, pr.data);
+    await processPullRequest(context, pr.data);
   }
 };
