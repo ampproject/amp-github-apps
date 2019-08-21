@@ -48,9 +48,6 @@ class OwnersTree {
    * @param {!OwnersRule} rule rule to add.
    */
   addRule(rule) {
-    if (this.depth > 5) {
-      return
-    }
     if (rule.dirPath === this.dirPath) {
       this.rules.push(rule);
     } else {
