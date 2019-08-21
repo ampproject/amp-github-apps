@@ -36,8 +36,11 @@ module.exports = app => {
    * @param {!JsonObject} pullRequest GitHub Pull Request JSON object.
    */
   async function processPullRequest(context, pullRequest) {
-    const pr =
-        new PullRequest(GitHub.fromContext(context), pullRequest, context.log);
+    const pr = new PullRequest(
+      GitHub.fromContext(context),
+      pullRequest,
+      context.log
+    );
     await pr.processOpened();
   }
 
@@ -58,8 +61,9 @@ module.exports = app => {
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
     const pr = await PullRequest.get(
-        GitHub.fromContext(context),
-        payload.check_run.check_suite.pull_requests[0].number);
+      GitHub.fromContext(context),
+      payload.check_run.check_suite.pull_requests[0].number
+    );
 
     await processPullRequest(context, pr.data);
   }
@@ -72,7 +76,9 @@ module.exports = app => {
   async function onPullRequestReview(context) {
     const payload = context.payload;
     const pr = await PullRequest.get(
-        GitHub.fromContext(context), payload.pull_request.number);
+      GitHub.fromContext(context),
+      payload.pull_request.number
+    );
 
     await processPullRequest(context, pr.data);
   }

@@ -18,8 +18,6 @@ const {RepoFile} = require('./repo-file');
 const {Owner} = require('./owner');
 const _ = require('lodash');
 const sleep = require('sleep-promise');
-const {Logger} = require('./types');
-
 
 /**
  * Interface for working with the GitHub API.
@@ -35,10 +33,10 @@ class GitHub {
    * @param {!Logger} logger logging interface.
    */
   constructor(client, owner, repository, logger) {
-   this.client = client;
-   this.owner = owner;
-   this.repository = repository;
-   this.logger = logger;
+    this.client = client;
+    this.owner = owner;
+    this.repository = repository;
+    this.logger = logger;
   }
 
   /**
@@ -112,10 +110,7 @@ class PullRequest {
     const {hasCheckRun, checkRun} = this.hasCheckRun(checkRuns);
     if (hasCheckRun) {
       return this.updateCheckRun(
-        checkRun,
-        checkOutputText,
-        prInfo.approvalsMet
-      );
+          checkRun, checkOutputText, prInfo.approvalsMet);
     }
     return this.createCheckRun(checkOutputText, prInfo.approvalsMet);
   }
@@ -173,11 +168,9 @@ class PullRequest {
     this.logger.debug('[getReviews]', res.data);
     // Sort by latest submitted_at date first since users and state
     // are not unique.
-    const reviews = res.data
-      .map(x => new Review(x))
-      .sort((a, b) => {
-        return b.submitted_at - a.submitted_at;
-      });
+    const reviews = res.data.map(x => new Review(x)).sort((a, b) => {
+      return b.submitted_at - a.submitted_at;
+    });
     return reviews;
   }
 
@@ -210,10 +203,10 @@ class PullRequest {
    */
   getReviewersWhoApproved(reviews) {
     const reviewersWhoApproved = reviews
-      .filter(x => {
-        return x.state === 'approved';
-      })
-      .map(x => x.username);
+                                     .filter(x => {
+                                       return x.state === 'approved';
+                                     })
+                                     .map(x => x.username);
     // If you're the author, then you yourself are assumed to approve your own
     // PR.
     reviewersWhoApproved.push(this.author);
@@ -230,21 +223,19 @@ class PullRequest {
     // GitHub might not be ready.
     await sleep(2000);
     const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.client.checks.create(
-      this.github.repo({
-        name: this.name,
-        head_branch: this.headRef,
-        head_sha: this.headSha,
-        status: 'completed',
-        conclusion: 'neutral',
-        completed_at: new Date(),
-        output: {
-          title: this.name,
-          summary: `The check was a ${conclusion}!`,
-          text,
-        },
-      })
-    );
+    return this.github.client.checks.create(this.github.repo({
+      name: this.name,
+      head_branch: this.headRef,
+      head_sha: this.headSha,
+      status: 'completed',
+      conclusion: 'neutral',
+      completed_at: new Date(),
+      output: {
+        title: this.name,
+        summary: `The check was a ${conclusion}!`,
+        text,
+      },
+    }));
   }
 
   /**
@@ -256,20 +247,18 @@ class PullRequest {
   async updateCheckRun(checkRun, text, areApprovalsMet) {
     this.logger.debug('[updateCheckRun]', checkRun);
     const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.client.checks.update(
-      this.github.repo({
-        check_run_id: checkRun.id,
-        status: 'completed',
-        conclusion: 'neutral',
-        name: this.name,
-        completed_at: new Date(),
-        output: {
-          title: this.name,
-          summary: `The check was a ${conclusion}!`,
-          text,
-        },
-      })
-    );
+    return this.github.client.checks.update(this.github.repo({
+      check_run_id: checkRun.id,
+      status: 'completed',
+      conclusion: 'neutral',
+      name: this.name,
+      completed_at: new Date(),
+      output: {
+        title: this.name,
+        summary: `The check was a ${conclusion}!`,
+        text,
+      },
+    }));
   }
 
   /**
@@ -279,7 +268,7 @@ class PullRequest {
    */
   async getCheckRun() {
     const res = await this.github.client.checks.listForRef(
-      this.github.repo({ref: this.headSha});
+        this.github.repo({ref: this.headSha}));
     this.logger.debug('[getCheckRun]', res);
     return res.data;
   }
@@ -304,25 +293,25 @@ class PullRequest {
    */
   buildCheckOutput(prInfo) {
     const text = Object.values(prInfo.fileOwners)
-      .filter(fileOwner => {
-        // Omit sections that has a required reviewer who has approved.
-        return !_.intersection(
-          prInfo.reviewersWhoApproved,
-          fileOwner.owner.dirOwners
-        ).length;
-      })
-      .map(fileOwner => {
-        const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(
-          ', '
-        )}`;
-        const files = fileOwner.files
-          .map(file => {
-            return ` - ${file.path}\n`;
-          })
-          .join('');
-        return `\n${fileOwnerHeader}\n${files}`;
-      })
-      .join('');
+                     .filter(fileOwner => {
+                       // Omit sections that has a required reviewer who has
+                       // approved.
+                       return !_.intersection(
+                                    prInfo.reviewersWhoApproved,
+                                    fileOwner.owner.dirOwners)
+                                   .length;
+                     })
+                     .map(fileOwner => {
+                       const fileOwnerHeader = `## possible reviewers: ${
+                           fileOwner.owner.dirOwners.join(', ')}`;
+                       const files = fileOwner.files
+                                         .map(file => {
+                                           return ` - ${file.path}\n`;
+                                         })
+                                         .join('');
+                       return `\n${fileOwnerHeader}\n${files}`;
+                     })
+                     .join('');
     this.logger.debug('[buildCheckOutput]', text);
     return text;
   }

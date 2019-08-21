@@ -23,9 +23,9 @@
  *   debug: function(*),
  *   log: function(*),
  *   warn: function(*),
- *   error: function(*), 
+ *   error: function(*),
  * }}
  */
-var Logger;
+let Logger;
 
-module.exports = {Logger}
+module.exports = {Logger};
