@@ -305,53 +305,6 @@ class PullRequest {
     );
   }
 }
-
-/**
- * A comment on a GitHub Pull Request.
- */
-class PullRequestComment {
-  /**
-   * @param {object} json
-   */
-  constructor(json) {
-    this.id = json.id;
-    this.type = 'pull_request_review_id' in json ? 'pulls' : 'issues';
-    this.author = json.user.login;
-    this.body = json.body;
-    this.createdAt = new Date(json.created_at);
-    this.updatedAt = new Date(json.updated_at);
-    this.url = json.url;
-  }
-}
-
-/**
- * A Label on a GitHub Pull Request.
- */
-class Label {
-  /**
-   * @param {object} json
-   */
-  constructor(json) {
-    this.id = json.id;
-    this.url = json.url;
-    this.name = json.name;
-    this.color = json.color;
-    this.default = json.default;
-  }
-}
-
-/**
- * Represents the sender on GitHub API responses.
- */
-class Sender {
-  /**
-   * @param {object} json
-   */
-  constructor(json) {
-    this.username = json.login;
-  }
-}
-
 /**
  * A Review action on a GitHub Pull Request. (approve, disapprove)
  */
@@ -374,32 +327,7 @@ class Review {
   }
 }
 
-/**
- * Teams API on GitHub.
- */
-class Teams {
-  /**
-   * @param {object} context
-   */
-  constructor(context) {
-    this.context = context;
-    this.github = context.github;
-  }
-
-  /**
-   * return the teams from the GitHub API.
-   * @return {!Promise}
-   */
-  async list() {
-    return this.github.repos.listTeams(this.inRepo());
-  }
-}
-
 module.exports = {
   PullRequest,
-  PullRequestComment,
-  Label,
-  Sender,
   Review,
-  Teams,
 };
