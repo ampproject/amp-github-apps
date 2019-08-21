@@ -17,7 +17,6 @@
 const path = require('path');
 const yaml = require('yamljs');
 
-
 /**
  * A tree of ownership keyed by directory.
  */
@@ -33,7 +32,6 @@ class OwnersTree {
     this.dirPath = dirPath || '.';
 
     this.isRoot = !parent;
-
 
     this.rules = [];
     this.children = {};
@@ -54,11 +52,13 @@ class OwnersTree {
       const nextDir = rule.dirPath.split(path.sep)[this.depth];
 
       if (!this.children[nextDir]) {
-        this.children[nextDir] =
-            new OwnersTree(path.join(this.dirPath, nextDir), this);
+        this.children[nextDir] = new OwnersTree(
+          path.join(this.dirPath, nextDir),
+          this
+        );
       }
 
-      this.children[nextDir].addRule(rule)
+      this.children[nextDir].addRule(rule);
     }
   }
 
@@ -92,12 +92,13 @@ class OwnersTree {
    * The most specific rules will be first, while the root-level owners rules
    * will be last.
    *
+   * @param {!string} filePath relative path to file.
    * @return {OwnersRule[]} list of rules for the file.
    */
   rulesForFile(filePath) {
-    let segments = filePath.split(path.sep);
+    const segments = filePath.split(path.sep);
     let subtree = this;
-    
+
     while (segments.length) {
       const nextDir = segments.shift();
       if (!subtree.children[nextDir]) {
@@ -115,28 +116,31 @@ class OwnersTree {
    * @return {string} visual representation of the tree.
    */
   toString() {
-    let lines = []
+    const lines = [];
 
-        const rulePrefix = '-';
+    const rulePrefix = '-';
     const childPrefix = '└---';
-    const indent = Math.max(0, (this.depth - 1)) * childPrefix.length;
+    const indent = Math.max(0, this.depth - 1) * childPrefix.length;
     const prefix = this.isRoot ? '' : `${' '.repeat(indent)}${childPrefix}`;
-    const dirName =
-        this.isRoot ? 'ROOT' : this.dirPath.split(path.sep).slice(-1);
+    const dirName = this.isRoot
+      ? 'ROOT'
+      : this.dirPath.split(path.sep).slice(-1);
 
     lines.push(`${prefix}${dirName}`);
-    this.rules.forEach(
-        rule => {lines.push(
-            `${' '.repeat(indent)}${rulePrefix} ${rule.owners.join(', ')}`)});
+    this.rules.forEach(rule => {
+      lines.push(
+        `${' '.repeat(indent)}${rulePrefix} ${rule.owners.join(', ')}`
+      );
+    });
 
-    for (let dirName in this.children) {
+    /* eslint-disable-next-line guard-for-in */
+    for (const dirName in this.children) {
       lines.push(this.children[dirName].toString());
     }
 
     return lines.join('\n');
   }
 }
-
 
 /**
  * A rule describing ownership for a directory.
@@ -146,7 +150,7 @@ class OwnersRule {
    * Constructor.
    *
    * @param {!string} ownersPath path to OWNERS file.
-   * @param {!string[]} owners list of GitHub usernames of owners.
+   * @param {string[]} owners list of GitHub usernames of owners.
    */
   constructor(ownersPath, owners) {
     this.dirPath = path.dirname(ownersPath);
@@ -172,11 +176,13 @@ class OwnersRule {
    * @return {boolean} true if the rule applies to the file.
    */
   matchesFile(filePath) {
-    const filePathDir = path.dirname(filePath)
-    const filePathSegments =
-        filePathDir.split(path.sep).filter(segment => segment != '.');
-    const rulePathSegments =
-        this.dirPath.split(path.sep).filter(segment => segment != '.');
+    const filePathDir = path.dirname(filePath);
+    const filePathSegments = filePathDir
+      .split(path.sep)
+      .filter(segment => segment != '.');
+    const rulePathSegments = this.dirPath
+      .split(path.sep)
+      .filter(segment => segment != '.');
 
     if (filePathSegments.length < rulePathSegments.length) {
       return false;
@@ -191,7 +197,6 @@ class OwnersRule {
     return true;
   }
 }
-
 
 /**
  * Parser for OWNERS.yaml files.
@@ -232,7 +237,6 @@ class OwnersParser {
     return ownersPaths.map(ownersPath => this.parseOwnersFile(ownersPath));
   }
 }
-
 
 module.exports = {
   OwnersParser,

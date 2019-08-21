@@ -16,6 +16,7 @@
 
 const path = require('path');
 const {LocalRepository} = require('./local_repo');
+const {OwnersParser} = require('./owners');
 
 /**
  * @file Contains classes and functions in relation to "OWNER" files
@@ -59,15 +60,15 @@ class Owner {
   /**
    * Parse all OWNERS files into Owner objects.
    *
-   * @param {LocalRepository} localRepo local repository to read from.
-   * @return {!Owner[]} list of owners.
+   * @param {!LocalRepository} localRepo local repository to read from.
+   * @return {object} map of owners.
    */
   static async parseOwnersMap(localRepo) {
     const parser = new OwnersParser(localRepo);
     const ownersRules = await parser.parseAllOwnersRules();
     const ownersList = ownersRules.map(
-        rule =>
-            new Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath));
+      rule => new Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath)
+    );
     return createOwnersMap(ownersList);
   }
 
@@ -157,5 +158,5 @@ module.exports = {
   Owner,
   findOwners,
   findClosestOwnersFile,
-  createOwnersMap
+  createOwnersMap,
 };

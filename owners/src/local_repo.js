@@ -16,21 +16,20 @@
 
 const path = require('path');
 const fs = require('fs');
-const child_process = require('child_process');
+const childProcess = require('child_process');
 const util = require('util');
-const exec = util.promisify(child_process.exec);
-
+const exec = util.promisify(childProcess.exec);
 
 /**
  * Execute raw shell commands.
  *
  * @private
- * @param {!!string[]} commands list of commands to execute.
+ * @param {...!string} commands list of commands to execute.
  * @return {string[]} command output
  */
 async function runCommands(...commands) {
-  return await new Promise(async (resolve, reject) => {
-    const {stdout, stderr} = await exec(commands.join(' && '));
+  const {stdout, stderr} = await exec(commands.join(' && '));
+  return new Promise((resolve, reject) => {
     if (stderr) {
       reject(stderr);
     } else {
@@ -38,7 +37,6 @@ async function runCommands(...commands) {
     }
   });
 }
-
 
 /**
  * Interface for reading from a checked out repository using relative paths.
@@ -59,7 +57,7 @@ class LocalRepository {
   /**
    * Runs commands in the repository's root directory.
    *
-   * @param {!string[]} commands list of commands to execute.
+   * @param {...!string} commands list of commands to execute.
    * @return {string[]} command output
    */
   async runCommands(...commands) {
@@ -74,8 +72,9 @@ class LocalRepository {
   async checkout(branch) {
     branch = branch || 'master';
     await this.runCommands(
-        `git fetch ${this.remote} ${branch}`,
-        `git checkout -B ${branch} ${this.remote}/${branch}`);
+      `git fetch ${this.remote} ${branch}`,
+      `git checkout -B ${branch} ${this.remote}/${branch}`
+    );
   }
 
   /**
@@ -109,18 +108,19 @@ class LocalRepository {
   async findOwnersFiles() {
     // NOTE: for some reason `git ls-tree --full-tree -r HEAD **/OWNERS*`
     // doesn't work from here.
-    const ownersFiles = await this.runCommands([
-      // Lists all files in the repo with extra metadata.
-      'git ls-tree --full-tree -r HEAD',
-      // Cuts out the first three columns.
-      'cut -f2',
-      // Finds OWNERS files.
-      'grep OWNERS.yaml$'
-    ].join('|'));
+    const ownersFiles = await this.runCommands(
+      [
+        // Lists all files in the repo with extra metadata.
+        'git ls-tree --full-tree -r HEAD',
+        // Cuts out the first three columns.
+        'cut -f2',
+        // Finds OWNERS files.
+        'grep OWNERS.yaml$',
+      ].join('|')
+    );
 
     return ownersFiles.trim().split('\n');
   }
 }
-
 
 module.exports = {LocalRepository};

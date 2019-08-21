@@ -18,14 +18,13 @@ const {LocalRepository} = require('../src/local_repo');
 const sinon = require('sinon');
 const fs = require('fs');
 
-
 describe('local repository', () => {
   const sandbox = sinon.createSandbox();
   let repo;
 
   beforeEach(() => {
     repo = new LocalRepository('path/to/repo');
-    sandbox.stub(repo, 'getAbsolutePath').callsFake((relativePath) => {
+    sandbox.stub(repo, 'getAbsolutePath').callsFake(relativePath => {
       return `path/to/repo/${relativePath}`;
     });
   });
@@ -55,26 +54,27 @@ describe('local repository', () => {
     it('fetches and checks out the requested branch', async () => {
       await repo.checkout('my_branch');
       sandbox.assert.calledWith(
-          repo.runCommands,
-          'git fetch origin my_branch',
-          'git checkout -B my_branch origin/my_branch',
+        repo.runCommands,
+        'git fetch origin my_branch',
+        'git checkout -B my_branch origin/my_branch'
       );
     });
 
     it('defaults to master', async () => {
       await repo.checkout();
       sandbox.assert.calledWith(
-          repo.runCommands,
-          'git fetch origin master',
-          'git checkout -B master origin/master',
+        repo.runCommands,
+        'git fetch origin master',
+        'git checkout -B master origin/master'
       );
     });
   });
 
   describe('getAbsolutePath', () => {
     it('prepends the repository root directory path', () => {
-      expect(repo.getAbsolutePath('file/path.txt'))
-          .toEqual('path/to/repo/file/path.txt');
+      expect(repo.getAbsolutePath('file/path.txt')).toEqual(
+        'path/to/repo/file/path.txt'
+      );
     });
   });
 
@@ -87,8 +87,9 @@ describe('local repository', () => {
 
     it('reads from the absolute file path', () => {
       repo.readFile('my/file.txt');
-      sandbox.assert.calledWith(
-          fs.readFileSync, 'path/to/repo/my/file.txt', {encoding: 'utf8'});
+      sandbox.assert.calledWith(fs.readFileSync, 'path/to/repo/my/file.txt', {
+        encoding: 'utf8',
+      });
     });
 
     it('returns the contents of the file', () => {
@@ -98,7 +99,7 @@ describe('local repository', () => {
   });
 
   describe('findOwnersFiles', () => {
-    FAKE_OWNERS_LIST_OUTPUT = 'foo.txt\nbar/baz.txt\n';
+    const FAKE_OWNERS_LIST_OUTPUT = 'foo.txt\nbar/baz.txt\n';
 
     it('splits the owners list from the command line output', async () => {
       sandbox.stub(repo, 'runCommands').returns(FAKE_OWNERS_LIST_OUTPUT);

@@ -24,8 +24,9 @@ describe('owners tree', () => {
   const rootDirRule = new OwnersRule('OWNERS.yaml', ['root']);
   const childDirRule = new OwnersRule('foo/OWNERS.yaml', ['child']);
   const otherChildDirRule = new OwnersRule('biz/OWNERS.yaml', ['child']);
-  const ancestorDirRule =
-      new OwnersRule('foo/bar/baz/OWNERS.yaml', ['ancestor']);
+  const ancestorDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+    'ancestor',
+  ]);
 
   beforeEach(() => {
     tree = new OwnersTree();
@@ -46,8 +47,9 @@ describe('owners tree', () => {
 
     it('adds rules to nested subdirectories', () => {
       tree.addRule(ancestorDirRule);
-      expect(tree.children.foo.children.bar.children.baz.rules)
-          .toContain(ancestorDirRule);
+      expect(tree.children.foo.children.bar.children.baz.rules).toContain(
+        ancestorDirRule
+      );
     });
   });
 
@@ -55,7 +57,6 @@ describe('owners tree', () => {
     it('should return 0 for the root', () => {
       expect(tree.depth).toEqual(0);
     });
-
 
     it('should return tree depth for files not at the root', () => {
       tree.addRule(childDirRule);
@@ -86,7 +87,9 @@ describe('owners tree', () => {
       tree.addRule(childDirRule);
       tree.addRule(ancestorDirRule);
       expect(tree.rulesForFile('foo/bar/baz/buzz.txt')).toEqual([
-        ancestorDirRule, childDirRule, rootDirRule
+        ancestorDirRule,
+        childDirRule,
+        rootDirRule,
       ]);
     });
   });
@@ -98,17 +101,19 @@ describe('owners tree', () => {
       tree.addRule(otherChildDirRule);
       tree.addRule(ancestorDirRule);
 
-      expect(tree.toString()).toEqual([
-        'ROOT',
-        '- root',
-        '└---foo',
-        '- child',
-        '    └---bar',
-        '        └---baz',
-        '        - ancestor',
-        '└---biz',
-        '- child',
-      ].join('\n'))
+      expect(tree.toString()).toEqual(
+        [
+          'ROOT',
+          '- root',
+          '└---foo',
+          '- child',
+          '    └---bar',
+          '        └---baz',
+          '        - ancestor',
+          '└---biz',
+          '- child',
+        ].join('\n')
+      );
     });
   });
 });
@@ -119,14 +124,15 @@ describe('owners rules', () => {
       toMatchFile(receivedOwnersPath, filePath) {
         const rule = new OwnersRule(receivedOwnersPath, []);
         const matches = rule.matchesFile(filePath);
-        const matchStr = this.isNot ? 'not match' : 'match'
+        const matchStr = this.isNot ? 'not match' : 'match';
 
         return {
           pass: matches,
-          message: () => `Expected rules in '${receivedOwnersPath}' to ` +
-              `${matchStr} file '${filePath}'.`,
+          message: () =>
+            `Expected rules in '${receivedOwnersPath}' to ` +
+            `${matchStr} file '${filePath}'.`,
         };
-      }
+      },
     });
 
     it('matches a file in the same directory', () => {
@@ -159,7 +165,7 @@ describe('owners parser', () => {
   beforeEach(() => {
     repo = new LocalRepository('path/to/repo');
     parser = new OwnersParser(repo);
-    sandbox.stub(repo, 'getAbsolutePath').callsFake((relativePath) => {
+    sandbox.stub(repo, 'getAbsolutePath').callsFake(relativePath => {
       return `path/to/repo/${relativePath}`;
     });
   });
@@ -173,7 +179,10 @@ describe('owners parser', () => {
       sandbox.stub(fs, 'readFileSync').returns('');
       parser.parseOwnersFile('foo/OWNERS.yaml');
       sandbox.assert.calledWith(
-          fs.readFileSync, 'path/to/repo/foo/OWNERS.yaml', {encoding: 'utf8'});
+        fs.readFileSync,
+        'path/to/repo/foo/OWNERS.yaml',
+        {encoding: 'utf8'}
+      );
     });
 
     it('assigns the OWNERS directory path', () => {
@@ -189,8 +198,9 @@ describe('owners parser', () => {
     });
 
     it('parses a YAML list with blank lines and comments', () => {
-      sandbox.stub(fs, 'readFileSync')
-          .returns('- user1\n# comment\n\n- user2\n');
+      sandbox
+        .stub(fs, 'readFileSync')
+        .returns('- user1\n# comment\n\n- user2\n');
       const rule = parser.parseOwnersFile('');
       expect(rule.owners).toEqual(['user1', 'user2']);
     });
@@ -198,10 +208,10 @@ describe('owners parser', () => {
 
   describe('parseAllOwnersRules', () => {
     it('reads all owners files in the repo', () => {
-      sandbox.stub(repo, 'findOwnersFiles').returns([
-        'OWNERS.yaml', 'foo/OWNERS.yaml'
-      ]);
-      const readFileStub = sandbox.stub(repo, 'readFile')
+      sandbox
+        .stub(repo, 'findOwnersFiles')
+        .returns(['OWNERS.yaml', 'foo/OWNERS.yaml']);
+      const readFileStub = sandbox.stub(repo, 'readFile');
       readFileStub.onCall(0).returns('- user1\n- user2\n');
       readFileStub.onCall(1).returns('- user3\n- user4\n');
       const rules = parser.parseAllOwnersRules();

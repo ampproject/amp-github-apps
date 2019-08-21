@@ -90,9 +90,7 @@ describe('owners bot', () => {
     sandbox = sinon.createSandbox();
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
-    sandbox
-      .stub(Owner, 'parseOwnersMap')
-      .returns(ownersYamlStruct);
+    sandbox.stub(Owner, 'parseOwnersMap').returns(ownersYamlStruct);
 
     probot = new Probot({});
     const app = probot.load(owners);
