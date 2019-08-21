@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const {PullRequest} = require('./src/github');
+const {GitHub, PullRequest} = require('./src/github');
 
 module.exports = app => {
   app.on(['pull_request.opened', 'pull_request.synchronized'], onPullRequest);
@@ -32,11 +32,12 @@ module.exports = app => {
   /**
    * Process a pull request and take any necessary actions.
    *
-   * @param {!Context} context Probot request context (for logging and GitHub).
+   * @param {!GitHub} context Probot request context (for logging and GitHub).
    * @param {!JsonObject} pullRequest GitHub Pull Request JSON object.
    */
   async function processPullRequest(context, pullRequest) {
-    const pr = new PullRequest(context, pullRequest);
+    const pr =
+        new PullRequest(GitHub.fromContext(context), pullRequest, context.log);
     await pr.processOpened();
   }
 
@@ -57,9 +58,8 @@ module.exports = app => {
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
     const pr = await PullRequest.get(
-      context,
-      payload.check_run.check_suite.pull_requests[0].number
-    );
+        GitHub.fromContext(context),
+        payload.check_run.check_suite.pull_requests[0].number);
 
     await processPullRequest(context, pr.data);
   }
@@ -71,7 +71,8 @@ module.exports = app => {
    */
   async function onPullRequestReview(context) {
     const payload = context.payload;
-    const pr = await PullRequest.get(context, payload.pull_request.number);
+    const pr = await PullRequest.get(
+        GitHub.fromContext(context), payload.pull_request.number);
 
     await processPullRequest(context, pr.data);
   }

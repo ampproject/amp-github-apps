@@ -68,16 +68,19 @@ class GitHub {
  */
 class PullRequest {
   /**
-   * @param {!Context} context
-   * @param {!PullRequest} pr
+   * Constructor.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   * @param {!PullRequest} pr JSON object containing pull request info.
+   * @param {Logger=} logger logging interface (defaults to console).
    */
-  constructor(context, pr) {
+  constructor(github, pr, logger) {
     this.name = 'ampproject/owners-check';
 
     this.nameMatcher = new RegExp('owners bot|owners-check', 'i');
 
-    this.logger = context.log;  /* type: Logger */
-    this.github = GitHub.fromContext(context);
+    this.logger = logger || console;
+    this.github = github;
 
     this.id = pr.number;
     this.author = pr.user.login;
@@ -336,15 +339,12 @@ class PullRequest {
   }
 
   /**
-   * @param {object} context
-   * @param {number} number
+   * @param {!GitHub} github GitHub API interface.
+   * @param {number} number Pull Request number.
+   * @return {object} JSON object representing a pull request.
    */
-  static async get(context, number) {
-    return await context.github.pullRequests.get(
-      context.repo({
-        number,
-      })
-    );
+  static async get(github, number) {
+    return await github.client.pullRequests.get(github.repo({number}));
   }
 }
 /**
@@ -370,6 +370,7 @@ class Review {
 }
 
 module.exports = {
+  GitHub,
   PullRequest,
   Review,
 };
