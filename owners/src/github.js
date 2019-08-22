@@ -106,9 +106,8 @@ class PullRequest {
     });
     reviewers = _.union(...reviewers);
     const checkOutputText = this.buildCheckOutput(prInfo);
-    const checkRuns = await this.getCheckRun();
-    const {hasCheckRun, checkRun} = this.hasCheckRun(checkRuns);
-    if (hasCheckRun) {
+    const checkRun = await this.getCheckRun();
+    if (checkRun) {
       return this.updateCheckRun(
           checkRun, checkOutputText, prInfo.approvalsMet);
     }
@@ -264,27 +263,16 @@ class PullRequest {
   /**
    * Retrieves a check run from the GitHub API.
    *
-   * @return {!Promise}
+   * @return {?object} the check run if it exists, or undefined.
    */
   async getCheckRun() {
     const res = await this.github.client.checks.listForRef(
         this.github.repo({ref: this.headSha}));
     this.logger.debug('[getCheckRun]', res);
-    return res.data;
-  }
-
-  /**
-   * @param {object} checkRuns
-   * @return {object}
-   */
-  hasCheckRun(checkRuns) {
-    const hasCheckRun = checkRuns.total_count > 0;
-    const [checkRun] = checkRuns.check_runs.filter(x => {
-      return x.head_sha === this.headSha && this.nameMatcher.test(x.name);
-    });
-    const tuple = {hasCheckRun: hasCheckRun && !!checkRun, checkRun};
-    this.logger.debug('[hasCheckRun]', tuple);
-    return tuple;
+    const checkRuns = res.data.check_runs;
+    const [checkRun] = checkRuns.filter(cr => cr.head_sha === this.headSha)
+                           .filter(cr => this.nameMatcher.test(cr.name));
+    return checkRun;
   }
 
   /**
