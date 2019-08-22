@@ -21,7 +21,7 @@ const sleep = require('sleep-promise');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
-
+const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
 
 /**
  * Interface for working with the GitHub API.
@@ -84,21 +84,28 @@ class GitHub {
    * @param {!CheckRun} checkRun check-run data to create.
    */
   async createCheckRun(branch, sha, checkRun) {
-    return await this.client.checks.create(this.repo({
-      head_branch: branch,
-      head_sha: sha,
-      ...checkRun.json,
-    }));
+    return await this.client.checks.create(
+      this.repo({
+        head_branch: branch,
+        head_sha: sha,
+        ...checkRun.json,
+      })
+    );
   }
 
   /**
-   * Fetches check-runs for a commit.
+   * Fetches the ID of the OWNERS bot check-run for a commit.
    *
    * @param {!string} sha SHA hash for head commit to lookup check-runs on.
-   * @return {CheckRun} check-run JSON response.
+   * @return {number|null} check-run ID if one exists, otherwise null.
    */
-  async getCheckRun(sha) {
-    // TODO: implement.
+  async getCheckRunId(sha) {
+    const response = await this.client.checks.listForRef(this.repo({ref: sha}));
+    const checkRuns = response.data.check_runs;
+    const [checkRun] = checkRuns
+      .filter(cr => cr.head_sha === sha)
+      .filter(cr => OWNERS_CHECKRUN_REGEX.test(cr.name));
+    return checkRun ? checkRun.id : null;
   }
 
   /**
@@ -108,13 +115,14 @@ class GitHub {
    * @param {!CheckRun} checkRun check-run data to update.
    */
   async updateCheckRun(id, checkRun) {
-    return await this.client.checks.update(this.repo({
-      check_run_id: id,
-      ...checkRun.json,
-    }));
+    return await this.client.checks.update(
+      this.repo({
+        check_run_id: id,
+        ...checkRun.json,
+      })
+    );
   }
 }
-
 
 /**
  * A GitHub presubmit check-run.
@@ -157,7 +165,6 @@ class CheckRun {
    * @return {object} JSON object for GitHub check-run creation.
    */
 }
-
 
 /**
  * Maps the github json payload to a simpler data structure.
@@ -204,10 +211,13 @@ class PullRequest {
     });
     reviewers = _.union(...reviewers);
     const checkOutputText = this.buildCheckOutput(prInfo);
-    const checkRun = await this.getCheckRun();
-    if (checkRun) {
+    const checkRunId = await this.getCheckRunId();
+    if (checkRunId) {
       return this.updateCheckRun(
-          checkRun, checkOutputText, prInfo.approvalsMet);
+        checkRunId,
+        checkOutputText,
+        prInfo.approvalsMet
+      );
     }
     return this.createCheckRun(checkOutputText, prInfo.approvalsMet);
   }
@@ -265,9 +275,11 @@ class PullRequest {
     this.logger.debug('[getReviews]', res.data);
     // Sort by latest submitted_at date first since users and state
     // are not unique.
-    const reviews = res.data.map(x => new Review(x)).sort((a, b) => {
-      return b.submitted_at - a.submitted_at;
-    });
+    const reviews = res.data
+      .map(x => new Review(x))
+      .sort((a, b) => {
+        return b.submitted_at - a.submitted_at;
+      });
     return reviews;
   }
 
@@ -300,10 +312,10 @@ class PullRequest {
    */
   getReviewersWhoApproved(reviews) {
     const reviewersWhoApproved = reviews
-                                     .filter(x => {
-                                       return x.state === 'approved';
-                                     })
-                                     .map(x => x.username);
+      .filter(x => {
+        return x.state === 'approved';
+      })
+      .map(x => x.username);
     // If you're the author, then you yourself are assumed to approve your own
     // PR.
     reviewersWhoApproved.push(this.author);
@@ -318,35 +330,34 @@ class PullRequest {
   async createCheckRun(text, areApprovalsMet) {
     // We need to add a delay on the PR creation and check creation since
     // GitHub might not be ready.
-    await sleep(2000);
+    await sleep(GITHUB_CHECKRUN_DELAY);
     return await this.github.createCheckRun(
-        this.headRef, this.headSha, new CheckRun(areApprovalsMet, text));
+      this.headRef,
+      this.headSha,
+      new CheckRun(areApprovalsMet, text)
+    );
   }
 
   /**
-   * @param {object} checkRun
+   * @param {number} checkRunId
    * @param {string} text
    * @param {boolean} areApprovalsMet
    * @return {!Promise}
    */
-  async updateCheckRun(checkRun, text, areApprovalsMet) {
+  async updateCheckRun(checkRunId, text, areApprovalsMet) {
     return await this.github.updateCheckRun(
-        checkRun.id, new CheckRun(areApprovalsMet, text));
+      checkRunId,
+      new CheckRun(areApprovalsMet, text)
+    );
   }
 
   /**
    * Retrieves a check run from the GitHub API.
    *
-   * @return {?object} the check run if it exists, or undefined.
+   * @return {number|null} the check run if it exists, or null.
    */
-  async getCheckRun() {
-    const res = await this.github.client.checks.listForRef(
-        this.github.repo({ref: this.headSha}));
-    this.logger.debug('[getCheckRun]', res);
-    const checkRuns = res.data.check_runs;
-    const [checkRun] = checkRuns.filter(cr => cr.head_sha === this.headSha)
-                           .filter(cr => this.nameMatcher.test(cr.name));
-    return checkRun;
+  async getCheckRunId() {
+    return await this.github.getCheckRunId(this.headSha);
   }
 
   /**
@@ -355,25 +366,26 @@ class PullRequest {
    */
   buildCheckOutput(prInfo) {
     const text = Object.values(prInfo.fileOwners)
-                     .filter(fileOwner => {
-                       // Omit sections that has a required reviewer who has
-                       // approved.
-                       return !_.intersection(
-                                    prInfo.reviewersWhoApproved,
-                                    fileOwner.owner.dirOwners)
-                                   .length;
-                     })
-                     .map(fileOwner => {
-                       const fileOwnerHeader = `## possible reviewers: ${
-                           fileOwner.owner.dirOwners.join(', ')}`;
-                       const files = fileOwner.files
-                                         .map(file => {
-                                           return ` - ${file.path}\n`;
-                                         })
-                                         .join('');
-                       return `\n${fileOwnerHeader}\n${files}`;
-                     })
-                     .join('');
+      .filter(fileOwner => {
+        // Omit sections that has a required reviewer who has
+        // approved.
+        return !_.intersection(
+          prInfo.reviewersWhoApproved,
+          fileOwner.owner.dirOwners
+        ).length;
+      })
+      .map(fileOwner => {
+        const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(
+          ', '
+        )}`;
+        const files = fileOwner.files
+          .map(file => {
+            return ` - ${file.path}\n`;
+          })
+          .join('');
+        return `\n${fileOwnerHeader}\n${files}`;
+      })
+      .join('');
     this.logger.debug('[buildCheckOutput]', text);
     return text;
   }
@@ -410,6 +422,7 @@ class Review {
 }
 
 module.exports = {
+  CheckRun,
   GitHub,
   PullRequest,
   Review,
