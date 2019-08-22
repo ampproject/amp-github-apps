@@ -19,6 +19,10 @@ const {Owner} = require('./owner');
 const _ = require('lodash');
 const sleep = require('sleep-promise');
 
+const GITHUB_CHECKRUN_DELAY = 2000;
+const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
+
+
 /**
  * Interface for working with the GitHub API.
  */
@@ -59,7 +63,101 @@ class GitHub {
   repo(obj) {
     return Object.assign({}, obj, {repo: this.repository, owner: this.owner});
   }
+
+  /**
+   * Fetches a pull request.
+   *
+   * @param {!number} number pull request number.
+   * @return {object} pull request JSON response.
+   */
+  getPullRequest(number) {
+    // TODO: implement.
+    return null;
+  }
+
+  /**
+   * Creates a check-run status for a commit.
+   *
+   * @param {!string} branch branch name.
+   * @param {!string} sha commit SHA for HEAD ref to create check-run
+   *     status on.
+   * @param {!CheckRun} checkRun check-run data to create.
+   */
+  async createCheckRun(branch, sha, checkRun) {
+    return await this.client.checks.create(this.repo({
+      head_branch: branch,
+      head_sha: sha,
+      ...checkRun.json,
+    }));
+  }
+
+  /**
+   * Fetches check-runs for a commit.
+   *
+   * @param {!string} sha SHA hash for head commit to lookup check-runs on.
+   * @return {CheckRun} check-run JSON response.
+   */
+  async getCheckRun(sha) {
+    // TODO: implement.
+  }
+
+  /**
+   * Updates the check-run status for a commit.
+   *
+   * @param {!number} id ID of check-run data to update.
+   * @param {!CheckRun} checkRun check-run data to update.
+   */
+  async updateCheckRun(id, checkRun) {
+    return await this.client.checks.update(this.repo({
+      check_run_id: id,
+      ...checkRun.json,
+    }));
+  }
 }
+
+
+/**
+ * A GitHub presubmit check-run.
+ */
+class CheckRun {
+  /**
+   * Constructor.
+   *
+   * @param {!string} passing whether or not the check-run is passing/approved.
+   * @param {!string} text description of check-run results.
+   */
+  constructor(passing, text) {
+    Object.assign(this, {passing, text});
+  }
+
+  /**
+   * Produces a JSON version of the object for use with GitHub API.
+   *
+   * @return {object} JSON object describing check-run.
+   */
+  get json() {
+    return {
+      name: GITHUB_CHECKRUN_NAME,
+      status: 'completed',
+      conclusion: 'neutral',
+      completed_at: new Date(),
+      output: {
+        title: GITHUB_CHECKRUN_NAME,
+        summary: `The check was a ${this.passing ? 'success' : 'failure'}!`,
+        text: this.text,
+      },
+    };
+  }
+
+  /**
+   * Produces the JSON object used to create a check-run through the GitHub API.
+   *
+   * Check-run must have `branch` and `sha` properties defined.
+   *
+   * @return {object} JSON object for GitHub check-run creation.
+   */
+}
+
 
 /**
  * Maps the github json payload to a simpler data structure.
@@ -221,20 +319,8 @@ class PullRequest {
     // We need to add a delay on the PR creation and check creation since
     // GitHub might not be ready.
     await sleep(2000);
-    const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.client.checks.create(this.github.repo({
-      name: this.name,
-      head_branch: this.headRef,
-      head_sha: this.headSha,
-      status: 'completed',
-      conclusion: 'neutral',
-      completed_at: new Date(),
-      output: {
-        title: this.name,
-        summary: `The check was a ${conclusion}!`,
-        text,
-      },
-    }));
+    return await this.github.createCheckRun(
+        this.headRef, this.headSha, new CheckRun(areApprovalsMet, text));
   }
 
   /**
@@ -244,20 +330,8 @@ class PullRequest {
    * @return {!Promise}
    */
   async updateCheckRun(checkRun, text, areApprovalsMet) {
-    this.logger.debug('[updateCheckRun]', checkRun);
-    const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.client.checks.update(this.github.repo({
-      check_run_id: checkRun.id,
-      status: 'completed',
-      conclusion: 'neutral',
-      name: this.name,
-      completed_at: new Date(),
-      output: {
-        title: this.name,
-        summary: `The check was a ${conclusion}!`,
-        text,
-      },
-    }));
+    return await this.github.updateCheckRun(
+        checkRun.id, new CheckRun(areApprovalsMet, text));
   }
 
   /**
