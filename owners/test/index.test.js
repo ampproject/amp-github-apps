@@ -147,7 +147,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
   });
 
@@ -200,7 +200,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
   });
 
@@ -248,7 +248,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
 
     test('with failure check when there are 0 reviews on a pull request and multiple files', async () => {
@@ -294,7 +294,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
   });
 
@@ -352,7 +352,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'check_run', payload: rerequest35});
+      await probot.receive({name: 'check_run', payload: rerequest35});
     });
   });
 
@@ -404,7 +404,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
 
     test('with passing check when author themselves are owners', async () => {
@@ -454,7 +454,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened36});
+      await probot.receive({name: 'pull_request', payload: opened36});
     });
   });
 
@@ -509,7 +509,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request_review', payload: review35});
+      await probot.receive({name: 'pull_request_review', payload: review35});
     });
   });
 });
