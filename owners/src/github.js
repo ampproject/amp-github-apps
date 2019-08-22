@@ -178,10 +178,6 @@ class PullRequest {
    * @param {Logger=} logger logging interface (defaults to console).
    */
   constructor(github, pr, logger) {
-    this.name = 'ampproject/owners-check';
-
-    this.nameMatcher = new RegExp('owners bot|owners-check', 'i');
-
     this.logger = logger || console;
     this.github = github;
 
@@ -211,15 +207,19 @@ class PullRequest {
     });
     reviewers = _.union(...reviewers);
     const checkOutputText = this.buildCheckOutput(prInfo);
-    const checkRunId = await this.getCheckRunId();
+    const checkRunId = await this.github.getCheckRunId(this.headSha);
+    const latestCheckRun = new CheckRun(prInfo.approvalsMet, checkOutputText);
+
     if (checkRunId) {
-      return this.updateCheckRun(
-        checkRunId,
-        checkOutputText,
-        prInfo.approvalsMet
-      );
+      await this.github.updateCheckRun(checkRunId, latestCheckRun);
+    } else {
+      // We need to add a delay on the PR creation and check creation since
+      // GitHub might not be ready.
+      // TODO: Verify this is still needed.
+      await sleep(GITHUB_CHECKRUN_DELAY);
+      await this.github.createCheckRun(
+        this.headRef, this.headSha, latestCheckRun);
     }
-    return this.createCheckRun(checkOutputText, prInfo.approvalsMet);
   }
 
   /**
@@ -320,44 +320,6 @@ class PullRequest {
     // PR.
     reviewersWhoApproved.push(this.author);
     return reviewersWhoApproved;
-  }
-
-  /**
-   * @param {string} text
-   * @param {boolean} areApprovalsMet
-   * @return {!Promise}
-   */
-  async createCheckRun(text, areApprovalsMet) {
-    // We need to add a delay on the PR creation and check creation since
-    // GitHub might not be ready.
-    await sleep(GITHUB_CHECKRUN_DELAY);
-    return await this.github.createCheckRun(
-      this.headRef,
-      this.headSha,
-      new CheckRun(areApprovalsMet, text)
-    );
-  }
-
-  /**
-   * @param {number} checkRunId
-   * @param {string} text
-   * @param {boolean} areApprovalsMet
-   * @return {!Promise}
-   */
-  async updateCheckRun(checkRunId, text, areApprovalsMet) {
-    return await this.github.updateCheckRun(
-      checkRunId,
-      new CheckRun(areApprovalsMet, text)
-    );
-  }
-
-  /**
-   * Retrieves a check run from the GitHub API.
-   *
-   * @return {number|null} the check run if it exists, or null.
-   */
-  async getCheckRunId() {
-    return await this.github.getCheckRunId(this.headSha);
   }
 
   /**
