@@ -137,6 +137,70 @@ class GitHub {
 }
 
 /**
+ * Manages checking if a PR has the necessary approvals.
+ */
+class ApprovalCheck {
+  /**
+   * Builds a check-run.
+   *
+   * @param {!object} fileOwners ownership rules.
+   * @param {!object} approvers list of usernames that approved this PR.
+   * @return {CheckRun} a check-run based on the approval state.
+   */
+  static buildCheckRun(fileOwners, approvers) {
+    const passing = this._allFilesApproved(fileOwners, approvers);
+    const text = this._buildOutputText(fileOwners, approvers);
+    return new CheckRun(passing, text);
+  }
+
+  /**
+   * Tests if all files are approved by at least one owner.
+   *
+   * @private
+   * @param {!object} fileOwners ownership rules.
+   * @param {!string[]} approvers list of usernames that approved this PR.
+   * @return {boolean} if all files are approved.
+   */
+  static _allFilesApproved(fileOwners, approvers) {
+    return Object.keys(fileOwners).every(path => {
+      const fileOwner = fileOwners[path];
+      const owner = fileOwner.owner;
+      return _.intersection(owner.dirOwners, approvers).length > 0;
+    });
+  }
+
+  /**
+   * Build the check-run output comment.
+   *
+   * @private
+   * @param {!object} fileOwners ownership rules.
+   * @param {!string[]} approvers list of usernames that approved this PR.
+   * @return {string} check-run output text.
+   */
+  static _buildOutputText(fileOwners, approvers) {
+    const text = Object.values(fileOwners)
+      .filter(fileOwner => {
+        // Omit sections that has a required reviewer who has
+        // approved.
+        return !_.intersection(approvers, fileOwner.owner.dirOwners).length;
+      })
+      .map(fileOwner => {
+        const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(
+          ', '
+        )}`;
+        const files = fileOwner.files
+          .map(file => {
+            return ` - ${file.path}\n`;
+          })
+          .join('');
+        return `\n${fileOwnerHeader}\n${files}`;
+      })
+      .join('');
+    return text;
+  }
+}
+
+/**
  * A GitHub presubmit check-run.
  */
 class CheckRun {
@@ -225,11 +289,11 @@ class PullRequest {
   async processOpened() {
     const fileOwners = await Owner.getOwners(this);
     const approvers = await this.getApprovers();
-    const approvalsMet = this.areAllApprovalsMet(fileOwners, approvers);
 
-    const checkOutputText = this.buildCheckOutput(fileOwners, approvers);
+    // const approvalsMet = this.areAllApprovalsMet(fileOwners, approvers);
+    // const checkOutputText = this.buildCheckOutput(fileOwners, approvers);
     const checkRunId = await this.github.getCheckRunId(this.headSha);
-    const latestCheckRun = new CheckRun(approvalsMet, checkOutputText);
+    const latestCheckRun = ApprovalCheck.buildCheckRun(fileOwners, approvers);
 
     if (checkRunId) {
       await this.github.updateCheckRun(checkRunId, latestCheckRun);
@@ -289,51 +353,6 @@ class PullRequest {
    */
   async setReviewers(reviewers) {
     // Stub
-  }
-
-  /**
-   * Tests if all files are approved by at least one owner.
-   *
-   * @param {!object} fileOwners ownership rules.
-   * @param {!string[]} approvers list of usernames that approved this PR.
-   * @return {boolean} if all files are approved.
-   */
-  areAllApprovalsMet(fileOwners, approvers) {
-    return Object.keys(fileOwners).every(path => {
-      const fileOwner = fileOwners[path];
-      const owner = fileOwner.owner;
-      return _.intersection(owner.dirOwners, approvers).length > 0;
-    });
-  }
-
-  /**
-   * Build the check-run output comment.
-   *
-   * @param {!object} fileOwners ownership rules.
-   * @param {!string[]} approvers list of usernames that approved this PR.
-   * @return {string} check-run output text.
-   */
-  buildCheckOutput(fileOwners, approvers) {
-    const text = Object.values(fileOwners)
-      .filter(fileOwner => {
-        // Omit sections that has a required reviewer who has
-        // approved.
-        return !_.intersection(approvers, fileOwner.owner.dirOwners).length;
-      })
-      .map(fileOwner => {
-        const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(
-          ', '
-        )}`;
-        const files = fileOwner.files
-          .map(file => {
-            return ` - ${file.path}\n`;
-          })
-          .join('');
-        return `\n${fileOwnerHeader}\n${files}`;
-      })
-      .join('');
-    this.logger.debug('[buildCheckOutput]', text);
-    return text;
   }
 
   /**
