@@ -15,6 +15,8 @@
  */
 
 const path = require('path');
+// TODO: Replace the RepoFile class and uses with LocalRepo.
+const {RepoFile} = require('./repo-file');
 const {LocalRepository} = require('./local_repo');
 const {OwnersParser} = require('./owners');
 
@@ -81,13 +83,11 @@ class Owner {
     const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
     await localRepo.checkout();
 
-    const [files, ownersMap] = await Promise.all([
-      pr.listFiles(),
-      this.parseOwnersMap(localRepo),
-    ]);
-    const owners = findOwners(files, ownersMap);
+    const filenames = await pr.github.listFiles(pr.id);
+    const repoFiles = filenames.map(filename => new RepoFile(filename));
+    const ownersMap = await this.parseOwnersMap(localRepo);
+    const owners = findOwners(repoFiles, ownersMap);
 
-    pr.logger.debug('[getOwners]', owners);
     return owners;
   }
 }

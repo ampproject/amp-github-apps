@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-const {RepoFile} = require('./repo-file');
 const {OwnersCheck} = require('./owners_check');
 const {Owner} = require('./owner');
 const _ = require('lodash');
@@ -235,17 +234,6 @@ class PullRequest {
         latestCheckRun
       );
     }
-  }
-
-  /**
-   * Retrieves the pull request json payload from the github API
-   * and pulls out the files that have been changed in any way
-   * and returns type RepoFile[].
-   * @return {!Promise<!Array<!RepoFile>>}
-   */
-  async listFiles() {
-    const files = await this.github.listFiles(this.id);
-    return files.map(filename => new RepoFile(filename));
   }
 
   /**
