@@ -80,10 +80,11 @@ class GitHub {
    */
   async getReviews(prNumber) {
     const response = await this.client.pullRequests.listReviews(
-        this.repo({number: prNumber}));
+      this.repo({number: prNumber})
+    );
     return response.data.map(
-        json => new Review(
-            json.user.login, json.state, json.submitted_at));
+      json => new Review(json.user.login, json.state, json.submitted_at)
+    );
   }
 
   /**
@@ -135,7 +136,6 @@ class GitHub {
   }
 }
 
-
 /**
  * A GitHub presubmit check-run.
  */
@@ -170,7 +170,6 @@ class CheckRun {
   }
 }
 
-
 /**
  * A a GitHub PR review.
  */
@@ -178,20 +177,18 @@ class Review {
   /**
    * Constructor.
    *
-   * @return {object} JSON object for GitHub check-run creation.
    * @param {!string} reviewer username of the reviewer giving approval.
    * @param {!string} state status of the review (ie. "approved" or not).
    * @param {!Date} submittedAt timestamp when the review was submitted.
    */
   constructor(reviewer, state, submittedAt) {
     Object.assign(this, {
-        reviewer,
-        submittedAt,
-        isApproved: state.toLowerCase() === 'approved',
+      reviewer,
+      submittedAt,
+      isApproved: state.toLowerCase() === 'approved',
     });
   }
 }
-
 
 /**
  * Maps the github json payload to a simpler data structure.
@@ -226,17 +223,13 @@ class PullRequest {
    * on GitHub.
    */
   async processOpened() {
-    const prInfo = await this.getMeta();
-    // TODO: Reviewers here is to be assigned to the Pull Request.
-    /* eslint-disable-next-line no-unused-vars */
-    let reviewers = Object.values(prInfo.fileOwners).map(fileOwner => {
-      return fileOwner.owner.dirOwners;
-    });
-    reviewers = _.union(...reviewers);
+    const fileOwners = await Owner.getOwners(this);
+    const approvers = await this.getApprovers();
+    const approvalsMet = this.areAllApprovalsMet(fileOwners, approvers);
 
-    const checkOutputText = this.buildCheckOutput(prInfo);
+    const checkOutputText = this.buildCheckOutput(fileOwners, approvers);
     const checkRunId = await this.github.getCheckRunId(this.headSha);
-    const latestCheckRun = new CheckRun(prInfo.approvalsMet, checkOutputText);
+    const latestCheckRun = new CheckRun(approvalsMet, checkOutputText);
 
     if (checkRunId) {
       await this.github.updateCheckRun(checkRunId, latestCheckRun);
@@ -246,18 +239,11 @@ class PullRequest {
       // TODO: Verify this is still needed.
       await sleep(GITHUB_CHECKRUN_DELAY);
       await this.github.createCheckRun(
-        this.headRef, this.headSha, latestCheckRun);
+        this.headRef,
+        this.headSha,
+        latestCheckRun
+      );
     }
-  }
-
-  /**
-   * Retrieve the metadata we need to evaluate a Pull Request.
-   */
-  async getMeta() {
-    const fileOwners = await Owner.getOwners(this);
-    const approvers = await this.getApprovers();
-    const approvalsMet = this.areAllApprovalsMet(fileOwners, approvers);
-    return {fileOwners, approvers, approvalsMet};
   }
 
   /**
@@ -283,8 +269,7 @@ class PullRequest {
   async getApprovers() {
     const reviews = await this.github.getReviews(this.id);
     // Sort by the latest submitted_at date to get the latest review.
-    const sortedReviews = reviews.sort(
-        (a, b) => b.submittedAt - a.submittedAt);
+    const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
     // This should always pick out the first instance.
     const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
     const uniqueApprovals = uniqueReviews.filter(review => review.isApproved);
@@ -308,7 +293,8 @@ class PullRequest {
 
   /**
    * Tests if all files are approved by at least one owner.
-   * @param {object} fileOwners
+   *
+   * @param {!object} fileOwners ownership rules.
    * @param {!string[]} approvers list of usernames that approved this PR.
    * @return {boolean} if all files are approved.
    */
@@ -321,18 +307,18 @@ class PullRequest {
   }
 
   /**
-   * @param {object} prInfo
-   * @return {string}
+   * Build the check-run output comment.
+   *
+   * @param {!object} fileOwners ownership rules.
+   * @param {!string[]} approvers list of usernames that approved this PR.
+   * @return {string} check-run output text.
    */
-  buildCheckOutput(prInfo) {
-    const text = Object.values(prInfo.fileOwners)
+  buildCheckOutput(fileOwners, approvers) {
+    const text = Object.values(fileOwners)
       .filter(fileOwner => {
         // Omit sections that has a required reviewer who has
         // approved.
-        return !_.intersection(
-          prInfo.approvers,
-          fileOwner.owner.dirOwners
-        ).length;
+        return !_.intersection(approvers, fileOwner.owner.dirOwners).length;
       })
       .map(fileOwner => {
         const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(

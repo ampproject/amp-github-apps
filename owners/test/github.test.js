@@ -141,7 +141,7 @@ describe('GitHub API', () => {
         const review = legacyReviews[0];
         expect(review.username).toEqual('erwinmombay');
         expect(review.state).toEqual('approved');
-        expect(review.submitted_at).toEqual("2019-02-26T20:39:13Z");
+        expect(review.submitted_at).toEqual('2019-02-26T20:39:13Z');
       });
     });
   });
