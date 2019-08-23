@@ -139,7 +139,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
             return true;
@@ -192,7 +192,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
             return true;
@@ -240,7 +240,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
             return true;
@@ -286,7 +286,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n - ./dir2/dir1/dir1/file-2.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n - ./dir2/dir1/dir1/file-2.txt',
               },
             });
             return true;
@@ -344,7 +344,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
             return true;

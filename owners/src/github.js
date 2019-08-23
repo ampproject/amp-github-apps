@@ -162,11 +162,9 @@ class ApprovalCheck {
    * @return {boolean} if all files are approved.
    */
   static _allFilesApproved(fileOwners, approvers) {
-    return Object.keys(fileOwners).every(path => {
-      const fileOwner = fileOwners[path];
-      const owner = fileOwner.owner;
-      return _.intersection(owner.dirOwners, approvers).length > 0;
-    });
+    return Object.values(fileOwners)
+        .map(fileOwner => fileOwner.owner.dirOwners)
+        .every(dirOwners => !!_.intersection(dirOwners, approvers).length);
   }
 
   /**
@@ -178,25 +176,20 @@ class ApprovalCheck {
    * @return {string} check-run output text.
    */
   static _buildOutputText(fileOwners, approvers) {
-    const text = Object.values(fileOwners)
-      .filter(fileOwner => {
-        // Omit sections that has a required reviewer who has
-        // approved.
-        return !_.intersection(approvers, fileOwner.owner.dirOwners).length;
-      })
-      .map(fileOwner => {
-        const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(
-          ', '
-        )}`;
-        const files = fileOwner.files
-          .map(file => {
-            return ` - ${file.path}\n`;
-          })
-          .join('');
-        return `\n${fileOwnerHeader}\n${files}`;
-      })
-      .join('');
-    return text;
+    const unapprovedFileOwners = Object.values(fileOwners)
+      .filter(fileOwner =>
+        // Omit sections that has a required reviewer who has approved.
+        !_.intersection(approvers, fileOwner.owner.dirOwners).length)
+
+    const reviewerSuggestions = unapprovedFileOwners
+      .map((fileOwner) => {
+        const reviewers = fileOwner.owner.dirOwners.join(', ');
+        const header = `## possible reviewers: ${reviewers}`;
+        const files = fileOwner.files.map(file => ` - ${file.path}`);
+        return [header, ...files].join('\n');
+      });
+
+    return reviewerSuggestions.join('\n\n');
   }
 }
 
@@ -271,15 +264,10 @@ class PullRequest {
 
     this.id = pr.number;
     this.author = pr.user.login;
-    this.state = pr.state;
 
     // Ref here is the branch name
     this.headRef = pr.head.ref;
     this.headSha = pr.head.sha;
-
-    // Base is usually master
-    this.baseRef = pr.base.ref;
-    this.baseSha = pr.base.sha;
   }
 
   /**
@@ -290,8 +278,6 @@ class PullRequest {
     const fileOwners = await Owner.getOwners(this);
     const approvers = await this.getApprovers();
 
-    // const approvalsMet = this.areAllApprovalsMet(fileOwners, approvers);
-    // const checkOutputText = this.buildCheckOutput(fileOwners, approvers);
     const checkRunId = await this.github.getCheckRunId(this.headSha);
     const latestCheckRun = ApprovalCheck.buildCheckRun(fileOwners, approvers);
 
