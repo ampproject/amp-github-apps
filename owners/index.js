@@ -56,7 +56,7 @@ module.exports = app => {
       // GitHub might not be ready.
       // TODO: Verify this is still needed.
       await sleep(GITHUB_CHECKRUN_DELAY);
-      await github.createCheckRun(pr.branch, pr.headSha, latestCheckRun);
+      await github.createCheckRun(pr.headSha, latestCheckRun);
     }
   }
 

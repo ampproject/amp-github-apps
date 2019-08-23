@@ -183,7 +183,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened35.pull_request.head.ref,
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'failure',
@@ -335,7 +334,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened35.pull_request.head.ref,
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'failure',
@@ -388,7 +386,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened35.pull_request.head.ref,
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'success',
@@ -438,7 +435,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened36.pull_request.head.ref,
               head_sha: opened36.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'success',
@@ -493,7 +489,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened35.pull_request.head.ref,
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'success',

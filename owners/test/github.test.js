@@ -161,7 +161,6 @@ describe('GitHub API', () => {
         .post('/repos/test_owner/test_repo/check-runs', body => {
           expect(body).toMatchObject({
             head_sha: '_test_hash_',
-            head_branch: 'test_branch',
             name: 'ampproject/owners-check',
             status: 'completed',
             conclusion: 'neutral',
@@ -177,7 +176,6 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         await github.createCheckRun(
-          'test_branch',
           '_test_hash_',
           new CheckRun(true, 'Test text')
         );

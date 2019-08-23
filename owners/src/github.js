@@ -127,20 +127,18 @@ class GitHub {
   /**
    * Creates a check-run status for a commit.
    *
-   * @param {!string} branch branch name.
    * @param {!string} sha commit SHA for HEAD ref to create check-run
    *     status on.
    * @param {!CheckRun} checkRun check-run data to create.
    */
-  async createCheckRun(branch, sha, checkRun) {
+  async createCheckRun(sha, checkRun) {
     this.logger.info(
-      `Creating check-run  on branch ${branch} for commit ${sha.substr(0, 7)}`
+      `Creating check-run for commit ${sha.substr(0, 7)}`
     );
-    this.logger.debug('[createCheckRun]', branch, sha, checkRun)
+    this.logger.debug('[createCheckRun]', sha, checkRun)
 
     return await this.client.checks.create(
       this.repo({
-        head_branch: branch,
         head_sha: sha,
         ...checkRun.json,
       })
@@ -195,26 +193,20 @@ class PullRequest {
    *
    * @param {!number} number pull request number.
    * @param {!string} author username of the pull request author.
-   * @param {!string} branch git branch the PR is on.
    * @param {!string} headSha SHA hash of the PR's HEAD commit.
    */
-  constructor(number, author, branch, headSha) {
-    Object.assign(this, {number, author, branch, headSha});
+  constructor(number, author, headSha) {
+    Object.assign(this, {number, author, headSha});
   }
 
   /**
    * Initialize a Pull Request from a GitHub response data structure.
    *
-   * @param {!object} response GitHub PullRequest response structure.
+   * @param {!object} res GitHub PullRequest response structure.
    * @return {PullRequest} a pull request instance.
    */
-  static fromGitHubResponse(response) {
-    return new PullRequest(
-      response.number,
-      response.user.login,
-      response.head.ref,
-      response.head.sha
-    );
+  static fromGitHubResponse(res) {
+    return new PullRequest(res.number, res.user.login, res.head.sha);
   }
 
   /**
@@ -237,14 +229,6 @@ class PullRequest {
     }
 
     return approvers;
-  }
-
-  /**
-   * @param {!Array<string>} reviewers
-   * @return {!Promise}
-   */
-  async setReviewers(reviewers) {
-    // Stub
   }
 }
 
