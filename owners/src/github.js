@@ -19,6 +19,32 @@ const _ = require('lodash');
 const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
 
 /**
+ * Maps the github json payload to a simpler data structure.
+ */
+class PullRequest {
+  /**
+   * Constructor.
+   *
+   * @param {!number} number pull request number.
+   * @param {!string} author username of the pull request author.
+   * @param {!string} headSha SHA hash of the PR's HEAD commit.
+   */
+  constructor(number, author, headSha) {
+    Object.assign(this, {number, author, headSha});
+  }
+
+  /**
+   * Initialize a Pull Request from a GitHub response data structure.
+   *
+   * @param {!object} res GitHub PullRequest response structure.
+   * @return {PullRequest} a pull request instance.
+   */
+  static fromGitHubResponse(res) {
+    return new PullRequest(res.number, res.user.login, res.head.sha);
+  }
+}
+
+/**
  * A a GitHub PR review.
  */
 class Review {
@@ -178,32 +204,6 @@ class GitHub {
         ...checkRun.json,
       })
     );
-  }
-}
-
-/**
- * Maps the github json payload to a simpler data structure.
- */
-class PullRequest {
-  /**
-   * Constructor.
-   *
-   * @param {!number} number pull request number.
-   * @param {!string} author username of the pull request author.
-   * @param {!string} headSha SHA hash of the PR's HEAD commit.
-   */
-  constructor(number, author, headSha) {
-    Object.assign(this, {number, author, headSha});
-  }
-
-  /**
-   * Initialize a Pull Request from a GitHub response data structure.
-   *
-   * @param {!object} res GitHub PullRequest response structure.
-   * @return {PullRequest} a pull request instance.
-   */
-  static fromGitHubResponse(res) {
-    return new PullRequest(res.number, res.user.login, res.head.sha);
   }
 }
 
