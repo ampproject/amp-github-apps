@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-const {CheckRun} = require('../src/owners_check');
+const {PullRequest, Review} = require('../src/github');
+const {CheckRun, OwnersCheck} = require('../src/owners_check');
 
 describe('check run', () => {
   describe('json', () => {
@@ -39,6 +40,59 @@ describe('check run', () => {
       expect(failingCheckRun.json.output.summary).toEqual(
         'The check was a failure!'
       );
+    });
+  });
+});
+
+describe('owners check', () => {
+  describe('getApprovers', () => {
+    class FakeGithub {
+      constructor(reviews) {
+        this.getReviews = () => reviews;
+      }
+    }
+    const pr = new PullRequest(35, 'the_author', '_test_hash_');
+
+    const timestamp = '2019-01-01T00:00:00Z';
+    const approval = new Review('approver', 'approved', timestamp);
+    const otherApproval = new Review('other_approver', 'approved', timestamp);
+    const rejection = new Review('rejector', 'changes_requested', timestamp);
+
+    it("returns the reviewers' usernames", async () => {
+      const ownersCheck = new OwnersCheck(
+        new FakeGithub([approval, otherApproval]),
+        pr
+      );
+      const approvers = await ownersCheck.getApprovers();
+
+      expect(approvers).toContain('approver', 'other_approver');
+    });
+
+    it('includes the author', async () => {
+      const ownersCheck = new OwnersCheck(new FakeGithub([]), pr);
+      const approvers = await ownersCheck.getApprovers();
+
+      expect(approvers).toContain('the_author');
+    });
+
+    it('produces unique usernames', async () => {
+      const ownersCheck = new OwnersCheck(
+        new FakeGithub([approval, approval, approval]),
+        pr
+      );
+      const approvers = await ownersCheck.getApprovers();
+
+      expect(approvers).toEqual(['approver', 'the_author']);
+    });
+
+    it('includes only reviwers who approved the review', async () => {
+      const ownersCheck = new OwnersCheck(
+        new FakeGithub([approval, rejection]),
+        pr
+      );
+      const approvers = await ownersCheck.getApprovers();
+
+      expect(approvers).not.toContain('rejector');
     });
   });
 });

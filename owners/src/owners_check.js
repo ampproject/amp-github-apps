@@ -57,13 +57,23 @@ class CheckRun {
  */
 class OwnersCheck {
   /**
+   * Constructor.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   * @parma {!PullRequest} pr pull request to run owners check on.
+   */
+  constructor(github, pr) {
+    Object.assign(this, {github, pr});
+  }
+
+  /**
    * Builds a check-run.
    *
    * @param {!object} fileOwners ownership rules.
    * @param {!object} approvers list of usernames that approved this PR.
    * @return {CheckRun} a check-run based on the approval state.
    */
-  static buildCheckRun(fileOwners, approvers) {
+  buildCheckRun(fileOwners, approvers) {
     const passing = this._allFilesApproved(fileOwners, approvers);
     const text = this._buildOutputText(fileOwners, approvers);
     return new CheckRun(passing, text);
@@ -77,7 +87,7 @@ class OwnersCheck {
    * @param {string[]} approvers list of usernames that approved this PR.
    * @return {boolean} if all files are approved.
    */
-  static _allFilesApproved(fileOwners, approvers) {
+  _allFilesApproved(fileOwners, approvers) {
     return Object.values(fileOwners)
       .map(fileOwner => fileOwner.owner.dirOwners)
       .every(dirOwners => !!_.intersection(dirOwners, approvers).length);
@@ -91,7 +101,7 @@ class OwnersCheck {
    * @param {string[]} approvers list of usernames that approved this PR.
    * @return {string} check-run output text.
    */
-  static _buildOutputText(fileOwners, approvers) {
+  _buildOutputText(fileOwners, approvers) {
     const unapprovedFileOwners = Object.values(fileOwners).filter(
       fileOwner =>
         // Omit sections that has a required reviewer who has approved.
@@ -106,6 +116,31 @@ class OwnersCheck {
     });
 
     return reviewerSuggestions.join('\n\n');
+  }
+
+  /**
+   * Identifies all reviewers whose latest reviews are approvals.
+   *
+   * Also includes the author, unless the author has explicitly left a blocking
+   * review.
+   *
+   * @return {string[]} list of usernames.
+   */
+  async getApprovers() {
+    const reviews = await this.github.getReviews(this.pr.number);
+    // Sort by the latest submitted_at date to get the latest review.
+    const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
+    // This should always pick out the first instance.
+    const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
+    const uniqueApprovals = uniqueReviews.filter(review => review.isApproved);
+    const approvers = uniqueApprovals.map(approval => approval.reviewer);
+
+    // The author of a PR implicitly gives approval over files they own.
+    if (!approvers.includes(this.pr.author)) {
+      approvers.push(this.pr.author);
+    }
+
+    return approvers;
   }
 }
 

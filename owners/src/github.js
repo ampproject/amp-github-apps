@@ -91,7 +91,7 @@ class GitHub {
    * Retrives code reviews for a PR from GitHub.
    *
    * @param {!number} number PR number.
-   * @return {LegacyReview[]} the list of code reviews.
+   * @return {Review[]} the list of code reviews.
    */
   async getReviews(number) {
     this.logger.info(`Fetching reviews for PR #${number}`);
@@ -204,28 +204,6 @@ class PullRequest {
    */
   static fromGitHubResponse(res) {
     return new PullRequest(res.number, res.user.login, res.head.sha);
-  }
-
-  /**
-   * Identifies all reviewers whose latest reviews are approvals.
-   *
-   * @param {Review[]} reviews list of PR reviews.
-   * @return {string[]} list of usernames.
-   */
-  async getApprovers(reviews) {
-    // Sort by the latest submitted_at date to get the latest review.
-    const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
-    // This should always pick out the first instance.
-    const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
-    const uniqueApprovals = uniqueReviews.filter(review => review.isApproved);
-    const approvers = uniqueApprovals.map(approval => approval.reviewer);
-
-    // The author of a PR implicitly gives approval over files they own.
-    if (!approvers.includes(this.author)) {
-      approvers.push(this.author);
-    }
-
-    return approvers;
   }
 }
 

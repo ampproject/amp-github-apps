@@ -42,12 +42,12 @@ module.exports = app => {
    * @param {!PullRequest} pr pull request to run owners check on.
    */
   async function runOwnersCheck(github, pr) {
+    const ownersCheck = new OwnersCheck(github, pr);
     const fileOwners = await Owner.getOwners(github, pr.number);
-    const reviews = await github.getReviews(pr.number);
-    const approvers = await pr.getApprovers(reviews);
+    const approvers = await ownersCheck.getApprovers();
 
     const checkRunId = await github.getCheckRunId(pr.headSha);
-    const latestCheckRun = OwnersCheck.buildCheckRun(fileOwners, approvers);
+    const latestCheckRun = ownersCheck.buildCheckRun(fileOwners, approvers);
 
     if (checkRunId) {
       await github.updateCheckRun(checkRunId, latestCheckRun);
