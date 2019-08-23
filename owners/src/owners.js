@@ -238,8 +238,4 @@ class OwnersParser {
   }
 }
 
-module.exports = {
-  OwnersParser,
-  OwnersRule,
-  OwnersTree,
-};
+module.exports = {OwnersParser, OwnersRule, OwnersTree};

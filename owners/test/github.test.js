@@ -17,7 +17,8 @@ const nock = require('nock');
 const sinon = require('sinon');
 const {Probot} = require('probot');
 const owners = require('..');
-const {CheckRun, GitHub, Review} = require('../src/github');
+const {CheckRun} = require('../src/owners_check');
+const {GitHub, Review} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
 const reviewsChangesResponse = require('./fixtures/reviews/reviews.35.changes_requested.json');
@@ -26,31 +27,6 @@ const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.m
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
 
 nock.disableNetConnect();
-
-describe('check run', () => {
-  describe('json', () => {
-    it('produces a JSON object in the GitHub API format', () => {
-      const checkRun = new CheckRun(true, 'Test text');
-      const checkRunJson = checkRun.json;
-      expect(checkRunJson.name).toEqual('ampproject/owners-check');
-      expect(checkRunJson.status).toEqual('completed');
-      expect(checkRunJson.conclusion).toEqual('neutral');
-      expect(checkRunJson.output.title).toEqual('ampproject/owners-check');
-      expect(checkRunJson.output.text).toEqual('Test text');
-    });
-
-    it('produces a the output summary based on the passing status', () => {
-      const passingCheckRun = new CheckRun(true, '');
-      const failingCheckRun = new CheckRun(false, '');
-      expect(passingCheckRun.json.output.summary).toEqual(
-        'The check was a success!'
-      );
-      expect(failingCheckRun.json.output.summary).toEqual(
-        'The check was a failure!'
-      );
-    });
-  });
-});
 
 describe('review', () => {
   it('initializes its approval state', () => {
