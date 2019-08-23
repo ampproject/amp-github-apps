@@ -37,10 +37,7 @@ class GitHub {
    * @param {!Logger} logger logging interface.
    */
   constructor(client, owner, repository, logger) {
-    this.client = client;
-    this.owner = owner;
-    this.repository = repository;
-    this.logger = logger;
+    Object.assign(this, {client, owner, repository, logger});
   }
 
   /**
@@ -73,6 +70,20 @@ class GitHub {
   getPullRequest(number) {
     // TODO: implement.
     return null;
+  }
+
+  /**
+   * Retrives code reviews for a PR from GitHub.
+   *
+   * @param {!number} prNumber PR number.
+   * @return {LegacyReview[]} the list of code reviews.
+   */
+  async getReviews(prNumber) {
+    const response = await this.client.pullRequests.listReviews(
+        this.repo({number: prNumber}));
+    return response.data.map(
+        json => new LegacyReview(
+            json.user.login, json.state.toLowerCase(), json.submitted_at));
   }
 
   /**
@@ -124,6 +135,7 @@ class GitHub {
   }
 }
 
+
 /**
  * A GitHub presubmit check-run.
  */
@@ -156,15 +168,30 @@ class CheckRun {
       },
     };
   }
+}
 
+
+/**
+ * A a GitHub PR review.
+ */
+class Review {
   /**
-   * Produces the JSON object used to create a check-run through the GitHub API.
-   *
-   * Check-run must have `branch` and `sha` properties defined.
+   * Constructor.
    *
    * @return {object} JSON object for GitHub check-run creation.
+   * @param {!string} reviewer username of the reviewer giving approval.
+   * @param {!string} state status of the review (ie. "approved" or not).
+   * @param {!Date} submittedAt timestamp when the review was submitted.
    */
+  constructor(reviewer, state, submittedAt) {
+    Object.assign(this, {
+        reviewer,
+        submittedAt,
+        isApproved: state.toLowerCase() === 'approved',
+    });
+  }
 }
+
 
 /**
  * Maps the github json payload to a simpler data structure.
@@ -268,19 +295,12 @@ class PullRequest {
    * @return {!Array<object>}
    */
   async getReviews() {
-    const res = await this.github.client.pullRequests.listReviews({
-      number: this.id,
-      ...this.github.repo(),
-    });
-    this.logger.debug('[getReviews]', res.data);
+    const legacyReviews = await this.github.getReviews(this.id);
     // Sort by latest submitted_at date first since users and state
     // are not unique.
-    const reviews = res.data
-      .map(x => new Review(x))
-      .sort((a, b) => {
-        return b.submitted_at - a.submitted_at;
-      });
-    return reviews;
+    return legacyReviews.sort((a, b) => {
+      return b.submitted_at - a.submitted_at;
+    });
   }
 
   /**
@@ -364,22 +384,12 @@ class PullRequest {
 /**
  * A Review action on a GitHub Pull Request. (approve, disapprove)
  */
-class Review {
+class LegacyReview {
   /**
    * @param {object} json
    */
-  constructor(json) {
-    this.id = json.id;
-    this.username = json.user.login;
-    this.state = json.state.toLowerCase();
-    this.submitted_at = new Date(json.submitted_at);
-  }
-
-  /**
-   * @return {boolean}
-   */
-  isApproved() {
-    return this.state == 'approved';
+  constructor(username, state, submitted_at) {
+    Object.assign(this, {username, state, submitted_at});
   }
 }
 

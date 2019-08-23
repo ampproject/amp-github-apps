@@ -17,10 +17,12 @@ const nock = require('nock');
 const sinon = require('sinon');
 const {Probot} = require('probot');
 const owners = require('..');
-const {CheckRun, GitHub} = require('../src/github');
+const {CheckRun, GitHub, Review} = require('../src/github');
 
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
+const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
+const reviewsChangesResponse = require('./fixtures/reviews/reviews.35.changes_requested.json');
 
 nock.disableNetConnect();
 
@@ -46,6 +48,19 @@ describe('check run', () => {
         'The check was a failure!'
       );
     });
+  });
+});
+
+describe('review', () => {
+  it('initializes its approval state', () => {
+    const timestamp = '2019-01-01T00:00:00Z';
+    const approval = new Review('a_user', 'APPROVED', timestamp);
+    const rejection = new Review('a_user', 'CHANGES_REQUESTED', timestamp);
+
+    expect(approval.reviewer).toEqual('a_user');
+    expect(approval.submittedAt).toEqual(timestamp);
+    expect(approval.isApproved).toBe(true);
+    expect(rejection.isApproved).toBe(false);
   });
 });
 
@@ -114,6 +129,22 @@ describe('GitHub API', () => {
 
   // TODO: implement & test.
   describe('getPullRequest', () => {});
+
+  describe('getReviews', () => {
+    it('fetches a list of reviews', async () => {
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/35/reviews')
+        .reply(200, reviewsApprovedResponse);
+
+      await withContext(async (context, github) => {
+        const legacyReviews = await github.getReviews(35);
+        const review = legacyReviews[0];
+        expect(review.username).toEqual('erwinmombay');
+        expect(review.state).toEqual('approved');
+        expect(review.submitted_at).toEqual("2019-02-26T20:39:13Z");
+      });
+    });
+  });
 
   describe('createCheckRun', () => {
     it('creates a check-run for the commit', async () => {
