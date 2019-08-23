@@ -22,6 +22,7 @@ const {GitHub, Review} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
 const reviewsChangesResponse = require('./fixtures/reviews/reviews.35.changes_requested.json');
+const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
@@ -76,6 +77,7 @@ describe('GitHub API', () => {
       'initializes a GitHub API interface',
       withContext(context => {
         const github = GitHub.fromContext(context);
+
         expect(github.client).toBe(context.github);
         expect(github.owner).toEqual('test_owner');
         expect(github.repository).toEqual('test_repo');
@@ -89,6 +91,7 @@ describe('GitHub API', () => {
       'returns the repo and owner',
       withContext((context, github) => {
         const repoInfo = github.repo();
+
         expect(repoInfo.owner).toEqual('test_owner');
         expect(repoInfo.repo).toEqual('test_repo');
       })
@@ -98,6 +101,7 @@ describe('GitHub API', () => {
       'sets the repo and owner on an object',
       withContext((context, github) => {
         const repoInfo = github.repo({key: 'value', owner: 'old_owner'});
+
         expect(repoInfo.key).toEqual('value');
         expect(repoInfo.owner).toEqual('test_owner');
       })
@@ -105,7 +109,21 @@ describe('GitHub API', () => {
   });
 
   // TODO: implement & test.
-  describe('getPullRequest', () => {});
+  describe('getPullRequest', () => {
+    it('fetches a pull request', async () => {
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/35')
+        .reply(200, pullRequestResponse);
+
+      await withContext(async (context, github) => {
+        const pr = github.getPullRequest(35);
+
+        // Author pulled from pull_request.35.json
+        expect(pr.author).toEqual('ampprojectbot');
+        expect(pr.id).toEqual(35);
+      });
+    })
+  });
 
   describe('getReviews', () => {
     it('fetches a list of reviews', async () => {
@@ -115,6 +133,7 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         const [review] = await github.getReviews(35);
+
         expect(review.username).toEqual('erwinmombay');
         expect(review.state).toEqual('approved');
         expect(review.submitted_at).toEqual('2019-02-26T20:39:13Z');
@@ -130,6 +149,7 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         const [filename] = await github.listFiles(35);
+
         expect(filename).toEqual('dir2/dir1/dir1/file.txt');
       });
     });
@@ -174,6 +194,7 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         const checkRunId = await github.getCheckRunId(sha);
+
         // ID pulled from check-runs.get.35.multiple
         expect(checkRunId).toEqual(53472315);
       })();
@@ -186,6 +207,7 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         const checkRun = await github.getCheckRunId('_missing_hash_');
+
         expect(checkRun).toBeNull();
       })();
     });
@@ -197,6 +219,7 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         const checkRun = await github.getCheckRunId('_test_hash_');
+
         expect(checkRun).toBeNull();
       })();
     });

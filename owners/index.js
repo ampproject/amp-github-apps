@@ -30,27 +30,18 @@ module.exports = app => {
   });
 
   /**
-   * Process a pull request and take any necessary actions.
-   *
-   * @param {!GitHub} context Probot request context (for logging and GitHub).
-   * @param {!JsonObject} pullRequest GitHub Pull Request JSON object.
-   */
-  async function processPullRequest(context, pullRequest) {
-    const pr = new PullRequest(
-      GitHub.fromContext(context),
-      pullRequest,
-      context.log
-    );
-    await pr.processOpened();
-  }
-
-  /**
    * Probot handler for newly opened pull request.
    *
    * @param {!Context} context Probot request context.
    */
   async function onPullRequest(context) {
-    await processPullRequest(context, context.payload.pull_request);
+    const pr = new PullRequest(
+      GitHub.fromContext(context),
+      context.payload.pull_request,
+      context.log
+    );
+
+    await pr.processOpened();
   }
 
   /**
@@ -60,12 +51,10 @@ module.exports = app => {
    */
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
-    const pr = await PullRequest.get(
-      GitHub.fromContext(context),
-      payload.check_run.check_suite.pull_requests[0].number
-    );
+    const prNumber = payload.check_run.check_suite.pull_requests[0].number
+    const pr = await GitHub.fromContext(context).getPullRequest(prNumber);
 
-    await processPullRequest(context, pr.data);
+    await pr.processOpened();
   }
 
   /**
@@ -75,11 +64,9 @@ module.exports = app => {
    */
   async function onPullRequestReview(context) {
     const payload = context.payload;
-    const pr = await PullRequest.get(
-      GitHub.fromContext(context),
-      payload.pull_request.number
-    );
+    const prNumber = payload.pull_request.number;
+    const pr = await GitHub.fromContext(context).getPullRequest(prNumber);
 
-    await processPullRequest(context, pr.data);
+    await pr.processOpened();
   }
 };

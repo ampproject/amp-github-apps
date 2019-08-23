@@ -85,26 +85,26 @@ class GitHub {
    * Fetches a pull request.
    *
    * @param {!number} number pull request number.
-   * @return {object} pull request JSON response.
+   * @return {PullRequest} pull request instance.
    */
-  getPullRequest(number) {
-    // TODO: implement.
-    return null;
+  async getPullRequest(number) {
+    const pr = await this.client.pullRequests.get(this.repo({number}));
+    return new PullRequest(this, pr.data, this.logger);
   }
 
   /**
    * Retrives code reviews for a PR from GitHub.
    *
-   * @param {!number} prNumber PR number.
+   * @param {!number} number PR number.
    * @return {LegacyReview[]} the list of code reviews.
    */
-  async getReviews(prNumber) {
-    this.logger.info(`Fetching reviews for PR #${prNumber}`);
+  async getReviews(number) {
+    this.logger.info(`Fetching reviews for PR #${number}`);
 
     const response = await this.client.pullRequests.listReviews(
-      this.repo({number: prNumber})
+      this.repo({number: number})
     );
-    this.logger.debug('[getReviews]', prNumber, response.data);
+    this.logger.debug('[getReviews]', number, response.data);
 
     return response.data.map(
       json => new Review(json.user.login, json.state, json.submitted_at)
@@ -114,16 +114,16 @@ class GitHub {
   /**
    * Lists all modified files for a PR.
    *
-   * @param {!number} prNumber PR number
+   * @param {!number} number PR number
    * @return {string[]} list of relative file paths.
    */
-  async listFiles(prNumber) {
-    this.logger.info(`Fetching changed files for PR #${prNumber}`);
+  async listFiles(number) {
+    this.logger.info(`Fetching changed files for PR #${number}`);
 
     const response = await this.client.pullRequests.listFiles(
-      this.repo({number: prNumber})
+      this.repo({number: number})
     );
-    this.logger.debug('[listFiles]', prNumber, response.data);
+    this.logger.debug('[listFiles]', number, response.data);
 
     return response.data.map(item => item.filename);
   }
@@ -278,15 +278,6 @@ class PullRequest {
    */
   async setReviewers(reviewers) {
     // Stub
-  }
-
-  /**
-   * @param {!GitHub} github GitHub API interface.
-   * @param {number} number Pull Request number.
-   * @return {object} JSON object representing a pull request.
-   */
-  static async get(github, number) {
-    return await github.client.pullRequests.get(github.repo({number}));
   }
 }
 
