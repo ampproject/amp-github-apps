@@ -82,8 +82,8 @@ class GitHub {
     const response = await this.client.pullRequests.listReviews(
         this.repo({number: prNumber}));
     return response.data.map(
-        json => new LegacyReview(
-            json.user.login, json.state.toLowerCase(), json.submitted_at));
+        json => new Review(
+            json.user.login, json.state, json.submitted_at));
   }
 
   /**
@@ -286,7 +286,7 @@ class PullRequest {
   async getUniqueReviews() {
     const reviews = await this.getReviews();
     // This should always pick out the first instance.
-    return _.uniqBy(reviews, 'username');
+    return _.uniqBy(reviews, 'reviewer');
   }
 
   /**
@@ -295,11 +295,11 @@ class PullRequest {
    * @return {!Array<object>}
    */
   async getReviews() {
-    const legacyReviews = await this.github.getReviews(this.id);
+    const reviews = await this.github.getReviews(this.id);
     // Sort by latest submitted_at date first since users and state
     // are not unique.
-    return legacyReviews.sort((a, b) => {
-      return b.submitted_at - a.submitted_at;
+    return reviews.sort((a, b) => {
+      return b.submittedAt - a.submittedAt;
     });
   }
 
@@ -332,10 +332,8 @@ class PullRequest {
    */
   getReviewersWhoApproved(reviews) {
     const reviewersWhoApproved = reviews
-      .filter(x => {
-        return x.state === 'approved';
-      })
-      .map(x => x.username);
+      .filter(review => review.isApproved)
+      .map(review => review.reviewer);
     // If you're the author, then you yourself are assumed to approve your own
     // PR.
     reviewersWhoApproved.push(this.author);
@@ -379,17 +377,6 @@ class PullRequest {
    */
   static async get(github, number) {
     return await github.client.pullRequests.get(github.repo({number}));
-  }
-}
-/**
- * A Review action on a GitHub Pull Request. (approve, disapprove)
- */
-class LegacyReview {
-  /**
-   * @param {object} json
-   */
-  constructor(username, state, submitted_at) {
-    Object.assign(this, {username, state, submitted_at});
   }
 }
 
