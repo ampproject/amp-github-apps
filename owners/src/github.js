@@ -199,10 +199,8 @@ class PullRequest {
    *
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr JSON object containing pull request info.
-   * @param {Logger=} logger logging interface (defaults to console).
    */
-  constructor(github, pr, logger) {
-    this.logger = logger || console;
+  constructor(github, pr) {
     this.github = github;
 
     this.id = pr.number;
