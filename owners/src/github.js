@@ -233,6 +233,7 @@ class PullRequest {
       return fileOwner.owner.dirOwners;
     });
     reviewers = _.union(...reviewers);
+
     const checkOutputText = this.buildCheckOutput(prInfo);
     const checkRunId = await this.github.getCheckRunId(this.headSha);
     const latestCheckRun = new CheckRun(prInfo.approvalsMet, checkOutputText);
@@ -254,11 +255,9 @@ class PullRequest {
    */
   async getMeta() {
     const fileOwners = await Owner.getOwners(this);
-    const reviews = await this.getUniqueReviews();
-    this.logger.debug('[getMeta]', reviews);
-    const approvalsMet = this.areAllApprovalsMet(fileOwners, reviews);
-    const reviewersWhoApproved = this.getReviewersWhoApproved(reviews);
-    return {fileOwners, reviews, approvalsMet, reviewersWhoApproved};
+    const approvers = await this.getApprovers();
+    const approvalsMet = this.areAllApprovalsMet(fileOwners, approvers);
+    return {fileOwners, approvers, approvalsMet};
   }
 
   /**
@@ -277,30 +276,26 @@ class PullRequest {
   }
 
   /**
-   * Filters out duplicate reviews on a Pull Request. A Pull Request can be
-   * reviewed by a single user multiple times (ex. disapproved then
-   * subsequently approves.)
+   * Identifies all reviewers whose latest reviews are approvals.
    *
-   * @return {!Array<object>}
+   * @return {string[]} list of usernames.
    */
-  async getUniqueReviews() {
-    const reviews = await this.getReviews();
-    // This should always pick out the first instance.
-    return _.uniqBy(reviews, 'reviewer');
-  }
-
-  /**
-   * Retrives the Reviews from GitHub.
-   *
-   * @return {!Array<object>}
-   */
-  async getReviews() {
+  async getApprovers() {
     const reviews = await this.github.getReviews(this.id);
-    // Sort by latest submitted_at date first since users and state
-    // are not unique.
-    return reviews.sort((a, b) => {
-      return b.submittedAt - a.submittedAt;
-    });
+    // Sort by the latest submitted_at date to get the latest review.
+    const sortedReviews = reviews.sort(
+        (a, b) => b.submittedAt - a.submittedAt);
+    // This should always pick out the first instance.
+    const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
+    const uniqueApprovals = uniqueReviews.filter(review => review.isApproved);
+    const approvers = uniqueApprovals.map(approval => approval.reviewer);
+
+    // The author of a PR implicitly gives approval over files they own.
+    if (!approvers.includes(this.author)) {
+      approvers.push(this.author);
+    }
+
+    return approvers;
   }
 
   /**
@@ -312,32 +307,17 @@ class PullRequest {
   }
 
   /**
+   * Tests if all files are approved by at least one owner.
    * @param {object} fileOwners
-   * @param {!Array<object>} reviews
-   * @return {boolean}
+   * @param {!string[]} approvers list of usernames that approved this PR.
+   * @return {boolean} if all files are approved.
    */
-  areAllApprovalsMet(fileOwners, reviews) {
-    const reviewersWhoApproved = this.getReviewersWhoApproved(reviews);
+  areAllApprovalsMet(fileOwners, approvers) {
     return Object.keys(fileOwners).every(path => {
       const fileOwner = fileOwners[path];
       const owner = fileOwner.owner;
-      _.intersection(owner.dirOwners, reviewersWhoApproved);
-      return _.intersection(owner.dirOwners, reviewersWhoApproved).length > 0;
+      return _.intersection(owner.dirOwners, approvers).length > 0;
     });
-  }
-
-  /**
-   * @param {!Array<object>} reviews
-   * @return {!Array<object>}
-   */
-  getReviewersWhoApproved(reviews) {
-    const reviewersWhoApproved = reviews
-      .filter(review => review.isApproved)
-      .map(review => review.reviewer);
-    // If you're the author, then you yourself are assumed to approve your own
-    // PR.
-    reviewersWhoApproved.push(this.author);
-    return reviewersWhoApproved;
   }
 
   /**
@@ -350,7 +330,7 @@ class PullRequest {
         // Omit sections that has a required reviewer who has
         // approved.
         return !_.intersection(
-          prInfo.reviewersWhoApproved,
+          prInfo.approvers,
           fileOwner.owner.dirOwners
         ).length;
       })
