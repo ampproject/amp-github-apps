@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
+const sleep = require('sleep-promise');
 const {GitHub, PullRequest} = require('./src/github');
+const {OwnersCheck} = require('./src/owners_check');
+const {Owner} = require('./src/owner');
+
+const GITHUB_CHECKRUN_DELAY = 2000;
 
 module.exports = app => {
   app.on(['pull_request.opened', 'pull_request.synchronized'], onPullRequest);
@@ -30,18 +35,40 @@ module.exports = app => {
   });
 
   /**
+   * Runs the steps to create a new check run on a newly opened Pull Request
+   * on GitHub.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   * @param {!PullRequest} pr pull request to run owners check on.
+   */
+  async function runOwnersCheck(github, pr) {
+    const fileOwners = await Owner.getOwners(github, pr.number);
+    const reviews = await github.getReviews(pr.number);
+    const approvers = await pr.getApprovers(reviews);
+
+    const checkRunId = await github.getCheckRunId(pr.headSha);
+    const latestCheckRun = OwnersCheck.buildCheckRun(fileOwners, approvers);
+
+    if (checkRunId) {
+      await github.updateCheckRun(checkRunId, latestCheckRun);
+    } else {
+      // We need to add a delay on the PR creation and check creation since
+      // GitHub might not be ready.
+      // TODO: Verify this is still needed.
+      await sleep(GITHUB_CHECKRUN_DELAY);
+      await github.createCheckRun(pr.branch, pr.headSha, latestCheckRun);
+    }
+  }
+
+  /**
    * Probot handler for newly opened pull request.
    *
    * @param {!Context} context Probot request context.
    */
   async function onPullRequest(context) {
-    const pr = new PullRequest(
-      GitHub.fromContext(context),
-      context.payload.pull_request,
-      context.log
-    );
+    const pr = PullRequest.fromGitHubResponse(context.payload.pull_request);
 
-    await pr.processOpened();
+    await runOwnersCheck(GitHub.fromContext(context), pr);
   }
 
   /**
@@ -52,9 +79,10 @@ module.exports = app => {
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
     const prNumber = payload.check_run.check_suite.pull_requests[0].number
-    const pr = await GitHub.fromContext(context).getPullRequest(prNumber);
+    const github = GitHub.fromContext(context);
+    const pr = await github.getPullRequest(prNumber);
 
-    await pr.processOpened();
+    await runOwnersCheck(github, pr);
   }
 
   /**
@@ -65,8 +93,9 @@ module.exports = app => {
   async function onPullRequestReview(context) {
     const payload = context.payload;
     const prNumber = payload.pull_request.number;
-    const pr = await GitHub.fromContext(context).getPullRequest(prNumber);
+    const github = GitHub.fromContext(context);
+    const pr = await github.getPullRequest(prNumber);
 
-    await pr.processOpened();
+    await runOwnersCheck(github, pr);
   }
 };

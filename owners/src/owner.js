@@ -75,15 +75,16 @@ class Owner {
   }
 
   /**
-   * @param {!PullRequest} pr
+   * @param {!GitHub} github GitHub API interface.
+   * @param {!number} prNumber pull request number
    * @return {object}
    */
-  static async getOwners(pr) {
+  static async getOwners(github, prNumber) {
     // Update the local target repository of the latest from master
     const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
     await localRepo.checkout();
 
-    const filenames = await pr.github.listFiles(pr.id);
+    const filenames = await github.listFiles(prNumber);
     const repoFiles = filenames.map(filename => new RepoFile(filename));
     const ownersMap = await this.parseOwnersMap(localRepo);
     const owners = findOwners(repoFiles, ownersMap);

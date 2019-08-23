@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-const {OwnersCheck} = require('./owners_check');
-const {Owner} = require('./owner');
 const _ = require('lodash');
 const sleep = require('sleep-promise');
 
-const GITHUB_CHECKRUN_DELAY = 2000;
 const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
 
 /**
@@ -87,8 +84,8 @@ class GitHub {
    * @return {PullRequest} pull request instance.
    */
   async getPullRequest(number) {
-    const pr = await this.client.pullRequests.get(this.repo({number}));
-    return new PullRequest(this, pr.data, this.logger);
+    const response = await this.client.pullRequests.get(this.repo({number}));
+    return PullRequest.fromGitHubResponse(response.data);
   }
 
   /**
@@ -196,53 +193,37 @@ class PullRequest {
   /**
    * Constructor.
    *
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!PullRequest} pr JSON object containing pull request info.
+   * @param {!number} number pull request number.
+   * @param {!string} author username of the pull request author.
+   * @param {!string} branch git branch the PR is on.
+   * @param {!string} headSha SHA hash of the PR's HEAD commit.
    */
-  constructor(github, pr) {
-    this.github = github;
-
-    this.id = pr.number;
-    this.author = pr.user.login;
-
-    // Ref here is the branch name
-    this.headRef = pr.head.ref;
-    this.headSha = pr.head.sha;
+  constructor(number, author, branch, headSha) {
+    Object.assign(this, {number, author, branch, headSha});
   }
 
   /**
-   * Runs the steps to create a new check run on a newly opened Pull Request
-   * on GitHub.
+   * Initialize a Pull Request from a GitHub response data structure.
+   *
+   * @param {!object} response GitHub PullRequest response structure.
+   * @return {PullRequest} a pull request instance.
    */
-  async processOpened() {
-    const fileOwners = await Owner.getOwners(this);
-    const approvers = await this.getApprovers();
-
-    const checkRunId = await this.github.getCheckRunId(this.headSha);
-    const latestCheckRun = OwnersCheck.buildCheckRun(fileOwners, approvers);
-
-    if (checkRunId) {
-      await this.github.updateCheckRun(checkRunId, latestCheckRun);
-    } else {
-      // We need to add a delay on the PR creation and check creation since
-      // GitHub might not be ready.
-      // TODO: Verify this is still needed.
-      await sleep(GITHUB_CHECKRUN_DELAY);
-      await this.github.createCheckRun(
-        this.headRef,
-        this.headSha,
-        latestCheckRun
-      );
-    }
+  static fromGitHubResponse(response) {
+    return new PullRequest(
+      response.number,
+      response.user.login,
+      response.head.ref,
+      response.head.sha
+    );
   }
 
   /**
    * Identifies all reviewers whose latest reviews are approvals.
    *
+   * @param {!Review[]} reviews list of PR reviews.
    * @return {string[]} list of usernames.
    */
-  async getApprovers() {
-    const reviews = await this.github.getReviews(this.id);
+  async getApprovers(reviews) {
     // Sort by the latest submitted_at date to get the latest review.
     const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
     // This should always pick out the first instance.
