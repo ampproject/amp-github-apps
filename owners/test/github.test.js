@@ -19,10 +19,11 @@ const {Probot} = require('probot');
 const owners = require('..');
 const {CheckRun, GitHub, Review} = require('../src/github');
 
-const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
-const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
 const reviewsChangesResponse = require('./fixtures/reviews/reviews.35.changes_requested.json');
+const listFilesResponse = require('./fixtures/files/files.35.json');
+const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
+const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
 
 nock.disableNetConnect();
 
@@ -137,11 +138,23 @@ describe('GitHub API', () => {
         .reply(200, reviewsApprovedResponse);
 
       await withContext(async (context, github) => {
-        const legacyReviews = await github.getReviews(35);
-        const review = legacyReviews[0];
+        const [review] = await github.getReviews(35);
         expect(review.username).toEqual('erwinmombay');
         expect(review.state).toEqual('approved');
         expect(review.submitted_at).toEqual('2019-02-26T20:39:13Z');
+      });
+    });
+  });
+
+  describe('listFiles', () => {
+    it('fetches the list of changed files', async () => {
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/35/files')
+        .reply(200, listFilesResponse);
+
+      await withContext(async (context, github) => {
+        const [filename] = await github.listFiles(35);
+        expect(filename).toEqual('dir2/dir1/dir1/file.txt');
       });
     });
   });

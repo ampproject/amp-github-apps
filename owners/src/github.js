@@ -88,6 +88,19 @@ class GitHub {
   }
 
   /**
+   * Lists all modified files for a PR.
+   *
+   * @param {!number} prNumber PR number
+   * @return {string[]} list of relative file paths.
+   */
+  async listFiles(prNumber) {
+    const response = await this.client.pullRequests.listFiles(
+      this.repo({number: prNumber})
+    );
+    return response.data.map(item => item.filename);
+  }
+
+  /**
    * Creates a check-run status for a commit.
    *
    * @param {!string} branch branch name.
@@ -303,12 +316,8 @@ class PullRequest {
    * @return {!Promise<!Array<!RepoFile>>}
    */
   async listFiles() {
-    const res = await this.github.client.pullRequests.listFiles({
-      number: this.id,
-      ...this.github.repo(),
-    });
-    this.logger.debug('[listFiles]', res.data);
-    return res.data.map(item => new RepoFile(item.filename));
+    const files = await this.github.listFiles(this.id);
+    return files.map(filename => new RepoFile(filename));
   }
 
   /**
