@@ -74,7 +74,7 @@ class OwnersCheck {
    *
    * @private
    * @param {!object} fileOwners ownership rules.
-   * @param {!string[]} approvers list of usernames that approved this PR.
+   * @param {string[]} approvers list of usernames that approved this PR.
    * @return {boolean} if all files are approved.
    */
   static _allFilesApproved(fileOwners, approvers) {
@@ -88,7 +88,7 @@ class OwnersCheck {
    *
    * @private
    * @param {!object} fileOwners ownership rules.
-   * @param {!string[]} approvers list of usernames that approved this PR.
+   * @param {string[]} approvers list of usernames that approved this PR.
    * @return {string} check-run output text.
    */
   static _buildOutputText(fileOwners, approvers) {

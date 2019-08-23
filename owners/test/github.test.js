@@ -21,7 +21,6 @@ const {CheckRun} = require('../src/owners_check');
 const {GitHub, Review} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
-const reviewsChangesResponse = require('./fixtures/reviews/reviews.35.changes_requested.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
@@ -59,6 +58,23 @@ describe('GitHub API', () => {
     sandbox.restore();
   });
 
+  /**
+   * A test function which uses a Probot context and/or its GitHub API.
+   *
+   * @callback contextFn
+   * @param {!Context} context Probot context.
+   * @param {!GitHub} github GitHub API interface.
+   */
+
+  /**
+   * Executes a function with a probot context and GitHub API interface.
+   *
+   * Wraps the function call in a fake Probot event handler and stubs out the
+   * context with the `test_owner/test_repo` repository.
+   *
+   * @param {contextFn} testFn test function.
+   * @return {function} the test function wrapped in a Probot context.
+   */
   function withContext(testFn) {
     return async () => {
       app.on('test_event', async context => {
@@ -122,7 +138,7 @@ describe('GitHub API', () => {
         expect(pr.author).toEqual('ampprojectbot');
         expect(pr.id).toEqual(35);
       });
-    })
+    });
   });
 
   describe('getReviews', () => {

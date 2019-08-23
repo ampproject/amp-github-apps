@@ -15,7 +15,6 @@
  */
 
 const _ = require('lodash');
-const sleep = require('sleep-promise');
 
 const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
 
@@ -98,7 +97,7 @@ class GitHub {
     this.logger.info(`Fetching reviews for PR #${number}`);
 
     const response = await this.client.pullRequests.listReviews(
-      this.repo({number: number})
+      this.repo({number})
     );
     this.logger.debug('[getReviews]', number, response.data);
 
@@ -117,7 +116,7 @@ class GitHub {
     this.logger.info(`Fetching changed files for PR #${number}`);
 
     const response = await this.client.pullRequests.listFiles(
-      this.repo({number: number})
+      this.repo({number})
     );
     this.logger.debug('[listFiles]', number, response.data);
 
@@ -132,10 +131,8 @@ class GitHub {
    * @param {!CheckRun} checkRun check-run data to create.
    */
   async createCheckRun(sha, checkRun) {
-    this.logger.info(
-      `Creating check-run for commit ${sha.substr(0, 7)}`
-    );
-    this.logger.debug('[createCheckRun]', sha, checkRun)
+    this.logger.info(`Creating check-run for commit ${sha.substr(0, 7)}`);
+    this.logger.debug('[createCheckRun]', sha, checkRun);
 
     return await this.client.checks.create(
       this.repo({
@@ -212,7 +209,7 @@ class PullRequest {
   /**
    * Identifies all reviewers whose latest reviews are approvals.
    *
-   * @param {!Review[]} reviews list of PR reviews.
+   * @param {Review[]} reviews list of PR reviews.
    * @return {string[]} list of usernames.
    */
   async getApprovers(reviews) {

@@ -78,7 +78,7 @@ module.exports = app => {
    */
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
-    const prNumber = payload.check_run.check_suite.pull_requests[0].number
+    const prNumber = payload.check_run.check_suite.pull_requests[0].number;
     const github = GitHub.fromContext(context);
     const pr = await github.getPullRequest(prNumber);
 
