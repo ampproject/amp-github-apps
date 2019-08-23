@@ -99,9 +99,13 @@ class GitHub {
    * @return {LegacyReview[]} the list of code reviews.
    */
   async getReviews(prNumber) {
+    this.logger.info(`Fetching reviews for PR #${prNumber}`);
+
     const response = await this.client.pullRequests.listReviews(
       this.repo({number: prNumber})
     );
+    this.logger.debug('[getReviews]', prNumber, response.data);
+
     return response.data.map(
       json => new Review(json.user.login, json.state, json.submitted_at)
     );
@@ -114,9 +118,13 @@ class GitHub {
    * @return {string[]} list of relative file paths.
    */
   async listFiles(prNumber) {
+    this.logger.info(`Fetching changed files for PR #${prNumber}`);
+
     const response = await this.client.pullRequests.listFiles(
       this.repo({number: prNumber})
     );
+    this.logger.debug('[listFiles]', prNumber, response.data);
+
     return response.data.map(item => item.filename);
   }
 
@@ -129,6 +137,11 @@ class GitHub {
    * @param {!CheckRun} checkRun check-run data to create.
    */
   async createCheckRun(branch, sha, checkRun) {
+    this.logger.info(
+      `Creating check-run  on branch ${branch} for commit ${sha.substr(0, 7)}`
+    );
+    this.logger.debug('[createCheckRun]', branch, sha, checkRun)
+
     return await this.client.checks.create(
       this.repo({
         head_branch: branch,
@@ -145,8 +158,12 @@ class GitHub {
    * @return {number|null} check-run ID if one exists, otherwise null.
    */
   async getCheckRunId(sha) {
+    this.logger.info(`Fetching check run ID for commit ${sha.substr(0, 7)}`);
+
     const response = await this.client.checks.listForRef(this.repo({ref: sha}));
     const checkRuns = response.data.check_runs;
+    this.logger.debug('[getCheckRunId]', sha, checkRuns);
+
     const [checkRun] = checkRuns
       .filter(cr => cr.head_sha === sha)
       .filter(cr => OWNERS_CHECKRUN_REGEX.test(cr.name));
@@ -160,6 +177,10 @@ class GitHub {
    * @param {!CheckRun} checkRun check-run data to update.
    */
   async updateCheckRun(id, checkRun) {
+    const status = checkRun.isApproved ? 'passing' : 'failing';
+    this.logger.info(`Updating check-run with ID ${id} (${status})`);
+    this.logger.debug('[updateCheckRun]', id, checkRun);
+
     return await this.client.checks.update(
       this.repo({
         check_run_id: id,

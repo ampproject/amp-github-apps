@@ -26,7 +26,7 @@ module.exports = app => {
   app.log.target.addStream({
     name: 'app-custom-stream',
     stream: process.stdout,
-    level: process.LOG_LEVEL || 'info',
+    level: process.env.LOG_LEVEL || 'info',
   });
 
   /**

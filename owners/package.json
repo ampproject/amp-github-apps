@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "nodemon",
     "start": "probot run ./index.js",
-    "test": "jest",
+    "test": "LOG_LEVEL=warn jest",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
   "license": "Apache-2.0",
