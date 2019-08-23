@@ -222,4 +222,18 @@ describe('owners parser', () => {
       expect(rules[1].owners).toEqual(['user3', 'user4']);
     });
   });
+
+  describe('parseOwnersTree', () => {
+    const rootRule = new OwnersRule('OWNERS.yaml', ['user1', 'user2']);
+    const childRule = new OwnersRule('foo/OWNERS.yaml', ['user3', 'user4']);
+
+    it('adds each rule to the tree', () => {
+      sandbox.stub(parser, 'parseAllOwnersRules').returns(
+        [rootRule, childRule]);
+      const tree = parser.parseOwnersTree();
+
+      expect(tree.rules).toContain(rootRule);
+      expect(tree.get('foo').rules).toContain(childRule);
+    })
+  });
 });

@@ -38,6 +38,16 @@ class OwnersTree {
   }
 
   /**
+   * Get a subdirectory tree.
+   *
+   * @param {!string} dirName subdirectory name.
+   * @return {?OwnersTree} subdirectory tree, or null if non-existant.
+   */
+  get(dirName) {
+    return this.children[dirName] || null;
+  }
+
+  /**
    * Add a rule to the tree.
    *
    * Adds to the current node if paths match; otherwise, adds it to the node
@@ -51,14 +61,14 @@ class OwnersTree {
     } else {
       const nextDir = rule.dirPath.split(path.sep)[this.depth];
 
-      if (!this.children[nextDir]) {
+      if (!this.get(nextDir)) {
         this.children[nextDir] = new OwnersTree(
           path.join(this.dirPath, nextDir),
           this
         );
       }
 
-      this.children[nextDir].addRule(rule);
+      this.get(nextDir).addRule(rule);
     }
   }
 
@@ -101,10 +111,10 @@ class OwnersTree {
 
     while (segments.length) {
       const nextDir = segments.shift();
-      if (!subtree.children[nextDir]) {
+      if (!subtree.get(nextDir)) {
         break;
       }
-      subtree = subtree.children[nextDir];
+      subtree = subtree.get(nextDir);
     }
 
     return subtree.allRules;
@@ -135,7 +145,7 @@ class OwnersTree {
 
     /* eslint-disable-next-line guard-for-in */
     for (const dirName in this.children) {
-      lines.push(this.children[dirName].toString());
+      lines.push(this.get(dirName).toString());
     }
 
     return lines.join('\n');
@@ -235,6 +245,18 @@ class OwnersParser {
   parseAllOwnersRules() {
     const ownersPaths = this.localRepo.findOwnersFiles();
     return ownersPaths.map(ownersPath => this.parseOwnersFile(ownersPath));
+  }
+
+  /**
+   * Parse all OWNERS rules into a tree.
+   *
+   * @return {OwnersTree} owners rule hierarchy.
+   */
+  parseOwnersTree() {
+    const tree = new OwnersTree(this.localRepo.rootPath);
+    const rules = this.parseAllOwnersRules().forEach(
+      rule => tree.addRule(rule));
+    return tree;
   }
 }
 
