@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 const nock = require('nock');
 const sinon = require('sinon');
 const {Probot} = require('probot');
 const owners = require('..');
 const {CheckRun} = require('../src/owners_check');
-const {GitHub, Review} = require('../src/github');
+const {GitHub, PullRequest, Review} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
@@ -27,6 +28,19 @@ const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.m
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
 
 nock.disableNetConnect();
+
+describe('pull request', () => {
+  describe('fromGitHubResponse', () => {
+    it('creates a pull request instance', () => {
+      const response = pullRequestResponse;
+      const pr = PullRequest.fromGitHubResponse(response);
+
+      expect(pr.number).toEqual(35);
+      expect(pr.author).toEqual('ampprojectbot');
+      expect(pr.headSha).toEqual('9272f18514cbd3fa935b3ced62ae1c2bf6efa76d');
+    });
+  });
+});
 
 describe('review', () => {
   it('initializes its approval state', () => {
@@ -124,7 +138,6 @@ describe('GitHub API', () => {
     );
   });
 
-  // TODO: implement & test.
   describe('getPullRequest', () => {
     it('fetches a pull request', async () => {
       nock('https://api.github.com')
