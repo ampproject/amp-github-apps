@@ -24,8 +24,8 @@ describe('owners tree', () => {
   const rootDirRule = new OwnersRule('OWNERS.yaml', ['root']);
   const childDirRule = new OwnersRule('foo/OWNERS.yaml', ['child']);
   const otherChildDirRule = new OwnersRule('biz/OWNERS.yaml', ['child']);
-  const ancestorDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
-    'ancestor',
+  const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+    'descendant',
   ]);
 
   beforeEach(() => {
@@ -46,9 +46,9 @@ describe('owners tree', () => {
     });
 
     it('adds rules to nested subdirectories', () => {
-      tree.addRule(ancestorDirRule);
+      tree.addRule(descendantDirRule);
       expect(tree.children.foo.children.bar.children.baz.rules).toContain(
-        ancestorDirRule
+        descendantDirRule
       );
     });
   });
@@ -61,7 +61,7 @@ describe('owners tree', () => {
     it('should return tree depth for files not at the root', () => {
       tree.addRule(childDirRule);
       tree.addRule(otherChildDirRule);
-      tree.addRule(ancestorDirRule);
+      tree.addRule(descendantDirRule);
 
       expect(tree.children.foo.depth).toEqual(1);
       expect(tree.children.biz.depth).toEqual(1);
@@ -69,29 +69,54 @@ describe('owners tree', () => {
     });
   });
 
-  describe('rulesForPath', () => {
-    it('should include rules for the file\'s directory', () => {
+  describe('allRules', () => {
+    let childTree;
+    let descendantTree;
+
+    beforeEach(() => {
+      tree.addRule(rootDirRule);
       tree.addRule(childDirRule);
-      tree.addRule(otherChildDirRule);
-      expect(tree.rulesForPath('foo/bar.txt')).toContain(childDirRule);
-      expect(tree.rulesForPath('biz/bar.txt')).toContain(otherChildDirRule);
+      tree.addRule(descendantDirRule);
+
+      childTree = tree.atPath('foo/bar.txt');
+      descendantTree = tree.atPath('foo/bar/baz/buzz.txt');
     });
 
-    it('should include rules for the parent directories', () => {
-      tree.addRule(rootDirRule);
-      expect(tree.rulesForPath('foo/bar.txt')).toContain(rootDirRule);
+    it('should include rules for the starting directory', () => {
+      expect(childTree.allRules).toContain(childDirRule);
+    });
+
+    it('should include rules for the parent directory', () => {
+      expect(childTree.allRules).toContain(rootDirRule);
+    });
+
+    it('should include rules for anscestor directories', () => {
+      expect(descendantTree.allRules).toContain(rootDirRule)
     });
 
     it('should include rules in descending order of depth', () => {
-      tree.addRule(rootDirRule);
-      tree.addRule(childDirRule);
-      tree.addRule(ancestorDirRule);
-      expect(tree.rulesForPath('foo/bar/baz/buzz.txt')).toEqual([
-        ancestorDirRule,
+      expect(descendantTree.allRules).toEqual([
+        descendantDirRule,
         childDirRule,
         rootDirRule,
       ]);
     });
+  });
+
+  describe('atPath', () => {
+    it('should produce the tree for the file\'s directory', () => {
+      tree.addRule(childDirRule);
+      tree.addRule(otherChildDirRule);
+
+      expect(tree.atPath('foo/bar.txt').dirPath).toEqual('foo');
+      expect(tree.atPath('biz/bar.txt').dirPath).toEqual('biz');
+    });
+
+    it('works for a directory path without a file', () => {
+      tree.addRule(descendantDirRule);
+
+      expect(tree.atPath('foo/bar/baz').dirPath).toEqual('foo/bar/baz');
+    })
   });
 
   describe('toString', () => {
@@ -99,7 +124,7 @@ describe('owners tree', () => {
       tree.addRule(rootDirRule);
       tree.addRule(childDirRule);
       tree.addRule(otherChildDirRule);
-      tree.addRule(ancestorDirRule);
+      tree.addRule(descendantDirRule);
 
       expect(tree.toString()).toEqual(
         [
@@ -109,7 +134,7 @@ describe('owners tree', () => {
           '- child',
           '    └---bar',
           '        └---baz',
-          '        - ancestor',
+          '        - descendant',
           '└---biz',
           '- child',
         ].join('\n')
@@ -143,7 +168,7 @@ describe('owners rules', () => {
       expect('OWNERS.yaml').toMatchFile('foo/bar.txt');
     });
 
-    it('matches a file in an ancestor directory', () => {
+    it('matches a file in an descendant directory', () => {
       expect('OWNERS.yaml').toMatchFile('foo/bar/baz.txt');
     });
 
