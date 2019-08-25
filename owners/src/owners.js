@@ -32,6 +32,7 @@ class OwnersTree {
     this.dirPath = dirPath || '.';
 
     this.isRoot = !parent;
+    this.depth = this.isRoot ? 0 : this.parent.depth + 1;
 
     this.rules = [];
     this.children = {};
@@ -70,17 +71,6 @@ class OwnersTree {
 
       this.get(nextDir).addRule(rule);
     }
-  }
-
-  /**
-   * Determines the directory tree depth of the OWNERS file.
-   *
-   * Used to determine precedence. The root OWNERS file has a depth of 0.
-   *
-   * @return {number} tree depth of the OWNERS file.
-   */
-  get depth() {
-    return this.isRoot ? 0 : this.dirPath.split(path.sep).length;
   }
 
   /**
