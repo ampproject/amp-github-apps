@@ -97,15 +97,15 @@ class OwnersTree {
   }
 
   /**
-   * Provides a list of ownership rules applicable to a file.
+   * Provides a list of ownership rules applicable to a file or directory.
    *
    * The most specific rules will be first, while the root-level owners rules
    * will be last.
    *
-   * @param {!string} filePath relative path to file.
-   * @return {OwnersRule[]} list of rules for the file.
+   * @param {!string} filePath relative path to file/directory.
+   * @return {OwnersRule[]} list of rules for the file/directory.
    */
-  rulesForFile(filePath) {
+  rulesForPath(filePath) {
     const segments = filePath.split(path.sep);
     let subtree = this;
 

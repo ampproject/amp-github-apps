@@ -69,24 +69,24 @@ describe('owners tree', () => {
     });
   });
 
-  describe('rulesForFile', () => {
-    it('should include rules for the directory', () => {
+  describe('rulesForPath', () => {
+    it('should include rules for the file\'s directory', () => {
       tree.addRule(childDirRule);
       tree.addRule(otherChildDirRule);
-      expect(tree.rulesForFile('foo/bar.txt')).toContain(childDirRule);
-      expect(tree.rulesForFile('biz/bar.txt')).toContain(otherChildDirRule);
+      expect(tree.rulesForPath('foo/bar.txt')).toContain(childDirRule);
+      expect(tree.rulesForPath('biz/bar.txt')).toContain(otherChildDirRule);
     });
 
     it('should include rules for the parent directories', () => {
       tree.addRule(rootDirRule);
-      expect(tree.rulesForFile('foo/bar.txt')).toContain(rootDirRule);
+      expect(tree.rulesForPath('foo/bar.txt')).toContain(rootDirRule);
     });
 
     it('should include rules in descending order of depth', () => {
       tree.addRule(rootDirRule);
       tree.addRule(childDirRule);
       tree.addRule(ancestorDirRule);
-      expect(tree.rulesForFile('foo/bar/baz/buzz.txt')).toEqual([
+      expect(tree.rulesForPath('foo/bar/baz/buzz.txt')).toEqual([
         ancestorDirRule,
         childDirRule,
         rootDirRule,
