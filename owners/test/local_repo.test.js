@@ -15,8 +15,10 @@
  */
 
 const {LocalRepository} = require('../src/local_repo');
+const child_process = require('child_process');
 const sinon = require('sinon');
 const fs = require('fs');
+const path = require('path');
 
 describe('local repository', () => {
   const sandbox = sinon.createSandbox();
@@ -24,9 +26,7 @@ describe('local repository', () => {
 
   beforeEach(() => {
     repo = new LocalRepository('path/to/repo');
-    sandbox.stub(repo, 'getAbsolutePath').callsFake(relativePath => {
-      return `path/to/repo/${relativePath}`;
-    });
+    sandbox.stub(path, 'resolve').callsFake((...paths) => paths.join(path.sep));
   });
 
   afterEach(() => {
@@ -47,34 +47,67 @@ describe('local repository', () => {
 
   describe('checkout', () => {
     beforeEach(() => {
-      // TODO: Figure out how to stub `util.promisify(child_process.exec)`.
-      sandbox.stub(repo, 'runCommands');
+      sandbox.stub(repo, 'runCommands').returns('');
     });
 
     it('fetches and checks out the requested branch', async () => {
       await repo.checkout('my_branch');
       sandbox.assert.calledWith(
-        repo.runCommands,
-        'git fetch origin my_branch',
-        'git checkout -B my_branch origin/my_branch'
+          repo.runCommands,
+          'git fetch origin my_branch',
+          'git checkout -B my_branch origin/my_branch',
       );
     });
 
     it('defaults to master', async () => {
       await repo.checkout();
       sandbox.assert.calledWith(
-        repo.runCommands,
-        'git fetch origin master',
-        'git checkout -B master origin/master'
+          repo.runCommands,
+          'git fetch origin master',
+          'git checkout -B master origin/master',
       );
+    });
+  });
+
+  describe('runCommands', () => {
+    beforeEach(() => {
+      jest.resetModules();
+    });
+
+    function stubExecAndSetRepo(stdout, stderr) {
+      sandbox.stub(child_process, 'exec').callsFake((commands, callback) => {
+        const err = stderr ? {stdout, stderr} : null;
+        return callback(err, {stdout, stderr});
+      });
+
+      let {LocalRepository} = require('../src/local_repo');
+      repo = new LocalRepository('path/to/repo');
+    }
+
+    it('executes the provided commands in the repo directory', async () => {
+      stubExecAndSetRepo();
+      await repo.runCommands('git status');
+      sandbox.assert.calledWith(
+          child_process.exec, `cd path/to/repo && git status`);
+    });
+
+    it('returns the contents of stdout', async () => {
+      stubExecAndSetRepo('Hello world!', '');
+      await expect(repo.runCommands('echo "Hello world!"'))
+          .resolves.toEqual('Hello world!');
+    });
+
+    it('throws the contents of stderr if there is an error', async () => {
+      stubExecAndSetRepo('', 'ERROR!');
+      await expect(repo.runCommands('failing command'))
+          .rejects.toEqual('ERROR!');
     });
   });
 
   describe('getAbsolutePath', () => {
     it('prepends the repository root directory path', () => {
-      expect(repo.getAbsolutePath('file/path.txt')).toEqual(
-        'path/to/repo/file/path.txt'
-      );
+      expect(repo.getAbsolutePath('file/path.txt'))
+          .toEqual('path/to/repo/file/path.txt');
     });
   });
 
