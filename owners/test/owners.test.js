@@ -191,15 +191,15 @@ describe('owners rules', () => {
     });
 
     it('matches a file in the same directory', () => {
-      expect('OWNERS.yaml').toMatchFile('foo.txt');
+      expect('src/OWNERS.yaml').toMatchFile('src/foo.txt');
     });
 
     it('matches a file in a child directory', () => {
-      expect('OWNERS.yaml').toMatchFile('foo/bar.txt');
+      expect('src/OWNERS.yaml').toMatchFile('src/foo/bar.txt');
     });
 
     it('matches a file in an descendant directory', () => {
-      expect('OWNERS.yaml').toMatchFile('foo/bar/baz.txt');
+      expect('src/OWNERS.yaml').toMatchFile('src/foo/bar/baz.txt');
     });
 
     it('does not match a file in a parent directory', () => {

@@ -194,7 +194,7 @@ class GitHub {
    * @param {!CheckRun} checkRun check-run data to update.
    */
   async updateCheckRun(id, checkRun) {
-    const status = checkRun.isApproved ? 'passing' : 'failing';
+    const status = checkRun.passing ? 'passing' : 'failing';
     this.logger.info(`Updating check-run with ID ${id} (${status})`);
     this.logger.debug('[updateCheckRun]', id, checkRun);
 

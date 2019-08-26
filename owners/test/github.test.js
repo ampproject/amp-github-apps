@@ -274,5 +274,26 @@ describe('GitHub API', () => {
         await github.updateCheckRun(1337, new CheckRun(false, 'Test text'));
       })();
     });
+
+    it('sets the summary based on the status', async () => {
+      nock('https://api.github.com')
+        .patch('/repos/test_owner/test_repo/check-runs/1337', body => {
+          expect(body.output.summary).toEqual('The check was a failure!');
+          return true;
+        })
+        .reply(200);
+
+      nock('https://api.github.com')
+        .patch('/repos/test_owner/test_repo/check-runs/42', body => {
+          expect(body.output.summary).toEqual('The check was a success!');
+          return true;
+        })
+        .reply(200);
+
+      await withContext(async (context, github) => {
+        await github.updateCheckRun(1337, new CheckRun(false, 'Test text'));
+        await github.updateCheckRun(42, new CheckRun(true, 'Test text'));
+      })();
+    });
   });
 });

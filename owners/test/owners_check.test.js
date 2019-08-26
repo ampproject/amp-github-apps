@@ -55,6 +55,7 @@ describe('owners check', () => {
 
     const timestamp = '2019-01-01T00:00:00Z';
     const approval = new Review('approver', 'approved', timestamp);
+    const authorApproval = new Review('the_author', 'approved', timestamp);
     const otherApproval = new Review('other_approver', 'approved', timestamp);
     const rejection = new Review('rejector', 'changes_requested', timestamp);
 
@@ -77,7 +78,7 @@ describe('owners check', () => {
 
     it('produces unique usernames', async () => {
       const ownersCheck = new OwnersCheck(
-        new FakeGithub([approval, approval, approval]),
+        new FakeGithub([approval, approval, authorApproval]),
         pr
       );
       const approvers = await ownersCheck.getApprovers();
