@@ -166,15 +166,6 @@ class OwnersRule {
   }
 
   /**
-   * Gets the full (relative) OWNERS.yaml file path.
-   *
-   * @return {string} relative file path.
-   */
-  get filePath() {
-    return path.join(this.dirPath, 'OWNERS.yaml');
-  }
-
-  /**
    * Test if a file is matched by the rule.
    *
    * Currently only tests directory hierarchy; may be modified to test
