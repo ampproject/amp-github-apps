@@ -108,6 +108,17 @@ class OwnersTree {
   }
 
   /**
+   * Tests if a user is in the ownership path of the tree.
+   *
+   * @param {!string} username user to check ownership of.
+   * @return {boolean} true of the username is in this or an ancestor's OWNERS.
+   */
+  hasOwner(username) {
+    return this.rules.some(rule => rule.owners.includes(username)) ||
+          (!!this.parent && this.parent.hasOwner(username))
+  }
+
+  /**
    * Renders the ownership tree as a string.
    *
    * @return {string} visual representation of the tree.

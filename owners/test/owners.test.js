@@ -116,7 +116,37 @@ describe('owners tree', () => {
       tree.addRule(descendantDirRule);
 
       expect(tree.atPath('foo/bar/baz').dirPath).toEqual('foo/bar/baz');
-    })
+    });
+  });
+
+  describe('hasOwner', () => {
+    beforeEach(() => {
+      tree.addRule(rootDirRule);
+      tree.addRule(childDirRule);
+      tree.addRule(descendantDirRule);
+    });
+
+    it('should be true for owners in the same directory', () => {
+      expect(tree.atPath('foo/bar.txt').hasOwner('child')).toBe(true);
+    });
+
+    it('should be true for owners in the parent directory', () => {
+      expect(tree.atPath('foo/bar.txt').hasOwner('root')).toBe(true);
+    });
+
+    it('should be true for owners an ancestor directory', () => {
+      expect(tree.atPath('foo/bar.txt').hasOwner('root')).toBe(true);
+    });
+
+    it('should be false for owners a child directory', () => {
+      expect(
+        tree.atPath('foo/bar/baz/buzz.txt').hasOwner('descendant')
+      ).toBe(true);
+    });
+
+    it('should be false for non-existant owners', () => {
+      expect(tree.atPath('foo/bar.txt').hasOwner('not_an_owner')).toBe(false);
+    });
   });
 
   describe('toString', () => {
