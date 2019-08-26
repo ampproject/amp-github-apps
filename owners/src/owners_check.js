@@ -60,7 +60,7 @@ class OwnersCheck {
    * Constructor.
    *
    * @param {!GitHub} github GitHub API interface.
-   * @parma {!PullRequest} pr pull request to run owners check on.
+   * @param {!PullRequest} pr pull request to run owners check on.
    */
   constructor(github, pr) {
     Object.assign(this, {github, pr});

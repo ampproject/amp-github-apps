@@ -46,7 +46,9 @@ describe('check run', () => {
 
 describe('owners check', () => {
   describe('getApprovers', () => {
+    /* eslint-disable-next-line require-jsdoc */
     class FakeGithub {
+      /* eslint-disable-next-line require-jsdoc */
       constructor(reviews) {
         this.getReviews = () => reviews;
       }

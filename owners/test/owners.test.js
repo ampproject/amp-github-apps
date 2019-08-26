@@ -91,7 +91,7 @@ describe('owners tree', () => {
     });
 
     it('should include rules for anscestor directories', () => {
-      expect(descendantTree.allRules).toContain(rootDirRule)
+      expect(descendantTree.allRules).toContain(rootDirRule);
     });
 
     it('should include rules in descending order of depth', () => {
@@ -104,7 +104,7 @@ describe('owners tree', () => {
   });
 
   describe('atPath', () => {
-    it('should produce the tree for the file\'s directory', () => {
+    it("should produce the tree for the file's directory", () => {
       tree.addRule(childDirRule);
       tree.addRule(otherChildDirRule);
 
@@ -139,9 +139,9 @@ describe('owners tree', () => {
     });
 
     it('should be false for owners a child directory', () => {
-      expect(
-        tree.atPath('foo/bar/baz/buzz.txt').hasOwner('descendant')
-      ).toBe(true);
+      expect(tree.atPath('foo/bar/baz/buzz.txt').hasOwner('descendant')).toBe(
+        true
+      );
     });
 
     it('should be false for non-existant owners', () => {
@@ -283,12 +283,13 @@ describe('owners parser', () => {
     const childRule = new OwnersRule('foo/OWNERS.yaml', ['user3', 'user4']);
 
     it('adds each rule to the tree', () => {
-      sandbox.stub(parser, 'parseAllOwnersRules').returns(
-        [rootRule, childRule]);
+      sandbox
+        .stub(parser, 'parseAllOwnersRules')
+        .returns([rootRule, childRule]);
       const tree = parser.parseOwnersTree();
 
       expect(tree.rules).toContain(rootRule);
       expect(tree.get('foo').rules).toContain(childRule);
-    })
+    });
   });
 });

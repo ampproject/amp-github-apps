@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-const _ = require('lodash');
-
 const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
 
 /**

@@ -66,8 +66,9 @@ class LocalRepository {
   async checkout(branch) {
     branch = branch || 'master';
     await this.runCommands(
-        `git fetch ${this.remote} ${branch}`,
-        `git checkout -B ${branch} ${this.remote}/${branch}`);
+      `git fetch ${this.remote} ${branch}`,
+      `git checkout -B ${branch} ${this.remote}/${branch}`
+    );
   }
 
   /**
@@ -101,14 +102,16 @@ class LocalRepository {
   async findOwnersFiles() {
     // NOTE: for some reason `git ls-tree --full-tree -r HEAD **/OWNERS*`
     // doesn't work from here.
-    const ownersFiles = await this.runCommands([
-      // Lists all files in the repo with extra metadata.
-      'git ls-tree --full-tree -r HEAD',
-      // Cuts out the first three columns.
-      'cut -f2',
-      // Finds OWNERS files.
-      'grep OWNERS.yaml$',
-    ].join('|'));
+    const ownersFiles = await this.runCommands(
+      [
+        // Lists all files in the repo with extra metadata.
+        'git ls-tree --full-tree -r HEAD',
+        // Cuts out the first three columns.
+        'cut -f2',
+        // Finds OWNERS files.
+        'grep OWNERS.yaml$',
+      ].join('|')
+    );
 
     return ownersFiles.trim().split('\n');
   }

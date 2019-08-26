@@ -114,8 +114,10 @@ class OwnersTree {
    * @return {boolean} true of the username is in this or an ancestor's OWNERS.
    */
   hasOwner(username) {
-    return this.rules.some(rule => rule.owners.includes(username)) ||
-          (!!this.parent && this.parent.hasOwner(username))
+    return (
+      this.rules.some(rule => rule.owners.includes(username)) ||
+      (!!this.parent && this.parent.hasOwner(username))
+    );
   }
 
   /**
@@ -243,8 +245,7 @@ class OwnersParser {
    */
   parseOwnersTree() {
     const tree = new OwnersTree(this.localRepo.rootPath);
-    const rules = this.parseAllOwnersRules().forEach(
-      rule => tree.addRule(rule));
+    this.parseAllOwnersRules().forEach(rule => tree.addRule(rule));
     return tree;
   }
 }
