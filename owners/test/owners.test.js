@@ -262,14 +262,14 @@ describe('owners parser', () => {
   });
 
   describe('parseAllOwnersRules', () => {
-    it('reads all owners files in the repo', () => {
+    it('reads all owners files in the repo', async () => {
       sandbox
         .stub(repo, 'findOwnersFiles')
         .returns(['OWNERS.yaml', 'foo/OWNERS.yaml']);
       const readFileStub = sandbox.stub(repo, 'readFile');
       readFileStub.onCall(0).returns('- user1\n- user2\n');
       readFileStub.onCall(1).returns('- user3\n- user4\n');
-      const rules = parser.parseAllOwnersRules();
+      const rules = await parser.parseAllOwnersRules();
 
       expect(rules[0].dirPath).toEqual('.');
       expect(rules[1].dirPath).toEqual('foo');
@@ -282,11 +282,11 @@ describe('owners parser', () => {
     const rootRule = new OwnersRule('OWNERS.yaml', ['user1', 'user2']);
     const childRule = new OwnersRule('foo/OWNERS.yaml', ['user3', 'user4']);
 
-    it('adds each rule to the tree', () => {
+    it('adds each rule to the tree', async () => {
       sandbox
         .stub(parser, 'parseAllOwnersRules')
         .returns([rootRule, childRule]);
-      const tree = parser.parseOwnersTree();
+      const tree = await parser.parseOwnersTree();
 
       expect(tree.rules).toContain(rootRule);
       expect(tree.get('foo').rules).toContain(childRule);

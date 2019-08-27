@@ -233,8 +233,8 @@ class OwnersParser {
    *
    * @return {OwnersRule[]} a list of all rules defined in the local repo.
    */
-  parseAllOwnersRules() {
-    const ownersPaths = this.localRepo.findOwnersFiles();
+  async parseAllOwnersRules() {
+    const ownersPaths = await this.localRepo.findOwnersFiles();
     return ownersPaths.map(ownersPath => this.parseOwnersFile(ownersPath));
   }
 
@@ -243,9 +243,10 @@ class OwnersParser {
    *
    * @return {OwnersTree} owners rule hierarchy.
    */
-  parseOwnersTree() {
+  async parseOwnersTree() {
     const tree = new OwnersTree(this.localRepo.rootPath);
-    this.parseAllOwnersRules().forEach(rule => tree.addRule(rule));
+    const rules = await this.parseAllOwnersRules();
+    rules.forEach(rule => tree.addRule(rule));
     return tree;
   }
 }
