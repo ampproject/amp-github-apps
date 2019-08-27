@@ -90,7 +90,7 @@ describe('owners tree', () => {
       expect(childTree.allRules).toContain(rootDirRule);
     });
 
-    it('should include rules for anscestor directories', () => {
+    it('should include rules for ancestor directories', () => {
       expect(descendantTree.allRules).toContain(rootDirRule);
     });
 

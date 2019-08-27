@@ -88,7 +88,7 @@ describe('owners check', () => {
       expect(approvers).toEqual(['approver', 'the_author']);
     });
 
-    it('includes only reviwers who approved the review', async () => {
+    it('includes only reviewers who approved the review', async () => {
       const ownersCheck = new OwnersCheck(
         new FakeGithub([approval, rejection]),
         pr
