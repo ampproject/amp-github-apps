@@ -59,18 +59,19 @@ class OwnersTree {
   addRule(rule) {
     if (rule.dirPath === this.dirPath) {
       this.rules.push(rule);
-    } else {
-      const nextDir = rule.dirPath.split(path.sep)[this.depth];
-
-      if (!this.get(nextDir)) {
-        this.children[nextDir] = new OwnersTree(
-          path.join(this.dirPath, nextDir),
-          this
-        );
-      }
-
-      this.get(nextDir).addRule(rule);
+      return this;
     }
+   
+    const nextDir = rule.dirPath.split(path.sep)[this.depth];
+
+    if (!this.get(nextDir)) {
+      this.children[nextDir] = new OwnersTree(
+        path.join(this.dirPath, nextDir),
+        this
+      );
+    }
+
+    return this.get(nextDir).addRule(rule);
   }
 
   /**
