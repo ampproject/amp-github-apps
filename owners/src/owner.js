@@ -63,10 +63,11 @@ class Owner {
    * Parse all OWNERS files into Owner objects.
    *
    * @param {!LocalRepository} localRepo local repository to read from.
+   * @param {!Logger} logger logging interface
    * @return {object} map of owners.
    */
-  static async parseOwnersMap(localRepo) {
-    const parser = new OwnersParser(localRepo);
+  static async parseOwnersMap(localRepo, logger) {
+    const parser = new OwnersParser(localRepo, logger);
     const ownersRules = await parser.parseAllOwnersRules();
     const ownersList = ownersRules.map(
       rule => new Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath)
@@ -86,7 +87,7 @@ class Owner {
 
     const filenames = await github.listFiles(prNumber);
     const repoFiles = filenames.map(filename => new RepoFile(filename));
-    const ownersMap = await this.parseOwnersMap(localRepo);
+    const ownersMap = await this.parseOwnersMap(localRepo, github.logger);
     const owners = findOwners(repoFiles, ownersMap);
 
     return owners;

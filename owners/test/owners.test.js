@@ -118,7 +118,7 @@ describe('owners tree', () => {
       expect(tree.atPath('foo/bar/baz').dirPath).toEqual('foo/bar/baz');
     });
 
-    it('returns the nearest tree with at least one rule', () => {
+    it('returns the nearest tree with a rule', () => {
       tree.addRule(childTree);
 
       expect(tree.atPath('foo/bar/baz').dirPath).toEqual('foo');
@@ -237,33 +237,56 @@ describe('owners parser', () => {
 
   describe('parseOwnersFile', () => {
     it('reads the file from the local repository', () => {
-      sandbox.stub(fs, 'readFileSync').returns('');
+      sandbox.stub(repo, 'readFile').returns('- owner');
       parser.parseOwnersFile('foo/OWNERS.yaml');
-      sandbox.assert.calledWith(
-        fs.readFileSync,
-        'path/to/repo/foo/OWNERS.yaml',
-        {encoding: 'utf8'}
-      );
+
+      sandbox.assert.calledWith(repo.readFile, 'foo/OWNERS.yaml');
     });
 
     it('assigns the OWNERS directory path', () => {
-      sandbox.stub(fs, 'readFileSync').returns('');
+      sandbox.stub(repo, 'readFile').returns('- owner');
       const rule = parser.parseOwnersFile('foo/OWNERS.yaml');
+
       expect(rule.dirPath).toEqual('foo');
     });
 
     it('parses a YAML list', () => {
-      sandbox.stub(fs, 'readFileSync').returns('- user1\n- user2\n');
+      sandbox.stub(repo, 'readFile').returns('- user1\n- user2\n');
       const rule = parser.parseOwnersFile('');
+
       expect(rule.owners).toEqual(['user1', 'user2']);
     });
 
     it('parses a YAML list with blank lines and comments', () => {
       sandbox
-        .stub(fs, 'readFileSync')
+        .stub(repo, 'readFile')
         .returns('- user1\n# comment\n\n- user2\n');
       const rule = parser.parseOwnersFile('');
+
       expect(rule.owners).toEqual(['user1', 'user2']);
+    });
+
+    it('returns null for team rules', () => {
+      sandbox.stub(repo, 'readFile').returns('- ampproject/team\n');
+      const rule = parser.parseOwnersFile('');
+
+      expect(rule).toBe(null);
+    });
+
+    it('returns null for non-list OWNERS file structures', () => {
+      sandbox.stub(repo, 'readFile').returns(
+        'dict:\n  key: "value"\n  key2: "value2"\n');
+      const rule = parser.parseOwnersFile('');
+
+      expect(rule).toBe(null);
+    });
+
+    it('ignores non-string rules in the list', () => {
+      sandbox.stub(repo, 'readFile').returns(
+        '- owner\n- dict:\n  key: "value"\n  key2: "value2"\n');
+      const rule = parser.parseOwnersFile('');
+
+      expect(rule.owners).toEqual(['owner']);
     });
   });
 

@@ -211,9 +211,11 @@ class OwnersParser {
    * Constructor.
    *
    * @param {!LocalRepository} localRepo local repository to read from.
+   * @param {!Logger=} logger logging interface (defaults to console).
    */
-  constructor(localRepo) {
+  constructor(localRepo, logger) {
     this.localRepo = localRepo;
+    this.logger = logger || console;
   }
 
   /**
@@ -224,9 +226,18 @@ class OwnersParser {
    */
   parseOwnersFile(ownersPath) {
     const contents = this.localRepo.readFile(ownersPath);
-    const ownersList = yaml.parse(contents);
+    const lines = yaml.parse(contents);
 
-    return new OwnersRule(ownersPath, ownersList);
+    if (!(lines instanceof Array)) {
+      this.logger.log(
+          `Failed to parse file '${ownersPath}'; must be a YAML list`);
+      return null;
+    }
+
+    const stringLines = lines.filter(line => typeof line === 'string')
+    const ownersList = stringLines.filter(line => line.indexOf('/') === -1)
+
+    return ownersList.length ? new OwnersRule(ownersPath, ownersList) : null;
   }
 
   /**
