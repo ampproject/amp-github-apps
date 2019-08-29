@@ -1,3 +1,4 @@
 **/node_modules/**
 .env
 pr-deploy/src/*.js
+release-tagging/src/*.js
