@@ -119,7 +119,7 @@ describe('owners tree', () => {
     });
 
     it('returns the nearest tree with a rule', () => {
-      tree.addRule(childTree);
+      tree.addRule(childDirRule);
 
       expect(tree.atPath('foo/bar/baz').dirPath).toEqual('foo');
     });
@@ -304,6 +304,16 @@ describe('owners parser', () => {
       expect(rules[1].dirPath).toEqual('foo');
       expect(rules[0].owners).toEqual(['user1', 'user2']);
       expect(rules[1].owners).toEqual(['user3', 'user4']);
+    });
+
+    it('does not include invalid rules', async () => {
+      sandbox
+        .stub(repo, 'findOwnersFiles')
+        .returns(['OWNERS.yaml']);
+      sandbox.stub(repo, 'readFile').returns('dict:\n  key: value');
+      const rules = await parser.parseAllOwnersRules();
+
+      expect(rules).toEqual([]);
     });
   });
 

@@ -167,6 +167,7 @@ class OwnersRule {
    * @param {string[]} owners list of GitHub usernames of owners.
    */
   constructor(ownersPath, owners) {
+    this.filePath = ownersPath;
     this.dirPath = path.dirname(ownersPath);
     this.owners = owners;
   }
@@ -250,7 +251,8 @@ class OwnersParser {
    */
   async parseAllOwnersRules() {
     const ownersPaths = await this.localRepo.findOwnersFiles();
-    return ownersPaths.map(ownersPath => this.parseOwnersFile(ownersPath));
+    return ownersPaths.map(ownersPath => this.parseOwnersFile(ownersPath))
+        .filter(rule => rule !== null);
   }
 
   /**
