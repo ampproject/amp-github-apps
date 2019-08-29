@@ -29,10 +29,10 @@ const exec = util.promisify(childProcess.exec);
  */
 async function runCommands(...commands) {
   return exec(commands.join(' && '))
-      .then(({stdout, stderr}) => stdout)
-      .catch(({stdout, stderr}) => {
-        throw stderr;
-      });
+    .then(({stdout, stderr}) => stdout)
+    .catch(({stdout, stderr}) => {
+      throw stderr;
+    });
 }
 
 /**
