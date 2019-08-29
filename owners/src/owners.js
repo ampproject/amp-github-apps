@@ -87,7 +87,8 @@ class OwnersTree {
   }
 
   /**
-   * Provides the deepest ownership rule applicable to a file or directory.
+   * Provides the deepest ownership tree with rules applicable to a file or
+   * directory.
    *
    * @param {!string} filePath relative path to file/directory.
    * @return {OwnersRule[]} list of rules for the file/directory.
@@ -104,6 +105,10 @@ class OwnersTree {
       subtree = subtree.get(nextDir);
     }
 
+    while (!subtree.rules.length && !subtree.isRoot) {
+      subtree = subtree.parent;
+    }
+
     return subtree;
   }
 
@@ -114,10 +119,9 @@ class OwnersTree {
    * @return {boolean} true of the username is in this or an ancestor's OWNERS.
    */
   hasOwner(username) {
-    return (
-      this.rules.some(rule => rule.owners.includes(username)) ||
-      (!!this.parent && this.parent.hasOwner(username))
-    );
+    const allOwners = this.allRules.map(rule => rule.owners)
+                          .reduce((left, right) => left.concat(right));
+    return allOwners.includes(username);
   }
 
   /**

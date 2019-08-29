@@ -117,6 +117,12 @@ describe('owners tree', () => {
 
       expect(tree.atPath('foo/bar/baz').dirPath).toEqual('foo/bar/baz');
     });
+
+    it('returns the nearest tree with at least one rule', () => {
+      tree.addRule(childTree);
+
+      expect(tree.atPath('foo/bar/baz').dirPath).toEqual('foo');
+    });
   });
 
   describe('hasOwner', () => {
