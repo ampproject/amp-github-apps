@@ -55,13 +55,14 @@ class OwnersTree {
    * keyed by the next directory name.
    *
    * @param {!OwnersRule} rule rule to add.
+   * @return {OwnersTree} the tree node the rule was added to.
    */
   addRule(rule) {
     if (rule.dirPath === this.dirPath) {
       this.rules.push(rule);
       return this;
     }
-   
+
     const nextDir = rule.dirPath.split(path.sep)[this.depth];
 
     if (!this.get(nextDir)) {

@@ -34,21 +34,21 @@ describe('owners tree', () => {
   describe('addRule', () => {
     it('adds rules to the tree structure', () => {
       tree.addRule(rootDirRule);
-      
+
       expect(tree.rules).toContain(rootDirRule);
     });
 
     it('adds rules to subdirectories', () => {
       tree.addRule(childDirRule);
       tree.addRule(otherChildDirRule);
-      
+
       expect(tree.children.foo.rules).toContain(childDirRule);
       expect(tree.children.biz.rules).toContain(otherChildDirRule);
     });
 
     it('adds rules to nested subdirectories', () => {
       tree.addRule(descendantDirRule);
-      
+
       expect(tree.children.foo.children.bar.children.baz.rules).toContain(
         descendantDirRule
       );
