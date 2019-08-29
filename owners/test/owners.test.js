@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-const fs = require('fs');
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersRule, OwnersTree} = require('../src/owners');
@@ -258,9 +257,7 @@ describe('owners parser', () => {
     });
 
     it('parses a YAML list with blank lines and comments', () => {
-      sandbox
-        .stub(repo, 'readFile')
-        .returns('- user1\n# comment\n\n- user2\n');
+      sandbox.stub(repo, 'readFile').returns('- user1\n# comment\n\n- user2\n');
       const rule = parser.parseOwnersFile('');
 
       expect(rule.owners).toEqual(['user1', 'user2']);
@@ -274,16 +271,18 @@ describe('owners parser', () => {
     });
 
     it('returns null for non-list OWNERS file structures', () => {
-      sandbox.stub(repo, 'readFile').returns(
-        'dict:\n  key: "value"\n  key2: "value2"\n');
+      sandbox
+        .stub(repo, 'readFile')
+        .returns('dict:\n  key: "value"\n  key2: "value2"\n');
       const rule = parser.parseOwnersFile('');
 
       expect(rule).toBe(null);
     });
 
     it('ignores non-string rules in the list', () => {
-      sandbox.stub(repo, 'readFile').returns(
-        '- owner\n- dict:\n  key: "value"\n  key2: "value2"\n');
+      sandbox
+        .stub(repo, 'readFile')
+        .returns('- owner\n- dict:\n  key: "value"\n  key2: "value2"\n');
       const rule = parser.parseOwnersFile('');
 
       expect(rule.owners).toEqual(['owner']);
@@ -307,9 +306,7 @@ describe('owners parser', () => {
     });
 
     it('does not include invalid rules', async () => {
-      sandbox
-        .stub(repo, 'findOwnersFiles')
-        .returns(['OWNERS.yaml']);
+      sandbox.stub(repo, 'findOwnersFiles').returns(['OWNERS.yaml']);
       sandbox.stub(repo, 'readFile').returns('dict:\n  key: value');
       const rules = await parser.parseAllOwnersRules();
 

@@ -119,8 +119,9 @@ class OwnersTree {
    * @return {boolean} true of the username is in this or an ancestor's OWNERS.
    */
   hasOwner(username) {
-    const allOwners = this.allRules.map(rule => rule.owners)
-                          .reduce((left, right) => left.concat(right));
+    const allOwners = this.allRules
+      .map(rule => rule.owners)
+      .reduce((left, right) => left.concat(right));
     return allOwners.includes(username);
   }
 
@@ -231,12 +232,13 @@ class OwnersParser {
 
     if (!(lines instanceof Array)) {
       this.logger.warn(
-          `Failed to parse file '${ownersPath}'; must be a YAML list`);
+        `Failed to parse file '${ownersPath}'; must be a YAML list`
+      );
       return null;
     }
 
-    const stringLines = lines.filter(line => typeof line === 'string')
-    const ownersList = stringLines.filter(line => line.indexOf('/') === -1)
+    const stringLines = lines.filter(line => typeof line === 'string');
+    const ownersList = stringLines.filter(line => line.indexOf('/') === -1);
 
     return ownersList.length ? new OwnersRule(ownersPath, ownersList) : null;
   }
@@ -251,8 +253,9 @@ class OwnersParser {
    */
   async parseAllOwnersRules() {
     const ownersPaths = await this.localRepo.findOwnersFiles();
-    return ownersPaths.map(ownersPath => this.parseOwnersFile(ownersPath))
-        .filter(rule => rule !== null);
+    return ownersPaths
+      .map(ownersPath => this.parseOwnersFile(ownersPath))
+      .filter(rule => rule !== null);
   }
 
   /**
