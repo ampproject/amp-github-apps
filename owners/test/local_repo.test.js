@@ -80,13 +80,13 @@ describe('local repository', () => {
      * Since the module imports and wraps `exec`, it must be stubbed before
      * requiring the module.
      *
-     * @param {string} stdout content to output as stdout.
-     * @param {string} stderr content to output as stderr.
+     * @param {number} error error code from executing the command.
+     * @param {!string} stdout content to output as stdout.
+     * @param {!string} stderr content to output as stderr.
      */
-    function stubExecAndSetRepo(stdout, stderr) {
+    function stubExecAndSetRepo(error, stdout, stderr) {
       sandbox.stub(childProcess, 'exec').callsFake((commands, callback) => {
-        const err = stderr ? {stdout, stderr} : null;
-        return callback(err, {stdout, stderr});
+        return callback(error ? {stdout, stderr} : null, {stdout, stderr});
       });
 
       const {LocalRepository} = require('../src/local_repo');
@@ -94,7 +94,7 @@ describe('local repository', () => {
     }
 
     it('executes the provided commands in the repo directory', async () => {
-      stubExecAndSetRepo();
+      stubExecAndSetRepo(false, '', '');
       await repo.runCommands('git status');
       sandbox.assert.calledWith(
         childProcess.exec,
@@ -103,14 +103,14 @@ describe('local repository', () => {
     });
 
     it('returns the contents of stdout', async () => {
-      stubExecAndSetRepo('Hello world!', '');
+      stubExecAndSetRepo(false, 'Hello world!', 'Some extra output');
       await expect(repo.runCommands('echo "Hello world!"')).resolves.toEqual(
         'Hello world!'
       );
     });
 
     it('throws the contents of stderr if there is an error', async () => {
-      stubExecAndSetRepo('', 'ERROR!');
+      stubExecAndSetRepo(true, '', 'ERROR!');
       await expect(repo.runCommands('failing command')).rejects.toEqual(
         'ERROR!'
       );

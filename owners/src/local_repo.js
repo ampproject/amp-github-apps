@@ -28,8 +28,11 @@ const exec = util.promisify(childProcess.exec);
  * @return {string[]} command output
  */
 async function runCommands(...commands) {
-  const {stdout, stderr} = await exec(commands.join(' && ')).catch(err => err);
-  return stderr ? Promise.reject(stderr) : Promise.resolve(stdout);
+  return exec(commands.join(' && '))
+      .then(({stdout, stderr}) => stdout)
+      .catch(({stdout, stderr}) => {
+        throw stderr;
+      });
 }
 
 /**
