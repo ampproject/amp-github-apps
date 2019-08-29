@@ -230,7 +230,7 @@ class OwnersParser {
     const lines = yaml.parse(contents);
 
     if (!(lines instanceof Array)) {
-      this.logger.log(
+      this.logger.warn(
           `Failed to parse file '${ownersPath}'; must be a YAML list`);
       return null;
     }
