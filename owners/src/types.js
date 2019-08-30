@@ -28,4 +28,18 @@
  */
 let Logger;
 
-module.exports = {Logger};
+/**
+ * A map from filenames to the nearest ownership subtree.
+ *
+ * @typedef {!Object<string, !OwnersTree>}
+ */
+let FileTreeMap;
+
+/**
+ * A tuple of a reviewer username and the files they need to approve.
+ *
+ * @typedef {!Tuple<!string, string[]>}
+ */
+let ReviewerFiles;
+
+module.exports = {FileTreeMap, Logger, ReviewerFiles};

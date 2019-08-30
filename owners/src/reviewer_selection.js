@@ -15,7 +15,6 @@
  */
 
 /**
-******************
 === Reviewer Selection ===
 
 -- Overview --
@@ -32,83 +31,17 @@ Inputs: a map from files needing approval to the nearest ownership subtree
 
 Repeat until all files have an OWNER in the reviewer set.
 
--- Detailed Algorithm Python/Pseudocode --
-
-> Note: Pseudocode is effectively Python, since it's easy to parse and has
-        powerful collections natives (sets, iteration helpers, etc.)
-
-def buildFileTreeMap(filenames, ownersTree):
-  return dict(filename: ownersTree.atPath(filename) for filename in filenames)
-
-- Part 1 -
-
-def reviewersForTrees(deepestTrees):
-  reviewers = set()
-  for tree in deepestTrees:
-    for rule in tree.rules:
-      reviewers.add(*rule.owners)
-  return reviewers
-
-def findPotentialReviewers(fileTreeMap)
-  nearestTrees = fileTreeMap.values()
-  maxDepth = max(tree.depth for tree in nearestTrees)
-  deepestTrees = filter(nearestTrees, lambda tree: tree.depth == maxDepth)
-  return reviewersForTrees(deepestTrees)
-
-- Part 2 -
-
-def filesOwnedByReviwer(fileTreeMap, reviewer):
-  return [filename for filename, tree in fileTreeMap.items()
-          if tree.hasOwner(reviewer)]
-
-def reviewersWithMostFiles(reviewerFilesMap):
-  mostFilesOwned = max(reviewerFilesMap.values().map(len))
-  return filter(reviewerFileMap.items,
-                lambda reviewer, files: len(files) == mostFilesOwned)
-
-def pickBestReviewer(fileTreeMap):
-  reviewerSet = findPotentialReviewers(fileTreeMap)
-  reviewerFilesMap = {reviewer: filesOwnedByReviewer(fileTreeMap, reviewer)
-                      for reviewer in reviewerSet}
-  return choice(reviewerWithMostFiles(reviewerFilesMap))
-
-- Part 3 -
-
-def pickReviweers(fileTreeMap):
-  reviewers = []
-
-  while len(fileTreeMap):
-    nextReviewer, coveredFiles = pickBestReviewer(fileTreeMap)
-    reviewers.append(nextReviewer)
-    for filename in coveredFiles:
-      del fileTreeMap[filename]
-
-  return reviewers
-
-*******************
 */
-
-/**
- * A map from filenames to the nearest ownership subtree.
- *
- * @typedef {!Object<string, !OwnersTree>}
- */
-let FileTreeMap;
-
-/**
- * A tuple of a reviewer username and the files they need to approve.
- *
- * @typedef {!Tuple<!string, string[]>}
- */
-let ReviewerFiles;
 
 /**
  * Class implementing the reviewer selection algorithm.
  */
 class ReviewerSelection {
-  /**********
+  /**
+   *********
    * Part 1 *
-   **********/
+   *********
+   */
 
   /**
    * Produce a set of all ownership subtrees directly owning a changed file.
@@ -127,7 +60,7 @@ class ReviewerSelection {
    *
    * @private
    * @param {OwnersTree[]} trees list of ownership trees.
-   * @returns {string[]} union of reviewers lists for all trees.
+   * @return {string[]} union of reviewers lists for all trees.
    */
   static _reviewersForTrees(trees) {
     const reviewers = new Set();
@@ -140,11 +73,12 @@ class ReviewerSelection {
   }
 
   /**
-   * Produce a list of reviewers to satisfy at least one of the deepest ownership
-   * rules.
+   * Produce a list of reviewers to satisfy at least one of the deepest
+   * ownership rules.
    *
    * @private
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
+   * @return {string[]} list of reviewer usernames.
    */
   static _findPotentialReviewers(fileTreeMap) {
     const nearestTrees = this._nearestOwnersTrees(fileTreeMap);
@@ -153,9 +87,11 @@ class ReviewerSelection {
     return this._reviewersForTrees(deepestTrees);
   }
 
-  /**********
+  /**
+   *********
    * Part 2 *
-   **********/
+   *********
+   */
 
   /**
    * List files owned by a reviewer.
@@ -167,8 +103,8 @@ class ReviewerSelection {
    */
   static _filesOwnedByReviewer(fileTreeMap, reviewer) {
     return Object.entries(fileTreeMap)
-        .filter(([filename, tree]) => tree.hasOwner(reviewer))
-        .map(([filename, tree]) => filename);
+      .filter(([filename, tree]) => tree.hasOwner(reviewer))
+      .map(([filename, tree]) => filename);
   }
 
   /**
@@ -180,10 +116,12 @@ class ReviewerSelection {
    * @return {string[]} list of reviewer usernames.
    */
   static _reviewersWithMostFiles(reviewerFilesMap) {
-    const mostFilesOwned =
-        Math.max(...Object.values(reviewerFilesMap).map(files => files.length));
-    return Object.entries(reviewerFilesMap)
-        .filter(([reviewer, files]) => files.length == mostFilesOwned);
+    const mostFilesOwned = Math.max(
+      ...Object.values(reviewerFilesMap).map(files => files.length)
+    );
+    return Object.entries(reviewerFilesMap).filter(
+      ([reviewer, files]) => files.length == mostFilesOwned
+    );
   }
 
   /**
@@ -194,21 +132,27 @@ class ReviewerSelection {
    * distribution of reviews.
    *
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @return {ReviewerFiles} tuple of a reviewer username and the files they own.
+   * @return {ReviewerFiles} tuple of a reviewer username and the files they
+   *     own.
    */
   static _pickBestReviewer(fileTreeMap) {
     const reviewerSet = this._findPotentialReviewers(fileTreeMap);
     const reviewerFilesMap = {};
     reviewerSet.forEach(reviewer => {
-      reviewerFilesMap[reviewer] = this._filesOwnedByReviewer(fileTreeMap, reviewer);
+      reviewerFilesMap[reviewer] = this._filesOwnedByReviewer(
+        fileTreeMap,
+        reviewer
+      );
     });
     const bestReviewers = this._reviewersWithMostFiles(reviewerFilesMap);
     return bestReviewers[Math.floor(Math.random() * bestReviewers.length)];
   }
 
-  /**********
+  /**
+   *********
    * Part 3 *
-   **********/
+   *********
+   */
 
   /**
    * Builds the map from filenames to ownership subtrees.
@@ -237,7 +181,7 @@ class ReviewerSelection {
     const reviews = [];
 
     while (Object.entries(fileTreeMap).length) {
-      let [bestReviewer, coveredFiles] = this._pickBestReviewer(fileTreeMap);
+      const [bestReviewer, coveredFiles] = this._pickBestReviewer(fileTreeMap);
       if (!bestReviewer) {
         // This should be impossible unless there is no top-level OWNERS file.
         throw Error('Could not select reviewers!');
@@ -250,4 +194,4 @@ class ReviewerSelection {
   }
 }
 
-module.exports = {ReviewerSelection}
+module.exports = {ReviewerSelection};

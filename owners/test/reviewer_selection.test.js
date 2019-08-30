@@ -20,7 +20,7 @@ const {OwnersRule, OwnersTree} = require('../src/owners');
 
 describe('reviewer selection', () => {
   const sandbox = sinon.createSandbox();
-  let ownersTree = new OwnersTree();
+  const ownersTree = new OwnersTree();
 
   const rootDirRule = new OwnersRule('OWNERS.yaml', ['root']);
   const childDirRule = new OwnersRule('foo/OWNERS.yaml', ['child']);
@@ -43,17 +43,21 @@ describe('reviewer selection', () => {
   describe('nearestOwnersTrees', () => {
     it('returns the nearest trees', () => {
       const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-          ['./main.js', 'biz/style.css', 'foo/bar/other_file.js'], ownersTree);
+        ['./main.js', 'biz/style.css', 'foo/bar/other_file.js'],
+        ownersTree
+      );
       const nearestTrees = ReviewerSelection._nearestOwnersTrees(fileTreeMap);
 
-      expect(nearestTrees).toEqual(expect.arrayContaining([
-        rootDirTree, otherChildDirTree, childDirTree
-      ]));
+      expect(nearestTrees).toEqual(
+        expect.arrayContaining([rootDirTree, otherChildDirTree, childDirTree])
+      );
     });
 
     it('does not return duplicates', () => {
       const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-          ['foo/file.js', 'foo/bar/other_file.js'], ownersTree);
+        ['foo/file.js', 'foo/bar/other_file.js'],
+        ownersTree
+      );
       const nearestTrees = ReviewerSelection._nearestOwnersTrees(fileTreeMap);
 
       expect(nearestTrees).toEqual([childDirTree]);
@@ -62,11 +66,14 @@ describe('reviewer selection', () => {
 
   describe('reviewersForTrees', () => {
     it('unions the owners for all subtrees', () => {
-      const reviewers = ReviewerSelection._reviewersForTrees(
-          [otherChildDirTree, descendantDirTree]);
+      const reviewers = ReviewerSelection._reviewersForTrees([
+        otherChildDirTree,
+        descendantDirTree,
+      ]);
 
       expect(reviewers).toEqual(
-          expect.arrayContaining(['child', 'kid', 'descendant']));
+        expect.arrayContaining(['child', 'kid', 'descendant'])
+      );
     });
 
     it('does not include inherited owners', () => {
@@ -79,18 +86,16 @@ describe('reviewer selection', () => {
   describe('findPotentialReviewers', () => {
     it('returns reviewers for the deepest trees', () => {
       const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-          [
-            './main.js',
-            'biz/style.css',
-            'foo/bar/other_file.js',
-          ],
-          ownersTree);
+        ['./main.js', 'biz/style.css', 'foo/bar/other_file.js'],
+        ownersTree
+      );
       sandbox.stub(ReviewerSelection, '_reviewersForTrees').callThrough();
       const reviewers = ReviewerSelection._findPotentialReviewers(fileTreeMap);
 
       sandbox.assert.calledWith(
-          ReviewerSelection._reviewersForTrees,
-          sinon.match.array.contains([childDirTree, otherChildDirTree]))
+        ReviewerSelection._reviewersForTrees,
+        sinon.match.array.contains([childDirTree, otherChildDirTree])
+      );
       expect(reviewers).toEqual(expect.arrayContaining(['child', 'kid']));
     });
   });
@@ -98,21 +103,30 @@ describe('reviewer selection', () => {
   describe('filesOwnedByReviewer', () => {
     it('lists files for which the reviewer is an owner', () => {
       const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-          [
-            './main.js',              // root
-            'biz/style.css',          // child, kid, root
-            'foo/bar/other_file.js',  // child, root
-            'foo/bar/baz/README.md',  // descendant, child, root
-          ],
-          ownersTree);
-      const rootFiles =
-          ReviewerSelection._filesOwnedByReviewer(fileTreeMap, 'root');
-      const childFiles =
-          ReviewerSelection._filesOwnedByReviewer(fileTreeMap, 'child');
-      const kidFiles =
-          ReviewerSelection._filesOwnedByReviewer(fileTreeMap, 'kid');
-      const descendantFiles =
-          ReviewerSelection._filesOwnedByReviewer(fileTreeMap, 'descendant');
+        [
+          './main.js', // root
+          'biz/style.css', // child, kid, root
+          'foo/bar/other_file.js', // child, root
+          'foo/bar/baz/README.md', // descendant, child, root
+        ],
+        ownersTree
+      );
+      const rootFiles = ReviewerSelection._filesOwnedByReviewer(
+        fileTreeMap,
+        'root'
+      );
+      const childFiles = ReviewerSelection._filesOwnedByReviewer(
+        fileTreeMap,
+        'child'
+      );
+      const kidFiles = ReviewerSelection._filesOwnedByReviewer(
+        fileTreeMap,
+        'kid'
+      );
+      const descendantFiles = ReviewerSelection._filesOwnedByReviewer(
+        fileTreeMap,
+        'descendant'
+      );
 
       expect(rootFiles).toEqual([
         './main.js',
@@ -121,7 +135,9 @@ describe('reviewer selection', () => {
         'foo/bar/baz/README.md',
       ]);
       expect(childFiles).toEqual([
-        'biz/style.css', 'foo/bar/other_file.js', 'foo/bar/baz/README.md'
+        'biz/style.css',
+        'foo/bar/other_file.js',
+        'foo/bar/baz/README.md',
       ]);
       expect(kidFiles).toEqual(['biz/style.css']);
       expect(descendantFiles).toEqual(['foo/bar/baz/README.md']);
@@ -136,23 +152,26 @@ describe('reviewer selection', () => {
         thirdChild: ['buzz/info.txt', 'buzz/code.js'],
       });
 
-      expect(reviewerFiles).toEqual(expect.arrayContaining([
-        ['child', ['foo/file.js', 'foo/bar/other_file.js']],
-        ['thirdChild', ['buzz/info.txt', 'buzz/code.js']],
-      ]));
+      expect(reviewerFiles).toEqual(
+        expect.arrayContaining([
+          ['child', ['foo/file.js', 'foo/bar/other_file.js']],
+          ['thirdChild', ['buzz/info.txt', 'buzz/code.js']],
+        ])
+      );
     });
   });
 
   describe('pickBestReviewer', () => {
     const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-        [
-          './main.js',              // root
-          'biz/style.css',          // child, kid, root
-          'foo/bar/other_file.js',  // child, root
-          'buzz/info.txt',          // thirdChild, root
-          'buzz/code.js',           // thirdChild, root
-        ],
-        ownersTree);
+      [
+        './main.js', // root
+        'biz/style.css', // child, kid, root
+        'foo/bar/other_file.js', // child, root
+        'buzz/info.txt', // thirdChild, root
+        'buzz/code.js', // thirdChild, root
+      ],
+      ownersTree
+    );
 
     it('builds a map from deepest reviewers to files they own', () => {
       sandbox.stub(ReviewerSelection, '_reviewersWithMostFiles').callThrough();
@@ -166,8 +185,9 @@ describe('reviewer selection', () => {
     });
 
     it('picks one of the reviewers with the most files', () => {
-      const [bestReviewer, filesCovered] =
-          ReviewerSelection._pickBestReviewer(fileTreeMap);
+      const [bestReviewer, filesCovered] = ReviewerSelection._pickBestReviewer(
+        fileTreeMap
+      );
 
       expect(['child', 'thirdChild']).toContain(bestReviewer);
       expect(filesCovered.length).toEqual(2);
@@ -177,16 +197,17 @@ describe('reviewer selection', () => {
   describe('buildFileTreeMap', () => {
     it('builds a map from filenames to subtrees', () => {
       const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-          [
-            './main.js',
-            './package.json',
-            'biz/style.css',
-            'foo/file.js',
-            'foo/bar/other_file.js',
-            'buzz/info.txt',
-            'buzz/code.js',
-          ],
-          ownersTree);
+        [
+          './main.js',
+          './package.json',
+          'biz/style.css',
+          'foo/file.js',
+          'foo/bar/other_file.js',
+          'buzz/info.txt',
+          'buzz/code.js',
+        ],
+        ownersTree
+      );
 
       expect(fileTreeMap).toEqual({
         './main.js': rootDirTree,
@@ -207,13 +228,9 @@ describe('reviewer selection', () => {
     beforeEach(() => {
       bestReviewerStub = sandbox.stub(ReviewerSelection, '_pickBestReviewer');
       fileTreeMap = ReviewerSelection.buildFileTreeMap(
-          [
-            './main.js',
-            'foo/file.js',
-            'biz/style.css',
-            'buzz/info.txt',
-          ],
-          ownersTree);
+        ['./main.js', 'foo/file.js', 'biz/style.css', 'buzz/info.txt'],
+        ownersTree
+      );
     });
 
     it('picks reviewers until all files are covered', () => {
