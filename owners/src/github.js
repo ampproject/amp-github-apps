@@ -14,392 +14,195 @@
  * limitations under the License.
  */
 
-const {RepoFile} = require('./repo-file');
-const {Owner} = require('./owner');
-const {Git} = require('./git');
-const _ = require('lodash');
-const sleep = require('sleep-promise');
+const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
 
 /**
  * Maps the github json payload to a simpler data structure.
  */
 class PullRequest {
   /**
-   * @param {!Context} context
-   * @param {!PullRequest} pr
-   */
-  constructor(context, pr) {
-    this.name = 'ampproject/owners-check';
-
-    this.nameMatcher = new RegExp('owners bot|owners-check', 'i');
-
-    this.git = new Git(context);
-    this.context = context;
-    this.github = context.github;
-
-    this.id = pr.number;
-    this.author = pr.user.login;
-    this.state = pr.state;
-
-    this.owner = pr.base.repo.owner.login;
-    this.repo = pr.base.repo.name;
-
-    // Ref here is the branch name
-    this.headRef = pr.head.ref;
-    this.headSha = pr.head.sha;
-
-    // Base is usually master
-    this.baseRef = pr.base.ref;
-    this.baseSha = pr.base.sha;
-
-    this.options = {
-      owner: this.owner,
-      repo: this.repo,
-    };
-  }
-
-  /**
-   * Runs the steps to create a new check run on a newly opened Pull Request
-   * on GitHub.
-   */
-  async processOpened() {
-    const prInfo = await this.getMeta();
-    // TODO: Reviewers here is to be assigned to the Pull Request.
-    /* eslint-disable-next-line no-unused-vars */
-    let reviewers = Object.values(prInfo.fileOwners).map(fileOwner => {
-      return fileOwner.owner.dirOwners;
-    });
-    reviewers = _.union(...reviewers);
-    const checkOutputText = this.buildCheckOutput(prInfo);
-    const checkRuns = await this.getCheckRun();
-    const {hasCheckRun, checkRun} = this.hasCheckRun(checkRuns);
-    if (hasCheckRun) {
-      return this.updateCheckRun(
-        checkRun,
-        checkOutputText,
-        prInfo.approvalsMet
-      );
-    }
-    return this.createCheckRun(checkOutputText, prInfo.approvalsMet);
-  }
-
-  /**
-   * Retrieve the metadata we need to evaluate a Pull Request.
-   */
-  async getMeta() {
-    const fileOwners = await Owner.getOwners(this.git, this);
-    const reviews = await this.getUniqueReviews();
-    this.context.log.debug('[getMeta]', reviews);
-    const approvalsMet = this.areAllApprovalsMet(fileOwners, reviews);
-    const reviewersWhoApproved = this.getReviewersWhoApproved(reviews);
-    return {fileOwners, reviews, approvalsMet, reviewersWhoApproved};
-  }
-
-  /**
-   * Retrieves the pull request json payload from the github API
-   * and pulls out the files that have been changed in any way
-   * and returns type RepoFile[].
-   * @return {!Promise<!Array<!RepoFile>>}
-   */
-  async listFiles() {
-    const res = await this.github.pullRequests.listFiles({
-      number: this.id,
-      ...this.options,
-    });
-    this.context.log.debug('[listFiles]', res.data);
-    return res.data.map(item => new RepoFile(item.filename));
-  }
-
-  /**
-   * Filters out duplicate reviews on a Pull Request. A Pull Request can be
-   * reviewed by a single user multiple times (ex. disapproved then
-   * subsequently approves.)
+   * Constructor.
    *
-   * @return {!Array<object>}
+   * @param {!number} number pull request number.
+   * @param {!string} author username of the pull request author.
+   * @param {!string} headSha SHA hash of the PR's HEAD commit.
    */
-  async getUniqueReviews() {
-    const reviews = await this.getReviews();
-    // This should always pick out the first instance.
-    return _.uniqBy(reviews, 'username');
+  constructor(number, author, headSha) {
+    Object.assign(this, {number, author, headSha});
   }
 
   /**
-   * Retrives the Reviews from GitHub.
+   * Initialize a Pull Request from a GitHub response data structure.
    *
-   * @return {!Array<object>}
+   * @param {!object} res GitHub PullRequest response structure.
+   * @return {PullRequest} a pull request instance.
    */
-  async getReviews() {
-    const res = await this.github.pullRequests.listReviews({
-      number: this.id,
-      ...this.options,
-    });
-    this.context.log.debug('[getReviews]', res.data);
-    // Sort by latest submitted_at date first since users and state
-    // are not unique.
-    const reviews = res.data
-      .map(x => new Review(x))
-      .sort((a, b) => {
-        return b.submitted_at - a.submitted_at;
-      });
-    return reviews;
-  }
-
-  /**
-   * @param {!Array<string>} reviewers
-   * @return {!Promise}
-   */
-  async setReviewers(reviewers) {
-    // Stub
-  }
-
-  /**
-   * @param {object} fileOwners
-   * @param {!Array<object>} reviews
-   * @return {boolean}
-   */
-  areAllApprovalsMet(fileOwners, reviews) {
-    const reviewersWhoApproved = this.getReviewersWhoApproved(reviews);
-    return Object.keys(fileOwners).every(path => {
-      const fileOwner = fileOwners[path];
-      const owner = fileOwner.owner;
-      _.intersection(owner.dirOwners, reviewersWhoApproved);
-      return _.intersection(owner.dirOwners, reviewersWhoApproved).length > 0;
-    });
-  }
-
-  /**
-   * @param {!Array<object>} reviews
-   * @return {!Array<object>}
-   */
-  getReviewersWhoApproved(reviews) {
-    const reviewersWhoApproved = reviews
-      .filter(x => {
-        return x.state === 'approved';
-      })
-      .map(x => x.username);
-    // If you're the author, then you yourself are assumed to approve your own
-    // PR.
-    reviewersWhoApproved.push(this.author);
-    return reviewersWhoApproved;
-  }
-
-  /**
-   * @param {string} text
-   * @param {boolean} areApprovalsMet
-   * @return {!Promise}
-   */
-  async createCheckRun(text, areApprovalsMet) {
-    // We need to add a delay on the PR creation and check creation since
-    // GitHub might not be ready.
-    await sleep(2000);
-    const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.checks.create(
-      this.context.repo({
-        name: this.name,
-        head_branch: this.headRef,
-        head_sha: this.headSha,
-        status: 'completed',
-        conclusion: 'neutral',
-        completed_at: new Date(),
-        output: {
-          title: this.name,
-          summary: `The check was a ${conclusion}!`,
-          text,
-        },
-      })
-    );
-  }
-
-  /**
-   * @param {object} checkRun
-   * @param {string} text
-   * @param {boolean} areApprovalsMet
-   * @return {!Promise}
-   */
-  async updateCheckRun(checkRun, text, areApprovalsMet) {
-    this.context.log.debug('[updateCheckRun]', checkRun);
-    const conclusion = areApprovalsMet ? 'success' : 'failure';
-    return this.github.checks.update(
-      this.context.repo({
-        check_run_id: checkRun.id,
-        status: 'completed',
-        conclusion: 'neutral',
-        name: this.name,
-        completed_at: new Date(),
-        output: {
-          title: this.name,
-          summary: `The check was a ${conclusion}!`,
-          text,
-        },
-      })
-    );
-  }
-
-  /**
-   * Retrieves a check run from the GitHub API.
-   *
-   * @return {!Promise}
-   */
-  async getCheckRun() {
-    const res = await this.github.checks.listForRef({
-      owner: this.owner,
-      repo: this.repo,
-      ref: this.headSha,
-    });
-    this.context.log.debug('[getCheckRun]', res);
-    return res.data;
-  }
-
-  /**
-   * @param {object} checkRuns
-   * @return {object}
-   */
-  hasCheckRun(checkRuns) {
-    const hasCheckRun = checkRuns.total_count > 0;
-    const [checkRun] = checkRuns.check_runs.filter(x => {
-      return x.head_sha === this.headSha && this.nameMatcher.test(x.name);
-    });
-    const tuple = {hasCheckRun: hasCheckRun && !!checkRun, checkRun};
-    this.context.log.debug('[hasCheckRun]', tuple);
-    return tuple;
-  }
-
-  /**
-   * @param {object} prInfo
-   * @return {string}
-   */
-  buildCheckOutput(prInfo) {
-    const text = Object.values(prInfo.fileOwners)
-      .filter(fileOwner => {
-        // Omit sections that has a required reviewer who has approved.
-        return !_.intersection(
-          prInfo.reviewersWhoApproved,
-          fileOwner.owner.dirOwners
-        ).length;
-      })
-      .map(fileOwner => {
-        const fileOwnerHeader = `## possible reviewers: ${fileOwner.owner.dirOwners.join(
-          ', '
-        )}`;
-        const files = fileOwner.files
-          .map(file => {
-            return ` - ${file.path}\n`;
-          })
-          .join('');
-        return `\n${fileOwnerHeader}\n${files}`;
-      })
-      .join('');
-    this.context.log.debug('[buildCheckOutput]', text);
-    return text;
-  }
-
-  /**
-   * @param {object} context
-   * @param {number} number
-   */
-  static async get(context, number) {
-    return await context.github.pullRequests.get(
-      context.repo({
-        number,
-      })
-    );
+  static fromGitHubResponse(res) {
+    return new PullRequest(res.number, res.user.login, res.head.sha);
   }
 }
 
 /**
- * A comment on a GitHub Pull Request.
- */
-class PullRequestComment {
-  /**
-   * @param {object} json
-   */
-  constructor(json) {
-    this.id = json.id;
-    this.type = 'pull_request_review_id' in json ? 'pulls' : 'issues';
-    this.author = json.user.login;
-    this.body = json.body;
-    this.createdAt = new Date(json.created_at);
-    this.updatedAt = new Date(json.updated_at);
-    this.url = json.url;
-  }
-}
-
-/**
- * A Label on a GitHub Pull Request.
- */
-class Label {
-  /**
-   * @param {object} json
-   */
-  constructor(json) {
-    this.id = json.id;
-    this.url = json.url;
-    this.name = json.name;
-    this.color = json.color;
-    this.default = json.default;
-  }
-}
-
-/**
- * Represents the sender on GitHub API responses.
- */
-class Sender {
-  /**
-   * @param {object} json
-   */
-  constructor(json) {
-    this.username = json.login;
-  }
-}
-
-/**
- * A Review action on a GitHub Pull Request. (approve, disapprove)
+ * A a GitHub PR review.
  */
 class Review {
   /**
-   * @param {object} json
+   * Constructor.
+   *
+   * @param {!string} reviewer username of the reviewer giving approval.
+   * @param {!string} state status of the review (ie. "approved" or not).
+   * @param {!Date} submittedAt timestamp when the review was submitted.
    */
-  constructor(json) {
-    this.id = json.id;
-    this.username = json.user.login;
-    this.state = json.state.toLowerCase();
-    this.submitted_at = new Date(json.submitted_at);
-  }
-
-  /**
-   * @return {boolean}
-   */
-  isApproved() {
-    return this.state == 'approved';
+  constructor(reviewer, state, submittedAt) {
+    Object.assign(this, {
+      reviewer,
+      submittedAt,
+      isApproved: state.toLowerCase() === 'approved',
+    });
   }
 }
 
 /**
- * Teams API on GitHub.
+ * Interface for working with the GitHub API.
  */
-class Teams {
+class GitHub {
   /**
-   * @param {object} context
+   * Constructor.
+   *
+   * @param {!GitHubAPI} client Probot GitHub client (see
+   *     https://probot.github.io/api/latest/interfaces/githubapi.html).
+   * @param {!string} owner GitHub repository owner.
+   * @param {!string} repository GitHub repository name.
+   * @param {!Logger} logger logging interface.
    */
-  constructor(context) {
-    this.context = context;
-    this.github = context.github;
+  constructor(client, owner, repository, logger) {
+    Object.assign(this, {client, owner, repository, logger});
   }
 
   /**
-   * return the teams from the GitHub API.
-   * @return {!Promise}
+   * Creates a GitHub API interface from a Probot request context.
+   *
+   * @param {!Context} context Probot request context.
+   * @return {GitHub} a GitHub API interface.
    */
-  async list() {
-    return this.github.repos.listTeams(this.context.repo());
+  static fromContext(context) {
+    const {repo, owner} = context.repo();
+    return new GitHub(context.github, owner, repo, context.log);
+  }
+
+  /**
+   * Adds the owner and repo name to an object.
+   *
+   * @param {?object} obj object to add fields to.
+   * @return {object} object with owner and repo fields set.
+   */
+  repo(obj) {
+    return Object.assign({}, obj, {repo: this.repository, owner: this.owner});
+  }
+
+  /**
+   * Fetches a pull request.
+   *
+   * @param {!number} number pull request number.
+   * @return {PullRequest} pull request instance.
+   */
+  async getPullRequest(number) {
+    const response = await this.client.pullRequests.get(this.repo({number}));
+    return PullRequest.fromGitHubResponse(response.data);
+  }
+
+  /**
+   * Retrives code reviews for a PR from GitHub.
+   *
+   * @param {!number} number PR number.
+   * @return {Review[]} the list of code reviews.
+   */
+  async getReviews(number) {
+    this.logger.info(`Fetching reviews for PR #${number}`);
+
+    const response = await this.client.pullRequests.listReviews(
+      this.repo({number})
+    );
+    this.logger.debug('[getReviews]', number, response.data);
+
+    return response.data.map(
+      json => new Review(json.user.login, json.state, json.submitted_at)
+    );
+  }
+
+  /**
+   * Lists all modified files for a PR.
+   *
+   * @param {!number} number PR number
+   * @return {string[]} list of relative file paths.
+   */
+  async listFiles(number) {
+    this.logger.info(`Fetching changed files for PR #${number}`);
+
+    const response = await this.client.pullRequests.listFiles(
+      this.repo({number})
+    );
+    this.logger.debug('[listFiles]', number, response.data);
+
+    return response.data.map(item => item.filename);
+  }
+
+  /**
+   * Creates a check-run status for a commit.
+   *
+   * @param {!string} sha commit SHA for HEAD ref to create check-run
+   *     status on.
+   * @param {!CheckRun} checkRun check-run data to create.
+   */
+  async createCheckRun(sha, checkRun) {
+    this.logger.info(`Creating check-run for commit ${sha.substr(0, 7)}`);
+    this.logger.debug('[createCheckRun]', sha, checkRun);
+
+    return await this.client.checks.create(
+      this.repo({
+        head_sha: sha,
+        ...checkRun.json,
+      })
+    );
+  }
+
+  /**
+   * Fetches the ID of the OWNERS bot check-run for a commit.
+   *
+   * @param {!string} sha SHA hash for head commit to lookup check-runs on.
+   * @return {number|null} check-run ID if one exists, otherwise null.
+   */
+  async getCheckRunId(sha) {
+    this.logger.info(`Fetching check run ID for commit ${sha.substr(0, 7)}`);
+
+    const response = await this.client.checks.listForRef(this.repo({ref: sha}));
+    const checkRuns = response.data.check_runs;
+    this.logger.debug('[getCheckRunId]', sha, checkRuns);
+
+    const [checkRun] = checkRuns
+      .filter(cr => cr.head_sha === sha)
+      .filter(cr => OWNERS_CHECKRUN_REGEX.test(cr.name));
+    return checkRun ? checkRun.id : null;
+  }
+
+  /**
+   * Updates the check-run status for a commit.
+   *
+   * @param {!number} id ID of check-run data to update.
+   * @param {!CheckRun} checkRun check-run data to update.
+   */
+  async updateCheckRun(id, checkRun) {
+    const status = checkRun.passing ? 'passing' : 'failing';
+    this.logger.info(`Updating check-run with ID ${id} (${status})`);
+    this.logger.debug('[updateCheckRun]', id, checkRun);
+
+    return await this.client.checks.update(
+      this.repo({
+        check_run_id: id,
+        ...checkRun.json,
+      })
+    );
   }
 }
 
-module.exports = {
-  PullRequest,
-  PullRequestComment,
-  Label,
-  Sender,
-  Review,
-  Teams,
-};
+module.exports = {GitHub, PullRequest, Review};

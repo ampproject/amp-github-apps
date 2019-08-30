@@ -18,8 +18,9 @@
 const nock = require('nock');
 const owners = require('..');
 const {Probot} = require('probot');
-const Git = require('../src/git').Git;
 const sinon = require('sinon');
+const {LocalRepository} = require('../src/local_repo');
+const {Owner} = require('../src/owner');
 
 const opened35 = require('./fixtures/actions/opened.35');
 const opened36 = require('./fixtures/actions/opened.36.author-is-owner');
@@ -88,10 +89,8 @@ describe('owners bot', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     // Disabled execution of `git pull` for testing.
-    sandbox.stub(Git.prototype, 'pullLatestForRepo').returns(null);
-    sandbox
-      .stub(Git.prototype, 'getOwnersFilesForBranch')
-      .returns(ownersYamlStruct);
+    sandbox.stub(LocalRepository.prototype, 'checkout');
+    sandbox.stub(Owner, 'parseOwnersMap').returns(ownersYamlStruct);
 
     probot = new Probot({});
     const app = probot.load(owners);
@@ -140,7 +139,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
             return true;
@@ -148,7 +147,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
   });
 
@@ -184,7 +183,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened35.pull_request.head.ref,
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'failure',
@@ -193,7 +191,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
             return true;
@@ -201,7 +199,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
   });
 
@@ -241,7 +239,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
             return true;
@@ -249,7 +247,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
 
     test('with failure check when there are 0 reviews on a pull request and multiple files', async () => {
@@ -287,7 +285,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n - ./dir2/dir1/dir1/file-2.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n - ./dir2/dir1/dir1/file-2.txt',
               },
             });
             return true;
@@ -295,7 +293,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
   });
 
@@ -336,7 +334,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened35.pull_request.head.ref,
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'failure',
@@ -345,7 +342,7 @@ describe('owners bot', () => {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
                 text:
-                  '\n## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n',
+                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
             return true;
@@ -353,7 +350,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'check_run', payload: rerequest35});
+      await probot.receive({name: 'check_run', payload: rerequest35});
     });
   });
 
@@ -389,7 +386,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened35.pull_request.head.ref,
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'success',
@@ -405,7 +401,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened35});
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
 
     test('with passing check when author themselves are owners', async () => {
@@ -439,7 +435,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened36.pull_request.head.ref,
               head_sha: opened36.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'success',
@@ -455,7 +450,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request', payload: opened36});
+      await probot.receive({name: 'pull_request', payload: opened36});
     });
   });
 
@@ -494,7 +489,6 @@ describe('owners bot', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_branch: opened35.pull_request.head.ref,
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
               // conclusion: 'success',
@@ -510,7 +504,7 @@ describe('owners bot', () => {
         )
         .reply(200);
 
-      await probot.receive({event: 'pull_request_review', payload: review35});
+      await probot.receive({name: 'pull_request_review', payload: review35});
     });
   });
 });
