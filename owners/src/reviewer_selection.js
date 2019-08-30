@@ -132,7 +132,9 @@ class ReviewerSelection {
   static _reviewersForTrees(trees) {
     const reviewers = new Set();
     trees.forEach(tree => {
-      tree.rules.forEach(rule => reviewers.add(...rule.owners));
+      tree.rules.forEach(rule => {
+        rule.owners.forEach(owner => reviewers.add(owner));
+      });
     });
     return Array.from(reviewers);
   }
@@ -145,10 +147,10 @@ class ReviewerSelection {
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    */
   static _findPotentialReviewers(fileTreeMap) {
-    const nearestTrees = _nearestOwnersTrees(fileTreeMap);
+    const nearestTrees = this._nearestOwnersTrees(fileTreeMap);
     const maxDepth = Math.max(...nearestTrees.map(tree => tree.depth));
     const deepestTrees = nearestTrees.filter(tree => tree.depth === maxDepth);
-    return _reviewersForTrees(deepestTrees);
+    return this._reviewersForTrees(deepestTrees);
   }
 
   /**********
@@ -195,12 +197,12 @@ class ReviewerSelection {
    * @return {ReviewerFiles} tuple of a reviewer username and the files they own.
    */
   static _pickBestReviewer(fileTreeMap) {
-    const reviewerSet = _findPotentialReviewers(fileTreeMap);
+    const reviewerSet = this._findPotentialReviewers(fileTreeMap);
     const reviewerFilesMap = {};
     reviewerSet.forEach(reviewer => {
-      reviewerFilesMap[reviewer] = _filesOwnedByReviewer(fileTreeMap, reviewer);
+      reviewerFilesMap[reviewer] = this._filesOwnedByReviewer(fileTreeMap, reviewer);
     });
-    const bestReviewers = _reviewersWithMostFiles(reviewerFilesMap);
+    const bestReviewers = this._reviewersWithMostFiles(reviewerFilesMap);
     return bestReviewers[Math.floor(Math.random() * bestReviewers.length)];
   }
 
@@ -232,18 +234,19 @@ class ReviewerSelection {
    *     decreasing order of ownership depth.
    */
   static pickReviewers(fileTreeMap) {
-    reviewers = [];
+    const reviews = [];
 
     while (Object.entries(fileTreeMap).length) {
-      [nextReviewer, coveredFiles] = _pickBestReviewer(fileTreeMap);
-      if (!nextReviewer) {
+      let [bestReviewer, coveredFiles] = this._pickBestReviewer(fileTreeMap);
+      if (!bestReviewer) {
+        // This should be impossible unless there is no top-level OWNERS file.
         throw Error('Could not select reviewers!');
       }
-      reviewers.push([nextReviewer, coveredFiles]);
+      reviews.push([bestReviewer, coveredFiles]);
       coveredFiles.forEach(filename => delete fileTreeMap[filename]);
     }
 
-    return reviewers;
+    return reviews;
   }
 }
 
