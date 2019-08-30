@@ -161,7 +161,7 @@ describe('reviewer selection', () => {
     });
   });
 
-  describe('pickBestReviewer', () => {
+  describe('pickBestReview', () => {
     const fileTreeMap = ReviewerSelection.buildFileTreeMap(
       [
         './main.js', // root
@@ -175,7 +175,7 @@ describe('reviewer selection', () => {
 
     it('builds a map from deepest reviewers to files they own', () => {
       sandbox.stub(ReviewerSelection, '_reviewersWithMostFiles').callThrough();
-      ReviewerSelection._pickBestReviewer(fileTreeMap);
+      ReviewerSelection._pickBestReview(fileTreeMap);
 
       sandbox.assert.calledWith(ReviewerSelection._reviewersWithMostFiles, {
         child: ['biz/style.css', 'foo/bar/other_file.js'],
@@ -185,7 +185,7 @@ describe('reviewer selection', () => {
     });
 
     it('picks one of the reviewers with the most files', () => {
-      const [bestReviewer, filesCovered] = ReviewerSelection._pickBestReviewer(
+      const [bestReviewer, filesCovered] = ReviewerSelection._pickBestReview(
         fileTreeMap
       );
 
@@ -226,7 +226,7 @@ describe('reviewer selection', () => {
     let bestReviewerStub;
 
     beforeEach(() => {
-      bestReviewerStub = sandbox.stub(ReviewerSelection, '_pickBestReviewer');
+      bestReviewerStub = sandbox.stub(ReviewerSelection, '_pickBestReview');
       fileTreeMap = ReviewerSelection.buildFileTreeMap(
         ['./main.js', 'foo/file.js', 'biz/style.css', 'buzz/info.txt'],
         ownersTree
@@ -238,14 +238,16 @@ describe('reviewer selection', () => {
       const reviews = ReviewerSelection.pickReviewers(fileTreeMap);
       const reviewers = reviews.map(([reviewer, files]) => reviewer);
 
-      sandbox.assert.calledThrice(ReviewerSelection._pickBestReviewer);
+      sandbox.assert.calledThrice(ReviewerSelection._pickBestReview);
       expect(reviewers).toEqual(['child', 'thirdChild', 'root']);
     });
 
     it('throws an error if it fails to find reviewer coverage', () => {
       bestReviewerStub.returns(undefined);
 
-      expect(() => ReviewerSelection.pickReviewers(fileTreeMap)).toThrow();
+      expect(() => ReviewerSelection.pickReviewers(fileTreeMap)).toThrow(
+        'Could not select reviewers!'
+      );
     });
   });
 });

@@ -125,7 +125,7 @@ class ReviewerSelection {
   }
 
   /**
-   * Picks the best reviewer to satisfy the deepest rules.
+   * Picks the best reviewer-fileset pair to satisfy the deepest rules.
    *
    * @private
    * Chooses randomly from the set of best possible reviewers to allow even
@@ -135,7 +135,7 @@ class ReviewerSelection {
    * @return {ReviewerFiles} tuple of a reviewer username and the files they
    *     own.
    */
-  static _pickBestReviewer(fileTreeMap) {
+  static _pickBestReview(fileTreeMap) {
     const reviewerSet = this._findPotentialReviewers(fileTreeMap);
     const reviewerFilesMap = {};
     reviewerSet.forEach(reviewer => {
@@ -181,11 +181,13 @@ class ReviewerSelection {
     const reviews = [];
 
     while (Object.entries(fileTreeMap).length) {
-      const [bestReviewer, coveredFiles] = this._pickBestReviewer(fileTreeMap);
-      if (!bestReviewer) {
+      const bestReview = this._pickBestReview(fileTreeMap);
+      if (!bestReview) {
         // This should be impossible unless there is no top-level OWNERS file.
         throw Error('Could not select reviewers!');
       }
+
+      const [bestReviewer, coveredFiles] = bestReview;
       reviews.push([bestReviewer, coveredFiles]);
       coveredFiles.forEach(filename => delete fileTreeMap[filename]);
     }
