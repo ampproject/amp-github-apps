@@ -53,8 +53,10 @@ module.exports = app => {
       latestCheckRun = ownersCheck.buildCheckRun(fileOwners, approvers);
     } catch (error) {
       // If anything goes wrong, report a failing check.
-      latestCheckRun =
-          new CheckRun(false, 'OWNERS check encountered an error: ' + error)
+      latestCheckRun = new CheckRun(
+        false,
+        'OWNERS check encountered an error: ' + error
+      );
     }
 
     if (checkRunId) {
