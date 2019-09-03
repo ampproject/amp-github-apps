@@ -19,7 +19,7 @@
     "url": "https://github.com/ampproject/amp-github-apps/issues"
   },
   "devDependencies": {
-    "nodemon": "1.19.1"
+    "nodemon": "1.19.2"
   },
   "nodemonConfig": {
     "exec": "npm start",
