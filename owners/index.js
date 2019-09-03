@@ -22,7 +22,7 @@ const {Owner} = require('./src/owner');
 const GITHUB_CHECKRUN_DELAY = 2000;
 
 module.exports = app => {
-  app.on(['pull_request.opened', 'pull_request.synchronized'], onPullRequest);
+  app.on(['pull_request.opened', 'pull_request.synchronize'], onPullRequest);
   app.on('check_run.rerequested', onCheckRunRerequest);
   app.on('pull_request_review.submitted', onPullRequestReview);
 
