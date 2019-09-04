@@ -20,26 +20,15 @@ const {CheckRun, OwnersCheck} = require('../src/owners_check');
 describe('check run', () => {
   describe('json', () => {
     it('produces a JSON object in the GitHub API format', () => {
-      const checkRun = new CheckRun(true, 'Test text');
+      const checkRun = new CheckRun('Test summary', 'Test text');
       const checkRunJson = checkRun.json;
 
       expect(checkRunJson.name).toEqual('ampproject/owners-check');
       expect(checkRunJson.status).toEqual('completed');
       expect(checkRunJson.conclusion).toEqual('neutral');
       expect(checkRunJson.output.title).toEqual('ampproject/owners-check');
+      expect(checkRunJson.output.summary).toEqual('Test summary');
       expect(checkRunJson.output.text).toEqual('Test text');
-    });
-
-    it('produces a the output summary based on the passing status', () => {
-      const passingCheckRun = new CheckRun(true, '');
-      const failingCheckRun = new CheckRun(false, '');
-
-      expect(passingCheckRun.json.output.summary).toEqual(
-        'The check was a success!'
-      );
-      expect(failingCheckRun.json.output.summary).toEqual(
-        'The check was a failure!'
-      );
     });
   });
 });

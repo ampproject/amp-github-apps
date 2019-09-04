@@ -25,11 +25,11 @@ class CheckRun {
   /**
    * Constructor.
    *
-   * @param {!string} passing whether or not the check-run is passing/approved.
+   * @param {!string} summary check-run summary text to show in PR.
    * @param {!string} text description of check-run results.
    */
-  constructor(passing, text) {
-    Object.assign(this, {passing, text});
+  constructor(summary, text) {
+    Object.assign(this, {summary, text});
   }
 
   /**
@@ -45,7 +45,7 @@ class CheckRun {
       completed_at: new Date(),
       output: {
         title: GITHUB_CHECKRUN_NAME,
-        summary: `The check was a ${this.passing ? 'success' : 'failure'}!`,
+        summary: this.summary,
         text: this.text,
       },
     };
@@ -70,14 +70,15 @@ class OwnersCheck {
    * Builds a check-run.
    *
    * @param {!object} fileOwners ownership rules.
-   * @param {!string[]} approvers list of usernames that approved this PR.
+   * @param {string[]} approvers list of usernames that approved this PR.
    * @param {!OwnersTree} ownersTree file ownership tree.
    * @return {CheckRun} a check-run based on the approval state.
    */
   buildCheckRun(fileOwners, approvers, ownersTree) {
     const passing = this._allFilesApproved(fileOwners, approvers);
     const text = this._buildOutputText(fileOwners, approvers);
-    return new CheckRun(passing, text);
+    const summary = `The check was a ${passing ? 'success' : 'failure'}!`;
+    return new CheckRun(summary, text);
   }
 
   /**
