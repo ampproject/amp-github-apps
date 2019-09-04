@@ -16,7 +16,7 @@
 
 const sleep = require('sleep-promise');
 const {GitHub, PullRequest} = require('./src/github');
-const {OwnersCheck} = require('./src/owners_check');
+const {CheckRun, OwnersCheck} = require('./src/owners_check');
 const {Owner} = require('./src/owner');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
@@ -43,11 +43,21 @@ module.exports = app => {
    */
   async function runOwnersCheck(github, pr) {
     const ownersCheck = new OwnersCheck(github, pr);
-    const fileOwners = await Owner.getOwners(github, pr.number);
-    const approvers = await ownersCheck.getApprovers();
+    let checkRunId;
+    let latestCheckRun;
 
-    const checkRunId = await github.getCheckRunId(pr.headSha);
-    const latestCheckRun = ownersCheck.buildCheckRun(fileOwners, approvers);
+    try {
+      const approvers = await ownersCheck.getApprovers();
+      checkRunId = await github.getCheckRunId(pr.headSha);
+      const fileOwners = await Owner.getOwners(github, pr.number);
+      latestCheckRun = ownersCheck.buildCheckRun(fileOwners, approvers);
+    } catch (error) {
+      // If anything goes wrong, report a failing check.
+      latestCheckRun = new CheckRun(
+        false,
+        'OWNERS check encountered an error: ' + error
+      );
+    }
 
     if (checkRunId) {
       await github.updateCheckRun(checkRunId, latestCheckRun);
