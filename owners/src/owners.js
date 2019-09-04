@@ -123,7 +123,7 @@ class OwnersTree {
   hasOwner(username) {
     const allOwners = this.allRules
       .map(rule => rule.owners)
-      .reduce((left, right) => left.concat(right));
+      .reduce((left, right) => left.concat(right), []);
     return allOwners.includes(username);
   }
 
