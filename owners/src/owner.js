@@ -66,21 +66,19 @@ class Owner {
   static async parseOwnersMap(parser) {
     const ownersRules = await parser.parseAllOwnersRules();
     const ownersList = ownersRules.map(
-      rule => new Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath)
-    );
+        rule =>
+            new Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath));
     return createOwnersMap(ownersList);
   }
 
   /**
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!number} prNumber pull request number
-   * @param {!OwnersParser} parser ownership rules parser.
+   * @param {!OwnersCheck} ownersCheck ownership approval check.
    * @return {object}
    */
-  static async getOwners(github, prNumber, parser) {
-    const filenames = await github.listFiles(prNumber);
-    const repoFiles = filenames.map(filename => new RepoFile(filename));
-    const ownersMap = await this.parseOwnersMap(parser);
+  static async getOwners(ownersCheck) {
+    const repoFiles =
+        ownersCheck.changedFiles.map(filename => new RepoFile(filename));
+    const ownersMap = await this.parseOwnersMap(ownersCheck.parser);
 
     return findOwners(repoFiles, ownersMap);
   }

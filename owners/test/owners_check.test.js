@@ -43,6 +43,10 @@ describe('owners check', () => {
     constructor(reviews) {
       this.getReviews = () => reviews;
     }
+    
+    async listFiles () {
+      return ['changed_file1.js', 'changed_file2.js'];
+    }
   }
 
   const sandbox = sinon.createSandbox();
@@ -87,6 +91,15 @@ describe('owners check', () => {
       expect(ownersCheck.approvers).toContain('approver', 'other_approver');
     });
 
+    it('fetches the files changed in the PR', async () => {
+      sandbox.stub(FakeGithub.prototype, 'listFiles').callThrough();
+      await ownersCheck.init();
+
+      sandbox.assert.calledWith(ownersCheck.github.listFiles, 35);
+      expect(ownersCheck.changedFiles)
+          .toContain('changed_file1.js', 'changed_file2.js');
+    });
+
     it('sets `initialized` to true', async () => {
       expect(ownersCheck.initialized).toBe(false);
       await ownersCheck.init();
@@ -95,12 +108,9 @@ describe('owners check', () => {
   });
 
   describe('getApprovers', () => {
-    it("returns the reviewers' usernames", async () => {
-      const ownersCheck = new OwnersCheck(
-        repo,
-        new FakeGithub([approval, otherApproval]),
-        pr
-      );
+    it('returns the reviewers\' usernames', async () => {
+      const ownersCheck =
+          new OwnersCheck(repo, new FakeGithub([approval, otherApproval]), pr);
       const approvers = await ownersCheck.getApprovers();
 
       expect(approvers).toContain('approver', 'other_approver');
@@ -115,21 +125,15 @@ describe('owners check', () => {
 
     it('produces unique usernames', async () => {
       const ownersCheck = new OwnersCheck(
-        repo,
-        new FakeGithub([approval, approval, authorApproval]),
-        pr
-      );
+          repo, new FakeGithub([approval, approval, authorApproval]), pr);
       const approvers = await ownersCheck.getApprovers();
 
       expect(approvers).toEqual(['approver', 'the_author']);
     });
 
     it('includes only reviewers who approved the review', async () => {
-      const ownersCheck = new OwnersCheck(
-        repo,
-        new FakeGithub([approval, rejection]),
-        pr
-      );
+      const ownersCheck =
+          new OwnersCheck(repo, new FakeGithub([approval, rejection]), pr);
       const approvers = await ownersCheck.getApprovers();
 
       expect(approvers).not.toContain('rejector');

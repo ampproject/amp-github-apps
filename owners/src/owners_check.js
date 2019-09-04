@@ -82,6 +82,7 @@ class OwnersCheck {
     await this.repo.checkout();
     this.tree = await this.parser.parseOwnersTree();
     this.approvers = await this.getApprovers();
+    this.changedFiles = await this.github.listFiles(this.pr.number);
     this.initialized = true;
   }
 
@@ -114,13 +115,11 @@ class OwnersCheck {
    * Builds a check-run.
    *
    * @param {!object} fileOwners ownership rules.
-   * @param {string[]} approvers list of usernames that approved this PR.
-   * @param {!OwnersTree} ownersTree file ownership tree.
    * @return {CheckRun} a check-run based on the approval state.
    */
-  buildCheckRun(fileOwners, approvers, ownersTree) {
-    const passing = this._allFilesApproved(fileOwners, approvers);
-    const text = this._buildOutputText(fileOwners, approvers);
+  buildCheckRun(fileOwners) {
+    const passing = this._allFilesApproved(fileOwners);
+    const text = this._buildOutputText(fileOwners);
     const summary = `The check was a ${passing ? 'success' : 'failure'}!`;
     return new CheckRun(summary, text);
   }
@@ -132,13 +131,12 @@ class OwnersCheck {
    *
    * @private
    * @param {!object} fileOwners ownership rules.
-   * @param {string[]} approvers list of usernames that approved this PR.
    * @return {boolean} if all files are approved.
    */
-  _allFilesApproved(fileOwners, approvers) {
+  _allFilesApproved(fileOwners) {
     return Object.values(fileOwners)
       .map(fileOwner => fileOwner.owner.dirOwners)
-      .every(dirOwners => !!_.intersection(dirOwners, approvers).length);
+      .every(dirOwners => !!_.intersection(dirOwners, this.approvers).length);
   }
 
   /**
@@ -148,15 +146,14 @@ class OwnersCheck {
    *
    * @private
    * @param {!object} fileOwners ownership rules.
-   * @param {string[]} approvers list of usernames that approved this PR.
    * @return {string} check-run output text.
    */
-  _buildOutputText(fileOwners, approvers) {
+  _buildOutputText(fileOwners) {
     const unapprovedFileOwners = Object.values(fileOwners).filter(
       fileOwner =>
         // Omit sections that has a required reviewer who has
         // approved.
-        !_.intersection(approvers, fileOwner.owner.dirOwners).length
+        !_.intersection(this.approvers, fileOwner.owner.dirOwners).length
     );
 
     const reviewerSuggestions = unapprovedFileOwners.map(fileOwner => {
