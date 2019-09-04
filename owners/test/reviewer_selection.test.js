@@ -22,19 +22,19 @@ describe('reviewer selection', () => {
   const sandbox = sinon.createSandbox();
   const ownersTree = new OwnersTree();
 
-  const rootDirRule = new OwnersRule('OWNERS.yaml', ['root']);
-  const childDirRule = new OwnersRule('foo/OWNERS.yaml', ['child']);
-  const otherChildDirRule = new OwnersRule('biz/OWNERS.yaml', ['child', 'kid']);
-  const thirdChildDirRule = new OwnersRule('buzz/OWNERS.yaml', ['thirdChild']);
-  const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
-    'descendant',
-  ]);
-
-  const rootDirTree = ownersTree.addRule(rootDirRule);
-  const childDirTree = ownersTree.addRule(childDirRule);
-  const otherChildDirTree = ownersTree.addRule(otherChildDirRule);
-  const thirdChildDirTree = ownersTree.addRule(thirdChildDirRule);
-  const descendantDirTree = ownersTree.addRule(descendantDirRule);
+  const dirTrees = {
+    '/': ownersTree.addRule(new OwnersRule('OWNERS.yaml', ['rootOwner'])),
+    '/foo': ownersTree.addRule(new OwnersRule('foo/OWNERS.yaml', ['child'])),
+    '/biz': ownersTree.addRule(
+      new OwnersRule('biz/OWNERS.yaml', ['child', 'kid'])
+    ),
+    '/buzz': ownersTree.addRule(
+      new OwnersRule('buzz/OWNERS.yaml', ['thirdChild'])
+    ),
+    '/foo/bar/baz': ownersTree.addRule(
+      new OwnersRule('foo/bar/baz/OWNERS.yaml', ['descendant'])
+    ),
+  };
 
   afterEach(() => {
     sandbox.restore();
@@ -49,7 +49,11 @@ describe('reviewer selection', () => {
       const nearestTrees = ReviewerSelection._nearestOwnersTrees(fileTreeMap);
 
       expect(nearestTrees).toEqual(
-        expect.arrayContaining([rootDirTree, otherChildDirTree, childDirTree])
+        expect.arrayContaining([
+          dirTrees['/'],
+          dirTrees['/biz'],
+          dirTrees['/foo'],
+        ])
       );
     });
 
@@ -60,15 +64,15 @@ describe('reviewer selection', () => {
       );
       const nearestTrees = ReviewerSelection._nearestOwnersTrees(fileTreeMap);
 
-      expect(nearestTrees).toEqual([childDirTree]);
+      expect(nearestTrees).toEqual([dirTrees['/foo']]);
     });
   });
 
   describe('reviewersForTrees', () => {
     it('unions the owners for all subtrees', () => {
       const reviewers = ReviewerSelection._reviewersForTrees([
-        otherChildDirTree,
-        descendantDirTree,
+        dirTrees['/biz'],
+        dirTrees['/foo/bar/baz'],
       ]);
 
       expect(reviewers).toEqual(
@@ -77,9 +81,11 @@ describe('reviewer selection', () => {
     });
 
     it('does not include inherited owners', () => {
-      const reviewers = ReviewerSelection._reviewersForTrees([childDirTree]);
+      const reviewers = ReviewerSelection._reviewersForTrees([
+        dirTrees['/foo'],
+      ]);
 
-      expect(reviewers).not.toContain('root');
+      expect(reviewers).not.toContain('rootOwner');
     });
   });
 
@@ -94,54 +100,50 @@ describe('reviewer selection', () => {
 
       sandbox.assert.calledWith(
         ReviewerSelection._reviewersForTrees,
-        sinon.match.array.contains([childDirTree, otherChildDirTree])
+        sinon.match.array.contains([dirTrees['/foo'], dirTrees['/biz']])
       );
       expect(reviewers).toEqual(expect.arrayContaining(['child', 'kid']));
     });
   });
 
   describe('filesOwnedByReviewer', () => {
-    it('lists files for which the reviewer is an owner', () => {
-      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-        [
-          './main.js', // root
-          'biz/style.css', // child, kid, root
-          'foo/bar/other_file.js', // child, root
-          'foo/bar/baz/README.md', // descendant, child, root
-        ],
-        ownersTree
-      );
-      const rootFiles = ReviewerSelection._filesOwnedByReviewer(
-        fileTreeMap,
-        'root'
-      );
-      const childFiles = ReviewerSelection._filesOwnedByReviewer(
-        fileTreeMap,
-        'child'
-      );
-      const kidFiles = ReviewerSelection._filesOwnedByReviewer(
-        fileTreeMap,
-        'kid'
-      );
-      const descendantFiles = ReviewerSelection._filesOwnedByReviewer(
-        fileTreeMap,
-        'descendant'
-      );
+    const fileTreeMap = ReviewerSelection.buildFileTreeMap(
+      [
+        './main.js', // root
+        'biz/style.css', // child, kid, root
+        'foo/bar/other_file.js', // child, root
+        'foo/bar/baz/README.md', // descendant, child, root
+      ],
+      ownersTree
+    );
 
-      expect(rootFiles).toEqual([
+    const filesOwnedMap = {
+      'rootOwner': [
         './main.js',
         'biz/style.css',
         'foo/bar/other_file.js',
         'foo/bar/baz/README.md',
-      ]);
-      expect(childFiles).toEqual([
+      ],
+      'child': [
         'biz/style.css',
         'foo/bar/other_file.js',
         'foo/bar/baz/README.md',
-      ]);
-      expect(kidFiles).toEqual(['biz/style.css']);
-      expect(descendantFiles).toEqual(['foo/bar/baz/README.md']);
-    });
+      ],
+      'kid': ['biz/style.css'],
+      'descendant': ['foo/bar/baz/README.md'],
+    };
+
+    it.each(Object.entries(filesOwnedMap))(
+      'lists files for %p',
+      (reviewer, expectedFilesOwned) => {
+        const filesOwned = ReviewerSelection._filesOwnedByReviewer(
+          fileTreeMap,
+          reviewer
+        );
+
+        expect(filesOwned).toEqual(expectedFilesOwned);
+      }
+    );
   });
 
   describe('reviewersWithMostFiles', () => {
@@ -210,42 +212,53 @@ describe('reviewer selection', () => {
       );
 
       expect(fileTreeMap).toEqual({
-        './main.js': rootDirTree,
-        './package.json': rootDirTree,
-        'biz/style.css': otherChildDirTree,
-        'foo/file.js': childDirTree,
-        'foo/bar/other_file.js': childDirTree,
-        'buzz/info.txt': thirdChildDirTree,
-        'buzz/code.js': thirdChildDirTree,
+        './main.js': dirTrees['/'],
+        './package.json': dirTrees['/'],
+        'biz/style.css': dirTrees['/biz'],
+        'foo/file.js': dirTrees['/foo'],
+        'foo/bar/other_file.js': dirTrees['/foo'],
+        'buzz/info.txt': dirTrees['/buzz'],
+        'buzz/code.js': dirTrees['/buzz'],
       });
     });
   });
 
-  describe('pickReviewers', () => {
-    let fileTreeMap;
-    let bestReviewerStub;
-
-    beforeEach(() => {
-      bestReviewerStub = sandbox.stub(ReviewerSelection, '_pickBestReview');
-      fileTreeMap = ReviewerSelection.buildFileTreeMap(
+  describe('pickReviews', () => {
+    it('picks reviewers until all files are covered', () => {
+      sandbox.stub(ReviewerSelection, '_pickBestReview').callThrough();
+      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
         ['./main.js', 'foo/file.js', 'biz/style.css', 'buzz/info.txt'],
         ownersTree
       );
-    });
 
-    it('picks reviewers until all files are covered', () => {
-      bestReviewerStub.callThrough();
-      const reviews = ReviewerSelection.pickReviewers(fileTreeMap);
+      const reviews = ReviewerSelection.pickReviews(fileTreeMap);
       const reviewers = reviews.map(([reviewer, files]) => reviewer);
 
       sandbox.assert.calledThrice(ReviewerSelection._pickBestReview);
-      expect(reviewers).toEqual(['child', 'thirdChild', 'root']);
+      expect(reviewers).toEqual(['child', 'thirdChild', 'rootOwner']);
+    });
+
+    it('can avoid adding high-level owners', () => {
+      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
+        ['foo/file.js', 'biz/style.css', 'buzz/info.txt'],
+        ownersTree
+      );
+
+      const reviews = ReviewerSelection.pickReviews(fileTreeMap);
+      const reviewers = reviews.map(([reviewer, files]) => reviewer);
+
+      expect(reviewers).toContain('child', 'thirdChild');
+      expect(reviewers).not.toContain('rootOwner');
     });
 
     it('throws an error if it fails to find reviewer coverage', () => {
-      bestReviewerStub.returns(undefined);
+      sandbox.stub(ReviewerSelection, '_pickBestReview').returns(undefined);
+      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
+        ['main.js'],
+        ownersTree
+      );
 
-      expect(() => ReviewerSelection.pickReviewers(fileTreeMap)).toThrow(
+      expect(() => ReviewerSelection.pickReviews(fileTreeMap)).toThrow(
         'Could not select reviewers!'
       );
     });

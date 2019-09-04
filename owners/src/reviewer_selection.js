@@ -157,14 +157,14 @@ class ReviewerSelection {
   }
 
   /**
-   * Picks a set of reviewers to approve the PR.
+   * Picks a set of reviews to approve the PR.
    *
    * @throws {Error} if the algorithm fails to select reviewers.
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    * @return {ReviewerFiles[]} list of reviewers and the files they cover, in
    *     decreasing order of ownership depth.
    */
-  static pickReviewers(fileTreeMap) {
+  static pickReviews(fileTreeMap) {
     const reviews = [];
 
     while (Object.entries(fileTreeMap).length) {
