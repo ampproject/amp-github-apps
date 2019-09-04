@@ -176,7 +176,9 @@ class ReviewerSelection {
 
       const [bestReviewer, coveredFiles] = bestReview;
       reviews.push([bestReviewer, coveredFiles]);
-      coveredFiles.forEach(filename => delete fileTreeMap[filename]);
+      coveredFiles.forEach(filename => {
+        delete fileTreeMap[filename];
+      });
     }
 
     return reviews;
