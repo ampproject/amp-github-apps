@@ -83,6 +83,7 @@ class OwnersCheck {
     this.tree = await this.parser.parseOwnersTree();
     this.approvers = await this._getApprovers();
     this.changedFiles = await this.github.listFiles(this.pr.number);
+    this.fileTreeMap = this.tree.buildFileTreeMap(this.changedFiles);
     this.initialized = true;
   }
 

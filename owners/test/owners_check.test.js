@@ -102,6 +102,19 @@ describe('owners check', () => {
       );
     });
 
+    it('builds a map of changed files and their ownership trees', async () => {
+      sandbox.stub(OwnersTree.prototype, 'buildFileTreeMap').callThrough();
+      await ownersCheck.init();
+
+      sandbox.assert.calledWith(ownersCheck.tree.buildFileTreeMap, [
+        'changed_file1.js',
+        'changed_file2.js',
+      ]);
+      expect(ownersCheck.fileTreeMap['changed_file1.js']).toEqual(
+        ownersCheck.tree
+      );
+    });
+
     it('sets `initialized` to true', async () => {
       expect(ownersCheck.initialized).toBe(false);
       await ownersCheck.init();
