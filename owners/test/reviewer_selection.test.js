@@ -42,10 +42,11 @@ describe('reviewer selection', () => {
 
   describe('nearestOwnersTrees', () => {
     it('returns the nearest trees', () => {
-      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-        ['./main.js', 'biz/style.css', 'foo/bar/other_file.js'],
-        ownersTree
-      );
+      const fileTreeMap = ownersTree.buildFileTreeMap([
+        './main.js',
+        'biz/style.css',
+        'foo/bar/other_file.js',
+      ]);
       const nearestTrees = ReviewerSelection._nearestOwnersTrees(fileTreeMap);
 
       expect(nearestTrees).toEqual(
@@ -58,10 +59,10 @@ describe('reviewer selection', () => {
     });
 
     it('does not return duplicates', () => {
-      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-        ['foo/file.js', 'foo/bar/other_file.js'],
-        ownersTree
-      );
+      const fileTreeMap = ownersTree.buildFileTreeMap([
+        'foo/file.js',
+        'foo/bar/other_file.js',
+      ]);
       const nearestTrees = ReviewerSelection._nearestOwnersTrees(fileTreeMap);
 
       expect(nearestTrees).toEqual([dirTrees['/foo']]);
@@ -91,10 +92,11 @@ describe('reviewer selection', () => {
 
   describe('findPotentialReviewers', () => {
     it('returns reviewers for the deepest trees', () => {
-      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-        ['./main.js', 'biz/style.css', 'foo/bar/other_file.js'],
-        ownersTree
-      );
+      const fileTreeMap = ownersTree.buildFileTreeMap([
+        './main.js',
+        'biz/style.css',
+        'foo/bar/other_file.js',
+      ]);
       sandbox.stub(ReviewerSelection, '_reviewersForTrees').callThrough();
       const reviewers = ReviewerSelection._findPotentialReviewers(fileTreeMap);
 
@@ -107,15 +109,12 @@ describe('reviewer selection', () => {
   });
 
   describe('filesOwnedByReviewer', () => {
-    const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-      [
-        './main.js', // root
-        'biz/style.css', // child, kid, root
-        'foo/bar/other_file.js', // child, root
-        'foo/bar/baz/README.md', // descendant, child, root
-      ],
-      ownersTree
-    );
+    const fileTreeMap = ownersTree.buildFileTreeMap([
+      './main.js', // root
+      'biz/style.css', // child, kid, root
+      'foo/bar/other_file.js', // child, root
+      'foo/bar/baz/README.md', // descendant, child, root
+    ]);
 
     const filesOwnedMap = {
       'rootOwner': [
@@ -164,16 +163,13 @@ describe('reviewer selection', () => {
   });
 
   describe('pickBestReview', () => {
-    const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-      [
-        './main.js', // root
-        'biz/style.css', // child, kid, root
-        'foo/bar/other_file.js', // child, root
-        'buzz/info.txt', // thirdChild, root
-        'buzz/code.js', // thirdChild, root
-      ],
-      ownersTree
-    );
+    const fileTreeMap = ownersTree.buildFileTreeMap([
+      './main.js', // root
+      'biz/style.css', // child, kid, root
+      'foo/bar/other_file.js', // child, root
+      'buzz/info.txt', // thirdChild, root
+      'buzz/code.js', // thirdChild, root
+    ]);
 
     it('builds a map from deepest reviewers to files they own', () => {
       sandbox.stub(ReviewerSelection, '_reviewersWithMostFiles').callThrough();
@@ -196,40 +192,15 @@ describe('reviewer selection', () => {
     });
   });
 
-  describe('buildFileTreeMap', () => {
-    it('builds a map from filenames to subtrees', () => {
-      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-        [
-          './main.js',
-          './package.json',
-          'biz/style.css',
-          'foo/file.js',
-          'foo/bar/other_file.js',
-          'buzz/info.txt',
-          'buzz/code.js',
-        ],
-        ownersTree
-      );
-
-      expect(fileTreeMap).toEqual({
-        './main.js': dirTrees['/'],
-        './package.json': dirTrees['/'],
-        'biz/style.css': dirTrees['/biz'],
-        'foo/file.js': dirTrees['/foo'],
-        'foo/bar/other_file.js': dirTrees['/foo'],
-        'buzz/info.txt': dirTrees['/buzz'],
-        'buzz/code.js': dirTrees['/buzz'],
-      });
-    });
-  });
-
   describe('pickReviews', () => {
     it('picks reviewers until all files are covered', () => {
       sandbox.stub(ReviewerSelection, '_pickBestReview').callThrough();
-      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-        ['./main.js', 'foo/file.js', 'biz/style.css', 'buzz/info.txt'],
-        ownersTree
-      );
+      const fileTreeMap = ownersTree.buildFileTreeMap([
+        './main.js',
+        'foo/file.js',
+        'biz/style.css',
+        'buzz/info.txt',
+      ]);
 
       const reviews = ReviewerSelection.pickReviews(fileTreeMap);
       const reviewers = reviews.map(([reviewer, files]) => reviewer);
@@ -239,10 +210,11 @@ describe('reviewer selection', () => {
     });
 
     it('can avoid adding high-level owners', () => {
-      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-        ['foo/file.js', 'biz/style.css', 'buzz/info.txt'],
-        ownersTree
-      );
+      const fileTreeMap = ownersTree.buildFileTreeMap([
+        'foo/file.js',
+        'biz/style.css',
+        'buzz/info.txt',
+      ]);
 
       const reviews = ReviewerSelection.pickReviews(fileTreeMap);
       const reviewers = reviews.map(([reviewer, files]) => reviewer);
@@ -253,10 +225,7 @@ describe('reviewer selection', () => {
 
     it('throws an error if it fails to find reviewer coverage', () => {
       sandbox.stub(ReviewerSelection, '_pickBestReview').returns(undefined);
-      const fileTreeMap = ReviewerSelection.buildFileTreeMap(
-        ['main.js'],
-        ownersTree
-      );
+      const fileTreeMap = ownersTree.buildFileTreeMap(['main.js']);
 
       expect(() => ReviewerSelection.pickReviews(fileTreeMap)).toThrow(
         'Could not select reviewers!'

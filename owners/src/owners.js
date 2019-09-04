@@ -128,6 +128,20 @@ class OwnersTree {
   }
 
   /**
+   * Builds the map from filenames to ownership subtrees.
+   *
+   * @param {string[]} filenames list of changed files.
+   * @return {FileTreeMap} map from filenames to nearest ownership subtrees.
+   */
+  buildFileTreeMap(filenames) {
+    const fileTreeMap = {};
+    filenames.forEach(filename => {
+      fileTreeMap[filename] = this.atPath(filename);
+    });
+    return fileTreeMap;
+  }
+
+  /**
    * Renders the ownership tree as a string.
    *
    * @return {string} visual representation of the tree.
