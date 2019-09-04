@@ -15,6 +15,7 @@
  */
 
 const _ = require('lodash');
+const {OwnersParser} = require('./owners');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
 
@@ -25,11 +26,11 @@ class CheckRun {
   /**
    * Constructor.
    *
-   * @param {!string} passing whether or not the check-run is passing/approved.
+   * @param {!string} summary check-run summary text to show in PR.
    * @param {!string} text description of check-run results.
    */
-  constructor(passing, text) {
-    Object.assign(this, {passing, text});
+  constructor(summary, text) {
+    Object.assign(this, {summary, text});
   }
 
   /**
@@ -45,7 +46,7 @@ class CheckRun {
       completed_at: new Date(),
       output: {
         title: GITHUB_CHECKRUN_NAME,
-        summary: `The check was a ${this.passing ? 'success' : 'failure'}!`,
+        summary: this.summary,
         text: this.text,
       },
     };
@@ -59,63 +60,30 @@ class OwnersCheck {
   /**
    * Constructor.
    *
+   * @param {!LocalRepository} repo local repository to read from.
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to run owners check on.
    */
-  constructor(github, pr) {
-    Object.assign(this, {github, pr});
+  constructor(repo, github, pr) {
+    const parser = new OwnersParser(repo, github.log);
+
+    Object.assign(this, {github, pr, repo, parser});
+
+    this.tree = null;
+    this.approvers = null;
+    this.changedFiles = null;
+    this.initialized = false;
   }
 
   /**
-   * Builds a check-run.
-   *
-   * @param {!object} fileOwners ownership rules.
-   * @param {!object} approvers list of usernames that approved this PR.
-   * @return {CheckRun} a check-run based on the approval state.
+   * Initializes key properties requiring async/await.
    */
-  buildCheckRun(fileOwners, approvers) {
-    const passing = this._allFilesApproved(fileOwners, approvers);
-    const text = this._buildOutputText(fileOwners, approvers);
-    return new CheckRun(passing, text);
-  }
-
-  /**
-   * Tests if all files are approved by at least one owner.
-   *
-   * @private
-   * @param {!object} fileOwners ownership rules.
-   * @param {string[]} approvers list of usernames that approved this PR.
-   * @return {boolean} if all files are approved.
-   */
-  _allFilesApproved(fileOwners, approvers) {
-    return Object.values(fileOwners)
-      .map(fileOwner => fileOwner.owner.dirOwners)
-      .every(dirOwners => !!_.intersection(dirOwners, approvers).length);
-  }
-
-  /**
-   * Build the check-run output comment.
-   *
-   * @private
-   * @param {!object} fileOwners ownership rules.
-   * @param {string[]} approvers list of usernames that approved this PR.
-   * @return {string} check-run output text.
-   */
-  _buildOutputText(fileOwners, approvers) {
-    const unapprovedFileOwners = Object.values(fileOwners).filter(
-      fileOwner =>
-        // Omit sections that has a required reviewer who has approved.
-        !_.intersection(approvers, fileOwner.owner.dirOwners).length
-    );
-
-    const reviewerSuggestions = unapprovedFileOwners.map(fileOwner => {
-      const reviewers = fileOwner.owner.dirOwners.join(', ');
-      const header = `## possible reviewers: ${reviewers}`;
-      const files = fileOwner.files.map(file => ` - ${file.path}`);
-      return [header, ...files].join('\n');
-    });
-
-    return reviewerSuggestions.join('\n\n');
+  async init() {
+    await this.repo.checkout();
+    this.tree = await this.parser.parseOwnersTree();
+    this.approvers = await this._getApprovers();
+    this.changedFiles = await this.github.listFiles(this.pr.number);
+    this.initialized = true;
   }
 
   /**
@@ -124,9 +92,10 @@ class OwnersCheck {
    * Also includes the author, unless the author has explicitly left a blocking
    * review.
    *
+   * @private
    * @return {string[]} list of usernames.
    */
-  async getApprovers() {
+  async _getApprovers() {
     const reviews = await this.github.getReviews(this.pr.number);
     // Sort by the latest submitted_at date to get the latest review.
     const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
@@ -142,6 +111,64 @@ class OwnersCheck {
 
     return approvers;
   }
+
+  /**
+   * Builds a check-run.
+   *
+   * @param {!object} fileOwners ownership rules.
+   * @return {CheckRun} a check-run based on the approval state.
+   */
+  buildCheckRun(fileOwners) {
+    const passing = this._allFilesApproved(fileOwners);
+    const text = this._buildOutputText(fileOwners);
+    const summary = `The check was a ${passing ? 'success' : 'failure'}!`;
+    return new CheckRun(summary, text);
+  }
+
+  /**
+   * Tests if all files are approved by at least one owner.
+   *
+   * TODO(rcebulko): Replace legacy check-run code used by old Owner class.
+   *
+   * @private
+   * @param {!object} fileOwners ownership rules.
+   * @return {boolean} if all files are approved.
+   */
+  _allFilesApproved(fileOwners) {
+    return Object.values(fileOwners)
+      .map(fileOwner => fileOwner.owner.dirOwners)
+      .every(dirOwners => !!_.intersection(dirOwners, this.approvers).length);
+  }
+
+  /**
+   * Build the check-run output comment.
+   *
+   * TODO(rcebulko): Replace legacy check-run code used by old Owner class.
+   *
+   * @private
+   * @param {!object} fileOwners ownership rules.
+   * @return {string} check-run output text.
+   */
+  _buildOutputText(fileOwners) {
+    const unapprovedFileOwners = Object.values(fileOwners).filter(
+      fileOwner =>
+        // Omit sections that has a required reviewer who has
+        // approved.
+        !_.intersection(this.approvers, fileOwner.owner.dirOwners).length
+    );
+
+    const reviewerSuggestions = unapprovedFileOwners.map(fileOwner => {
+      const reviewers = fileOwner.owner.dirOwners.join(', ');
+      const header = `## possible reviewers: ${reviewers}`;
+      const files = fileOwner.files.map(file => ` - ${file.path}`);
+      return [header, ...files].join('\n');
+    });
+
+    return reviewerSuggestions.join('\n\n');
+  }
 }
 
-module.exports = {OwnersCheck, CheckRun};
+module.exports = {
+  OwnersCheck,
+  CheckRun,
+};

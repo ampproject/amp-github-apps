@@ -17,8 +17,6 @@
 const path = require('path');
 // TODO: Replace the RepoFile class and uses with LocalRepo.
 const {RepoFile} = require('./repo-file');
-const {LocalRepository} = require('./local_repo');
-const {OwnersParser} = require('./owners');
 
 /**
  * @file Contains classes and functions in relation to "OWNER" files
@@ -62,12 +60,10 @@ class Owner {
   /**
    * Parse all OWNERS files into Owner objects.
    *
-   * @param {!LocalRepository} localRepo local repository to read from.
-   * @param {!Logger} logger logging interface
+   * @param {!OwnersParser} parser OWNERS file parser.
    * @return {object} map of owners.
    */
-  static async parseOwnersMap(localRepo, logger) {
-    const parser = new OwnersParser(localRepo, logger);
+  static async parseOwnersMap(parser) {
     const ownersRules = await parser.parseAllOwnersRules();
     const ownersList = ownersRules.map(
       rule => new Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath)
@@ -76,21 +72,16 @@ class Owner {
   }
 
   /**
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!number} prNumber pull request number
+   * @param {!OwnersCheck} ownersCheck ownership approval check.
    * @return {object}
    */
-  static async getOwners(github, prNumber) {
-    // Update the local target repository of the latest from master
-    const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
-    await localRepo.checkout();
+  static async getOwners(ownersCheck) {
+    const repoFiles = ownersCheck.changedFiles.map(
+      filename => new RepoFile(filename)
+    );
+    const ownersMap = await this.parseOwnersMap(ownersCheck.parser);
 
-    const filenames = await github.listFiles(prNumber);
-    const repoFiles = filenames.map(filename => new RepoFile(filename));
-    const ownersMap = await this.parseOwnersMap(localRepo, github.logger);
-    const owners = findOwners(repoFiles, ownersMap);
-
-    return owners;
+    return findOwners(repoFiles, ownersMap);
   }
 }
 

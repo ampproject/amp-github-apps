@@ -128,8 +128,9 @@ describe('owners tree', () => {
 
     it('returns the nearest tree with a rule', () => {
       tree.addRule(childDirRule);
+      tree.addRule(descendantDirRule);
 
-      expect(tree.atPath('foo/bar/baz').dirPath).toEqual('foo');
+      expect(tree.atPath('foo/bar/okay.txt').dirPath).toEqual('foo');
     });
   });
 
