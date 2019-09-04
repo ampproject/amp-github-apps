@@ -47,10 +47,18 @@ module.exports = app => {
     let latestCheckRun;
 
     try {
-      const approvers = await ownersCheck.getApprovers();
       checkRunId = await github.getCheckRunId(pr.headSha);
-      const fileOwners = await Owner.getOwners(github, pr.number);
-      latestCheckRun = ownersCheck.buildCheckRun(fileOwners, approvers);
+
+      // TODO: Once OwnersCheck swallows the remaining logic in Owner, this can
+      // become just `const latestCheckRun = ownersCheck.run();`
+
+      const approvers = await ownersCheck.getApprovers();
+      const {fileOwners, ownersTree} = await Owner.getOwners(github, pr.number);
+      latestCheckRun = ownersCheck.buildCheckRun(
+        fileOwners,
+        approvers,
+        ownersTree
+      );
     } catch (error) {
       // If anything goes wrong, report a failing check.
       latestCheckRun = new CheckRun(

@@ -70,10 +70,11 @@ class OwnersCheck {
    * Builds a check-run.
    *
    * @param {!object} fileOwners ownership rules.
-   * @param {!object} approvers list of usernames that approved this PR.
+   * @param {!string[]} approvers list of usernames that approved this PR.
+   * @param {!OwnersTree} ownersTree file ownership tree.
    * @return {CheckRun} a check-run based on the approval state.
    */
-  buildCheckRun(fileOwners, approvers) {
+  buildCheckRun(fileOwners, approvers, ownersTree) {
     const passing = this._allFilesApproved(fileOwners, approvers);
     const text = this._buildOutputText(fileOwners, approvers);
     return new CheckRun(passing, text);

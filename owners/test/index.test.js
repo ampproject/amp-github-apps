@@ -21,6 +21,7 @@ const {Probot} = require('probot');
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
 const {Owner} = require('../src/owner');
+const {OwnersParser} = require('../src/owners');
 
 const opened35 = require('./fixtures/actions/opened.35');
 const opened36 = require('./fixtures/actions/opened.36.author-is-owner');
@@ -90,6 +91,7 @@ describe('owners bot', () => {
     sandbox = sinon.createSandbox();
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
+    sandbox.stub(OwnersParser.prototype, 'parseAllOwnersRules').returns([]);
     sandbox.stub(Owner, 'parseOwnersMap').returns(ownersYamlStruct);
 
     probot = new Probot({});

@@ -87,9 +87,10 @@ class Owner {
     const filenames = await github.listFiles(prNumber);
     const repoFiles = filenames.map(filename => new RepoFile(filename));
     const ownersMap = await this.parseOwnersMap(parser);
-    const owners = findOwners(repoFiles, ownersMap);
+    const fileOwners = findOwners(repoFiles, ownersMap);
+    const ownersTree = await parser.parseOwnersTree();
 
-    return owners;
+    return {fileOwners, ownersTree};
   }
 }
 
