@@ -15,9 +15,8 @@
  */
 
 /**
-=== Reviewer Selection ===
 
--- Overview --
+=== Reviewer Selection Algorithm ===
 
 Inputs: a map from files needing approval to the nearest ownership subtree
 
@@ -37,11 +36,7 @@ Repeat until all files have an OWNER in the reviewer set.
  * Class implementing the reviewer selection algorithm.
  */
 class ReviewerSelection {
-  /**
-   *********
-   * Part 1 *
-   *********
-   */
+  /** Part 1 **/
 
   /**
    * Produce a set of all ownership subtrees directly owning a changed file.
@@ -87,11 +82,7 @@ class ReviewerSelection {
     return this._reviewersForTrees(deepestTrees);
   }
 
-  /**
-   *********
-   * Part 2 *
-   *********
-   */
+  /** Part 2 **/
 
   /**
    * List files owned by a reviewer.
@@ -148,11 +139,7 @@ class ReviewerSelection {
     return bestReviewers[Math.floor(Math.random() * bestReviewers.length)];
   }
 
-  /**
-   *********
-   * Part 3 *
-   *********
-   */
+  /** Part 3 **/
 
   /**
    * Builds the map from filenames to ownership subtrees.
