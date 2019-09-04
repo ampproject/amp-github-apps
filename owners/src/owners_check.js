@@ -86,6 +86,31 @@ class OwnersCheck {
   }
 
   /**
+   * Identifies all reviewers whose latest reviews are approvals.
+   *
+   * Also includes the author, unless the author has explicitly left a blocking
+   * review.
+   *
+   * @return {string[]} list of usernames.
+   */
+  async getApprovers() {
+    const reviews = await this.github.getReviews(this.pr.number);
+    // Sort by the latest submitted_at date to get the latest review.
+    const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
+    // This should always pick out the first instance.
+    const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
+    const uniqueApprovals = uniqueReviews.filter(review => review.isApproved);
+    const approvers = uniqueApprovals.map(approval => approval.reviewer);
+
+    // The author of a PR implicitly gives approval over files they own.
+    if (!approvers.includes(this.pr.author)) {
+      approvers.push(this.pr.author);
+    }
+
+    return approvers;
+  }
+
+  /**
    * Builds a check-run.
    *
    * @param {!object} fileOwners ownership rules.
@@ -142,31 +167,6 @@ class OwnersCheck {
     });
 
     return reviewerSuggestions.join('\n\n');
-  }
-
-  /**
-   * Identifies all reviewers whose latest reviews are approvals.
-   *
-   * Also includes the author, unless the author has explicitly left a blocking
-   * review.
-   *
-   * @return {string[]} list of usernames.
-   */
-  async getApprovers() {
-    const reviews = await this.github.getReviews(this.pr.number);
-    // Sort by the latest submitted_at date to get the latest review.
-    const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
-    // This should always pick out the first instance.
-    const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
-    const uniqueApprovals = uniqueReviews.filter(review => review.isApproved);
-    const approvers = uniqueApprovals.map(approval => approval.reviewer);
-
-    // The author of a PR implicitly gives approval over files they own.
-    if (!approvers.includes(this.pr.author)) {
-      approvers.push(this.pr.author);
-    }
-
-    return approvers;
   }
 }
 
