@@ -88,6 +88,19 @@ class OwnersCheck {
   }
 
   /**
+   * Tests whether a file has been approved by an owner.
+   *
+   * Must be called after `init`.
+   *
+   * @param {!string} filename file to check.
+   * @return {boolean} if the file is approved
+   */
+  _hasOwnersApproval(filename) {
+    const subtree = this.fileTreeMap[filename];
+    return this.approvers.some(approver => subtree.hasOwner(approver));
+  }
+
+  /**
    * Identifies all reviewers whose latest reviews are approvals.
    *
    * Also includes the author, unless the author has explicitly left a blocking
@@ -120,25 +133,13 @@ class OwnersCheck {
    * @return {CheckRun} a check-run based on the approval state.
    */
   buildCheckRun(fileOwners) {
-    const passing = this._allFilesApproved(fileOwners);
+    const filesNeedingApproval = this.changedFiles.filter(
+      filename => !this._hasOwnersApproval(filename)
+    );
+    const passing = !filesNeedingApproval.length;
     const text = this._buildOutputText(fileOwners);
     const summary = `The check was a ${passing ? 'success' : 'failure'}!`;
     return new CheckRun(summary, text);
-  }
-
-  /**
-   * Tests if all files are approved by at least one owner.
-   *
-   * TODO(rcebulko): Replace legacy check-run code used by old Owner class.
-   *
-   * @private
-   * @param {!object} fileOwners ownership rules.
-   * @return {boolean} if all files are approved.
-   */
-  _allFilesApproved(fileOwners) {
-    return Object.values(fileOwners)
-      .map(fileOwner => fileOwner.owner.dirOwners)
-      .every(dirOwners => !!_.intersection(dirOwners, this.approvers).length);
   }
 
   /**

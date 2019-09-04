@@ -20,8 +20,7 @@ const owners = require('..');
 const {Probot} = require('probot');
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {Owner} = require('../src/owner');
-const {OwnersParser} = require('../src/owners');
+const {OwnersRule, OwnersParser} = require('../src/owners');
 
 const opened35 = require('./fixtures/actions/opened.35');
 const opened36 = require('./fixtures/actions/opened.36.author-is-owner');
@@ -45,43 +44,13 @@ const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 nock.disableNetConnect();
 jest.setTimeout(30000);
 
-const ownersYamlStruct = {
-  '.': {
-    'path': './OWNERS.yaml',
-    'dirname': '.',
-    'fullpath': '/Users/erwinm/dev/github-owners-bot-test-repo/OWNERS.yaml',
-    'score': 0,
-    'dirOwners': ['donttrustthisbot'],
-    'fileOwners': {},
-  },
-  './dir1': {
-    'path': './dir1/OWNERS.yaml',
-    'dirname': './dir1',
-    'fullpath':
-      '/Users/erwinm/dev/github-owners-bot-test-repo/dir1/OWNERS.yaml',
-    'score': 1,
-    'dirOwners': ['donttrustthisbot'],
-    'fileOwners': {},
-  },
-  './dir2': {
-    'path': './dir2/OWNERS.yaml',
-    'dirname': './dir2',
-    'fullpath':
-      '/Users/erwinm/dev/github-owners-bot-test-repo/dir2/OWNERS.yaml',
-    'score': 1,
-    'dirOwners': ['erwinmombay'],
-    'fileOwners': {},
-  },
-  './dir2/dir1/dir1': {
-    'path': './dir2/dir1/dir1/OWNERS.yaml',
-    'dirname': './dir2/dir1/dir1',
-    'fullpath':
-      '/Users/erwinm/dev/github-owners-bot-test-repo/dir2/dir1/dir1/OWNERS.yaml',
-    'score': 3,
-    'dirOwners': ['erwinmombay'],
-    'fileOwners': {},
-  },
-};
+const GITHUB_REPO_DIR = '/Users/erwinm/dev/github-owners-bot-test-repo';
+const ownersRules = [
+  new OwnersRule('OWNERS.yaml', ['donttrustthisbot']),
+  new OwnersRule('dir1/OWNERS.yaml', ['donttrustthisbot']),
+  new OwnersRule('dir2/OWNERS.yaml', ['erwinmombay']),
+  new OwnersRule('dir2/dir1/dir1/OWNERS.yaml', ['erwinmombay']),
+];
 
 describe('owners bot', () => {
   let probot;
@@ -89,10 +58,13 @@ describe('owners bot', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'env').value({GITHUB_REPO_DIR});
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
-    sandbox.stub(OwnersParser.prototype, 'parseAllOwnersRules').returns([]);
-    sandbox.stub(Owner, 'parseOwnersMap').returns(ownersYamlStruct);
+    sandbox
+      .stub(OwnersParser.prototype, 'parseAllOwnersRules')
+      .returns(ownersRules);
+    // sandbox.stub(Owner, 'parseOwnersMap').returns(ownersYamlStruct);
 
     probot = new Probot({});
     const app = probot.load(owners);
@@ -457,7 +429,7 @@ describe('owners bot', () => {
   });
 
   describe('pull request review', () => {
-    test('triggers pull request re-evaluation', async () => {
+    test.only('triggers pull request re-evaluation', async () => {
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});

@@ -18,7 +18,7 @@ const sinon = require('sinon');
 const {PullRequest, Review} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {CheckRun, OwnersCheck} = require('../src/owners_check');
-const {OwnersTree} = require('../src/owners');
+const {OwnersRule, OwnersTree} = require('../src/owners');
 
 describe('check run', () => {
   describe('json', () => {
@@ -39,12 +39,9 @@ describe('check run', () => {
 describe('owners check', () => {
   /* eslint-disable require-jsdoc */
   class FakeGithub {
-    constructor(reviews) {
+    constructor(reviews, files) {
       this.getReviews = () => reviews;
-    }
-
-    async listFiles() {
-      return ['changed_file1.js', 'changed_file2.js'];
+      this.listFiles = async () => files;
     }
   }
   /* eslint-enable require-jsdoc */
@@ -69,7 +66,10 @@ describe('owners check', () => {
   });
 
   describe('init', () => {
-    const github = new FakeGithub([approval, otherApproval]);
+    const github = new FakeGithub(
+      [approval, otherApproval],
+      ['changed_file1.js', 'foo/changed_file2.js']
+    );
     let ownersCheck;
 
     beforeEach(() => {
@@ -92,13 +92,13 @@ describe('owners check', () => {
     });
 
     it('fetches the files changed in the PR', async () => {
-      sandbox.stub(FakeGithub.prototype, 'listFiles').callThrough();
+      sandbox.stub(github, 'listFiles').callThrough();
       await ownersCheck.init();
 
       sandbox.assert.calledWith(ownersCheck.github.listFiles, 35);
       expect(ownersCheck.changedFiles).toContain(
         'changed_file1.js',
-        'changed_file2.js'
+        'foo/changed_file2.js'
       );
     });
 
@@ -108,7 +108,7 @@ describe('owners check', () => {
 
       sandbox.assert.calledWith(ownersCheck.tree.buildFileTreeMap, [
         'changed_file1.js',
-        'changed_file2.js',
+        'foo/changed_file2.js',
       ]);
       expect(ownersCheck.fileTreeMap['changed_file1.js']).toEqual(
         ownersCheck.tree
@@ -122,11 +122,48 @@ describe('owners check', () => {
     });
   });
 
+  describe('hasOwnersApproval', () => {
+    const github = new FakeGithub(
+      [approval, otherApproval],
+      [
+        'main.js', // root_owner
+        'foo/test.js', // approver, some_user, root_owner
+        'bar/baz/file.txt', // other_approver, root_owner
+        'buzz/README.md', // root_owner
+      ]
+    );
+    let ownersCheck;
+
+    beforeEach(async () => {
+      ownersCheck = new OwnersCheck(repo, github, pr);
+
+      sandbox
+        .stub(ownersCheck.parser, 'parseAllOwnersRules')
+        .returns([
+          new OwnersRule('OWNERS.yaml', ['root_owner']),
+          new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
+          new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
+        ]);
+
+      await ownersCheck.init();
+    });
+
+    it('returns true if any approver is an owner of the file', () => {
+      expect(ownersCheck._hasOwnersApproval('foo/test.js')).toBe(true);
+      expect(ownersCheck._hasOwnersApproval('bar/baz/file.txt')).toBe(true);
+    });
+
+    it('returns true if no owner has given approval', () => {
+      expect(ownersCheck._hasOwnersApproval('main.js')).toBe(false);
+      expect(ownersCheck._hasOwnersApproval('buzz/README.md')).toBe(false);
+    });
+  });
+
   describe('getApprovers', () => {
     it("returns the reviewers' usernames", async () => {
       const ownersCheck = new OwnersCheck(
         repo,
-        new FakeGithub([approval, otherApproval]),
+        new FakeGithub([approval, otherApproval], []),
         pr
       );
       const approvers = await ownersCheck._getApprovers();
@@ -135,7 +172,7 @@ describe('owners check', () => {
     });
 
     it('includes the author', async () => {
-      const ownersCheck = new OwnersCheck(repo, new FakeGithub([]), pr);
+      const ownersCheck = new OwnersCheck(repo, new FakeGithub([], []), pr);
       const approvers = await ownersCheck._getApprovers();
 
       expect(approvers).toContain('the_author');
@@ -144,7 +181,7 @@ describe('owners check', () => {
     it('produces unique usernames', async () => {
       const ownersCheck = new OwnersCheck(
         repo,
-        new FakeGithub([approval, approval, authorApproval]),
+        new FakeGithub([approval, approval, authorApproval], []),
         pr
       );
       const approvers = await ownersCheck._getApprovers();
@@ -155,7 +192,7 @@ describe('owners check', () => {
     it('includes only reviewers who approved the review', async () => {
       const ownersCheck = new OwnersCheck(
         repo,
-        new FakeGithub([approval, rejection]),
+        new FakeGithub([approval, rejection], []),
         pr
       );
       const approvers = await ownersCheck._getApprovers();
