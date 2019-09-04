@@ -16,6 +16,7 @@
 
 const sleep = require('sleep-promise');
 const {GitHub, PullRequest} = require('./src/github');
+const {LocalRepository} = require('./src/local_repo');
 const {CheckRun, OwnersCheck} = require('./src/owners_check');
 const {Owner} = require('./src/owner');
 
@@ -42,22 +43,26 @@ module.exports = app => {
    * @param {!PullRequest} pr pull request to run owners check on.
    */
   async function runOwnersCheck(github, pr) {
-    const ownersCheck = new OwnersCheck(github, pr);
     let checkRunId;
     let latestCheckRun;
 
     try {
+      const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
+      const ownersCheck = new OwnersCheck(localRepo, github, pr);
       checkRunId = await github.getCheckRunId(pr.headSha);
 
       // TODO: Once OwnersCheck swallows the remaining logic in Owner, this can
       // become just `const latestCheckRun = ownersCheck.run();`
-
-      const approvers = await ownersCheck.getApprovers();
-      const {fileOwners, ownersTree} = await Owner.getOwners(github, pr.number);
+      await ownersCheck.init();
+      const fileOwners = await Owner.getOwners(
+        github,
+        pr.number,
+        ownersCheck.parser
+      );
       latestCheckRun = ownersCheck.buildCheckRun(
         fileOwners,
-        approvers,
-        ownersTree
+        ownersCheck.approvers,
+        ownersCheck.tree
       );
     } catch (error) {
       // If anything goes wrong, report a failing check.

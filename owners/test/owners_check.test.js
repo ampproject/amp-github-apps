@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+const sinon = require('sinon');
 const {PullRequest, Review} = require('../src/github');
+const {LocalRepository} = require('../src/local_repo');
 const {CheckRun, OwnersCheck} = require('../src/owners_check');
+const {OwnersTree} = require('../src/owners');
 
 describe('check run', () => {
   describe('json', () => {
@@ -34,24 +37,67 @@ describe('check run', () => {
 });
 
 describe('owners check', () => {
-  describe('getApprovers', () => {
+  /* eslint-disable-next-line require-jsdoc */
+  class FakeGithub {
     /* eslint-disable-next-line require-jsdoc */
-    class FakeGithub {
-      /* eslint-disable-next-line require-jsdoc */
-      constructor(reviews) {
-        this.getReviews = () => reviews;
-      }
+    constructor(reviews) {
+      this.getReviews = () => reviews;
     }
-    const pr = new PullRequest(35, 'the_author', '_test_hash_');
+  }
 
-    const timestamp = '2019-01-01T00:00:00Z';
-    const approval = new Review('approver', 'approved', timestamp);
-    const authorApproval = new Review('the_author', 'approved', timestamp);
-    const otherApproval = new Review('other_approver', 'approved', timestamp);
-    const rejection = new Review('rejector', 'changes_requested', timestamp);
+  const sandbox = sinon.createSandbox();
+  const repo = new LocalRepository('path/to/repo');
+  const pr = new PullRequest(35, 'the_author', '_test_hash_');
 
+  const timestamp = '2019-01-01T00:00:00Z';
+  const approval = new Review('approver', 'approved', timestamp);
+  const authorApproval = new Review('the_author', 'approved', timestamp);
+  const otherApproval = new Review('other_approver', 'approved', timestamp);
+  const rejection = new Review('rejector', 'changes_requested', timestamp);
+
+  beforeEach(() => {
+    sandbox.stub(repo, 'checkout');
+    sandbox.stub(repo, 'findOwnersFiles').returns([]);
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+  });
+
+  describe('init', () => {
+    const github = new FakeGithub([approval, otherApproval]);
+    let ownersCheck;
+
+    beforeEach(() => {
+      ownersCheck = new OwnersCheck(repo, github, pr);
+    });
+
+    it('checks out the repo', async () => {
+      await ownersCheck.init();
+      sandbox.assert.calledOnce(repo.checkout);
+    });
+
+    it('parses the owners tree', async () => {
+      await ownersCheck.init();
+      expect(ownersCheck.tree).toBeInstanceOf(OwnersTree);
+    });
+
+    it('finds the reviewers that approved', async () => {
+      await ownersCheck.init();
+      expect(ownersCheck.approvers).toContain('approver', 'other_approver');
+    });
+
+    it('sets `initialized` to true', async () => {
+      expect(ownersCheck.initialized).toBe(false);
+      await ownersCheck.init();
+      expect(ownersCheck.initialized).toBe(true);
+    });
+  });
+
+  describe('getApprovers', () => {
     it("returns the reviewers' usernames", async () => {
       const ownersCheck = new OwnersCheck(
+        repo,
         new FakeGithub([approval, otherApproval]),
         pr
       );
@@ -61,7 +107,7 @@ describe('owners check', () => {
     });
 
     it('includes the author', async () => {
-      const ownersCheck = new OwnersCheck(new FakeGithub([]), pr);
+      const ownersCheck = new OwnersCheck(repo, new FakeGithub([]), pr);
       const approvers = await ownersCheck.getApprovers();
 
       expect(approvers).toContain('the_author');
@@ -69,6 +115,7 @@ describe('owners check', () => {
 
     it('produces unique usernames', async () => {
       const ownersCheck = new OwnersCheck(
+        repo,
         new FakeGithub([approval, approval, authorApproval]),
         pr
       );
@@ -79,6 +126,7 @@ describe('owners check', () => {
 
     it('includes only reviewers who approved the review', async () => {
       const ownersCheck = new OwnersCheck(
+        repo,
         new FakeGithub([approval, rejection]),
         pr
       );

@@ -17,8 +17,6 @@
 const path = require('path');
 // TODO: Replace the RepoFile class and uses with LocalRepo.
 const {RepoFile} = require('./repo-file');
-const {LocalRepository} = require('./local_repo');
-const {OwnersParser} = require('./owners');
 
 /**
  * @file Contains classes and functions in relation to "OWNER" files
@@ -76,21 +74,15 @@ class Owner {
   /**
    * @param {!GitHub} github GitHub API interface.
    * @param {!number} prNumber pull request number
+   * @param {!OwnersParser} parser ownership rules parser.
    * @return {object}
    */
-  static async getOwners(github, prNumber) {
-    // Update the local target repository of the latest from master
-    const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
-    const parser = new OwnersParser(localRepo, github.logger);
-    await localRepo.checkout();
-
+  static async getOwners(github, prNumber, parser) {
     const filenames = await github.listFiles(prNumber);
     const repoFiles = filenames.map(filename => new RepoFile(filename));
     const ownersMap = await this.parseOwnersMap(parser);
-    const fileOwners = findOwners(repoFiles, ownersMap);
-    const ownersTree = await parser.parseOwnersTree();
 
-    return {fileOwners, ownersTree};
+    return findOwners(repoFiles, ownersMap);
   }
 }
 

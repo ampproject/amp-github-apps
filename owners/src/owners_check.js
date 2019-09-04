@@ -15,6 +15,7 @@
  */
 
 const _ = require('lodash');
+const {OwnersParser} = require('./owners');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
 
@@ -59,11 +60,29 @@ class OwnersCheck {
   /**
    * Constructor.
    *
+   * @param {!LocalRepository} repo local repository to read from.
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to run owners check on.
    */
-  constructor(github, pr) {
-    Object.assign(this, {github, pr});
+  constructor(repo, github, pr) {
+    const parser = new OwnersParser(repo, github.log);
+
+    Object.assign(this, {github, pr, repo, parser});
+
+    this.tree = null;
+    this.approvers = null;
+    this.changedFiles = null;
+    this.initialized = false;
+  }
+
+  /**
+   * Initializes key properties requiring async/await.
+   */
+  async init() {
+    await this.repo.checkout();
+    this.tree = await this.parser.parseOwnersTree();
+    this.approvers = await this.getApprovers();
+    this.initialized = true;
   }
 
   /**
@@ -84,6 +103,8 @@ class OwnersCheck {
   /**
    * Tests if all files are approved by at least one owner.
    *
+   * TODO: Replace legacy check-run code used by old Owner class.
+   *
    * @private
    * @param {!object} fileOwners ownership rules.
    * @param {string[]} approvers list of usernames that approved this PR.
@@ -98,6 +119,8 @@ class OwnersCheck {
   /**
    * Build the check-run output comment.
    *
+   * TODO: Replace legacy check-run code used by old Owner class.
+   *
    * @private
    * @param {!object} fileOwners ownership rules.
    * @param {string[]} approvers list of usernames that approved this PR.
@@ -106,7 +129,8 @@ class OwnersCheck {
   _buildOutputText(fileOwners, approvers) {
     const unapprovedFileOwners = Object.values(fileOwners).filter(
       fileOwner =>
-        // Omit sections that has a required reviewer who has approved.
+        // Omit sections that has a required reviewer who has
+        // approved.
         !_.intersection(approvers, fileOwner.owner.dirOwners).length
     );
 
@@ -146,4 +170,7 @@ class OwnersCheck {
   }
 }
 
-module.exports = {OwnersCheck, CheckRun};
+module.exports = {
+  OwnersCheck,
+  CheckRun,
+};
