@@ -66,8 +66,8 @@ class Owner {
   static async parseOwnersMap(parser) {
     const ownersRules = await parser.parseAllOwnersRules();
     const ownersList = ownersRules.map(
-        rule =>
-            new Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath));
+      rule => new Owner(rule.owners, process.env.GITHUB_REPO_DIR, rule.filePath)
+    );
     return createOwnersMap(ownersList);
   }
 
@@ -76,8 +76,9 @@ class Owner {
    * @return {object}
    */
   static async getOwners(ownersCheck) {
-    const repoFiles =
-        ownersCheck.changedFiles.map(filename => new RepoFile(filename));
+    const repoFiles = ownersCheck.changedFiles.map(
+      filename => new RepoFile(filename)
+    );
     const ownersMap = await this.parseOwnersMap(ownersCheck.parser);
 
     return findOwners(repoFiles, ownersMap);

@@ -55,7 +55,7 @@ module.exports = app => {
       // become just `const latestCheckRun = ownersCheck.run();`
       await ownersCheck.init();
       const fileOwners = await Owner.getOwners(ownersCheck);
-      const latestCheckRun = ownersCheck.buildCheckRun(fileOwners);
+      latestCheckRun = ownersCheck.buildCheckRun(fileOwners);
     } catch (error) {
       // If anything goes wrong, report a failing check.
       latestCheckRun = new CheckRun(

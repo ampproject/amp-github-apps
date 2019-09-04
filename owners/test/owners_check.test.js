@@ -37,17 +37,17 @@ describe('check run', () => {
 });
 
 describe('owners check', () => {
-  /* eslint-disable-next-line require-jsdoc */
+  /* eslint-disable require-jsdoc */
   class FakeGithub {
-    /* eslint-disable-next-line require-jsdoc */
     constructor(reviews) {
       this.getReviews = () => reviews;
     }
-    
-    async listFiles () {
+
+    async listFiles() {
       return ['changed_file1.js', 'changed_file2.js'];
     }
   }
+  /* eslint-enable require-jsdoc */
 
   const sandbox = sinon.createSandbox();
   const repo = new LocalRepository('path/to/repo');
@@ -96,8 +96,10 @@ describe('owners check', () => {
       await ownersCheck.init();
 
       sandbox.assert.calledWith(ownersCheck.github.listFiles, 35);
-      expect(ownersCheck.changedFiles)
-          .toContain('changed_file1.js', 'changed_file2.js');
+      expect(ownersCheck.changedFiles).toContain(
+        'changed_file1.js',
+        'changed_file2.js'
+      );
     });
 
     it('sets `initialized` to true', async () => {
@@ -108,9 +110,12 @@ describe('owners check', () => {
   });
 
   describe('getApprovers', () => {
-    it('returns the reviewers\' usernames', async () => {
-      const ownersCheck =
-          new OwnersCheck(repo, new FakeGithub([approval, otherApproval]), pr);
+    it("returns the reviewers' usernames", async () => {
+      const ownersCheck = new OwnersCheck(
+        repo,
+        new FakeGithub([approval, otherApproval]),
+        pr
+      );
       const approvers = await ownersCheck.getApprovers();
 
       expect(approvers).toContain('approver', 'other_approver');
@@ -125,15 +130,21 @@ describe('owners check', () => {
 
     it('produces unique usernames', async () => {
       const ownersCheck = new OwnersCheck(
-          repo, new FakeGithub([approval, approval, authorApproval]), pr);
+        repo,
+        new FakeGithub([approval, approval, authorApproval]),
+        pr
+      );
       const approvers = await ownersCheck.getApprovers();
 
       expect(approvers).toEqual(['approver', 'the_author']);
     });
 
     it('includes only reviewers who approved the review', async () => {
-      const ownersCheck =
-          new OwnersCheck(repo, new FakeGithub([approval, rejection]), pr);
+      const ownersCheck = new OwnersCheck(
+        repo,
+        new FakeGithub([approval, rejection]),
+        pr
+      );
       const approvers = await ownersCheck.getApprovers();
 
       expect(approvers).not.toContain('rejector');
