@@ -51,8 +51,8 @@ module.exports = app => {
       const ownersCheck = new OwnersCheck(localRepo, github, pr);
       checkRunId = await github.getCheckRunId(pr.headSha);
 
-      // TODO: Once OwnersCheck swallows the remaining logic in Owner, this can
-      // become just `const latestCheckRun = ownersCheck.run();`
+      // TODO(rcebulko): Once OwnersCheck swallows the remaining logic in Owner,
+      // this can become just `const latestCheckRun = ownersCheck.run();`
       await ownersCheck.init();
       const fileOwners = await Owner.getOwners(ownersCheck);
       latestCheckRun = ownersCheck.buildCheckRun(fileOwners);

@@ -81,7 +81,7 @@ class OwnersCheck {
   async init() {
     await this.repo.checkout();
     this.tree = await this.parser.parseOwnersTree();
-    this.approvers = await this.getApprovers();
+    this.approvers = await this._getApprovers();
     this.changedFiles = await this.github.listFiles(this.pr.number);
     this.initialized = true;
   }
@@ -92,9 +92,10 @@ class OwnersCheck {
    * Also includes the author, unless the author has explicitly left a blocking
    * review.
    *
+   * @private
    * @return {string[]} list of usernames.
    */
-  async getApprovers() {
+  async _getApprovers() {
     const reviews = await this.github.getReviews(this.pr.number);
     // Sort by the latest submitted_at date to get the latest review.
     const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
@@ -127,7 +128,7 @@ class OwnersCheck {
   /**
    * Tests if all files are approved by at least one owner.
    *
-   * TODO: Replace legacy check-run code used by old Owner class.
+   * TODO(rcebulko): Replace legacy check-run code used by old Owner class.
    *
    * @private
    * @param {!object} fileOwners ownership rules.
@@ -142,7 +143,7 @@ class OwnersCheck {
   /**
    * Build the check-run output comment.
    *
-   * TODO: Replace legacy check-run code used by old Owner class.
+   * TODO(rcebulko): Replace legacy check-run code used by old Owner class.
    *
    * @private
    * @param {!object} fileOwners ownership rules.

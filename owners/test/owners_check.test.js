@@ -116,14 +116,14 @@ describe('owners check', () => {
         new FakeGithub([approval, otherApproval]),
         pr
       );
-      const approvers = await ownersCheck.getApprovers();
+      const approvers = await ownersCheck._getApprovers();
 
       expect(approvers).toContain('approver', 'other_approver');
     });
 
     it('includes the author', async () => {
       const ownersCheck = new OwnersCheck(repo, new FakeGithub([]), pr);
-      const approvers = await ownersCheck.getApprovers();
+      const approvers = await ownersCheck._getApprovers();
 
       expect(approvers).toContain('the_author');
     });
@@ -134,7 +134,7 @@ describe('owners check', () => {
         new FakeGithub([approval, approval, authorApproval]),
         pr
       );
-      const approvers = await ownersCheck.getApprovers();
+      const approvers = await ownersCheck._getApprovers();
 
       expect(approvers).toEqual(['approver', 'the_author']);
     });
@@ -145,7 +145,7 @@ describe('owners check', () => {
         new FakeGithub([approval, rejection]),
         pr
       );
-      const approvers = await ownersCheck.getApprovers();
+      const approvers = await ownersCheck._getApprovers();
 
       expect(approvers).not.toContain('rejector');
     });
