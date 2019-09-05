@@ -99,6 +99,19 @@ class OwnersTree {
     const segments = filePath.split(path.sep);
     let subtree = this;
 
+    if (!this.isRoot) {
+      const treeSegments = this.dirPath.split(path.sep);
+      while (treeSegments.length) {
+        const nextTreeDir = treeSegments.shift();
+        const nextDir = segments.shift();
+        if (nextTreeDir !== nextDir) {
+          throw new Error(
+            `Tried to find subtree at path "${filePath}" on a subtree at path "${this.dirPath}"`
+          );
+        }
+      }
+    }
+
     while (segments.length) {
       const nextDir = segments.shift();
       if (!subtree.get(nextDir)) {
