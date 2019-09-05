@@ -132,6 +132,21 @@ describe('owners tree', () => {
 
       expect(tree.atPath('foo/bar/okay.txt').dirPath).toEqual('foo');
     });
+
+    it('works on a non-root subtree', () => {
+      tree.addRule(rootDirRule);
+      const childTree = tree.addRule(childDirRule);
+      tree.addRule(descendantDirRule);
+
+      expect(childTree.atPath('foo/bar/baz/okay.txt').dirPath).toEqual('foo/bar/baz');
+    });
+
+    it('throws an error when requesting a path not under the subtree', () => {
+      const childTree = tree.addRule(childDirRule);
+
+      expect(() => childTree.atPath('not/in/foo.txt')).toThrow(
+        'Tried to find subtree at path "not/in/foo.txt" on a subtree at path "foo"');
+    });
   });
 
   describe('hasOwner', () => {
