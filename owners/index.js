@@ -21,6 +21,7 @@ const {OwnersBot} = require('./src/owners_bot');
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(localRepo);
+  const router = app.route('/admin');
 
   // Probot does not stream properly to GCE logs so we need to hook into
   // bunyan explicitly and stream it to process.stdout.
@@ -30,14 +31,18 @@ module.exports = app => {
     level: process.env.LOG_LEVEL || 'info',
   });
 
-  app.on(['pull_request.opened', 'pull_request.synchronize'], async (context) => {
+  router.get('/status', (req, res) => {
+    res.send('The OWNERS bot is live and running!');
+  });
+
+  app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
     await ownersBot.runOwnersCheck(
       GitHub.fromContext(context),
       PullRequest.fromGitHubResponse(context.payload.pull_request)
     );
   });
 
-  app.on('check_run.rerequested', async (context) => {
+  app.on('check_run.rerequested', async context => {
     const payload = context.payload;
     const prNumber = payload.check_run.check_suite.pull_requests[0].number;
 
@@ -47,7 +52,7 @@ module.exports = app => {
     );
   });
 
-  app.on('pull_request_review.submitted', async (context) => {
+  app.on('pull_request_review.submitted', async context => {
     const payload = context.payload;
     const prNumber = payload.pull_request.number;
 
