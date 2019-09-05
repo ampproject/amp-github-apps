@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-const sleep = require('sleep-promise');
 const {GitHub, PullRequest} = require('./src/github');
-const {LocalRepository} = require('./src/local_repo');
-const {CheckRun, OwnersCheck} = require('./src/owners_check');
-
-const GITHUB_CHECKRUN_DELAY = 2000;
+const {LocalRepository} = require('./src/local_repo')
+const {OwnersBot} = require('./src/owners_bot')
 
 module.exports = app => {
+  const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
+  const ownersBot = new OwnersBot(localRepo);
+
   app.on(['pull_request.opened', 'pull_request.synchronize'], onPullRequest);
   app.on('check_run.rerequested', onCheckRunRerequest);
   app.on('pull_request_review.submitted', onPullRequestReview);
@@ -35,53 +35,6 @@ module.exports = app => {
   });
 
   /**
-   * Runs the steps to create or update an owners-bot check-run on a GitHub Pull
-   * Request.
-   *
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!PullRequest} pr pull request to run owners check on.
-   */
-  async function runOwnersCheck(github, pr) {
-    const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
-    const ownersCheck = new OwnersCheck(localRepo, github, pr);
-    let checkRunId;
-    let latestCheckRun;
-
-    try {
-      checkRunId = await github.getCheckRunId(pr.headSha);
-      latestCheckRun = await ownersCheck.run();
-    } catch (error) {
-      // If anything goes wrong, report a failing check.
-      latestCheckRun = new CheckRun(
-        'The check encountered an error!',
-        'OWNERS check encountered an error:\n' + error
-      );
-    }
-
-    if (checkRunId) {
-      await github.updateCheckRun(checkRunId, latestCheckRun);
-    } else {
-      // We need to add a delay on the PR creation and check creation since
-      // GitHub might not be ready.
-      // TODO: Verify this is still needed.
-      await sleep(GITHUB_CHECKRUN_DELAY);
-      await github.createCheckRun(pr.headSha, latestCheckRun);
-    }
-  }
-
-  /**
-   * Runs the steps to create or update an owners-bot check-run on a GitHub Pull
-   * Request.
-   *
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!number} prNumber pull request number.
-   */
-  async function runOwnersCheckOnPrNumber(github, prNumber) {
-    const pr = await github.getPullRequest(prNumber);
-    await runOwnersCheck(github, pr);
-  }
-
-  /**
    * Probot handler for newly opened pull request.
    *
    * @param {!Context} context Probot request context.
@@ -89,7 +42,7 @@ module.exports = app => {
   async function onPullRequest(context) {
     const pr = PullRequest.fromGitHubResponse(context.payload.pull_request);
 
-    await runOwnersCheck(GitHub.fromContext(context), pr);
+    await ownersBot.runOwnersCheck(GitHub.fromContext(context), pr);
   }
 
   /**
@@ -101,7 +54,7 @@ module.exports = app => {
     const payload = context.payload;
     const prNumber = payload.check_run.check_suite.pull_requests[0].number;
 
-    await runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
+    await ownersBot.runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
   }
 
   /**
@@ -113,6 +66,6 @@ module.exports = app => {
     const payload = context.payload;
     const prNumber = payload.pull_request.number;
 
-    await runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
+    await ownersBot.runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
   }
 };
