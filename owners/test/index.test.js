@@ -568,7 +568,7 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              'OWNERS check encountered an error:\n' + 'Error: Oops'
+              'OWNERS check encountered an error:\nError: Oops'
             );
 
             return true;
