@@ -130,7 +130,9 @@ class OwnersCheck {
    * @return {boolean} if the file is approved
    */
   _hasOwnersApproval(filename, subtree) {
-    return this.approvers.some(approver => subtree.hasOwner(approver));
+    return this.approvers.some(approver =>
+      this.tree.fileHasOwner(filename, approver)
+    );
   }
 
   /**
@@ -169,7 +171,7 @@ class OwnersCheck {
     const allFilesText = Object.entries(fileTreeMap)
       .map(([filename, subtree]) => {
         const fileApprovers = this.approvers.filter(approver =>
-          subtree.hasOwner(approver)
+          this.tree.fileHasOwner(filename, approver)
         );
 
         if (fileApprovers.length) {

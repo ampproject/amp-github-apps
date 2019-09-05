@@ -132,9 +132,27 @@ describe('owners tree', () => {
 
       expect(tree.atPath('foo/bar/okay.txt').dirPath).toEqual('foo');
     });
+
+    it('works on a non-root subtree', () => {
+      tree.addRule(rootDirRule);
+      const childTree = tree.addRule(childDirRule);
+      tree.addRule(descendantDirRule);
+
+      expect(childTree.atPath('foo/bar/baz/okay.txt').dirPath).toEqual(
+        'foo/bar/baz'
+      );
+    });
+
+    it('throws an error when requesting a path not under the subtree', () => {
+      const childTree = tree.addRule(childDirRule);
+
+      expect(() => childTree.atPath('not/in/foo.txt')).toThrow(
+        'Tried to find subtree at path "not/in/foo.txt" on a subtree at path "foo"'
+      );
+    });
   });
 
-  describe('hasOwner', () => {
+  describe('fileHasOwner', () => {
     beforeEach(() => {
       tree.addRule(rootDirRule);
       tree.addRule(childDirRule);
@@ -142,25 +160,25 @@ describe('owners tree', () => {
     });
 
     it('should be true for owners in the same directory', () => {
-      expect(tree.atPath('foo/bar.txt').hasOwner('child')).toBe(true);
+      expect(tree.fileHasOwner('foo/bar.txt', 'child')).toBe(true);
     });
 
     it('should be true for owners in the parent directory', () => {
-      expect(tree.atPath('foo/bar.txt').hasOwner('root')).toBe(true);
+      expect(tree.fileHasOwner('foo/bar.txt', 'root')).toBe(true);
     });
 
     it('should be true for owners an ancestor directory', () => {
-      expect(tree.atPath('foo/bar.txt').hasOwner('root')).toBe(true);
+      expect(tree.fileHasOwner('foo/bar.txt', 'root')).toBe(true);
     });
 
     it('should be false for owners a child directory', () => {
-      expect(tree.atPath('foo/bar/baz/buzz.txt').hasOwner('descendant')).toBe(
+      expect(tree.fileHasOwner('foo/bar/baz/buzz.txt', 'descendant')).toBe(
         true
       );
     });
 
     it('should be false for non-existant owners', () => {
-      expect(tree.atPath('foo/bar.txt').hasOwner('not_an_owner')).toBe(false);
+      expect(tree.fileHasOwner('foo/bar.txt', 'not_an_owner')).toBe(false);
     });
   });
 
@@ -218,40 +236,28 @@ describe('owners tree', () => {
 });
 
 describe('owners rules', () => {
-  describe('matchesFile', () => {
-    expect.extend({
-      toMatchFile(receivedOwnersPath, filePath) {
-        const rule = new OwnersRule(receivedOwnersPath, []);
-        const matches = rule.matchesFile(filePath);
-        const matchStr = this.isNot ? 'not match' : 'match';
+  expect.extend({
+    toMatchFile(receivedOwnersPath, filePath) {
+      const rule = new OwnersRule(receivedOwnersPath, []);
+      const matches = rule.matchesFile(filePath);
+      const matchStr = this.isNot ? 'not match' : 'match';
 
-        return {
-          pass: matches,
-          message: () =>
-            `Expected rules in '${receivedOwnersPath}' to ` +
-            `${matchStr} file '${filePath}'.`,
-        };
-      },
-    });
+      return {
+        pass: matches,
+        message: () =>
+          `Expected rules in '${receivedOwnersPath}' to ` +
+          `${matchStr} file '${filePath}'.`,
+      };
+    },
+  });
 
-    it('matches a file in the same directory', () => {
-      expect('src/OWNERS.yaml').toMatchFile('src/foo.txt');
-    });
-
-    it('matches a file in a child directory', () => {
-      expect('src/OWNERS.yaml').toMatchFile('src/foo/bar.txt');
-    });
-
-    it('matches a file in an descendant directory', () => {
-      expect('src/OWNERS.yaml').toMatchFile('src/foo/bar/baz.txt');
-    });
-
-    it('does not match a file in a parent directory', () => {
-      expect('src/OWNERS.yaml').not.toMatchFile('foo.txt');
-    });
-
-    it('does not match a file in a sibling directory', () => {
-      expect('src/OWNERS.yaml').not.toMatchFile('test/foo.txt');
+  describe('basic directory ownership', () => {
+    describe('matchesFile', () => {
+      it('matches all files', () => {
+        expect('src/OWNERS.yaml').toMatchFile('src/foo.txt');
+        expect('src/OWNERS.yaml').toMatchFile('src/foo/bar.txt');
+        expect('src/OWNERS.yaml').toMatchFile('src/foo/bar/baz.txt');
+      });
     });
   });
 });
