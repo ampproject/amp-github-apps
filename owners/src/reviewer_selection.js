@@ -142,21 +142,6 @@ class ReviewerSelection {
   /** Part 3 **/
 
   /**
-   * Builds the map from filenames to ownership subtrees.
-   *
-   * @param {string[]} filenames list of changed files.
-   * @param {!OwnersTree} ownersTree root node of the ownership tree.
-   * @return {FileTreeMap} map from filenames to nearest ownership subtrees.
-   */
-  static buildFileTreeMap(filenames, ownersTree) {
-    const fileTreeMap = {};
-    filenames.forEach(filename => {
-      fileTreeMap[filename] = ownersTree.atPath(filename);
-    });
-    return fileTreeMap;
-  }
-
-  /**
    * Picks a set of reviews to approve the PR.
    *
    * @throws {Error} if the algorithm fails to select reviewers.

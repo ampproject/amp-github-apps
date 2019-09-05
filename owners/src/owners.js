@@ -123,8 +123,22 @@ class OwnersTree {
   hasOwner(username) {
     const allOwners = this.allRules
       .map(rule => rule.owners)
-      .reduce((left, right) => left.concat(right));
+      .reduce((left, right) => left.concat(right), []);
     return allOwners.includes(username);
+  }
+
+  /**
+   * Builds the map from filenames to ownership subtrees.
+   *
+   * @param {string[]} filenames list of changed files.
+   * @return {FileTreeMap} map from filenames to nearest ownership subtrees.
+   */
+  buildFileTreeMap(filenames) {
+    const fileTreeMap = {};
+    filenames.forEach(filename => {
+      fileTreeMap[filename] = this.atPath(filename);
+    });
+    return fileTreeMap;
   }
 
   /**

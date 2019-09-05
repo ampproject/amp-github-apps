@@ -20,8 +20,8 @@ const owners = require('..');
 const {Probot} = require('probot');
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {Owner} = require('../src/owner');
-const {OwnersParser} = require('../src/owners');
+const {OwnersCheck} = require('../src/owners_check');
+const {OwnersRule, OwnersParser} = require('../src/owners');
 
 const opened35 = require('./fixtures/actions/opened.35');
 const opened36 = require('./fixtures/actions/opened.36.author-is-owner');
@@ -38,50 +38,19 @@ const reviews35Approved = require('./fixtures/reviews/reviews.35.approved');
 const checkruns35 = require('./fixtures/check-runs/check-runs.get.35');
 const checkruns35Multiple = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkruns35Empty = require('./fixtures/check-runs/check-runs.get.35.empty');
-// const checkRunsCreate = require('./fixtures/check-runs/check-runs.create');
 
 const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 
 nock.disableNetConnect();
 jest.setTimeout(30000);
 
-const ownersYamlStruct = {
-  '.': {
-    'path': './OWNERS.yaml',
-    'dirname': '.',
-    'fullpath': '/Users/erwinm/dev/github-owners-bot-test-repo/OWNERS.yaml',
-    'score': 0,
-    'dirOwners': ['donttrustthisbot'],
-    'fileOwners': {},
-  },
-  './dir1': {
-    'path': './dir1/OWNERS.yaml',
-    'dirname': './dir1',
-    'fullpath':
-      '/Users/erwinm/dev/github-owners-bot-test-repo/dir1/OWNERS.yaml',
-    'score': 1,
-    'dirOwners': ['donttrustthisbot'],
-    'fileOwners': {},
-  },
-  './dir2': {
-    'path': './dir2/OWNERS.yaml',
-    'dirname': './dir2',
-    'fullpath':
-      '/Users/erwinm/dev/github-owners-bot-test-repo/dir2/OWNERS.yaml',
-    'score': 1,
-    'dirOwners': ['erwinmombay'],
-    'fileOwners': {},
-  },
-  './dir2/dir1/dir1': {
-    'path': './dir2/dir1/dir1/OWNERS.yaml',
-    'dirname': './dir2/dir1/dir1',
-    'fullpath':
-      '/Users/erwinm/dev/github-owners-bot-test-repo/dir2/dir1/dir1/OWNERS.yaml',
-    'score': 3,
-    'dirOwners': ['erwinmombay'],
-    'fileOwners': {},
-  },
-};
+const GITHUB_REPO_DIR = '/Users/erwinm/dev/github-owners-bot-test-repo';
+const ownersRules = [
+  new OwnersRule('OWNERS.yaml', ['donttrustthisbot']),
+  new OwnersRule('dir1/OWNERS.yaml', ['donttrustthisbot']),
+  new OwnersRule('dir2/OWNERS.yaml', ['erwinmombay']),
+  new OwnersRule('dir2/dir1/dir1/OWNERS.yaml', ['erwinmombay']),
+];
 
 describe('owners bot', () => {
   let probot;
@@ -89,10 +58,12 @@ describe('owners bot', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'env').value({GITHUB_REPO_DIR});
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
-    sandbox.stub(OwnersParser.prototype, 'parseAllOwnersRules').returns([]);
-    sandbox.stub(Owner, 'parseOwnersMap').returns(ownersYamlStruct);
+    sandbox
+      .stub(OwnersParser.prototype, 'parseAllOwnersRules')
+      .returns(ownersRules);
 
     probot = new Probot({});
     const app = probot.load(owners);
@@ -135,15 +106,22 @@ describe('owners bot', () => {
           '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472315',
           body => {
             expect(body).toMatchObject({
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                text:
-                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt'
+            );
+
             return true;
           }
         )
@@ -187,15 +165,22 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                text:
-                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt'
+            );
+
             return true;
           }
         )
@@ -235,15 +220,22 @@ describe('owners bot', () => {
           '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313',
           body => {
             expect(body).toMatchObject({
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                text:
-                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt'
+            );
+
             return true;
           }
         )
@@ -281,15 +273,24 @@ describe('owners bot', () => {
           '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313',
           body => {
             expect(body).toMatchObject({
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                text:
-                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n - ./dir2/dir1/dir1/file-2.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file-2.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt\n' +
+                '- dir2/dir1/dir1/file-2.txt'
+            );
+
             return true;
           }
         )
@@ -338,15 +339,22 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                text:
-                  '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt'
+            );
+
             return true;
           }
         )
@@ -390,14 +398,17 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'success',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a success!',
-                text: '',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- dir2/dir1/dir1/file.txt (erwinmombay)'
+            );
+
             return true;
           }
         )
@@ -439,14 +450,17 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened36.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'success',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a success!',
-                text: '',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- dir2/new-file.txt (erwinmombay)'
+            );
+
             return true;
           }
         )
@@ -493,20 +507,74 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'success',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a success!',
-                text: '',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- dir2/dir1/dir1/file.txt (erwinmombay)'
+            );
+
             return true;
           }
         )
         .reply(200);
 
       await probot.receive({name: 'pull_request_review', payload: review35});
+    });
+  });
+
+  describe('when there is a failure to run the check', () => {
+    test('it should report the error with a neutral status', async () => {
+      sandbox.stub(OwnersCheck.prototype, 'run').throws(new Error('Oops!'));
+
+      nock('https://api.github.com')
+        .post('/app/installations/588033/access_tokens')
+        .reply(200, {token: 'test'});
+
+      // We need the list of files on a pull request to evaluate the required
+      // reviewers.
+      nock('https://api.github.com')
+        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+        .reply(200, files35);
+
+      // We need the reviews to check if a pull request has been approved or
+      // not.
+      nock('https://api.github.com')
+        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews')
+        .reply(200, reviews35);
+
+      nock('https://api.github.com')
+        .get(
+          '/repos/erwinmombay/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
+        )
+        .reply(200, checkruns35Multiple);
+
+      // Test that a check-run is created
+      nock('https://api.github.com')
+        .patch(
+          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472315',
+          body => {
+            expect(body).toMatchObject({
+              conclusion: 'neutral',
+              output: {
+                title: 'ampproject/owners-check',
+                summary: 'The check encountered an error!',
+              },
+            });
+            expect(body.output.text).toContain(
+              'OWNERS check encountered an error:\nError: Oops'
+            );
+
+            return true;
+          }
+        )
+        .reply(200);
+
+      await probot.receive({name: 'pull_request', payload: opened35});
     });
   });
 });

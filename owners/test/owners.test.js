@@ -164,6 +164,35 @@ describe('owners tree', () => {
     });
   });
 
+  describe('buildFileTreeMap', () => {
+    it('builds a map from filenames to subtrees', () => {
+      const dirTrees = {
+        '/': tree.addRule(rootDirRule),
+        '/foo': tree.addRule(rootDirRule),
+        '/biz': tree.addRule(rootDirRule),
+      };
+      const fileTreeMap = tree.buildFileTreeMap([
+        './main.js',
+        './package.json',
+        'biz/style.css',
+        'foo/file.js',
+        'foo/bar/other_file.js',
+        'buzz/info.txt',
+        'buzz/code.js',
+      ]);
+
+      expect(fileTreeMap).toEqual({
+        './main.js': dirTrees['/'],
+        './package.json': dirTrees['/'],
+        'biz/style.css': dirTrees['/biz'],
+        'foo/file.js': dirTrees['/foo'],
+        'foo/bar/other_file.js': dirTrees['/foo'],
+        'buzz/info.txt': dirTrees['/'],
+        'buzz/code.js': dirTrees['/'],
+      });
+    });
+  });
+
   describe('toString', () => {
     it('should draw the tree', () => {
       tree.addRule(rootDirRule);
