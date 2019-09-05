@@ -22,6 +22,7 @@ const {OwnersParser} = require('./src/owners');
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(localRepo);
+  const treeCache = new OneDayCache();
   const router = app.route('/admin');
 
   // Probot does not stream properly to GCE logs so we need to hook into
@@ -32,16 +33,21 @@ module.exports = app => {
     level: process.env.LOG_LEVEL || 'info',
   });
 
+  /** Health check server endpoints **/
   router.get('/status', (req, res) => {
     res.send('The OWNERS bot is live and running!');
   });
 
   router.get('/tree', async (req, res) => {
-    const parser = new OwnersParser(localRepo, req.log);
-    const tree = await parser.parseOwnersTree();
-    res.send(`<pre>${tree.toString()}</pre>`);
+    const ownersTree = await treeCache.wrapAsync(async () => {
+      const parser = new OwnersParser(localRepo, req.log);
+      return await parser.parseOwnersTree();
+    });
+
+    res.send(`<pre>${ownersTree.toString()}</pre>`);
   });
 
+  /** Probot request handlers **/
   app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
     await ownersBot.runOwnersCheck(
       GitHub.fromContext(context),
@@ -69,3 +75,45 @@ module.exports = app => {
     );
   });
 };
+
+/**
+ * Simple one-day cache for endpoints that do Git commands and file reads.
+ *
+ * TODO(rcebulko): Replace with a real caching solution once the health-check
+ * server gets real functionality.
+ */
+class OneDayCache {
+  /**
+   * Constructor.
+   */
+  constructor() {
+    this.lastUpdate = this.yesterday;
+    this.lastValue = null;
+  }
+
+  /**
+   * Get the date 24 hours ago.
+   *
+   * @return {Date} yesterday's date.
+   */
+  get yesterday() {
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+    return date;
+  }
+
+  /**
+   * Wraps an async function with the cache.
+   *
+   * @param {!function} asyncFn function to wrap.
+   * @return {any} computed or cached result.
+   */
+  async wrapAsync(asyncFn) {
+    if (this.lastValue === null || this.lastUpdate < this.yesterday) {
+      this.lastUpdate = new Date();
+      this.lastValue = await asyncFn();
+    }
+
+    return this.lastValue;
+  }
+}
