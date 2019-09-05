@@ -160,49 +160,6 @@ class OwnersCheck {
   }
 
   /**
-   * Builds a check-run.
-   *
-   * @param {!object} fileOwners ownership rules.
-   * @return {CheckRun} a check-run based on the approval state.
-   */
-  buildCheckRun(fileOwners) {
-    const filesNeedingApproval = this.changedFiles.filter(
-      filename => !this._hasOwnersApproval(filename)
-    );
-    const passing = !filesNeedingApproval.length;
-    const text = this._buildOutputText(fileOwners);
-    const summary = `The check was a ${passing ? 'success' : 'failure'}!`;
-    return new CheckRun(summary, text);
-  }
-
-  /**
-   * Build the check-run output comment.
-   *
-   * TODO(rcebulko): Replace legacy check-run code used by old Owner class.
-   *
-   * @private
-   * @param {!object} fileOwners ownership rules.
-   * @return {string} check-run output text.
-   */
-  _buildOutputText(fileOwners) {
-    const unapprovedFileOwners = Object.values(fileOwners).filter(
-      fileOwner =>
-        // Omit sections that has a required reviewer who has
-        // approved.
-        !_.intersection(this.approvers, fileOwner.owner.dirOwners).length
-    );
-
-    const reviewerSuggestions = unapprovedFileOwners.map(fileOwner => {
-      const reviewers = fileOwner.owner.dirOwners.join(', ');
-      const header = `## possible reviewers: ${reviewers}`;
-      const files = fileOwner.files.map(file => ` - ${file.path}`);
-      return [header, ...files].join('\n');
-    });
-
-    return reviewerSuggestions.join('\n\n');
-  }
-
-  /**
    * Build the check-run comment describing current approval coverage.
    *
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
