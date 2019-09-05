@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
+const Octokit = require('@octokit/rest');
 const {GitHub, PullRequest} = require('./src/github');
 const {LocalRepository} = require('./src/local_repo');
 const {OwnersBot} = require('./src/owners_bot');
 const {OwnersParser} = require('./src/owners');
+const {OwnersCheck} = require('./src/owners_check');
+
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
@@ -45,6 +49,15 @@ module.exports = app => {
     });
 
     res.send(`<pre>${ownersTree.toString()}</pre>`);
+  });
+
+  router.get('/check/:prNumber', async (req, res) => {
+    const octokit = new Octokit({auth: `token ${GITHUB_TOKEN}`});
+    const github = new GitHub(octokit, 'ampproject', 'amphtml', app.log);
+    const pr = await github.getPullRequest(req.params.prNumber);
+    const ownersCheck = new OwnersCheck(localRepo, github, pr);
+    const checkRun = await ownersCheck.run();
+    res.send(checkRun.json);
   });
 
   /** Probot request handlers **/
