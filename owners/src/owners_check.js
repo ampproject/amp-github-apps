@@ -16,6 +16,7 @@
 
 const _ = require('lodash');
 const {OwnersParser} = require('./owners');
+const {ReviewerSelection} = require('./reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
 
@@ -83,8 +84,40 @@ class OwnersCheck {
     this.tree = await this.parser.parseOwnersTree();
     this.approvers = await this._getApprovers();
     this.changedFiles = await this.github.listFiles(this.pr.number);
-    this.fileTreeMap = this.tree.buildFileTreeMap(this.changedFiles);
     this.initialized = true;
+  }
+
+  /**
+   * Runs the owners check and, if necessary, the reviewer selection algorithm.
+   *
+   * @return {CheckRun} a GitHub check-run with approval and reviewer info.
+   */
+  async run() {
+    if (!this.initialized) {
+      await this.init();
+    }
+
+    const fileTreeMap = this.tree.buildFileTreeMap(this.changedFiles);
+    const coverageText = this.buildCurrentCoverageText(fileTreeMap);
+
+    // Note: This starts removing files from the fileTreeMap that are already
+    // approved, so we build the coverage text first.
+    this.changedFiles.forEach(filename => {
+      const subtree = fileTreeMap[filename];
+      if (this._hasOwnersApproval(filename, subtree)) {
+        delete fileTreeMap[filename];
+      }
+    });
+    const passing = !Object.keys(fileTreeMap).length;
+    const summary = `The check was a ${passing ? 'success' : 'failure'}!`;
+
+    if (passing) {
+      return new CheckRun(summary, coverageText);
+    }
+
+    const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
+    const suggestionsText = this.buildReviewSuggestionsText(reviewSuggestions);
+    return new CheckRun(summary, [coverageText, suggestionsText].join('\n\n'));
   }
 
   /**
@@ -93,10 +126,10 @@ class OwnersCheck {
    * Must be called after `init`.
    *
    * @param {!string} filename file to check.
+   * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {boolean} if the file is approved
    */
-  _hasOwnersApproval(filename) {
-    const subtree = this.fileTreeMap[filename];
+  _hasOwnersApproval(filename, subtree) {
     return this.approvers.some(approver => subtree.hasOwner(approver));
   }
 

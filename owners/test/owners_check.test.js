@@ -102,18 +102,19 @@ describe('owners check', () => {
       );
     });
 
-    it('builds a map of changed files and their ownership trees', async () => {
-      sandbox.stub(OwnersTree.prototype, 'buildFileTreeMap').callThrough();
-      await ownersCheck.init();
+    // it('builds a map of changed files and their ownership trees', async ()
+    // => {
+    //   sandbox.stub(OwnersTree.prototype, 'buildFileTreeMap').callThrough();
+    //   await ownersCheck.init();
 
-      sandbox.assert.calledWith(ownersCheck.tree.buildFileTreeMap, [
-        'changed_file1.js',
-        'foo/changed_file2.js',
-      ]);
-      expect(ownersCheck.fileTreeMap['changed_file1.js']).toEqual(
-        ownersCheck.tree
-      );
-    });
+    //   sandbox.assert.calledWith(ownersCheck.tree.buildFileTreeMap, [
+    //     'changed_file1.js',
+    //     'foo/changed_file2.js',
+    //   ]);
+    //   expect(ownersCheck.fileTreeMap['changed_file1.js']).toEqual(
+    //     ownersCheck.tree
+    //   );
+    // });
 
     it('sets `initialized` to true', async () => {
       expect(ownersCheck.initialized).toBe(false);
@@ -149,13 +150,33 @@ describe('owners check', () => {
     });
 
     it('returns true if any approver is an owner of the file', () => {
-      expect(ownersCheck._hasOwnersApproval('foo/test.js')).toBe(true);
-      expect(ownersCheck._hasOwnersApproval('bar/baz/file.txt')).toBe(true);
+      expect(
+        ownersCheck._hasOwnersApproval(
+          'foo/test.js',
+          ownersCheck.tree.atPath('foo/test.js')
+        )
+      ).toBe(true);
+      expect(
+        ownersCheck._hasOwnersApproval(
+          'bar/baz/file.txt',
+          ownersCheck.tree.atPath('bar/baz/file.txt')
+        )
+      ).toBe(true);
     });
 
     it('returns true if no owner has given approval', () => {
-      expect(ownersCheck._hasOwnersApproval('main.js')).toBe(false);
-      expect(ownersCheck._hasOwnersApproval('buzz/README.md')).toBe(false);
+      expect(
+        ownersCheck._hasOwnersApproval(
+          'main.js',
+          ownersCheck.tree.atPath('main.js')
+        )
+      ).toBe(false);
+      expect(
+        ownersCheck._hasOwnersApproval(
+          'buzz/README.md',
+          ownersCheck.tree.atPath('buzz/README.md')
+        )
+      ).toBe(false);
     });
   });
 
@@ -231,9 +252,10 @@ describe('owners check', () => {
 
     it('lists files with their owners approvers', async () => {
       await ownersCheck.init();
-      const coverageText = ownersCheck.buildCurrentCoverageText(
-        ownersCheck.fileTreeMap
+      const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
+        ownersCheck.changedFiles
       );
+      const coverageText = ownersCheck.buildCurrentCoverageText(fileTreeMap);
 
       expect(coverageText).toContain('=== Current Coverage ===');
       expect(coverageText).toContain('- foo/test.js (approver)');
@@ -243,9 +265,10 @@ describe('owners check', () => {
 
     it('lists files needing approval', async () => {
       await ownersCheck.init();
-      const coverageText = ownersCheck.buildCurrentCoverageText(
-        ownersCheck.fileTreeMap
+      const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
+        ownersCheck.changedFiles
       );
+      const coverageText = ownersCheck.buildCurrentCoverageText(fileTreeMap);
 
       expect(coverageText).toContain('=== Current Coverage ===');
       expect(coverageText).toContain('- [NEEDS APPROVAL] main.js');
