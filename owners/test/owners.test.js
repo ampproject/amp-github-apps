@@ -164,6 +164,36 @@ describe('owners tree', () => {
     });
   });
 
+  describe('fileHasOwner', () => {
+    beforeEach(() => {
+      tree.addRule(rootDirRule);
+      tree.addRule(childDirRule);
+      tree.addRule(descendantDirRule);
+    });
+
+    it('should be true for owners in the same directory', () => {
+      expect(tree.fileHasOwner('foo/bar.txt', 'child')).toBe(true);
+    });
+
+    it('should be true for owners in the parent directory', () => {
+      expect(tree.fileHasOwner('foo/bar.txt', 'root')).toBe(true);
+    });
+
+    it('should be true for owners an ancestor directory', () => {
+      expect(tree.fileHasOwner('foo/bar.txt', 'root')).toBe(true);
+    });
+
+    it('should be false for owners a child directory', () => {
+      expect(tree.fileHasOwner('foo/bar/baz/buzz.txt', 'descendant')).toBe(
+        true
+      );
+    });
+
+    it('should be false for non-existant owners', () => {
+      expect(tree.fileHasOwner('foo/bar.txt', 'not_an_owner')).toBe(false);
+    });
+  });
+
   describe('buildFileTreeMap', () => {
     it('builds a map from filenames to subtrees', () => {
       const dirTrees = {

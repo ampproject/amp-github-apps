@@ -128,6 +128,17 @@ class OwnersTree {
   }
 
   /**
+   * Tests if a user is in the ownership path of a file.
+   *
+   * @param {!string} filename file to test ownership for.
+   * @param {!string} username user to check ownership of.
+   * @return {boolean} true of the user is an owner of the file.
+   */
+  fileHasOwner(filename, username) {
+    return this.atPath(filename).hasOwner(username);
+  }
+
+  /**
    * Builds the map from filenames to ownership subtrees.
    *
    * @param {string[]} filenames list of changed files.
