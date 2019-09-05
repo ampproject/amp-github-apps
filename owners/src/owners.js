@@ -148,7 +148,9 @@ class OwnersTree {
    * @return {boolean} true of the user is an owner of the file.
    */
   fileHasOwner(filename, username) {
-    return this.atPath(filename).hasOwner(username);
+    const allRules = this.atPath(filename).allRules;
+    const fileRules = allRules.filter(rule => rule.matchesFile(filename));
+    return fileRules.some(rule => rule.owners.includes(username));
   }
 
   /**
@@ -216,31 +218,14 @@ class OwnersRule {
   /**
    * Test if a file is matched by the rule.
    *
-   * Currently only tests directory hierarchy; may be modified to test
-   * filetypes, globs, special cases like package.json, etc.
+   * Currently is always true, as it assumes that the rule is being tested on;
+   * files within its hierarchy; may be modified to test filetypes, globs,
+   * special cases like package.json, etc.
    *
    * @param {!string} filePath relative path in repo to the file being checked.
    * @return {boolean} true if the rule applies to the file.
    */
   matchesFile(filePath) {
-    const filePathDir = path.dirname(filePath);
-    const filePathSegments = filePathDir
-      .split(path.sep)
-      .filter(segment => segment != '.');
-    const rulePathSegments = this.dirPath
-      .split(path.sep)
-      .filter(segment => segment != '.');
-
-    if (filePathSegments.length < rulePathSegments.length) {
-      return false;
-    }
-
-    for (let i = 0; i < rulePathSegments.length; ++i) {
-      if (rulePathSegments[i] !== filePathSegments[i]) {
-        return false;
-      }
-    }
-
     return true;
   }
 }
