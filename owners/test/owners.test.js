@@ -152,36 +152,6 @@ describe('owners tree', () => {
     });
   });
 
-  describe('hasOwner', () => {
-    beforeEach(() => {
-      tree.addRule(rootDirRule);
-      tree.addRule(childDirRule);
-      tree.addRule(descendantDirRule);
-    });
-
-    it('should be true for owners in the same directory', () => {
-      expect(tree.atPath('foo/bar.txt').hasOwner('child')).toBe(true);
-    });
-
-    it('should be true for owners in the parent directory', () => {
-      expect(tree.atPath('foo/bar.txt').hasOwner('root')).toBe(true);
-    });
-
-    it('should be true for owners an ancestor directory', () => {
-      expect(tree.atPath('foo/bar.txt').hasOwner('root')).toBe(true);
-    });
-
-    it('should be false for owners a child directory', () => {
-      expect(tree.atPath('foo/bar/baz/buzz.txt').hasOwner('descendant')).toBe(
-        true
-      );
-    });
-
-    it('should be false for non-existant owners', () => {
-      expect(tree.atPath('foo/bar.txt').hasOwner('not_an_owner')).toBe(false);
-    });
-  });
-
   describe('fileHasOwner', () => {
     beforeEach(() => {
       tree.addRule(rootDirRule);
@@ -266,40 +236,28 @@ describe('owners tree', () => {
 });
 
 describe('owners rules', () => {
-  describe('matchesFile', () => {
-    expect.extend({
-      toMatchFile(receivedOwnersPath, filePath) {
-        const rule = new OwnersRule(receivedOwnersPath, []);
-        const matches = rule.matchesFile(filePath);
-        const matchStr = this.isNot ? 'not match' : 'match';
+  expect.extend({
+    toMatchFile(receivedOwnersPath, filePath) {
+      const rule = new OwnersRule(receivedOwnersPath, []);
+      const matches = rule.matchesFile(filePath);
+      const matchStr = this.isNot ? 'not match' : 'match';
 
-        return {
-          pass: matches,
-          message: () =>
-            `Expected rules in '${receivedOwnersPath}' to ` +
-            `${matchStr} file '${filePath}'.`,
-        };
-      },
-    });
+      return {
+        pass: matches,
+        message: () =>
+          `Expected rules in '${receivedOwnersPath}' to ` +
+          `${matchStr} file '${filePath}'.`,
+      };
+    },
+  });
 
-    it('matches a file in the same directory', () => {
-      expect('src/OWNERS.yaml').toMatchFile('src/foo.txt');
-    });
-
-    it('matches a file in a child directory', () => {
-      expect('src/OWNERS.yaml').toMatchFile('src/foo/bar.txt');
-    });
-
-    it('matches a file in an descendant directory', () => {
-      expect('src/OWNERS.yaml').toMatchFile('src/foo/bar/baz.txt');
-    });
-
-    it('does not match a file in a parent directory', () => {
-      expect('src/OWNERS.yaml').not.toMatchFile('foo.txt');
-    });
-
-    it('does not match a file in a sibling directory', () => {
-      expect('src/OWNERS.yaml').not.toMatchFile('test/foo.txt');
+  describe('basic directory ownership', () => {
+    describe('matchesFile', () => {
+      it('matches all files', () => {
+        expect('src/OWNERS.yaml').toMatchFile('src/foo.txt');
+        expect('src/OWNERS.yaml').toMatchFile('src/foo/bar.txt');
+        expect('src/OWNERS.yaml').toMatchFile('src/foo/bar/baz.txt');
+      });
     });
   });
 });
