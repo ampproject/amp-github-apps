@@ -78,7 +78,7 @@ module.exports = app => {
    */
   async function runOwnersCheckOnPrNumber(github, prNumber) {
     const pr = await github.getPullRequest(prNumber);
-    await runOwnersCheck(github, pr)
+    await runOwnersCheck(github, pr);
   }
 
   /**
@@ -100,7 +100,7 @@ module.exports = app => {
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
     const prNumber = payload.check_run.check_suite.pull_requests[0].number;
-    
+
     await runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
   }
 
@@ -112,7 +112,7 @@ module.exports = app => {
   async function onPullRequestReview(context) {
     const payload = context.payload;
     const prNumber = payload.pull_request.number;
-    
+
     await runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
   }
 };

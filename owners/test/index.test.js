@@ -107,16 +107,22 @@ describe('owners bot', () => {
           '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472315',
           body => {
             expect(body).toMatchObject({
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                // TODO(rcebulko): Add matchers for new output text.
-                // text:
-                //   '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt'
+            );
+
             return true;
           }
         )
@@ -160,16 +166,22 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                // TODO(rcebulko): Add matchers for new output text.
-                // text:
-                //   '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt'
+            );
+
             return true;
           }
         )
@@ -209,16 +221,22 @@ describe('owners bot', () => {
           '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313',
           body => {
             expect(body).toMatchObject({
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                // TODO(rcebulko): Add matchers for new output text.
-                // text:
-                  // '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt'
+            );
+
             return true;
           }
         )
@@ -256,16 +274,24 @@ describe('owners bot', () => {
           '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313',
           body => {
             expect(body).toMatchObject({
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                // TODO(rcebulko): Add matchers for new output text.
-                // text:
-                  // '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt\n - ./dir2/dir1/dir1/file-2.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file-2.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt\n' +
+                '- dir2/dir1/dir1/file-2.txt'
+            );
+
             return true;
           }
         )
@@ -314,16 +340,22 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'failure',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a failure!',
-                // TODO(rcebulko): Add matchers for new output text.
-                // text:
-                  // '## possible reviewers: erwinmombay\n - ./dir2/dir1/dir1/file.txt',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+            );
+            expect(body.output.text).toContain(
+              '=== Suggested Reviewers ===\n\n' +
+                'Reviewer: erwinmombay\n' +
+                '- dir2/dir1/dir1/file.txt'
+            );
+
             return true;
           }
         )
@@ -367,15 +399,17 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'success',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a success!',
-                // TODO(rcebulko): Add matchers for new output text.
-                // text: '',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- dir2/dir1/dir1/file.txt (erwinmombay)'
+            );
+
             return true;
           }
         )
@@ -417,15 +451,17 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened36.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'success',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a success!',
-                // TODO(rcebulko): Add matchers for new output text.
-                // text: '',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- dir2/new-file.txt (erwinmombay)'
+            );
+
             return true;
           }
         )
@@ -436,7 +472,7 @@ describe('owners bot', () => {
   });
 
   describe('pull request review', () => {
-    test.only('triggers pull request re-evaluation', async () => {
+    test('triggers pull request re-evaluation', async () => {
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -472,15 +508,17 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              // conclusion: 'success',
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'The check was a success!',
-                // TODO(rcebulko): Add matchers for new output text.
-                // text: '',
               },
             });
+            expect(body.output.text).toContain(
+              '=== Current Coverage ===\n\n' +
+                '- dir2/dir1/dir1/file.txt (erwinmombay)'
+            );
+
             return true;
           }
         )
