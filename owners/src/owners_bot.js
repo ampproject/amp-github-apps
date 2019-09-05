@@ -39,11 +39,10 @@ class OwnersBot {
    */
   async runOwnersCheck(github, pr) {
     const ownersCheck = new OwnersCheck(this.repo, github, pr);
-    let checkRunId;
+    let checkRunId = await github.getCheckRunId(pr.headSha);
     let latestCheckRun;
 
     try {
-      checkRunId = await github.getCheckRunId(pr.headSha);
       latestCheckRun = await ownersCheck.run();
     } catch (error) {
       // If anything goes wrong, report a failing check.

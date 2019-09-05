@@ -169,16 +169,27 @@ class GitHub {
   /**
    * Fetches the ID of the OWNERS bot check-run for a commit.
    *
+   * If an error is encountered contacting the GitHub API, it will be logged and
+   * will return `null`.
+   *
    * @param {!string} sha SHA hash for head commit to lookup check-runs on.
    * @return {number|null} check-run ID if one exists, otherwise null.
    */
   async getCheckRunId(sha) {
     this.logger.info(`Fetching check run ID for commit ${sha.substr(0, 7)}`);
+    let checkRuns;
 
-    const response = await this.client.checks.listForRef(this.repo({ref: sha}));
-    const checkRuns = response.data.check_runs;
+    try {
+      const response = await this.client.checks.listForRef(
+        this.repo({ref: sha})
+      );
+      checkRuns = response.data.check_runs;
+    } catch (error) {
+      this.logger.error(error);
+      return null;
+    }
+
     this.logger.debug('[getCheckRunId]', sha, checkRuns);
-
     const [checkRun] = checkRuns
       .filter(cr => cr.head_sha === sha)
       .filter(cr => OWNERS_CHECKRUN_REGEX.test(cr.name));

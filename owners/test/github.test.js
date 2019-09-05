@@ -227,7 +227,7 @@ describe('GitHub API', () => {
       })();
     });
 
-    it('returns undefined if the list has no matching check-run', async () => {
+    it('returns null if the list has no matching check-run', async () => {
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/commits/_missing_hash_/check-runs')
         .reply(200, checkRunsListResponse);
@@ -239,10 +239,25 @@ describe('GitHub API', () => {
       })();
     });
 
-    it('returns undefined if the list is empty', async () => {
+    it('returns null if the list is empty', async () => {
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/commits/_test_hash_/check-runs')
         .reply(200, checkRunsEmptyResponse);
+
+      await withContext(async (context, github) => {
+        const checkRun = await github.getCheckRunId('_test_hash_');
+
+        expect(checkRun).toBeNull();
+      })();
+    });
+
+    it('returns null if there is an error querying GitHub', async () => {
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/commits/_test_hash_/check-runs')
+        .replyWithError({
+          message: 'Not found',
+          code: 404,
+        });
 
       await withContext(async (context, github) => {
         const checkRun = await github.getCheckRunId('_test_hash_');
