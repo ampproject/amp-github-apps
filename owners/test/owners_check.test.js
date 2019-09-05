@@ -200,4 +200,75 @@ describe('owners check', () => {
       expect(approvers).not.toContain('rejector');
     });
   });
+
+  describe('buildCurrentCoverageText', () => {
+    let ownersCheck;
+    let ownersTree;
+
+    beforeEach(() => {
+      ownersCheck = new OwnersCheck(
+        repo,
+        new FakeGithub(
+          [approval, otherApproval],
+          [
+            'main.js', // root_owner
+            'foo/test.js', // approver, some_user, root_owner
+            'bar/baz/file.txt', // other_approver, root_owner
+            'buzz/README.md', // the_author, root_owner
+          ]
+        ),
+        pr
+      );
+      sandbox
+        .stub(ownersCheck.parser, 'parseAllOwnersRules')
+        .returns([
+          new OwnersRule('OWNERS.yaml', ['root_owner']),
+          new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
+          new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
+          new OwnersRule('buzz/OWNERS.yaml', ['the_author']),
+        ]);
+    });
+
+    it('lists files with their owners approvers', async () => {
+      await ownersCheck.init();
+      const coverageText = ownersCheck.buildCurrentCoverageText(
+        ownersCheck.fileTreeMap
+      );
+
+      expect(coverageText).toContain('=== Current Coverage ===');
+      expect(coverageText).toContain('- foo/test.js (approver)');
+      expect(coverageText).toContain('- bar/baz/file.txt (other_approver)');
+      expect(coverageText).toContain('- buzz/README.md (the_author)');
+    });
+
+    it('lists files needing approval', async () => {
+      await ownersCheck.init();
+      const coverageText = ownersCheck.buildCurrentCoverageText(
+        ownersCheck.fileTreeMap
+      );
+
+      expect(coverageText).toContain('=== Current Coverage ===');
+      expect(coverageText).toContain('- [NEEDS APPROVAL] main.js');
+    });
+  });
+
+  describe('buildReviewSuggestionsText', () => {
+    it('displays review suggestions', () => {
+      const ownersCheck = new OwnersCheck(repo, new FakeGithub([], []), pr);
+      const reviewSuggestions = [
+        ['alice', ['alice_file1.js', 'foo/alice_file2.js']],
+        ['bob', ['bob_file1.js', 'bar/bob_file2.js']],
+      ];
+
+      expect(ownersCheck.buildReviewSuggestionsText(reviewSuggestions)).toEqual(
+        '=== Suggested Reviewers ===\n\n' +
+          'Reviewer: alice\n' +
+          '- alice_file1.js\n' +
+          '- foo/alice_file2.js\n\n' +
+          'Reviewer: bob\n' +
+          '- bob_file1.js\n' +
+          '- bar/bob_file2.js'
+      );
+    });
+  });
 });

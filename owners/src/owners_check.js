@@ -168,6 +168,48 @@ class OwnersCheck {
 
     return reviewerSuggestions.join('\n\n');
   }
+
+  /**
+   * Build the check-run comment describing current approval coverage.
+   *
+   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
+   * @return {string} a list of files and which owners approved them, if any.
+   */
+  buildCurrentCoverageText(fileTreeMap) {
+    const allFilesText = Object.entries(fileTreeMap)
+      .map(([filename, subtree]) => {
+        const fileApprovers = this.approvers.filter(approver =>
+          subtree.hasOwner(approver)
+        );
+
+        if (fileApprovers.length) {
+          return `- ${filename} (${fileApprovers.join(', ')})`;
+        } else {
+          return `- [NEEDS APPROVAL] ${filename}`;
+        }
+      })
+      .join('\n');
+
+    return ['=== Current Coverage ===', allFilesText].join('\n\n');
+  }
+
+  /**
+   * Build the check-run comment suggesting a reviewer set.
+   *
+   * @param {!ReviewerFiles} reviewSuggestions suggested reviewer set.
+   * @return {string} suggested reviewers and the files they could approve.
+   */
+  buildReviewSuggestionsText(reviewSuggestions) {
+    const suggestionsText = reviewSuggestions.map(
+      ([reviewer, coveredFiles]) => {
+        const header = `Reviewer: ${reviewer}`;
+        const files = coveredFiles.map(filename => `- ${filename}`);
+        return [header, ...files].join('\n');
+      }
+    );
+
+    return ['=== Suggested Reviewers ===', ...suggestionsText].join('\n\n');
+  }
 }
 
 module.exports = {
