@@ -93,31 +93,41 @@ class OwnersCheck {
    * @return {CheckRun} a GitHub check-run with approval and reviewer info.
    */
   async run() {
-    if (!this.initialized) {
-      await this.init();
-    }
-
-    const fileTreeMap = this.tree.buildFileTreeMap(this.changedFiles);
-    const coverageText = this.buildCurrentCoverageText(fileTreeMap);
-
-    // Note: This starts removing files from the fileTreeMap that are already
-    // approved, so we build the coverage text first.
-    this.changedFiles.forEach(filename => {
-      const subtree = fileTreeMap[filename];
-      if (this._hasOwnersApproval(filename, subtree)) {
-        delete fileTreeMap[filename];
+    try {
+      if (!this.initialized) {
+        await this.init();
       }
-    });
-    const passing = !Object.keys(fileTreeMap).length;
-    const summary = `The check was a ${passing ? 'success' : 'failure'}!`;
 
-    if (passing) {
-      return new CheckRun(summary, coverageText);
+      const fileTreeMap = this.tree.buildFileTreeMap(this.changedFiles);
+      const coverageText = this.buildCurrentCoverageText(fileTreeMap);
+
+      // Note: This starts removing files from the fileTreeMap that are already
+      // approved, so we build the coverage text first.
+      this.changedFiles.forEach(filename => {
+        const subtree = fileTreeMap[filename];
+        if (this._hasOwnersApproval(filename, subtree)) {
+          delete fileTreeMap[filename];
+        }
+      });
+      const passing = !Object.keys(fileTreeMap).length;
+      const summary = `The check was a ${passing ? 'success' : 'failure'}!`;
+
+      if (passing) {
+        return new CheckRun(summary, coverageText);
+      }
+
+      const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
+      const suggestionsText = this.buildReviewSuggestionsText(
+        reviewSuggestions
+      );
+      return new CheckRun(summary, `${coverageText}\n\n${suggestionsText}`);
+    } catch (error) {
+      // If anything goes wrong, report a failing check.
+      return new CheckRun(
+        'The check encountered an error!',
+        'OWNERS check encountered an error:\n' + error
+      );
     }
-
-    const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
-    const suggestionsText = this.buildReviewSuggestionsText(reviewSuggestions);
-    return new CheckRun(summary, `${coverageText}\n\n${suggestionsText}`);
   }
 
   /**
