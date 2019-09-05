@@ -35,8 +35,8 @@ module.exports = app => {
   });
 
   /**
-   * Runs the steps to create a new check run on a newly opened Pull Request
-   * on GitHub.
+   * Runs the steps to create or update an owners-bot check-run on a GitHub Pull
+   * Request.
    *
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to run owners check on.
@@ -70,6 +70,18 @@ module.exports = app => {
   }
 
   /**
+   * Runs the steps to create or update an owners-bot check-run on a GitHub Pull
+   * Request.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   * @param {!number} prNumber pull request number.
+   */
+  async function runOwnersCheckOnPrNumber(github, prNumber) {
+    const pr = await github.getPullRequest(prNumber);
+    await runOwnersCheck(github, pr)
+  }
+
+  /**
    * Probot handler for newly opened pull request.
    *
    * @param {!Context} context Probot request context.
@@ -88,10 +100,8 @@ module.exports = app => {
   async function onCheckRunRerequest(context) {
     const payload = context.payload;
     const prNumber = payload.check_run.check_suite.pull_requests[0].number;
-    const github = GitHub.fromContext(context);
-    const pr = await github.getPullRequest(prNumber);
-
-    await runOwnersCheck(github, pr);
+    
+    await runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
   }
 
   /**
@@ -102,9 +112,7 @@ module.exports = app => {
   async function onPullRequestReview(context) {
     const payload = context.payload;
     const prNumber = payload.pull_request.number;
-    const github = GitHub.fromContext(context);
-    const pr = await github.getPullRequest(prNumber);
-
-    await runOwnersCheck(github, pr);
+    
+    await runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
   }
 };
