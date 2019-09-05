@@ -54,7 +54,7 @@ module.exports = app => {
       // If anything goes wrong, report a failing check.
       latestCheckRun = new CheckRun(
         'The check encountered an error!',
-        'OWNERS check encountered an error: ' + error
+        'OWNERS check encountered an error:\n' + error
       );
     }
 
