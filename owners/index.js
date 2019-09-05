@@ -15,8 +15,8 @@
  */
 
 const {GitHub, PullRequest} = require('./src/github');
-const {LocalRepository} = require('./src/local_repo')
-const {OwnersBot} = require('./src/owners_bot')
+const {LocalRepository} = require('./src/local_repo');
+const {OwnersBot} = require('./src/owners_bot');
 
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
@@ -54,7 +54,10 @@ module.exports = app => {
     const payload = context.payload;
     const prNumber = payload.check_run.check_suite.pull_requests[0].number;
 
-    await ownersBot.runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
+    await ownersBot.runOwnersCheckOnPrNumber(
+      GitHub.fromContext(context),
+      prNumber
+    );
   }
 
   /**
@@ -66,6 +69,9 @@ module.exports = app => {
     const payload = context.payload;
     const prNumber = payload.pull_request.number;
 
-    await ownersBot.runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
+    await ownersBot.runOwnersCheckOnPrNumber(
+      GitHub.fromContext(context),
+      prNumber
+    );
   }
 };
