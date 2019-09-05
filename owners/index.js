@@ -17,6 +17,7 @@
 const {GitHub, PullRequest} = require('./src/github');
 const {LocalRepository} = require('./src/local_repo');
 const {OwnersBot} = require('./src/owners_bot');
+const {OwnersParser} = require('./src/owners');
 
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
@@ -33,6 +34,12 @@ module.exports = app => {
 
   router.get('/status', (req, res) => {
     res.send('The OWNERS bot is live and running!');
+  });
+
+  router.get('/tree', async (req, res) => {
+    const parser = new OwnersParser(localRepo, req.log);
+    const tree = await parser.parseOwnersTree();
+    res.send(`<pre>${tree.toString()}</pre>`);
   });
 
   app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
