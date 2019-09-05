@@ -130,7 +130,9 @@ class OwnersCheck {
    * @return {boolean} if the file is approved
    */
   _hasOwnersApproval(filename, subtree) {
-    return this.approvers.some(approver => this.tree.fileHasOwner(filename, approver));
+    return this.approvers.some(approver =>
+      this.tree.fileHasOwner(filename, approver)
+    );
   }
 
   /**

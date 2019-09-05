@@ -132,7 +132,7 @@ class OwnersTree {
    *
    * @param {!string} filename file to test ownership for.
    * @param {!string} username user to check ownership of.
-   * @return {boolean} true of the user is an owner of the file.
+   * @return {boolean} true if the user is an owner of the file.
    */
   fileHasOwner(filename, username) {
     const allRules = this.atPath(filename).allRules;
@@ -208,6 +208,8 @@ class OwnersRule {
    * Currently is always true, as it assumes that the rule is being tested on;
    * files within its hierarchy; may be modified to test filetypes, globs,
    * special cases like package.json, etc.
+   *
+   * TODO(Issue #278): Implement pattern matching.
    *
    * @param {!string} filePath relative path in repo to the file being checked.
    * @return {boolean} true if the rule applies to the file.
