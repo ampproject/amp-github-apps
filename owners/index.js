@@ -22,10 +22,6 @@ module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(localRepo);
 
-  app.on(['pull_request.opened', 'pull_request.synchronize'], onPullRequest);
-  app.on('check_run.rerequested', onCheckRunRerequest);
-  app.on('pull_request_review.submitted', onPullRequestReview);
-
   // Probot does not stream properly to GCE logs so we need to hook into
   // bunyan explicitly and stream it to process.stdout.
   app.log.target.addStream({
@@ -34,23 +30,14 @@ module.exports = app => {
     level: process.env.LOG_LEVEL || 'info',
   });
 
-  /**
-   * Probot handler for newly opened pull request.
-   *
-   * @param {!Context} context Probot request context.
-   */
-  async function onPullRequest(context) {
-    const pr = PullRequest.fromGitHubResponse(context.payload.pull_request);
+  app.on(['pull_request.opened', 'pull_request.synchronize'], async (context) => {
+    await ownersBot.runOwnersCheck(
+      GitHub.fromContext(context),
+      PullRequest.fromGitHubResponse(context.payload.pull_request)
+    );
+  });
 
-    await ownersBot.runOwnersCheck(GitHub.fromContext(context), pr);
-  }
-
-  /**
-   * Probot handler for check-run re-requests.
-   *
-   * @param {!Context} context Probot request context.
-   */
-  async function onCheckRunRerequest(context) {
+  app.on('check_run.rerequested', async (context) => {
     const payload = context.payload;
     const prNumber = payload.check_run.check_suite.pull_requests[0].number;
 
@@ -58,14 +45,9 @@ module.exports = app => {
       GitHub.fromContext(context),
       prNumber
     );
-  }
+  });
 
-  /**
-   * Probot handler for after a PR review is submitted.
-   *
-   * @param {!Context} context Probot request context.
-   */
-  async function onPullRequestReview(context) {
+  app.on('pull_request_review.submitted', async (context) => {
     const payload = context.payload;
     const prNumber = payload.pull_request.number;
 
@@ -73,5 +55,5 @@ module.exports = app => {
       GitHub.fromContext(context),
       prNumber
     );
-  }
+  });
 };
