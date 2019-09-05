@@ -38,7 +38,6 @@ const reviews35Approved = require('./fixtures/reviews/reviews.35.approved');
 const checkruns35 = require('./fixtures/check-runs/check-runs.get.35');
 const checkruns35Multiple = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkruns35Empty = require('./fixtures/check-runs/check-runs.get.35.empty');
-// const checkRunsCreate = require('./fixtures/check-runs/check-runs.create');
 
 const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 
@@ -65,7 +64,6 @@ describe('owners bot', () => {
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
       .returns(ownersRules);
-    // sandbox.stub(Owner, 'parseOwnersMap').returns(ownersYamlStruct);
 
     probot = new Probot({});
     const app = probot.load(owners);
