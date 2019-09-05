@@ -172,7 +172,7 @@ describe('owners check', () => {
 
       describe('for a fully-approved PR', () => {
         beforeEach(() => {
-          sandbox.stub(OwnersTree.prototype, 'hasOwner').returns(true);
+          sandbox.stub(OwnersTree.prototype, 'fileHasOwner').returns(true);
         });
 
         it('has a passing summary', async () => {

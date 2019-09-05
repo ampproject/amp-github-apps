@@ -94,7 +94,7 @@ class ReviewerSelection {
    */
   static _filesOwnedByReviewer(fileTreeMap, reviewer) {
     return Object.entries(fileTreeMap)
-      .filter(([filename, tree]) => tree.hasOwner(reviewer))
+      .filter(([filename, tree]) => tree.fileHasOwner(filename, reviewer))
       .map(([filename, tree]) => filename);
   }
 
