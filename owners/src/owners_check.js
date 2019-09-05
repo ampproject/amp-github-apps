@@ -117,7 +117,7 @@ class OwnersCheck {
 
     const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
     const suggestionsText = this.buildReviewSuggestionsText(reviewSuggestions);
-    return new CheckRun(summary, [coverageText, suggestionsText].join('\n\n'));
+    return new CheckRun(summary, `${coverageText}\n\n${suggestionsText}`);
   }
 
   /**
@@ -180,7 +180,7 @@ class OwnersCheck {
       })
       .join('\n');
 
-    return ['=== Current Coverage ===', allFilesText].join('\n\n');
+    return `=== Current Coverage ===\n\n${allFilesText}`;
   }
 
   /**
