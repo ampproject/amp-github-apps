@@ -103,7 +103,7 @@ class PatternOwnersRule extends OwnersRule {
    * @return {string} the label for the rule.
    */
   get label() {
-    return this.pattern;
+    return `**/${this.pattern}`;
   }
 
   /**
