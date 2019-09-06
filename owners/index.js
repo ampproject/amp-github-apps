@@ -22,11 +22,13 @@ const {OwnersParser} = require('./src/owners');
 const {OwnersCheck} = require('./src/owners_check');
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_REPO_OWNER = process.env.GITHUB_REPO_OWNER || 'ampproject';
+const GITHUB_REPO_NAME = process.env.GITHUB_REPO_NAME || 'amphtml';
 
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(localRepo);
-  const router = app.route('/admin');
+  const adminRouter = app.route('/admin');
 
   // Probot does not stream properly to GCE logs so we need to hook into
   // bunyan explicitly and stream it to process.stdout.
@@ -39,20 +41,24 @@ module.exports = app => {
   /** Health check server endpoints **/
   // TODO(rcebulko): Implement GitHub authentication to prevent spamming any of
   // these endpoints.
-  router.get('/status', (req, res) => {
-    res.send('The OWNERS bot is live and running!');
+  adminRouter.get('/status', (req, res) => {
+    res.send([
+      'The OWNERS bot is live and running!'
+      `Project: ${process.env.GOOGLE_CLOUD_PROJECT || 'UNKNOWN'}`
+      `Version: ${process.env.GAE_VERSION || 'UNKNOWN'}`
+    ].join('<br>'));
   });
 
-  router.get('/tree', async (req, res) => {
+  adminRouter.get('/tree', async (req, res) => {
     const parser = new OwnersParser(localRepo, req.log);
     const ownersTree = await parser.parseOwnersTree();
 
     res.send(`<pre>${ownersTree.toString()}</pre>`);
   });
 
-  router.get('/check/:prNumber', async (req, res) => {
+  adminRouter.get('/check/:prNumber', async (req, res) => {
     const octokit = new Octokit({auth: `token ${GITHUB_TOKEN}`});
-    const github = new GitHub(octokit, 'ampproject', 'amphtml', app.log);
+    const github = new GitHub(octokit, GITHUB_REPO_OWNER, GITHUB_REPO_NAME, app.log);
     const pr = await github.getPullRequest(req.params.prNumber);
     const ownersCheck = new OwnersCheck(localRepo, github, pr);
     const checkRun = await ownersCheck.run();

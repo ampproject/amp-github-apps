@@ -51,7 +51,7 @@ class OwnersBot {
     } else {
       // We need to add a delay on the PR creation and check creation since
       // GitHub might not be ready.
-      // TODO: Verify this is still needed.
+      // TODO(rcebulko): Verify this is still needed.
       await sleep(this.GITHUB_CHECKRUN_DELAY);
       await github.createCheckRun(pr.headSha, latestCheckRun);
     }
