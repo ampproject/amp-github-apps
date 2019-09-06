@@ -110,17 +110,22 @@ class OwnersCheck {
         }
       });
       const passing = !Object.keys(fileTreeMap).length;
-      const summary = `The check was a ${passing ? 'success' : 'failure'}!`;
 
       if (passing) {
-        return new CheckRun(summary, coverageText);
+        return new CheckRun(
+          'All files in this PR have OWNERS approval.',
+          coverageText
+        );
       }
 
       const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
       const suggestionsText = this.buildReviewSuggestionsText(
         reviewSuggestions
       );
-      return new CheckRun(summary, `${coverageText}\n\n${suggestionsText}`);
+      return new CheckRun(
+        'The check was a failure!',
+        `${coverageText}\n\n${suggestionsText}`
+      );
     } catch (error) {
       // If anything goes wrong, report a failing check.
       return new CheckRun(
