@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-const {OwnersRule, PatternOwnersRule} = require('../src/rules');
+const {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+} = require('../src/rules');
 
 describe('owners rules', () => {
   expect.extend({
@@ -110,14 +114,10 @@ describe('owners rules', () => {
         );
       });
 
-      it.each([
-        ['package.json', 'foo/package.json'],
-        ['*.js', 'bar/main.js'],
-        ['*.css', 'foo/bar/baz/style.css'],
-      ])('pattern %p matches nested file %p', (pattern, filePath) => {
-        expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(
-          filePath
-        );
+      it('fails for non-matching patterns', () => {
+        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.js');
+
+        expect(rule).not.toMatchFile('style.css');
       });
     });
 
@@ -138,6 +138,36 @@ describe('owners rules', () => {
         );
 
         expect(rule.toString()).toEqual('*.css: rcebulko, erwinmombay');
+      });
+    });
+
+    describe('in the same directory', () => {
+      const rule = new SameDirPatternOwnersRule('foo/OWNERS.yaml', [], '*.js');
+
+      describe('label', () => {
+        it('is the pattern in the "./" directory', () => {
+          expect(rule.label).toEqual('./*.js');
+        });
+      });
+
+      describe('matchesFile', () => {
+        it('fails if there is no pattern match', () => {
+          expect(rule).not.toMatchFile('style.css');
+        });
+
+        it('fails for files in subdirectories', () => {
+          expect(rule).not.toMatchFile('foo/bar/code.js');
+        });
+
+        it('passes for matching files in the same directory', () => {
+          expect(rule).toMatchFile('foo/main.js');
+        });
+
+        it('works for files and rules in the root directory', () => {
+          expect(
+            new SameDirPatternOwnersRule('OWNERS.yaml', [], '*.js')
+          ).toMatchFile('main.js');
+        });
       });
     });
   });
