@@ -20,7 +20,6 @@ const owners = require('..');
 const {Probot} = require('probot');
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {OwnersCheck} = require('../src/owners_check');
 const {OwnersRule, OwnersParser} = require('../src/owners');
 
 const opened35 = require('./fixtures/actions/opened.35');
@@ -524,57 +523,6 @@ describe('owners bot', () => {
         .reply(200);
 
       await probot.receive({name: 'pull_request_review', payload: review35});
-    });
-  });
-
-  describe('when there is a failure to run the check', () => {
-    test('it should report the error with a neutral status', async () => {
-      sandbox.stub(OwnersCheck.prototype, 'run').throws(new Error('Oops!'));
-
-      nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
-
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
-        .reply(200, files35);
-
-      // We need the reviews to check if a pull request has been approved or
-      // not.
-      nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews')
-        .reply(200, reviews35);
-
-      nock('https://api.github.com')
-        .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35Multiple);
-
-      // Test that a check-run is created
-      nock('https://api.github.com')
-        .patch(
-          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472315',
-          body => {
-            expect(body).toMatchObject({
-              conclusion: 'neutral',
-              output: {
-                title: 'ampproject/owners-check',
-                summary: 'The check encountered an error!',
-              },
-            });
-            expect(body.output.text).toContain(
-              'OWNERS check encountered an error:\nError: Oops'
-            );
-
-            return true;
-          }
-        )
-        .reply(200);
-
-      await probot.receive({name: 'pull_request', payload: opened35});
     });
   });
 });
