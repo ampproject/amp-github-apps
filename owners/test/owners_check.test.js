@@ -186,7 +186,7 @@ describe('owners check', () => {
           const checkRun = await ownersCheck.run();
 
           expect(checkRun.summary).toEqual(
-            'All files in this PR have OWNERS approval.'
+            'All files in this PR have OWNERS approval'
           );
         });
 

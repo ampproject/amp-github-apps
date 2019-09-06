@@ -113,7 +113,7 @@ class OwnersCheck {
 
       if (passing) {
         return new CheckRun(
-          'All files in this PR have OWNERS approval.',
+          'All files in this PR have OWNERS approval',
           coverageText
         );
       }
