@@ -20,7 +20,6 @@ const owners = require('..');
 const {Probot} = require('probot');
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {OwnersCheck} = require('../src/owners_check');
 const {OwnersRule, OwnersParser} = require('../src/owners');
 
 const opened35 = require('./fixtures/actions/opened.35');
