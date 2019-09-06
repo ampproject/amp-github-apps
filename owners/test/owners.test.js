@@ -221,14 +221,14 @@ describe('owners tree', () => {
       expect(tree.toString()).toEqual(
         [
           'ROOT',
-          '- root',
-          '└---foo',
-          '- child',
-          '    └---bar',
-          '        └---baz',
-          '        - descendant',
-          '└---biz',
-          '- child',
+          ' * root',
+          '└───foo',
+          ' * child',
+          '    └───bar',
+          '        └───baz',
+          '         * descendant',
+          '└───biz',
+          ' * child',
         ].join('\n')
       );
     });
