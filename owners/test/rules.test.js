@@ -104,9 +104,9 @@ describe('owners rules', () => {
           'bar/main.js'
         );
 
-        expect(
-          new PatternOwnersRule('OWNERS.yaml', [], '*.css')
-        ).toMatchFile('foo/bar/baz/style.css');
+        expect(new PatternOwnersRule('OWNERS.yaml', [], '*.css')).toMatchFile(
+          'foo/bar/baz/style.css'
+        );
       });
     });
 
