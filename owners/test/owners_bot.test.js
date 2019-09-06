@@ -18,7 +18,11 @@ const sinon = require('sinon');
 const {GitHub, PullRequest} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersBot} = require('../src/owners_bot');
-const {CheckRun, OwnersCheck} = require('../src/owners_check');
+const {
+  CheckRun,
+  CheckRunConclusion,
+  OwnersCheck,
+} = require('../src/owners_check');
 
 describe.only('owners bot', () => {
   let sandbox;
@@ -37,7 +41,11 @@ describe.only('owners bot', () => {
   });
 
   describe('runOwnersCheck', () => {
-    const checkRun = new CheckRun('Success!', 'The owners check passed.');
+    const checkRun = new CheckRun(
+      CheckRunConclusion.SUCCESS,
+      'Success!',
+      'The owners check passed.'
+    );
     let getCheckRunIdStub;
 
     beforeEach(() => {

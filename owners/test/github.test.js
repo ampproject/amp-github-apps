@@ -18,7 +18,7 @@ const nock = require('nock');
 const sinon = require('sinon');
 const {Probot} = require('probot');
 const owners = require('..');
-const {CheckRun} = require('../src/owners_check');
+const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
 const {GitHub, PullRequest, Review} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
@@ -206,7 +206,7 @@ describe('GitHub API', () => {
       await withContext(async (context, github) => {
         await github.createCheckRun(
           '_test_hash_',
-          new CheckRun('Test summary', 'Test text')
+          new CheckRun(CheckRunConclusion.NEUTRAL, 'Test summary', 'Test text')
         );
       })();
     });
@@ -288,7 +288,7 @@ describe('GitHub API', () => {
       await withContext(async (context, github) => {
         await github.updateCheckRun(
           1337,
-          new CheckRun('Test summary', 'Test text')
+          new CheckRun(CheckRunConclusion.NEUTRAL, 'Test summary', 'Test text')
         );
       })();
     });

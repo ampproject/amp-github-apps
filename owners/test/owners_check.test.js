@@ -17,14 +17,22 @@
 const sinon = require('sinon');
 const {PullRequest, Review} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
-const {CheckRun, OwnersCheck} = require('../src/owners_check');
+const {
+  CheckRun,
+  CheckRunConclusion,
+  OwnersCheck,
+} = require('../src/owners_check');
 const {OwnersRule, OwnersTree} = require('../src/owners');
 const {ReviewerSelection} = require('../src/reviewer_selection');
 
 describe('check run', () => {
   describe('json', () => {
     it('produces a JSON object in the GitHub API format', () => {
-      const checkRun = new CheckRun('Test summary', 'Test text');
+      const checkRun = new CheckRun(
+        CheckRunConclusion.NEUTRAL,
+        'Test summary',
+        'Test text'
+      );
       const checkRunJson = checkRun.json;
 
       expect(checkRunJson.name).toEqual('ampproject/owners-check');
@@ -175,11 +183,10 @@ describe('owners check', () => {
           sandbox.stub(OwnersTree.prototype, 'fileHasOwner').returns(true);
         });
 
-        // TODO(rcebulko): Update once this is changed to a blocking check.
-        it('has a neutral conclusion', async () => {
+        it('has a success conclusion', async () => {
           const checkRun = await ownersCheck.run();
 
-          expect(checkRun.json.conclusion).toEqual('neutral');
+          expect(checkRun.json.conclusion).toEqual('success');
         });
 
         it('has a passing summary', async () => {

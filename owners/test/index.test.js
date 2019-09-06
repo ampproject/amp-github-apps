@@ -402,7 +402,7 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              conclusion: 'neutral',
+              conclusion: 'success',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'All files in this PR have OWNERS approval',
@@ -454,7 +454,7 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened36.pull_request.head.sha,
               status: 'completed',
-              conclusion: 'neutral',
+              conclusion: 'success',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'All files in this PR have OWNERS approval',
@@ -511,7 +511,7 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              conclusion: 'neutral',
+              conclusion: 'success',
               output: {
                 title: 'ampproject/owners-check',
                 summary: 'All files in this PR have OWNERS approval',

@@ -20,6 +20,12 @@ const {ReviewerSelection} = require('./reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
 
+const CheckRunConclusion = {
+  SUCCESS: 'success',
+  FAILURE: 'failure',
+  NEUTRAL: 'neutral',
+};
+
 /**
  * A GitHub presubmit check-run.
  */
@@ -27,11 +33,12 @@ class CheckRun {
   /**
    * Constructor.
    *
+   * @param {!CheckRunConclusion} conclusion result of the check-run.
    * @param {!string} summary check-run summary text to show in PR.
    * @param {!string} text description of check-run results.
    */
-  constructor(summary, text) {
-    Object.assign(this, {summary, text});
+  constructor(conclusion, summary, text) {
+    Object.assign(this, {conclusion, summary, text});
   }
 
   /**
@@ -43,7 +50,7 @@ class CheckRun {
     return {
       name: GITHUB_CHECKRUN_NAME,
       status: 'completed',
-      conclusion: 'neutral',
+      conclusion: this.conclusion,
       completed_at: new Date(),
       output: {
         title: GITHUB_CHECKRUN_NAME,
@@ -113,6 +120,7 @@ class OwnersCheck {
 
       if (passing) {
         return new CheckRun(
+          CheckRunConclusion.SUCCESS,
           'All files in this PR have OWNERS approval',
           coverageText
         );
@@ -126,12 +134,14 @@ class OwnersCheck {
         reviewSuggestions
       );
       return new CheckRun(
+        CheckRunConclusion.NEUTRAL,
         `Missing required OWNERS approvals! Suggested reviewers: ${reviewers}`,
         `${coverageText}\n\n${suggestionsText}`
       );
     } catch (error) {
       // If anything goes wrong, report a failing check.
       return new CheckRun(
+        CheckRunConclusion.NEUTRAL,
         'The check encountered an error!',
         'OWNERS check encountered an error:\n' + error
       );
@@ -225,4 +235,5 @@ class OwnersCheck {
 module.exports = {
   OwnersCheck,
   CheckRun,
+  CheckRunConclusion,
 };
