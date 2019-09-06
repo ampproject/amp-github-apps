@@ -119,11 +119,14 @@ class OwnersCheck {
       }
 
       const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
+      const reviewers = reviewSuggestions
+        .map(([reviewer, files]) => reviewer)
+        .join(', ');
       const suggestionsText = this.buildReviewSuggestionsText(
         reviewSuggestions
       );
       return new CheckRun(
-        'The check was a failure!',
+        `Missing required OWNERS approvals! Suggested reviewers: ${reviewers}`,
         `${coverageText}\n\n${suggestionsText}`
       );
     } catch (error) {
