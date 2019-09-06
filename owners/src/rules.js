@@ -88,8 +88,6 @@ class PatternOwnersRule extends OwnersRule {
         .split('*')
         .map(PatternOwnersRule.escapeRegexChars)
         .join('.*?')
-        .split(/\s*,\s*/)
-        .join('|')
     );
   }
 

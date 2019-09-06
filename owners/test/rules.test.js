@@ -62,7 +62,6 @@ describe('owners rules', () => {
       it.each([
         ['file.txt', /file\.txt/],
         ['package*.json', /package.*?\.json/],
-        ['*.css, *.js', /.*?\.css|.*?\.js/],
       ])(
         'converts the pattern "%p" into regex "%p"',
         (pattern, expectedRegex) => {
@@ -76,7 +75,6 @@ describe('owners rules', () => {
       it.each([
         ['file.txt', 'file\\.txt'],
         ['this+that.txt', 'this\\+that\\.txt'],
-        ['*.css, *.js', '\\*\\.css, \\*\\.js'],
         ['with space.txt', 'with space\\.txt'],
         ['with-hyphen.txt', 'with-hyphen\\.txt'],
       ])('escapes "%p" as "%p"', (text, expected) => {
@@ -97,13 +95,6 @@ describe('owners rules', () => {
         expect(rule).toMatchFile('main.js');
       });
 
-      it('matches comma-separated patterns', () => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.js, *.css');
-
-        expect(rule).toMatchFile('main.js');
-        expect(rule).toMatchFile('style.css');
-      });
-
       it('matches files in subdirectories', () => {
         expect(
           new PatternOwnersRule('OWNERS.yaml', [], 'package.json')
@@ -114,10 +105,7 @@ describe('owners rules', () => {
         );
 
         expect(
-          new PatternOwnersRule('OWNERS.yaml', [], '*.js, *.css')
-        ).toMatchFile('foo/baz/main.js');
-        expect(
-          new PatternOwnersRule('OWNERS.yaml', [], '*.js, *.css')
+          new PatternOwnersRule('OWNERS.yaml', [], '*.css')
         ).toMatchFile('foo/bar/baz/style.css');
       });
     });
@@ -127,10 +115,10 @@ describe('owners rules', () => {
         const rule = new PatternOwnersRule(
           'OWNERS.yaml',
           ['rcebulko', 'erwinmombay'],
-          '*.js, *.css'
+          '*.css'
         );
 
-        expect(rule.toString()).toEqual('*.js, *.css: rcebulko, erwinmombay');
+        expect(rule.toString()).toEqual('*.css: rcebulko, erwinmombay');
       });
     });
   });
