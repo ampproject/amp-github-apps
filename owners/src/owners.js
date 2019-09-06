@@ -226,6 +226,55 @@ class OwnersRule {
 }
 
 /**
+ * A pattern-based ownership rule applying to all matching files in the
+ * directory and all subdirectories.
+ *
+ * Treats `*` as a wildcard glob pattern; all other characters are treated as
+ * literals.
+ */
+class PatternOwnersRule extends OwnersRule {
+  /**
+   * Constructor.
+   *
+   * @param {!string} ownersPath path to OWNERS file.
+   * @param {string[]} owners list of GitHub usernames of owners.
+   * @param {!string} pattern filename/type pattern.
+   */
+  constructor(ownersPath, owners, pattern) {
+    super(ownersPath, owners);
+    this.pattern = pattern;
+    this.regex = new RegExp(
+      pattern
+        .split('*')
+        .map(PatternOwnersRule.escapeRegexChars)
+        .join('.*?')
+        .split(/\s*,\s*/)
+        .join('|')
+    );
+  }
+
+  /**
+   * Escapes all regex characters in a string.
+   *
+   * @param {!string} str string to escape.
+   * @return {string} copy of the string that can be used in a regex.
+   */
+  static escapeRegexChars(str) {
+    return str.replace(/[[\]{}()*+?.\\^$|]/g, '\\$&');
+  }
+
+  /**
+   * Test if a file is matched by the pattern rule.
+   *
+   * @param {!string} filePath relative path in repo to the file being checked.
+   * @return {boolean} true if the rule applies to the file.
+   */
+  matchesFile(filePath) {
+    return this.regex.test(path.basename(filePath));
+  }
+}
+
+/**
  * Parser for OWNERS.yaml files.
  */
 class OwnersParser {
@@ -291,4 +340,4 @@ class OwnersParser {
   }
 }
 
-module.exports = {OwnersParser, OwnersRule, OwnersTree};
+module.exports = {OwnersParser, OwnersRule, PatternOwnersRule, OwnersTree};
