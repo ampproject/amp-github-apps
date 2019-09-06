@@ -16,6 +16,7 @@
 
 const path = require('path');
 const yaml = require('yamljs');
+const {OwnersRule} = require('./rules.js');
 
 /**
  * A tree of ownership keyed by directory.
@@ -174,9 +175,7 @@ class OwnersTree {
 
     lines.push(`${prefix}${dirName}`);
     this.rules.forEach(rule => {
-      lines.push(
-        `${' '.repeat(indent)}${rulePrefix} ${rule}`
-      );
+      lines.push(`${' '.repeat(indent)}${rulePrefix} ${rule}`);
     });
 
     /* eslint-disable-next-line guard-for-in */
@@ -185,104 +184,6 @@ class OwnersTree {
     }
 
     return lines.join('\n');
-  }
-}
-
-/**
- * A rule describing ownership for a directory.
- */
-class OwnersRule {
-  /**
-   * Constructor.
-   *
-   * If a rule's owners includes the `*` wildcard, all other owners will be
-   * ignored, and the rule will be satisfied by any reviewer.
-   *
-   * @param {!string} ownersPath path to OWNERS file.
-   * @param {string[]} owners list of GitHub usernames of owners.
-   */
-  constructor(ownersPath, owners) {
-    this.filePath = ownersPath;
-    this.dirPath = path.dirname(ownersPath);
-    this.wildcardOwner = owners.includes('*');
-    this.owners = this.wildcardOwner ? ['*'] : owners;
-    this.label = 'All';
-  }
-
-  /**
-   * Test if a file is matched by the rule.
-   *
-   * Currently is always true, as it assumes that the rule is being tested on;
-   * files within its hierarchy; may be modified to test filetypes, globs,
-   * special cases like package.json, etc.
-   *
-   * TODO(Issue #278): Implement pattern matching.
-   *
-   * @param {!string} filePath relative path in repo to the file being checked.
-   * @return {boolean} true if the rule applies to the file.
-   */
-  matchesFile(filePath) {
-    return true;
-  }
-
-  /**
-   * Describe the rule.
-   *
-   * @return {string} description of the rule.
-   */
-  toString() {
-    const ownersList = this.owners.length ? this.owners.join(', ') : '-';
-    return `${this.label}: ${ownersList}`;
-  }
-}
-
-/**
- * A pattern-based ownership rule applying to all matching files in the
- * directory and all subdirectories.
- *
- * Treats `*` as a wildcard glob pattern; all other characters are treated as
- * literals.
- */
-class PatternOwnersRule extends OwnersRule {
-  /**
-   * Constructor.
-   *
-   * @param {!string} ownersPath path to OWNERS file.
-   * @param {string[]} owners list of GitHub usernames of owners.
-   * @param {!string} pattern filename/type pattern.
-   */
-  constructor(ownersPath, owners, pattern) {
-    super(ownersPath, owners);
-    this.pattern = pattern;
-    this.label = pattern;
-    this.regex = new RegExp(
-      pattern
-        .split('*')
-        .map(PatternOwnersRule.escapeRegexChars)
-        .join('.*?')
-        .split(/\s*,\s*/)
-        .join('|')
-    );
-  }
-
-  /**
-   * Escapes all regex characters in a string.
-   *
-   * @param {!string} str string to escape.
-   * @return {string} copy of the string that can be used in a regex.
-   */
-  static escapeRegexChars(str) {
-    return str.replace(/[[\]{}()*+?.\\^$|]/g, '\\$&');
-  }
-
-  /**
-   * Test if a file is matched by the pattern rule.
-   *
-   * @param {!string} filePath relative path in repo to the file being checked.
-   * @return {boolean} true if the rule applies to the file.
-   */
-  matchesFile(filePath) {
-    return this.regex.test(path.basename(filePath));
   }
 }
 
@@ -352,4 +253,4 @@ class OwnersParser {
   }
 }
 
-module.exports = {OwnersParser, OwnersRule, PatternOwnersRule, OwnersTree};
+module.exports = {OwnersParser, OwnersTree};

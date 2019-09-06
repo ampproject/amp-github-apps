@@ -16,12 +16,8 @@
 
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {
-  OwnersParser,
-  OwnersRule,
-  PatternOwnersRule,
-  OwnersTree,
-} = require('../src/owners');
+const {OwnersParser, OwnersTree} = require('../src/owners');
+const {OwnersRule} = require('../src/rules');
 
 describe('owners tree', () => {
   let tree;
@@ -242,140 +238,6 @@ describe('owners tree', () => {
           ' * All: child',
         ].join('\n')
       );
-    });
-  });
-});
-
-describe('owners rules', () => {
-  expect.extend({
-    toMatchFile(rule, filePath) {
-      const matches = rule.matchesFile(filePath);
-      const matchStr = this.isNot ? 'not match' : 'match';
-
-      return {
-        pass: matches,
-        message: () =>
-          `Expected rules in '${rule.filePath}' to ` +
-          `${matchStr} file '${filePath}'.`,
-      };
-    },
-  });
-
-  describe('with a wildcard (*) owner', () => {
-    it('sets the wildcardOwner flag', () => {
-      const rule = new OwnersRule('OWNERS.yaml', ['*']);
-
-      expect(rule.wildcardOwner).toBe(true);
-    });
-
-    it('ignores any other owners', () => {
-      const rule = new OwnersRule('OWNERS.yaml', ['a_user', '*', 'someone']);
-
-      expect(rule.owners).toEqual(['*']);
-    });
-  });
-
-  describe('basic directory ownership', () => {
-    describe('matchesFile', () => {
-      it('matches all files', () => {
-        const rule = new OwnersRule('src/OWNERS.yaml', []);
-
-        expect(rule).toMatchFile('src/foo.txt');
-        expect(rule).toMatchFile('src/foo/bar.txt');
-        expect(rule).toMatchFile('src/foo/bar/baz.txt');
-      });
-    });
-
-    describe('toString', () => {
-      it('lists all owners', () => {
-        const rule = new OwnersRule('OWNERS.yaml', ['rcebulko', 'erwinmombay']);
-
-        expect(rule.toString()).toEqual('All: rcebulko, erwinmombay');
-      });
-
-      it('shows when there are no owners', () => {
-        const rule = new OwnersRule('OWNERS.yaml', []);
-        
-        expect(rule.toString()).toEqual('All: -');
-      });
-    });
-  });
-
-  describe('with glob patterns', () => {
-    describe('constructor', () => {
-      it.each([
-        ['file.txt', /file\.txt/],
-        ['package*.json', /package.*?\.json/],
-        ['*.css, *.js', /.*?\.css|.*?\.js/],
-      ])(
-        'converts the pattern "%p" into regex "%p"',
-        (pattern, expectedRegex) => {
-          const rule = new PatternOwnersRule('OWNERS.yaml', [], pattern);
-          expect(rule.regex).toEqual(expectedRegex);
-        }
-      );
-    });
-
-    describe('regexEscape', () => {
-      it.each([
-        ['file.txt', 'file\\.txt'],
-        ['this+that.txt', 'this\\+that\\.txt'],
-        ['*.css, *.js', '\\*\\.css, \\*\\.js'],
-        ['with space.txt', 'with space\\.txt'],
-        ['with-hyphen.txt', 'with-hyphen\\.txt'],
-      ])('escapes "%p" as "%p"', (text, expected) => {
-        expect(PatternOwnersRule.escapeRegexChars(text)).toEqual(expected);
-      });
-    });
-
-    describe('matchesFile', () => {
-      it('matches literal filenames', () => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], 'package.json');
-
-        expect(rule).toMatchFile('package.json');
-      });
-
-      it('matches glob patterns', () => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.js');
-
-        expect(rule).toMatchFile('main.js');
-      });
-
-      it('matches comma-separated patterns', () => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.js, *.css');
-
-        expect(rule).toMatchFile('main.js');
-        expect(rule).toMatchFile('style.css');
-      });
-
-      it('matches files in subdirectories', () => {
-        expect(
-          new PatternOwnersRule('OWNERS.yaml', [], 'package.json')
-        ).toMatchFile('foo/package.json');
-
-        expect(new PatternOwnersRule('OWNERS.yaml', [], '*.js')).toMatchFile(
-          'bar/main.js'
-        );
-
-        expect(
-          new PatternOwnersRule('OWNERS.yaml', [], '*.js, *.css')
-        ).toMatchFile('foo/baz/main.js');
-        expect(
-          new PatternOwnersRule('OWNERS.yaml', [], '*.js, *.css')
-        ).toMatchFile('foo/bar/baz/style.css');
-      });
-    });
-
-    describe('toString', () => {
-      it('lists all owners for the pattern', () => {
-        const rule = new PatternOwnersRule(
-          'OWNERS.yaml',
-          ['rcebulko', 'erwinmombay'],
-          '*.js, *.css',
-        );
-
-        expect(rule.toString()).toEqual('*.js, *.css: rcebulko, erwinmombay');
-      });
     });
   });
 });
