@@ -175,6 +175,13 @@ describe('owners check', () => {
           sandbox.stub(OwnersTree.prototype, 'fileHasOwner').returns(true);
         });
 
+        // TODO(rcebulko): Update once this is changed to a blocking check.
+        it('has a neutral conclusion', async () => {
+          const checkRun = await ownersCheck.run();
+
+          expect(checkRun.json.conclusion).toEqual('neutral');
+        });
+
         it('has a passing summary', async () => {
           const checkRun = await ownersCheck.run();
 
@@ -197,6 +204,13 @@ describe('owners check', () => {
       });
 
       describe('for a PR requiring approvals', () => {
+        // TODO(rcebulko): Update once this is changed to a blocking check.
+        it('has a neutral conclusion', async () => {
+          const checkRun = await ownersCheck.run();
+
+          expect(checkRun.json.conclusion).toEqual('neutral');
+        });
+
         it('has a failing summary', async () => {
           const checkRun = await ownersCheck.run();
 
@@ -217,6 +231,35 @@ describe('owners check', () => {
           const checkRun = await ownersCheck.run();
 
           expect(checkRun.text).toContain('%% REVIEW SUGGESTIONS %%');
+        });
+      });
+
+      describe('if an error occurs', () => {
+        beforeEach(() => {
+          sandbox
+            .stub(OwnersCheck.prototype, 'buildCurrentCoverageText')
+            .throws(new Error('Something is wrong'));
+        });
+
+        // TODO(rcebulko): Update once this is changed to a blocking check.
+        it('has a neutral conclusion', async () => {
+          const checkRun = await ownersCheck.run();
+
+          expect(checkRun.json.conclusion).toEqual('neutral');
+        });
+
+        it('has an error summary', async () => {
+          const checkRun = await ownersCheck.run();
+
+          expect(checkRun.summary).toEqual('The check encountered an error!');
+        });
+
+        it('contains error details in the output', async () => {
+          const checkRun = await ownersCheck.run();
+
+          expect(checkRun.text).toEqual(
+            'OWNERS check encountered an error:\nError: Something is wrong'
+          );
         });
       });
     });

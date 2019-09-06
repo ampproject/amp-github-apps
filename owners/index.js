@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-const sleep = require('sleep-promise');
+const Octokit = require('@octokit/rest');
 const {GitHub, PullRequest} = require('./src/github');
 const {LocalRepository} = require('./src/local_repo');
-const {CheckRun, OwnersCheck} = require('./src/owners_check');
+const {OwnersBot} = require('./src/owners_bot');
+const {OwnersParser} = require('./src/owners');
+const {OwnersCheck} = require('./src/owners_check');
 
-const GITHUB_CHECKRUN_DELAY = 2000;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_REPO_OWNER = process.env.GITHUB_REPO_OWNER || 'ampproject';
+const GITHUB_REPO_NAME = process.env.GITHUB_REPO_NAME || 'amphtml';
 
 module.exports = app => {
-  app.on(['pull_request.opened', 'pull_request.synchronize'], onPullRequest);
-  app.on('check_run.rerequested', onCheckRunRerequest);
-  app.on('pull_request_review.submitted', onPullRequestReview);
+  const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
+  const ownersBot = new OwnersBot(localRepo);
+  const adminRouter = app.route('/admin');
 
   // Probot does not stream properly to GCE logs so we need to hook into
   // bunyan explicitly and stream it to process.stdout.
@@ -34,85 +38,66 @@ module.exports = app => {
     level: process.env.LOG_LEVEL || 'info',
   });
 
-  /**
-   * Runs the steps to create or update an owners-bot check-run on a GitHub Pull
-   * Request.
-   *
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!PullRequest} pr pull request to run owners check on.
-   */
-  async function runOwnersCheck(github, pr) {
-    const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
+  /** Health check server endpoints **/
+  // TODO(rcebulko): Implement GitHub authentication to prevent spamming any of
+  // these endpoints.
+  adminRouter.get('/status', (req, res) => {
+    res.send(
+      [
+        'The OWNERS bot is live and running!'`Project: ${process.env
+          .GOOGLE_CLOUD_PROJECT || 'UNKNOWN'}``Version: ${process.env
+          .GAE_VERSION || 'UNKNOWN'}`,
+      ].join('<br>')
+    );
+  });
+
+  adminRouter.get('/tree', async (req, res) => {
+    const parser = new OwnersParser(localRepo, req.log);
+    const ownersTree = await parser.parseOwnersTree();
+
+    res.send(`<pre>${ownersTree.toString()}</pre>`);
+  });
+
+  adminRouter.get('/check/:prNumber', async (req, res) => {
+    const octokit = new Octokit({auth: `token ${GITHUB_TOKEN}`});
+    const github = new GitHub(
+      octokit,
+      GITHUB_REPO_OWNER,
+      GITHUB_REPO_NAME,
+      app.log
+    );
+    const pr = await github.getPullRequest(req.params.prNumber);
     const ownersCheck = new OwnersCheck(localRepo, github, pr);
-    let checkRunId;
-    let latestCheckRun;
+    const checkRun = await ownersCheck.run();
 
-    try {
-      checkRunId = await github.getCheckRunId(pr.headSha);
-      latestCheckRun = await ownersCheck.run();
-    } catch (error) {
-      // If anything goes wrong, report a failing check.
-      latestCheckRun = new CheckRun(
-        'The check encountered an error!',
-        'OWNERS check encountered an error:\n' + error
-      );
-    }
+    res.send(checkRun.json);
+  });
 
-    if (checkRunId) {
-      await github.updateCheckRun(checkRunId, latestCheckRun);
-    } else {
-      // We need to add a delay on the PR creation and check creation since
-      // GitHub might not be ready.
-      // TODO: Verify this is still needed.
-      await sleep(GITHUB_CHECKRUN_DELAY);
-      await github.createCheckRun(pr.headSha, latestCheckRun);
-    }
-  }
+  /** Probot request handlers **/
+  app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
+    await ownersBot.runOwnersCheck(
+      GitHub.fromContext(context),
+      PullRequest.fromGitHubResponse(context.payload.pull_request)
+    );
+  });
 
-  /**
-   * Runs the steps to create or update an owners-bot check-run on a GitHub Pull
-   * Request.
-   *
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!number} prNumber pull request number.
-   */
-  async function runOwnersCheckOnPrNumber(github, prNumber) {
-    const pr = await github.getPullRequest(prNumber);
-    await runOwnersCheck(github, pr);
-  }
-
-  /**
-   * Probot handler for newly opened pull request.
-   *
-   * @param {!Context} context Probot request context.
-   */
-  async function onPullRequest(context) {
-    const pr = PullRequest.fromGitHubResponse(context.payload.pull_request);
-
-    await runOwnersCheck(GitHub.fromContext(context), pr);
-  }
-
-  /**
-   * Probot handler for check-run re-requests.
-   *
-   * @param {!Context} context Probot request context.
-   */
-  async function onCheckRunRerequest(context) {
+  app.on('check_run.rerequested', async context => {
     const payload = context.payload;
     const prNumber = payload.check_run.check_suite.pull_requests[0].number;
 
-    await runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
-  }
+    await ownersBot.runOwnersCheckOnPrNumber(
+      GitHub.fromContext(context),
+      prNumber
+    );
+  });
 
-  /**
-   * Probot handler for after a PR review is submitted.
-   *
-   * @param {!Context} context Probot request context.
-   */
-  async function onPullRequestReview(context) {
+  app.on('pull_request_review.submitted', async context => {
     const payload = context.payload;
     const prNumber = payload.pull_request.number;
 
-    await runOwnersCheckOnPrNumber(GitHub.fromContext(context), prNumber);
-  }
+    await ownersBot.runOwnersCheckOnPrNumber(
+      GitHub.fromContext(context),
+      prNumber
+    );
+  });
 };
