@@ -60,9 +60,11 @@ class ReviewerSelection {
   static _reviewersForTrees(trees) {
     const reviewers = new Set();
     trees.forEach(tree => {
-      tree.rules.forEach(rule => {
-        rule.owners.forEach(owner => reviewers.add(owner));
-      });
+      tree.rules
+        .filter(rule => !rule.wildcardOwner)
+        .forEach(rule => {
+          rule.owners.forEach(owner => reviewers.add(owner));
+        });
     });
     return Array.from(reviewers);
   }

@@ -137,7 +137,9 @@ class OwnersTree {
   fileHasOwner(filename, username) {
     const allRules = this.atPath(filename).allRules;
     const fileRules = allRules.filter(rule => rule.matchesFile(filename));
-    return fileRules.some(rule => rule.owners.includes(username));
+    return fileRules.some(
+      rule => rule.wildcardOwner || rule.owners.includes(username)
+    );
   }
 
   /**
@@ -193,13 +195,17 @@ class OwnersRule {
   /**
    * Constructor.
    *
+   * If a rule's owners includes the `*` wildcard, all other owners will be
+   * ignored, and the rule will be satisfied by any reviewer.
+   *
    * @param {!string} ownersPath path to OWNERS file.
    * @param {string[]} owners list of GitHub usernames of owners.
    */
   constructor(ownersPath, owners) {
     this.filePath = ownersPath;
     this.dirPath = path.dirname(ownersPath);
-    this.owners = owners;
+    this.wildcardOwner = owners.includes('*');
+    this.owners = this.wildcardOwner ? ['*'] : owners;
   }
 
   /**
