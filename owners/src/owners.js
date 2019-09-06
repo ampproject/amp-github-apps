@@ -175,7 +175,7 @@ class OwnersTree {
     lines.push(`${prefix}${dirName}`);
     this.rules.forEach(rule => {
       lines.push(
-        `${' '.repeat(indent)}${rulePrefix} ${rule.owners.join(', ')}`
+        `${' '.repeat(indent)}${rulePrefix} ${rule}`
       );
     });
 
@@ -206,6 +206,7 @@ class OwnersRule {
     this.dirPath = path.dirname(ownersPath);
     this.wildcardOwner = owners.includes('*');
     this.owners = this.wildcardOwner ? ['*'] : owners;
+    this.label = 'All';
   }
 
   /**
@@ -222,6 +223,16 @@ class OwnersRule {
    */
   matchesFile(filePath) {
     return true;
+  }
+
+  /**
+   * Describe the rule.
+   *
+   * @return {string} description of the rule.
+   */
+  toString() {
+    const ownersList = this.owners.length ? this.owners.join(', ') : '-';
+    return `${this.label}: ${ownersList}`;
   }
 }
 
@@ -243,6 +254,7 @@ class PatternOwnersRule extends OwnersRule {
   constructor(ownersPath, owners, pattern) {
     super(ownersPath, owners);
     this.pattern = pattern;
+    this.label = pattern;
     this.regex = new RegExp(
       pattern
         .split('*')

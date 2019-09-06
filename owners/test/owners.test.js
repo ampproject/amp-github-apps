@@ -232,14 +232,14 @@ describe('owners tree', () => {
       expect(tree.toString()).toEqual(
         [
           'ROOT',
-          ' * root',
+          ' * All: root',
           '└───foo',
-          ' * child',
+          ' * All: child',
           '    └───bar',
           '        └───baz',
-          '         * descendant',
+          '         * All: descendant',
           '└───biz',
-          ' * child',
+          ' * All: child',
         ].join('\n')
       );
     });
@@ -283,6 +283,20 @@ describe('owners rules', () => {
         expect(rule).toMatchFile('src/foo.txt');
         expect(rule).toMatchFile('src/foo/bar.txt');
         expect(rule).toMatchFile('src/foo/bar/baz.txt');
+      });
+    });
+
+    describe('toString', () => {
+      it('lists all owners', () => {
+        const rule = new OwnersRule('OWNERS.yaml', ['rcebulko', 'erwinmombay']);
+
+        expect(rule.toString()).toEqual('All: rcebulko, erwinmombay');
+      });
+
+      it('shows when there are no owners', () => {
+        const rule = new OwnersRule('OWNERS.yaml', []);
+        
+        expect(rule.toString()).toEqual('All: -');
       });
     });
   });
@@ -349,6 +363,18 @@ describe('owners rules', () => {
         expect(
           new PatternOwnersRule('OWNERS.yaml', [], '*.js, *.css')
         ).toMatchFile('foo/bar/baz/style.css');
+      });
+    });
+
+    describe('toString', () => {
+      it('lists all owners for the pattern', () => {
+        const rule = new PatternOwnersRule(
+          'OWNERS.yaml',
+          ['rcebulko', 'erwinmombay'],
+          '*.js, *.css',
+        );
+
+        expect(rule.toString()).toEqual('*.js, *.css: rcebulko, erwinmombay');
       });
     });
   });
