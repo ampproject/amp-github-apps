@@ -42,11 +42,13 @@ module.exports = app => {
   // TODO(rcebulko): Implement GitHub authentication to prevent spamming any of
   // these endpoints.
   adminRouter.get('/status', (req, res) => {
-    res.send([
-      'The OWNERS bot is live and running!'
-      `Project: ${process.env.GOOGLE_CLOUD_PROJECT || 'UNKNOWN'}`
-      `Version: ${process.env.GAE_VERSION || 'UNKNOWN'}`
-    ].join('<br>'));
+    res.send(
+      [
+        'The OWNERS bot is live and running!'`Project: ${process.env
+          .GOOGLE_CLOUD_PROJECT || 'UNKNOWN'}``Version: ${process.env
+          .GAE_VERSION || 'UNKNOWN'}`,
+      ].join('<br>')
+    );
   });
 
   adminRouter.get('/tree', async (req, res) => {
@@ -58,7 +60,12 @@ module.exports = app => {
 
   adminRouter.get('/check/:prNumber', async (req, res) => {
     const octokit = new Octokit({auth: `token ${GITHUB_TOKEN}`});
-    const github = new GitHub(octokit, GITHUB_REPO_OWNER, GITHUB_REPO_NAME, app.log);
+    const github = new GitHub(
+      octokit,
+      GITHUB_REPO_OWNER,
+      GITHUB_REPO_NAME,
+      app.log
+    );
     const pr = await github.getPullRequest(req.params.prNumber);
     const ownersCheck = new OwnersCheck(localRepo, github, pr);
     const checkRun = await ownersCheck.run();
