@@ -185,7 +185,9 @@ describe('owners check', () => {
         it('has a passing summary', async () => {
           const checkRun = await ownersCheck.run();
 
-          expect(checkRun.summary).toEqual('The check was a success!');
+          expect(checkRun.summary).toEqual(
+            'All files in this PR have OWNERS approval'
+          );
         });
 
         it('does not run reviewer selection', async () => {
@@ -214,7 +216,9 @@ describe('owners check', () => {
         it('has a failing summary', async () => {
           const checkRun = await ownersCheck.run();
 
-          expect(checkRun.summary).toEqual('The check was a failure!');
+          expect(checkRun.summary).toEqual(
+            'Missing required OWNERS approvals! Suggested reviewers: root_owner'
+          );
         });
 
         it('runs reviewer selection', async () => {

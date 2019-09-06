@@ -108,7 +108,8 @@ describe('owners bot', () => {
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
-                summary: 'The check was a failure!',
+                summary:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
             });
             expect(body.output.text).toContain(
@@ -167,7 +168,8 @@ describe('owners bot', () => {
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
-                summary: 'The check was a failure!',
+                summary:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
             });
             expect(body.output.text).toContain(
@@ -222,7 +224,8 @@ describe('owners bot', () => {
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
-                summary: 'The check was a failure!',
+                summary:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
             });
             expect(body.output.text).toContain(
@@ -275,7 +278,8 @@ describe('owners bot', () => {
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
-                summary: 'The check was a failure!',
+                summary:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
             });
             expect(body.output.text).toContain(
@@ -341,7 +345,8 @@ describe('owners bot', () => {
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
-                summary: 'The check was a failure!',
+                summary:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
             });
             expect(body.output.text).toContain(
@@ -400,7 +405,7 @@ describe('owners bot', () => {
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
-                summary: 'The check was a success!',
+                summary: 'All files in this PR have OWNERS approval',
               },
             });
             expect(body.output.text).toContain(
@@ -452,7 +457,7 @@ describe('owners bot', () => {
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
-                summary: 'The check was a success!',
+                summary: 'All files in this PR have OWNERS approval',
               },
             });
             expect(body.output.text).toContain(
@@ -509,7 +514,7 @@ describe('owners bot', () => {
               conclusion: 'neutral',
               output: {
                 title: 'ampproject/owners-check',
-                summary: 'The check was a success!',
+                summary: 'All files in this PR have OWNERS approval',
               },
             });
             expect(body.output.text).toContain(
