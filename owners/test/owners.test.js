@@ -241,15 +241,15 @@ describe('owners tree', () => {
       expect(tree.toString()).toEqual(
         [
           'ROOT',
-          ' • All: root',
+          ' • All files: root',
           ' • *.test.js: testers',
           '└───foo',
-          ' • All: child',
+          ' • All files: child',
           '    └───bar',
           '        └───baz',
-          '         • All: descendant',
+          '         • All files: descendant',
           '└───biz',
-          ' • All: child',
+          ' • All files: child',
         ].join('\n')
       );
     });

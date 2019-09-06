@@ -42,11 +42,19 @@ describe('owners rules', () => {
       });
     });
 
+    describe('label', () => {
+      it('is "All files"', () => {
+        const rule = new OwnersRule('OWNERS.yaml', []);
+
+        expect(rule.label).toEqual('All files');
+      });
+    });
+
     describe('toString', () => {
       it('lists all owners', () => {
         const rule = new OwnersRule('OWNERS.yaml', ['rcebulko', 'erwinmombay']);
 
-        expect(rule.toString()).toEqual('All: rcebulko, erwinmombay');
+        expect(rule.toString()).toEqual('All files: rcebulko, erwinmombay');
       });
     });
   });
@@ -110,6 +118,14 @@ describe('owners rules', () => {
         expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(
           filePath
         );
+      });
+    });
+
+    describe('label', () => {
+      it('is the pattern', () => {
+        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.css');
+
+        expect(rule.label).toEqual('*.css');
       });
     });
 

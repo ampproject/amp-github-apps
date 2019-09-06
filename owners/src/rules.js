@@ -34,7 +34,15 @@ class OwnersRule {
     this.dirPath = path.dirname(ownersPath);
     this.wildcardOwner = owners.includes('*');
     this.owners = this.wildcardOwner ? ['*'] : owners;
-    this.label = 'All';
+  }
+
+  /**
+   * The label to use when describing the rule.
+   *
+   * @return {string} the label for the rule.
+   */
+  get label() {
+    return 'All files';
   }
 
   /**
@@ -81,13 +89,21 @@ class PatternOwnersRule extends OwnersRule {
   constructor(ownersPath, owners, pattern) {
     super(ownersPath, owners);
     this.pattern = pattern;
-    this.label = pattern;
     this.regex = new RegExp(
       pattern
         .split('*')
         .map(PatternOwnersRule.escapeRegexChars)
         .join('.*?')
     );
+  }
+
+  /**
+   * The label to use when describing the rule.
+   *
+   * @return {string} the label for the rule.
+   */
+  get label() {
+    return this.pattern;
   }
 
   /**
