@@ -59,8 +59,7 @@ class OwnersRule {
    * @return {string} description of the rule.
    */
   toString() {
-    const ownersList = this.owners.length ? this.owners.join(', ') : '-';
-    return `${this.label}: ${ownersList}`;
+    return `${this.label}: ${this.owners.join(', ')}`;
   }
 }
 
