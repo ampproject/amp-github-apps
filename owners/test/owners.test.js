@@ -157,6 +157,7 @@ describe('owners tree', () => {
       tree.addRule(rootDirRule);
       tree.addRule(childDirRule);
       tree.addRule(descendantDirRule);
+      tree.addRule(new OwnersRule('shared/OWNERS.yaml', ['*']));
     });
 
     it('should be true for owners in the same directory', () => {
@@ -179,6 +180,11 @@ describe('owners tree', () => {
 
     it('should be false for non-existant owners', () => {
       expect(tree.fileHasOwner('foo/bar.txt', 'not_an_owner')).toBe(false);
+    });
+
+    it('should be true for files in directories with wildcard owners', () => {
+      expect(tree.fileHasOwner('shared/README.md', 'not_an_owner')).toBe(true);
+      expect(tree.fileHasOwner('shared/README.md', 'anyone')).toBe(true);
     });
   });
 
@@ -249,6 +255,20 @@ describe('owners rules', () => {
           `${matchStr} file '${filePath}'.`,
       };
     },
+  });
+
+  describe('with a wildcard (*) owner', () => {
+    it('sets the wildcardOwner flag', () => {
+      const rule = new OwnersRule('OWNERS.yaml', ['*']);
+
+      expect(rule.wildcardOwner).toBe(true);
+    });
+
+    it('ignores any other owners', () => {
+      const rule = new OwnersRule('OWNERS.yaml', ['a_user', '*', 'someone']);
+
+      expect(rule.owners).toEqual(['*']);
+    });
   });
 
   describe('basic directory ownership', () => {
