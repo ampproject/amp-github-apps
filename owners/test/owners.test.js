@@ -28,7 +28,11 @@ describe('owners tree', () => {
     'descendant',
   ]);
   const wildcardDirRule = new OwnersRule('shared/OWNERS.yaml', ['*']);
-  const testFileRule = new PatternOwnersRule('OWNERS.yaml', ['testers'], '*.test.js');
+  const testFileRule = new PatternOwnersRule(
+    'OWNERS.yaml',
+    ['testers'],
+    '*.test.js'
+  );
 
   beforeEach(() => {
     tree = new OwnersTree();
@@ -237,15 +241,15 @@ describe('owners tree', () => {
       expect(tree.toString()).toEqual(
         [
           'ROOT',
-          ' * All: root',
-          ' * *.test.js: testers',
+          ' • All: root',
+          ' • *.test.js: testers',
           '└───foo',
-          ' * All: child',
+          ' • All: child',
           '    └───bar',
           '        └───baz',
-          '         * All: descendant',
+          '         • All: descendant',
           '└───biz',
-          ' * All: child',
+          ' • All: child',
         ].join('\n')
       );
     });

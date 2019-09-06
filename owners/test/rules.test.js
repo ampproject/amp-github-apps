@@ -56,18 +56,14 @@ describe('owners rules', () => {
       it.each([
         ['file.txt', /file\.txt/],
         ['package*.json', /package.*?\.json/],
-      ])(
-        'converts the pattern %p into regex %p',
-        (pattern, expectedRegex) => {
-          const rule = new PatternOwnersRule('OWNERS.yaml', [], pattern);
-          expect(rule.regex).toEqual(expectedRegex);
-        }
-      );
+      ])('converts the pattern %p into regex %p', (pattern, expectedRegex) => {
+        const rule = new PatternOwnersRule('OWNERS.yaml', [], pattern);
+        expect(rule.regex).toEqual(expectedRegex);
+      });
     });
 
     describe('regexEscape', () => {
-      it.each([
-      ])('escapes %p as %p', (text, expected) => {
+      it.each([])('escapes %p as %p', (text, expected) => {
         expect(PatternOwnersRule.escapeRegexChars(text)).toEqual(expected);
       });
     });
@@ -90,24 +86,30 @@ describe('owners rules', () => {
         ['this+that.txt', 'this+that.txt'],
         ['with space.txt', 'with space.txt'],
         ['with-hyphen.txt', 'with-hyphen.txt'],
-        ])('simple file name %p matches file %p', (pattern, filePath) => {
-          expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(filePath);
-        });
+      ])('simple file name %p matches file %p', (pattern, filePath) => {
+        expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(
+          filePath
+        );
+      });
 
       it.each([
         ['*.txt', 'file.txt'],
         ['*.test.txt', 'file.test.txt'],
         ['package*.json', 'package.lock.json'],
-        ])('pattern %p matches file %p', (pattern, filePath) => {
-          expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(filePath);
-        });
+      ])('pattern %p matches file %p', (pattern, filePath) => {
+        expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(
+          filePath
+        );
+      });
 
       it.each([
         ['package.json', 'foo/package.json'],
         ['*.js', 'bar/main.js'],
         ['*.css', 'foo/bar/baz/style.css'],
-        ])('pattern %p matches nested file %p', (pattern, filePath) => {
-          expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(filePath);
+      ])('pattern %p matches nested file %p', (pattern, filePath) => {
+        expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(
+          filePath
+        );
       });
     });
 

@@ -165,7 +165,7 @@ class OwnersTree {
   toString() {
     const lines = [];
 
-    const rulePrefix = ' *';
+    const rulePrefix = ' •';
     const childPrefix = '└───';
     const indent = Math.max(0, this.depth - 1) * childPrefix.length;
     const prefix = this.isRoot ? '' : `${' '.repeat(indent)}${childPrefix}`;
