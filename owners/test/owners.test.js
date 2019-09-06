@@ -16,7 +16,8 @@
 
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {OwnersParser, OwnersRule, OwnersTree} = require('../src/owners');
+const {OwnersParser, OwnersTree} = require('../src/owners');
+const {OwnersRule, PatternOwnersRule} = require('../src/rules');
 
 describe('owners tree', () => {
   let tree;
@@ -26,6 +27,12 @@ describe('owners tree', () => {
   const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
     'descendant',
   ]);
+  const wildcardDirRule = new OwnersRule('shared/OWNERS.yaml', ['*']);
+  const testFileRule = new PatternOwnersRule(
+    'OWNERS.yaml',
+    ['testers'],
+    '*.test.js'
+  );
 
   beforeEach(() => {
     tree = new OwnersTree();
@@ -157,7 +164,8 @@ describe('owners tree', () => {
       tree.addRule(rootDirRule);
       tree.addRule(childDirRule);
       tree.addRule(descendantDirRule);
-      tree.addRule(new OwnersRule('shared/OWNERS.yaml', ['*']));
+      tree.addRule(wildcardDirRule);
+      tree.addRule(testFileRule);
     });
 
     it('should be true for owners in the same directory', () => {
@@ -185,6 +193,11 @@ describe('owners tree', () => {
     it('should be true for files in directories with wildcard owners', () => {
       expect(tree.fileHasOwner('shared/README.md', 'not_an_owner')).toBe(true);
       expect(tree.fileHasOwner('shared/README.md', 'anyone')).toBe(true);
+    });
+
+    it('should respect pattern-based rules', () => {
+      expect(tree.fileHasOwner('foo/bar/thing.test.js', 'testers')).toBe(true);
+      expect(tree.fileHasOwner('foo/bar/thing.js', 'testers')).toBe(false);
     });
   });
 
@@ -223,61 +236,22 @@ describe('owners tree', () => {
       tree.addRule(childDirRule);
       tree.addRule(otherChildDirRule);
       tree.addRule(descendantDirRule);
+      tree.addRule(testFileRule);
 
       expect(tree.toString()).toEqual(
         [
           'ROOT',
-          ' * root',
+          ' • All: root',
+          ' • *.test.js: testers',
           '└───foo',
-          ' * child',
+          ' • All: child',
           '    └───bar',
           '        └───baz',
-          '         * descendant',
+          '         • All: descendant',
           '└───biz',
-          ' * child',
+          ' • All: child',
         ].join('\n')
       );
-    });
-  });
-});
-
-describe('owners rules', () => {
-  expect.extend({
-    toMatchFile(receivedOwnersPath, filePath) {
-      const rule = new OwnersRule(receivedOwnersPath, []);
-      const matches = rule.matchesFile(filePath);
-      const matchStr = this.isNot ? 'not match' : 'match';
-
-      return {
-        pass: matches,
-        message: () =>
-          `Expected rules in '${receivedOwnersPath}' to ` +
-          `${matchStr} file '${filePath}'.`,
-      };
-    },
-  });
-
-  describe('with a wildcard (*) owner', () => {
-    it('sets the wildcardOwner flag', () => {
-      const rule = new OwnersRule('OWNERS.yaml', ['*']);
-
-      expect(rule.wildcardOwner).toBe(true);
-    });
-
-    it('ignores any other owners', () => {
-      const rule = new OwnersRule('OWNERS.yaml', ['a_user', '*', 'someone']);
-
-      expect(rule.owners).toEqual(['*']);
-    });
-  });
-
-  describe('basic directory ownership', () => {
-    describe('matchesFile', () => {
-      it('matches all files', () => {
-        expect('src/OWNERS.yaml').toMatchFile('src/foo.txt');
-        expect('src/OWNERS.yaml').toMatchFile('src/foo/bar.txt');
-        expect('src/OWNERS.yaml').toMatchFile('src/foo/bar/baz.txt');
-      });
     });
   });
 });
