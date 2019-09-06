@@ -37,6 +37,8 @@ module.exports = app => {
   });
 
   /** Health check server endpoints **/
+  // TODO(rcebulko): Implement GitHub authentication to prevent spamming any of
+  // these endpoints.
   router.get('/status', (req, res) => {
     res.send('The OWNERS bot is live and running!');
   });
