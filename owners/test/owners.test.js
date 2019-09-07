@@ -250,7 +250,7 @@ describe('owners tree', () => {
         [
           'ROOT',
           ' • All files: root',
-          ' • *.test.js: testers',
+          ' • **/*.test.js: testers',
           ' • ./package.json: anyone',
           '└───foo',
           ' • All files: child',

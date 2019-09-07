@@ -125,7 +125,7 @@ describe('owners rules', () => {
       it('is the pattern', () => {
         const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.css');
 
-        expect(rule.label).toEqual('*.css');
+        expect(rule.label).toEqual('**/*.css');
       });
     });
 
@@ -137,7 +137,7 @@ describe('owners rules', () => {
           '*.css'
         );
 
-        expect(rule.toString()).toEqual('*.css: rcebulko, erwinmombay');
+        expect(rule.toString()).toEqual('**/*.css: rcebulko, erwinmombay');
       });
     });
 
