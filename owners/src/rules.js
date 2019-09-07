@@ -34,7 +34,15 @@ class OwnersRule {
     this.dirPath = path.dirname(ownersPath);
     this.wildcardOwner = owners.includes('*');
     this.owners = this.wildcardOwner ? ['*'] : owners;
-    this.label = 'All';
+  }
+
+  /**
+   * The label to use when describing the rule.
+   *
+   * @return {string} the label for the rule.
+   */
+  get label() {
+    return 'All files';
   }
 
   /**
@@ -81,13 +89,21 @@ class PatternOwnersRule extends OwnersRule {
   constructor(ownersPath, owners, pattern) {
     super(ownersPath, owners);
     this.pattern = pattern;
-    this.label = pattern;
     this.regex = new RegExp(
       pattern
         .split('*')
         .map(PatternOwnersRule.escapeRegexChars)
         .join('.*?')
     );
+  }
+
+  /**
+   * The label to use when describing the rule.
+   *
+   * @return {string} the label for the rule.
+   */
+  get label() {
+    return `**/${this.pattern}`;
   }
 
   /**
@@ -111,4 +127,30 @@ class PatternOwnersRule extends OwnersRule {
   }
 }
 
-module.exports = {OwnersRule, PatternOwnersRule};
+/**
+ * A pattern-based ownership rule applying only to files in the same directory.
+ */
+class SameDirPatternOwnersRule extends PatternOwnersRule {
+  /**
+   * The label to use when describing the rule.
+   *
+   * @return {string} the label for the rule.
+   */
+  get label() {
+    return `./${this.pattern}`;
+  }
+
+  /**
+   * Test if a file is in the rule directory and matched by the pattern rule.
+   *
+   * @param {!string} filePath relative path in repo to the file being checked.
+   * @return {boolean} true if the rule applies to the file.
+   */
+  matchesFile(filePath) {
+    return (
+      super.matchesFile(filePath) && this.dirPath === path.dirname(filePath)
+    );
+  }
+}
+
+module.exports = {OwnersRule, PatternOwnersRule, SameDirPatternOwnersRule};

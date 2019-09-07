@@ -17,7 +17,11 @@
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersTree} = require('../src/owners');
-const {OwnersRule, PatternOwnersRule} = require('../src/rules');
+const {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+} = require('../src/rules');
 
 describe('owners tree', () => {
   let tree;
@@ -32,6 +36,11 @@ describe('owners tree', () => {
     'OWNERS.yaml',
     ['testers'],
     '*.test.js'
+  );
+  const packageJsonRule = new SameDirPatternOwnersRule(
+    'OWNERS.yaml',
+    ['anyone'],
+    'package.json'
   );
 
   beforeEach(() => {
@@ -166,6 +175,7 @@ describe('owners tree', () => {
       tree.addRule(descendantDirRule);
       tree.addRule(wildcardDirRule);
       tree.addRule(testFileRule);
+      tree.addRule(packageJsonRule);
     });
 
     it('should be true for owners in the same directory', () => {
@@ -176,11 +186,11 @@ describe('owners tree', () => {
       expect(tree.fileHasOwner('foo/bar.txt', 'root')).toBe(true);
     });
 
-    it('should be true for owners an ancestor directory', () => {
+    it('should be true for owners in an ancestor directory', () => {
       expect(tree.fileHasOwner('foo/bar.txt', 'root')).toBe(true);
     });
 
-    it('should be false for owners a child directory', () => {
+    it('should be false for owners in a child directory', () => {
       expect(tree.fileHasOwner('foo/bar/baz/buzz.txt', 'descendant')).toBe(
         true
       );
@@ -198,6 +208,11 @@ describe('owners tree', () => {
     it('should respect pattern-based rules', () => {
       expect(tree.fileHasOwner('foo/bar/thing.test.js', 'testers')).toBe(true);
       expect(tree.fileHasOwner('foo/bar/thing.js', 'testers')).toBe(false);
+    });
+
+    it('should respect same-directory rules', () => {
+      expect(tree.fileHasOwner('package.json', 'anyone')).toBe(true);
+      expect(tree.fileHasOwner('examples/package.json', 'anyone')).toBe(false);
     });
   });
 
@@ -237,19 +252,21 @@ describe('owners tree', () => {
       tree.addRule(otherChildDirRule);
       tree.addRule(descendantDirRule);
       tree.addRule(testFileRule);
+      tree.addRule(packageJsonRule);
 
       expect(tree.toString()).toEqual(
         [
           'ROOT',
-          ' • All: root',
-          ' • *.test.js: testers',
+          ' • All files: root',
+          ' • **/*.test.js: testers',
+          ' • ./package.json: anyone',
           '└───foo',
-          ' • All: child',
+          ' • All files: child',
           '    └───bar',
           '        └───baz',
-          '         • All: descendant',
+          '         • All files: descendant',
           '└───biz',
-          ' • All: child',
+          ' • All files: child',
         ].join('\n')
       );
     });
