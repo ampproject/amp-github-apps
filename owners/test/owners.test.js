@@ -17,7 +17,11 @@
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersTree} = require('../src/owners');
-const {OwnersRule, PatternOwnersRule, SameDirPatternOwnersRule} = require('../src/rules');
+const {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+} = require('../src/rules');
 
 describe('owners tree', () => {
   let tree;
@@ -33,7 +37,11 @@ describe('owners tree', () => {
     ['testers'],
     '*.test.js'
   );
-  const packageJsonRule = new SameDirPatternOwnersRule('OWNERS.yaml', ['anyone'], 'package.json');
+  const packageJsonRule = new SameDirPatternOwnersRule(
+    'OWNERS.yaml',
+    ['anyone'],
+    'package.json'
+  );
 
   beforeEach(() => {
     tree = new OwnersTree();
