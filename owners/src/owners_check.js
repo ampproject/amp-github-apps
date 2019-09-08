@@ -53,7 +53,7 @@ class CheckRun {
       conclusion: this.conclusion,
       completed_at: new Date(),
       output: {
-        title: GITHUB_CHECKRUN_NAME,
+        title: this.summary,
         summary: this.summary,
         text: this.text,
       },

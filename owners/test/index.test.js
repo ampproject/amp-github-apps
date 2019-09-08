@@ -108,7 +108,8 @@ describe('owners bot', () => {
             expect(body).toMatchObject({
               conclusion: 'neutral',
               output: {
-                title: 'ampproject/owners-check',
+                title:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
                 summary:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
@@ -168,7 +169,8 @@ describe('owners bot', () => {
               status: 'completed',
               conclusion: 'neutral',
               output: {
-                title: 'ampproject/owners-check',
+                title:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
                 summary:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
@@ -224,7 +226,8 @@ describe('owners bot', () => {
             expect(body).toMatchObject({
               conclusion: 'neutral',
               output: {
-                title: 'ampproject/owners-check',
+                title:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
                 summary:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
@@ -278,7 +281,8 @@ describe('owners bot', () => {
             expect(body).toMatchObject({
               conclusion: 'neutral',
               output: {
-                title: 'ampproject/owners-check',
+                title:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
                 summary:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
@@ -345,7 +349,8 @@ describe('owners bot', () => {
               status: 'completed',
               conclusion: 'neutral',
               output: {
-                title: 'ampproject/owners-check',
+                title:
+                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
                 summary:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
               },
@@ -405,7 +410,7 @@ describe('owners bot', () => {
               status: 'completed',
               conclusion: 'success',
               output: {
-                title: 'ampproject/owners-check',
+                title: 'All files in this PR have OWNERS approval',
                 summary: 'All files in this PR have OWNERS approval',
               },
             });
@@ -457,7 +462,7 @@ describe('owners bot', () => {
               status: 'completed',
               conclusion: 'success',
               output: {
-                title: 'ampproject/owners-check',
+                title: 'All files in this PR have OWNERS approval',
                 summary: 'All files in this PR have OWNERS approval',
               },
             });
@@ -514,7 +519,7 @@ describe('owners bot', () => {
               status: 'completed',
               conclusion: 'success',
               output: {
-                title: 'ampproject/owners-check',
+                title: 'All files in this PR have OWNERS approval',
                 summary: 'All files in this PR have OWNERS approval',
               },
             });

@@ -39,7 +39,7 @@ describe('check run', () => {
       expect(checkRunJson.name).toEqual('ampproject/owners-check');
       expect(checkRunJson.status).toEqual('completed');
       expect(checkRunJson.conclusion).toEqual('neutral');
-      expect(checkRunJson.output.title).toEqual('ampproject/owners-check');
+      expect(checkRunJson.output.title).toEqual('Test summary');
       expect(checkRunJson.output.summary).toEqual('Test summary');
       expect(checkRunJson.output.text).toEqual('Test text');
     });
