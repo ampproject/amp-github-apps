@@ -24,7 +24,7 @@ const {
   OwnersCheck,
 } = require('../src/owners_check');
 
-describe.only('owners bot', () => {
+describe('owners bot', () => {
   let sandbox;
   const fakeGithub = new GitHub({}, 'ampproject', 'amphtml', console);
   const pr = new PullRequest(1337, 'author_user', 'test_sha');
