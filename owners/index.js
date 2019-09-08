@@ -47,7 +47,8 @@ module.exports = app => {
         `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
         `Project: ${process.env.GCLOUD_PROJECT || 'UNKNOWN'}`,
         `App ID: ${process.env.APP_ID || 'UNKNOWN'}`,
-        `Deployed commit SHA: <code>${process.env.APP_COMMIT_SHA || 'UNKNOWN'}</code>`,
+        `Deployed commit SHA: <code>${process.env.APP_COMMIT_SHA ||
+          'UNKNOWN'}</code>`,
       ].join('<br>')
     );
   });

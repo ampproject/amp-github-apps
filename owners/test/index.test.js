@@ -467,8 +467,7 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '### Current Coverage\n\n' +
-                '- dir2/new-file.txt _(erwinmombay)_'
+              '### Current Coverage\n\n- dir2/new-file.txt _(erwinmombay)_'
             );
 
             return true;
