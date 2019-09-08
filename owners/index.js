@@ -25,6 +25,11 @@ const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 
+const GCLOUD_PROJECT = process.env.GCLOUD_PROJECT || 'UNKNOWN';
+const APP_ID = process.env.APP_ID || 'UNKNOWN';
+const APP_COMMIT_SHA = process.env.APP_COMMIT_SHA || 'UNKNOWN';
+const APP_COMMIT_MSG = process.env.APP_COMMIT_MSG || 'UNKNOWN';
+
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(localRepo);
@@ -45,10 +50,9 @@ module.exports = app => {
     res.send(
       [
         `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
-        `Project: ${process.env.GCLOUD_PROJECT || 'UNKNOWN'}`,
-        `App ID: ${process.env.APP_ID || 'UNKNOWN'}`,
-        `Deployed commit SHA: <code>${process.env.APP_COMMIT_SHA ||
-          'UNKNOWN'}</code>`,
+        `Project: ${GCLOUD_PROJECT}`,
+        `App ID: ${APP_ID}`,
+        `Deployed commit: <code>${APP_COMMIT_SHA}</code> ${APP_COMMIT_MSG}`,
       ].join('<br>')
     );
   });
