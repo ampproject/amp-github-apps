@@ -115,12 +115,12 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '=== Current Coverage ===\n\n' +
-                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+              '### Current Coverage\n\n' +
+                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt'
             );
             expect(body.output.text).toContain(
-              '=== Suggested Reviewers ===\n\n' +
-                'Reviewer: erwinmombay\n' +
+              '### Suggested Reviewers\n\n' +
+                'Reviewer: _erwinmombay_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
 
@@ -176,12 +176,12 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '=== Current Coverage ===\n\n' +
-                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+              '### Current Coverage\n\n' +
+                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt'
             );
             expect(body.output.text).toContain(
-              '=== Suggested Reviewers ===\n\n' +
-                'Reviewer: erwinmombay\n' +
+              '### Suggested Reviewers\n\n' +
+                'Reviewer: _erwinmombay_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
 
@@ -233,12 +233,12 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '=== Current Coverage ===\n\n' +
-                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+              '### Current Coverage\n\n' +
+                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt'
             );
             expect(body.output.text).toContain(
-              '=== Suggested Reviewers ===\n\n' +
-                'Reviewer: erwinmombay\n' +
+              '### Suggested Reviewers\n\n' +
+                'Reviewer: _erwinmombay_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
 
@@ -288,13 +288,13 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '=== Current Coverage ===\n\n' +
-                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt\n' +
-                '- [NEEDS APPROVAL] dir2/dir1/dir1/file-2.txt'
+              '### Current Coverage\n\n' +
+                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt\n' +
+                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file-2.txt'
             );
             expect(body.output.text).toContain(
-              '=== Suggested Reviewers ===\n\n' +
-                'Reviewer: erwinmombay\n' +
+              '### Suggested Reviewers\n\n' +
+                'Reviewer: _erwinmombay_\n' +
                 '- dir2/dir1/dir1/file.txt\n' +
                 '- dir2/dir1/dir1/file-2.txt'
             );
@@ -356,12 +356,12 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '=== Current Coverage ===\n\n' +
-                '- [NEEDS APPROVAL] dir2/dir1/dir1/file.txt'
+              '### Current Coverage\n\n' +
+                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt'
             );
             expect(body.output.text).toContain(
-              '=== Suggested Reviewers ===\n\n' +
-                'Reviewer: erwinmombay\n' +
+              '### Suggested Reviewers\n\n' +
+                'Reviewer: _erwinmombay_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
 
@@ -415,8 +415,8 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '=== Current Coverage ===\n\n' +
-                '- dir2/dir1/dir1/file.txt (erwinmombay)'
+              '### Current Coverage\n\n' +
+                '- dir2/dir1/dir1/file.txt _(erwinmombay)_'
             );
 
             return true;
@@ -467,8 +467,8 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '=== Current Coverage ===\n\n' +
-                '- dir2/new-file.txt (erwinmombay)'
+              '### Current Coverage\n\n' +
+                '- dir2/new-file.txt _(erwinmombay)_'
             );
 
             return true;
@@ -524,8 +524,8 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '=== Current Coverage ===\n\n' +
-                '- dir2/dir1/dir1/file.txt (erwinmombay)'
+              '### Current Coverage\n\n' +
+                '- dir2/dir1/dir1/file.txt _(erwinmombay)_'
             );
 
             return true;
