@@ -194,7 +194,7 @@ describe('GitHub API', () => {
             status: 'completed',
             conclusion: 'neutral',
             output: {
-              title: 'ampproject/owners-check',
+              title: 'Test summary',
               summary: 'Test summary',
               text: 'Test text',
             },
@@ -276,7 +276,7 @@ describe('GitHub API', () => {
             status: 'completed',
             conclusion: 'neutral',
             output: {
-              title: 'ampproject/owners-check',
+              title: 'Test summary',
               summary: 'Test summary',
               text: 'Test text',
             },

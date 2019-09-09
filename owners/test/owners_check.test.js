@@ -39,7 +39,7 @@ describe('check run', () => {
       expect(checkRunJson.name).toEqual('ampproject/owners-check');
       expect(checkRunJson.status).toEqual('completed');
       expect(checkRunJson.conclusion).toEqual('neutral');
-      expect(checkRunJson.output.title).toEqual('ampproject/owners-check');
+      expect(checkRunJson.output.title).toEqual('Test summary');
       expect(checkRunJson.output.summary).toEqual('Test summary');
       expect(checkRunJson.output.text).toEqual('Test text');
     });
@@ -410,10 +410,10 @@ describe('owners check', () => {
       );
       const coverageText = ownersCheck.buildCurrentCoverageText(fileTreeMap);
 
-      expect(coverageText).toContain('=== Current Coverage ===');
-      expect(coverageText).toContain('- foo/test.js (approver)');
-      expect(coverageText).toContain('- bar/baz/file.txt (other_approver)');
-      expect(coverageText).toContain('- buzz/README.md (the_author)');
+      expect(coverageText).toContain('### Current Coverage');
+      expect(coverageText).toContain('- foo/test.js _(approver)_');
+      expect(coverageText).toContain('- bar/baz/file.txt _(other_approver)_');
+      expect(coverageText).toContain('- buzz/README.md _(the_author)_');
     });
 
     it('lists files needing approval', async () => {
@@ -423,8 +423,8 @@ describe('owners check', () => {
       );
       const coverageText = ownersCheck.buildCurrentCoverageText(fileTreeMap);
 
-      expect(coverageText).toContain('=== Current Coverage ===');
-      expect(coverageText).toContain('- [NEEDS APPROVAL] main.js');
+      expect(coverageText).toContain('### Current Coverage');
+      expect(coverageText).toContain('- **[NEEDS APPROVAL]** main.js');
     });
   });
 
@@ -437,11 +437,11 @@ describe('owners check', () => {
       ];
 
       expect(ownersCheck.buildReviewSuggestionsText(reviewSuggestions)).toEqual(
-        '=== Suggested Reviewers ===\n\n' +
-          'Reviewer: alice\n' +
+        '### Suggested Reviewers\n\n' +
+          'Reviewer: _alice_\n' +
           '- alice_file1.js\n' +
           '- foo/alice_file2.js\n\n' +
-          'Reviewer: bob\n' +
+          'Reviewer: _bob_\n' +
           '- bob_file1.js\n' +
           '- bar/bob_file2.js'
       );

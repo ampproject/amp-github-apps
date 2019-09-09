@@ -53,7 +53,7 @@ class CheckRun {
       conclusion: this.conclusion,
       completed_at: new Date(),
       output: {
-        title: GITHUB_CHECKRUN_NAME,
+        title: this.summary,
         summary: this.summary,
         text: this.text,
       },
@@ -203,14 +203,14 @@ class OwnersCheck {
         );
 
         if (fileApprovers.length) {
-          return `- ${filename} (${fileApprovers.join(', ')})`;
+          return `- ${filename} _(${fileApprovers.join(', ')})_`;
         } else {
-          return `- [NEEDS APPROVAL] ${filename}`;
+          return `- **[NEEDS APPROVAL]** ${filename}`;
         }
       })
       .join('\n');
 
-    return `=== Current Coverage ===\n\n${allFilesText}`;
+    return `### Current Coverage\n\n${allFilesText}`;
   }
 
   /**
@@ -222,13 +222,13 @@ class OwnersCheck {
   buildReviewSuggestionsText(reviewSuggestions) {
     const suggestionsText = reviewSuggestions.map(
       ([reviewer, coveredFiles]) => {
-        const header = `Reviewer: ${reviewer}`;
+        const header = `Reviewer: _${reviewer}_`;
         const files = coveredFiles.map(filename => `- ${filename}`);
         return [header, ...files].join('\n');
       }
     );
 
-    return ['=== Suggested Reviewers ===', ...suggestionsText].join('\n\n');
+    return ['### Suggested Reviewers', ...suggestionsText].join('\n\n');
   }
 }
 
