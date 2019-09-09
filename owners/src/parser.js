@@ -21,7 +21,11 @@ const {OwnersTree} = require('./owners_tree');
 /**
  * An error encountered parsing an OWNERS file
  */
-class OwnersParserError extends Error {}
+class OwnersParserError extends Error {
+  toString() {
+    return `OwnersParserError: ${this.message}`;
+  }
+}
 
 /**
  * Parser for OWNERS.yaml files.
