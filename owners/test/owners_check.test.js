@@ -133,13 +133,13 @@ describe('owners check', () => {
 
     beforeEach(() => {
       ownersCheck = new OwnersCheck(repo, github, pr);
-      sandbox
-        .stub(ownersCheck.parser, 'parseAllOwnersRules')
-        .returns([
+      sandbox.stub(ownersCheck.parser, 'parseAllOwnersRules').returns({
+        rules: [
           new OwnersRule('OWNERS.yaml', ['root_owner']),
           new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
           new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
-        ]);
+        ],
+      });
     });
 
     it('calls `init` if not initialized', async () => {
@@ -292,13 +292,13 @@ describe('owners check', () => {
     beforeEach(async () => {
       ownersCheck = new OwnersCheck(repo, github, pr);
 
-      sandbox
-        .stub(ownersCheck.parser, 'parseAllOwnersRules')
-        .returns([
+      sandbox.stub(ownersCheck.parser, 'parseAllOwnersRules').returns({
+        rules: [
           new OwnersRule('OWNERS.yaml', ['root_owner']),
           new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
           new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
-        ]);
+        ],
+      });
 
       await ownersCheck.init();
     });
@@ -393,14 +393,14 @@ describe('owners check', () => {
         ),
         pr
       );
-      sandbox
-        .stub(ownersCheck.parser, 'parseAllOwnersRules')
-        .returns([
+      sandbox.stub(ownersCheck.parser, 'parseAllOwnersRules').returns({
+        rules: [
           new OwnersRule('OWNERS.yaml', ['root_owner']),
           new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
           new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
           new OwnersRule('buzz/OWNERS.yaml', ['the_author']),
-        ]);
+        ],
+      });
     });
 
     it('lists files with their owners approvers', async () => {

@@ -42,4 +42,14 @@ let FileTreeMap;
  */
 let ReviewerFiles;
 
+/**
+ * The result of parsing OWNERS rules, along with any errors encountered.
+ *
+ * @typedef {{
+ *   rules: null|OwnersRule[],
+ *   errors: OwnersParserError[],
+ * }}
+ */
+let OwnersParserResult;
+
 module.exports = {FileTreeMap, Logger, ReviewerFiles};
