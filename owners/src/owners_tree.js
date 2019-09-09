@@ -15,8 +15,6 @@
  */
 
 const path = require('path');
-const yaml = require('yamljs');
-const {OwnersRule} = require('./rules.js');
 
 /**
  * A tree of ownership keyed by directory.
@@ -187,70 +185,4 @@ class OwnersTree {
   }
 }
 
-/**
- * Parser for OWNERS.yaml files.
- */
-class OwnersParser {
-  /**
-   * Constructor.
-   *
-   * @param {!LocalRepository} localRepo local repository to read from.
-   * @param {!Logger=} logger logging interface (defaults to console).
-   */
-  constructor(localRepo, logger) {
-    this.localRepo = localRepo;
-    this.logger = logger || console;
-  }
-
-  /**
-   * Parse an OWNERS.yaml file.
-   *
-   * @param {!string} ownersPath OWNERS.yaml file path.
-   * @return {OwnersRule} parsed OWNERS file rule.
-   */
-  parseOwnersFile(ownersPath) {
-    const contents = this.localRepo.readFile(ownersPath);
-    const lines = yaml.parse(contents);
-
-    if (!(lines instanceof Array)) {
-      this.logger.warn(
-        `Failed to parse file '${ownersPath}'; must be a YAML list`
-      );
-      return null;
-    }
-
-    const stringLines = lines.filter(line => typeof line === 'string');
-    const ownersList = stringLines.filter(line => line.indexOf('/') === -1);
-
-    return ownersList.length ? new OwnersRule(ownersPath, ownersList) : null;
-  }
-
-  /**
-   * Parse all OWNERS rules in the repo.
-   *
-   * TODO: Replace this with `parseAllOwnersRulesForFiles` to reduce OWNERS file
-   * reads
-   *
-   * @return {OwnersRule[]} a list of all rules defined in the local repo.
-   */
-  async parseAllOwnersRules() {
-    const ownersPaths = await this.localRepo.findOwnersFiles();
-    return ownersPaths
-      .map(ownersPath => this.parseOwnersFile(ownersPath))
-      .filter(rule => rule !== null);
-  }
-
-  /**
-   * Parse all OWNERS rules into a tree.
-   *
-   * @return {OwnersTree} owners rule hierarchy.
-   */
-  async parseOwnersTree() {
-    const tree = new OwnersTree(this.localRepo.rootPath);
-    const rules = await this.parseAllOwnersRules();
-    rules.forEach(rule => tree.addRule(rule));
-    return tree;
-  }
-}
-
-module.exports = {OwnersParser, OwnersTree};
+module.exports = {OwnersTree};

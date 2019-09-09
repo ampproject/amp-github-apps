@@ -22,7 +22,7 @@ const {
   CheckRunConclusion,
   OwnersCheck,
 } = require('../src/owners_check');
-const {OwnersTree} = require('../src/owners');
+const {OwnersTree} = require('../src/owners_tree');
 const {OwnersRule} = require('../src/rules');
 const {ReviewerSelection} = require('../src/reviewer_selection');
 

@@ -18,7 +18,7 @@ const Octokit = require('@octokit/rest');
 const {GitHub, PullRequest} = require('./src/github');
 const {LocalRepository} = require('./src/local_repo');
 const {OwnersBot} = require('./src/owners_bot');
-const {OwnersParser} = require('./src/owners');
+const {OwnersParser} = require('./src/parser');
 const {OwnersCheck} = require('./src/owners_check');
 
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
