@@ -99,9 +99,9 @@ class OwnersParser {
    */
   async parseOwnersTree() {
     const tree = new OwnersTree(this.localRepo.rootPath);
-    const {rules} = await this.parseAllOwnersRules();
+    const {rules, errors} = await this.parseAllOwnersRules();
     rules.forEach(rule => tree.addRule(rule));
-    return tree;
+    return {tree, errors};
   }
 }
 

@@ -129,11 +129,20 @@ describe('owners parser', () => {
     it('adds each rule to the tree', async () => {
       sandbox
         .stub(parser, 'parseAllOwnersRules')
-        .returns({rules: [rootRule, childRule]});
-      const tree = await parser.parseOwnersTree();
+        .returns({rules: [rootRule, childRule], errors: []});
+      const {tree} = await parser.parseOwnersTree();
 
       expect(tree.rules).toContain(rootRule);
       expect(tree.get('foo').rules).toContain(childRule);
+    });
+
+    it('returns parser errors', async () => {
+      sandbox
+        .stub(parser, 'parseAllOwnersRules')
+        .returns({rules: [], errors: [new Error('Oops!')]});
+      const {errors} = await parser.parseOwnersTree();
+
+      expect(errors[0].message).toEqual('Oops!');
     });
   });
 });
