@@ -45,11 +45,12 @@ let ReviewerFiles;
 /**
  * The result of parsing OWNERS rules, along with any errors encountered.
  *
+ * @template T
  * @typedef {{
- *   rules: null|OwnersRule[],
+ *   rules: T,
  *   errors: OwnersParserError[],
  * }}
  */
 let OwnersParserResult;
 
-module.exports = {FileTreeMap, Logger, ReviewerFiles};
+module.exports = {FileTreeMap, Logger, ReviewerFiles, OwnersParserResult};

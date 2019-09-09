@@ -94,7 +94,7 @@ class OwnersCheck {
       console.warn(error);
     });
 
-    this.tree = tree
+    this.tree = tree;
     this.approvers = await this._getApprovers();
     this.changedFiles = await this.github.listFiles(this.pr.number);
     this.initialized = true;

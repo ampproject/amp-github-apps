@@ -22,6 +22,11 @@ const {OwnersTree} = require('./owners_tree');
  * An error encountered parsing an OWNERS file
  */
 class OwnersParserError extends Error {
+  /**
+   * Displays the error message.
+   *
+   * @return {string} error message.
+   */
   toString() {
     return `OwnersParserError: ${this.message}`;
   }
@@ -46,7 +51,7 @@ class OwnersParser {
    * Parse an OWNERS.yaml file.
    *
    * @param {!string} ownersPath OWNERS.yaml file path.
-   * @return {OwnersParserResult} parsed OWNERS file rule.
+   * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
    */
   parseOwnersFile(ownersPath) {
     const contents = this.localRepo.readFile(ownersPath);
@@ -77,7 +82,7 @@ class OwnersParser {
    * TODO: Replace this with `parseAllOwnersRulesForFiles` to reduce OWNERS file
    * reads
    *
-   * @return {OwnersRule[]} a list of all rules defined in the local repo.
+   * @return {OwnersParserResult<OwnersRule[]>} a list of all rules defined in the local repo.
    */
   async parseAllOwnersRules() {
     const ownersPaths = await this.localRepo.findOwnersFiles();
@@ -99,7 +104,7 @@ class OwnersParser {
   /**
    * Parse all OWNERS rules into a tree.
    *
-   * @return {OwnersTree} owners rule hierarchy.
+   * @return {{tree: OwnersTree, errors: OwnersParserError[]}} owners rule hierarchy.
    */
   async parseOwnersTree() {
     const tree = new OwnersTree(this.localRepo.rootPath);
