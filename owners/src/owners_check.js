@@ -15,7 +15,7 @@
  */
 
 const _ = require('lodash');
-const {OwnersParser} = require('./owners');
+const {OwnersParser} = require('./parser');
 const {ReviewerSelection} = require('./reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
