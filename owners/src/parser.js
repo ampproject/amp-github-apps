@@ -16,7 +16,7 @@
 
 const yaml = require('yamljs');
 const {OwnersRule} = require('./rules');
-const {OwnersTree} = require('./owners');
+const {OwnersTree} = require('./owners_tree');
 
 /**
  * Parser for OWNERS.yaml files.

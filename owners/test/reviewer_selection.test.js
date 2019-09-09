@@ -16,7 +16,7 @@
 
 const sinon = require('sinon');
 const {ReviewerSelection} = require('../src/reviewer_selection');
-const {OwnersTree} = require('../src/owners');
+const {OwnersTree} = require('../src/owners_tree');
 const {OwnersRule} = require('../src/rules');
 
 describe('reviewer selection', () => {
