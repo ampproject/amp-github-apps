@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
-const {LocalRepository} = require('../src/local_repo');
 const {OwnersTree} = require('../src/owners_tree');
-const {OwnersParser} = require('../src/parser');
 const {
   OwnersRule,
   PatternOwnersRule,

@@ -1,12 +1,7 @@
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {OwnersTree} = require('../src/owners_tree');
 const {OwnersParser} = require('../src/parser');
-const {
-  OwnersRule,
-  PatternOwnersRule,
-  SameDirPatternOwnersRule,
-} = require('../src/rules');
+const {OwnersRule} = require('../src/rules');
 
 describe('owners parser', () => {
   const sandbox = sinon.createSandbox();
