@@ -88,7 +88,13 @@ class OwnersCheck {
    */
   async init() {
     await this.repo.checkout();
-    this.tree = await this.parser.parseOwnersTree();
+    const {tree, errors} = await this.parser.parseOwnersTree();
+
+    errors.forEach(error => {
+      console.warn(error);
+    });
+
+    this.tree = tree;
     this.approvers = await this._getApprovers();
     this.changedFiles = await this.github.listFiles(this.pr.number);
     this.initialized = true;
