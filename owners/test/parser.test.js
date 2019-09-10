@@ -111,7 +111,6 @@ describe('owners parser', () => {
     describe('rule dictionary', () => {
       it('parses a single owner into a pattern rule', () => {
         sandbox.stub(repo, 'readFile').returns('- *.js: scripty\n');
-
         const fileParse = parser.parseOwnersFile('');
         const rules = fileParse.result;
 
@@ -124,7 +123,6 @@ describe('owners parser', () => {
         sandbox
           .stub(repo, 'readFile')
           .returns('- *.js:\n  - scripty\n  - coder\n');
-
         const fileParse = parser.parseOwnersFile('');
         const rules = fileParse.result;
 
@@ -146,13 +144,30 @@ describe('owners parser', () => {
 
       it('starting with **/ parses into a recursive pattern rule', () => {
         sandbox.stub(repo, 'readFile').returns('- **/*.js: scripty\n');
-
         const fileParse = parser.parseOwnersFile('');
         const rules = fileParse.result;
 
         expect(rules[0]).toBeInstanceOf(PatternOwnersRule);
         expect(rules[0].pattern).toEqual('*.js');
         expect(rules[0].owners).toEqual(['scripty']);
+      });
+
+      it('parses no rule if no valid owners are listed', () => {
+        sandbox.stub(repo, 'readFile').returns('- *.js: bad/team_owner\n');
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules.length).toEqual(0);
+      });
+
+      it("reports an error for patterns containing illegal '/'", () => {
+        sandbox.stub(repo, 'readFile').returns('- foo/*.js: scripty\n');
+        const fileParse = parser.parseOwnersFile('');
+
+        expect(fileParse.result.length).toEqual(0);
+        expect(fileParse.errors[0].message).toEqual(
+          "Failed to parse rule for pattern 'foo/*.js'; directory patterns other than '**/' not supported"
+        );
       });
     });
 

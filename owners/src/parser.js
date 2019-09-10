@@ -135,14 +135,27 @@ class OwnersParser {
    * @return {OwnersParserResult<PatternOwnersRule[]>} parsed OWNERS pattern rule.
    */
   _parseOwnersDict(ownersPath, ownersDict) {
-    const [[pattern, ownersList]] = Object.entries(ownersDict);
-    const isRecursive = pattern.indexOf('**/') === 0;
+    let [[pattern, ownersList]] = Object.entries(ownersDict);
     const owners = [];
     const rules = [];
     const errors = [];
 
-    if (typeof ownersList === 'string') {
-      owners.push(ownersList);
+    const isRecursive = pattern.indexOf('**/') === 0;
+    if (isRecursive) {
+      pattern = pattern.slice(3);
+    }
+
+    if (pattern.indexOf('/') !== -1) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Failed to parse rule for pattern '${pattern}'; directory patterns other than '**/' not supported`
+        )
+      );
+    } else if (typeof ownersList === 'string') {
+      const lineResult = this._parseOwnersLine(ownersPath, ownersList);
+      owners.push(...lineResult.result);
+      errors.push(...lineResult.errors);
     } else {
       ownersList.forEach(owner => {
         if (typeof owner === 'string') {
@@ -160,10 +173,12 @@ class OwnersParser {
       });
     }
 
-    if (isRecursive) {
-      rules.push(new PatternOwnersRule(ownersPath, owners, pattern.slice(3)));
-    } else {
-      rules.push(new SameDirPatternOwnersRule(ownersPath, owners, pattern));
+    if (owners.length) {
+      if (isRecursive) {
+        rules.push(new PatternOwnersRule(ownersPath, owners, pattern));
+      } else {
+        rules.push(new SameDirPatternOwnersRule(ownersPath, owners, pattern));
+      }
     }
 
     return {result: rules, errors};
