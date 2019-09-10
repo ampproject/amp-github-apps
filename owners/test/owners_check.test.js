@@ -134,11 +134,12 @@ describe('owners check', () => {
     beforeEach(() => {
       ownersCheck = new OwnersCheck(repo, github, pr);
       sandbox.stub(ownersCheck.parser, 'parseAllOwnersRules').returns({
-        rules: [
+        result: [
           new OwnersRule('OWNERS.yaml', ['root_owner']),
           new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
           new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
         ],
+        errors: [],
       });
     });
 
@@ -293,11 +294,12 @@ describe('owners check', () => {
       ownersCheck = new OwnersCheck(repo, github, pr);
 
       sandbox.stub(ownersCheck.parser, 'parseAllOwnersRules').returns({
-        rules: [
+        result: [
           new OwnersRule('OWNERS.yaml', ['root_owner']),
           new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
           new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
         ],
+        errors: [],
       });
 
       await ownersCheck.init();
@@ -394,12 +396,13 @@ describe('owners check', () => {
         pr
       );
       sandbox.stub(ownersCheck.parser, 'parseAllOwnersRules').returns({
-        rules: [
+        result: [
           new OwnersRule('OWNERS.yaml', ['root_owner']),
           new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
           new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
           new OwnersRule('buzz/OWNERS.yaml', ['the_author']),
         ],
+        errors: [],
       });
     });
 

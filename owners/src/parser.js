@@ -73,7 +73,7 @@ class OwnersParser {
       );
     }
 
-    return {rules, errors};
+    return {result: rules, errors};
   }
 
   /**
@@ -86,31 +86,32 @@ class OwnersParser {
    */
   async parseAllOwnersRules() {
     const ownersPaths = await this.localRepo.findOwnersFiles();
-    const allRules = [];
-    const allErrors = [];
+    const rules = [];
+    const errors = [];
 
     ownersPaths.forEach(ownersPath => {
-      const {rules, errors} = this.parseOwnersFile(ownersPath);
-      allRules.push(...rules);
-      allErrors.push(...errors);
+      const fileParse = this.parseOwnersFile(ownersPath);
+      rules.push(...fileParse.result);
+      errors.push(...fileParse.errors);
     });
 
     return {
-      rules: allRules,
-      errors: allErrors,
+      result: rules,
+      errors,
     };
   }
 
   /**
    * Parse all OWNERS rules into a tree.
    *
-   * @return {{tree: OwnersTree, errors: OwnersParserError[]}} owners rule hierarchy.
+   * @return {OwnersParserResult<OwnersTree>} owners rule hierarchy.
    */
   async parseOwnersTree() {
     const tree = new OwnersTree(this.localRepo.rootPath);
-    const {rules, errors} = await this.parseAllOwnersRules();
-    rules.forEach(rule => tree.addRule(rule));
-    return {tree, errors};
+    const ruleParse = await this.parseAllOwnersRules();
+    ruleParse.result.forEach(rule => tree.addRule(rule));
+    
+    return {result: tree, errors: ruleParse.errors};
   }
 }
 

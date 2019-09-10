@@ -63,7 +63,7 @@ describe('owners bot', () => {
     sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
-      .returns({rules: ownersRules});
+      .returns({result: ownersRules, errors: []});
 
     probot = new Probot({});
     const app = probot.load(owners);

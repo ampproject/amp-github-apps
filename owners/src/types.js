@@ -43,11 +43,11 @@ let FileTreeMap;
 let ReviewerFiles;
 
 /**
- * The result of parsing OWNERS rules, along with any errors encountered.
+ * The result of parsing OWNERS files, along with any errors encountered.
  *
  * @template T
  * @typedef {{
- *   rules: T,
+ *   result: T,
  *   errors: OwnersParserError[],
  * }}
  */
