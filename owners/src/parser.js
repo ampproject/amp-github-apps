@@ -152,7 +152,7 @@ class OwnersParser {
         errors.push(
           new OwnersParserError(
             ownersPath,
-            `Failed to parse rule for pattern '${subpattern}';' ` +
+            `Failed to parse rule for pattern '${subpattern}'; ` +
               "directory patterns other than '**/' not supported"
           )
         );

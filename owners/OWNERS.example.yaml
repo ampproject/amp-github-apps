@@ -53,6 +53,13 @@
 # appropriate OWNERS file should be created/updated in that subdirectory.
 - this/pattern/will/be/ignored.txt: doesntmatter
 
+# Filename and pattern rules may be combined with commas. They will be treated
+# as separate rules. An error in one sub-pattern will not block the rest from
+# being parsed.
+- "*.js, *.css": frontend
+- "a/bad/pattern, package.json, **/.eslintrc": somebodyelse
+
+
 # The result of parsing this file would be a tree with these rules:
 #
 # All files:       someuser, anotheruser, dothisinstead, thiswillworkbutdontdoit
@@ -62,3 +69,7 @@
 # ./package*.json: infraperson, developer
 # **/.eslintrc:    styleperson
 # **/*.protoascii: languageperson, translator
+# *.js:            frontend
+# *.css:           frontend
+# package.json:    somebodyelse
+# **/.eslintrc:    somebodyelse
