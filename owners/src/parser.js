@@ -132,54 +132,62 @@ class OwnersParser {
    * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
    * @param {!object} ownersDict dictionary with a pattern as the key and a list
    * of owners as the value.
-   * @return {OwnersParserResult<PatternOwnersRule[]>} parsed OWNERS pattern rule.
+   * @return {OwnersParserResult<PatternOwnersRule[]>} parsed OWNERS pattern
+   *     rule.
    */
   _parseOwnersDict(ownersPath, ownersDict) {
-    let [[pattern, ownersList]] = Object.entries(ownersDict);
-    const owners = [];
+    const [[pattern, ownersList]] = Object.entries(ownersDict);
     const rules = [];
     const errors = [];
 
-    const isRecursive = pattern.indexOf('**/') === 0;
-    if (isRecursive) {
-      pattern = pattern.slice(3);
-    }
+    // Treat each comma-separated subpattern as its own rule definition.
+    pattern.split(/\s*,\s*/).forEach(subpattern => {
+      const owners = [];
+      const isRecursive = subpattern.indexOf('**/') === 0;
+      if (isRecursive) {
+        subpattern = subpattern.slice(3);
+      }
 
-    if (pattern.indexOf('/') !== -1) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Failed to parse rule for pattern '${pattern}'; directory patterns other than '**/' not supported`
-        )
-      );
-    } else if (typeof ownersList === 'string') {
-      const lineResult = this._parseOwnersLine(ownersPath, ownersList);
-      owners.push(...lineResult.result);
-      errors.push(...lineResult.errors);
-    } else {
-      ownersList.forEach(owner => {
-        if (typeof owner === 'string') {
-          const lineResult = this._parseOwnersLine(ownersPath, owner);
-          owners.push(...lineResult.result);
-          errors.push(...lineResult.errors);
+      if (subpattern.indexOf('/') !== -1) {
+        errors.push(
+          new OwnersParserError(
+            ownersPath,
+            `Failed to parse rule for pattern '${subpattern}';' ` +
+              "directory patterns other than '**/' not supported"
+          )
+        );
+      } else if (typeof ownersList === 'string') {
+        const lineResult = this._parseOwnersLine(ownersPath, ownersList);
+        owners.push(...lineResult.result);
+        errors.push(...lineResult.errors);
+      } else {
+        ownersList.forEach(owner => {
+          if (typeof owner === 'string') {
+            const lineResult = this._parseOwnersLine(ownersPath, owner);
+            owners.push(...lineResult.result);
+            errors.push(...lineResult.errors);
+          } else {
+            errors.push(
+              new OwnersParserError(
+                ownersPath,
+                `Failed to parse owner of type ${typeof owner} for pattern ` +
+                  `rule '${subpattern}'`
+              )
+            );
+          }
+        });
+      }
+
+      if (owners.length) {
+        if (isRecursive) {
+          rules.push(new PatternOwnersRule(ownersPath, owners, subpattern));
         } else {
-          errors.push(
-            new OwnersParserError(
-              ownersPath,
-              `Failed to parse owner of type ${typeof owner} for pattern rule '${pattern}'`
-            )
+          rules.push(
+            new SameDirPatternOwnersRule(ownersPath, owners, subpattern)
           );
         }
-      });
-    }
-
-    if (owners.length) {
-      if (isRecursive) {
-        rules.push(new PatternOwnersRule(ownersPath, owners, pattern));
-      } else {
-        rules.push(new SameDirPatternOwnersRule(ownersPath, owners, pattern));
       }
-    }
+    });
 
     return {result: rules, errors};
   }
@@ -229,7 +237,8 @@ class OwnersParser {
    * TODO: Replace this with `parseAllOwnersRulesForFiles` to reduce OWNERS file
    * reads
    *
-   * @return {OwnersParserResult<OwnersRule[]>} a list of all rules defined in the local repo.
+   * @return {OwnersParserResult<OwnersRule[]>} a list of all rules defined in
+   *     the local repo.
    */
   async parseAllOwnersRules() {
     const ownersPaths = await this.localRepo.findOwnersFiles();
