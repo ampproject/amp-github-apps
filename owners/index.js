@@ -62,12 +62,14 @@ module.exports = app => {
     const treeParse = await parser.parseOwnersTree();
     const treeHeader = '<h3>OWNERS tree</h3>';
     const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
-    const errorHeader = '<h3>Parser Errors</h3>';
-    const errorDisplay = treeParse.errors.map(error => error.toString());
 
     let output = `${treeHeader}${treeDisplay}`;
     if (treeParse.errors.length) {
-      output += `${errorHeader}${errorDisplay}`;
+      const errorHeader = '<h3>Parser Errors</h3>';
+      const errorDisplay = treeParse.errors
+        .map(error => error.toString())
+        .join('<br>');
+      output += `${errorHeader}<code>${errorDisplay}</code>`;
     }
 
     res.send(output);
