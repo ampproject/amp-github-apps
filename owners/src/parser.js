@@ -98,6 +98,27 @@ class OwnersParser {
   }
 
   /**
+   * Parse a list of owners.
+   *
+   * @private
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {string[]} ownersList list of owners.
+   * @return {OwnersParserResult<string[]>} list of owners' usernames.
+   */
+  _parseOwnersList(ownersPath, ownersList) {
+    const owners = [];
+    const errors = [];
+
+    ownersList.forEach(owner => {
+      const lineResult = this._parseOwnersLine(ownersPath, owner);
+      owners.push(...lineResult.result);
+      errors.push(...lineResult.errors);
+    });
+
+    return {result: owners, errors};
+  }
+
+  /**
    * Parse an OWNERS.yaml file.
    *
    * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
@@ -112,15 +133,10 @@ class OwnersParser {
     if (lines instanceof Array) {
       const stringLines = lines.filter(line => typeof line === 'string');
 
-      const ownersList = [];
-      stringLines.forEach(line => {
-        const lineResult = this._parseOwnersLine(ownersPath, line);
-        ownersList.push(...lineResult.result);
-        errors.push(...lineResult.errors);
-      });
-
-      if (ownersList.length) {
-        rules.push(new OwnersRule(ownersPath, ownersList));
+      const fileOwners = this._parseOwnersList(ownersPath, stringLines);
+      errors.push(...fileOwners.errors);
+      if (fileOwners.result.length) {
+        rules.push(new OwnersRule(ownersPath, fileOwners.result));
       }
     } else {
       errors.push(
