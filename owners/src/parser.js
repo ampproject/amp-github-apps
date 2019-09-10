@@ -15,7 +15,11 @@
  */
 
 const yaml = require('yamljs');
-const {OwnersRule} = require('./rules');
+const {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+} = require('./rules');
 const {OwnersTree} = require('./owners_tree');
 
 /**
@@ -119,6 +123,53 @@ class OwnersParser {
   }
 
   /**
+   * Parse an owners dictionary as a pattern-based rule.
+   *
+   * Note: All YAML parsed dictionaries have a single key-value pair; a dict not
+   * matching this will not be parsed correctly.
+   *
+   * @private
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!object} ownersDict dictionary with a pattern as the key and a list
+   * of owners as the value.
+   * @return {OwnersParserResult<PatternOwnersRule[]>} parsed OWNERS pattern rule.
+   */
+  _parseOwnersDict(ownersPath, ownersDict) {
+    const [[pattern, ownersList]] = Object.entries(ownersDict);
+    const isRecursive = pattern.indexOf('**/') === 0;
+    const owners = [];
+    const rules = [];
+    const errors = [];
+
+    if (typeof ownersList === 'string') {
+      owners.push(ownersList);
+    } else {
+      ownersList.forEach(owner => {
+        if (typeof owner === 'string') {
+          const lineResult = this._parseOwnersLine(ownersPath, owner);
+          owners.push(...lineResult.result);
+          errors.push(...lineResult.errors);
+        } else {
+          errors.push(
+            new OwnersParserError(
+              ownersPath,
+              `Failed to parse owner of type ${typeof owner} for pattern rule '${pattern}'`
+            )
+          );
+        }
+      });
+    }
+
+    if (isRecursive) {
+      rules.push(new PatternOwnersRule(ownersPath, owners, pattern.slice(3)));
+    } else {
+      rules.push(new SameDirPatternOwnersRule(ownersPath, owners, pattern));
+    }
+
+    return {result: rules, errors};
+  }
+
+  /**
    * Parse an OWNERS.yaml file.
    *
    * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
@@ -138,6 +189,13 @@ class OwnersParser {
       if (fileOwners.result.length) {
         rules.push(new OwnersRule(ownersPath, fileOwners.result));
       }
+
+      const dictLines = lines.filter(line => typeof line === 'object');
+      dictLines.forEach(dict => {
+        const dictResult = this._parseOwnersDict(ownersPath, dict);
+        rules.push(...dictResult.result);
+        errors.push(...dictResult.errors);
+      });
     } else {
       errors.push(
         new OwnersParserError(

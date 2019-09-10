@@ -1,7 +1,11 @@
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
-const {OwnersRule} = require('../src/rules');
+const {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+} = require('../src/rules');
 
 describe('owners parser error', () => {
   describe('toString', () => {
@@ -104,14 +108,52 @@ describe('owners parser', () => {
       });
     });
 
-    it('ignores non-string rules in the list', () => {
-      sandbox
-        .stub(repo, 'readFile')
-        .returns('- owner\n- dict:\n  key: "value"\n  key2: "value2"\n');
-      const fileParse = parser.parseOwnersFile('');
-      const rules = fileParse.result;
+    describe('rule dictionary', () => {
+      it('parses a single owner into a pattern rule', () => {
+        sandbox.stub(repo, 'readFile').returns('- *.js: scripty\n');
 
-      expect(rules.length).toEqual(1);
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules[0]).toBeInstanceOf(SameDirPatternOwnersRule);
+        expect(rules[0].pattern).toEqual('*.js');
+        expect(rules[0].owners).toEqual(['scripty']);
+      });
+
+      it('parses a list of owners into a pattern rule', () => {
+        sandbox
+          .stub(repo, 'readFile')
+          .returns('- *.js:\n  - scripty\n  - coder\n');
+
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules[0]).toBeInstanceOf(SameDirPatternOwnersRule);
+        expect(rules[0].pattern).toEqual('*.js');
+        expect(rules[0].owners).toEqual(['scripty', 'coder']);
+      });
+
+      it('reports errors for non-string owners', () => {
+        sandbox
+          .stub(repo, 'readFile')
+          .returns('- *.js:\n  - nestedDict: "value"\n');
+        const {errors} = parser.parseOwnersFile('');
+
+        expect(errors[0].message).toContain(
+          "Failed to parse owner of type object for pattern rule '*.js'"
+        );
+      });
+
+      it('starting with **/ parses into a recursive pattern rule', () => {
+        sandbox.stub(repo, 'readFile').returns('- **/*.js: scripty\n');
+
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules[0]).toBeInstanceOf(PatternOwnersRule);
+        expect(rules[0].pattern).toEqual('*.js');
+        expect(rules[0].owners).toEqual(['scripty']);
+      });
     });
 
     describe('files containing top-level dictionaries', () => {
