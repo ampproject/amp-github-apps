@@ -23,12 +23,23 @@ const {OwnersTree} = require('./owners_tree');
  */
 class OwnersParserError extends Error {
   /**
+   * Constructor
+   *
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!string} message error message;
+   */
+  constructor(ownersPath, message) {
+    super(message);
+    this.ownersPath = ownersPath;
+  }
+
+  /**
    * Displays the error message.
    *
    * @return {string} error message.
    */
   toString() {
-    return `OwnersParserError: ${this.message}`;
+    return `OwnersParserError [${this.ownersPath}]: ${this.message}`;
   }
 }
 
@@ -48,9 +59,48 @@ class OwnersParser {
   }
 
   /**
+   * Parse a single owner declaration.
+   *
+   * TODO(rcebulko): Add support for teams.
+   *
+   * @private
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!string} owner owner username.
+   * @return {OwnersParserResult<string[]>} list of owners' usernames.
+   */
+  _parseOwnersLine(ownersPath, owner) {
+    const owners = [];
+    const errors = [];
+
+    if (owner[0] === '@') {
+      const lineResult = this._parseOwnersLine(ownersPath, owner.slice(1));
+
+      owners.push(...lineResult.result);
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Ignoring unnecessary '@' in '${owner}'`
+        ),
+        ...lineResult.errors
+      );
+    } else if (owner.indexOf('/') !== -1) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Failed to parse owner '${owner}'; team ownership not yet supported`
+        )
+      );
+    } else {
+      owners.push(owner);
+    }
+
+    return {result: owners, errors};
+  }
+
+  /**
    * Parse an OWNERS.yaml file.
    *
-   * @param {!string} ownersPath OWNERS.yaml file path.
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
    * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
    */
   parseOwnersFile(ownersPath) {
@@ -61,14 +111,22 @@ class OwnersParser {
 
     if (lines instanceof Array) {
       const stringLines = lines.filter(line => typeof line === 'string');
-      const ownersList = stringLines.filter(line => line.indexOf('/') === -1);
+
+      const ownersList = [];
+      stringLines.forEach(line => {
+        const lineResult = this._parseOwnersLine(ownersPath, line);
+        ownersList.push(...lineResult.result);
+        errors.push(...lineResult.errors);
+      });
+
       if (ownersList.length) {
         rules.push(new OwnersRule(ownersPath, ownersList));
       }
     } else {
       errors.push(
         new OwnersParserError(
-          `Failed to parse file '${ownersPath}'; must be a YAML list`
+          ownersPath,
+          `Failed to parse file; must be a YAML list`
         )
       );
     }
@@ -110,7 +168,7 @@ class OwnersParser {
     const tree = new OwnersTree(this.localRepo.rootPath);
     const ruleParse = await this.parseAllOwnersRules();
     ruleParse.result.forEach(rule => tree.addRule(rule));
-    
+
     return {result: tree, errors: ruleParse.errors};
   }
 }

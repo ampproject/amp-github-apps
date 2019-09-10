@@ -1,7 +1,21 @@
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {OwnersParser} = require('../src/parser');
+const {OwnersParser, OwnersParserError} = require('../src/parser');
 const {OwnersRule} = require('../src/rules');
+
+describe('owners parser error', () => {
+  describe('toString', () => {
+    const error = new OwnersParserError('foo/OWNERS.yaml', 'Oops!');
+
+    it('displays the file containing the error', () => {
+      expect(error.toString()).toContain('[foo/OWNERS.yaml]');
+    });
+
+    it('displays the error message', () => {
+      expect(error.toString()).toContain('Oops!');
+    });
+  });
+});
 
 describe('owners parser', () => {
   const sandbox = sinon.createSandbox();
@@ -52,33 +66,41 @@ describe('owners parser', () => {
       expect(rules[0].owners).toEqual(['user1', 'user2']);
     });
 
-    it('returns no rule for team rules', () => {
-      sandbox.stub(repo, 'readFile').returns('- ampproject/team\n');
-      const fileParse = parser.parseOwnersFile('');
-      const rules = fileParse.result;
-
-      expect(rules).toEqual([]);
-    });
-
-    describe('dictionary rule declarations', () => {
-      beforeEach(() => {
-        sandbox
-          .stub(repo, 'readFile')
-          .returns('dict:\n  key: "value"\n  key2: "value2"\n');
-      });
+    describe('team rule declarations', () => {
       it('returns no rule', () => {
+        sandbox.stub(repo, 'readFile').returns('- ampproject/team\n');
         const fileParse = parser.parseOwnersFile('');
         const rules = fileParse.result;
 
         expect(rules).toEqual([]);
       });
 
-      it('returns a parser error', () => {
-        const {errors} = parser.parseOwnersFile('foo/OWNERS.yaml');
+      it('records an error', () => {
+        sandbox.stub(repo, 'readFile').returns('- ampproject/team\n');
+        const {errors} = parser.parseOwnersFile('');
 
         expect(errors[0].message).toEqual(
-          "Failed to parse file 'foo/OWNERS.yaml'; must be a YAML list"
+          "Failed to parse owner 'ampproject/team'; team ownership not yet supported"
         );
+      });
+    });
+
+    describe('owner with a leading @', () => {
+      let fileParse;
+
+      beforeEach(() => {
+        sandbox.stub(repo, 'readFile').returns('- @owner');
+        fileParse = parser.parseOwnersFile('');
+      });
+
+      it('parses ignoring the @ sign', () => {
+        const [rule] = fileParse.result;
+        expect(rule.owners).toEqual(['owner']);
+      });
+
+      it('records an error', () => {
+        const [error] = fileParse.errors;
+        expect(error.message).toEqual("Ignoring unnecessary '@' in '@owner'");
       });
     });
 
@@ -90,6 +112,29 @@ describe('owners parser', () => {
       const rules = fileParse.result;
 
       expect(rules.length).toEqual(1);
+    });
+
+    describe('files containing top-level dictionaries', () => {
+      beforeEach(() => {
+        sandbox
+          .stub(repo, 'readFile')
+          .returns('dict:\n  key: "value"\n  key2: "value2"\n');
+      });
+
+      it('returns no rules', () => {
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules).toEqual([]);
+      });
+
+      it('returns a parser error', () => {
+        const {errors} = parser.parseOwnersFile('foo/OWNERS.yaml');
+
+        expect(errors[0].message).toEqual(
+          'Failed to parse file; must be a YAML list'
+        );
+      });
     });
   });
 
