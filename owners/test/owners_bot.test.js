@@ -52,12 +52,12 @@ describe('owners bot', () => {
 
   describe('initPr', () => {
     beforeEach(() => {
-      sandbox.stub(GitHub.prototype, 'getReviews').returns(
-        [approval, otherApproval]
-      );
-      sandbox.stub(GitHub.prototype, 'listFiles').returns(
-        ['changed_file1.js', 'foo/changed_file2.js']
-      );
+      sandbox
+        .stub(GitHub.prototype, 'getReviews')
+        .returns([approval, otherApproval]);
+      sandbox
+        .stub(GitHub.prototype, 'listFiles')
+        .returns(['changed_file1.js', 'foo/changed_file2.js']);
     });
 
     it('parses the owners tree', async () => {
