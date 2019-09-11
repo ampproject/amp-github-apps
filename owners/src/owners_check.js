@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-const _ = require('lodash');
-const {OwnersParser} = require('./parser');
 const {ReviewerSelection} = require('./reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
@@ -68,36 +66,12 @@ class OwnersCheck {
   /**
    * Constructor.
    *
-   * @param {!LocalRepository} repo local repository to read from.
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!PullRequest} pr pull request to run owners check on.
+   * @param {!OwnersTree} tree file ownership tree.
+   * @param {string[]} approvers list of usernames of approving reviewers.
+   * @param {string[]} changedFiles list of change files.
    */
-  constructor(repo, github, pr) {
-    const parser = new OwnersParser(repo, github.log);
-
-    Object.assign(this, {github, pr, repo, parser});
-
-    this.tree = null;
-    this.approvers = null;
-    this.changedFiles = null;
-    this.initialized = false;
-  }
-
-  /**
-   * Initializes key properties requiring async/await.
-   */
-  async init() {
-    await this.repo.checkout();
-    const treeParse = await this.parser.parseOwnersTree();
-
-    treeParse.errors.forEach(error => {
-      console.warn(error);
-    });
-
-    this.tree = treeParse.result;
-    this.approvers = await this._getApprovers();
-    this.changedFiles = await this.github.listFiles(this.pr.number);
-    this.initialized = true;
+  constructor(tree, approvers, changedFiles) {
+    Object.assign(this, {tree, approvers, changedFiles});
   }
 
   /**
@@ -105,12 +79,8 @@ class OwnersCheck {
    *
    * @return {CheckRun} a GitHub check-run with approval and reviewer info.
    */
-  async run() {
+  run() {
     try {
-      if (!this.initialized) {
-        await this.init();
-      }
-
       const fileTreeMap = this.tree.buildFileTreeMap(this.changedFiles);
       const coverageText = this.buildCurrentCoverageText(fileTreeMap);
 
@@ -167,32 +137,6 @@ class OwnersCheck {
     return this.approvers.some(approver =>
       this.tree.fileHasOwner(filename, approver)
     );
-  }
-
-  /**
-   * Identifies all reviewers whose latest reviews are approvals.
-   *
-   * Also includes the author, unless the author has explicitly left a blocking
-   * review.
-   *
-   * @private
-   * @return {string[]} list of usernames.
-   */
-  async _getApprovers() {
-    const reviews = await this.github.getReviews(this.pr.number);
-    // Sort by the latest submitted_at date to get the latest review.
-    const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
-    // This should always pick out the first instance.
-    const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
-    const uniqueApprovals = uniqueReviews.filter(review => review.isApproved);
-    const approvers = uniqueApprovals.map(approval => approval.reviewer);
-
-    // The author of a PR implicitly gives approval over files they own.
-    if (!approvers.includes(this.pr.author)) {
-      approvers.push(this.pr.author);
-    }
-
-    return approvers;
   }
 
   /**

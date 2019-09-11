@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+const _ = require('lodash');
 const sleep = require('sleep-promise');
 const {OwnersCheck} = require('./owners_check');
+const {OwnersParser} = require('./parser');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
 
@@ -35,6 +37,33 @@ class OwnersBot {
   }
 
   /**
+   * Fetch and initialize key data for running checks on PR.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   * @param {!PullRequest} pr pull request to initialize data for.
+   * @return {{
+   *     tree: OwnersTree,
+   *     approvers: string[],
+   *     changedFiles: string[],
+   * }} key structures needed to check PR ownership.
+   */
+  async initPr(github, pr) {
+    await this.repo.checkout();
+
+    const parser = new OwnersParser(this.repo, github.log);
+    const treeParse = await parser.parseOwnersTree();
+    treeParse.errors.forEach(error => {
+      github.logger.warn(error);
+    });
+    const tree = treeParse.result;
+
+    const approvers = await this._getApprovers(github, pr);
+    const changedFiles = await github.listFiles(pr.number);
+
+    return {tree, approvers, changedFiles};
+  }
+
+  /**
    * Runs the steps to create or update an owners-bot check-run on a GitHub Pull
    * Request.
    *
@@ -42,9 +71,10 @@ class OwnersBot {
    * @param {!PullRequest} pr pull request to run owners check on.
    */
   async runOwnersCheck(github, pr) {
-    const ownersCheck = new OwnersCheck(this.repo, github, pr);
+    const {tree, approvers, changedFiles} = await this.initPr(github, pr);
+    const ownersCheck = new OwnersCheck(tree, approvers, changedFiles);
     const checkRunId = await github.getCheckRunId(pr.headSha);
-    const latestCheckRun = await ownersCheck.run();
+    const latestCheckRun = ownersCheck.run();
 
     if (checkRunId) {
       await github.updateCheckRun(checkRunId, latestCheckRun);
@@ -67,6 +97,34 @@ class OwnersBot {
   async runOwnersCheckOnPrNumber(github, prNumber) {
     const pr = await github.getPullRequest(prNumber);
     await this.runOwnersCheck(github, pr);
+  }
+
+  /**
+   * Identifies all reviewers whose latest reviews are approvals.
+   *
+   * Also includes the author, unless the author has explicitly left a blocking
+   * review.
+   *
+   * @private
+   * @param {!GitHub} github GitHub API interface.
+   * @param {!PullRequest} pr pull request to fetch approvers for.
+   * @return {string[]} list of usernames.
+   */
+  async _getApprovers(github, pr) {
+    const reviews = await github.getReviews(pr.number);
+    // Sort by the latest submitted_at date to get the latest review.
+    const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
+    // This should always pick out the first instance.
+    const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
+    const uniqueApprovals = uniqueReviews.filter(review => review.isApproved);
+    const approvers = uniqueApprovals.map(approval => approval.reviewer);
+
+    // The author of a PR implicitly gives approval over files they own.
+    if (!approvers.includes(pr.author)) {
+      approvers.push(pr.author);
+    }
+
+    return approvers;
   }
 }
 
