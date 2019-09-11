@@ -22,6 +22,8 @@ const {
 } = require('./rules');
 const {OwnersTree} = require('./owners_tree');
 
+const GLOB_PATTERN = '**/'
+
 /**
  * An error encountered parsing an OWNERS file
  */
@@ -143,9 +145,9 @@ class OwnersParser {
     // Treat each comma-separated subpattern as its own rule definition.
     pattern.split(/\s*,\s*/).forEach(subpattern => {
       const owners = [];
-      const isRecursive = subpattern.indexOf('**/') === 0;
+      const isRecursive = subpattern.startsWith(GLOB_PATTERN);
       if (isRecursive) {
-        subpattern = subpattern.slice(3);
+        subpattern = subpattern.slice(GLOB_PATTERN.length);
       }
 
       if (subpattern.indexOf('/') !== -1) {
@@ -153,7 +155,7 @@ class OwnersParser {
           new OwnersParserError(
             ownersPath,
             `Failed to parse rule for pattern '${subpattern}'; ` +
-              "directory patterns other than '**/' not supported"
+              `directory patterns other than '${GLOB_PATTERN}' not supported`
           )
         );
       } else if (typeof ownersList === 'string') {
