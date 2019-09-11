@@ -15,8 +15,6 @@
  */
 
 const sinon = require('sinon');
-const {PullRequest, Review} = require('../src/github');
-const {LocalRepository} = require('../src/local_repo');
 const {
   CheckRun,
   CheckRunConclusion,
@@ -47,120 +45,38 @@ describe('check run', () => {
 });
 
 describe('owners check', () => {
-  /* eslint-disable require-jsdoc */
-  class FakeGithub {
-    constructor(reviews, files) {
-      this.getReviews = () => reviews;
-      this.listFiles = async () => files;
-    }
-  }
-  /* eslint-enable require-jsdoc */
-
   const sandbox = sinon.createSandbox();
-  const repo = new LocalRepository('path/to/repo');
-  const pr = new PullRequest(35, 'the_author', '_test_hash_');
-
-  const timestamp = '2019-01-01T00:00:00Z';
-  const approval = new Review('approver', 'approved', timestamp);
-  const authorApproval = new Review('the_author', 'approved', timestamp);
-  const otherApproval = new Review('other_approver', 'approved', timestamp);
-  const rejection = new Review('rejector', 'changes_requested', timestamp);
+  let ownersCheck;
 
   beforeEach(() => {
-    sandbox.stub(repo, 'checkout');
-    sandbox.stub(repo, 'findOwnersFiles').returns([]);
+    const ownersTree = new OwnersTree();
+    [
+      new OwnersRule('OWNERS.yaml', ['root_owner']),
+      new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
+      new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
+      new OwnersRule('buzz/OWNERS.yaml', ['the_author']),
+    ].forEach(rule => ownersTree.addRule(rule));
+
+    ownersCheck = new OwnersCheck(
+      ownersTree,
+      ['the_author', 'approver', 'other_approver'],
+      [
+        'main.js', // root_owner
+        'foo/test.js', // approver, some_user, root_owner
+        'bar/baz/file.txt', // other_approver, root_owner
+        'buzz/README.md', // the_author, root_owner
+      ]
+    );
   });
 
   afterEach(() => {
     sandbox.restore();
   });
 
-  describe('init', () => {
-    const github = new FakeGithub(
-      [approval, otherApproval],
-      ['changed_file1.js', 'foo/changed_file2.js']
-    );
-    let ownersCheck;
-
-    beforeEach(() => {
-      ownersCheck = new OwnersCheck(repo, github, pr);
-    });
-
-    it('checks out the repo', async () => {
-      await ownersCheck.init();
-      sandbox.assert.calledOnce(repo.checkout);
-    });
-
-    it('parses the owners tree', async () => {
-      await ownersCheck.init();
-      expect(ownersCheck.tree).toBeInstanceOf(OwnersTree);
-    });
-
-    it('finds the reviewers that approved', async () => {
-      await ownersCheck.init();
-      expect(ownersCheck.approvers).toContain('approver', 'other_approver');
-    });
-
-    it('fetches the files changed in the PR', async () => {
-      sandbox.stub(github, 'listFiles').callThrough();
-      await ownersCheck.init();
-
-      sandbox.assert.calledWith(ownersCheck.github.listFiles, 35);
-      expect(ownersCheck.changedFiles).toContain(
-        'changed_file1.js',
-        'foo/changed_file2.js'
-      );
-    });
-
-    it('sets `initialized` to true', async () => {
-      expect(ownersCheck.initialized).toBe(false);
-      await ownersCheck.init();
-      expect(ownersCheck.initialized).toBe(true);
-    });
-  });
-
   describe('run', () => {
-    const github = new FakeGithub(
-      [approval, otherApproval],
-      [
-        'main.js', // root_owner
-        'foo/test.js', // approver, some_user, root_owner
-        'bar/baz/file.txt', // other_approver, root_owner
-        'buzz/README.md', // root_owner
-      ]
-    );
-    let ownersCheck;
-
-    beforeEach(() => {
-      ownersCheck = new OwnersCheck(repo, github, pr);
-      sandbox.stub(ownersCheck.parser, 'parseAllOwnersRules').returns({
-        result: [
-          new OwnersRule('OWNERS.yaml', ['root_owner']),
-          new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
-          new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
-        ],
-        errors: [],
-      });
-    });
-
-    it('calls `init` if not initialized', async () => {
-      sandbox.stub(OwnersCheck.prototype, 'init').callThrough();
-      await ownersCheck.run();
-
-      sandbox.assert.calledOnce(ownersCheck.init);
-    });
-
-    it('does not call `init` if already initialized', async () => {
-      await ownersCheck.init();
-      sandbox.stub(OwnersCheck.prototype, 'init').callThrough();
-      await ownersCheck.run();
-
-      sandbox.assert.notCalled(ownersCheck.init);
-    });
-
-    it('builds a map of changed files and their ownership trees', async () => {
+    it('builds a map of changed files and their ownership trees', () => {
       sandbox.stub(OwnersTree.prototype, 'buildFileTreeMap').callThrough();
-      await ownersCheck.run();
+      ownersCheck.run();
 
       sandbox.assert.calledWith(ownersCheck.tree.buildFileTreeMap, [
         'main.js',
@@ -171,11 +87,11 @@ describe('owners check', () => {
     });
 
     describe('created check-run', () => {
-      it('contains coverage information in the output', async () => {
+      it('contains coverage information in the output', () => {
         sandbox
           .stub(OwnersCheck.prototype, 'buildCurrentCoverageText')
           .returns('%% COVERAGE INFO %%');
-        const checkRun = await ownersCheck.run();
+        const checkRun = ownersCheck.run();
 
         expect(checkRun.text).toContain('%% COVERAGE INFO %%');
       });
@@ -185,30 +101,30 @@ describe('owners check', () => {
           sandbox.stub(OwnersTree.prototype, 'fileHasOwner').returns(true);
         });
 
-        it('has a success conclusion', async () => {
-          const checkRun = await ownersCheck.run();
+        it('has a success conclusion', () => {
+          const checkRun = ownersCheck.run();
 
           expect(checkRun.json.conclusion).toEqual('success');
         });
 
-        it('has a passing summary', async () => {
-          const checkRun = await ownersCheck.run();
+        it('has a passing summary', () => {
+          const checkRun = ownersCheck.run();
 
           expect(checkRun.summary).toEqual(
             'All files in this PR have OWNERS approval'
           );
         });
 
-        it('does not run reviewer selection', async () => {
+        it('does not run reviewer selection', () => {
           sandbox.stub(ReviewerSelection, 'pickReviews');
-          await ownersCheck.run();
+          ownersCheck.run();
 
           sandbox.assert.notCalled(ReviewerSelection.pickReviews);
         });
 
-        it('does output review suggestions', async () => {
+        it('does output review suggestions', () => {
           sandbox.stub(OwnersCheck.prototype, 'buildReviewSuggestionsText');
-          await ownersCheck.run();
+          ownersCheck.run();
 
           sandbox.assert.notCalled(ownersCheck.buildReviewSuggestionsText);
         });
@@ -216,32 +132,32 @@ describe('owners check', () => {
 
       describe('for a PR requiring approvals', () => {
         // TODO(rcebulko): Update once this is changed to a blocking check.
-        it('has a neutral conclusion', async () => {
-          const checkRun = await ownersCheck.run();
+        it('has a neutral conclusion', () => {
+          const checkRun = ownersCheck.run();
 
           expect(checkRun.json.conclusion).toEqual('neutral');
         });
 
-        it('has a failing summary', async () => {
-          const checkRun = await ownersCheck.run();
+        it('has a failing summary', () => {
+          const checkRun = ownersCheck.run();
 
           expect(checkRun.summary).toEqual(
             'Missing required OWNERS approvals! Suggested reviewers: root_owner'
           );
         });
 
-        it('runs reviewer selection', async () => {
+        it('runs reviewer selection', () => {
           sandbox.stub(ReviewerSelection, 'pickReviews').callThrough();
-          await ownersCheck.run();
+          ownersCheck.run();
 
           sandbox.assert.calledOnce(ReviewerSelection.pickReviews);
         });
 
-        it('contains review suggestions in the output', async () => {
+        it('contains review suggestions in the output', () => {
           sandbox
             .stub(OwnersCheck.prototype, 'buildReviewSuggestionsText')
             .returns('%% REVIEW SUGGESTIONS %%');
-          const checkRun = await ownersCheck.run();
+          const checkRun = ownersCheck.run();
 
           expect(checkRun.text).toContain('%% REVIEW SUGGESTIONS %%');
         });
@@ -255,20 +171,20 @@ describe('owners check', () => {
         });
 
         // TODO(rcebulko): Update once this is changed to a blocking check.
-        it('has a neutral conclusion', async () => {
-          const checkRun = await ownersCheck.run();
+        it('has a neutral conclusion', () => {
+          const checkRun = ownersCheck.run();
 
           expect(checkRun.json.conclusion).toEqual('neutral');
         });
 
-        it('has an error summary', async () => {
-          const checkRun = await ownersCheck.run();
+        it('has an error summary', () => {
+          const checkRun = ownersCheck.run();
 
           expect(checkRun.summary).toEqual('The check encountered an error!');
         });
 
-        it('contains error details in the output', async () => {
-          const checkRun = await ownersCheck.run();
+        it('contains error details in the output', () => {
+          const checkRun = ownersCheck.run();
 
           expect(checkRun.text).toEqual(
             'OWNERS check encountered an error:\nError: Something is wrong'
@@ -279,32 +195,6 @@ describe('owners check', () => {
   });
 
   describe('hasOwnersApproval', () => {
-    const github = new FakeGithub(
-      [approval, otherApproval],
-      [
-        'main.js', // root_owner
-        'foo/test.js', // approver, some_user, root_owner
-        'bar/baz/file.txt', // other_approver, root_owner
-        'buzz/README.md', // root_owner
-      ]
-    );
-    let ownersCheck;
-
-    beforeEach(async () => {
-      ownersCheck = new OwnersCheck(repo, github, pr);
-
-      sandbox.stub(ownersCheck.parser, 'parseAllOwnersRules').returns({
-        result: [
-          new OwnersRule('OWNERS.yaml', ['root_owner']),
-          new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
-          new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
-        ],
-        errors: [],
-      });
-
-      await ownersCheck.init();
-    });
-
     it('returns true if any approver is an owner of the file', () => {
       expect(
         ownersCheck._hasOwnersApproval(
@@ -318,9 +208,15 @@ describe('owners check', () => {
           ownersCheck.tree.atPath('bar/baz/file.txt')
         )
       ).toBe(true);
+      expect(
+        ownersCheck._hasOwnersApproval(
+          'buzz/README.md',
+          ownersCheck.tree.atPath('buzz/README.md')
+        )
+      ).toBe(true);
     });
 
-    it('returns true if no owner has given approval', () => {
+    it('returns false if no owner has given approval', () => {
       expect(
         ownersCheck._hasOwnersApproval(
           'main.js',
@@ -329,85 +225,15 @@ describe('owners check', () => {
       ).toBe(false);
       expect(
         ownersCheck._hasOwnersApproval(
-          'buzz/README.md',
-          ownersCheck.tree.atPath('buzz/README.md')
+          'baz/README.md',
+          ownersCheck.tree.atPath('baz/README.md')
         )
       ).toBe(false);
     });
   });
 
-  describe('getApprovers', () => {
-    it("returns the reviewers' usernames", async () => {
-      const ownersCheck = new OwnersCheck(
-        repo,
-        new FakeGithub([approval, otherApproval], []),
-        pr
-      );
-      const approvers = await ownersCheck._getApprovers();
-
-      expect(approvers).toContain('approver', 'other_approver');
-    });
-
-    it('includes the author', async () => {
-      const ownersCheck = new OwnersCheck(repo, new FakeGithub([], []), pr);
-      const approvers = await ownersCheck._getApprovers();
-
-      expect(approvers).toContain('the_author');
-    });
-
-    it('produces unique usernames', async () => {
-      const ownersCheck = new OwnersCheck(
-        repo,
-        new FakeGithub([approval, approval, authorApproval], []),
-        pr
-      );
-      const approvers = await ownersCheck._getApprovers();
-
-      expect(approvers).toEqual(['approver', 'the_author']);
-    });
-
-    it('includes only reviewers who approved the review', async () => {
-      const ownersCheck = new OwnersCheck(
-        repo,
-        new FakeGithub([approval, rejection], []),
-        pr
-      );
-      const approvers = await ownersCheck._getApprovers();
-
-      expect(approvers).not.toContain('rejector');
-    });
-  });
-
   describe('buildCurrentCoverageText', () => {
-    let ownersCheck;
-
-    beforeEach(() => {
-      ownersCheck = new OwnersCheck(
-        repo,
-        new FakeGithub(
-          [approval, otherApproval],
-          [
-            'main.js', // root_owner
-            'foo/test.js', // approver, some_user, root_owner
-            'bar/baz/file.txt', // other_approver, root_owner
-            'buzz/README.md', // the_author, root_owner
-          ]
-        ),
-        pr
-      );
-      sandbox.stub(ownersCheck.parser, 'parseAllOwnersRules').returns({
-        result: [
-          new OwnersRule('OWNERS.yaml', ['root_owner']),
-          new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
-          new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
-          new OwnersRule('buzz/OWNERS.yaml', ['the_author']),
-        ],
-        errors: [],
-      });
-    });
-
-    it('lists files with their owners approvers', async () => {
-      await ownersCheck.init();
+    it('lists files with their owners approvers', () => {
       const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
         ownersCheck.changedFiles
       );
@@ -419,8 +245,7 @@ describe('owners check', () => {
       expect(coverageText).toContain('- buzz/README.md _(the_author)_');
     });
 
-    it('lists files needing approval', async () => {
-      await ownersCheck.init();
+    it('lists files needing approval', () => {
       const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
         ownersCheck.changedFiles
       );
@@ -433,7 +258,6 @@ describe('owners check', () => {
 
   describe('buildReviewSuggestionsText', () => {
     it('displays review suggestions', () => {
-      const ownersCheck = new OwnersCheck(repo, new FakeGithub([], []), pr);
       const reviewSuggestions = [
         ['alice', ['alice_file1.js', 'foo/alice_file2.js']],
         ['bob', ['bob_file1.js', 'bar/bob_file2.js']],

@@ -85,7 +85,7 @@ module.exports = app => {
     );
     const pr = await github.getPullRequest(req.params.prNumber);
     const ownersCheck = new OwnersCheck(localRepo, github, pr);
-    const checkRun = await ownersCheck.run();
+    const checkRun = ownersCheck.run();
 
     res.send(checkRun.json);
   });

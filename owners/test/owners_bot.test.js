@@ -15,9 +15,11 @@
  */
 
 const sinon = require('sinon');
-const {GitHub, PullRequest} = require('../src/github');
+const {GitHub, PullRequest, Review} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersBot} = require('../src/owners_bot');
+const {OwnersParser} = require('../src/parser');
+const {OwnersTree} = require('../src/owners_tree');
 const {
   CheckRun,
   CheckRunConclusion,
@@ -26,18 +28,69 @@ const {
 
 describe('owners bot', () => {
   let sandbox;
-  const fakeGithub = new GitHub({}, 'ampproject', 'amphtml', console);
-  const pr = new PullRequest(1337, 'author_user', 'test_sha');
+  const github = new GitHub({}, 'ampproject', 'amphtml', console);
+  const pr = new PullRequest(1337, 'the_author', '_test_hash_');
   const localRepo = new LocalRepository('path/to/repo');
   const ownersBot = new OwnersBot(localRepo);
 
+  const timestamp = '2019-01-01T00:00:00Z';
+  const approval = new Review('approver', 'approved', timestamp);
+  const authorApproval = new Review('the_author', 'approved', timestamp);
+  const otherApproval = new Review('other_approver', 'approved', timestamp);
+  const rejection = new Review('rejector', 'changes_requested', timestamp);
+
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    sandbox.stub(LocalRepository.prototype, 'checkout');
+    sandbox.stub(LocalRepository.prototype, 'findOwnersFiles').returns([]);
     ownersBot.GITHUB_CHECKRUN_DELAY = 0;
   });
 
   afterEach(() => {
     sandbox.restore();
+  });
+
+  describe('initPr', () => {
+    beforeEach(() => {
+      sandbox
+        .stub(GitHub.prototype, 'getReviews')
+        .returns([approval, otherApproval]);
+      sandbox
+        .stub(GitHub.prototype, 'listFiles')
+        .returns(['changed_file1.js', 'foo/changed_file2.js']);
+    });
+
+    it('parses the owners tree', async () => {
+      const {tree} = await ownersBot.initPr(github, pr);
+      expect(tree).toBeInstanceOf(OwnersTree);
+    });
+
+    it('warns about parsing errors', async () => {
+      const error = new Error('Oops!');
+      sandbox.stub(console, 'warn');
+      sandbox.stub(OwnersParser.prototype, 'parseOwnersTree').returns({
+        tree: new OwnersTree(),
+        errors: [error],
+      });
+      await ownersBot.initPr(github, pr);
+
+      sandbox.assert.calledWith(console.warn, error);
+    });
+
+    it('finds the reviewers that approved', async () => {
+      const {approvers} = await ownersBot.initPr(github, pr);
+      expect(approvers).toContain('approver', 'other_approver');
+    });
+
+    it('fetches the files changed in the PR', async () => {
+      const {changedFiles} = await ownersBot.initPr(github, pr);
+
+      sandbox.assert.calledWith(github.listFiles, 1337);
+      expect(changedFiles).toContain(
+        'changed_file1.js',
+        'foo/changed_file2.js'
+      );
+    });
   });
 
   describe('runOwnersCheck', () => {
@@ -53,22 +106,29 @@ describe('owners bot', () => {
       sandbox.stub(OwnersCheck.prototype, 'run').returns(checkRun);
       sandbox.stub(GitHub.prototype, 'updateCheckRun');
       sandbox.stub(GitHub.prototype, 'createCheckRun');
+      sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
+      sandbox.stub(GitHub.prototype, 'listFiles').returns([]);
     });
 
     it('attempts to fetch the existing check-run ID', async () => {
-      await ownersBot.runOwnersCheck(fakeGithub, pr);
-      sandbox.assert.calledWith(fakeGithub.getCheckRunId, 'test_sha');
+      await ownersBot.runOwnersCheck(github, pr);
+      sandbox.assert.calledWith(github.getCheckRunId, '_test_hash_');
+    });
+
+    it('checks out the latest master', async () => {
+      await ownersBot.runOwnersCheck(github, pr);
+      sandbox.assert.calledOnce(localRepo.checkout);
     });
 
     it('runs the owners check', async () => {
-      await ownersBot.runOwnersCheck(fakeGithub, pr);
+      await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledOnce(OwnersCheck.prototype.run);
     });
 
     describe('when a check-run exists', () => {
       it('updates the existing check-run', async () => {
         getCheckRunIdStub.returns(42);
-        await ownersBot.runOwnersCheck(fakeGithub, pr);
+        await ownersBot.runOwnersCheck(github, pr);
 
         sandbox.assert.calledWith(
           GitHub.prototype.updateCheckRun,
@@ -81,11 +141,11 @@ describe('owners bot', () => {
     describe('when no check-run exists yet', () => {
       it('creates a new check-run', async () => {
         getCheckRunIdStub.returns(null);
-        await ownersBot.runOwnersCheck(fakeGithub, pr);
+        await ownersBot.runOwnersCheck(github, pr);
 
         sandbox.assert.calledWith(
           GitHub.prototype.createCheckRun,
-          'test_sha',
+          '_test_hash_',
           checkRun
         );
       });
@@ -99,13 +159,49 @@ describe('owners bot', () => {
     });
 
     it('fetches the PR from GitHub', async () => {
-      await ownersBot.runOwnersCheckOnPrNumber(fakeGithub, 1337);
-      sandbox.assert.calledWith(fakeGithub.getPullRequest, 1337);
+      await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
+      sandbox.assert.calledWith(github.getPullRequest, 1337);
     });
 
     it('runs the owners check on the retrieved PR', async () => {
-      await ownersBot.runOwnersCheckOnPrNumber(fakeGithub, 1337);
-      sandbox.assert.calledWith(ownersBot.runOwnersCheck, fakeGithub, pr);
+      await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
+      sandbox.assert.calledWith(ownersBot.runOwnersCheck, github, pr);
+    });
+  });
+
+  describe('getApprovers', () => {
+    it("returns the reviewers' usernames", async () => {
+      sandbox
+        .stub(GitHub.prototype, 'getReviews')
+        .returns([approval, otherApproval]);
+      const approvers = await ownersBot._getApprovers(github, pr);
+
+      expect(approvers).toContain('approver', 'other_approver');
+    });
+
+    it('includes the author', async () => {
+      sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
+      const approvers = await ownersBot._getApprovers(github, pr);
+
+      expect(approvers).toContain('the_author');
+    });
+
+    it('produces unique usernames', async () => {
+      sandbox
+        .stub(GitHub.prototype, 'getReviews')
+        .returns([approval, approval, authorApproval]);
+      const approvers = await ownersBot._getApprovers(github, pr);
+
+      expect(approvers).toEqual(['approver', 'the_author']);
+    });
+
+    it('includes only reviewers who approved the review', async () => {
+      sandbox
+        .stub(GitHub.prototype, 'getReviews')
+        .returns([approval, rejection]);
+      const approvers = await ownersBot._getApprovers(github, pr);
+
+      expect(approvers).not.toContain('rejector');
     });
   });
 });
