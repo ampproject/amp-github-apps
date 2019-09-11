@@ -22,7 +22,7 @@ const {
 } = require('./rules');
 const {OwnersTree} = require('./owners_tree');
 
-const GLOB_PATTERN = '**/'
+const GLOB_PATTERN = '**/';
 
 /**
  * An error encountered parsing an OWNERS file
