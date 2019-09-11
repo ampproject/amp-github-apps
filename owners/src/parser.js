@@ -15,20 +15,37 @@
  */
 
 const yaml = require('yamljs');
-const {OwnersRule} = require('./rules');
+const {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+} = require('./rules');
 const {OwnersTree} = require('./owners_tree');
+
+const GLOB_PATTERN = '**/';
 
 /**
  * An error encountered parsing an OWNERS file
  */
 class OwnersParserError extends Error {
   /**
+   * Constructor
+   *
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!string} message error message;
+   */
+  constructor(ownersPath, message) {
+    super(message);
+    this.ownersPath = ownersPath;
+  }
+
+  /**
    * Displays the error message.
    *
    * @return {string} error message.
    */
   toString() {
-    return `OwnersParserError: ${this.message}`;
+    return `OwnersParserError [${this.ownersPath}]: ${this.message}`;
   }
 }
 
@@ -48,9 +65,139 @@ class OwnersParser {
   }
 
   /**
+   * Parse a single owner declaration.
+   *
+   * TODO(rcebulko): Add support for teams.
+   *
+   * @private
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!string} owner owner username.
+   * @return {OwnersParserResult<string[]>} list of owners' usernames.
+   */
+  _parseOwnersLine(ownersPath, owner) {
+    const owners = [];
+    const errors = [];
+
+    if (owner[0] === '@') {
+      const lineResult = this._parseOwnersLine(ownersPath, owner.slice(1));
+
+      owners.push(...lineResult.result);
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Ignoring unnecessary '@' in '${owner}'`
+        ),
+        ...lineResult.errors
+      );
+    } else if (owner.indexOf('/') !== -1) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Failed to parse owner '${owner}'; team ownership not yet supported`
+        )
+      );
+    } else {
+      owners.push(owner);
+    }
+
+    return {result: owners, errors};
+  }
+
+  /**
+   * Parse a list of owners.
+   *
+   * @private
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {string[]} ownersList list of owners.
+   * @return {OwnersParserResult<string[]>} list of owners' usernames.
+   */
+  _parseOwnersList(ownersPath, ownersList) {
+    const owners = [];
+    const errors = [];
+
+    ownersList.forEach(owner => {
+      const lineResult = this._parseOwnersLine(ownersPath, owner);
+      owners.push(...lineResult.result);
+      errors.push(...lineResult.errors);
+    });
+
+    return {result: owners, errors};
+  }
+
+  /**
+   * Parse an owners dictionary as a pattern-based rule.
+   *
+   * Note: All YAML parsed dictionaries have a single key-value pair; a dict not
+   * matching this will not be parsed correctly.
+   *
+   * @private
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!object} ownersDict dictionary with a pattern as the key and a list
+   * of owners as the value.
+   * @return {OwnersParserResult<PatternOwnersRule[]>} parsed OWNERS pattern
+   *     rule.
+   */
+  _parseOwnersDict(ownersPath, ownersDict) {
+    const [[pattern, ownersList]] = Object.entries(ownersDict);
+    const rules = [];
+    const errors = [];
+
+    // Treat each comma-separated subpattern as its own rule definition.
+    pattern.split(/\s*,\s*/).forEach(subpattern => {
+      const owners = [];
+      const isRecursive = subpattern.startsWith(GLOB_PATTERN);
+      if (isRecursive) {
+        subpattern = subpattern.slice(GLOB_PATTERN.length);
+      }
+
+      if (subpattern.indexOf('/') !== -1) {
+        errors.push(
+          new OwnersParserError(
+            ownersPath,
+            `Failed to parse rule for pattern '${subpattern}'; ` +
+              `directory patterns other than '${GLOB_PATTERN}' not supported`
+          )
+        );
+      } else if (typeof ownersList === 'string') {
+        const lineResult = this._parseOwnersLine(ownersPath, ownersList);
+        owners.push(...lineResult.result);
+        errors.push(...lineResult.errors);
+      } else {
+        ownersList.forEach(owner => {
+          if (typeof owner === 'string') {
+            const lineResult = this._parseOwnersLine(ownersPath, owner);
+            owners.push(...lineResult.result);
+            errors.push(...lineResult.errors);
+          } else {
+            errors.push(
+              new OwnersParserError(
+                ownersPath,
+                `Failed to parse owner of type ${typeof owner} for pattern ` +
+                  `rule '${subpattern}'`
+              )
+            );
+          }
+        });
+      }
+
+      if (owners.length) {
+        if (isRecursive) {
+          rules.push(new PatternOwnersRule(ownersPath, owners, subpattern));
+        } else {
+          rules.push(
+            new SameDirPatternOwnersRule(ownersPath, owners, subpattern)
+          );
+        }
+      }
+    });
+
+    return {result: rules, errors};
+  }
+
+  /**
    * Parse an OWNERS.yaml file.
    *
-   * @param {!string} ownersPath OWNERS.yaml file path.
+   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
    * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
    */
   parseOwnersFile(ownersPath) {
@@ -61,19 +208,29 @@ class OwnersParser {
 
     if (lines instanceof Array) {
       const stringLines = lines.filter(line => typeof line === 'string');
-      const ownersList = stringLines.filter(line => line.indexOf('/') === -1);
-      if (ownersList.length) {
-        rules.push(new OwnersRule(ownersPath, ownersList));
+
+      const fileOwners = this._parseOwnersList(ownersPath, stringLines);
+      errors.push(...fileOwners.errors);
+      if (fileOwners.result.length) {
+        rules.push(new OwnersRule(ownersPath, fileOwners.result));
       }
+
+      const dictLines = lines.filter(line => typeof line === 'object');
+      dictLines.forEach(dict => {
+        const dictResult = this._parseOwnersDict(ownersPath, dict);
+        rules.push(...dictResult.result);
+        errors.push(...dictResult.errors);
+      });
     } else {
       errors.push(
         new OwnersParserError(
-          `Failed to parse file '${ownersPath}'; must be a YAML list`
+          ownersPath,
+          `Failed to parse file; must be a YAML list`
         )
       );
     }
 
-    return {rules, errors};
+    return {result: rules, errors};
   }
 
   /**
@@ -82,35 +239,37 @@ class OwnersParser {
    * TODO: Replace this with `parseAllOwnersRulesForFiles` to reduce OWNERS file
    * reads
    *
-   * @return {OwnersParserResult<OwnersRule[]>} a list of all rules defined in the local repo.
+   * @return {OwnersParserResult<OwnersRule[]>} a list of all rules defined in
+   *     the local repo.
    */
   async parseAllOwnersRules() {
     const ownersPaths = await this.localRepo.findOwnersFiles();
-    const allRules = [];
-    const allErrors = [];
+    const rules = [];
+    const errors = [];
 
     ownersPaths.forEach(ownersPath => {
-      const {rules, errors} = this.parseOwnersFile(ownersPath);
-      allRules.push(...rules);
-      allErrors.push(...errors);
+      const fileParse = this.parseOwnersFile(ownersPath);
+      rules.push(...fileParse.result);
+      errors.push(...fileParse.errors);
     });
 
     return {
-      rules: allRules,
-      errors: allErrors,
+      result: rules,
+      errors,
     };
   }
 
   /**
    * Parse all OWNERS rules into a tree.
    *
-   * @return {{tree: OwnersTree, errors: OwnersParserError[]}} owners rule hierarchy.
+   * @return {OwnersParserResult<OwnersTree>} owners rule hierarchy.
    */
   async parseOwnersTree() {
     const tree = new OwnersTree(this.localRepo.rootPath);
-    const {rules, errors} = await this.parseAllOwnersRules();
-    rules.forEach(rule => tree.addRule(rule));
-    return {tree, errors};
+    const ruleParse = await this.parseAllOwnersRules();
+    ruleParse.result.forEach(rule => tree.addRule(rule));
+
+    return {result: tree, errors: ruleParse.errors};
   }
 }
 

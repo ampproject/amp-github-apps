@@ -1,0 +1,75 @@
+# OWNERS files support standard YAML syntax, including comments and blank lines.
+# In this file, "this directory" refers to the directory containing the
+# OWNERS.yaml file.
+
+# IMPORTANT NOTE: YAML syntax does not like non-alphanumeric characters to start
+# dictionary keys, so patterns or globs starting with `*` must be wrapped in
+# quotes to ensure it is parsed correctly. For consistency, it is preferred to 
+# wrap all patterns and globs in quotes.
+
+# The top-level structure must be a list. Any usernames in this top-level list
+# will be considered owners of all files and subdirectories of this directory.
+- someuser
+- anotheruser
+
+# Usernames should not be prefixed with '@'. This will raise a parsing error.
+# - @dontdothis
+- dothisinstead
+- "@thiswillworkbutdontdoit"
+
+# Teams are not supported. The following owner declaration will be ignored.
+- teams/arenotsupported
+
+# Individual filenames can be listed, with owners as the value. The value can be
+# a single owner on the same line, or a list of many on the following lines.
+# These users own the file matching that name within this directory. For
+# example, if this file were in the root directory, the first rule below means
+# `fileowner` owns `./package.json` but not `./examples/package.json`.
+- package.json: fileowner
+- .eslintrc:
+  - styleperson
+  - infraperson
+
+# Glob-like patterns may be used in place of literal filenames. In these
+# patterns, a star `*` can represent any sequence of characters. These patterns
+# follow the same directory rules as above, so the pattern `*.js` applies to
+# `./main.js` and `./index.js` but not `./extensions/script.js`.
+- "*.js": scripter
+- "package*.json":
+  - infraperson
+  - developer
+
+# To apply a filename or pattern to all subdirectories as well, prefix the
+# pattern with `**/`. The pattern `**/.eslintrc` applies to
+# `./.eslintrc` as well as `./foo/.eslintrc`. The pattern `**/*.protoascii`
+# applies to `./test.protoascii` as well as `./foo/example.protoascii`.
+- "**/.eslintrc": styleperson
+- "**/*.protoascii":
+  - languageperson
+  - translator
+
+# Any other use of `/` in a pattern is forbidden (ie. no directory traversal).
+# Patterns using `/` will be ignored. If rules are needed in a subdirectory, the
+# appropriate OWNERS file should be created/updated in that subdirectory.
+- this/pattern/will/be/ignored.txt: doesntmatter
+
+# Filename and pattern rules may be combined with commas. They will be treated
+# as separate rules. An error in one sub-pattern will not block the rest from
+# being parsed.
+- "*.js, *.css": frontend
+- "a/bad/pattern, package.json, **/.eslintrc": somebodyelse
+
+
+# The result of parsing this file would be a tree with these rules:
+#
+# All files:       someuser, anotheruser, dothisinstead, thiswillworkbutdontdoit
+# ./package.json:  fileowner
+# ./.eslintrc:     styleperson, infraperson
+# ./*.js:          scripter
+# ./package*.json: infraperson, developer
+# **/.eslintrc:    styleperson
+# **/*.protoascii: languageperson, translator
+# *.js:            frontend
+# *.css:           frontend
+# package.json:    somebodyelse
+# **/.eslintrc:    somebodyelse

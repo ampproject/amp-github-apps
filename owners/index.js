@@ -59,15 +59,17 @@ module.exports = app => {
 
   adminRouter.get('/tree', async (req, res) => {
     const parser = new OwnersParser(localRepo, req.log);
-    const {tree, errors} = await parser.parseOwnersTree();
+    const treeParse = await parser.parseOwnersTree();
     const treeHeader = '<h3>OWNERS tree</h3>';
-    const treeDisplay = `<pre>${tree.toString()}</pre>`;
-    const errorHeader = '<h3>Parser Errors</h3>';
-    const errorDisplay = errors.map(error => error.toString());
+    const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
 
     let output = `${treeHeader}${treeDisplay}`;
-    if (errors.length) {
-      output += `${errorHeader}${errorDisplay}`;
+    if (treeParse.errors.length) {
+      const errorHeader = '<h3>Parser Errors</h3>';
+      const errorDisplay = treeParse.errors
+        .map(error => error.toString())
+        .join('<br>');
+      output += `${errorHeader}<code>${errorDisplay}</code>`;
     }
 
     res.send(output);

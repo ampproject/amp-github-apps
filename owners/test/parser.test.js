@@ -1,7 +1,25 @@
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {OwnersParser} = require('../src/parser');
-const {OwnersRule} = require('../src/rules');
+const {OwnersParser, OwnersParserError} = require('../src/parser');
+const {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+} = require('../src/rules');
+
+describe('owners parser error', () => {
+  describe('toString', () => {
+    const error = new OwnersParserError('foo/OWNERS.yaml', 'Oops!');
+
+    it('displays the file containing the error', () => {
+      expect(error.toString()).toContain('[foo/OWNERS.yaml]');
+    });
+
+    it('displays the error message', () => {
+      expect(error.toString()).toContain('Oops!');
+    });
+  });
+});
 
 describe('owners parser', () => {
   const sandbox = sinon.createSandbox();
@@ -30,40 +48,148 @@ describe('owners parser', () => {
 
     it('assigns the OWNERS directory path', () => {
       sandbox.stub(repo, 'readFile').returns('- owner');
-      const {rules} = parser.parseOwnersFile('foo/OWNERS.yaml');
+      const fileParse = parser.parseOwnersFile('foo/OWNERS.yaml');
+      const rules = fileParse.result;
 
       expect(rules[0].dirPath).toEqual('foo');
     });
 
     it('parses a YAML list', () => {
       sandbox.stub(repo, 'readFile').returns('- user1\n- user2\n');
-      const {rules} = parser.parseOwnersFile('');
+      const fileParse = parser.parseOwnersFile('');
+      const rules = fileParse.result;
 
       expect(rules[0].owners).toEqual(['user1', 'user2']);
     });
 
     it('parses a YAML list with blank lines and comments', () => {
       sandbox.stub(repo, 'readFile').returns('- user1\n# comment\n\n- user2\n');
-      const {rules} = parser.parseOwnersFile('');
+      const fileParse = parser.parseOwnersFile('');
+      const rules = fileParse.result;
 
       expect(rules[0].owners).toEqual(['user1', 'user2']);
     });
 
-    it('returns no rule for team rules', () => {
-      sandbox.stub(repo, 'readFile').returns('- ampproject/team\n');
-      const {rules} = parser.parseOwnersFile('');
+    describe('team rule declarations', () => {
+      it('returns no rule', () => {
+        sandbox.stub(repo, 'readFile').returns('- ampproject/team\n');
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
 
-      expect(rules).toEqual([]);
+        expect(rules).toEqual([]);
+      });
+
+      it('records an error', () => {
+        sandbox.stub(repo, 'readFile').returns('- ampproject/team\n');
+        const {errors} = parser.parseOwnersFile('');
+
+        expect(errors[0].message).toEqual(
+          "Failed to parse owner 'ampproject/team'; team ownership not yet supported"
+        );
+      });
     });
 
-    describe('dictionary rule declarations', () => {
+    describe('owner with a leading @', () => {
+      let fileParse;
+
+      beforeEach(() => {
+        sandbox.stub(repo, 'readFile').returns('- @owner');
+        fileParse = parser.parseOwnersFile('');
+      });
+
+      it('parses ignoring the @ sign', () => {
+        const [rule] = fileParse.result;
+        expect(rule.owners).toEqual(['owner']);
+      });
+
+      it('records an error', () => {
+        const [error] = fileParse.errors;
+        expect(error.message).toEqual("Ignoring unnecessary '@' in '@owner'");
+      });
+    });
+
+    describe('rule dictionary', () => {
+      it('parses a single owner into a pattern rule', () => {
+        sandbox.stub(repo, 'readFile').returns('- *.js: scripty\n');
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules[0]).toBeInstanceOf(SameDirPatternOwnersRule);
+        expect(rules[0].pattern).toEqual('*.js');
+        expect(rules[0].owners).toEqual(['scripty']);
+      });
+
+      it('parses a list of owners into a pattern rule', () => {
+        sandbox
+          .stub(repo, 'readFile')
+          .returns('- *.js:\n  - scripty\n  - coder\n');
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules[0]).toBeInstanceOf(SameDirPatternOwnersRule);
+        expect(rules[0].pattern).toEqual('*.js');
+        expect(rules[0].owners).toEqual(['scripty', 'coder']);
+      });
+
+      it('reports errors for non-string owners', () => {
+        sandbox
+          .stub(repo, 'readFile')
+          .returns('- *.js:\n  - nestedDict: "value"\n');
+        const {errors} = parser.parseOwnersFile('');
+
+        expect(errors[0].message).toContain(
+          "Failed to parse owner of type object for pattern rule '*.js'"
+        );
+      });
+
+      it('starting with **/ parses into a recursive pattern rule', () => {
+        sandbox.stub(repo, 'readFile').returns('- **/*.js: scripty\n');
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules[0]).toBeInstanceOf(PatternOwnersRule);
+        expect(rules[0].pattern).toEqual('*.js');
+        expect(rules[0].owners).toEqual(['scripty']);
+      });
+
+      it('parses no rule if no valid owners are listed', () => {
+        sandbox.stub(repo, 'readFile').returns('- *.js: bad/team_owner\n');
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules.length).toEqual(0);
+      });
+
+      it("reports an error for patterns containing illegal '/'", () => {
+        sandbox.stub(repo, 'readFile').returns('- foo/*.js: scripty\n');
+        const fileParse = parser.parseOwnersFile('');
+
+        expect(fileParse.result.length).toEqual(0);
+        expect(fileParse.errors[0].message).toEqual(
+          "Failed to parse rule for pattern 'foo/*.js'; directory patterns other than '**/' not supported"
+        );
+      });
+
+      it('parses comma-separate patterns as separate rules', () => {
+        sandbox.stub(repo, 'readFile').returns('- *.js, *.css: frontend\n');
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules[0].pattern).toEqual('*.js');
+        expect(rules[1].pattern).toEqual('*.css');
+      });
+    });
+
+    describe('files containing top-level dictionaries', () => {
       beforeEach(() => {
         sandbox
           .stub(repo, 'readFile')
           .returns('dict:\n  key: "value"\n  key2: "value2"\n');
       });
-      it('returns no rule', () => {
-        const {rules} = parser.parseOwnersFile('');
+
+      it('returns no rules', () => {
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
 
         expect(rules).toEqual([]);
       });
@@ -72,18 +198,9 @@ describe('owners parser', () => {
         const {errors} = parser.parseOwnersFile('foo/OWNERS.yaml');
 
         expect(errors[0].message).toEqual(
-          "Failed to parse file 'foo/OWNERS.yaml'; must be a YAML list"
+          'Failed to parse file; must be a YAML list'
         );
       });
-    });
-
-    it('ignores non-string rules in the list', () => {
-      sandbox
-        .stub(repo, 'readFile')
-        .returns('- owner\n- dict:\n  key: "value"\n  key2: "value2"\n');
-      const {rules} = parser.parseOwnersFile('');
-
-      expect(rules.length).toEqual(1);
     });
   });
 
@@ -95,7 +212,8 @@ describe('owners parser', () => {
       const readFileStub = sandbox.stub(repo, 'readFile');
       readFileStub.onCall(0).returns('- user1\n- user2\n');
       readFileStub.onCall(1).returns('- user3\n- user4\n');
-      const {rules} = await parser.parseAllOwnersRules();
+      const ruleParse = await parser.parseAllOwnersRules();
+      const rules = ruleParse.result;
 
       expect(rules[0].dirPath).toEqual('.');
       expect(rules[1].dirPath).toEqual('foo');
@@ -106,7 +224,8 @@ describe('owners parser', () => {
     it('does not include invalid rules', async () => {
       sandbox.stub(repo, 'findOwnersFiles').returns(['OWNERS.yaml']);
       sandbox.stub(repo, 'readFile').returns('dict:\n  key: value');
-      const {rules} = await parser.parseAllOwnersRules();
+      const ruleParse = await parser.parseAllOwnersRules();
+      const rules = ruleParse.result;
 
       expect(rules).toEqual([]);
     });
@@ -129,8 +248,9 @@ describe('owners parser', () => {
     it('adds each rule to the tree', async () => {
       sandbox
         .stub(parser, 'parseAllOwnersRules')
-        .returns({rules: [rootRule, childRule], errors: []});
-      const {tree} = await parser.parseOwnersTree();
+        .returns({result: [rootRule, childRule], errors: []});
+      const treeParse = await parser.parseOwnersTree();
+      const tree = treeParse.result;
 
       expect(tree.rules).toContain(rootRule);
       expect(tree.get('foo').rules).toContain(childRule);
@@ -139,7 +259,7 @@ describe('owners parser', () => {
     it('returns parser errors', async () => {
       sandbox
         .stub(parser, 'parseAllOwnersRules')
-        .returns({rules: [], errors: [new Error('Oops!')]});
+        .returns({result: [], errors: [new Error('Oops!')]});
       const {errors} = await parser.parseOwnersTree();
 
       expect(errors[0].message).toEqual('Oops!');
