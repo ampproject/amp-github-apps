@@ -19,7 +19,7 @@ const sinon = require('sinon');
 const {Probot} = require('probot');
 const owners = require('..');
 const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
-const {GitHub, PullRequest, Review} = require('../src/github');
+const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
@@ -52,6 +52,45 @@ describe('review', () => {
     expect(approval.submittedAt).toEqual(timestamp);
     expect(approval.isApproved).toBe(true);
     expect(rejection.isApproved).toBe(false);
+  });
+});
+
+describe('team', () => {
+  describe('getMembers', () => {
+    let sandbox;
+    let team;
+    const fakeGithub = {getTeamMembers: id => ['rcebulko', 'erwinmombay']};
+
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();
+      sandbox.stub(fakeGithub, 'getTeamMembers').callThrough();
+      team = new Team(1337, 'my_team');
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it('fetches team members from GitHub', async () => {
+      expect.assertions(1);
+      const members = await team.getMembers(fakeGithub);
+
+      sandbox.assert.calledWith(fakeGithub.getTeamMembers, 1337);
+      expect(members).toEqual(['rcebulko', 'erwinmombay']);
+    });
+
+    it('only fetches from GitHub once', async () => {
+      expect.assertions(1);
+      await team.getMembers(fakeGithub);
+      await team.getMembers(fakeGithub);
+      await team.getMembers(fakeGithub);
+      await team.getMembers(fakeGithub);
+
+      sandbox.assert.calledOnce(fakeGithub.getTeamMembers);
+
+      // Ensures the test fails if the assertion is never run.
+      expect(true).toBe(true);
+    });
   });
 });
 

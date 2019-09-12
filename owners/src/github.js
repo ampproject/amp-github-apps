@@ -73,7 +73,21 @@ class Team {
    * @param {!string} slug team name slug.
    */
   constructor(id, slug) {
-    Object.assign(this, {id, slug});
+    Object.assign(this, {id, slug, _members: null});
+  }
+
+  /**
+   * Gets the members of team.
+   *
+   * @param {!GitHubAPI} github GitHub API client.
+   * @return {string[]} list of team member usernames.
+   */
+  async getMembers(github) {
+    if (this._members === null) {
+      this._members = await github.getTeamMembers(this.id);
+    }
+
+    return this._members;
   }
 }
 
@@ -281,4 +295,4 @@ class GitHub {
   }
 }
 
-module.exports = {GitHub, PullRequest, Review};
+module.exports = {GitHub, PullRequest, Review, Team};
