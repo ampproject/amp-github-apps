@@ -78,6 +78,7 @@ describe('owners bot', () => {
 
   describe('when there are more than 1 checks on a PR', () => {
     test('it should update amp owners bot check when there is one', async () => {
+      expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -135,6 +136,7 @@ describe('owners bot', () => {
 
   describe('create check run', () => {
     test('with failure check when there are 0 reviews on a pull request', async () => {
+      expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -196,6 +198,7 @@ describe('owners bot', () => {
 
   describe('update check run', () => {
     test('with failure check when there are 0 reviews on a pull request', async () => {
+      expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -251,6 +254,7 @@ describe('owners bot', () => {
     });
 
     test('with failure check when there are 0 reviews on a pull request and multiple files', async () => {
+      expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -310,6 +314,7 @@ describe('owners bot', () => {
 
   describe('rerequest check run', () => {
     test('should re-evaluate pull request', async () => {
+      expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -376,6 +381,7 @@ describe('owners bot', () => {
 
   describe('has approvals met', () => {
     test('with passing check when there is 1 approver on a pull request', async () => {
+      expect.assertions(2);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -428,6 +434,7 @@ describe('owners bot', () => {
     });
 
     test('with passing check when author themselves are owners', async () => {
+      expect.assertions(2);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -481,6 +488,7 @@ describe('owners bot', () => {
 
   describe('pull request review', () => {
     test('triggers pull request re-evaluation', async () => {
+      expect.assertions(2);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});

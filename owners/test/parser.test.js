@@ -206,6 +206,7 @@ describe('owners parser', () => {
 
   describe('parseAllOwnersRules', () => {
     it('reads all owners files in the repo', async () => {
+      expect.assertions(4);
       sandbox
         .stub(repo, 'findOwnersFiles')
         .returns(['OWNERS.yaml', 'foo/OWNERS.yaml']);
@@ -222,6 +223,7 @@ describe('owners parser', () => {
     });
 
     it('does not include invalid rules', async () => {
+      expect.assertions(1);
       sandbox.stub(repo, 'findOwnersFiles').returns(['OWNERS.yaml']);
       sandbox.stub(repo, 'readFile').returns('dict:\n  key: value');
       const ruleParse = await parser.parseAllOwnersRules();
@@ -231,6 +233,7 @@ describe('owners parser', () => {
     });
 
     it('collects errors from all parsed files', async () => {
+      expect.assertions(1);
       sandbox
         .stub(repo, 'findOwnersFiles')
         .returns(['OWNERS.yaml', 'foo/OWNERS.yaml']);
@@ -246,6 +249,7 @@ describe('owners parser', () => {
     const childRule = new OwnersRule('foo/OWNERS.yaml', ['user3', 'user4']);
 
     it('adds each rule to the tree', async () => {
+      expect.assertions(2);
       sandbox
         .stub(parser, 'parseAllOwnersRules')
         .returns({result: [rootRule, childRule], errors: []});
@@ -257,6 +261,7 @@ describe('owners parser', () => {
     });
 
     it('returns parser errors', async () => {
+      expect.assertions(1);
       sandbox
         .stub(parser, 'parseAllOwnersRules')
         .returns({result: [], errors: [new Error('Oops!')]});
