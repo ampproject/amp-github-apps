@@ -68,12 +68,11 @@ async function getBuildArtifactsFile(github, filename) {
  * @return {object} to ignore.
  */
 async function storeBuildArtifactsFile(github, filename, bundleSize) {
-  return await github.repos.createOrUpdateFile(
-    Object.assign(getBuildArtifactsFileParams(filename), {
-      message: `bundle-size: ${filename} (${bundleSize})`,
-      content: Buffer.from(bundleSize).toString('base64'),
-    })
-  );
+  return await github.repos.createOrUpdateFile({
+    ...getBuildArtifactsFileParams(filename),
+    message: `bundle-size: ${filename} (${bundleSize})`,
+    content: Buffer.from(bundleSize).toString('base64'),
+  });
 }
 
 /**
@@ -204,14 +203,12 @@ module.exports = app => {
       owner: check.owner,
       repo: check.repo,
     };
-    const updatedCheckOptions = Object.assign(
-      {
-        check_run_id: check.check_run_id,
-        name: 'ampproject/bundle-size',
-        completed_at: new Date().toISOString(),
-      },
-      githubOptions
-    );
+    const updatedCheckOptions = {
+      check_run_id: check.check_run_id,
+      name: 'ampproject/bundle-size',
+      completed_at: new Date().toISOString(),
+      ...githubOptions,
+    };
 
     try {
       const baseBundleSize = parseFloat(
@@ -258,10 +255,10 @@ module.exports = app => {
       await github.checks.update(updatedCheckOptions);
 
       if (requiresApproval) {
-        await addBundleSizeReviewer(
-          github,
-          Object.assign({pull_number: check.pull_request_id}, githubOptions)
-        );
+        await addBundleSizeReviewer(github, {
+          pull_number: check.pull_request_id,
+          ...githubOptions,
+        });
       }
 
       return true;
@@ -297,10 +294,10 @@ module.exports = app => {
           },
         });
         await github.checks.update(updatedCheckOptions);
-        await addBundleSizeReviewer(
-          github,
-          Object.assign({pull_number: check.pull_request_id}, githubOptions)
-        );
+        await addBundleSizeReviewer(github, {
+          pull_number: check.pull_request_id,
+          ...githubOptions,
+        });
       }
       return false;
     }
@@ -337,14 +334,10 @@ module.exports = app => {
       // Choose a random capable username and add them as a reviewer to the pull
       // request.
       const newReviewer = await getRandomReviewer(userBasedGithub);
-      return await github.pullRequests.createReviewRequest(
-        Object.assign(
-          {
-            reviewers: [newReviewer],
-          },
-          pullRequest
-        )
-      );
+      return await github.pullRequests.createReviewRequest({
+        reviewers: [newReviewer],
+        ...pullRequest,
+      });
     } catch (error) {
       app.log(
         'ERROR: Failed to add a reviewer to pull request ' +
