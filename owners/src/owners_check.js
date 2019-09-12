@@ -110,7 +110,7 @@ class OwnersCheck {
         reviewSuggestions
       );
       return new CheckRun(
-        CheckRunConclusion.NEUTRAL,
+        CheckRunConclusion.FAILURE,
         `Missing required OWNERS approvals! Suggested reviewers: ${reviewers}`,
         `${coverageText}\n\n${suggestionsText}`
       );
