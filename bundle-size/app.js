@@ -27,30 +27,56 @@ const HUMAN_ENCOURAGEMENT_MAX_DELTA = -0.03;
 const db = dbConnect();
 
 /**
+ * Get GitHub API parameters for bundle-size file actions.
+ *
+ * @param {string} filename the name of the file to act on.
+ * @return {!object} GitHub API parameters to act on the file.
+ */
+function getBuildArtifactsFileParams(filename) {
+  return {
+    owner: 'ampproject',
+    repo: 'amphtml-build-artifacts',
+    path: path.join('bundle-size', filename),
+  };
+}
+
+/**
  * Get a file from the bundle-size directory in the AMPHTML build artifacts
  * repository.
  *
- * @param {github} github an authenticated GitHub API object.
+ * @param {!github} github an authenticated GitHub API object.
  * @param {string} filename the name of the file to retrieve.
- * @throws {Error} on any error.
  * @return {string} the text contents of the file.
  */
 async function getBuildArtifactsFile(github, filename) {
   return await github.repos
-    .getContents({
-      owner: 'ampproject',
-      repo: 'amphtml-build-artifacts',
-      path: path.join('bundle-size', filename),
-    })
+    .getContents(getBuildArtifactsFileParams(filename))
     .then(result => {
       return Buffer.from(result.data.content, 'base64').toString();
     });
 }
 
 /**
+ * Store a file in the bundle-size directory in the AMPHTML build artifacts
+ * repository.
+ *
+ * @param {!github} github an authenticated GitHub API object.
+ * @param {string} filename the name of the file to store into.
+ * @param {string} contents text contents of the file.
+ * @return {object} to ignore.
+ */
+async function storeBuildArtifactsFile(github, filename, contents) {
+  return await github.repos.createOrUpdateFile({
+    ...getBuildArtifactsFileParams(filename),
+    message: `bundle-size: ${filename} (${contents})`,
+    content: Buffer.from(contents).toString('base64'),
+  });
+}
+
+/**
  * Check whether the user is allowed to approve a bundle size change.
  *
- * @param {github} github an authorized GitHub API object.
+ * @param {!github} github an authorized GitHub API object.
  * @param {string} username the username to check.
  * @return {boolean} true if the user is allowed to approve bundle size changes.
  */
@@ -73,8 +99,7 @@ async function isBundleSizeApprover(github, username) {
 /**
  * Get a random reviewer from the approved teams.
  *
- * @param {github} github an authorized GitHub API object.
- * @throws {Error} on any error.
+ * @param {!github} github an authorized GitHub API object.
  * @return {string} a username of someone who can approve a bundle size change.
  */
 async function getRandomReviewer(github) {
@@ -175,14 +200,12 @@ module.exports = app => {
       owner: check.owner,
       repo: check.repo,
     };
-    const updatedCheckOptions = Object.assign(
-      {
-        check_run_id: check.check_run_id,
-        name: 'ampproject/bundle-size',
-        completed_at: new Date().toISOString(),
-      },
-      githubOptions
-    );
+    const updatedCheckOptions = {
+      check_run_id: check.check_run_id,
+      name: 'ampproject/bundle-size',
+      completed_at: new Date().toISOString(),
+      ...githubOptions,
+    };
 
     try {
       const baseBundleSize = parseFloat(
@@ -229,10 +252,10 @@ module.exports = app => {
       await github.checks.update(updatedCheckOptions);
 
       if (requiresApproval) {
-        await addBundleSizeReviewer(
-          github,
-          Object.assign({pull_number: check.pull_request_id}, githubOptions)
-        );
+        await addBundleSizeReviewer(github, {
+          pull_number: check.pull_request_id,
+          ...githubOptions,
+        });
       }
 
       return true;
@@ -268,10 +291,10 @@ module.exports = app => {
           },
         });
         await github.checks.update(updatedCheckOptions);
-        await addBundleSizeReviewer(
-          github,
-          Object.assign({pull_number: check.pull_request_id}, githubOptions)
-        );
+        await addBundleSizeReviewer(github, {
+          pull_number: check.pull_request_id,
+          ...githubOptions,
+        });
       }
       return false;
     }
@@ -282,7 +305,7 @@ module.exports = app => {
    *
    * Ignore errors as this is a non-critical action.
    *
-   * @param {github} github an authenticated GitHub API object.
+   * @param {!github} github an authenticated GitHub API object.
    * @param {!object} pullRequest GitHub Pull Request object.
    */
   async function addBundleSizeReviewer(github, pullRequest) {
@@ -308,14 +331,10 @@ module.exports = app => {
       // Choose a random capable username and add them as a reviewer to the pull
       // request.
       const newReviewer = await getRandomReviewer(userBasedGithub);
-      return await github.pullRequests.createReviewRequest(
-        Object.assign(
-          {
-            reviewers: [newReviewer],
-          },
-          pullRequest
-        )
-      );
+      return await github.pullRequests.createReviewRequest({
+        reviewers: [newReviewer],
+        ...pullRequest,
+      });
     } catch (error) {
       app.log(
         'ERROR: Failed to add a reviewer to pull request ' +
@@ -497,25 +516,19 @@ module.exports = app => {
   });
 
   v0.post('/commit/:headSha/report', async (request, response) => {
-    if (
-      !('baseSha' in request.body) ||
-      typeof request.body.baseSha != 'string' ||
-      !/^[0-9a-f]{40}$/.test(request.body.baseSha)
-    ) {
+    const {headSha} = request.params;
+    const {baseSha, bundleSize} = request.body;
+
+    if (typeof baseSha !== 'string' || !/^[0-9a-f]{40}$/.test(baseSha)) {
       return response
         .status(400)
         .end('POST request to /report must have commit SHA field "baseSha"');
     }
-    if (
-      !('bundleSize' in request.body) ||
-      typeof request.body.bundleSize != 'number'
-    ) {
+    if (typeof bundleSize !== 'number') {
       return response
         .status(400)
         .end('POST request to /report must have numeric field "bundleSize"');
     }
-    const {headSha} = request.params;
-    const {baseSha, bundleSize} = request.body;
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
@@ -540,5 +553,64 @@ module.exports = app => {
         );
       } while (retriesLeft > 0 && !reportSuccess);
     }
+  });
+
+  v0.post('/commit/:headSha/store', async (request, response) => {
+    const {headSha} = request.params;
+    const {gzippedBundleSize, brotliBundleSize} = request.body;
+
+    if (request.body['token'] !== process.env.TRAVIS_PUSH_BUILD_TOKEN) {
+      return response.status(403).end('You are not Travis!');
+    }
+    for (const bundleSize of [gzippedBundleSize, brotliBundleSize]) {
+      if (typeof bundleSize !== 'number') {
+        return response
+          .status(400)
+          .end(
+            'POST request to /store must have numeric fields ' +
+              '"gzippedBundleSize" and "brotliBundleSize"'
+          );
+      }
+    }
+
+    for (const [compression, extension, bundleSizeValue] of [
+      ['gzip', '', gzippedBundleSize],
+      ['brotli', '.br', brotliBundleSize],
+    ]) {
+      const bundleSizeText = `${bundleSizeValue}KB`;
+      const bundleSizeFile = `${headSha}${extension}`;
+
+      try {
+        await getBuildArtifactsFile(userBasedGithub, bundleSizeFile);
+        app.log(
+          `The file bundle-size/${bundleSizeFile} already exists in the ` +
+            'build artifacts repository on GitHub. Skipping...'
+        );
+        continue;
+      } catch (unusedException) {
+        // The file was not found in the GitHub repository, so continue to
+        // create it...
+      }
+
+      try {
+        await storeBuildArtifactsFile(
+          userBasedGithub,
+          bundleSizeFile,
+          bundleSizeText
+        );
+        app.log(
+          `Stored the new ${compression} bundle size of ${bundleSizeText} in ` +
+            'the artifacts repository on GitHub'
+        );
+      } catch (error) {
+        const errorMessage =
+          `ERROR: Failed to create the bundle-size/${bundleSizeFile} file in ` +
+          'the build artifacts repository on GitHub!\n' +
+          `Error message was: ${error.message}`;
+        app.log(errorMessage);
+        return response.status(500).end(errorMessage);
+      }
+    }
+    response.end();
   });
 };

@@ -33,12 +33,18 @@ requests from this comma separated list of IP addresses will be processed.
     request does not change the bundle at all (e.g., documentation changes)
 * `/v0/commit/:headSha/report`
   * Accepts a JSON object with a numeric `bundleSize` field, denoting the size
-    of the compiled bundle based on the head commit in KB
+    of the compiled bundle based on the head commit in KB, and a `baseSha` field
+    denoting the commit SHA on to compare against.
   * Calculated the change in the size of the compiled bundle between the base
     and the head commits, and determines whether to mark the check as passed
     (i.e., when the bundle size is not increased or is increased by a fraction),
     or whether to mark the check as requiring action (i.e., the size increases
     significantly or could not be calculated for any reason).
+* `/v0/commit/:headSha/store`
+  * Accepts a JSON object with numeric `gzippedBundleSize` and
+    `brotliBundleSize` fields, denoting the size of the compiled bundle in the
+    respective compressions.
+  * Stores these values in the `ampproject/amphtml-build-artifacts` repository.
 
 
 
@@ -77,6 +83,12 @@ Follow these setup instructions to start developing for this App locally:
      command line
    * The value for the `ACCESS_TOKEN` field is the personal access token from
      the precending step
+   * The value for the `TRAVIS_PUSH_BUILD_TOKEN` should be a unique identifier.
+     This token can be any string, and must be passed as a `token` field to
+     verify that requests to `/commit/:headSha/store` are coming from push
+     builds and not from pull requests. On Travis, set this as an push-build
+     only environment variable and treat this like you would any other access
+     token.
 10. Copy the `db-config.example.js` file to `db-config.js` and modify the fields
     based on the connection information to your database
 11. `npm run dev`
