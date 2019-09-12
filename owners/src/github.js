@@ -143,6 +143,7 @@ class GitHub {
     const response = await this.client.request({
       headers: {
         authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
+        // This accept header adds support for fetching members of nested teams.
         accept: 'application/vnd.github.hellcat-preview+json',
       },
       url: endpoint,
