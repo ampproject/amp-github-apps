@@ -146,12 +146,12 @@ describe('GitHub API', () => {
         .reply(200, pullRequestResponse);
 
       await withContext(async (context, github) => {
-        const pr = github.getPullRequest(35);
+        const pr = await github.getPullRequest(35);
 
         // Author pulled from pull_request.35.json
         expect(pr.author).toEqual('ampprojectbot');
-        expect(pr.id).toEqual(35);
-      });
+        expect(pr.number).toEqual(35);
+      })();
     });
   });
 
@@ -165,10 +165,10 @@ describe('GitHub API', () => {
       await withContext(async (context, github) => {
         const [review] = await github.getReviews(35);
 
-        expect(review.username).toEqual('erwinmombay');
-        expect(review.state).toEqual('approved');
-        expect(review.submitted_at).toEqual('2019-02-26T20:39:13Z');
-      });
+        expect(review.reviewer).toEqual('erwinmombay');
+        expect(review.isApproved).toBe(true);
+        expect(review.submittedAt).toEqual('2019-02-26T20:39:13Z');
+      })();
     });
   });
 
@@ -183,7 +183,7 @@ describe('GitHub API', () => {
         const [filename] = await github.listFiles(35);
 
         expect(filename).toEqual('dir2/dir1/dir1/file.txt');
-      });
+      })();
     });
   });
 
