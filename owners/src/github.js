@@ -15,6 +15,7 @@
  */
 
 const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
+const GITHUB_TEAMS_MAX_COUNT = 30;
 
 /**
  * Maps the github json payload to a simpler data structure.
@@ -160,7 +161,19 @@ class GitHub {
   async getTeams() {
     this.logger.info(`Fetching teams for organization '${this.owner}'`);
 
-    const teamsList = await this._customRequest(`/orgs/${this.owner}/teams`);
+    const teamsList = [];
+    let pageNum = 0;
+    while (true) {
+      const teamPage = await this._customRequest(
+        `/orgs/${this.owner}/teams?page=${pageNum}`
+      );
+      teamsList.push(...teamPage);
+      pageNum++;
+
+      if (teamPage.length < GITHUB_TEAMS_MAX_COUNT) {
+        break;
+      }
+    }
     this.logger.debug('[getTeams]', teamsList);
 
     return teamsList.map(({id, slug}) => new Team(id, slug));

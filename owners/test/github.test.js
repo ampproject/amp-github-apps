@@ -217,7 +217,7 @@ describe('GitHub API', () => {
     it('returns a list of team objects', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get('/orgs/test_owner/teams')
+        .get('/orgs/test_owner/teams?page=0')
         .reply(200, [{id: 1337, slug: 'my_team'}]);
 
       await withContext(async (context, github) => {
@@ -225,6 +225,25 @@ describe('GitHub API', () => {
 
         expect(teams[0].id).toEqual(1337);
         expect(teams[0].slug).toEqual('my_team');
+      })();
+    });
+
+    it('pages automatically', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/orgs/test_owner/teams?page=0')
+        .reply(200, Array(30).fill({id: 1337, slug: 'my_team'}));
+      nock('https://api.github.com')
+        .get('/orgs/test_owner/teams?page=1')
+        .reply(200, Array(30).fill({id: 1337, slug: 'my_team'}));
+      nock('https://api.github.com')
+        .get('/orgs/test_owner/teams?page=2')
+        .reply(200, Array(10).fill({id: 1337, slug: 'my_team'}));
+
+      await withContext(async (context, github) => {
+        const teams = await github.getTeams();
+
+        expect(teams.length).toEqual(70);
       })();
     });
   });
