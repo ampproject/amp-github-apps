@@ -338,7 +338,7 @@ describe('bundle-size', () => {
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -357,8 +357,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
-          brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
@@ -388,7 +386,7 @@ describe('bundle-size', () => {
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -421,8 +419,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
-          brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
@@ -452,7 +448,7 @@ describe('bundle-size', () => {
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -485,8 +481,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
-          brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
@@ -518,7 +512,7 @@ describe('bundle-size', () => {
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -541,8 +535,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
-          brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
@@ -572,13 +564,13 @@ describe('bundle-size', () => {
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
         )
         .times(2)
         .reply(404)
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -597,8 +589,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
-          brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
@@ -628,13 +618,13 @@ describe('bundle-size', () => {
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
         )
         .times(2)
         .reply(404)
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -667,8 +657,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
-          brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
@@ -691,7 +679,7 @@ describe('bundle-size', () => {
     const nocks = nock('https://api.github.com')
       .get(
         '/repos/ampproject/amphtml-build-artifacts/contents/' +
-          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
       )
       .times(60)
       .reply(404)
@@ -725,8 +713,6 @@ describe('bundle-size', () => {
       .send({
         baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
         bundleSize: 12.34,
-        gzippedBundleSize: 12.34,
-        brotliBundleSize: 12.34,
       })
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
@@ -740,8 +726,6 @@ describe('bundle-size', () => {
       .send({
         baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
         bundleSize: 12.34,
-        gzippedBundleSize: 12.34,
-        brotliBundleSize: 12.34,
       })
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')

@@ -117,14 +117,14 @@ function successfulSummaryMessage(delta, deltaFormatted) {
   if (delta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
     return (
       'This pull request *reduces* the bundle size ' +
-      '(brotli compressed size of `v0.js`), so no special approval is ' +
+      '(gzipped compressed size of `v0.js`), so no special approval is ' +
       `necessary. The bundle size change is ${deltaFormatted}.`
     );
   }
 
   return (
     'This pull request does not change the bundle size ' +
-    '(brotli compressed size of `v0.js`) by any significant amount, so no ' +
+    '(gzipped compressed size of `v0.js`) by any significant amount, so no ' +
     'special approval is necessary. ' +
     `The bundle size change is ${deltaFormatted}.`
   );
@@ -186,7 +186,7 @@ module.exports = app => {
 
     try {
       const baseBundleSize = parseFloat(
-        await getBuildArtifactsFile(github, `${baseSha}.br`)
+        await getBuildArtifactsFile(github, baseSha)
       );
       const bundleSizeDelta = bundleSize - baseBundleSize;
       const bundleSizeDeltaFormatted = formatBundleSizeDelta(bundleSizeDelta);
@@ -204,7 +204,7 @@ module.exports = app => {
             title: `${bundleSizeDeltaFormatted} | approval required`,
             summary:
               'This pull request has increased the bundle size ' +
-              '(brotli compressed size of `v0.js`) by ' +
+              '(gzipped compressed size of `v0.js`) by ' +
               `${bundleSizeDeltaFormatted}. As part of an ongoing effort to ` +
               'reduce the bundle size, this change requires special approval.' +
               '\n' +
@@ -253,7 +253,7 @@ module.exports = app => {
               'Failed to retrieve the bundle size of branch point ' +
               partialBaseSha,
             summary:
-              'The bundle size (brotli compressed size of `v0.js`) ' +
+              'The bundle size (gzipped compressed size of `v0.js`) ' +
               'of this pull request could not be determined because the base ' +
               'size (that is, the bundle size of the `master` commit that ' +
               'this pull request was compared against) was not found in the ' +
@@ -336,7 +336,7 @@ module.exports = app => {
       output: {
         title: 'Calculating new bundle size for this PR…',
         summary:
-          'The bundle size (brotli compressed size of `v0.js`) ' +
+          'The bundle size (gzipped compressed size of `v0.js`) ' +
           'of this pull request is being calculated on Travis. Look for the ' +
           'shard that contains "Bundle Size" in its title.',
       },
@@ -419,7 +419,7 @@ module.exports = app => {
         output: {
           title: `${approvalMessagePrefix} | approved by @${approver}`,
           summary:
-            'The bundle size (brotli compressed size of `v0.js`) ' +
+            'The bundle size (gzipped compressed size of `v0.js`) ' +
             `of this pull request was approved by ${approver}`,
         },
       });
@@ -488,7 +488,7 @@ module.exports = app => {
         title: 'check skipped because PR contains no runtime changes',
         summary:
           'An automated check has determined that the bundle size ' +
-          '(brotli compressed size of `v0.js`) could not be affected by ' +
+          '(gzipped compressed size of `v0.js`) could not be affected by ' +
           'the files that this pull request modifies, so this check was ' +
           'marked as skipped.',
       },
@@ -507,20 +507,15 @@ module.exports = app => {
         .end('POST request to /report must have commit SHA field "baseSha"');
     }
     if (
-      !('brotliBundleSize' in request.body) ||
-      typeof request.body.brotliBundleSize != 'number'
+      !('bundleSize' in request.body) ||
+      typeof request.body.bundleSize != 'number'
     ) {
       return response
         .status(400)
-        .end(
-          'POST request to /report must have numeric field "brotliBundleSize"'
-        );
+        .end('POST request to /report must have numeric field "bundleSize"');
     }
     const {headSha} = request.params;
-    // TODO(#142): restore the default bundleSize field name here once the
-    // ampproject/amphtml runner starts reporting Brotli sizes in the bundleSize
-    // field.
-    const {baseSha, brotliBundleSize: bundleSize} = request.body;
+    const {baseSha, bundleSize} = request.body;
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
