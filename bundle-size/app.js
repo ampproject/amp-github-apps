@@ -46,7 +46,6 @@ function getBuildArtifactsFileParams(filename) {
  *
  * @param {!github} github an authenticated GitHub API object.
  * @param {string} filename the name of the file to retrieve.
- * @throws {Error} on any error.
  * @return {string} the text contents of the file.
  */
 async function getBuildArtifactsFile(github, filename) {
@@ -64,7 +63,6 @@ async function getBuildArtifactsFile(github, filename) {
  * @param {!github} github an authenticated GitHub API object.
  * @param {string} filename the name of the file to store into.
  * @param {string} contents text contents of the file.
- * @throws {Error} on any error.
  * @return {object} to ignore.
  */
 async function storeBuildArtifactsFile(github, filename, contents) {
@@ -102,7 +100,6 @@ async function isBundleSizeApprover(github, username) {
  * Get a random reviewer from the approved teams.
  *
  * @param {!github} github an authorized GitHub API object.
- * @throws {Error} on any error.
  * @return {string} a username of someone who can approve a bundle size change.
  */
 async function getRandomReviewer(github) {
