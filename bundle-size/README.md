@@ -83,8 +83,12 @@ Follow these setup instructions to start developing for this App locally:
      command line
    * The value for the `ACCESS_TOKEN` field is the personal access token from
      the precending step
-   * The value for the `TRAVIS_PUSH_BUILD_TOKEN` should be a unique identifier
-     that is only set for Travis _push_ builds, not for pull requests.
+   * The value for the `TRAVIS_PUSH_BUILD_TOKEN` should be a unique identifier.
+     This token can be any string, and must be passed as a `token` field to
+     verify that requests to `/commit/:headSha/store` are coming from push
+     builds and not from pull requests. On Travis, set this as an push-build
+     only environment variable and treat this like you would any other access
+     token.
 10. Copy the `db-config.example.js` file to `db-config.js` and modify the fields
     based on the connection information to your database
 11. `npm run dev`
