@@ -199,6 +199,9 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/api/endpoint')
         .reply(200, function() {
+          // Note: it is important this use `function` syntax (instead of arrow
+          // syntax `() => {}` because it needs to access `this`.
+          // eslint-disable-next-line no-invalid-this
           expect(this.req.headers.accept[0]).toContain(
             'application/vnd.github.hellcat-preview+json'
           );
@@ -212,7 +215,7 @@ describe('GitHub API', () => {
 
   describe('getTeams', () => {
     it('returns a list of team objects', async () => {
-      expect.assertions(2);      
+      expect.assertions(2);
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams')
         .reply(200, [{id: 1337, slug: 'my_team'}]);
@@ -228,7 +231,7 @@ describe('GitHub API', () => {
 
   describe('getTeamMembers', () => {
     it('returns a list of team objects', async () => {
-      expect.assertions(1);      
+      expect.assertions(1);
       nock('https://api.github.com')
         .get('/teams/1337/members')
         .reply(200, [{login: 'rcebulko'}, {login: 'erwinmombay'}]);
