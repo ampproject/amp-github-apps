@@ -606,18 +606,12 @@ module.exports = app => {
             'the artifacts repository on GitHub'
         );
       } catch (error) {
-        app.log(
+        const errorMessage =
           `ERROR: Failed to create the bundle-size/${bundleSizeFile} file in ` +
-            'the build artifacts repository on GitHub!'
-        );
-        app.log(`Error message was: ${error.message}`);
-        return response
-          .status(500)
-          .end(
-            `ERROR: Failed to create the bundle-size/${bundleSizeFile} file ` +
-              'in the build artifacts repository on GitHub! Error message ' +
-              `was: ${error.message}`
-          );
+          'the build artifacts repository on GitHub!\n' +
+          `Error message was: ${error.message}`;
+        app.log(errorMessage);
+        return response.status(500).end(errorMessage);
       }
     }
     response.end();
