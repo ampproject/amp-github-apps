@@ -519,25 +519,19 @@ module.exports = app => {
   });
 
   v0.post('/commit/:headSha/report', async (request, response) => {
-    if (
-      !('baseSha' in request.body) ||
-      typeof request.body.baseSha != 'string' ||
-      !/^[0-9a-f]{40}$/.test(request.body.baseSha)
-    ) {
+    const {headSha} = request.params;
+    const {baseSha, bundleSize} = request.body;
+
+    if (typeof baseSha !== 'string' || !/^[0-9a-f]{40}$/.test(baseSha)) {
       return response
         .status(400)
         .end('POST request to /report must have commit SHA field "baseSha"');
     }
-    if (
-      !('bundleSize' in request.body) ||
-      typeof request.body.bundleSize != 'number'
-    ) {
+    if (typeof bundleSize !== 'number') {
       return response
         .status(400)
         .end('POST request to /report must have numeric field "bundleSize"');
     }
-    const {headSha} = request.params;
-    const {baseSha, bundleSize} = request.body;
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
@@ -565,24 +559,22 @@ module.exports = app => {
   });
 
   v0.post('/commit/:headSha/store', async (request, response) => {
-    if (request.body['token'] != process.env.TRAVIS_PUSH_BUILD_TOKEN) {
+    const {headSha} = request.params;
+    const {gzippedBundleSize, brotliBundleSize} = request.body;
+
+    if (request.body['token'] !== process.env.TRAVIS_PUSH_BUILD_TOKEN) {
       return response.status(403).end('You are not Travis!');
     }
-    for (const bundleSizeField of ['gzippedBundleSize', 'brotliBundleSize']) {
-      if (
-        !(bundleSizeField in request.body) ||
-        typeof request.body[bundleSizeField] != 'number'
-      ) {
+    for (const bundleSize of [gzippedBundleSize, brotliBundleSize]) {
+      if (typeof bundleSize !== 'number') {
         return response
           .status(400)
           .end(
-            'POST request to /store must have numeric field ' +
-              `"${bundleSizeField}"`
+            'POST request to /store must have numeric fields ' +
+              '"gzippedBundleSize" and "brotliBundleSize"'
           );
       }
     }
-    const {headSha} = request.params;
-    const {gzippedBundleSize, brotliBundleSize} = request.body;
 
     for (const [compression, extension, bundleSizeValue] of [
       ['gzip', '', gzippedBundleSize],

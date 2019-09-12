@@ -867,7 +867,8 @@ describe('bundle-size', () => {
       .set('Accept', 'application/json')
       .expect(
         400,
-        'POST request to /store must have numeric field "gzippedBundleSize"'
+        'POST request to /store must have numeric fields "gzippedBundleSize" ' +
+          'and "brotliBundleSize"'
       );
   });
 
