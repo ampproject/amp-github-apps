@@ -572,6 +572,9 @@ module.exports = app => {
   });
 
   v0.post('/commit/:headSha/store', async (request, response) => {
+    if (request.body['token'] != process.env.TRAVIS_PUSH_BUILD_TOKEN) {
+      return response.status(403).end('You are not Travis!');
+    }
     for (const bundleSizeField of ['gzippedBundleSize', 'brotliBundleSize']) {
       if (
         !(bundleSizeField in request.body) ||

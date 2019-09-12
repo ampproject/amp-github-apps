@@ -76,6 +76,7 @@ describe('bundle-size', () => {
 
   beforeEach(async () => {
     process.env = {
+      TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
       MAX_ALLOWED_INCREASE: '0.1',
       APPROVER_TEAMS: '123,234',
       REVIEWER_TEAMS: '123',
@@ -786,6 +787,7 @@ describe('bundle-size', () => {
     await request(probot.server)
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
+        token: '0123456789abcdefghijklmnopqrstuvwxyz',
         gzippedBundleSize: 12.34,
         brotliBundleSize: 12.34,
       })
@@ -811,6 +813,7 @@ describe('bundle-size', () => {
     await request(probot.server)
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
+        token: '0123456789abcdefghijklmnopqrstuvwxyz',
         gzippedBundleSize: 12.34,
         brotliBundleSize: 12.34,
       })
@@ -842,6 +845,7 @@ describe('bundle-size', () => {
     await request(probot.server)
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
+        token: '0123456789abcdefghijklmnopqrstuvwxyz',
         gzippedBundleSize: 12.34,
         brotliBundleSize: 12.34,
       })
@@ -855,6 +859,7 @@ describe('bundle-size', () => {
     await request(probot.server)
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
+        token: '0123456789abcdefghijklmnopqrstuvwxyz',
         // Deliberately not add a `gzippedBundleSize` field,
         brotliBundleSize: 12.34,
       })
@@ -864,6 +869,19 @@ describe('bundle-size', () => {
         400,
         'POST request to /store must have numeric field "gzippedBundleSize"'
       );
+  });
+
+  test('rejects calls to store without the Travis token', async () => {
+    await request(probot.server)
+      .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
+      .send({
+        token: 'wrong token',
+        gzippedBundleSize: 12.34,
+        brotliBundleSize: 12.34,
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(403, 'You are not Travis!');
   });
 
   test('ignore closed (not merged) pull request', async () => {
