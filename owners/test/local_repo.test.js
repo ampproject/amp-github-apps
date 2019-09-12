@@ -58,7 +58,7 @@ describe('local repository', () => {
         'git fetch origin my_branch',
         'git checkout -B my_branch origin/my_branch'
       );
-      
+
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
@@ -71,7 +71,7 @@ describe('local repository', () => {
         'git fetch origin master',
         'git checkout -B master origin/master'
       );
-      
+
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
@@ -109,7 +109,7 @@ describe('local repository', () => {
         childProcess.exec,
         `cd path/to/repo && git status`
       );
-      
+
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
@@ -151,7 +151,7 @@ describe('local repository', () => {
       sandbox.assert.calledWith(fs.readFileSync, 'path/to/repo/my/file.txt', {
         encoding: 'utf8',
       });
-      
+
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
