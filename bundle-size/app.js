@@ -27,6 +27,20 @@ const HUMAN_ENCOURAGEMENT_MAX_DELTA = -0.03;
 const db = dbConnect();
 
 /**
+ * Get GitHub API parameters for bundle-size file actions.
+ *
+ * @param {string} filename the name of the file to act on.
+ * @return {!object} GitHub API parameters to act on the file.
+ */
+function getBuildArtifactsFileParams(filename) {
+  return {
+    owner: 'ampproject',
+    repo: 'amphtml-build-artifacts',
+    path: path.join('bundle-size', filename),
+  };
+}
+
+/**
  * Get a file from the bundle-size directory in the AMPHTML build artifacts
  * repository.
  *
@@ -37,14 +51,29 @@ const db = dbConnect();
  */
 async function getBuildArtifactsFile(github, filename) {
   return await github.repos
-    .getContents({
-      owner: 'ampproject',
-      repo: 'amphtml-build-artifacts',
-      path: path.join('bundle-size', filename),
-    })
+    .getContents(getBuildArtifactsFileParams(filename))
     .then(result => {
       return Buffer.from(result.data.content, 'base64').toString();
     });
+}
+
+/**
+ * Store a file in the bundle-size directory in the AMPHTML build artifacts
+ * repository.
+ *
+ * @param {github} github an authenticated GitHub API object.
+ * @param {string} filename the name of the file to store into.
+ * @param {string} bundleSize text contents of the file.
+ * @throws {Error} on any error.
+ * @return {object} to ignore.
+ */
+async function storeBuildArtifactsFile(github, filename, bundleSize) {
+  return await github.repos.createOrUpdateFile(
+    Object.assign(getBuildArtifactsFileParams(filename), {
+      message: `bundle-size: ${filename} (${bundleSize})`,
+      content: Buffer.from(bundleSize).toString('base64'),
+    })
+  );
 }
 
 /**
@@ -540,5 +569,69 @@ module.exports = app => {
         );
       } while (retriesLeft > 0 && !reportSuccess);
     }
+  });
+
+  v0.post('/commit/:headSha/store', async (request, response) => {
+    for (const bundleSizeField of ['gzippedBundleSize', 'brotliBundleSize']) {
+      if (
+        !(bundleSizeField in request.body) ||
+        typeof request.body[bundleSizeField] != 'number'
+      ) {
+        return response
+          .status(400)
+          .end(
+            'POST request to /store must have numeric field ' +
+              `"${bundleSizeField}"`
+          );
+      }
+    }
+    const {headSha} = request.params;
+    const {gzippedBundleSize, brotliBundleSize} = request.body;
+
+    for (const [compression, extension, bundleSizeValue] of [
+      ['gzip', '', gzippedBundleSize],
+      ['brotli', '.br', brotliBundleSize],
+    ]) {
+      const bundleSize = `${bundleSizeValue}KB`;
+      const bundleSizeFile = `${headSha}${extension}`;
+
+      try {
+        await getBuildArtifactsFile(userBasedGithub, bundleSizeFile);
+        app.log(
+          `The file bundle-size/${bundleSizeFile} already exists in the ` +
+            'build artifacts repository on GitHub. Skipping...'
+        );
+        continue;
+      } catch (unusedException) {
+        // The file was not found in the GitHub repository, so continue to
+        // create it...
+      }
+
+      try {
+        await storeBuildArtifactsFile(
+          userBasedGithub,
+          bundleSizeFile,
+          bundleSize
+        );
+        app.log(
+          `Stored the new ${compression} bundle size of ${bundleSize} in the ` +
+            'artifacts repository on GitHub'
+        );
+      } catch (error) {
+        app.log(
+          `ERROR: Failed to create the bundle-size/${bundleSizeFile} file in ` +
+            'the build artifacts repository on GitHub!'
+        );
+        app.log(`Error message was: ${error.message}`);
+        return response
+          .status(500)
+          .end(
+            `ERROR: Failed to create the bundle-size/${bundleSizeFile} file ` +
+              'in the build artifacts repository on GitHub! Error message ' +
+              `was: ${error.message}`
+          );
+      }
+    }
+    response.end();
   });
 };

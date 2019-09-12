@@ -748,6 +748,124 @@ describe('bundle-size', () => {
       .expect(400);
   });
 
+  test('store new bundle-size', async () => {
+    const nocks = nock('https://api.github.com')
+      .get(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+      )
+      .reply(404)
+      .put(
+        '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size' +
+          '/5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+        {
+          message:
+            'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33 ' +
+            '(12.34KB)',
+          content: Buffer.from('12.34KB').toString('base64'),
+        }
+      )
+      .reply(201)
+      .get(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+      )
+      .reply(404)
+      .put(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br',
+        {
+          message:
+            'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br ' +
+            '(12.34KB)',
+          content: Buffer.from('12.34KB').toString('base64'),
+        }
+      )
+      .reply(201);
+
+    await request(probot.server)
+      .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
+      .send({
+        gzippedBundleSize: 12.34,
+        brotliBundleSize: 12.34,
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(200);
+    await waitUntilNockScopeIsDone(nocks);
+  });
+
+  test('ignore already existing bundle-size when called to store', async () => {
+    const nocks = nock('https://api.github.com')
+      .get(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+      )
+      .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33'))
+      .get(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+      )
+      .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33'));
+
+    await request(probot.server)
+      .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
+      .send({
+        gzippedBundleSize: 12.34,
+        brotliBundleSize: 12.34,
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(200);
+    await waitUntilNockScopeIsDone(nocks);
+  });
+
+  test('show error when failed to store bundle-size', async () => {
+    const nocks = nock('https://api.github.com')
+      .get(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+      )
+      .reply(404)
+      .put(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+        {
+          message:
+            'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33 ' +
+            '(12.34KB)',
+          content: Buffer.from('12.34KB').toString('base64'),
+        }
+      )
+      .reply(418, 'I am a tea pot');
+
+    await request(probot.server)
+      .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
+      .send({
+        gzippedBundleSize: 12.34,
+        brotliBundleSize: 12.34,
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(500, /I am a tea pot/);
+    await waitUntilNockScopeIsDone(nocks);
+  });
+
+  test('fail on missing values when called to store bundle-size', async () => {
+    await request(probot.server)
+      .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
+      .send({
+        // Deliberately not add a `gzippedBundleSize` field,
+        brotliBundleSize: 12.34,
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(
+        400,
+        'POST request to /store must have numeric field "gzippedBundleSize"'
+      );
+  });
+
   test('ignore closed (not merged) pull request', async () => {
     const pullRequestPayload = getFixture('pull_request.opened');
     pullRequestPayload.action = 'closed';

@@ -33,12 +33,18 @@ requests from this comma separated list of IP addresses will be processed.
     request does not change the bundle at all (e.g., documentation changes)
 * `/v0/commit/:headSha/report`
   * Accepts a JSON object with a numeric `bundleSize` field, denoting the size
-    of the compiled bundle based on the head commit in KB
+    of the compiled bundle based on the head commit in KB, and a `baseSha` field
+    denoting the commit SHA on to compare against.
   * Calculated the change in the size of the compiled bundle between the base
     and the head commits, and determines whether to mark the check as passed
     (i.e., when the bundle size is not increased or is increased by a fraction),
     or whether to mark the check as requiring action (i.e., the size increases
     significantly or could not be calculated for any reason).
+* `/v0/commit/:headSha/store`
+  * Accepts a JSON object with numeric `gzippedBundleSize` and
+    `brotliBundleSize` fields, denoting the size of the compiled bundle in the
+    respective compressions.
+  * Stores these values in the `ampproject/amphtml-build-artifacts` repository.
 
 
 
