@@ -138,6 +138,20 @@ class GitHub {
   }
 
   /**
+   * Fetch all teams for the organization.
+   *
+   * @return {Team[]} list of teams.
+   */
+  async getTeams() {
+    this.logger.info(`Fetching teams for organization '${this.owner}'`);
+
+    const teamsList = await this._customRequest(`/orgs/${this.owner}/teams`);
+    this.logger.debug('[getTeams]', teamsList);
+
+    return teamsList.map(({id, slug}) => new Team(id, slug));
+  }
+
+  /**
    * Fetches a pull request.
    *
    * @param {!number} number pull request number.

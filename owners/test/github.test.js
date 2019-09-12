@@ -169,7 +169,23 @@ describe('GitHub API', () => {
         await github._customRequest('/api/endpoint');
       })();
     });
-  });  
+  });
+
+  describe('getTeams', () => {
+    it('returns a list of team objects', async () => {
+      expect.assertions(2);      
+      nock('https://api.github.com')
+        .get('/orgs/test_owner/teams')
+        .reply(200, [{id: 1337, slug: 'my_team'}]);
+
+      await withContext(async (context, github) => {
+        const teams = await github.getTeams();
+
+        expect(teams[0].id).toEqual(1337);
+        expect(teams[0].slug).toEqual('my_team');
+      })();
+    });
+  });
 
   describe('getPullRequest', () => {
     it('fetches a pull request', async () => {
