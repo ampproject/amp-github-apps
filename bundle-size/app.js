@@ -63,15 +63,15 @@ async function getBuildArtifactsFile(github, filename) {
  *
  * @param {!github} github an authenticated GitHub API object.
  * @param {string} filename the name of the file to store into.
- * @param {string} bundleSize text contents of the file.
+ * @param {string} contents text contents of the file.
  * @throws {Error} on any error.
  * @return {object} to ignore.
  */
-async function storeBuildArtifactsFile(github, filename, bundleSize) {
+async function storeBuildArtifactsFile(github, filename, contents) {
   return await github.repos.createOrUpdateFile({
     ...getBuildArtifactsFileParams(filename),
-    message: `bundle-size: ${filename} (${bundleSize})`,
-    content: Buffer.from(bundleSize).toString('base64'),
+    message: `bundle-size: ${filename} (${contents})`,
+    content: Buffer.from(contents).toString('base64'),
   });
 }
 
@@ -580,7 +580,7 @@ module.exports = app => {
       ['gzip', '', gzippedBundleSize],
       ['brotli', '.br', brotliBundleSize],
     ]) {
-      const bundleSize = `${bundleSizeValue}KB`;
+      const bundleSizeText = `${bundleSizeValue}KB`;
       const bundleSizeFile = `${headSha}${extension}`;
 
       try {
@@ -599,11 +599,11 @@ module.exports = app => {
         await storeBuildArtifactsFile(
           userBasedGithub,
           bundleSizeFile,
-          bundleSize
+          bundleSizeText
         );
         app.log(
-          `Stored the new ${compression} bundle size of ${bundleSize} in the ` +
-            'artifacts repository on GitHub'
+          `Stored the new ${compression} bundle size of ${bundleSizeText} in ` +
+            'the artifacts repository on GitHub'
         );
       } catch (error) {
         app.log(
