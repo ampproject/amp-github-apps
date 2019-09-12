@@ -44,7 +44,7 @@ function getBuildArtifactsFileParams(filename) {
  * Get a file from the bundle-size directory in the AMPHTML build artifacts
  * repository.
  *
- * @param {github} github an authenticated GitHub API object.
+ * @param {!github} github an authenticated GitHub API object.
  * @param {string} filename the name of the file to retrieve.
  * @throws {Error} on any error.
  * @return {string} the text contents of the file.
@@ -61,7 +61,7 @@ async function getBuildArtifactsFile(github, filename) {
  * Store a file in the bundle-size directory in the AMPHTML build artifacts
  * repository.
  *
- * @param {github} github an authenticated GitHub API object.
+ * @param {!github} github an authenticated GitHub API object.
  * @param {string} filename the name of the file to store into.
  * @param {string} bundleSize text contents of the file.
  * @throws {Error} on any error.
@@ -79,7 +79,7 @@ async function storeBuildArtifactsFile(github, filename, bundleSize) {
 /**
  * Check whether the user is allowed to approve a bundle size change.
  *
- * @param {github} github an authorized GitHub API object.
+ * @param {!github} github an authorized GitHub API object.
  * @param {string} username the username to check.
  * @return {boolean} true if the user is allowed to approve bundle size changes.
  */
@@ -102,7 +102,7 @@ async function isBundleSizeApprover(github, username) {
 /**
  * Get a random reviewer from the approved teams.
  *
- * @param {github} github an authorized GitHub API object.
+ * @param {!github} github an authorized GitHub API object.
  * @throws {Error} on any error.
  * @return {string} a username of someone who can approve a bundle size change.
  */
@@ -311,7 +311,7 @@ module.exports = app => {
    *
    * Ignore errors as this is a non-critical action.
    *
-   * @param {github} github an authenticated GitHub API object.
+   * @param {!github} github an authenticated GitHub API object.
    * @param {!object} pullRequest GitHub Pull Request object.
    */
   async function addBundleSizeReviewer(github, pullRequest) {
