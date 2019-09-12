@@ -140,6 +140,7 @@ describe('GitHub API', () => {
 
   describe('getPullRequest', () => {
     it('fetches a pull request', async () => {
+      expect.assertions(2);
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/pulls/35')
         .reply(200, pullRequestResponse);
@@ -156,6 +157,7 @@ describe('GitHub API', () => {
 
   describe('getReviews', () => {
     it('fetches a list of reviews', async () => {
+      expect.assertions(3);
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/pulls/35/reviews')
         .reply(200, reviewsApprovedResponse);
@@ -172,6 +174,7 @@ describe('GitHub API', () => {
 
   describe('listFiles', () => {
     it('fetches the list of changed files', async () => {
+      expect.assertions(1);
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/pulls/35/files')
         .reply(200, listFilesResponse);
@@ -186,6 +189,7 @@ describe('GitHub API', () => {
 
   describe('createCheckRun', () => {
     it('creates a check-run for the commit', async () => {
+      expect.assertions(1);
       nock('https://api.github.com')
         .post('/repos/test_owner/test_repo/check-runs', body => {
           expect(body).toMatchObject({
@@ -214,6 +218,7 @@ describe('GitHub API', () => {
 
   describe('getCheckRunId', () => {
     it('fetches the first matching check-run from the list', async () => {
+      expect.assertions(1);
       const sha = '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d';
       nock('https://api.github.com')
         .get(`/repos/test_owner/test_repo/commits/${sha}/check-runs`)
@@ -228,6 +233,7 @@ describe('GitHub API', () => {
     });
 
     it('returns null if the list has no matching check-run', async () => {
+      expect.assertions(1);
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/commits/_missing_hash_/check-runs')
         .reply(200, checkRunsListResponse);
@@ -240,6 +246,7 @@ describe('GitHub API', () => {
     });
 
     it('returns null if the list is empty', async () => {
+      expect.assertions(1);
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/commits/_test_hash_/check-runs')
         .reply(200, checkRunsEmptyResponse);
@@ -252,6 +259,7 @@ describe('GitHub API', () => {
     });
 
     it('returns null if there is an error querying GitHub', async () => {
+      expect.assertions(1);
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/commits/_test_hash_/check-runs')
         .replyWithError({
@@ -269,6 +277,7 @@ describe('GitHub API', () => {
 
   describe('updateCheckRun', () => {
     it('updates a check-run by ID', async () => {
+      expect.assertions(1);
       nock('https://api.github.com')
         .patch('/repos/test_owner/test_repo/check-runs/1337', body => {
           expect(body).toMatchObject({

@@ -51,6 +51,7 @@ describe('local repository', () => {
     });
 
     it('fetches and checks out the requested branch', async () => {
+      expect.assertions(1);
       await repo.checkout('my_branch');
       sandbox.assert.calledWith(
         repo.runCommands,
@@ -60,6 +61,7 @@ describe('local repository', () => {
     });
 
     it('defaults to master', async () => {
+      expect.assertions(1);
       await repo.checkout();
       sandbox.assert.calledWith(
         repo.runCommands,
@@ -94,6 +96,7 @@ describe('local repository', () => {
     }
 
     it('executes the provided commands in the repo directory', async () => {
+      expect.assertions(1);
       stubExecAndSetRepo(false, '', '');
       await repo.runCommands('git status');
       sandbox.assert.calledWith(
@@ -103,6 +106,7 @@ describe('local repository', () => {
     });
 
     it('returns the contents of stdout', async () => {
+      expect.assertions(1);
       stubExecAndSetRepo(false, 'Hello world!', 'Some extra output');
       await expect(repo.runCommands('echo "Hello world!"')).resolves.toEqual(
         'Hello world!'
@@ -110,6 +114,7 @@ describe('local repository', () => {
     });
 
     it('throws the contents of stderr if there is an error', async () => {
+      expect.assertions(1);
       stubExecAndSetRepo(true, '', 'ERROR!');
       await expect(repo.runCommands('failing command')).rejects.toEqual(
         'ERROR!'
@@ -149,6 +154,7 @@ describe('local repository', () => {
     const FAKE_OWNERS_LIST_OUTPUT = 'foo.txt\nbar/baz.txt\n';
 
     it('splits the owners list from the command line output', async () => {
+      expect.assertions(1);
       sandbox.stub(repo, 'runCommands').returns(FAKE_OWNERS_LIST_OUTPUT);
       const ownersFiles = await repo.findOwnersFiles();
       expect(ownersFiles).toEqual(['foo.txt', 'bar/baz.txt']);

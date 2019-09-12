@@ -61,11 +61,13 @@ describe('owners bot', () => {
     });
 
     it('parses the owners tree', async () => {
+      expect.assertions(1);
       const {tree} = await ownersBot.initPr(github, pr);
       expect(tree).toBeInstanceOf(OwnersTree);
     });
 
     it('warns about parsing errors', async () => {
+      expect.assertions(1);
       const error = new Error('Oops!');
       sandbox.stub(console, 'warn');
       sandbox.stub(OwnersParser.prototype, 'parseOwnersTree').returns({
@@ -78,11 +80,13 @@ describe('owners bot', () => {
     });
 
     it('finds the reviewers that approved', async () => {
+      expect.assertions(1);
       const {approvers} = await ownersBot.initPr(github, pr);
       expect(approvers).toContain('approver', 'other_approver');
     });
 
     it('fetches the files changed in the PR', async () => {
+      expect.assertions(2);
       const {changedFiles} = await ownersBot.initPr(github, pr);
 
       sandbox.assert.calledWith(github.listFiles, 1337);
@@ -111,22 +115,26 @@ describe('owners bot', () => {
     });
 
     it('attempts to fetch the existing check-run ID', async () => {
+      expect.assertions(1);
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledWith(github.getCheckRunId, '_test_hash_');
     });
 
     it('checks out the latest master', async () => {
+      expect.assertions(1);
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledOnce(localRepo.checkout);
     });
 
     it('runs the owners check', async () => {
+      expect.assertions(1);
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledOnce(OwnersCheck.prototype.run);
     });
 
     describe('when a check-run exists', () => {
       it('updates the existing check-run', async () => {
+        expect.assertions(1);
         getCheckRunIdStub.returns(42);
         await ownersBot.runOwnersCheck(github, pr);
 
@@ -140,6 +148,7 @@ describe('owners bot', () => {
 
     describe('when no check-run exists yet', () => {
       it('creates a new check-run', async () => {
+        expect.assertions(1);
         getCheckRunIdStub.returns(null);
         await ownersBot.runOwnersCheck(github, pr);
 
@@ -159,11 +168,13 @@ describe('owners bot', () => {
     });
 
     it('fetches the PR from GitHub', async () => {
+      expect.assertions(1);
       await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
       sandbox.assert.calledWith(github.getPullRequest, 1337);
     });
 
     it('runs the owners check on the retrieved PR', async () => {
+      expect.assertions(1);
       await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
       sandbox.assert.calledWith(ownersBot.runOwnersCheck, github, pr);
     });
@@ -171,6 +182,7 @@ describe('owners bot', () => {
 
   describe('getApprovers', () => {
     it("returns the reviewers' usernames", async () => {
+      expect.assertions(1);
       sandbox
         .stub(GitHub.prototype, 'getReviews')
         .returns([approval, otherApproval]);
@@ -180,6 +192,7 @@ describe('owners bot', () => {
     });
 
     it('includes the author', async () => {
+      expect.assertions(1);
       sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
       const approvers = await ownersBot._getApprovers(github, pr);
 
@@ -187,6 +200,7 @@ describe('owners bot', () => {
     });
 
     it('produces unique usernames', async () => {
+      expect.assertions(1);
       sandbox
         .stub(GitHub.prototype, 'getReviews')
         .returns([approval, approval, authorApproval]);
@@ -196,6 +210,7 @@ describe('owners bot', () => {
     });
 
     it('includes only reviewers who approved the review', async () => {
+      expect.assertions(1);
       sandbox
         .stub(GitHub.prototype, 'getReviews')
         .returns([approval, rejection]);
