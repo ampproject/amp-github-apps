@@ -138,6 +138,39 @@ describe('GitHub API', () => {
     );
   });
 
+  describe('customRequest', () => {
+    beforeEach(() => {
+      sandbox.stub(process, 'env').value({GITHUB_ACCESS_TOKEN: '_TOKEN_'});
+    });
+
+    it('returns the response', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/api/endpoint')
+        .reply(200, '_DATA_');
+
+      await withContext(async (context, github) => {
+        const responseData = await github._customRequest('/api/endpoint');
+        expect(responseData).toEqual('_DATA_');
+      })();
+    });
+
+    it('adds the preview header', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/api/endpoint')
+        .reply(200, function() {
+          expect(this.req.headers.accept[0]).toContain(
+            'application/vnd.github.hellcat-preview+json'
+          );
+        });
+
+      await withContext(async (context, github) => {
+        await github._customRequest('/api/endpoint');
+      })();
+    });
+  });  
+
   describe('getPullRequest', () => {
     it('fetches a pull request', async () => {
       expect.assertions(2);

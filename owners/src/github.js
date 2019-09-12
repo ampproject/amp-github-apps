@@ -63,6 +63,21 @@ class Review {
 }
 
 /**
+ * A GitHub organization team.
+ */
+class Team {
+  /**
+   * Constructor.
+   *
+   * @param {!number} id team ID.
+   * @param {!string} slug team name slug.
+   */
+  constructor(id, slug) {
+    Object.assign(this, {id, slug});
+  }
+}
+
+/**
  * Interface for working with the GitHub API.
  */
 class GitHub {
@@ -98,6 +113,28 @@ class GitHub {
    */
   repo(obj) {
     return Object.assign({}, obj, {repo: this.repository, owner: this.owner});
+  }
+
+  /**
+   * Issue a custom API request.
+   *
+   * Some endpoints are not fully supported by Octokit (the GitHub REST API
+   * implementation),  so this method makes an arbitrary request with the
+   * required headers.
+   *
+   * @param {!string} endpoint API endpoint URL path (ie. `/repos`).
+   * @return {*} the response data.
+   */
+  async _customRequest(endpoint) {
+    const response = await this.client.request({
+      headers: {
+        authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
+        accept: 'application/vnd.github.hellcat-preview+json',
+      },
+      url: endpoint,
+    });
+
+    return response.data;
   }
 
   /**
