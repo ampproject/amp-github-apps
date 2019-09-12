@@ -152,6 +152,21 @@ class GitHub {
   }
 
   /**
+   * Fetch all members of a team.
+   *
+   * @param {!Team} teamId ID of team to find members for.
+   * @return {string[]} list of member usernames.
+   */
+  async getTeamMembers(teamId) {
+    this.logger.info(`Fetching team members for team with ID ${teamId}`);
+
+    const memberList = await this._customRequest(`/teams/${teamId}/members`);
+    this.logger.debug('[getTeamMembers]', teamId, memberList);
+
+    return memberList.map(({login}) => login);
+  }
+
+  /**
    * Fetches a pull request.
    *
    * @param {!number} number pull request number.

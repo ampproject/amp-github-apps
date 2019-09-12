@@ -187,6 +187,21 @@ describe('GitHub API', () => {
     });
   });
 
+  describe('getTeamMembers', () => {
+    it('returns a list of team objects', async () => {
+      expect.assertions(1);      
+      nock('https://api.github.com')
+        .get('/teams/1337/members')
+        .reply(200, [{login: 'rcebulko'}, {login: 'erwinmombay'}]);
+
+      await withContext(async (context, github) => {
+        const members = await github.getTeamMembers(1337);
+
+        expect(members).toEqual(['rcebulko', 'erwinmombay']);
+      })();
+    });
+  });
+
   describe('getPullRequest', () => {
     it('fetches a pull request', async () => {
       expect.assertions(2);
