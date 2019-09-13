@@ -92,12 +92,15 @@ class OwnersParser {
         ...lineResult.errors
       );
     } else if (owner.indexOf('/') !== -1) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Failed to parse owner '${owner}'; team ownership not yet supported`
-        )
-      );
+      const team = this.teamMap[owner];
+
+      if (team) {
+        owners.push(...team.members);
+      } else {
+        errors.push(
+          new OwnersParserError(ownersPath, `Unrecognized team: '${owner}'`)
+        );
+      }
     } else {
       owners.push(owner);
     }
