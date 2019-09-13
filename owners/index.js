@@ -93,14 +93,13 @@ module.exports = app => {
     res.send(checkRun.json);
   });
 
-  adminRouter.get('/teams', async (req, res) => {
+  adminRouter.get('/teams', (req, res) => {
     const teamSections = [];
     for (const team of Object.values(ownersBot.teams)) {
-      const members = await team.getMembers(github);
       teamSections.push(
         [
           `Team "${team.slug}" (ID: ${team.id}):`,
-          ...members.map(username => `- ${username}`),
+          ...team.members.map(username => `- ${username}`),
         ].join('<br>')
       );
     }
