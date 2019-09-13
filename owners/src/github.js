@@ -226,7 +226,8 @@ class GitHub {
     this.logger.debug('[getReviews]', number, response.data);
 
     return response.data.map(
-      json => new Review(json.user.login, json.state, json.submitted_at)
+      json =>
+        new Review(json.user.login, json.state, new Date(json.submitted_at))
     );
   }
 
