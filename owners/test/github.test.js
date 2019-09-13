@@ -45,7 +45,7 @@ describe('pull request', () => {
 
 describe('review', () => {
   it('initializes its approval state', () => {
-    const timestamp = '2019-01-01T00:00:00Z';
+    const timestamp = new Date('2019-01-01T00:00:00Z');
     const approval = new Review('a_user', 'APPROVED', timestamp);
     const rejection = new Review('a_user', 'CHANGES_REQUESTED', timestamp);
 
@@ -288,7 +288,7 @@ describe('GitHub API', () => {
 
         expect(review.reviewer).toEqual('erwinmombay');
         expect(review.isApproved).toBe(true);
-        expect(review.submittedAt).toEqual('2019-02-26T20:39:13Z');
+        expect(review.submittedAt).toEqual(new Date('2019-02-26T20:39:13Z'));
       })();
     });
   });
