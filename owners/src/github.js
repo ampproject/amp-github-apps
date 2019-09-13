@@ -150,7 +150,7 @@ class GitHub {
       url: endpoint,
     });
 
-    return response.data;
+    return response;
   }
 
   /**
@@ -163,16 +163,18 @@ class GitHub {
 
     const teamsList = [];
     let pageNum = 0;
-    while (true) {
-      const teamPage = await this._customRequest(
+    let isNextLink = true;
+    while (isNextLink) {
+      const response = await this._customRequest(
         `/orgs/${this.owner}/teams?page=${pageNum}`
       );
+      const nextLink = response.headers.link || '';
+      isNextLink = nextLink.indexOf('rel="next"') !== -1
+
+      const teamPage = response.data
       teamsList.push(...teamPage);
       pageNum++;
 
-      if (teamPage.length < GITHUB_TEAMS_MAX_COUNT) {
-        break;
-      }
     }
     this.logger.debug('[getTeams]', teamsList);
 
@@ -188,7 +190,8 @@ class GitHub {
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
 
-    const memberList = await this._customRequest(`/teams/${teamId}/members`);
+    const response = await this._customRequest(`/teams/${teamId}/members`);
+    const memberList = response.data;
     this.logger.debug('[getTeamMembers]', teamId, memberList);
 
     return memberList.map(({login}) => login);

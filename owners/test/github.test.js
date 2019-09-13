@@ -232,18 +232,17 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?page=0')
-        .reply(200, Array(30).fill({id: 1337, slug: 'my_team'}));
+        .reply(200, Array(30).fill([{id: 1337, slug: 'my_team'}]), {
+          link: '<https://api.github.com/blah/blah?page=2>; rel="next"'
+        });
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?page=1')
-        .reply(200, Array(30).fill({id: 1337, slug: 'my_team'}));
-      nock('https://api.github.com')
-        .get('/orgs/test_owner/teams?page=2')
-        .reply(200, Array(10).fill({id: 1337, slug: 'my_team'}));
+        .reply(200, Array(10).fill([{id: 1337, slug: 'my_team'}]));
 
       await withContext(async (context, github) => {
         const teams = await github.getTeams();
 
-        expect(teams.length).toEqual(70);
+        expect(teams.length).toEqual(40);
       })();
     });
   });
