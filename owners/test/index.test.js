@@ -107,7 +107,7 @@ describe('owners bot', () => {
           '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472315',
           body => {
             expect(body).toMatchObject({
-              conclusion: 'neutral',
+              conclusion: 'action_required',
               output: {
                 title:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
@@ -169,7 +169,7 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              conclusion: 'neutral',
+              conclusion: 'action_required',
               output: {
                 title:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
@@ -227,7 +227,7 @@ describe('owners bot', () => {
           '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313',
           body => {
             expect(body).toMatchObject({
-              conclusion: 'neutral',
+              conclusion: 'action_required',
               output: {
                 title:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
@@ -283,7 +283,7 @@ describe('owners bot', () => {
           '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313',
           body => {
             expect(body).toMatchObject({
-              conclusion: 'neutral',
+              conclusion: 'action_required',
               output: {
                 title:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
@@ -352,7 +352,7 @@ describe('owners bot', () => {
               name: 'ampproject/owners-check',
               head_sha: opened35.pull_request.head.sha,
               status: 'completed',
-              conclusion: 'neutral',
+              conclusion: 'action_required',
               output: {
                 title:
                   'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',

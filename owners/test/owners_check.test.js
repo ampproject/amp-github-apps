@@ -131,11 +131,10 @@ describe('owners check', () => {
       });
 
       describe('for a PR requiring approvals', () => {
-        // TODO(rcebulko): Update once this is changed to a blocking check.
-        it('has a neutral conclusion', () => {
+        it('has an action-required conclusion', () => {
           const checkRun = ownersCheck.run();
 
-          expect(checkRun.json.conclusion).toEqual('neutral');
+          expect(checkRun.json.conclusion).toEqual('action_required');
         });
 
         it('has a failing summary', () => {
@@ -170,7 +169,6 @@ describe('owners check', () => {
             .throws(new Error('Something is wrong'));
         });
 
-        // TODO(rcebulko): Update once this is changed to a blocking check.
         it('has a neutral conclusion', () => {
           const checkRun = ownersCheck.run();
 

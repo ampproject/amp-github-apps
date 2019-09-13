@@ -22,6 +22,7 @@ const CheckRunConclusion = {
   SUCCESS: 'success',
   FAILURE: 'failure',
   NEUTRAL: 'neutral',
+  ACTION_REQUIRED: 'action_required',
 };
 
 /**
@@ -110,7 +111,7 @@ class OwnersCheck {
         reviewSuggestions
       );
       return new CheckRun(
-        CheckRunConclusion.NEUTRAL,
+        CheckRunConclusion.ACTION_REQUIRED,
         `Missing required OWNERS approvals! Suggested reviewers: ${reviewers}`,
         `${coverageText}\n\n${suggestionsText}`
       );
