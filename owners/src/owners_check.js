@@ -22,7 +22,7 @@ const CheckRunConclusion = {
   SUCCESS: 'success',
   FAILURE: 'failure',
   NEUTRAL: 'neutral',
-  ACTION_REQUIRED: 'action_required', 
+  ACTION_REQUIRED: 'action_required',
 };
 
 /**
