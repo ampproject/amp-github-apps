@@ -15,7 +15,6 @@
  */
 
 const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
-const GITHUB_TEAMS_MAX_COUNT = 30;
 
 /**
  * Maps the github json payload to a simpler data structure.
@@ -169,12 +168,11 @@ class GitHub {
         `/orgs/${this.owner}/teams?page=${pageNum}`
       );
       const nextLink = response.headers.link || '';
-      isNextLink = nextLink.indexOf('rel="next"') !== -1
+      isNextLink = nextLink.indexOf('rel="next"') !== -1;
 
-      const teamPage = response.data
+      const teamPage = response.data;
       teamsList.push(...teamPage);
       pageNum++;
-
     }
     this.logger.debug('[getTeams]', teamsList);
 
@@ -184,7 +182,7 @@ class GitHub {
   /**
    * Fetch all members of a team.
    *
-   * @param {!Team} teamId ID of team to find members for.
+   * @param {!number} teamId ID of team to find members for.
    * @return {string[]} list of member usernames.
    */
   async getTeamMembers(teamId) {
