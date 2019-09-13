@@ -102,7 +102,7 @@ module.exports = app => {
           ...team.members.map(username => `- ${username}`),
         ].join('<br>')
       );
-    })
+    });
 
     res.send(teamSections.join('<br><br>'));
   });
