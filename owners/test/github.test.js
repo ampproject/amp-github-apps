@@ -81,23 +81,10 @@ describe('team', () => {
 
     it('fetches team members from GitHub', async () => {
       expect.assertions(1);
-      const members = await team.getMembers(fakeGithub);
+      await team.fetchMembers(fakeGithub);
 
       sandbox.assert.calledWith(fakeGithub.getTeamMembers, 1337);
-      expect(members).toEqual(['rcebulko', 'erwinmombay']);
-    });
-
-    it('only fetches from GitHub once', async () => {
-      expect.assertions(1);
-      await team.getMembers(fakeGithub);
-      await team.getMembers(fakeGithub);
-      await team.getMembers(fakeGithub);
-      await team.getMembers(fakeGithub);
-
-      sandbox.assert.calledOnce(fakeGithub.getTeamMembers);
-
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      expect(team.members).toEqual(['rcebulko', 'erwinmombay']);
     });
   });
 });

@@ -74,7 +74,7 @@ class Team {
    * @param {!string} slug team name slug.
    */
   constructor(id, org, slug) {
-    Object.assign(this, {id, org, slug, _members: null});
+    Object.assign(this, {id, org, slug, members: []});
   }
 
   /**
@@ -90,14 +90,9 @@ class Team {
    * Gets the members of team.
    *
    * @param {!GitHubAPI} github GitHub API client.
-   * @return {string[]} list of team member usernames.
    */
-  async getMembers(github) {
-    if (this._members === null) {
-      this._members = await github.getTeamMembers(this.id);
-    }
-
-    return this._members;
+  async fetchMembers(github) {
+    this.members = await github.getTeamMembers(this.id);
   }
 }
 
