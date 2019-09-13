@@ -87,7 +87,7 @@ module.exports = app => {
 
   adminRouter.get('/check/:prNumber', async (req, res) => {
     const pr = await github.getPullRequest(req.params.prNumber);
-    const {tree, approvers, changedFiles} = ownersBot.initPr(github, pr);
+    const {tree, approvers, changedFiles} = await ownersBot.initPr(github, pr);
     const ownersCheck = new OwnersCheck(tree, approvers, changedFiles);
     const checkRun = ownersCheck.run();
 
