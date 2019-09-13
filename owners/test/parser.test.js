@@ -29,8 +29,8 @@ describe('owners parser', () => {
   let myTeam;
 
   beforeEach(() => {
-    myTeam = new Team(1337, 'my_team');
-    myTeam._members = ['team_member', 'other_member'];
+    myTeam = new Team(1337, 'ampproject', 'my_team');
+    myTeam.members = ['team_member', 'other_member'];
 
     repo = new LocalRepository('path/to/repo');
     parser = new OwnersParser(repo, {'ampproject/my_team': myTeam});

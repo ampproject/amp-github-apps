@@ -51,7 +51,7 @@ class OwnersBot {
   async initTeams(github) {
     const teamList = await github.getTeams();
     teamList.forEach(team => {
-      this.teams[`${github.owner}/${team.slug}`] = team;
+      this.teams[team.toString()] = team;
     });
     for (const team of teamList) {
       await team.getMembers(github);

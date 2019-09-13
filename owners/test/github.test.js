@@ -57,6 +57,13 @@ describe('review', () => {
 });
 
 describe('team', () => {
+  describe('toString', () => {
+    it('prefixes the slug with the orginazation', () => {
+      const team = new Team(1337, 'ampproject', 'my_team');
+      expect(team.toString()).toEqual('ampproject/my_team');
+    });
+  });
+
   describe('getMembers', () => {
     let sandbox;
     let team;
@@ -65,7 +72,7 @@ describe('team', () => {
     beforeEach(() => {
       sandbox = sinon.createSandbox();
       sandbox.stub(fakeGithub, 'getTeamMembers').callThrough();
-      team = new Team(1337, 'my_team');
+      team = new Team(1337, 'ampproject', 'my_team');
     });
 
     afterEach(() => {
@@ -217,7 +224,7 @@ describe('GitHub API', () => {
 
   describe('getTeams', () => {
     it('returns a list of team objects', async () => {
-      expect.assertions(2);
+      expect.assertions(3);
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?page=0')
         .reply(200, [{id: 1337, slug: 'my_team'}]);
@@ -226,6 +233,7 @@ describe('GitHub API', () => {
         const teams = await github.getTeams();
 
         expect(teams[0].id).toEqual(1337);
+        expect(teams[0].org).toEqual('test_owner');
         expect(teams[0].slug).toEqual('my_team');
       })();
     });

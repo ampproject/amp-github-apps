@@ -56,8 +56,8 @@ describe('owners bot', () => {
     let otherTeam;
 
     beforeEach(() => {
-      myTeam = new Team(1337, 'my_team');
-      otherTeam = new Team(42, 'other_team');
+      myTeam = new Team(1337, 'ampproject', 'my_team');
+      otherTeam = new Team(42, 'ampproject', 'other_team');
       sandbox.stub(GitHub.prototype, 'getTeams').returns([myTeam, otherTeam]);
       sandbox.stub(GitHub.prototype, 'getTeamMembers').returns([]);
     });
@@ -67,8 +67,8 @@ describe('owners bot', () => {
       await ownersBot.initTeams(github);
 
       sandbox.assert.calledOnce(github.getTeams);
-      expect(ownersBot.teams['my_team']).toBe(myTeam);
-      expect(ownersBot.teams['other_team']).toBe(otherTeam);
+      expect(ownersBot.teams['ampproject/my_team']).toBe(myTeam);
+      expect(ownersBot.teams['ampproject/other_team']).toBe(otherTeam);
     });
 
     it('fetches members for each team', async () => {
