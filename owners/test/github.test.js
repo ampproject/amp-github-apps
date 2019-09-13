@@ -18,6 +18,7 @@ const nock = require('nock');
 const sinon = require('sinon');
 const {Probot} = require('probot');
 const owners = require('..');
+const {OwnersBot} = require('../src/owners_bot');
 const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
@@ -100,9 +101,10 @@ describe('GitHub API', () => {
   let sandbox;
 
   beforeEach(() => {
+    sandbox = sinon.createSandbox();
+    sandbox.stub(OwnersBot.prototype, 'initTeams');
     probot = new Probot({});
     app = probot.load(owners);
-    sandbox = sinon.createSandbox();
 
     app.app = () => 'test';
   });
