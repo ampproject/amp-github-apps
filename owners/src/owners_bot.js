@@ -51,7 +51,7 @@ class OwnersBot {
   async initTeams(github) {
     const teamList = await github.getTeams();
     teamList.forEach(team => {
-      this.teams[team.slug] = team;
+      this.teams[`${github.owner}/${team.slug}`] = team;
     });
     for (const team of teamList) {
       await team.getMembers(github);
@@ -73,7 +73,7 @@ class OwnersBot {
   async initPr(github, pr) {
     await this.repo.checkout();
 
-    const parser = new OwnersParser(this.repo, github.log);
+    const parser = new OwnersParser(this.repo, this.teams, github.log);
     const treeParse = await parser.parseOwnersTree();
     treeParse.errors.forEach(error => {
       github.logger.warn(error);
