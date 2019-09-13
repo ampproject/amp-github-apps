@@ -190,7 +190,7 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         const responseData = await github._customRequest('/api/endpoint');
-        expect(responseData).toEqual('_DATA_');
+        expect(responseData.data).toEqual('_DATA_');
       })();
     });
 
