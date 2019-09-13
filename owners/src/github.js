@@ -70,24 +70,29 @@ class Team {
    * Constructor.
    *
    * @param {!number} id team ID.
+   * @param {!string} org GitHub organization the team belongs to.
    * @param {!string} slug team name slug.
    */
-  constructor(id, slug) {
-    Object.assign(this, {id, slug, _members: null});
+  constructor(id, org, slug) {
+    Object.assign(this, {id, org, slug, members: []});
+  }
+
+  /**
+   * Represent the team as a string.
+   *
+   * @return {string} the full organization-prefixed team name.
+   */
+  toString() {
+    return `${this.org}/${this.slug}`;
   }
 
   /**
    * Gets the members of team.
    *
    * @param {!GitHubAPI} github GitHub API client.
-   * @return {string[]} list of team member usernames.
    */
-  async getMembers(github) {
-    if (this._members === null) {
-      this._members = await github.getTeamMembers(this.id);
-    }
-
-    return this._members;
+  async fetchMembers(github) {
+    this.members = await github.getTeamMembers(this.id);
   }
 }
 
@@ -176,7 +181,7 @@ class GitHub {
     }
     this.logger.debug('[getTeams]', teamsList);
 
-    return teamsList.map(({id, slug}) => new Team(id, slug));
+    return teamsList.map(({id, slug}) => new Team(id, this.owner, slug));
   }
 
   /**

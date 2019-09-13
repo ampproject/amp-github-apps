@@ -20,6 +20,7 @@ const {OwnersCheck} = require('./owners_check');
 const {OwnersParser} = require('./parser');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
+const GITHUB_GET_MEMBERS_DELAY = 3000;
 
 /**
  * Bot to run the owners check and create/update the GitHub check-run.
@@ -32,8 +33,28 @@ class OwnersBot {
    */
   constructor(repo) {
     this.repo = repo;
+    this.teams = {};
     // Defined as a property, to allow overriding in tests.
     this.GITHUB_CHECKRUN_DELAY = GITHUB_CHECKRUN_DELAY;
+    this.GITHUB_GET_MEMBERS_DELAY = GITHUB_GET_MEMBERS_DELAY;
+  }
+
+  /**
+   * Initialize the bot's list of teams.
+   *
+   * Also initializes each team's member list, spaced out to avoid hitting rate
+   * limits. This is so that the member lists of many teams do not need to be
+   * requested all at once when parsing the owners tree.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   */
+  async initTeams(github) {
+    const teamList = await github.getTeams();
+    for (const team of teamList) {
+      await team.fetchMembers(github);
+      this.teams[team.toString()] = team;
+      sleep(this.GITHUB_GET_MEMBERS_DELAY);
+    }
   }
 
   /**
@@ -50,7 +71,7 @@ class OwnersBot {
   async initPr(github, pr) {
     await this.repo.checkout();
 
-    const parser = new OwnersParser(this.repo, github.log);
+    const parser = new OwnersParser(this.repo, this.teams, github.log);
     const treeParse = await parser.parseOwnersTree();
     treeParse.errors.forEach(error => {
       github.logger.warn(error);

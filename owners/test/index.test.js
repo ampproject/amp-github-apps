@@ -22,6 +22,7 @@ const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser} = require('../src/parser');
 const {OwnersRule} = require('../src/rules');
+const {OwnersBot} = require('../src/owners_bot');
 
 const opened35 = require('./fixtures/actions/opened.35');
 const opened36 = require('./fixtures/actions/opened.36.author-is-owner');
@@ -61,6 +62,7 @@ describe('owners bot', () => {
     sandbox.stub(process, 'env').value({GITHUB_REPO_DIR});
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
+    sandbox.stub(OwnersBot.prototype, 'initTeams');
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
       .returns({result: ownersRules, errors: []});

@@ -57,10 +57,12 @@ class OwnersParser {
    * Constructor.
    *
    * @param {!LocalRepository} localRepo local repository to read from.
+   * @param {!Object<!string, !Team>} teamMap map from team slugs to teams.
    * @param {!Logger=} logger logging interface (defaults to console).
    */
-  constructor(localRepo, logger) {
+  constructor(localRepo, teamMap, logger) {
     this.localRepo = localRepo;
+    this.teamMap = teamMap;
     this.logger = logger || console;
   }
 
@@ -90,12 +92,15 @@ class OwnersParser {
         ...lineResult.errors
       );
     } else if (owner.indexOf('/') !== -1) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Failed to parse owner '${owner}'; team ownership not yet supported`
-        )
-      );
+      const team = this.teamMap[owner];
+
+      if (team) {
+        owners.push(...team.members);
+      } else {
+        errors.push(
+          new OwnersParserError(ownersPath, `Unrecognized team: '${owner}'`)
+        );
+      }
     } else {
       owners.push(owner);
     }

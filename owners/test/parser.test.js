@@ -1,4 +1,5 @@
 const sinon = require('sinon');
+const {Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
 const {
@@ -25,10 +26,15 @@ describe('owners parser', () => {
   const sandbox = sinon.createSandbox();
   let repo;
   let parser;
+  let myTeam;
 
   beforeEach(() => {
+    myTeam = new Team(1337, 'ampproject', 'my_team');
+    myTeam.members = ['team_member', 'other_member'];
+
     repo = new LocalRepository('path/to/repo');
-    parser = new OwnersParser(repo);
+    parser = new OwnersParser(repo, {'ampproject/my_team': myTeam});
+
     sandbox.stub(repo, 'getAbsolutePath').callsFake(relativePath => {
       return `path/to/repo/${relativePath}`;
     });
@@ -71,20 +77,20 @@ describe('owners parser', () => {
     });
 
     describe('team rule declarations', () => {
-      it('returns no rule', () => {
-        sandbox.stub(repo, 'readFile').returns('- ampproject/team\n');
+      it('returns a rule with all team members as owners', () => {
+        sandbox.stub(repo, 'readFile').returns('- ampproject/my_team\n');
         const fileParse = parser.parseOwnersFile('');
         const rules = fileParse.result;
 
-        expect(rules).toEqual([]);
+        expect(rules[0].owners).toEqual(['team_member', 'other_member']);
       });
 
-      it('records an error', () => {
-        sandbox.stub(repo, 'readFile').returns('- ampproject/team\n');
+      it('records an error for unknown teams', () => {
+        sandbox.stub(repo, 'readFile').returns('- ampproject/other_team\n');
         const {errors} = parser.parseOwnersFile('');
 
         expect(errors[0].message).toEqual(
-          "Failed to parse owner 'ampproject/team'; team ownership not yet supported"
+          "Unrecognized team: 'ampproject/other_team'"
         );
       });
     });

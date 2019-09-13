@@ -15,7 +15,7 @@
  */
 
 const sinon = require('sinon');
-const {GitHub, PullRequest, Review} = require('../src/github');
+const {GitHub, PullRequest, Review, Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersBot} = require('../src/owners_bot');
 const {OwnersParser} = require('../src/parser');
@@ -44,10 +44,42 @@ describe('owners bot', () => {
     sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox.stub(LocalRepository.prototype, 'findOwnersFiles').returns([]);
     ownersBot.GITHUB_CHECKRUN_DELAY = 0;
+    ownersBot.GITHUB_GET_MEMBERS_DELAY = 0;
   });
 
   afterEach(() => {
     sandbox.restore();
+  });
+
+  describe('initTeams', () => {
+    let myTeam;
+    let otherTeam;
+
+    beforeEach(() => {
+      myTeam = new Team(1337, 'ampproject', 'my_team');
+      otherTeam = new Team(42, 'ampproject', 'other_team');
+      sandbox.stub(GitHub.prototype, 'getTeams').returns([myTeam, otherTeam]);
+      sandbox.stub(GitHub.prototype, 'getTeamMembers').returns([]);
+    });
+
+    it('builds a map of teams from GitHub', async () => {
+      expect.assertions(2);
+      await ownersBot.initTeams(github);
+
+      sandbox.assert.calledOnce(github.getTeams);
+      expect(ownersBot.teams['ampproject/my_team']).toBe(myTeam);
+      expect(ownersBot.teams['ampproject/other_team']).toBe(otherTeam);
+    });
+
+    it('fetches members for each team', async () => {
+      expect.assertions(1);
+      await ownersBot.initTeams(github);
+
+      sandbox.assert.calledWith(github.getTeamMembers, 1337);
+      sandbox.assert.calledWith(github.getTeamMembers, 42);
+      // Ensures the test fails if the assertion is never run.
+      expect(true).toBe(true);
+    });
   });
 
   describe('initPr', () => {

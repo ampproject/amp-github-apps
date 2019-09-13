@@ -32,7 +32,17 @@ const APP_COMMIT_MSG = process.env.APP_COMMIT_MSG || 'UNKNOWN';
 
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
+
   const ownersBot = new OwnersBot(localRepo);
+  const github = new GitHub(
+    new Octokit({auth: `token ${GITHUB_ACCESS_TOKEN}`}),
+    GITHUB_REPO_OWNER,
+    GITHUB_REPO_NAME,
+    app.log
+  );
+  // TODO(rcebulko): Add a mechanism to periodically refresh teams.
+  ownersBot.initTeams(github);
+
   const adminRouter = app.route('/admin');
 
   // Probot does not stream properly to GCE logs so we need to hook into
@@ -58,7 +68,7 @@ module.exports = app => {
   });
 
   adminRouter.get('/tree', async (req, res) => {
-    const parser = new OwnersParser(localRepo, req.log);
+    const parser = new OwnersParser(localRepo, ownersBot.teams, req.log);
     const treeParse = await parser.parseOwnersTree();
     const treeHeader = '<h3>OWNERS tree</h3>';
     const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
@@ -76,18 +86,25 @@ module.exports = app => {
   });
 
   adminRouter.get('/check/:prNumber', async (req, res) => {
-    const octokit = new Octokit({auth: `token ${GITHUB_ACCESS_TOKEN}`});
-    const github = new GitHub(
-      octokit,
-      GITHUB_REPO_OWNER,
-      GITHUB_REPO_NAME,
-      app.log
-    );
     const pr = await github.getPullRequest(req.params.prNumber);
     const ownersCheck = new OwnersCheck(localRepo, github, pr);
     const checkRun = ownersCheck.run();
 
     res.send(checkRun.json);
+  });
+
+  adminRouter.get('/teams', (req, res) => {
+    const teamSections = [];
+    Object.entries(ownersBot.teams).forEach(([name, team]) => {
+      teamSections.push(
+        [
+          `Team "${name}" (ID: ${team.id}):`,
+          ...team.members.map(username => `- ${username}`),
+        ].join('<br>')
+      );
+    });
+
+    res.send(teamSections.join('<br><br>'));
   });
 
   /** Probot request handlers **/

@@ -18,6 +18,7 @@ const nock = require('nock');
 const sinon = require('sinon');
 const {Probot} = require('probot');
 const owners = require('..');
+const {OwnersBot} = require('../src/owners_bot');
 const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
@@ -56,6 +57,13 @@ describe('review', () => {
 });
 
 describe('team', () => {
+  describe('toString', () => {
+    it('prefixes the slug with the orginazation', () => {
+      const team = new Team(1337, 'ampproject', 'my_team');
+      expect(team.toString()).toEqual('ampproject/my_team');
+    });
+  });
+
   describe('getMembers', () => {
     let sandbox;
     let team;
@@ -64,7 +72,7 @@ describe('team', () => {
     beforeEach(() => {
       sandbox = sinon.createSandbox();
       sandbox.stub(fakeGithub, 'getTeamMembers').callThrough();
-      team = new Team(1337, 'my_team');
+      team = new Team(1337, 'ampproject', 'my_team');
     });
 
     afterEach(() => {
@@ -73,23 +81,10 @@ describe('team', () => {
 
     it('fetches team members from GitHub', async () => {
       expect.assertions(1);
-      const members = await team.getMembers(fakeGithub);
+      await team.fetchMembers(fakeGithub);
 
       sandbox.assert.calledWith(fakeGithub.getTeamMembers, 1337);
-      expect(members).toEqual(['rcebulko', 'erwinmombay']);
-    });
-
-    it('only fetches from GitHub once', async () => {
-      expect.assertions(1);
-      await team.getMembers(fakeGithub);
-      await team.getMembers(fakeGithub);
-      await team.getMembers(fakeGithub);
-      await team.getMembers(fakeGithub);
-
-      sandbox.assert.calledOnce(fakeGithub.getTeamMembers);
-
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      expect(team.members).toEqual(['rcebulko', 'erwinmombay']);
     });
   });
 });
@@ -100,9 +95,10 @@ describe('GitHub API', () => {
   let sandbox;
 
   beforeEach(() => {
+    sandbox = sinon.createSandbox();
+    sandbox.stub(OwnersBot.prototype, 'initTeams');
     probot = new Probot({});
     app = probot.load(owners);
-    sandbox = sinon.createSandbox();
 
     app.app = () => 'test';
   });
@@ -190,7 +186,7 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         const responseData = await github._customRequest('/api/endpoint');
-        expect(responseData).toEqual('_DATA_');
+        expect(responseData.data).toEqual('_DATA_');
       })();
     });
 
@@ -215,7 +211,7 @@ describe('GitHub API', () => {
 
   describe('getTeams', () => {
     it('returns a list of team objects', async () => {
-      expect.assertions(2);
+      expect.assertions(3);
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?page=0')
         .reply(200, [{id: 1337, slug: 'my_team'}]);
@@ -224,6 +220,7 @@ describe('GitHub API', () => {
         const teams = await github.getTeams();
 
         expect(teams[0].id).toEqual(1337);
+        expect(teams[0].org).toEqual('test_owner');
         expect(teams[0].slug).toEqual('my_team');
       })();
     });
