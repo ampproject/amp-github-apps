@@ -52,7 +52,7 @@ function initializeRouter(app: Application) {
       const pr = new PullRequest(github, headSha);
       switch (result) {
         case 'success':
-          await pr.buildCompleted(travisBuild);
+          await pr.buildCompleted(Number(travisBuild));
           break;
         case 'errored':
           await pr.buildErrored();
