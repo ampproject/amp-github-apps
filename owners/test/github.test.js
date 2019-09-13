@@ -19,7 +19,7 @@ const sinon = require('sinon');
 const {Probot} = require('probot');
 const owners = require('..');
 const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
-const {GitHub, PullRequest, Review} = require('../src/github');
+const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
@@ -52,6 +52,45 @@ describe('review', () => {
     expect(approval.submittedAt).toEqual(timestamp);
     expect(approval.isApproved).toBe(true);
     expect(rejection.isApproved).toBe(false);
+  });
+});
+
+describe('team', () => {
+  describe('getMembers', () => {
+    let sandbox;
+    let team;
+    const fakeGithub = {getTeamMembers: id => ['rcebulko', 'erwinmombay']};
+
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();
+      sandbox.stub(fakeGithub, 'getTeamMembers').callThrough();
+      team = new Team(1337, 'my_team');
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it('fetches team members from GitHub', async () => {
+      expect.assertions(1);
+      const members = await team.getMembers(fakeGithub);
+
+      sandbox.assert.calledWith(fakeGithub.getTeamMembers, 1337);
+      expect(members).toEqual(['rcebulko', 'erwinmombay']);
+    });
+
+    it('only fetches from GitHub once', async () => {
+      expect.assertions(1);
+      await team.getMembers(fakeGithub);
+      await team.getMembers(fakeGithub);
+      await team.getMembers(fakeGithub);
+      await team.getMembers(fakeGithub);
+
+      sandbox.assert.calledOnce(fakeGithub.getTeamMembers);
+
+      // Ensures the test fails if the assertion is never run.
+      expect(true).toBe(true);
+    });
   });
 });
 
@@ -136,6 +175,91 @@ describe('GitHub API', () => {
         expect(repoInfo.owner).toEqual('test_owner');
       })
     );
+  });
+
+  describe('customRequest', () => {
+    beforeEach(() => {
+      sandbox.stub(process, 'env').value({GITHUB_ACCESS_TOKEN: '_TOKEN_'});
+    });
+
+    it('returns the response', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/api/endpoint')
+        .reply(200, '_DATA_');
+
+      await withContext(async (context, github) => {
+        const responseData = await github._customRequest('/api/endpoint');
+        expect(responseData).toEqual('_DATA_');
+      })();
+    });
+
+    it('adds the preview header', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/api/endpoint')
+        .reply(200, function() {
+          // Note: it is important this use `function` syntax (instead of arrow
+          // syntax `() => {}` because it needs to access `this`.
+          // eslint-disable-next-line no-invalid-this
+          expect(this.req.headers.accept[0]).toContain(
+            'application/vnd.github.hellcat-preview+json'
+          );
+        });
+
+      await withContext(async (context, github) => {
+        await github._customRequest('/api/endpoint');
+      })();
+    });
+  });
+
+  describe('getTeams', () => {
+    it('returns a list of team objects', async () => {
+      expect.assertions(2);
+      nock('https://api.github.com')
+        .get('/orgs/test_owner/teams?page=0')
+        .reply(200, [{id: 1337, slug: 'my_team'}]);
+
+      await withContext(async (context, github) => {
+        const teams = await github.getTeams();
+
+        expect(teams[0].id).toEqual(1337);
+        expect(teams[0].slug).toEqual('my_team');
+      })();
+    });
+
+    it('pages automatically', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/orgs/test_owner/teams?page=0')
+        .reply(200, Array(30).fill([{id: 1337, slug: 'my_team'}]), {
+          link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
+        });
+      nock('https://api.github.com')
+        .get('/orgs/test_owner/teams?page=1')
+        .reply(200, Array(10).fill([{id: 1337, slug: 'my_team'}]));
+
+      await withContext(async (context, github) => {
+        const teams = await github.getTeams();
+
+        expect(teams.length).toEqual(40);
+      })();
+    });
+  });
+
+  describe('getTeamMembers', () => {
+    it('returns a list of team objects', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/teams/1337/members')
+        .reply(200, [{login: 'rcebulko'}, {login: 'erwinmombay'}]);
+
+      await withContext(async (context, github) => {
+        const members = await github.getTeamMembers(1337);
+
+        expect(members).toEqual(['rcebulko', 'erwinmombay']);
+      })();
+    });
   });
 
   describe('getPullRequest', () => {

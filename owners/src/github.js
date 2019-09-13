@@ -63,6 +63,35 @@ class Review {
 }
 
 /**
+ * A GitHub organization team.
+ */
+class Team {
+  /**
+   * Constructor.
+   *
+   * @param {!number} id team ID.
+   * @param {!string} slug team name slug.
+   */
+  constructor(id, slug) {
+    Object.assign(this, {id, slug, _members: null});
+  }
+
+  /**
+   * Gets the members of team.
+   *
+   * @param {!GitHubAPI} github GitHub API client.
+   * @return {string[]} list of team member usernames.
+   */
+  async getMembers(github) {
+    if (this._members === null) {
+      this._members = await github.getTeamMembers(this.id);
+    }
+
+    return this._members;
+  }
+}
+
+/**
  * Interface for working with the GitHub API.
  */
 class GitHub {
@@ -98,6 +127,72 @@ class GitHub {
    */
   repo(obj) {
     return Object.assign({}, obj, {repo: this.repository, owner: this.owner});
+  }
+
+  /**
+   * Issue a custom API request.
+   *
+   * Some endpoints are not fully supported by Octokit (the GitHub REST API
+   * implementation),  so this method makes an arbitrary request with the
+   * required headers.
+   *
+   * @param {!string} endpoint API endpoint URL path (ie. `/repos`).
+   * @return {*} the response data.
+   */
+  async _customRequest(endpoint) {
+    const response = await this.client.request({
+      headers: {
+        authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
+        // This accept header adds support for fetching members of nested teams.
+        accept: 'application/vnd.github.hellcat-preview+json',
+      },
+      url: endpoint,
+    });
+
+    return response;
+  }
+
+  /**
+   * Fetch all teams for the organization.
+   *
+   * @return {Team[]} list of teams.
+   */
+  async getTeams() {
+    this.logger.info(`Fetching teams for organization '${this.owner}'`);
+
+    const teamsList = [];
+    let pageNum = 0;
+    let isNextLink = true;
+    while (isNextLink) {
+      const response = await this._customRequest(
+        `/orgs/${this.owner}/teams?page=${pageNum}`
+      );
+      const nextLink = response.headers.link || '';
+      isNextLink = nextLink.indexOf('rel="next"') !== -1;
+
+      const teamPage = response.data;
+      teamsList.push(...teamPage);
+      pageNum++;
+    }
+    this.logger.debug('[getTeams]', teamsList);
+
+    return teamsList.map(({id, slug}) => new Team(id, slug));
+  }
+
+  /**
+   * Fetch all members of a team.
+   *
+   * @param {!number} teamId ID of team to find members for.
+   * @return {string[]} list of member usernames.
+   */
+  async getTeamMembers(teamId) {
+    this.logger.info(`Fetching team members for team with ID ${teamId}`);
+
+    const response = await this._customRequest(`/teams/${teamId}/members`);
+    const memberList = response.data;
+    this.logger.debug('[getTeamMembers]', teamId, memberList);
+
+    return memberList.map(({login}) => login);
   }
 
   /**
@@ -215,4 +310,4 @@ class GitHub {
   }
 }
 
-module.exports = {GitHub, PullRequest, Review};
+module.exports = {GitHub, PullRequest, Review, Team};
