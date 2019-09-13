@@ -131,10 +131,10 @@ describe('owners check', () => {
       });
 
       describe('for a PR requiring approvals', () => {
-        it('has a failure conclusion', () => {
+        it('has an action-required conclusion', () => {
           const checkRun = ownersCheck.run();
 
-          expect(checkRun.json.conclusion).toEqual('failure');
+          expect(checkRun.json.conclusion).toEqual('action_required');
         });
 
         it('has a failing summary', () => {
