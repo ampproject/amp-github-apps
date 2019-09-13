@@ -68,7 +68,7 @@ module.exports = app => {
   });
 
   adminRouter.get('/tree', async (req, res) => {
-    const parser = new OwnersParser(localRepo, req.log);
+    const parser = new OwnersParser(localRepo, ownersBot.teams, req.log);
     const treeParse = await parser.parseOwnersTree();
     const treeHeader = '<h3>OWNERS tree</h3>';
     const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
@@ -95,14 +95,14 @@ module.exports = app => {
 
   adminRouter.get('/teams', (req, res) => {
     const teamSections = [];
-    for (const team of Object.values(ownersBot.teams)) {
+    Object.entries(ownersBot.teams).forEach(([name, team]) => {
       teamSections.push(
         [
-          `Team "${team.slug}" (ID: ${team.id}):`,
+          `Team "${name}" (ID: ${team.id}):`,
           ...team.members.map(username => `- ${username}`),
         ].join('<br>')
       );
-    }
+    })
 
     res.send(teamSections.join('<br><br>'));
   });
