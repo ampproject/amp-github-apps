@@ -602,7 +602,8 @@ module.exports = app => {
         );
         app.log(
           `Stored the new ${compression} bundle size of ${bundleSizeText} in ` +
-            'the artifacts repository on GitHub'
+            `the bundle-size/${bundleSizeFile} file artifacts repository on ` +
+            'GitHub'
         );
       } catch (error) {
         const errorMessage =
@@ -637,8 +638,8 @@ module.exports = app => {
         jsonBundleSizeText
       );
       app.log(
-        'Stored the new bundle size JSON file in the artifacts repository on ' +
-          'GitHub'
+        `Stored the new bundle size file bundle-size/${jsonBundleSizeFile} ` +
+          'the artifacts repository on GitHub'
       );
     } catch (error) {
       const errorMessage =
