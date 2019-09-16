@@ -145,7 +145,10 @@ describe('owners bot', () => {
 
     beforeEach(() => {
       getCheckRunIdsStub = sandbox.stub(GitHub.prototype, 'getCheckRunIds');
-      sandbox.stub(OwnersCheck.prototype, 'run').returns(checkRun);
+      sandbox.stub(OwnersCheck.prototype, 'run').returns({
+        checkRun,
+        reviewerSuggestions: [['root_owner', ['main.js']]],
+      });
       sandbox.stub(GitHub.prototype, 'updateCheckRun');
       sandbox.stub(GitHub.prototype, 'createCheckRun');
       sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
@@ -200,7 +203,7 @@ describe('owners bot', () => {
     });
 
     describe('when no check-run exists yet', () => {
-      it('creates a new check-run', async () => {
+      it.only('creates a new check-run', async () => {
         expect.assertions(1);
         getCheckRunIdsStub.returns({});
         await ownersBot.runOwnersCheck(github, pr);

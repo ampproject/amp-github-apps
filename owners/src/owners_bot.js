@@ -98,16 +98,16 @@ class OwnersBot {
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
     // TODO(rcebulko): Make this into a loop through multiple check/name pairs.
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
-    const latestCheckRun = ownersCheck.run();
+    const ownersCheckResults = ownersCheck.run();
 
     if (checkRunId) {
-      await github.updateCheckRun(checkRunId, latestCheckRun);
+      await github.updateCheckRun(checkRunId, ownersCheckResults.checkRun);
     } else {
       // We need to add a delay on the PR creation and check creation since
       // GitHub might not be ready.
       // TODO(rcebulko): Verify this is still needed.
       await sleep(this.GITHUB_CHECKRUN_DELAY);
-      await github.createCheckRun(pr.headSha, latestCheckRun);
+      await github.createCheckRun(pr.headSha, ownersCheckResults.checkRun);
     }
   }
 

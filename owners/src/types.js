@@ -63,10 +63,21 @@ let OwnersParserResult;
  */
 let FileRef;
 
+/**
+ * The result of an owners check.
+ *
+ * @typedef {{
+ *   checkRun: CheckRun,
+ *   reviewers: ?ReviewerFiles[],
+ * }}
+ */
+let OwnersCheckResult;
+
 module.exports = {
   FileTreeMap,
   Logger,
   ReviewerFiles,
   OwnersParserResult,
   FileRef,
+  OwnersCheckResult,
 };

@@ -111,7 +111,7 @@ describe('owners check', () => {
         sandbox
           .stub(OwnersCheck.prototype, 'buildCurrentCoverageText')
           .returns('%% COVERAGE INFO %%');
-        const checkRun = ownersCheck.run();
+        const {checkRun} = ownersCheck.run();
 
         expect(checkRun.text).toContain('%% COVERAGE INFO %%');
       });
@@ -122,13 +122,13 @@ describe('owners check', () => {
         });
 
         it('has a success conclusion', () => {
-          const checkRun = ownersCheck.run();
+          const {checkRun} = ownersCheck.run();
 
           expect(checkRun.json.conclusion).toEqual('success');
         });
 
         it('has a passing summary', () => {
-          const checkRun = ownersCheck.run();
+          const {checkRun} = ownersCheck.run();
 
           expect(checkRun.summary).toEqual(
             'All files in this PR have OWNERS approval'
@@ -148,17 +148,23 @@ describe('owners check', () => {
 
           sandbox.assert.notCalled(ownersCheck.buildReviewSuggestionsText);
         });
+
+        it('returns no reviewers to add', () => {
+          const {reviewers} = ownersCheck.run();
+
+          expect(reviewers).toEqual([]);
+        });
       });
 
       describe('for a PR requiring approvals', () => {
         it('has an action-required conclusion', () => {
-          const checkRun = ownersCheck.run();
+          const {checkRun} = ownersCheck.run();
 
           expect(checkRun.json.conclusion).toEqual('action_required');
         });
 
         it('has a failing summary', () => {
-          const checkRun = ownersCheck.run();
+          const {checkRun} = ownersCheck.run();
 
           expect(checkRun.summary).toEqual(
             'Missing required OWNERS approvals! Suggested reviewers: root_owner'
@@ -176,9 +182,15 @@ describe('owners check', () => {
           sandbox
             .stub(OwnersCheck.prototype, 'buildReviewSuggestionsText')
             .returns('%% REVIEW SUGGESTIONS %%');
-          const checkRun = ownersCheck.run();
+          const {checkRun} = ownersCheck.run();
 
           expect(checkRun.text).toContain('%% REVIEW SUGGESTIONS %%');
+        });
+
+        it('returns reviewers to add', () => {
+          const {reviewers} = ownersCheck.run();
+
+          expect(reviewers).toEqual(['root_owner']);
         });
       });
 
@@ -190,19 +202,19 @@ describe('owners check', () => {
         });
 
         it('has a neutral conclusion', () => {
-          const checkRun = ownersCheck.run();
+          const {checkRun} = ownersCheck.run();
 
           expect(checkRun.json.conclusion).toEqual('neutral');
         });
 
         it('has an error summary', () => {
-          const checkRun = ownersCheck.run();
+          const {checkRun} = ownersCheck.run();
 
           expect(checkRun.summary).toEqual('The check encountered an error!');
         });
 
         it('contains error details in the output', () => {
-          const checkRun = ownersCheck.run();
+          const {checkRun} = ownersCheck.run();
 
           expect(checkRun.text).toEqual(
             'OWNERS check encountered an error:\nError: Something is wrong'
