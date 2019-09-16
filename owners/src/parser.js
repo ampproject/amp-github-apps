@@ -21,6 +21,7 @@ const {
   SameDirPatternOwnersRule,
 } = require('./rules');
 const {OwnersTree} = require('./owners_tree');
+const {UserOwner, TeamOwner} = require('./owner');
 
 const GLOB_PATTERN = '**/';
 
@@ -74,7 +75,7 @@ class OwnersParser {
    * @private
    * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
    * @param {!string} owner owner username.
-   * @return {OwnersParserResult<string[]>} list of owners' usernames.
+   * @return {OwnersParserResult<Owner>} list of owners.
    */
   _parseOwnersLine(ownersPath, owner) {
     const owners = [];
@@ -95,7 +96,7 @@ class OwnersParser {
       const team = this.teamMap[owner];
 
       if (team) {
-        owners.push(...team.members);
+        owners.push(new TeamOwner(team));
       } else {
         errors.push(
           new OwnersParserError(ownersPath, `Unrecognized team: '${owner}'`)
