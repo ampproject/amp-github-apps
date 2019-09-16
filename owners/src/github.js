@@ -238,7 +238,9 @@ class GitHub {
    * @return {string} file contents as a string.
    */
   async getFileContents(file) {
-    this.logger.info(`Fetching contents of file ${file.filename} at ref ${file.sha}`);
+    this.logger.info(
+      `Fetching contents of file ${file.filename} at ref ${file.sha}`
+    );
 
     const response = await this.client.gitdata.getBlob(
       this.repo({file_sha: file.sha})

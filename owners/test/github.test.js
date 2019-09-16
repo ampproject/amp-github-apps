@@ -298,13 +298,15 @@ describe('GitHub API', () => {
     it('fetches the contents of a file', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/git/blobs/eeae1593f4ecbae3f4453c9ceee2940a0e98ddca')
+        .get(
+          '/repos/test_owner/test_repo/git/blobs/eeae1593f4ecbae3f4453c9ceee2940a0e98ddca'
+        )
         .reply(200, getFileResponse);
 
       await withContext(async (context, github) => {
         const contents = await github.getFileContents({
           filename: 'third_party/subscriptions-project/OWNERS.yaml',
-          sha: 'eeae1593f4ecbae3f4453c9ceee2940a0e98ddca'
+          sha: 'eeae1593f4ecbae3f4453c9ceee2940a0e98ddca',
         });
 
         expect(contents).toEqual(
