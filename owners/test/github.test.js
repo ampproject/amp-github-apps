@@ -301,9 +301,12 @@ describe('GitHub API', () => {
         .reply(200, listFilesResponse);
 
       await withContext(async (context, github) => {
-        const [filename] = await github.listFiles(35);
+        const [file] = await github.listFiles(35);
 
-        expect(filename).toEqual('dir2/dir1/dir1/file.txt');
+        expect(file).toMatchObject({
+          filename: 'dir2/dir1/dir1/file.txt',
+          sha: 'eeae1593f4ecbae3f4453c9ceee2940a0e98ddca',
+        });
       })();
     });
   });

@@ -235,7 +235,7 @@ class GitHub {
    * Lists all modified files for a PR.
    *
    * @param {!number} number PR number
-   * @return {string[]} list of relative file paths.
+   * @return {FileRef[]} list of relative file paths.
    */
   async listFiles(number) {
     this.logger.info(`Fetching changed files for PR #${number}`);
@@ -245,7 +245,9 @@ class GitHub {
     );
     this.logger.debug('[listFiles]', number, response.data);
 
-    return response.data.map(item => item.filename);
+    return response.data.map(({filename, sha}) => {
+      return {filename, sha};
+    });
   }
 
   /**
