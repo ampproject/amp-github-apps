@@ -762,8 +762,8 @@ describe('bundle-size', () => {
         {
           message:
             'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33 ' +
-            '(12.34KB)',
-          content: Buffer.from('12.34KB').toString('base64'),
+            '(23.45KB)',
+          content: Buffer.from('23.45KB').toString('base64'),
         }
       )
       .reply(201)
@@ -782,13 +782,29 @@ describe('bundle-size', () => {
           content: Buffer.from('12.34KB').toString('base64'),
         }
       )
+      .reply(201)
+      .get(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+      )
+      .reply(404)
+      .put(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
+        {
+          message:
+            'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json ' +
+            '({"dist/v0.js":12.34})',
+          content: Buffer.from('{"dist/v0.js":12.34}').toString('base64'),
+        }
+      )
       .reply(201);
 
     await request(probot.server)
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
         token: '0123456789abcdefghijklmnopqrstuvwxyz',
-        gzippedBundleSize: 12.34,
+        gzippedBundleSize: 23.45,
         brotliBundleSize: 12.34,
       })
       .set('Content-Type', 'application/json')
@@ -807,6 +823,11 @@ describe('bundle-size', () => {
       .get(
         '/repos/ampproject/amphtml-build-artifacts/contents/' +
           'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+      )
+      .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33'))
+      .get(
+        '/repos/ampproject/amphtml-build-artifacts/contents/' +
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       )
       .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33'));
 
