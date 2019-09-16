@@ -573,6 +573,8 @@ module.exports = app => {
       }
     }
 
+    // TODO(danielrozenberg): remove this block once we switch entirely to the
+    // JSON format.
     for (const [compression, extension, bundleSizeValue] of [
       ['gzip', '', gzippedBundleSize],
       ['brotli', '.br', brotliBundleSize],
@@ -600,17 +602,54 @@ module.exports = app => {
         );
         app.log(
           `Stored the new ${compression} bundle size of ${bundleSizeText} in ` +
-            'the artifacts repository on GitHub'
+            `the bundle-size/${bundleSizeFile} file artifacts repository on ` +
+            'GitHub'
         );
       } catch (error) {
         const errorMessage =
           `ERROR: Failed to create the bundle-size/${bundleSizeFile} file in ` +
           'the build artifacts repository on GitHub!\n' +
-          `Error message was: ${error.message}`;
+          `Error message was: ${error}`;
         app.log(errorMessage);
         return response.status(500).end(errorMessage);
       }
     }
+
+    const jsonBundleSizeFile = `${headSha}.json`;
+    try {
+      await getBuildArtifactsFile(userBasedGithub, jsonBundleSizeFile);
+      app.log(
+        `The file bundle-size/${jsonBundleSizeFile} already exists in the ` +
+          'build artifacts repository on GitHub. Skipping...'
+      );
+      return response.end();
+    } catch (unusedException) {
+      // The file was not found in the GitHub repository, so continue to
+      // create it...
+    }
+
+    try {
+      const jsonBundleSizeText = JSON.stringify({
+        'dist/v0.js': brotliBundleSize,
+      });
+      await storeBuildArtifactsFile(
+        userBasedGithub,
+        jsonBundleSizeFile,
+        jsonBundleSizeText
+      );
+      app.log(
+        `Stored the new bundle size file bundle-size/${jsonBundleSizeFile} ` +
+          'the artifacts repository on GitHub'
+      );
+    } catch (error) {
+      const errorMessage =
+        `ERROR: Failed to create the bundle-size/${jsonBundleSizeFile} file ` +
+        'in the build artifacts repository on GitHub!\n' +
+        `Error message was: ${error}`;
+      app.log(errorMessage);
+      return response.status(500).end(errorMessage);
+    }
+
     response.end();
   });
 };
