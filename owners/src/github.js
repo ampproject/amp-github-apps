@@ -309,9 +309,9 @@ class GitHub {
       return {};
     }
 
-    this.logger.debug('[getCheckRunId]', sha, checkRuns);
+    this.logger.debug('[getCheckRunIds]', sha, checkRuns);
 
-    let checkRunIds = {};
+    const checkRunIds = {};
     checkRuns.filter(cr => cr.head_sha === sha).forEach(checkRun => {
       const [owner, checkName] = checkRun.name.split('/');
       // Always take the first matching result, since the response is in

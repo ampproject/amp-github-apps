@@ -141,10 +141,10 @@ describe('owners bot', () => {
       'Success!',
       'The owners check passed.'
     );
-    let getCheckRunIdStub;
+    let getCheckRunIdsStub;
 
     beforeEach(() => {
-      getCheckRunIdStub = sandbox.stub(GitHub.prototype, 'getCheckRunId');
+      getCheckRunIdsStub = sandbox.stub(GitHub.prototype, 'getCheckRunIds');
       sandbox.stub(OwnersCheck.prototype, 'run').returns(checkRun);
       sandbox.stub(GitHub.prototype, 'updateCheckRun');
       sandbox.stub(GitHub.prototype, 'createCheckRun');
@@ -154,8 +154,9 @@ describe('owners bot', () => {
 
     it('attempts to fetch the existing check-run ID', async () => {
       expect.assertions(1);
+      getCheckRunIdsStub.returns({});
       await ownersBot.runOwnersCheck(github, pr);
-      sandbox.assert.calledWith(github.getCheckRunId, '_test_hash_');
+      sandbox.assert.calledWith(github.getCheckRunIds, '_test_hash_');
 
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
@@ -163,6 +164,7 @@ describe('owners bot', () => {
 
     it('checks out the latest master', async () => {
       expect.assertions(1);
+      getCheckRunIdsStub.returns({});
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledOnce(localRepo.checkout);
 
@@ -172,6 +174,7 @@ describe('owners bot', () => {
 
     it('runs the owners check', async () => {
       expect.assertions(1);
+      getCheckRunIdsStub.returns({});
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledOnce(OwnersCheck.prototype.run);
 
@@ -182,7 +185,7 @@ describe('owners bot', () => {
     describe('when a check-run exists', () => {
       it('updates the existing check-run', async () => {
         expect.assertions(1);
-        getCheckRunIdStub.returns(42);
+        getCheckRunIdsStub.returns({'owners-check': 42});
         await ownersBot.runOwnersCheck(github, pr);
 
         sandbox.assert.calledWith(
@@ -199,7 +202,7 @@ describe('owners bot', () => {
     describe('when no check-run exists yet', () => {
       it('creates a new check-run', async () => {
         expect.assertions(1);
-        getCheckRunIdStub.returns(null);
+        getCheckRunIdsStub.returns({});
         await ownersBot.runOwnersCheck(github, pr);
 
         sandbox.assert.calledWith(

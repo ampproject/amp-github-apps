@@ -21,6 +21,7 @@ const {OwnersParser} = require('./parser');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
 const GITHUB_GET_MEMBERS_DELAY = 3000;
+const OWNERS_CHECKRUN_NAME = 'owners-check';
 
 /**
  * Bot to run the owners check and create/update the GitHub check-run.
@@ -94,7 +95,9 @@ class OwnersBot {
   async runOwnersCheck(github, pr) {
     const {tree, approvers, changedFiles} = await this.initPr(github, pr);
     const ownersCheck = new OwnersCheck(tree, approvers, changedFiles);
-    const checkRunId = await github.getCheckRunId(pr.headSha);
+    const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
+    // TODO(rcebulko): Make this into a loop through multiple check/name pairs.
+    const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
     const latestCheckRun = ownersCheck.run();
 
     if (checkRunId) {
