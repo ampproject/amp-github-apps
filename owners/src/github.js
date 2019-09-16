@@ -312,14 +312,16 @@ class GitHub {
     this.logger.debug('[getCheckRunIds]', sha, checkRuns);
 
     const checkRunIds = {};
-    checkRuns.filter(cr => cr.head_sha === sha).forEach(checkRun => {
-      const [owner, checkName] = checkRun.name.split('/');
-      // Always take the first matching result, since the response is in
-      // most-recent-first order.
-      if (!checkRunIds[checkName]) {
-        checkRunIds[checkName] = checkRun.id;
-      }
-    });
+    checkRuns
+      .filter(cr => cr.head_sha === sha)
+      .forEach(checkRun => {
+        const checkName = checkRun.name.split('/')[1];
+        // Always take the first matching result, since the response is in
+        // most-recent-first order.
+        if (!checkRunIds[checkName]) {
+          checkRunIds[checkName] = checkRun.id;
+        }
+      });
 
     return checkRunIds;
   }
