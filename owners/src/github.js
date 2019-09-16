@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
-
 /**
  * Maps the github json payload to a simpler data structure.
  */
@@ -23,7 +21,7 @@ class PullRequest {
   /**
    * Constructor.
    *
-   * @param {!number} number pull request number.
+   * @param {number} number pull request number.
    * @param {!string} author username of the pull request author.
    * @param {!string} headSha SHA hash of the PR's HEAD commit.
    */
@@ -69,7 +67,7 @@ class Team {
   /**
    * Constructor.
    *
-   * @param {!number} id team ID.
+   * @param {number} id team ID.
    * @param {!string} org GitHub organization the team belongs to.
    * @param {!string} slug team name slug.
    */
@@ -187,7 +185,7 @@ class GitHub {
   /**
    * Fetch all members of a team.
    *
-   * @param {!number} teamId ID of team to find members for.
+   * @param {number} teamId ID of team to find members for.
    * @return {string[]} list of member usernames.
    */
   async getTeamMembers(teamId) {
@@ -203,7 +201,7 @@ class GitHub {
   /**
    * Fetches a pull request.
    *
-   * @param {!number} number pull request number.
+   * @param {number} number pull request number.
    * @return {PullRequest} pull request instance.
    */
   async getPullRequest(number) {
@@ -214,7 +212,7 @@ class GitHub {
   /**
    * Retrives code reviews for a PR from GitHub.
    *
-   * @param {!number} number PR number.
+   * @param {number} number PR number.
    * @return {Review[]} the list of code reviews.
    */
   async getReviews(number) {
@@ -253,7 +251,7 @@ class GitHub {
   /**
    * Lists all modified files for a PR.
    *
-   * @param {!number} number PR number
+   * @param {number} number PR number
    * @return {FileRef[]} list of relative file paths.
    */
   async listFiles(number) {
@@ -295,11 +293,11 @@ class GitHub {
    * will return `null`.
    *
    * @param {!string} sha SHA hash for head commit to lookup check-runs on.
-   * @return {number|null} check-run ID if one exists, otherwise null.
+   * @return {Object<!string, number>} map from check names to check-run IDs.
    */
-  async getCheckRunId(sha) {
+  async getCheckRunIds(sha) {
     this.logger.info(`Fetching check run ID for commit ${sha.substr(0, 7)}`);
-    let checkRuns;
+    let checkRuns = [];
 
     try {
       const response = await this.client.checks.listForRef(
@@ -308,20 +306,30 @@ class GitHub {
       checkRuns = response.data.check_runs;
     } catch (error) {
       this.logger.error(error);
-      return null;
+      return {};
     }
 
-    this.logger.debug('[getCheckRunId]', sha, checkRuns);
-    const [checkRun] = checkRuns
+    this.logger.debug('[getCheckRunIds]', sha, checkRuns);
+
+    const checkRunIds = {};
+    checkRuns
       .filter(cr => cr.head_sha === sha)
-      .filter(cr => OWNERS_CHECKRUN_REGEX.test(cr.name));
-    return checkRun ? checkRun.id : null;
+      .forEach(checkRun => {
+        const checkName = checkRun.name.split('/')[1];
+        // Always take the first matching result, since the response is in
+        // most-recent-first order.
+        if (!checkRunIds[checkName]) {
+          checkRunIds[checkName] = checkRun.id;
+        }
+      });
+
+    return checkRunIds;
   }
 
   /**
    * Updates the check-run status for a commit.
    *
-   * @param {!number} id ID of check-run data to update.
+   * @param {number} id ID of check-run data to update.
    * @param {!CheckRun} checkRun check-run data to update.
    */
   async updateCheckRun(id, checkRun) {

@@ -1,5 +1,5 @@
 {
-    "total_count": 1,
+    "total_count": 2,
     "check_runs": [
         {
             "id": 53472315,
@@ -99,7 +99,7 @@
                 "annotations_count": 0,
                 "annotations_url": "https://api.github.com/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313/annotations"
             },
-            "name": "some other check from the same bot",
+            "name": "ampproject/another-check",
             "check_suite": {
                 "id": 52508974
             },
