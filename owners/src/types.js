@@ -68,7 +68,7 @@ let FileRef;
  *
  * @typedef {{
  *   checkRun: CheckRun,
- *   reviewers: ?ReviewerFiles[],
+ *   reviewers: ?string[],
  * }}
  */
 let OwnersCheckResult;
