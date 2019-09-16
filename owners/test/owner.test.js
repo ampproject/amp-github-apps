@@ -36,9 +36,9 @@ describe('owner base class', () => {
 
   describe('toString', () => {
     it('throws an error', () => {
-      expect(() => {
-        owner.includes('');
-      }).toThrow('Not implemented for abstract class `Owner`');
+      expect(() => owner.toString()).toThrow(
+        'Not implemented for abstract class `Owner`'
+      );
     });
   });
 });
