@@ -16,7 +16,12 @@
 
 const {OwnersTree} = require('../src/owners_tree');
 const {Team} = require('../src/github');
-const {UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
+const {
+  UserOwner,
+  TeamOwner,
+  WildcardOwner,
+  OWNER_MODIFIER,
+} = require('../src/owner');
 const {
   OwnersRule,
   PatternOwnersRule,
@@ -27,10 +32,10 @@ describe('owners tree', () => {
   let tree;
   const rootDirRule = new OwnersRule('OWNERS.yaml', [new UserOwner('root')]);
   const childDirRule = new OwnersRule('foo/OWNERS.yaml', [
-    new UserOwner('child'),
+    new UserOwner('child', OWNER_MODIFIER.NOTIFY),
   ]);
   const otherChildDirRule = new OwnersRule('biz/OWNERS.yaml', [
-    new UserOwner('child'),
+    new UserOwner('child', OWNER_MODIFIER.SILENT),
   ]);
   const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
     new UserOwner('descendant'),
@@ -269,15 +274,15 @@ describe('owners tree', () => {
         [
           'ROOT',
           ' • All files: root',
-          ' • **/*.test.js: tester',
+          ' • **/*.test.js: [tester]',
           ' • ./package.json: anyone',
           '└───foo',
-          ' • All files: child',
+          ' • All files: child (always notify)',
           '    └───bar',
           '        └───baz',
           '         • All files: descendant',
           '└───biz',
-          ' • All files: child',
+          ' • All files: child (never notify)',
           '└───shared',
           ' • All files: *',
         ].join('\n')

@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 
-const {Owner, UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
+const {
+  Owner,
+  UserOwner,
+  TeamOwner,
+  WildcardOwner,
+  OWNER_MODIFIER,
+} = require('../src/owner');
 const {Team} = require('../src/github');
 
 describe('owner base class', () => {
   const owner = new Owner();
 
   describe('includes', () => {
+    it('throws an error', () => {
+      expect(() => {
+        owner.includes('');
+      }).toThrow('Not implemented for abstract class `Owner`');
+    });
+  });
+
+  describe('toString', () => {
     it('throws an error', () => {
       expect(() => {
         owner.includes('');
@@ -52,6 +66,12 @@ describe('owner users', () => {
     it('returns the owner username', () => {
       expect(owner.toString()).toEqual('auser');
     });
+
+    it('includes any modifiers', () => {
+      const owner = new UserOwner('auser', OWNER_MODIFIER.SILENT);
+      expect(owner.toString()).toContain(' (never notify)');
+      expect(owner.toString().endsWith(' (never notify)')).toBe(true);
+    });
   });
 });
 
@@ -79,13 +99,27 @@ describe('owner teams', () => {
 
   describe('toString', () => {
     it("returns the team members' usernames as a comma-separated list", () => {
-      expect(owner.toString()).toEqual('auser, anothermember');
+      expect(owner.toString()).toEqual('[auser, anothermember]');
+    });
+
+    it('includes any modifiers', () => {
+      const owner = new TeamOwner(myTeam, OWNER_MODIFIER.NOTIFY);
+      expect(owner.toString()).toContain(' (always notify)');
+      expect(owner.toString().endsWith(' (always notify)')).toBe(true);
     });
   });
 });
 
 describe('owner wildcard', () => {
   const owner = new WildcardOwner();
+
+  describe('constructor', () => {
+    it('throws an error if given a modifier', () => {
+      expect(() => new WildcardOwner(OWNER_MODIFIER.NOTIFY)).toThrow(
+        'Modifiers not supported on wildcard `*` owner'
+      );
+    });
+  });
 
   describe('includes', () => {
     it('returns true for any username', () => {
@@ -101,7 +135,7 @@ describe('owner wildcard', () => {
 
   describe('toString', () => {
     it('returns the `*` wildcard symbol ', () => {
-      expect(owner.toString()).toEqual('*');
+      expect(owner.toString()).toContain('*');
     });
   });
 });
