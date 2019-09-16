@@ -2,6 +2,7 @@ const sinon = require('sinon');
 const {Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
+const {UserOwner, WildcardOwner, TeamOwner} = require('../src/owner');
 const {
   OwnersRule,
   PatternOwnersRule,
@@ -65,7 +66,10 @@ describe('owners parser', () => {
       const fileParse = parser.parseOwnersFile('');
       const rules = fileParse.result;
 
-      expect(rules[0].owners).toEqual(['user1', 'user2']);
+      expect(rules[0].owners).toEqual([
+        new UserOwner('user1'),
+        new UserOwner('user2'),
+      ]);
     });
 
     it('parses a YAML list with blank lines and comments', () => {
@@ -73,7 +77,10 @@ describe('owners parser', () => {
       const fileParse = parser.parseOwnersFile('');
       const rules = fileParse.result;
 
-      expect(rules[0].owners).toEqual(['user1', 'user2']);
+      expect(rules[0].owners).toEqual([
+        new UserOwner('user1'),
+        new UserOwner('user2'),
+      ]);
     });
 
     describe('team rule declarations', () => {
@@ -82,7 +89,7 @@ describe('owners parser', () => {
         const fileParse = parser.parseOwnersFile('');
         const rules = fileParse.result;
 
-        expect(rules[0].owners).toEqual(['team_member', 'other_member']);
+        expect(rules[0].owners).toEqual([new TeamOwner(myTeam)]);
       });
 
       it('records an error for unknown teams', () => {
@@ -105,7 +112,7 @@ describe('owners parser', () => {
 
       it('parses ignoring the @ sign', () => {
         const [rule] = fileParse.result;
-        expect(rule.owners).toEqual(['owner']);
+        expect(rule.owners).toEqual([new UserOwner('owner')]);
       });
 
       it('records an error', () => {
@@ -122,7 +129,7 @@ describe('owners parser', () => {
 
         expect(rules[0]).toBeInstanceOf(SameDirPatternOwnersRule);
         expect(rules[0].pattern).toEqual('*.js');
-        expect(rules[0].owners).toEqual(['scripty']);
+        expect(rules[0].owners).toEqual([new UserOwner('scripty')]);
       });
 
       it('parses a list of owners into a pattern rule', () => {
@@ -134,7 +141,10 @@ describe('owners parser', () => {
 
         expect(rules[0]).toBeInstanceOf(SameDirPatternOwnersRule);
         expect(rules[0].pattern).toEqual('*.js');
-        expect(rules[0].owners).toEqual(['scripty', 'coder']);
+        expect(rules[0].owners).toEqual([
+          new UserOwner('scripty'),
+          new UserOwner('coder'),
+        ]);
       });
 
       it('reports errors for non-string owners', () => {
@@ -155,7 +165,7 @@ describe('owners parser', () => {
 
         expect(rules[0]).toBeInstanceOf(PatternOwnersRule);
         expect(rules[0].pattern).toEqual('*.js');
-        expect(rules[0].owners).toEqual(['scripty']);
+        expect(rules[0].owners).toEqual([new UserOwner('scripty')]);
       });
 
       it('parses no rule if no valid owners are listed', () => {
@@ -224,8 +234,14 @@ describe('owners parser', () => {
 
       expect(rules[0].dirPath).toEqual('.');
       expect(rules[1].dirPath).toEqual('foo');
-      expect(rules[0].owners).toEqual(['user1', 'user2']);
-      expect(rules[1].owners).toEqual(['user3', 'user4']);
+      expect(rules[0].owners).toEqual([
+        new UserOwner('user1'),
+        new UserOwner('user2'),
+      ]);
+      expect(rules[1].owners).toEqual([
+        new UserOwner('user3'),
+        new UserOwner('user4'),
+      ]);
     });
 
     it('does not include invalid rules', async () => {

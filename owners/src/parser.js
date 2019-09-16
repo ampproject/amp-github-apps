@@ -21,7 +21,7 @@ const {
   SameDirPatternOwnersRule,
 } = require('./rules');
 const {OwnersTree} = require('./owners_tree');
-const {UserOwner, TeamOwner} = require('./owner');
+const {UserOwner, TeamOwner, WildcardOwner} = require('./owner');
 
 const GLOB_PATTERN = '**/';
 
@@ -75,7 +75,7 @@ class OwnersParser {
    * @private
    * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
    * @param {!string} owner owner username.
-   * @return {OwnersParserResult<Owner>} list of owners.
+   * @return {OwnersParserResult<Owner[]>} list of owners.
    */
   _parseOwnersLine(ownersPath, owner) {
     const owners = [];
@@ -102,8 +102,10 @@ class OwnersParser {
           new OwnersParserError(ownersPath, `Unrecognized team: '${owner}'`)
         );
       }
+    } else if (owner === '*') {
+      owners.push(new WildcardOwner());
     } else {
-      owners.push(owner);
+      owners.push(new UserOwner(owner));
     }
 
     return {result: owners, errors};
@@ -115,7 +117,7 @@ class OwnersParser {
    * @private
    * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
    * @param {string[]} ownersList list of owners.
-   * @return {OwnersParserResult<string[]>} list of owners' usernames.
+   * @return {OwnersParserResult<Owner[]>} list of owners' usernames.
    */
   _parseOwnersList(ownersPath, ownersList) {
     const owners = [];

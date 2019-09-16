@@ -23,8 +23,8 @@ class OwnersRule {
   /**
    * Constructor.
    *
-   * If a rule's owners includes the `*` wildcard, all other owners will be
-   * ignored, and the rule will be satisfied by any reviewer.
+   * If a rule's owners includes the `*` wildcard, the rule will be satisfied by
+   * any reviewer.
    *
    * @param {!string} ownersPath path to OWNERS file.
    * @param {string[]} owners list of GitHub usernames of owners.
@@ -32,8 +32,7 @@ class OwnersRule {
   constructor(ownersPath, owners) {
     this.filePath = ownersPath;
     this.dirPath = path.dirname(ownersPath);
-    this.wildcardOwner = owners.includes('*');
-    this.owners = this.wildcardOwner ? ['*'] : owners;
+    this.owners = owners;
   }
 
   /**
