@@ -232,6 +232,23 @@ class GitHub {
   }
 
   /**
+   * Fetches the contents of a file from GitHub.
+   *
+   * @param {!FileRef} file file ref to fetch.
+   * @return {string} file contents as a string.
+   */
+  async getFileContents(file) {
+    this.logger.info(`Fetching contents of file ${file.filename} at ref ${file.sha}`);
+
+    const response = await this.client.gitdata.getBlob(
+      this.repo({file_sha: file.sha})
+    );
+    this.logger.debug('[getFileContents]', file, response.data);
+
+    return Buffer.from(response.data.content, 'base64').toString('utf8');
+  }
+
+  /**
    * Lists all modified files for a PR.
    *
    * @param {!number} number PR number

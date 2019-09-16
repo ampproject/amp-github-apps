@@ -27,6 +27,7 @@ const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
+const getFileResponse = require('./fixtures/files/file_blob.24523.json');
 
 nock.disableNetConnect();
 
@@ -289,6 +290,26 @@ describe('GitHub API', () => {
         expect(review.reviewer).toEqual('erwinmombay');
         expect(review.isApproved).toBe(true);
         expect(review.submittedAt).toEqual(new Date('2019-02-26T20:39:13Z'));
+      })();
+    });
+  });
+
+  describe('getFileContents', () => {
+    it('fetches the contents of a file', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/git/blobs/eeae1593f4ecbae3f4453c9ceee2940a0e98ddca')
+        .reply(200, getFileResponse);
+
+      await withContext(async (context, github) => {
+        const contents = await github.getFileContents({
+          filename: 'third_party/subscriptions-project/OWNERS.yaml',
+          sha: 'eeae1593f4ecbae3f4453c9ceee2940a0e98ddca'
+        });
+
+        expect(contents).toEqual(
+          '- chenshay\n- chrisantaki\n- dparikh\n- dvoytenko\n- jpettitt\n'
+        );
       })();
     });
   });
