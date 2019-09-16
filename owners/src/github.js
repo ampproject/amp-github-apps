@@ -21,7 +21,7 @@ class PullRequest {
   /**
    * Constructor.
    *
-   * @param {!number} number pull request number.
+   * @param {number} number pull request number.
    * @param {!string} author username of the pull request author.
    * @param {!string} headSha SHA hash of the PR's HEAD commit.
    */
@@ -67,7 +67,7 @@ class Team {
   /**
    * Constructor.
    *
-   * @param {!number} id team ID.
+   * @param {number} id team ID.
    * @param {!string} org GitHub organization the team belongs to.
    * @param {!string} slug team name slug.
    */
@@ -185,7 +185,7 @@ class GitHub {
   /**
    * Fetch all members of a team.
    *
-   * @param {!number} teamId ID of team to find members for.
+   * @param {number} teamId ID of team to find members for.
    * @return {string[]} list of member usernames.
    */
   async getTeamMembers(teamId) {
@@ -201,7 +201,7 @@ class GitHub {
   /**
    * Fetches a pull request.
    *
-   * @param {!number} number pull request number.
+   * @param {number} number pull request number.
    * @return {PullRequest} pull request instance.
    */
   async getPullRequest(number) {
@@ -212,7 +212,7 @@ class GitHub {
   /**
    * Retrives code reviews for a PR from GitHub.
    *
-   * @param {!number} number PR number.
+   * @param {number} number PR number.
    * @return {Review[]} the list of code reviews.
    */
   async getReviews(number) {
@@ -251,7 +251,7 @@ class GitHub {
   /**
    * Lists all modified files for a PR.
    *
-   * @param {!number} number PR number
+   * @param {number} number PR number
    * @return {FileRef[]} list of relative file paths.
    */
   async listFiles(number) {
@@ -293,7 +293,7 @@ class GitHub {
    * will return `null`.
    *
    * @param {!string} sha SHA hash for head commit to lookup check-runs on.
-   * @return {Object<!string, !number>} map from check names to check-run IDs.
+   * @return {Object<!string, number>} map from check names to check-run IDs.
    */
   async getCheckRunIds(sha) {
     this.logger.info(`Fetching check run ID for commit ${sha.substr(0, 7)}`);
@@ -329,7 +329,7 @@ class GitHub {
   /**
    * Updates the check-run status for a commit.
    *
-   * @param {!number} id ID of check-run data to update.
+   * @param {number} id ID of check-run data to update.
    * @param {!CheckRun} checkRun check-run data to update.
    */
   async updateCheckRun(id, checkRun) {
