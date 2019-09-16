@@ -118,7 +118,8 @@ class OwnersCheck {
       return {
         checkRun: new CheckRun(
           CheckRunConclusion.ACTION_REQUIRED,
-          `Missing required OWNERS approvals! Suggested reviewers: ${reviewers.join(', ')}`,
+          'Missing required OWNERS approvals! ' +
+            `Suggested reviewers: ${reviewers.join(', ')}`,
           `${coverageText}\n\n${suggestionsText}`
         ),
         reviewers,

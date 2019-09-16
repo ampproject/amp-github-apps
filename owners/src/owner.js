@@ -29,6 +29,7 @@ class Owner {
   /**
    * Constructor.
    *
+   * @param {!string} name readable name identifying the owner user/team.
    * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
    */
   constructor(name, modifier) {
