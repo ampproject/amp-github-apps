@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
 const {UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
 const {Team} = require('../src/github');
 
@@ -30,20 +29,33 @@ describe('owner users', () => {
       expect(owner.includes('someoneelse')).toBe(false);
     });
   });
+
+  describe('toString', () => {
+    it('returns the owner username', () => {
+      expect(owner.toString()).toEqual('auser');
+    });
+  });
 });
 
 describe('owner teams', () => {
   const myTeam = new Team(42, 'ampproject', 'my_team');
-  myTeam.members = ['auser'];
+  myTeam.members = ['auser', 'anothermember'];
   const owner = new TeamOwner(myTeam);
 
   describe('includes', () => {
     it('returns true for a username in the team', () => {
       expect(owner.includes('auser')).toBe(true);
+      expect(owner.includes('anothermember')).toBe(true);
     });
 
     it('returns true for a username in the team', () => {
       expect(owner.includes('someoneelse')).toBe(false);
+    });
+  });
+
+  describe('toString', () => {
+    it('returns the team members\' usernames as a comma-separated list', () => {
+      expect(owner.toString()).toEqual('auser, anothermember');
     });
   });
 });
@@ -54,6 +66,12 @@ describe('owner wildcard', () => {
   describe('includes', () => {
     it('returns true for any username', () => {
       expect(owner.includes('auser')).toBe(true);
+    });
+  });
+
+  describe('toString', () => {
+    it('returns the `*` wildcard symbol ', () => {
+      expect(owner.toString()).toEqual('*');
     });
   });
 });

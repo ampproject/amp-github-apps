@@ -261,6 +261,7 @@ describe('owners tree', () => {
       tree.addRule(childDirRule);
       tree.addRule(otherChildDirRule);
       tree.addRule(descendantDirRule);
+      tree.addRule(wildcardDirRule);
       tree.addRule(testFileRule);
       tree.addRule(packageJsonRule);
 
@@ -268,7 +269,7 @@ describe('owners tree', () => {
         [
           'ROOT',
           ' • All files: root',
-          ' • **/*.test.js: testers',
+          ' • **/*.test.js: tester',
           ' • ./package.json: anyone',
           '└───foo',
           ' • All files: child',
@@ -277,6 +278,8 @@ describe('owners tree', () => {
           '         • All files: descendant',
           '└───biz',
           ' • All files: child',
+          '└───shared',
+          ' • All files: *',
         ].join('\n')
       );
     });

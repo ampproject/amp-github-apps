@@ -27,9 +27,9 @@ class Owner {
    * @param {!string} username username to check.
    * @return {boolean} true if this owner has the username.
    */
-   includes(username) {
+  includes(username) {
     throw new Error('Not implemented for abstract class `Owner`');
-   }
+  }
 }
 
 class UserOwner extends Owner {
@@ -51,6 +51,15 @@ class UserOwner extends Owner {
    */
   includes(username) {
     return this.username === username;
+  }
+
+  /**
+   * Render the owner as a string.
+   *
+   * @return {string} the owner's username.
+   */
+  toString() {
+    return this.username;
   }
 }
 
@@ -77,6 +86,15 @@ class TeamOwner extends Owner {
   includes(username) {
     return this.team.members.includes(username);
   }
+
+  /**
+   * Render the owner as a string.
+   *
+   * @return {string} the team members' usernames as a comma-separated list.
+   */
+  toString() {
+    return this.team.members.join(', ');
+  }
 }
 
 /**
@@ -91,6 +109,15 @@ class WildcardOwner extends Owner {
    */
   includes(unusedUsername) {
     return true;
+  }
+
+  /**
+   * Render the owner as a string.
+   *
+   * @return {string} the `*` wildcard symbol.
+   */
+  toString() {
+    return '*';
   }
 }
 
