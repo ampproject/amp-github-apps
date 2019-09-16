@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-const OWNERS_CHECKRUN_REGEX = /owners bot|owners-check/i;
-
 /**
  * Maps the github json payload to a simpler data structure.
  */
@@ -295,11 +293,11 @@ class GitHub {
    * will return `null`.
    *
    * @param {!string} sha SHA hash for head commit to lookup check-runs on.
-   * @return {number|null} check-run ID if one exists, otherwise null.
+   * @return {Object<!string, !number>} map from check names to check-run IDs.
    */
-  async getCheckRunId(sha) {
+  async getCheckRunIds(sha) {
     this.logger.info(`Fetching check run ID for commit ${sha.substr(0, 7)}`);
-    let checkRuns;
+    let checkRuns = [];
 
     try {
       const response = await this.client.checks.listForRef(
@@ -308,14 +306,22 @@ class GitHub {
       checkRuns = response.data.check_runs;
     } catch (error) {
       this.logger.error(error);
-      return null;
+      return {};
     }
 
     this.logger.debug('[getCheckRunId]', sha, checkRuns);
-    const [checkRun] = checkRuns
-      .filter(cr => cr.head_sha === sha)
-      .filter(cr => OWNERS_CHECKRUN_REGEX.test(cr.name));
-    return checkRun ? checkRun.id : null;
+
+    let checkRunIds = {};
+    checkRuns.filter(cr => cr.head_sha === sha).forEach(checkRun => {
+      const [owner, checkName] = checkRun.name.split('/');
+      // Always take the first matching result, since the response is in
+      // most-recent-first order.
+      if (!checkRunIds[checkName]) {
+        checkRunIds[checkName] = checkRun.id;
+      }
+    });
+
+    return checkRunIds;
   }
 
   /**

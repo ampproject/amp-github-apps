@@ -363,19 +363,20 @@ describe('GitHub API', () => {
     });
   });
 
-  describe('getCheckRunId', () => {
+  describe('getCheckRunIds', () => {
     it('fetches the first matching check-run from the list', async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       const sha = '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d';
       nock('https://api.github.com')
         .get(`/repos/test_owner/test_repo/commits/${sha}/check-runs`)
         .reply(200, checkRunsListResponse);
 
       await withContext(async (context, github) => {
-        const checkRunId = await github.getCheckRunId(sha);
+        const checkRunIds = await github.getCheckRunIds(sha);
 
         // ID pulled from check-runs.get.35.multiple
-        expect(checkRunId).toEqual(53472315);
+        expect(checkRunIds['owners-check']).toEqual(53472315);
+        expect(checkRunIds['another-check']).toEqual(53472313);
       })();
     });
 
@@ -386,9 +387,9 @@ describe('GitHub API', () => {
         .reply(200, checkRunsListResponse);
 
       await withContext(async (context, github) => {
-        const checkRun = await github.getCheckRunId('_missing_hash_');
+        const checkRunIds = await github.getCheckRunIds('_missing_hash_');
 
-        expect(checkRun).toBeNull();
+        expect(checkRunIds['owners-check']).toBeUndefined();
       })();
     });
 
@@ -399,9 +400,9 @@ describe('GitHub API', () => {
         .reply(200, checkRunsEmptyResponse);
 
       await withContext(async (context, github) => {
-        const checkRun = await github.getCheckRunId('_test_hash_');
+        const checkRunIds = await github.getCheckRunIds('_test_hash_');
 
-        expect(checkRun).toBeNull();
+        expect(checkRunIds['owners-check']).toBeUndefined();
       })();
     });
 
@@ -415,9 +416,9 @@ describe('GitHub API', () => {
         });
 
       await withContext(async (context, github) => {
-        const checkRun = await github.getCheckRunId('_test_hash_');
+        const checkRunIds = await github.getCheckRunIds('_test_hash_');
 
-        expect(checkRun).toBeNull();
+        expect(checkRunIds['owners-check']).toBeUndefined();
       })();
     });
   });
