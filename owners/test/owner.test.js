@@ -30,6 +30,12 @@ describe('owner users', () => {
     });
   });
 
+  describe('allUsernames', () => {
+    it("returns the user owner's username", () => {
+      expect(owner.allUsernames).toEqual(['auser']);
+    });
+  });
+
   describe('toString', () => {
     it('returns the owner username', () => {
       expect(owner.toString()).toEqual('auser');
@@ -53,6 +59,12 @@ describe('owner teams', () => {
     });
   });
 
+  describe('allUsernames', () => {
+    it("returns the team members' username", () => {
+      expect(owner.allUsernames).toEqual(['auser', 'anothermember']);
+    });
+  });
+
   describe('toString', () => {
     it("returns the team members' usernames as a comma-separated list", () => {
       expect(owner.toString()).toEqual('auser, anothermember');
@@ -66,6 +78,12 @@ describe('owner wildcard', () => {
   describe('includes', () => {
     it('returns true for any username', () => {
       expect(owner.includes('auser')).toBe(true);
+    });
+  });
+
+  describe('allUsernames', () => {
+    it('returns an empty list', () => {
+      expect(owner.allUsernames).toEqual([]);
     });
   });
 

@@ -29,6 +29,15 @@ class Owner {
   includes(username) {
     throw new Error('Not implemented for abstract class `Owner`');
   }
+
+  /**
+   * Returns a list of all usernames included by the owner.
+   *
+   * @return {string[]} list of GitHub usernames.
+   */
+  get allUsernames() {
+    return [];
+  }
 }
 
 /**
@@ -53,6 +62,15 @@ class UserOwner extends Owner {
    */
   includes(username) {
     return this.username === username;
+  }
+
+  /**
+   * Returns a list of all usernames included by the owner.
+   *
+   * @return {string[]} list containing the user's GitHub username.
+   */
+  get allUsernames() {
+    return [this.username];
   }
 
   /**
@@ -87,6 +105,15 @@ class TeamOwner extends Owner {
    */
   includes(username) {
     return this.team.members.includes(username);
+  }
+
+  /**
+   * Returns a list of all usernames included by the owner.
+   *
+   * @return {string[]} list containing the user's GitHub username.
+   */
+  get allUsernames() {
+    return this.team.members;
   }
 
   /**
