@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const {Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
-const {UserOwner, TeamOwner} = require('../src/owner');
+const {UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
 const {
   OwnersRule,
   PatternOwnersRule,
@@ -81,6 +81,14 @@ describe('owners parser', () => {
         new UserOwner('user1'),
         new UserOwner('user2'),
       ]);
+    });
+
+    it('parses a wildcard owner', () => {
+      sandbox.stub(repo, 'readFile').returns('- "*"');
+      const fileParse = parser.parseOwnersFile('hat');
+      const rules = fileParse.result;
+
+      expect(rules[0].owners).toEqual([new WildcardOwner()]);
     });
 
     describe('team rule declarations', () => {

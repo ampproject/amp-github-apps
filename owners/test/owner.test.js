@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-const {UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
+const {Owner, UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
 const {Team} = require('../src/github');
+
+describe('owner base class', () => {
+  const owner = new Owner();
+
+  describe('includes', () => {
+    it('throws an error', () => {
+      expect(() => {
+        owner.includes('');
+      }).toThrow('Not implemented for abstract class `Owner`');
+    });
+  });
+});
 
 describe('owner users', () => {
   const owner = new UserOwner('auser');
