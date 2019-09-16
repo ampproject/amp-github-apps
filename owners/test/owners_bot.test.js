@@ -203,7 +203,7 @@ describe('owners bot', () => {
     });
 
     describe('when no check-run exists yet', () => {
-      it.only('creates a new check-run', async () => {
+      it('creates a new check-run', async () => {
         expect.assertions(1);
         getCheckRunIdsStub.returns({});
         await ownersBot.runOwnersCheck(github, pr);
