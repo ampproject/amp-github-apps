@@ -137,8 +137,8 @@ class OwnersTree {
     const allRules = this.atPath(filename).allRules;
     const fileRules = allRules.filter(rule => rule.matchesFile(filename));
 
-    return fileRules.some(
-      rule => rule.owners.some(owner => owner.includes(username))
+    return fileRules.some(rule =>
+      rule.owners.some(owner => owner.includes(username))
     );
   }
 

@@ -18,20 +18,22 @@
  * An owner of some set of files.
  *
  * TODO(#395): Implement ownership modifiers.
- * @private
  */
 class Owner {
   /**
    * Tests if this owner matches a username.
    *
+   * @throws {Error} if called on the abstract base `Owner` class.
    * @param {!string} username username to check.
-   * @return {boolean} true if this owner has the username.
    */
   includes(username) {
     throw new Error('Not implemented for abstract class `Owner`');
   }
 }
 
+/**
+ * A user who owns a set of files.
+ */
 class UserOwner extends Owner {
   /**
    * Constructor.
@@ -104,7 +106,7 @@ class WildcardOwner extends Owner {
   /**
    * Tests if this owner matches a username.
    *
-   * @param {!string} username username to check.
+   * @param {!string} unusedUsername username to check.
    * @return {boolean} always true
    */
   includes(unusedUsername) {

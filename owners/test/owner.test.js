@@ -54,7 +54,7 @@ describe('owner teams', () => {
   });
 
   describe('toString', () => {
-    it('returns the team members\' usernames as a comma-separated list', () => {
+    it("returns the team members' usernames as a comma-separated list", () => {
       expect(owner.toString()).toEqual('auser, anothermember');
     });
   });
