@@ -27,6 +27,7 @@ const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
+const getFileResponse = require('./fixtures/files/file_blob.24523.json');
 
 nock.disableNetConnect();
 
@@ -293,6 +294,28 @@ describe('GitHub API', () => {
     });
   });
 
+  describe('getFileContents', () => {
+    it('fetches the contents of a file', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get(
+          '/repos/test_owner/test_repo/git/blobs/eeae1593f4ecbae3f4453c9ceee2940a0e98ddca'
+        )
+        .reply(200, getFileResponse);
+
+      await withContext(async (context, github) => {
+        const contents = await github.getFileContents({
+          filename: 'third_party/subscriptions-project/OWNERS.yaml',
+          sha: 'eeae1593f4ecbae3f4453c9ceee2940a0e98ddca',
+        });
+
+        expect(contents).toEqual(
+          '- chenshay\n- chrisantaki\n- dparikh\n- dvoytenko\n- jpettitt\n'
+        );
+      })();
+    });
+  });
+
   describe('listFiles', () => {
     it('fetches the list of changed files', async () => {
       expect.assertions(1);
@@ -301,9 +324,12 @@ describe('GitHub API', () => {
         .reply(200, listFilesResponse);
 
       await withContext(async (context, github) => {
-        const [filename] = await github.listFiles(35);
+        const [file] = await github.listFiles(35);
 
-        expect(filename).toEqual('dir2/dir1/dir1/file.txt');
+        expect(file).toMatchObject({
+          filename: 'dir2/dir1/dir1/file.txt',
+          sha: 'eeae1593f4ecbae3f4453c9ceee2940a0e98ddca',
+        });
       })();
     });
   });

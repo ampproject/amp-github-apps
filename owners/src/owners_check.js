@@ -69,10 +69,14 @@ class OwnersCheck {
    *
    * @param {!OwnersTree} tree file ownership tree.
    * @param {string[]} approvers list of usernames of approving reviewers.
-   * @param {string[]} changedFiles list of change files.
+   * @param {FileRef[]} changedFiles list of change files.
    */
   constructor(tree, approvers, changedFiles) {
-    Object.assign(this, {tree, approvers, changedFiles});
+    Object.assign(this, {
+      tree,
+      approvers,
+      changedFilenames: changedFiles.map(({filename}) => filename),
+    });
   }
 
   /**
@@ -82,12 +86,12 @@ class OwnersCheck {
    */
   run() {
     try {
-      const fileTreeMap = this.tree.buildFileTreeMap(this.changedFiles);
+      const fileTreeMap = this.tree.buildFileTreeMap(this.changedFilenames);
       const coverageText = this.buildCurrentCoverageText(fileTreeMap);
 
       // Note: This starts removing files from the fileTreeMap that are already
       // approved, so we build the coverage text first.
-      this.changedFiles.forEach(filename => {
+      this.changedFilenames.forEach(filename => {
         const subtree = fileTreeMap[filename];
         if (this._hasOwnersApproval(filename, subtree)) {
           delete fileTreeMap[filename];

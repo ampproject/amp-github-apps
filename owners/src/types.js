@@ -53,4 +53,20 @@ let ReviewerFiles;
  */
 let OwnersParserResult;
 
-module.exports = {FileTreeMap, Logger, ReviewerFiles, OwnersParserResult};
+/**
+ * A file ref from a commit.
+ *
+ * @typedef {{
+ *   filename: !string,
+ *   sha: !string,
+ * }}
+ */
+let FileRef;
+
+module.exports = {
+  FileTreeMap,
+  Logger,
+  ReviewerFiles,
+  OwnersParserResult,
+  FileRef,
+};

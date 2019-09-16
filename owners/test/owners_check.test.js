@@ -61,10 +61,26 @@ describe('owners check', () => {
       ownersTree,
       ['the_author', 'approver', 'other_approver'],
       [
-        'main.js', // root_owner
-        'foo/test.js', // approver, some_user, root_owner
-        'bar/baz/file.txt', // other_approver, root_owner
-        'buzz/README.md', // the_author, root_owner
+        {
+          // root_owner
+          filename: 'main.js',
+          sha: '_sha0_',
+        },
+        {
+          // approver, some_user, root_owner
+          filename: 'foo/test.js',
+          sha: '_sha1_',
+        },
+        {
+          // other_approver, root_owner
+          filename: 'bar/baz/file.txt',
+          sha: '_sha2_',
+        },
+        {
+          // the_author, root_owner
+          filename: 'buzz/README.md',
+          sha: '_sha3_',
+        },
       ]
     );
   });
@@ -233,7 +249,7 @@ describe('owners check', () => {
   describe('buildCurrentCoverageText', () => {
     it('lists files with their owners approvers', () => {
       const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
-        ownersCheck.changedFiles
+        ownersCheck.changedFilenames
       );
       const coverageText = ownersCheck.buildCurrentCoverageText(fileTreeMap);
 
@@ -245,7 +261,7 @@ describe('owners check', () => {
 
     it('lists files needing approval', () => {
       const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
-        ownersCheck.changedFiles
+        ownersCheck.changedFilenames
       );
       const coverageText = ownersCheck.buildCurrentCoverageText(fileTreeMap);
 

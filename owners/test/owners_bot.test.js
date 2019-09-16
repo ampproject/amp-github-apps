@@ -89,7 +89,10 @@ describe('owners bot', () => {
         .returns([approval, otherApproval]);
       sandbox
         .stub(GitHub.prototype, 'listFiles')
-        .returns(['changed_file1.js', 'foo/changed_file2.js']);
+        .returns([
+          {filename: 'changed_file1.js', sha: '_sha1_'},
+          {filename: 'foo/changed_file2.js', sha: '_sha2_'},
+        ]);
     });
 
     it('parses the owners tree', async () => {
@@ -125,9 +128,9 @@ describe('owners bot', () => {
       const {changedFiles} = await ownersBot.initPr(github, pr);
 
       sandbox.assert.calledWith(github.listFiles, 1337);
-      expect(changedFiles).toContain(
-        'changed_file1.js',
-        'foo/changed_file2.js'
+      expect(changedFiles).toContainEqual(
+        {filename: 'changed_file1.js', sha: '_sha1_'},
+        {filename: 'foo/changed_file2.js', sha: '_sha2_'}
       );
     });
   });
