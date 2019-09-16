@@ -30,7 +30,9 @@ const {
 
 describe('owners tree', () => {
   let tree;
-  const rootDirRule = new OwnersRule('OWNERS.yaml', [new UserOwner('root')]);
+  const rootDirRule = new OwnersRule('OWNERS.yaml', [
+    new UserOwner('root', OWNER_MODIFIER.SILENT),
+  ]);
   const childDirRule = new OwnersRule('foo/OWNERS.yaml', [
     new UserOwner('child', OWNER_MODIFIER.NOTIFY),
   ]);
@@ -38,7 +40,7 @@ describe('owners tree', () => {
     new UserOwner('child', OWNER_MODIFIER.SILENT),
   ]);
   const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
-    new UserOwner('descendant'),
+    new UserOwner('descendant', OWNER_MODIFIER.NOTIFY),
   ]);
   const wildcardDirRule = new OwnersRule('shared/OWNERS.yaml', [
     new WildcardOwner(),
@@ -180,6 +182,54 @@ describe('owners tree', () => {
       expect(() => childTree.atPath('not/in/foo.txt')).toThrow(
         'Tried to find subtree at path "not/in/foo.txt" on a subtree at path "foo"'
       );
+    });
+  });
+
+  describe('getModifiedOwners', () => {
+    beforeEach(() => {
+      tree.addRule(rootDirRule);
+      tree.addRule(childDirRule);
+      tree.addRule(descendantDirRule);
+    });
+
+    it('finds matching owners in the subtree', () => {
+      const subtree = tree.atPath('foo/file.js');
+      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+
+      expect(modifiedOwners).toContainEqual(
+        new UserOwner('child', OWNER_MODIFIER.NOTIFY)
+      );
+    });
+
+    it('finds matching owners in parent trees', () => {
+      const subtree = tree.atPath('foo/bar/baz/file.js');
+      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+
+      expect(modifiedOwners).toContainEqual(
+        new UserOwner('descendant', OWNER_MODIFIER.NOTIFY),
+        new UserOwner('child', OWNER_MODIFIER.NOTIFY)
+      );
+    });
+
+    it('does not return non-matching owners', () => {
+      const subtree = tree.atPath('foo/file.js');
+      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+
+      expect(modifiedOwners).not.toContainEqual(
+        new UserOwner('root', OWNER_MODIFIER.SILENT)
+      );
+    });
+
+    it('does not return duplicate owners', () => {
+      tree.addRule(
+        new OwnersRule('OWNERS.yaml', [
+          new UserOwner('child', OWNER_MODIFIER.NOTIFY),
+        ])
+      );
+      const subtree = tree.atPath('foo/file.js');
+      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+
+      expect(modifiedOwners.length).toEqual(1);
     });
   });
 
