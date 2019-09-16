@@ -43,8 +43,14 @@ describe('owner base class', () => {
   });
 });
 
-describe('owner users', () => {
+describe('owner user', () => {
   const owner = new UserOwner('auser');
+
+  describe('constructor', () => {
+    it('sets the name to the username', () => {
+      expect(owner.name).toEqual('auser');
+    });
+  });
 
   describe('includes', () => {
     it('returns true for a matching username', () => {
@@ -75,10 +81,16 @@ describe('owner users', () => {
   });
 });
 
-describe('owner teams', () => {
+describe('owner team', () => {
   const myTeam = new Team(42, 'ampproject', 'my_team');
   myTeam.members = ['auser', 'anothermember'];
   const owner = new TeamOwner(myTeam);
+
+  describe('constructor', () => {
+    it('sets the name to the team name', () => {
+      expect(owner.name).toEqual('ampproject/my_team');
+    });
+  });
 
   describe('includes', () => {
     it('returns true for a username in the team', () => {
@@ -118,6 +130,10 @@ describe('owner wildcard', () => {
       expect(() => new WildcardOwner(OWNER_MODIFIER.NOTIFY)).toThrow(
         'Modifiers not supported on wildcard `*` owner'
       );
+    });
+
+    it('sets the name to the `*` wildcard symbol', () => {
+      expect(owner.name).toEqual('*');
     });
   });
 
