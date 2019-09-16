@@ -28,7 +28,7 @@ Local development
    * General
      * Set _Homepage URL_ to the Smee channel
      * Set _Webhook URL_ to the Smee channel
-     * Set __Webhook Secret_ to any pin your choice
+     * Set _Webhook Secret_ to any pin your choice
    * Permissions and Events
      * Set _Checks_ to Read & write
      * Set _Metadata_ to Read-only
