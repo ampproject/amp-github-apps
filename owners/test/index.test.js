@@ -21,6 +21,7 @@ const {Probot} = require('probot');
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser} = require('../src/parser');
+const {UserOwner} = require('../src/owner');
 const {OwnersRule} = require('../src/rules');
 const {OwnersBot} = require('../src/owners_bot');
 
@@ -47,10 +48,10 @@ jest.setTimeout(30000);
 
 const GITHUB_REPO_DIR = '/Users/erwinm/dev/github-owners-bot-test-repo';
 const ownersRules = [
-  new OwnersRule('OWNERS.yaml', ['donttrustthisbot']),
-  new OwnersRule('dir1/OWNERS.yaml', ['donttrustthisbot']),
-  new OwnersRule('dir2/OWNERS.yaml', ['erwinmombay']),
-  new OwnersRule('dir2/dir1/dir1/OWNERS.yaml', ['erwinmombay']),
+  new OwnersRule('OWNERS.yaml', [new UserOwner('donttrustthisbot')]),
+  new OwnersRule('dir1/OWNERS.yaml', [new UserOwner('donttrustthisbot')]),
+  new OwnersRule('dir2/OWNERS.yaml', [new UserOwner('erwinmombay')]),
+  new OwnersRule('dir2/dir1/dir1/OWNERS.yaml', [new UserOwner('erwinmombay')]),
 ];
 
 describe('owners bot', () => {

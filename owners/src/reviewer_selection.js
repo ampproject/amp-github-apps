@@ -63,7 +63,9 @@ class ReviewerSelection {
       tree.rules
         .filter(rule => !rule.wildcardOwner)
         .forEach(rule => {
-          rule.owners.forEach(owner => reviewers.add(owner));
+          rule.owners.forEach(owner => {
+            owner.allUsernames.forEach(username => reviewers.add(username));
+          });
         });
     });
     return Array.from(reviewers);
@@ -145,6 +147,10 @@ class ReviewerSelection {
 
   /**
    * Picks a set of reviews to approve the PR.
+   *
+   * Assumption: The file-tree map should only contain files which do not yet
+   * have owners approval. This means that any file under the scope of a
+   * wildcard `*` ownership will not be considered.
    *
    * @throws {Error} if the algorithm fails to select reviewers.
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.

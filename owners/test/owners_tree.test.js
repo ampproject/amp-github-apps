@@ -15,6 +15,8 @@
  */
 
 const {OwnersTree} = require('../src/owners_tree');
+const {Team} = require('../src/github');
+const {UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
 const {
   OwnersRule,
   PatternOwnersRule,
@@ -23,21 +25,31 @@ const {
 
 describe('owners tree', () => {
   let tree;
-  const rootDirRule = new OwnersRule('OWNERS.yaml', ['root']);
-  const childDirRule = new OwnersRule('foo/OWNERS.yaml', ['child']);
-  const otherChildDirRule = new OwnersRule('biz/OWNERS.yaml', ['child']);
-  const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
-    'descendant',
+  const rootDirRule = new OwnersRule('OWNERS.yaml', [new UserOwner('root')]);
+  const childDirRule = new OwnersRule('foo/OWNERS.yaml', [
+    new UserOwner('child'),
   ]);
-  const wildcardDirRule = new OwnersRule('shared/OWNERS.yaml', ['*']);
+  const otherChildDirRule = new OwnersRule('biz/OWNERS.yaml', [
+    new UserOwner('child'),
+  ]);
+  const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+    new UserOwner('descendant'),
+  ]);
+  const wildcardDirRule = new OwnersRule('shared/OWNERS.yaml', [
+    new WildcardOwner(),
+  ]);
+
+  const testerTeam = new Team(42, 'ampproject', 'testers');
+  testerTeam.members.push('tester');
   const testFileRule = new PatternOwnersRule(
     'OWNERS.yaml',
-    ['testers'],
+    [new TeamOwner(testerTeam)],
     '*.test.js'
   );
+
   const packageJsonRule = new SameDirPatternOwnersRule(
     'OWNERS.yaml',
-    ['anyone'],
+    [new UserOwner('anyone')],
     'package.json'
   );
 
@@ -204,8 +216,8 @@ describe('owners tree', () => {
     });
 
     it('should respect pattern-based rules', () => {
-      expect(tree.fileHasOwner('foo/bar/thing.test.js', 'testers')).toBe(true);
-      expect(tree.fileHasOwner('foo/bar/thing.js', 'testers')).toBe(false);
+      expect(tree.fileHasOwner('foo/bar/thing.test.js', 'tester')).toBe(true);
+      expect(tree.fileHasOwner('foo/bar/thing.js', 'tester')).toBe(false);
     });
 
     it('should respect same-directory rules', () => {
@@ -249,6 +261,7 @@ describe('owners tree', () => {
       tree.addRule(childDirRule);
       tree.addRule(otherChildDirRule);
       tree.addRule(descendantDirRule);
+      tree.addRule(wildcardDirRule);
       tree.addRule(testFileRule);
       tree.addRule(packageJsonRule);
 
@@ -256,7 +269,7 @@ describe('owners tree', () => {
         [
           'ROOT',
           ' • All files: root',
-          ' • **/*.test.js: testers',
+          ' • **/*.test.js: tester',
           ' • ./package.json: anyone',
           '└───foo',
           ' • All files: child',
@@ -265,6 +278,8 @@ describe('owners tree', () => {
           '         • All files: descendant',
           '└───biz',
           ' • All files: child',
+          '└───shared',
+          ' • All files: *',
         ].join('\n')
       );
     });

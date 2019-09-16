@@ -20,6 +20,7 @@ const {
   CheckRunConclusion,
   OwnersCheck,
 } = require('../src/owners_check');
+const {UserOwner} = require('../src/owner');
 const {OwnersTree} = require('../src/owners_tree');
 const {OwnersRule} = require('../src/rules');
 const {ReviewerSelection} = require('../src/reviewer_selection');
@@ -51,10 +52,13 @@ describe('owners check', () => {
   beforeEach(() => {
     const ownersTree = new OwnersTree();
     [
-      new OwnersRule('OWNERS.yaml', ['root_owner']),
-      new OwnersRule('foo/OWNERS.yaml', ['approver', 'some_user']),
-      new OwnersRule('bar/OWNERS.yaml', ['other_approver']),
-      new OwnersRule('buzz/OWNERS.yaml', ['the_author']),
+      new OwnersRule('OWNERS.yaml', [new UserOwner('root_owner')]),
+      new OwnersRule('foo/OWNERS.yaml', [
+        new UserOwner('approver'),
+        new UserOwner('some_user'),
+      ]),
+      new OwnersRule('bar/OWNERS.yaml', [new UserOwner('other_approver')]),
+      new OwnersRule('buzz/OWNERS.yaml', [new UserOwner('the_author')]),
     ].forEach(rule => ownersTree.addRule(rule));
 
     ownersCheck = new OwnersCheck(
