@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const {Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
-const {UserOwner, WildcardOwner, TeamOwner} = require('../src/owner');
+const {UserOwner, TeamOwner} = require('../src/owner');
 const {
   OwnersRule,
   PatternOwnersRule,

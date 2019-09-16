@@ -16,24 +16,32 @@
 
 const sinon = require('sinon');
 const {ReviewerSelection} = require('../src/reviewer_selection');
+const {Team} = require('../src/github');
+const {UserOwner, TeamOwner} = require('../src/owner');
 const {OwnersTree} = require('../src/owners_tree');
 const {OwnersRule} = require('../src/rules');
 
 describe('reviewer selection', () => {
   const sandbox = sinon.createSandbox();
   const ownersTree = new OwnersTree();
+  const myTeam = new Team(42, 'ampproject', 'my_team');
+  myTeam.members = ['child', 'kid'];
 
   const dirTrees = {
-    '/': ownersTree.addRule(new OwnersRule('OWNERS.yaml', ['rootOwner'])),
-    '/foo': ownersTree.addRule(new OwnersRule('foo/OWNERS.yaml', ['child'])),
+    '/': ownersTree.addRule(
+      new OwnersRule('OWNERS.yaml', [new UserOwner('rootOwner')])
+    ),
+    '/foo': ownersTree.addRule(
+      new OwnersRule('foo/OWNERS.yaml', [new UserOwner('child')])
+    ),
     '/biz': ownersTree.addRule(
-      new OwnersRule('biz/OWNERS.yaml', ['child', 'kid'])
+      new OwnersRule('biz/OWNERS.yaml', [new TeamOwner(myTeam)])
     ),
     '/buzz': ownersTree.addRule(
-      new OwnersRule('buzz/OWNERS.yaml', ['thirdChild'])
+      new OwnersRule('buzz/OWNERS.yaml', [new UserOwner('thirdChild')])
     ),
     '/foo/bar/baz': ownersTree.addRule(
-      new OwnersRule('foo/bar/baz/OWNERS.yaml', ['descendant'])
+      new OwnersRule('foo/bar/baz/OWNERS.yaml', [new UserOwner('descendant')])
     ),
   };
 
