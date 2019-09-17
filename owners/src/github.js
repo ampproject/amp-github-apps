@@ -230,6 +230,29 @@ class GitHub {
   }
 
   /**
+   * Requests a review from GitHub users.
+   *
+   * @param {number} number PR number.
+   * @param {string[]} reviewers the list of usernames to request reviews from.
+   */
+  async createReviewRequests(number, reviewers) {
+    if (!reviewers.length) {
+      this.logger.warn(
+        `Attempted to request reviews for PR ${number} ` +
+          'but provided an empty username list'
+      );
+      return;
+    }
+    this.logger.info(
+      `Requesting review for PR #${number} from: ${reviewers.join(', ')}`
+    );
+
+    await this.client.pullRequests.createReviewRequest(
+      this.repo({number, reviewers})
+    );
+  }
+
+  /**
    * Retrieves code review requests for a PR from GitHub.
    *
    * @param {number} number PR number.
