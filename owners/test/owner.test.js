@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-const {Owner, UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
+const {
+  Owner,
+  UserOwner,
+  TeamOwner,
+  WildcardOwner,
+  OWNER_MODIFIER,
+} = require('../src/owner');
 const {Team} = require('../src/github');
 
 describe('owner base class', () => {
@@ -27,10 +33,24 @@ describe('owner base class', () => {
       }).toThrow('Not implemented for abstract class `Owner`');
     });
   });
+
+  describe('toString', () => {
+    it('throws an error', () => {
+      expect(() => owner.toString()).toThrow(
+        'Not implemented for abstract class `Owner`'
+      );
+    });
+  });
 });
 
-describe('owner users', () => {
+describe('owner user', () => {
   const owner = new UserOwner('auser');
+
+  describe('constructor', () => {
+    it('sets the name to the username', () => {
+      expect(owner.name).toEqual('auser');
+    });
+  });
 
   describe('includes', () => {
     it('returns true for a matching username', () => {
@@ -52,13 +72,24 @@ describe('owner users', () => {
     it('returns the owner username', () => {
       expect(owner.toString()).toEqual('auser');
     });
+
+    it('includes any modifiers', () => {
+      const owner = new UserOwner('auser', OWNER_MODIFIER.SILENT);
+      expect(owner.toString()).toMatch(/ \(never notify\)$/);
+    });
   });
 });
 
-describe('owner teams', () => {
+describe('owner team', () => {
   const myTeam = new Team(42, 'ampproject', 'my_team');
   myTeam.members = ['auser', 'anothermember'];
   const owner = new TeamOwner(myTeam);
+
+  describe('constructor', () => {
+    it('sets the name to the team name', () => {
+      expect(owner.name).toEqual('ampproject/my_team');
+    });
+  });
 
   describe('includes', () => {
     it('returns true for a username in the team', () => {
@@ -79,13 +110,30 @@ describe('owner teams', () => {
 
   describe('toString', () => {
     it("returns the team members' usernames as a comma-separated list", () => {
-      expect(owner.toString()).toEqual('auser, anothermember');
+      expect(owner.toString()).toEqual('[auser, anothermember]');
+    });
+
+    it('includes any modifiers', () => {
+      const owner = new TeamOwner(myTeam, OWNER_MODIFIER.NOTIFY);
+      expect(owner.toString()).toMatch(/ \(always notify\)/);
     });
   });
 });
 
 describe('owner wildcard', () => {
   const owner = new WildcardOwner();
+
+  describe('constructor', () => {
+    it('throws an error if given a modifier', () => {
+      expect(() => new WildcardOwner(OWNER_MODIFIER.NOTIFY)).toThrow(
+        'Modifiers not supported on wildcard `*` owner'
+      );
+    });
+
+    it('sets the name to the `*` wildcard symbol', () => {
+      expect(owner.name).toEqual('*');
+    });
+  });
 
   describe('includes', () => {
     it('returns true for any username', () => {
@@ -101,7 +149,7 @@ describe('owner wildcard', () => {
 
   describe('toString', () => {
     it('returns the `*` wildcard symbol ', () => {
-      expect(owner.toString()).toEqual('*');
+      expect(owner.toString()).toContain('*');
     });
   });
 });

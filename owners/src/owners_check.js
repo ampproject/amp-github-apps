@@ -82,7 +82,7 @@ class OwnersCheck {
   /**
    * Runs the owners check and, if necessary, the reviewer selection algorithm.
    *
-   * @return {CheckRun} a GitHub check-run with approval and reviewer info.
+   * @return {OwnersCheckResult} a GitHub check-run and reviewers to add.
    */
   run() {
     try {
@@ -100,32 +100,40 @@ class OwnersCheck {
       const passing = !Object.keys(fileTreeMap).length;
 
       if (passing) {
-        return new CheckRun(
-          CheckRunConclusion.SUCCESS,
-          'All files in this PR have OWNERS approval',
-          coverageText
-        );
+        return {
+          checkRun: new CheckRun(
+            CheckRunConclusion.SUCCESS,
+            'All files in this PR have OWNERS approval',
+            coverageText
+          ),
+          reviewers: [],
+        };
       }
 
       const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
-      const reviewers = reviewSuggestions
-        .map(([reviewer, files]) => reviewer)
-        .join(', ');
+      const reviewers = reviewSuggestions.map(([reviewer, files]) => reviewer);
       const suggestionsText = this.buildReviewSuggestionsText(
         reviewSuggestions
       );
-      return new CheckRun(
-        CheckRunConclusion.ACTION_REQUIRED,
-        `Missing required OWNERS approvals! Suggested reviewers: ${reviewers}`,
-        `${coverageText}\n\n${suggestionsText}`
-      );
+      return {
+        checkRun: new CheckRun(
+          CheckRunConclusion.ACTION_REQUIRED,
+          'Missing required OWNERS approvals! ' +
+            `Suggested reviewers: ${reviewers.join(', ')}`,
+          `${coverageText}\n\n${suggestionsText}`
+        ),
+        reviewers,
+      };
     } catch (error) {
       // If anything goes wrong, report a failing check.
-      return new CheckRun(
-        CheckRunConclusion.NEUTRAL,
-        'The check encountered an error!',
-        'OWNERS check encountered an error:\n' + error
-      );
+      return {
+        checkRun: new CheckRun(
+          CheckRunConclusion.NEUTRAL,
+          'The check encountered an error!',
+          'OWNERS check encountered an error:\n' + error
+        ),
+        reviewers: [],
+      };
     }
   }
 

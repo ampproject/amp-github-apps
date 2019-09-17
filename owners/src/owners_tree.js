@@ -127,6 +127,28 @@ class OwnersTree {
   }
 
   /**
+   * Lists of owners which have modifiers from this tree to the root.
+   *
+   * @param {!OWNER_MODIFIER} modifier owner modifier.
+   * @return {Owner[]} list of owners.
+   */
+  getModifiedOwners(modifier) {
+    const modifiedOwners = {};
+
+    this.allRules.forEach(rule => {
+      rule.owners
+        .filter(owner => owner.modifier === modifier)
+        .forEach(owner => {
+          if (!modifiedOwners[owner.name]) {
+            modifiedOwners[owner.name] = owner;
+          }
+        });
+    });
+
+    return Object.values(modifiedOwners);
+  }
+
+  /**
    * Tests if a user is in the ownership path of a file.
    *
    * @param {!string} filename file to test ownership for.

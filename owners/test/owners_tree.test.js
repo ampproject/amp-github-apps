@@ -16,7 +16,12 @@
 
 const {OwnersTree} = require('../src/owners_tree');
 const {Team} = require('../src/github');
-const {UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
+const {
+  UserOwner,
+  TeamOwner,
+  WildcardOwner,
+  OWNER_MODIFIER,
+} = require('../src/owner');
 const {
   OwnersRule,
   PatternOwnersRule,
@@ -25,15 +30,17 @@ const {
 
 describe('owners tree', () => {
   let tree;
-  const rootDirRule = new OwnersRule('OWNERS.yaml', [new UserOwner('root')]);
+  const rootDirRule = new OwnersRule('OWNERS.yaml', [
+    new UserOwner('root', OWNER_MODIFIER.SILENT),
+  ]);
   const childDirRule = new OwnersRule('foo/OWNERS.yaml', [
-    new UserOwner('child'),
+    new UserOwner('child', OWNER_MODIFIER.NOTIFY),
   ]);
   const otherChildDirRule = new OwnersRule('biz/OWNERS.yaml', [
-    new UserOwner('child'),
+    new UserOwner('child', OWNER_MODIFIER.SILENT),
   ]);
   const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
-    new UserOwner('descendant'),
+    new UserOwner('descendant', OWNER_MODIFIER.NOTIFY),
   ]);
   const wildcardDirRule = new OwnersRule('shared/OWNERS.yaml', [
     new WildcardOwner(),
@@ -178,6 +185,54 @@ describe('owners tree', () => {
     });
   });
 
+  describe('getModifiedOwners', () => {
+    beforeEach(() => {
+      tree.addRule(rootDirRule);
+      tree.addRule(childDirRule);
+      tree.addRule(descendantDirRule);
+    });
+
+    it('finds matching owners in the subtree', () => {
+      const subtree = tree.atPath('foo/file.js');
+      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+
+      expect(modifiedOwners).toContainEqual(
+        new UserOwner('child', OWNER_MODIFIER.NOTIFY)
+      );
+    });
+
+    it('finds matching owners in parent trees', () => {
+      const subtree = tree.atPath('foo/bar/baz/file.js');
+      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+
+      expect(modifiedOwners).toContainEqual(
+        new UserOwner('descendant', OWNER_MODIFIER.NOTIFY),
+        new UserOwner('child', OWNER_MODIFIER.NOTIFY)
+      );
+    });
+
+    it('does not return non-matching owners', () => {
+      const subtree = tree.atPath('foo/file.js');
+      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+
+      expect(modifiedOwners).not.toContainEqual(
+        new UserOwner('root', OWNER_MODIFIER.SILENT)
+      );
+    });
+
+    it('does not return duplicate owners', () => {
+      tree.addRule(
+        new OwnersRule('OWNERS.yaml', [
+          new UserOwner('child', OWNER_MODIFIER.NOTIFY),
+        ])
+      );
+      const subtree = tree.atPath('foo/file.js');
+      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+
+      expect(modifiedOwners.length).toEqual(1);
+    });
+  });
+
   describe('fileHasOwner', () => {
     beforeEach(() => {
       tree.addRule(rootDirRule);
@@ -269,15 +324,15 @@ describe('owners tree', () => {
         [
           'ROOT',
           ' • All files: root',
-          ' • **/*.test.js: tester',
+          ' • **/*.test.js: [tester]',
           ' • ./package.json: anyone',
           '└───foo',
-          ' • All files: child',
+          ' • All files: child (always notify)',
           '    └───bar',
           '        └───baz',
           '         • All files: descendant',
           '└───biz',
-          ' • All files: child',
+          ' • All files: child (never notify)',
           '└───shared',
           ' • All files: *',
         ].join('\n')

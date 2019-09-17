@@ -17,6 +17,7 @@
 const sinon = require('sinon');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
+const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
 const {OwnersBot} = require('../src/owners_bot');
 const {OwnersParser} = require('../src/parser');
 const {OwnersTree} = require('../src/owners_tree');
@@ -145,7 +146,10 @@ describe('owners bot', () => {
 
     beforeEach(() => {
       getCheckRunIdsStub = sandbox.stub(GitHub.prototype, 'getCheckRunIds');
-      sandbox.stub(OwnersCheck.prototype, 'run').returns(checkRun);
+      sandbox.stub(OwnersCheck.prototype, 'run').returns({
+        checkRun,
+        reviewers: ['root_owner'],
+      });
       sandbox.stub(GitHub.prototype, 'updateCheckRun');
       sandbox.stub(GitHub.prototype, 'createCheckRun');
       sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
@@ -279,6 +283,68 @@ describe('owners bot', () => {
       const approvers = await ownersBot._getApprovers(github, pr);
 
       expect(approvers).not.toContain('rejector');
+    });
+  });
+
+  describe('getReviewRequests', () => {
+    const tree = new OwnersTree();
+    const busyTeam = new Team(42, 'ampproject', 'busy_team');
+    busyTeam.members = ['busy_member'];
+
+    beforeEach(() => {
+      sandbox
+        .stub(OwnersTree.prototype, 'getModifiedOwners')
+        .withArgs(OWNER_MODIFIER.SILENT)
+        .returns([new UserOwner('busy_user'), new TeamOwner(busyTeam)]);
+    });
+
+    it('includes suggested reviewers', () => {
+      const reviewRequests = ownersBot._getReviewRequests([tree], ['auser']);
+
+      expect(Array.from(reviewRequests)).toContain('auser');
+    });
+
+    it('excludes user owners with the no-notify modifier', () => {
+      const reviewRequests = ownersBot._getReviewRequests(
+        [tree],
+        ['busy_user']
+      );
+
+      expect(Array.from(reviewRequests)).not.toContain('busy_user');
+    });
+
+    it('excludes members of team owners with the no-notify modifier', () => {
+      const reviewRequests = ownersBot._getReviewRequests(
+        [tree],
+        ['busy_member']
+      );
+
+      expect(Array.from(reviewRequests)).not.toContain('busy_member');
+    });
+  });
+
+  describe('getNotifies', () => {
+    const tree = new OwnersTree();
+    const relevantTeam = new Team(42, 'ampproject', 'relevant_team');
+    relevantTeam.members = ['relevant_member'];
+
+    beforeEach(() => {
+      sandbox
+        .stub(OwnersTree.prototype, 'getModifiedOwners')
+        .withArgs(OWNER_MODIFIER.NOTIFY)
+        .returns([new UserOwner('relevant_user'), new TeamOwner(relevantTeam)]);
+    });
+
+    it('includes user owners with the always-notify modifier', () => {
+      const notifies = ownersBot._getNotifies([tree]);
+
+      expect(Array.from(notifies)).toContain('relevant_user');
+    });
+
+    it('includes team owners with the always-notify modifier', () => {
+      const notifies = ownersBot._getNotifies([tree]);
+
+      expect(Array.from(notifies)).toContain('ampproject/relevant_team');
     });
   });
 });

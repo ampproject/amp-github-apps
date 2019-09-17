@@ -14,12 +14,29 @@
  * limitations under the License.
  */
 
+const OWNER_MODIFIER = {
+  NONE: '',
+  NOTIFY: 'always notify',
+  SILENT: 'never notify',
+};
+
 /**
  * An owner of some set of files.
  *
  * TODO(#395): Implement ownership modifiers.
  */
 class Owner {
+  /**
+   * Constructor.
+   *
+   * @param {!string} name readable name identifying the owner user/team.
+   * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
+   */
+  constructor(name, modifier) {
+    this.name = name;
+    this.modifier = modifier || OWNER_MODIFIER.NONE;
+  }
+
   /**
    * Tests if this owner matches a username.
    *
@@ -38,6 +55,33 @@ class Owner {
   get allUsernames() {
     return [];
   }
+
+  /**
+   * Render the owner list as a string
+   *
+   * @throws {Error} if called on the abstract base `Owner` class.
+   */
+  get _ownerListString() {
+    throw new Error('Not implemented for abstract class `Owner`');
+  }
+
+  /**
+   * Renders the modifier string.
+   *
+   * @return {string} the modifier in parentheses if any, else empty string.
+   */
+  get _modString() {
+    return this.modifier ? ` (${this.modifier})` : '';
+  }
+
+  /**
+   * Renders the owner as a string.
+   *
+   * @return {string} the string representation of the owner.
+   */
+  toString() {
+    return `${this._ownerListString}${this._modString}`;
+  }
 }
 
 /**
@@ -48,9 +92,10 @@ class UserOwner extends Owner {
    * Constructor.
    *
    * @param {!string} username owner's GitHub username.
+   * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
    */
-  constructor(username) {
-    super();
+  constructor(username, modifier) {
+    super(username, modifier);
     Object.assign(this, {username});
   }
 
@@ -78,7 +123,7 @@ class UserOwner extends Owner {
    *
    * @return {string} the owner's username.
    */
-  toString() {
+  get _ownerListString() {
     return this.username;
   }
 }
@@ -91,9 +136,10 @@ class TeamOwner extends Owner {
    * Constructor.
    *
    * @param {!Team} team the GitHub team.
+   * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
    */
-  constructor(team) {
-    super();
+  constructor(team, modifier) {
+    super(team.toString(), modifier);
     Object.assign(this, {team});
   }
 
@@ -117,12 +163,12 @@ class TeamOwner extends Owner {
   }
 
   /**
-   * Render the owner as a string.
+   * Render the owner list as a string.
    *
    * @return {string} the team members' usernames as a comma-separated list.
    */
-  toString() {
-    return this.team.members.join(', ');
+  get _ownerListString() {
+    return `[${this.team.members.join(', ')}]`;
   }
 }
 
@@ -130,6 +176,18 @@ class TeamOwner extends Owner {
  * A wildcard owner that includes anyone.
  */
 class WildcardOwner extends Owner {
+  /**
+   * Constructor.
+   *
+   * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
+   */
+  constructor(modifier) {
+    if (modifier && modifier != OWNER_MODIFIER.NONE) {
+      throw new Error('Modifiers not supported on wildcard `*` owner');
+    }
+    super('*');
+  }
+
   /**
    * Tests if this owner matches a username.
    *
@@ -141,13 +199,13 @@ class WildcardOwner extends Owner {
   }
 
   /**
-   * Render the owner as a string.
+   * Render the wildcard owner as a string.
    *
    * @return {string} the `*` wildcard symbol.
    */
-  toString() {
+  get _ownerListString() {
     return '*';
   }
 }
 
-module.exports = {Owner, UserOwner, TeamOwner, WildcardOwner};
+module.exports = {Owner, UserOwner, TeamOwner, WildcardOwner, OWNER_MODIFIER};
