@@ -23,6 +23,7 @@ const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
+const requestedReviewsResponse = require('./fixtures/reviews/requested_reviewers.24574.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
@@ -290,6 +291,52 @@ describe('GitHub API', () => {
         expect(review.reviewer).toEqual('erwinmombay');
         expect(review.isApproved).toBe(true);
         expect(review.submittedAt).toEqual(new Date('2019-02-26T20:39:13Z'));
+      })();
+    });
+  });
+
+  describe('createReviewRequests', () => {
+    it('requests reviews from GitHub users', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .post(
+          '/repos/test_owner/test_repo/pulls/24574/requested_reviewers',
+          body => {
+            expect(body).toMatchObject({reviewers: ['reviewer']});
+            return true;
+          }
+        )
+        .reply(200);
+
+      await withContext(async (context, github) => {
+        await github.createReviewRequests(24574, ['reviewer']);
+      })();
+    });
+
+    it('skips the API call if no usernames are provided', async () => {
+      expect.assertions(1);
+
+      await withContext(async (context, github) => {
+        // This will fail if it attempts to make an un-nocked network request.
+        await github.createReviewRequests(24574, []);
+
+        // Ensures the test fails if the assertion is never run.
+        expect(true).toBe(true);
+      })();
+    });
+  });
+
+  describe('getReviewRequests', () => {
+    it('fetches a list of review requests', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/24574/requested_reviewers')
+        .reply(200, requestedReviewsResponse);
+
+      await withContext(async (context, github) => {
+        const reviewers = await github.getReviewRequests(24574);
+
+        expect(reviewers).toEqual(['jridgewell', 'jpettitt', 'sparhami']);
       })();
     });
   });
