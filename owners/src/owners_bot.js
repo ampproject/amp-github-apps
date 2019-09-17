@@ -171,6 +171,24 @@ class OwnersBot {
 
     return reviewers;
   }
+
+  /**
+   * Determine the set of owners to notify/tag in the PR.
+   *
+   * @param {Set<!OwnersTree>} trees set of ownership trees touched by the PR.
+   * @return {Set<string>} set of who to request a review from.
+   */
+  _getNotifies(trees) {
+    const notifies = new Set();
+    trees.forEach(tree =>
+      tree
+        .getModifiedOwners(OWNER_MODIFIER.NOTIFY)
+        .map(owner => owner.name)
+        .forEach(notifies.add, notifies)
+    );
+
+    return notifies;
+  }
 }
 
 module.exports = {OwnersBot};

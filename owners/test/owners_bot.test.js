@@ -322,4 +322,29 @@ describe('owners bot', () => {
       expect(Array.from(reviewRequests)).not.toContain('busy_member');
     });
   });
+
+  describe('getNotifies', () => {
+    const tree = new OwnersTree();
+    const relevantTeam = new Team(42, 'ampproject', 'relevant_team');
+    relevantTeam.members = ['relevant_member'];
+
+    beforeEach(() => {
+      sandbox
+        .stub(OwnersTree.prototype, 'getModifiedOwners')
+        .withArgs(OWNER_MODIFIER.NOTIFY)
+        .returns([new UserOwner('relevant_user'), new TeamOwner(relevantTeam)]);
+    });
+
+    it('includes user owners with the always-notify modifier', () => {
+      const notifies = ownersBot._getNotifies([tree]);
+
+      expect(Array.from(notifies)).toContain('relevant_user');
+    });
+
+    it('includes team owners with the always-notify modifier', () => {
+      const notifies = ownersBot._getNotifies([tree]);
+
+      expect(Array.from(notifies)).toContain('ampproject/relevant_team');
+    });
+  });
 });
