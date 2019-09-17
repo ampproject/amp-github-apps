@@ -230,6 +230,23 @@ class GitHub {
   }
 
   /**
+   * Retrieves code review requests for a PR from GitHub.
+   *
+   * @param {number} number PR number.
+   * @return {string[]} the list of code reviews.
+   */
+  async getReviewRequests(number) {
+    this.logger.info(`Fetching review requests for PR #${number}`);
+
+    const response = await this.client.pullRequests.listReviewRequests(
+      this.repo({number})
+    );
+    this.logger.debug('[getReviewRequests]', number, response.data);
+
+    return response.data.users.map(({login}) => login);
+  }
+
+  /**
    * Fetches the contents of a file from GitHub.
    *
    * @param {!FileRef} file file ref to fetch.

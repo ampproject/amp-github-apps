@@ -23,6 +23,7 @@ const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
+const requestedReviewsResponse = require('./fixtures/reviews/requested_reviewers.24574.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
@@ -290,6 +291,21 @@ describe('GitHub API', () => {
         expect(review.reviewer).toEqual('erwinmombay');
         expect(review.isApproved).toBe(true);
         expect(review.submittedAt).toEqual(new Date('2019-02-26T20:39:13Z'));
+      })();
+    });
+  });
+
+  describe('getReviewRequests', () => {
+    it('fetches a list of review requests', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/24574/requested_reviewers')
+        .reply(200, requestedReviewsResponse);
+
+      await withContext(async (context, github) => {
+        const reviewers = await github.getReviewRequests(24574);
+
+        expect(reviewers).toEqual(['jridgewell', 'jpettitt', 'sparhami']);
       })();
     });
   });
