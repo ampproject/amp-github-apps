@@ -47,10 +47,10 @@ describe('owners rules', () => {
     });
 
     describe('label', () => {
-      it('is "All files"', () => {
+      it('is "**/*"', () => {
         const rule = new OwnersRule('OWNERS.yaml', []);
 
-        expect(rule.label).toEqual('All files');
+        expect(rule.label).toEqual('**/*');
       });
     });
 
@@ -58,7 +58,7 @@ describe('owners rules', () => {
       it('lists all owners', () => {
         const rule = new OwnersRule('OWNERS.yaml', ['rcebulko', 'erwinmombay']);
 
-        expect(rule.toString()).toEqual('All files: rcebulko, erwinmombay');
+        expect(rule.toString()).toEqual('**/*: rcebulko, erwinmombay');
       });
     });
   });

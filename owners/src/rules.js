@@ -41,7 +41,7 @@ class OwnersRule {
    * @return {string} the label for the rule.
    */
   get label() {
-    return 'All files';
+    return '**/*';
   }
 
   /**

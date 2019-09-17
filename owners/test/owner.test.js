@@ -110,7 +110,9 @@ describe('owner team', () => {
 
   describe('toString', () => {
     it("returns the team members' usernames as a comma-separated list", () => {
-      expect(owner.toString()).toEqual('[auser, anothermember]');
+      expect(owner.toString()).toEqual(
+        'ampproject/my_team [auser, anothermember]'
+      );
     });
 
     it('includes any modifiers', () => {

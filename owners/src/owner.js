@@ -168,7 +168,7 @@ class TeamOwner extends Owner {
    * @return {string} the team members' usernames as a comma-separated list.
    */
   get _ownerListString() {
-    return `[${this.team.members.join(', ')}]`;
+    return `${this.name} [${this.team.members.join(', ')}]`;
   }
 }
 
