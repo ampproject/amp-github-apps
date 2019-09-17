@@ -68,14 +68,14 @@ class OwnersCheck {
    * Constructor.
    *
    * @param {!OwnersTree} tree file ownership tree.
-   * @param {string[]} approvers list of usernames of approving reviewers.
    * @param {FileRef[]} changedFiles list of change files.
+   * @param {string[]} approvers list of usernames of approving reviewers.
    */
-  constructor(tree, approvers, changedFiles) {
+  constructor(tree, changedFiles, approvers) {
     Object.assign(this, {
       tree,
-      approvers,
       changedFilenames: changedFiles.map(({filename}) => filename),
+      approvers,
     });
   }
 

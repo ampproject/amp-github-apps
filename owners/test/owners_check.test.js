@@ -63,7 +63,6 @@ describe('owners check', () => {
 
     ownersCheck = new OwnersCheck(
       ownersTree,
-      ['the_author', 'approver', 'other_approver'],
       [
         {
           // root_owner
@@ -85,7 +84,8 @@ describe('owners check', () => {
           filename: 'buzz/README.md',
           sha: '_sha3_',
         },
-      ]
+      ],
+      ['the_author', 'approver', 'other_approver'],
     );
   });
 

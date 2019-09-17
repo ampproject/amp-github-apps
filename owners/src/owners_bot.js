@@ -80,10 +80,10 @@ class OwnersBot {
     });
     const tree = treeParse.result;
 
-    const approvers = await this._getApprovers(github, pr);
     const changedFiles = await github.listFiles(pr.number);
+    const approvers = await this._getApprovers(github, pr);
 
-    return {tree, approvers, changedFiles};
+    return {tree, changedFiles, approvers};
   }
 
   /**
@@ -94,8 +94,8 @@ class OwnersBot {
    * @param {!PullRequest} pr pull request to run owners check on.
    */
   async runOwnersCheck(github, pr) {
-    const {tree, approvers, changedFiles} = await this.initPr(github, pr);
-    const ownersCheck = new OwnersCheck(tree, approvers, changedFiles);
+    const {tree, changedFiles, approvers} = await this.initPr(github, pr);
+    const ownersCheck = new OwnersCheck(tree, changedFiles, approvers);
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
     // TODO(rcebulko): Make this into a loop through multiple check/name pairs.
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
