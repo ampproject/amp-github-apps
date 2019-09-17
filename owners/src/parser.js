@@ -21,7 +21,12 @@ const {
   SameDirPatternOwnersRule,
 } = require('./rules');
 const {OwnersTree} = require('./owners_tree');
-const {UserOwner, TeamOwner, WildcardOwner} = require('./owner');
+const {
+  UserOwner,
+  TeamOwner,
+  WildcardOwner,
+  OWNER_MODIFIER,
+} = require('./owner');
 
 const GLOB_PATTERN = '**/';
 
@@ -80,8 +85,17 @@ class OwnersParser {
   _parseOwnersLine(ownersPath, owner) {
     const owners = [];
     const errors = [];
+    let modifier = OWNER_MODIFIER.NONE;
 
-    if (owner[0] === '@') {
+    if (owner.startsWith('?')) {
+      modifier = OWNER_MODIFIER.SILENT;
+      owner = owner.slice(1);
+    } else if (owner.startsWith('!')) {
+      modifier = OWNER_MODIFIER.NOTIFY;
+      owner = owner.slice(1);
+    }
+
+    if (owner.startsWith('@')) {
       const lineResult = this._parseOwnersLine(ownersPath, owner.slice(1));
 
       owners.push(...lineResult.result);
@@ -96,16 +110,21 @@ class OwnersParser {
       const team = this.teamMap[owner];
 
       if (team) {
-        owners.push(new TeamOwner(team));
+        owners.push(new TeamOwner(team, modifier));
       } else {
         errors.push(
           new OwnersParserError(ownersPath, `Unrecognized team: '${owner}'`)
         );
       }
     } else if (owner === '*') {
-      owners.push(new WildcardOwner());
+      try {
+        owners.push(new WildcardOwner(modifier));
+      } catch (error) {
+        errors.push(new OwnersParserError(ownersPath, error.message));
+        owners.push(new WildcardOwner());
+      }
     } else {
-      owners.push(new UserOwner(owner));
+      owners.push(new UserOwner(owner, modifier));
     }
 
     return {result: owners, errors};
