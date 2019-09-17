@@ -148,7 +148,7 @@ describe('owners bot', () => {
       getCheckRunIdsStub = sandbox.stub(GitHub.prototype, 'getCheckRunIds');
       sandbox.stub(OwnersCheck.prototype, 'run').returns({
         checkRun,
-        reviewerSuggestions: [['root_owner', ['main.js']]],
+        reviewers: ['root_owner'],
       });
       sandbox.stub(GitHub.prototype, 'updateCheckRun');
       sandbox.stub(GitHub.prototype, 'createCheckRun');

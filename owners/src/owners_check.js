@@ -132,6 +132,7 @@ class OwnersCheck {
           'The check encountered an error!',
           'OWNERS check encountered an error:\n' + error
         ),
+        reviewers: [],
       };
     }
   }

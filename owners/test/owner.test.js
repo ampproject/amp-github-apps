@@ -75,8 +75,7 @@ describe('owner user', () => {
 
     it('includes any modifiers', () => {
       const owner = new UserOwner('auser', OWNER_MODIFIER.SILENT);
-      expect(owner.toString()).toContain(' (never notify)');
-      expect(owner.toString().endsWith(' (never notify)')).toBe(true);
+      expect(owner.toString()).toMatch(/ \(never notify\)$/);
     });
   });
 });
@@ -116,8 +115,7 @@ describe('owner team', () => {
 
     it('includes any modifiers', () => {
       const owner = new TeamOwner(myTeam, OWNER_MODIFIER.NOTIFY);
-      expect(owner.toString()).toContain(' (always notify)');
-      expect(owner.toString().endsWith(' (always notify)')).toBe(true);
+      expect(owner.toString()).toMatch(/ \(always notify\)/);
     });
   });
 });
