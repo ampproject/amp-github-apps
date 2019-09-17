@@ -118,6 +118,27 @@ describe('owners check', () => {
       ]);
     });
 
+    it('picks reviewers', () => {
+      sandbox.stub(ReviewerSelection, 'pickReviews').callThrough();
+      ownersCheck.run();
+
+      sandbox.assert.calledOnce(ReviewerSelection.pickReviews);
+    });
+
+    it("doesn't pick reviewers for a file with owner review requested", () => {
+      let fileTreeMap;
+      // Note: A spy cannot be used here because the assertion takes place after
+      // reviewer selection, which empties out the file-tree map object.
+      sandbox.stub(ReviewerSelection, 'pickReviews').callsFake(ftm => {
+        fileTreeMap = ftm;
+        return [];
+      });
+      ownersCheck.run();
+
+      expect(fileTreeMap['extra/script.js']).toBeUndefined();
+      sandbox.assert.calledOnce(ReviewerSelection.pickReviews);
+    });
+
     describe('created check-run', () => {
       it('contains coverage information in the output', () => {
         sandbox
@@ -181,13 +202,6 @@ describe('owners check', () => {
           expect(checkRun.summary).toEqual(
             'Missing required OWNERS approvals! Suggested reviewers: extra_reviewer, root_owner'
           );
-        });
-
-        it('runs reviewer selection', () => {
-          sandbox.stub(ReviewerSelection, 'pickReviews').callThrough();
-          ownersCheck.run();
-
-          sandbox.assert.calledOnce(ReviewerSelection.pickReviews);
         });
 
         it('contains review suggestions in the output', () => {
