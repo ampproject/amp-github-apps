@@ -66,7 +66,7 @@ class OwnersBot {
    * @param {!PullRequest} pr pull request to initialize data for.
    * @return {{
    *     tree: !OwnersTree,
-   *     approvers: !ReviewerApprovalMap,
+   *     reviewers: !ReviewerApprovalMap,
    *     changedFiles: string[],
    * }} key structures needed to check PR ownership.
    */
