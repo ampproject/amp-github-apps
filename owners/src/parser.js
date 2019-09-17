@@ -96,17 +96,16 @@ class OwnersParser {
     }
 
     if (owner.startsWith('@')) {
-      const lineResult = this._parseOwnersLine(ownersPath, owner.slice(1));
-
-      owners.push(...lineResult.result);
       errors.push(
         new OwnersParserError(
           ownersPath,
           `Ignoring unnecessary '@' in '${owner}'`
         ),
-        ...lineResult.errors
       );
-    } else if (owner.indexOf('/') !== -1) {
+      owner = owner.slice(1);
+    }
+
+    if (owner.indexOf('/') !== -1) {
       const team = this.teamMap[owner];
 
       if (team) {
