@@ -16,6 +16,7 @@
 
 const _ = require('lodash');
 const sleep = require('sleep-promise');
+const {OWNER_MODIFIER} = require('./owner');
 const {OwnersCheck} = require('./owners_check');
 const {OwnersParser} = require('./parser');
 
@@ -98,16 +99,16 @@ class OwnersBot {
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
     // TODO(rcebulko): Make this into a loop through multiple check/name pairs.
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
-    const ownersCheckResults = ownersCheck.run();
+    const ownersCheckResult = ownersCheck.run();
 
     if (checkRunId) {
-      await github.updateCheckRun(checkRunId, ownersCheckResults.checkRun);
+      await github.updateCheckRun(checkRunId, ownersCheckResult.checkRun);
     } else {
       // We need to add a delay on the PR creation and check creation since
       // GitHub might not be ready.
       // TODO(rcebulko): Verify this is still needed.
       await sleep(this.GITHUB_CHECKRUN_DELAY);
-      await github.createCheckRun(pr.headSha, ownersCheckResults.checkRun);
+      await github.createCheckRun(pr.headSha, ownersCheckResult.checkRun);
     }
   }
 
@@ -149,6 +150,26 @@ class OwnersBot {
     }
 
     return approvers;
+  }
+
+  /**
+   * Determine the set of users to request reviews from.
+   *
+   * @param {Set<!OwnersTree>} trees set of ownership trees touched by the PR.
+   * @param {string[]} suggestedReviewers list of suggested reviewer usernames.
+   * @return {Set<string>} set of usernames.
+   */
+  _getReviewRequests(trees, suggestedReviewers) {
+    const reviewers = new Set(suggestedReviewers);
+    trees.forEach(tree =>
+      tree
+        .getModifiedOwners(OWNER_MODIFIER.SILENT)
+        .map(owner => owner.allUsernames)
+        .reduce((left, right) => left.concat(right), [])
+        .forEach(reviewers.delete, reviewers)
+    );
+
+    return reviewers;
   }
 }
 

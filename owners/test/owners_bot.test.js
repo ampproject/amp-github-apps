@@ -17,6 +17,7 @@
 const sinon = require('sinon');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
+const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
 const {OwnersBot} = require('../src/owners_bot');
 const {OwnersParser} = require('../src/parser');
 const {OwnersTree} = require('../src/owners_tree');
@@ -282,6 +283,43 @@ describe('owners bot', () => {
       const approvers = await ownersBot._getApprovers(github, pr);
 
       expect(approvers).not.toContain('rejector');
+    });
+  });
+
+  describe('getReviewRequests', () => {
+    const tree = new OwnersTree();
+    const busyTeam = new Team(42, 'ampproject', 'busy_team');
+    busyTeam.members = ['busy_member'];
+
+    beforeEach(() => {
+      sandbox
+        .stub(OwnersTree.prototype, 'getModifiedOwners')
+        .withArgs(OWNER_MODIFIER.SILENT)
+        .returns([new UserOwner('busy_user'), new TeamOwner(busyTeam)]);
+    });
+
+    it('includes suggested reviewers', () => {
+      const reviewRequests = ownersBot._getReviewRequests([tree], ['auser']);
+
+      expect(Array.from(reviewRequests)).toContain('auser');
+    });
+
+    it('excludes user owners with the no-notify modifier', () => {
+      const reviewRequests = ownersBot._getReviewRequests(
+        [tree],
+        ['busy_user']
+      );
+
+      expect(Array.from(reviewRequests)).not.toContain('busy_user');
+    });
+
+    it('excludes members of team owners with the no-notify modifier', () => {
+      const reviewRequests = ownersBot._getReviewRequests(
+        [tree],
+        ['busy_member']
+      );
+
+      expect(Array.from(reviewRequests)).not.toContain('busy_member');
     });
   });
 });
