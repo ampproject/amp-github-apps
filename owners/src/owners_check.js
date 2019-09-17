@@ -144,13 +144,40 @@ class OwnersCheck {
    *
    * @param {!string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
-   * @return {boolean} if the file is approved
+   * @param {boolean} isApproved approval status to filter by.
+   * @return {boolean} if the file is approved.
    */
-  _hasOwnersApproval(filename, subtree) {
+  _hasOwnersReview(filename, subtree, isApproved) {
     return Object.entries(this.reviewers)
-      .filter(([username, approved]) => approved)
+      .filter(([username, approved]) => approved === isApproved)
       .map(([username, approved]) => username)
       .some(approver => this.tree.fileHasOwner(filename, approver));
+  }
+
+  /**
+   * Tests whether a file has been approved by an owner.
+   *
+   * Must be called after `init`.
+   *
+   * @param {!string} filename file to check.
+   * @param {!OwnersTree} subtree nearest ownership tree to file.
+   * @return {boolean} if the file is approved.
+   */
+  _hasOwnersApproval(filename, subtree) {
+    return this._hasOwnersReview(filename, subtree, true);
+  }
+
+  /**
+   * Tests whether a file has been approved by an owner.
+   *
+   * Must be called after `init`.
+   *
+   * @param {!string} filename file to check.
+   * @param {!OwnersTree} subtree nearest ownership tree to file.
+   * @return {boolean} if the file is approved.
+   */
+  _hasOwnersPendingReview(filename, subtree) {
+    return this._hasOwnersReview(filename, subtree, false);
   }
 
   /**
