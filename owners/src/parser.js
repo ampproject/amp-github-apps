@@ -100,7 +100,7 @@ class OwnersParser {
         new OwnersParserError(
           ownersPath,
           `Ignoring unnecessary '@' in '${owner}'`
-        ),
+        )
       );
       owner = owner.slice(1);
     }

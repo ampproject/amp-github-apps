@@ -6,7 +6,7 @@ const {
   UserOwner,
   TeamOwner,
   WildcardOwner,
-  OWNER_MODIFIER
+  OWNER_MODIFIER,
 } = require('../src/owner');
 const {
   OwnersRule,
@@ -264,7 +264,7 @@ describe('owners parser', () => {
           expect(teamOwner.name).toEqual('ampproject/my_team');
           expect(teamOwner.modifier).toEqual(OWNER_MODIFIER.NOTIFY);
         });
-        
+
         it('parses a never-notify `?` team modifier', () => {
           sandbox.stub(repo, 'readFile').returns('- "?ampproject/my_team"');
           const fileParse = parser.parseOwnersFile('');
@@ -274,7 +274,7 @@ describe('owners parser', () => {
           expect(teamOwner.modifier).toEqual(OWNER_MODIFIER.SILENT);
         });
       });
-      
+
       describe('wildcard owner', () => {
         it('reports an error for an always-notify `!` modifier', () => {
           sandbox.stub(repo, 'readFile').returns('- "!*"');
