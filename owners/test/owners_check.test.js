@@ -200,7 +200,7 @@ describe('owners check', () => {
           const {checkRun} = ownersCheck.run();
 
           expect(checkRun.summary).toEqual(
-            'Missing required OWNERS approvals! Suggested reviewers: extra_reviewer, root_owner'
+            'Missing required OWNERS approvals! Suggested reviewers: root_owner'
           );
         });
 
@@ -216,7 +216,7 @@ describe('owners check', () => {
         it('returns reviewers to add', () => {
           const {reviewers} = ownersCheck.run();
 
-          expect(reviewers).toEqual(['extra_reviewer', 'root_owner']);
+          expect(reviewers).toEqual(['root_owner']);
         });
       });
 

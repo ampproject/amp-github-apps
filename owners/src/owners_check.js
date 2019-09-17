@@ -110,6 +110,11 @@ class OwnersCheck {
         };
       }
 
+      Object.entries(fileTreeMap).forEach(([filename, subtree])=> {
+        if (this._hasOwnersPendingReview(filename, subtree)) {
+          delete fileTreeMap[filename];
+        }
+      });
       const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
       const reviewers = reviewSuggestions.map(([reviewer, files]) => reviewer);
       const suggestionsText = this.buildReviewSuggestionsText(
