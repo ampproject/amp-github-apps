@@ -95,7 +95,13 @@ class OwnersBot {
    */
   async runOwnersCheck(github, pr) {
     const {tree, changedFiles, approvers} = await this.initPr(github, pr);
-    const ownersCheck = new OwnersCheck(tree, changedFiles, approvers);
+
+    const reviewers = {};
+    approvers.forEach(username => {
+      reviewers[username] = true;
+    });
+    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
+
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
     // TODO(rcebulko): Make this into a loop through multiple check/name pairs.
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];

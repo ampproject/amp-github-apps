@@ -73,6 +73,13 @@ let FileRef;
  */
 let OwnersCheckResult;
 
+/**
+ * A map from reviewer usernames to their approval status.
+ *
+ * @typedef {!Object<!string, boolean>}
+ */
+let ReviewerApprovalMap;
+
 module.exports = {
   FileTreeMap,
   Logger,
@@ -80,4 +87,5 @@ module.exports = {
   OwnersParserResult,
   FileRef,
   OwnersCheckResult,
+  ReviewerApprovalMap,
 };

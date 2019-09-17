@@ -69,13 +69,13 @@ class OwnersCheck {
    *
    * @param {!OwnersTree} tree file ownership tree.
    * @param {FileRef[]} changedFiles list of change files.
-   * @param {string[]} approvers list of usernames of approving reviewers.
+   * @param {!ReviewerApprovalMap} reviewers map of reviewer approval statuses.
    */
-  constructor(tree, changedFiles, approvers) {
+  constructor(tree, changedFiles, reviewers) {
     Object.assign(this, {
       tree,
       changedFilenames: changedFiles.map(({filename}) => filename),
-      approvers,
+      reviewers,
     });
   }
 
@@ -147,9 +147,10 @@ class OwnersCheck {
    * @return {boolean} if the file is approved
    */
   _hasOwnersApproval(filename, subtree) {
-    return this.approvers.some(approver =>
-      this.tree.fileHasOwner(filename, approver)
-    );
+    return Object.entries(this.reviewers)
+      .filter(([username, approved]) => approved)
+      .map(([username, approved]) => username)
+      .some(approver => this.tree.fileHasOwner(filename, approver));
   }
 
   /**
@@ -161,14 +162,25 @@ class OwnersCheck {
   buildCurrentCoverageText(fileTreeMap) {
     const allFilesText = Object.entries(fileTreeMap)
       .map(([filename, subtree]) => {
-        const fileApprovers = this.approvers.filter(approver =>
-          this.tree.fileHasOwner(filename, approver)
+        const reviewers = Object.entries(this.reviewers).filter(
+          ([username, approved]) => this.tree.fileHasOwner(filename, username)
         );
 
-        if (fileApprovers.length) {
-          return `- ${filename} _(${fileApprovers.join(', ')})_`;
+        const approving = reviewers
+          .filter(([username, approved]) => approved)
+          .map(([username, approved]) => username);
+        const pending = reviewers
+          .filter(([username, approved]) => !approved)
+          .map(([username, approved]) => username);
+
+        if (approving.length) {
+          return `- ${filename} _(${approving.join(', ')})_`;
         } else {
-          return `- **[NEEDS APPROVAL]** ${filename}`;
+          let line = `- **[NEEDS APPROVAL]** ${filename}`;
+          if (pending.length) {
+            line += ` _(requested: ${pending.join(', ')})_`;
+          }
+          return line;
         }
       })
       .join('\n');
