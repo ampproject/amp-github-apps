@@ -36,7 +36,6 @@ describe('owners bot', () => {
 
   const timestamp = '2019-01-01T00:00:00Z';
   const approval = new Review('approver', 'approved', timestamp);
-  const authorApproval = new Review('the_author', 'approved', timestamp);
   const otherApproval = new Review('other_approver', 'approved', timestamp);
   const rejection = new Review('rejector', 'changes_requested', timestamp);
 

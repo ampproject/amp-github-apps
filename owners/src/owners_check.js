@@ -110,7 +110,7 @@ class OwnersCheck {
         };
       }
 
-      Object.entries(fileTreeMap).forEach(([filename, subtree])=> {
+      Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
         if (this._hasOwnersPendingReview(filename, subtree)) {
           delete fileTreeMap[filename];
         }
