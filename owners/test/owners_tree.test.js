@@ -323,14 +323,14 @@ describe('owners tree', () => {
       expect(tree.toString()).toEqual(
         [
           'ROOT',
-          ' • All files: root',
-          ' • **/*.test.js: [tester]',
+          ' • All files: root (never notify)',
+          ' • **/*.test.js: ampproject/testers [tester]',
           ' • ./package.json: anyone',
           '└───foo',
           ' • All files: child (always notify)',
           '    └───bar',
           '        └───baz',
-          '         • All files: descendant',
+          '         • All files: descendant (always notify)',
           '└───biz',
           ' • All files: child (never notify)',
           '└───shared',
