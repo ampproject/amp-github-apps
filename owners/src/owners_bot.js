@@ -123,6 +123,8 @@ class OwnersBot {
 
       await github.createReviewRequests(pr.number, reviewRequests);
     }
+
+    await this.createNotifications(github, pr.number, fileTreeMap);
   }
 
   /**

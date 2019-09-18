@@ -157,6 +157,8 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
       sandbox.stub(GitHub.prototype, 'listFiles').returns([]);
       sandbox.stub(GitHub.prototype, 'createReviewRequests');
+      sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
+      sandbox.stub(GitHub.prototype, 'createBotComment');
     });
 
     it('attempts to fetch the existing check-run ID', async () => {
@@ -241,6 +243,16 @@ describe('owners bot', () => {
         ]);
         done();
       });
+
+    it('creates a notification comment', async () => {
+      expect.assertions(1);
+      getCheckRunIdsStub.returns({});
+      sandbox.stub(OwnersBot.prototype, 'createNotifications');
+      await ownersBot.runOwnersCheck(github, pr);
+
+      sandbox.assert.calledOnce(ownersBot.createNotifications);
+      // Ensures the test fails if the assertion is never run.
+      expect(true).toBe(true);
     });
   });
 
