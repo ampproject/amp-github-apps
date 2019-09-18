@@ -188,8 +188,26 @@ describe('GitHub API', () => {
         .reply(200, '_DATA_');
 
       await withContext(async (context, github) => {
-        const responseData = await github._customRequest('/api/endpoint');
+        const responseData = await github._customRequest('GET', '/api/endpoint');
         expect(responseData.data).toEqual('_DATA_');
+      })();
+    });
+
+    it('includes POST data', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .post('/api/endpoint', body => {
+          expect(body).toEqual({body: 'BODY'});
+          return true
+        })
+        .reply(200);
+
+      await withContext(async (context, github) => {
+        const responseData = await github._customRequest(
+          'POST',
+          '/api/endpoint',
+          {body: 'BODY'}
+        );
       })();
     });
 
@@ -207,7 +225,7 @@ describe('GitHub API', () => {
         });
 
       await withContext(async (context, github) => {
-        await github._customRequest('/api/endpoint');
+        await github._customRequest('GET', '/api/endpoint');
       })();
     });
   });
