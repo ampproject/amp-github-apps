@@ -188,7 +188,10 @@ describe('GitHub API', () => {
         .reply(200, '_DATA_');
 
       await withContext(async (context, github) => {
-        const responseData = await github._customRequest('GET', '/api/endpoint');
+        const responseData = await github._customRequest(
+          'GET',
+          '/api/endpoint'
+        );
         expect(responseData.data).toEqual('_DATA_');
       })();
     });
@@ -198,16 +201,12 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .post('/api/endpoint', body => {
           expect(body).toEqual({body: 'BODY'});
-          return true
+          return true;
         })
         .reply(200);
 
       await withContext(async (context, github) => {
-        const responseData = await github._customRequest(
-          'POST',
-          '/api/endpoint',
-          {body: 'BODY'}
-        );
+        await github._customRequest('POST', '/api/endpoint', {body: 'BODY'});
       })();
     });
 
@@ -364,7 +363,7 @@ describe('GitHub API', () => {
     it('fetches a list of comments by the bot user', async () => {
       expect.assertions(1);
       sandbox.stub(process, 'env').value({
-        GITHUB_BOT_USERNAME: 'ampprojectbot'
+        GITHUB_BOT_USERNAME: 'ampprojectbot',
       });
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/issues/24574/comments')
@@ -382,13 +381,10 @@ describe('GitHub API', () => {
     it('adds a comment to the pull request', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .post(
-          '/repos/test_owner/test_repo/issues/24574/comments',
-          body => {
-            expect(body).toMatchObject({body: 'test comment'});
-            return true;
-          }
-        )
+        .post('/repos/test_owner/test_repo/issues/24574/comments', body => {
+          expect(body).toMatchObject({body: 'test comment'});
+          return true;
+        })
         .reply(200);
 
       await withContext(async (context, github) => {

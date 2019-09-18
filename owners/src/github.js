@@ -200,7 +200,8 @@ class GitHub {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
 
     const response = await this._customRequest(
-      'GET', `/teams/${teamId}/members`
+      'GET',
+      `/teams/${teamId}/members`
     );
     const memberList = response.data;
     this.logger.debug('[getTeamMembers]', teamId, memberList);
@@ -291,14 +292,12 @@ class GitHub {
   async getBotComments(number) {
     this.logger.info(`Fetching bot comments for PR #${number}`);
 
-    const response = await this.client.issues.listComments(
-      this.repo({number})
-    );
+    const response = await this.client.issues.listComments(this.repo({number}));
     this.logger.debug('[getBotComments]', number, response.data);
 
-    return response.data.filter(
-      ({user}) => user.login === process.env.GITHUB_BOT_USERNAME
-    ).map(({body}) => body);
+    return response.data
+      .filter(({user}) => user.login === process.env.GITHUB_BOT_USERNAME)
+      .map(({body}) => body);
   }
 
   /**
