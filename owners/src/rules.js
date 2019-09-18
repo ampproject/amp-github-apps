@@ -15,6 +15,7 @@
  */
 
 const path = require('path');
+const minimatch = require('minimatch');
 
 /**
  * A rule describing ownership for a directory.
@@ -88,12 +89,14 @@ class PatternOwnersRule extends OwnersRule {
   constructor(ownersPath, owners, pattern) {
     super(ownersPath, owners);
     this.pattern = pattern;
-    this.regex = new RegExp(
-      pattern
-        .split('*')
-        .map(PatternOwnersRule.escapeRegexChars)
-        .join('.*?')
-    );
+    this.regex = minimatch.makeRe(pattern, {
+      matchBase: true,
+      noglobstar: true,
+      noext: true,
+      nocase: true,
+      nocomment: true,
+      nonegate: true,
+    });
   }
 
   /**
@@ -103,16 +106,6 @@ class PatternOwnersRule extends OwnersRule {
    */
   get label() {
     return `**/${this.pattern}`;
-  }
-
-  /**
-   * Escapes all regex characters in a string.
-   *
-   * @param {!string} str string to escape.
-   * @return {string} copy of the string that can be used in a regex.
-   */
-  static escapeRegexChars(str) {
-    return str.replace(/[[\]{}()*+?.\\^$|]/g, '\\$&');
   }
 
   /**

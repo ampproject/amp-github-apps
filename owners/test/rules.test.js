@@ -64,22 +64,6 @@ describe('owners rules', () => {
   });
 
   describe('with glob patterns', () => {
-    describe('constructor', () => {
-      it.each([
-        ['file.txt', /file\.txt/],
-        ['package*.json', /package.*?\.json/],
-      ])('converts the pattern %p into regex %p', (pattern, expectedRegex) => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], pattern);
-        expect(rule.regex).toEqual(expectedRegex);
-      });
-    });
-
-    describe('regexEscape', () => {
-      it.each([])('escapes %p as %p', (text, expected) => {
-        expect(PatternOwnersRule.escapeRegexChars(text)).toEqual(expected);
-      });
-    });
-
     describe('matchesFile', () => {
       it('matches literal filenames', () => {
         const rule = new PatternOwnersRule('OWNERS.yaml', [], 'package.json');
@@ -118,6 +102,17 @@ describe('owners rules', () => {
         const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.js');
 
         expect(rule).not.toMatchFile('style.css');
+      });
+
+      it.each([
+        ['*.{js,css}', 'file.js'],
+        ['*.{js,css}', 'style.css'],
+        ['package{,-lock}.json', 'package.json'],
+        ['package{,.lock}.json', 'package.lock.json'],
+      ])('brace-set pattern %p matches file %p', (pattern, filePath) => {
+        expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(
+          filePath
+        );
       });
     });
 

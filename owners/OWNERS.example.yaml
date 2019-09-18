@@ -10,15 +10,16 @@
 # The top-level structure must be a list. Any usernames in this top-level list
 # will be considered owners of all files and subdirectories of this directory.
 - someuser
-- anotheruser
 
 # Usernames should not be prefixed with '@'. This will raise a parsing error.
 # - @dontdothis
 - dothisinstead
 - "@thiswillworkbutdontdoit"
 
-# Teams are not supported. The following owner declaration will be ignored.
-- teams/arenotsupported
+# GitHub teams are also supported as owners. When a team is declared as an
+# owner, it is treated the same as if all members of the team were listed as
+# owners individually
+- ampproject/wg-cool-team
 
 # Individual filenames can be listed, with owners as the value. The value can be
 # a single owner on the same line, or a list of many on the following lines.
@@ -53,23 +54,21 @@
 # appropriate OWNERS file should be created/updated in that subdirectory.
 - this/pattern/will/be/ignored.txt: doesntmatter
 
-# Filename and pattern rules may be combined with commas. They will be treated
-# as separate rules. An error in one sub-pattern will not block the rest from
-# being parsed.
-- "*.js, *.css": frontend
-- "a/bad/pattern, package.json, **/.eslintrc": somebodyelse
+# Filename and pattern rules may be combined with brace expansion.
+- "*.{js,css}": frontend
+- "package.{,lock.}json": somebodyelse
 
 
 # The result of parsing this file would be a tree with these rules:
 #
-# All files:       someuser, anotheruser, dothisinstead, thiswillworkbutdontdoit
-# ./package.json:  fileowner
-# ./.eslintrc:     styleperson, infraperson
-# ./*.js:          scripter
-# ./package*.json: infraperson, developer
-# **/.eslintrc:    styleperson
-# **/*.protoascii: languageperson, translator
-# *.js:            frontend
-# *.css:           frontend
-# package.json:    somebodyelse
-# **/.eslintrc:    somebodyelse
+# */**:                  someuser, dothisinstead, thiswillworkbutdontdoit
+#                        ampproject/wg-cool-team [member, othermember, etc]
+# ./package.json:        fileowner
+# ./.eslintrc:           styleperson, infraperson
+# ./*.js:                scripter
+# ./package*.json:       infraperson, developer
+# **/.eslintrc:          styleperson
+# **/*.protoascii:       languageperson, translator
+# *.{js,css}:            frontend
+# package.{,lock.}json:  somebodyelse
+# **/.eslintrc:          somebodyelse
