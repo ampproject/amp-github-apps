@@ -17,6 +17,8 @@
 const {ReviewerSelection} = require('./reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
+const EXAMPLE_OWNERS_LINK =
+  'https://github.com/ampproject/amp-github-apps/blob/master/owners/OWNERS.example.yaml';
 
 const CheckRunConclusion = {
   SUCCESS: 'success',
@@ -54,11 +56,14 @@ class CheckRun {
       output: {
         title: this.summary,
         summary: this.summary,
-        text: this.text,
+        text: `${this.text}\n\n${this.helpText}`,
       },
     };
   }
 }
+CheckRun.prototype.helpText =
+  'For a description of the OWNERS.yaml file syntax, see ' +
+  `[this example YAML file](${EXAMPLE_OWNERS_LINK}).`;
 
 /**
  * Manages checking if a PR has the necessary approvals.
