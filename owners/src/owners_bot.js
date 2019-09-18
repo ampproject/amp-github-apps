@@ -137,6 +137,27 @@ class OwnersBot {
     await this.runOwnersCheck(github, pr);
   }
 
+  async createNotifications(github, prNumber, fileTreeMap) {
+    const botComments = await github.getBotComments(prNumber);
+    if (botComments.length) {
+      // Avoid adding duplicate notification comment.
+      return;
+    }
+
+    const notifies = this._getNotifies(fileTreeMap);
+
+    const tag = name => `@${name}`;
+    const header = 'Some owners are notified of changes to files in this PR:'
+    const fileNotifyComments = Object.entries(notifies).map(
+      ([filename, names]) => `- ${filename}: ${names.map(tag).join(', ')}`
+    );
+
+    if (fileNotifyComments.length) {
+      const comment = [header, ...fileNotifyComments].join('\n');
+      await github.createBotComment(prNumber, comment);
+    }
+  }
+
   /**
    * Identifies all reviewers and whether their latest reviews are approvals.
    *

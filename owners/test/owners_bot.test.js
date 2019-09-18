@@ -113,7 +113,6 @@ describe('owners bot', () => {
       await ownersBot.initPr(github, pr);
 
       sandbox.assert.calledWith(console.warn, error);
-
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
@@ -163,8 +162,8 @@ describe('owners bot', () => {
     it('attempts to fetch the existing check-run ID', async () => {
       expect.assertions(1);
       await ownersBot.runOwnersCheck(github, pr);
-      sandbox.assert.calledWith(github.getCheckRunIds, '_test_hash_');
 
+      sandbox.assert.calledWith(github.getCheckRunIds, '_test_hash_');
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
@@ -172,8 +171,8 @@ describe('owners bot', () => {
     it('checks out the latest master', async () => {
       expect.assertions(1);
       await ownersBot.runOwnersCheck(github, pr);
-      sandbox.assert.calledOnce(localRepo.checkout);
 
+      sandbox.assert.calledOnce(localRepo.checkout);
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
@@ -181,8 +180,8 @@ describe('owners bot', () => {
     it('runs the owners check', async () => {
       expect.assertions(1);
       await ownersBot.runOwnersCheck(github, pr);
-      sandbox.assert.calledOnce(OwnersCheck.prototype.run);
 
+      sandbox.assert.calledOnce(OwnersCheck.prototype.run);
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
@@ -198,7 +197,6 @@ describe('owners bot', () => {
           42,
           checkRun
         );
-
         // Ensures the test fails if the assertion is never run.
         expect(true).toBe(true);
       });
@@ -214,7 +212,6 @@ describe('owners bot', () => {
           '_test_hash_',
           checkRun
         );
-
         // Ensures the test fails if the assertion is never run.
         expect(true).toBe(true);
       });
@@ -256,8 +253,8 @@ describe('owners bot', () => {
     it('fetches the PR from GitHub', async () => {
       expect.assertions(1);
       await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
-      sandbox.assert.calledWith(github.getPullRequest, 1337);
 
+      sandbox.assert.calledWith(github.getPullRequest, 1337);
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
@@ -265,10 +262,80 @@ describe('owners bot', () => {
     it('runs the owners check on the retrieved PR', async () => {
       expect.assertions(1);
       await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
-      sandbox.assert.calledWith(ownersBot.runOwnersCheck, github, pr);
 
+      sandbox.assert.calledWith(ownersBot.runOwnersCheck, github, pr);
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
+    });
+  });
+
+  describe('createNotifications', () => {
+    const fileTreeMap = {'main.js': new OwnersTree()};
+
+    beforeEach(() => {
+      sandbox.stub(GitHub.prototype, 'createBotComment');
+    });
+
+    describe('when a comment by the bot already exists', () => {
+      beforeEach(() => {
+        sandbox.stub(GitHub.prototype, 'getBotComments').returns(['a comment']);
+      });
+
+      it('does not create a comment', async () => {
+        expect.assertions(1);
+        await ownersBot.createNotifications(github, 1337, fileTreeMap);
+
+        sandbox.assert.notCalled(github.createBotComment);
+        // Ensures the test fails if the assertion is never run.
+        expect(true).toBe(true);
+      });
+    });
+
+    describe('when no comment by the bot exists yet', () => {
+      beforeEach(() => {
+        sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
+      });
+
+      it('gets users and teams to notify', async () => {
+        expect.assertions(1);
+        sandbox.stub(OwnersBot.prototype, '_getNotifies').returns([])
+        await ownersBot.createNotifications(github, 1337, fileTreeMap);
+
+        sandbox.assert.calledWith(ownersBot._getNotifies, fileTreeMap);
+        // Ensures the test fails if the assertion is never run.
+        expect(true).toBe(true);
+      });
+
+      describe('when there are users or teams to notify', () => {
+        beforeEach(() => {
+          sandbox.stub(OwnersBot.prototype, '_getNotifies').returns({
+            'foo/main.js': ['a_subscriber', 'ampproject/some_team']
+          });
+        });
+
+        it('creates a comment tagging users and teams', async () => {
+          expect.assertions(2);
+          await ownersBot.createNotifications(github, 1337, fileTreeMap);
+
+          sandbox.assert.calledOnce(github.createBotComment);
+          const [prNumber, comment] = github.createBotComment.getCall(0).args;
+          expect(prNumber).toEqual(1337);
+          expect(comment).toContain(
+            '- foo/main.js: @a_subscriber, @ampproject/some_team'
+          );
+        });
+      });
+        
+      describe('when there are no users or teams to notify', () => {
+        it('does not create a comment', async () => {
+          expect.assertions(1);
+          await ownersBot.createNotifications(github, 1337, fileTreeMap);
+
+          sandbox.assert.notCalled(github.createBotComment);
+          // Ensures the test fails if the assertion is never run.
+          expect(true).toBe(true);
+        });
+      });
     });
   });
 
