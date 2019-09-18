@@ -73,14 +73,14 @@ class OwnersCheck {
    * Constructor.
    *
    * @param {!OwnersTree} tree file ownership tree.
-   * @param {string[]} approvers list of usernames of approving reviewers.
    * @param {FileRef[]} changedFiles list of change files.
+   * @param {!ReviewerApprovalMap} reviewers map of reviewer approval statuses.
    */
-  constructor(tree, approvers, changedFiles) {
+  constructor(tree, changedFiles, reviewers) {
     Object.assign(this, {
       tree,
-      approvers,
       changedFilenames: changedFiles.map(({filename}) => filename),
+      reviewers,
     });
   }
 
@@ -115,6 +115,11 @@ class OwnersCheck {
         };
       }
 
+      Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
+        if (this._hasOwnersPendingReview(filename, subtree)) {
+          delete fileTreeMap[filename];
+        }
+      });
       const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
       const reviewers = reviewSuggestions.map(([reviewer, files]) => reviewer);
       const suggestionsText = this.buildReviewSuggestionsText(
@@ -149,12 +154,40 @@ class OwnersCheck {
    *
    * @param {!string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
-   * @return {boolean} if the file is approved
+   * @param {boolean} isApproved approval status to filter by.
+   * @return {boolean} if the file is approved.
+   */
+  _hasOwnersReview(filename, subtree, isApproved) {
+    return Object.entries(this.reviewers)
+      .filter(([username, approved]) => approved === isApproved)
+      .map(([username, approved]) => username)
+      .some(approver => this.tree.fileHasOwner(filename, approver));
+  }
+
+  /**
+   * Tests whether a file has been approved by an owner.
+   *
+   * Must be called after `init`.
+   *
+   * @param {!string} filename file to check.
+   * @param {!OwnersTree} subtree nearest ownership tree to file.
+   * @return {boolean} if the file is approved.
    */
   _hasOwnersApproval(filename, subtree) {
-    return this.approvers.some(approver =>
-      this.tree.fileHasOwner(filename, approver)
-    );
+    return this._hasOwnersReview(filename, subtree, true);
+  }
+
+  /**
+   * Tests whether a file has been approved by an owner.
+   *
+   * Must be called after `init`.
+   *
+   * @param {!string} filename file to check.
+   * @param {!OwnersTree} subtree nearest ownership tree to file.
+   * @return {boolean} if the file is approved.
+   */
+  _hasOwnersPendingReview(filename, subtree) {
+    return this._hasOwnersReview(filename, subtree, false);
   }
 
   /**
@@ -166,14 +199,25 @@ class OwnersCheck {
   buildCurrentCoverageText(fileTreeMap) {
     const allFilesText = Object.entries(fileTreeMap)
       .map(([filename, subtree]) => {
-        const fileApprovers = this.approvers.filter(approver =>
-          this.tree.fileHasOwner(filename, approver)
+        const reviewers = Object.entries(this.reviewers).filter(
+          ([username, approved]) => this.tree.fileHasOwner(filename, username)
         );
 
-        if (fileApprovers.length) {
-          return `- ${filename} _(${fileApprovers.join(', ')})_`;
+        const approving = reviewers
+          .filter(([username, approved]) => approved)
+          .map(([username, approved]) => username);
+        const pending = reviewers
+          .filter(([username, approved]) => !approved)
+          .map(([username, approved]) => username);
+
+        if (approving.length) {
+          return `- ${filename} _(${approving.join(', ')})_`;
         } else {
-          return `- **[NEEDS APPROVAL]** ${filename}`;
+          let line = `- **[NEEDS APPROVAL]** ${filename}`;
+          if (pending.length) {
+            line += ` _(requested: ${pending.join(', ')})_`;
+          }
+          return line;
         }
       })
       .join('\n');

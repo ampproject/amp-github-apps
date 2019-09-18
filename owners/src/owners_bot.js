@@ -65,8 +65,8 @@ class OwnersBot {
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to initialize data for.
    * @return {{
-   *     tree: OwnersTree,
-   *     approvers: string[],
+   *     tree: !OwnersTree,
+   *     reviewers: !ReviewerApprovalMap,
    *     changedFiles: string[],
    * }} key structures needed to check PR ownership.
    */
@@ -80,10 +80,10 @@ class OwnersBot {
     });
     const tree = treeParse.result;
 
-    const approvers = await this._getApprovers(github, pr);
     const changedFiles = await github.listFiles(pr.number);
+    const reviewers = await this._getCurrentReviewers(github, pr);
 
-    return {tree, approvers, changedFiles};
+    return {tree, changedFiles, reviewers};
   }
 
   /**
@@ -94,8 +94,9 @@ class OwnersBot {
    * @param {!PullRequest} pr pull request to run owners check on.
    */
   async runOwnersCheck(github, pr) {
-    const {tree, approvers, changedFiles} = await this.initPr(github, pr);
-    const ownersCheck = new OwnersCheck(tree, approvers, changedFiles);
+    const {tree, changedFiles, reviewers} = await this.initPr(github, pr);
+    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
+
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
     // TODO(rcebulko): Make this into a loop through multiple check/name pairs.
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
@@ -125,7 +126,7 @@ class OwnersBot {
   }
 
   /**
-   * Identifies all reviewers whose latest reviews are approvals.
+   * Identifies all reviewers and whether their latest reviews are approvals.
    *
    * Also includes the author, unless the author has explicitly left a blocking
    * review.
@@ -133,23 +134,23 @@ class OwnersBot {
    * @private
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to fetch approvers for.
-   * @return {string[]} list of usernames.
+   * @return {!ReviewerApprovalMap} map of reviewer approval statuses.
    */
-  async _getApprovers(github, pr) {
+  async _getCurrentReviewers(github, pr) {
     const reviews = await github.getReviews(pr.number);
     // Sort by the latest submitted_at date to get the latest review.
     const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
     // This should always pick out the first instance.
     const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
-    const uniqueApprovals = uniqueReviews.filter(review => review.isApproved);
-    const approvers = uniqueApprovals.map(approval => approval.reviewer);
 
+    const approvals = {};
+    uniqueReviews.forEach(review => {
+      approvals[review.reviewer] = review.isApproved;
+    });
     // The author of a PR implicitly gives approval over files they own.
-    if (!approvers.includes(pr.author)) {
-      approvers.push(pr.author);
-    }
+    approvals[pr.author] = true;
 
-    return approvers;
+    return approvals;
   }
 
   /**

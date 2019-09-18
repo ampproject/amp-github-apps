@@ -36,7 +36,6 @@ describe('owners bot', () => {
 
   const timestamp = '2019-01-01T00:00:00Z';
   const approval = new Review('approver', 'approved', timestamp);
-  const authorApproval = new Review('the_author', 'approved', timestamp);
   const otherApproval = new Review('other_approver', 'approved', timestamp);
   const rejection = new Review('rejector', 'changes_requested', timestamp);
 
@@ -119,9 +118,11 @@ describe('owners bot', () => {
     });
 
     it('finds the reviewers that approved', async () => {
-      expect.assertions(1);
-      const {approvers} = await ownersBot.initPr(github, pr);
-      expect(approvers).toContain('approver', 'other_approver');
+      expect.assertions(2);
+      const {reviewers} = await ownersBot.initPr(github, pr);
+
+      expect(reviewers['approver']).toBe(true);
+      expect(reviewers['other_approver']).toBe(true);
     });
 
     it('fetches the files changed in the PR', async () => {
@@ -246,43 +247,34 @@ describe('owners bot', () => {
     });
   });
 
-  describe('getApprovers', () => {
-    it("returns the reviewers' usernames", async () => {
-      expect.assertions(1);
+  describe('getCurrentReviewers', () => {
+    it("includes true for approvers' usernames", async () => {
+      expect.assertions(2);
       sandbox
         .stub(GitHub.prototype, 'getReviews')
         .returns([approval, otherApproval]);
-      const approvers = await ownersBot._getApprovers(github, pr);
+      const reviewers = await ownersBot._getCurrentReviewers(github, pr);
 
-      expect(approvers).toContain('approver', 'other_approver');
+      expect(reviewers['approver']).toBe(true);
+      expect(reviewers['other_approver']).toBe(true);
     });
 
-    it('includes the author', async () => {
+    it('includes true for the author', async () => {
       expect.assertions(1);
       sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
-      const approvers = await ownersBot._getApprovers(github, pr);
+      const reviewers = await ownersBot._getCurrentReviewers(github, pr);
 
-      expect(approvers).toContain('the_author');
+      expect(reviewers['the_author']).toBe(true);
     });
 
-    it('produces unique usernames', async () => {
-      expect.assertions(1);
-      sandbox
-        .stub(GitHub.prototype, 'getReviews')
-        .returns([approval, approval, authorApproval]);
-      const approvers = await ownersBot._getApprovers(github, pr);
-
-      expect(approvers).toEqual(['approver', 'the_author']);
-    });
-
-    it('includes only reviewers who approved the review', async () => {
+    it('includes false for reviewers who rejected the review', async () => {
       expect.assertions(1);
       sandbox
         .stub(GitHub.prototype, 'getReviews')
         .returns([approval, rejection]);
-      const approvers = await ownersBot._getApprovers(github, pr);
+      const reviewers = await ownersBot._getCurrentReviewers(github, pr);
 
-      expect(approvers).not.toContain('rejector');
+      expect(reviewers['rejector']).toBe(false);
     });
   });
 

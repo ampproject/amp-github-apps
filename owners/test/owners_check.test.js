@@ -66,11 +66,11 @@ describe('owners check', () => {
       ]),
       new OwnersRule('bar/OWNERS.yaml', [new UserOwner('other_approver')]),
       new OwnersRule('buzz/OWNERS.yaml', [new UserOwner('the_author')]),
+      new OwnersRule('extra/OWNERS.yaml', [new UserOwner('extra_reviewer')]),
     ].forEach(rule => ownersTree.addRule(rule));
 
     ownersCheck = new OwnersCheck(
       ownersTree,
-      ['the_author', 'approver', 'other_approver'],
       [
         {
           // root_owner
@@ -92,7 +92,18 @@ describe('owners check', () => {
           filename: 'buzz/README.md',
           sha: '_sha3_',
         },
-      ]
+        {
+          // extra_reviewer, root_owner
+          filename: 'extra/script.js',
+          sha: '_sha4_',
+        },
+      ],
+      {
+        the_author: true,
+        approver: true,
+        other_approver: true,
+        extra_reviewer: false,
+      }
     );
   });
 
@@ -110,7 +121,29 @@ describe('owners check', () => {
         'foo/test.js',
         'bar/baz/file.txt',
         'buzz/README.md',
+        'extra/script.js',
       ]);
+    });
+
+    it('picks reviewers', () => {
+      sandbox.stub(ReviewerSelection, 'pickReviews').callThrough();
+      ownersCheck.run();
+
+      sandbox.assert.calledOnce(ReviewerSelection.pickReviews);
+    });
+
+    it("doesn't pick reviewers for a file with owner review requested", () => {
+      let fileTreeMap;
+      // Note: A spy cannot be used here because the assertion takes place after
+      // reviewer selection, which empties out the file-tree map object.
+      sandbox.stub(ReviewerSelection, 'pickReviews').callsFake(ftm => {
+        fileTreeMap = ftm;
+        return [];
+      });
+      ownersCheck.run();
+
+      expect(fileTreeMap['extra/script.js']).toBeUndefined();
+      sandbox.assert.calledOnce(ReviewerSelection.pickReviews);
     });
 
     describe('created check-run', () => {
@@ -176,13 +209,6 @@ describe('owners check', () => {
           expect(checkRun.summary).toEqual(
             'Missing required OWNERS approvals! Suggested reviewers: root_owner'
           );
-        });
-
-        it('runs reviewer selection', () => {
-          sandbox.stub(ReviewerSelection, 'pickReviews').callThrough();
-          ownersCheck.run();
-
-          sandbox.assert.calledOnce(ReviewerSelection.pickReviews);
         });
 
         it('contains review suggestions in the output', () => {
@@ -267,15 +293,39 @@ describe('owners check', () => {
         )
       ).toBe(false);
     });
+
+    it('ignores reviewers that have not yet approved', () => {
+      expect(
+        ownersCheck._hasOwnersApproval(
+          'extra/script.js',
+          ownersCheck.tree.atPath('extra/script.js')
+        )
+      ).toBe(false);
+    });
+  });
+
+  describe('hasOwnersPendingReview', () => {
+    it('returns true if there are reviewers that have not yet approved', () => {
+      expect(
+        ownersCheck._hasOwnersPendingReview(
+          'extra/script.js',
+          ownersCheck.tree.atPath('extra/script.js')
+        )
+      ).toBe(true);
+    });
   });
 
   describe('buildCurrentCoverageText', () => {
-    it('lists files with their owners approvers', () => {
+    let coverageText;
+
+    beforeEach(() => {
       const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
         ownersCheck.changedFilenames
       );
-      const coverageText = ownersCheck.buildCurrentCoverageText(fileTreeMap);
+      coverageText = ownersCheck.buildCurrentCoverageText(fileTreeMap);
+    });
 
+    it('lists files with their owners approvers', () => {
       expect(coverageText).toContain('### Current Coverage');
       expect(coverageText).toContain('- foo/test.js _(approver)_');
       expect(coverageText).toContain('- bar/baz/file.txt _(other_approver)_');
@@ -283,13 +333,15 @@ describe('owners check', () => {
     });
 
     it('lists files needing approval', () => {
-      const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
-        ownersCheck.changedFilenames
-      );
-      const coverageText = ownersCheck.buildCurrentCoverageText(fileTreeMap);
-
       expect(coverageText).toContain('### Current Coverage');
       expect(coverageText).toContain('- **[NEEDS APPROVAL]** main.js');
+    });
+
+    it('shows existing reviewers that could approve files', () => {
+      expect(coverageText).toContain('### Current Coverage');
+      expect(coverageText).toContain(
+        '- **[NEEDS APPROVAL]** extra/script.js _(requested: extra_reviewer)_'
+      );
     });
   });
 
