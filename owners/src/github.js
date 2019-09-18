@@ -270,6 +270,28 @@ class GitHub {
   }
 
   /**
+   * Retrieves PR comments by the bot user.
+   *
+   * Note that pull request comments fall under the Issues API, while comments
+   * created via the Pulls API require a file path/position.
+   *
+   * @param {number} number PR number.
+   * @return {string[]} list of comments by the bot user.
+   */
+  async getBotComments(number) {
+    this.logger.info(`Fetching bot comments for PR #${number}`);
+
+    const response = await this.client.issues.listComments(
+      this.repo({number})
+    );
+    this.logger.debug('[getBotComments]', number, response.data);
+
+    return response.data.filter(
+      ({user}) => user.login === process.env.GITHUB_BOT_USERNAME
+    ).map(({body}) => body);
+  }
+
+  /**
    * Fetches the contents of a file from GitHub.
    *
    * @param {!FileRef} file file ref to fetch.

@@ -29,6 +29,7 @@ const GCLOUD_PROJECT = process.env.GCLOUD_PROJECT || 'UNKNOWN';
 const APP_ID = process.env.APP_ID || 'UNKNOWN';
 const APP_COMMIT_SHA = process.env.APP_COMMIT_SHA || 'UNKNOWN';
 const APP_COMMIT_MSG = process.env.APP_COMMIT_MSG || 'UNKNOWN';
+const GITHUB_BOT_USERNAME = process.env.GITHUB_BOT_USERNAME || 'ampprojectbot';
 
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);

@@ -25,6 +25,7 @@ const {GitHub, PullRequest, Review, Team} = require('../src/github');
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
 const requestedReviewsResponse = require('./fixtures/reviews/requested_reviewers.24574.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
+const issueCommentsResponse = require('./fixtures/comments/issue_comments.438.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
@@ -337,6 +338,24 @@ describe('GitHub API', () => {
         const reviewers = await github.getReviewRequests(24574);
 
         expect(reviewers).toEqual(['jridgewell', 'jpettitt', 'sparhami']);
+      })();
+    });
+  });
+
+  describe('getBotComments', () => {
+    it('fetches a list of comments by the bot user', async () => {
+      expect.assertions(1);
+      sandbox.stub(process, 'env').value({
+        GITHUB_BOT_USERNAME: 'ampprojectbot'
+      });
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/issues/24574/comments')
+        .reply(200, issueCommentsResponse);
+
+      await withContext(async (context, github) => {
+        const comments = await github.getBotComments(24574);
+
+        expect(comments).toEqual(['Test comment by ampprojectbot']);
       })();
     });
   });
