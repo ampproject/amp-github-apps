@@ -358,24 +358,36 @@ describe('owners bot', () => {
     const tree = new OwnersTree();
     const relevantTeam = new Team(42, 'ampproject', 'relevant_team');
     relevantTeam.members = ['relevant_member'];
-
-    beforeEach(() => {
-      sandbox
-        .stub(OwnersTree.prototype, 'getModifiedOwners')
-        .withArgs(OWNER_MODIFIER.NOTIFY)
-        .returns([new UserOwner('relevant_user'), new TeamOwner(relevantTeam)]);
-    });
+    tree.addRule(
+      new OwnersRule('foo/OWNERS.yaml', [
+        new UserOwner('relevant_user', OWNER_MODIFIER.NOTIFY),
+      ])
+    );
+    tree.addRule(
+      new OwnersRule('bar/OWNERS.yaml', [
+        new TeamOwner(relevantTeam, OWNER_MODIFIER.NOTIFY),
+      ])
+    );
 
     it('includes user owners with the always-notify modifier', () => {
-      const notifies = ownersBot._getNotifies([tree]);
+      const fileTreeMap = tree.buildFileTreeMap(['foo/main.js']);
+      const notifies = ownersBot._getNotifies(fileTreeMap);
 
-      expect(Array.from(notifies)).toContain('relevant_user');
+      expect(notifies['foo/main.js']).toContain('relevant_user');
     });
 
     it('includes team owners with the always-notify modifier', () => {
-      const notifies = ownersBot._getNotifies([tree]);
+      const fileTreeMap = tree.buildFileTreeMap(['bar/script.js']);
+      const notifies = ownersBot._getNotifies(fileTreeMap);
 
-      expect(Array.from(notifies)).toContain('ampproject/relevant_team');
+      expect(notifies['bar/script.js']).toContain('ampproject/relevant_team');
+    });
+
+    it('excludes files with no always-notify owners', () => {
+      const fileTreeMap = tree.buildFileTreeMap(['baz/test.js']);
+      const notifies = ownersBot._getNotifies(fileTreeMap);
+
+      expect(notifies['baz/test.js']).toBeUndefined();
     });
   });
 });
