@@ -139,6 +139,13 @@ class OwnersBot {
     await this.runOwnersCheck(github, pr);
   }
 
+  /**
+   * Adds a comment tagging always-notify owners of changed files.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   * @param {!number} prNumber pull request number.
+   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
+   */
   async createNotifications(github, prNumber, fileTreeMap) {
     const botComments = await github.getBotComments(prNumber);
     if (botComments.length) {
@@ -149,7 +156,7 @@ class OwnersBot {
     const notifies = this._getNotifies(fileTreeMap);
 
     const tag = name => `@${name}`;
-    const header = 'Some owners are notified of changes to files in this PR:'
+    const header = 'Some owners are notified of changes to files in this PR:';
     const fileNotifyComments = Object.entries(notifies).map(
       ([filename, names]) => `- ${filename}: ${names.map(tag).join(', ')}`
     );

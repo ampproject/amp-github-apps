@@ -317,7 +317,7 @@ describe('owners bot', () => {
 
       it('gets users and teams to notify', async () => {
         expect.assertions(1);
-        sandbox.stub(OwnersBot.prototype, '_getNotifies').returns([])
+        sandbox.stub(OwnersBot.prototype, '_getNotifies').returns([]);
         await ownersBot.createNotifications(github, 1337, fileTreeMap);
 
         sandbox.assert.calledWith(ownersBot._getNotifies, fileTreeMap);
@@ -328,7 +328,7 @@ describe('owners bot', () => {
       describe('when there are users or teams to notify', () => {
         beforeEach(() => {
           sandbox.stub(OwnersBot.prototype, '_getNotifies').returns({
-            'foo/main.js': ['a_subscriber', 'ampproject/some_team']
+            'foo/main.js': ['a_subscriber', 'ampproject/some_team'],
           });
         });
 
@@ -344,7 +344,7 @@ describe('owners bot', () => {
           );
         });
       });
-        
+
       describe('when there are no users or teams to notify', () => {
         it('does not create a comment', async () => {
           expect.assertions(1);
