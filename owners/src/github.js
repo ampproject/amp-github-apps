@@ -302,6 +302,27 @@ class GitHub {
   }
 
   /**
+   * Creates a comment on a PR.
+   *
+   * Note that pull request comments fall under the Issues API, while comments
+   * created via the Pulls API require a file path/position.
+   *
+   * @param {number} number PR number.
+   * @param {!string} body comment body.
+   * @return {string[]} list of comments by the bot user.
+   */
+  async createBotComment(number, body) {
+    this.logger.info(`Adding bot comment to PR #${number}`);
+    this.logger.debug('[createBotComment]', number, body);
+
+    await this._customRequest(
+      'POST',
+      `/repos/${this.owner}/${this.repository}/issues/${number}/comments`,
+      {body}
+    );
+  }
+
+  /**
    * Fetches the contents of a file from GitHub.
    *
    * @param {!FileRef} file file ref to fetch.

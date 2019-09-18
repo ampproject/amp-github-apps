@@ -378,6 +378,25 @@ describe('GitHub API', () => {
     });
   });
 
+  describe('createBotComment', () => {
+    it('adds a comment to the pull request', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .post(
+          '/repos/test_owner/test_repo/issues/24574/comments',
+          body => {
+            expect(body).toMatchObject({body: 'test comment'});
+            return true;
+          }
+        )
+        .reply(200);
+
+      await withContext(async (context, github) => {
+        await github.createBotComment(24574, 'test comment');
+      })();
+    });
+  });
+
   describe('getFileContents', () => {
     it('fetches the contents of a file', async () => {
       expect.assertions(1);
