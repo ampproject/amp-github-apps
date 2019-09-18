@@ -99,6 +99,7 @@ describe('GitHub API', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     sandbox.stub(OwnersBot.prototype, 'initTeams');
+    sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
     probot = new Probot({});
     app = probot.load(owners);
 
@@ -394,7 +395,7 @@ describe('GitHub API', () => {
             output: {
               title: 'Test summary',
               summary: 'Test summary',
-              text: 'Test text',
+              text: 'Test text\n\nHELP TEXT',
             },
           });
           return true;
@@ -402,10 +403,12 @@ describe('GitHub API', () => {
         .reply(200);
 
       await withContext(async (context, github) => {
-        await github.createCheckRun(
-          '_test_hash_',
-          new CheckRun(CheckRunConclusion.NEUTRAL, 'Test summary', 'Test text')
+        const checkRun = new CheckRun(
+          CheckRunConclusion.NEUTRAL,
+          'Test summary',
+          'Test text'
         );
+        await github.createCheckRun('_test_hash_', checkRun);
       })();
     });
   });
@@ -482,7 +485,7 @@ describe('GitHub API', () => {
             output: {
               title: 'Test summary',
               summary: 'Test summary',
-              text: 'Test text',
+              text: 'Test text\n\nHELP TEXT',
             },
           });
           return true;
@@ -490,10 +493,12 @@ describe('GitHub API', () => {
         .reply(200);
 
       await withContext(async (context, github) => {
-        await github.updateCheckRun(
-          1337,
-          new CheckRun(CheckRunConclusion.NEUTRAL, 'Test summary', 'Test text')
+        const checkRun = new CheckRun(
+          CheckRunConclusion.NEUTRAL,
+          'Test summary',
+          'Test text'
         );
+        await github.updateCheckRun(1337, checkRun);
       })();
     });
   });

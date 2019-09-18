@@ -26,8 +26,15 @@ const {OwnersRule} = require('../src/rules');
 const {ReviewerSelection} = require('../src/reviewer_selection');
 
 describe('check run', () => {
+  const sandbox = sinon.createSandbox();
+
+  afterEach(() => {
+    sandbox.restore();
+  });
+
   describe('json', () => {
     it('produces a JSON object in the GitHub API format', () => {
+      sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
       const checkRun = new CheckRun(
         CheckRunConclusion.NEUTRAL,
         'Test summary',
@@ -40,7 +47,7 @@ describe('check run', () => {
       expect(checkRunJson.conclusion).toEqual('neutral');
       expect(checkRunJson.output.title).toEqual('Test summary');
       expect(checkRunJson.output.summary).toEqual('Test summary');
-      expect(checkRunJson.output.text).toEqual('Test text');
+      expect(checkRunJson.output.text).toEqual('Test text\n\nHELP TEXT');
     });
   });
 });

@@ -23,6 +23,7 @@ const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser} = require('../src/parser');
 const {UserOwner} = require('../src/owner');
 const {OwnersRule} = require('../src/rules');
+const {CheckRun} = require('../src/owners_check');
 const {OwnersBot} = require('../src/owners_bot');
 
 const opened35 = require('./fixtures/actions/opened.35');
@@ -64,6 +65,7 @@ describe('owners bot', () => {
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox.stub(OwnersBot.prototype, 'initTeams');
+    sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
       .returns({result: ownersRules, errors: []});
@@ -81,7 +83,7 @@ describe('owners bot', () => {
 
   describe('when there are more than 1 checks on a PR', () => {
     test('it should update amp owners bot check when there is one', async () => {
-      expect.assertions(3);
+      expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -127,6 +129,7 @@ describe('owners bot', () => {
                 'Reviewer: _erwinmombay_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
+            expect(body.output.text).toContain('HELP TEXT');
 
             return true;
           }
@@ -139,7 +142,7 @@ describe('owners bot', () => {
 
   describe('create check run', () => {
     test('with failure check when there are 0 reviews on a pull request', async () => {
-      expect.assertions(3);
+      expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -189,6 +192,7 @@ describe('owners bot', () => {
                 'Reviewer: _erwinmombay_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
+            expect(body.output.text).toContain('HELP TEXT');
 
             return true;
           }
@@ -201,7 +205,7 @@ describe('owners bot', () => {
 
   describe('update check run', () => {
     test('with failure check when there are 0 reviews on a pull request', async () => {
-      expect.assertions(3);
+      expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -247,6 +251,7 @@ describe('owners bot', () => {
                 'Reviewer: _erwinmombay_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
+            expect(body.output.text).toContain('HELP TEXT');
 
             return true;
           }
@@ -257,7 +262,7 @@ describe('owners bot', () => {
     });
 
     test('with failure check when there are 0 reviews on a pull request and multiple files', async () => {
-      expect.assertions(3);
+      expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -305,6 +310,7 @@ describe('owners bot', () => {
                 '- dir2/dir1/dir1/file.txt\n' +
                 '- dir2/dir1/dir1/file-2.txt'
             );
+            expect(body.output.text).toContain('HELP TEXT');
 
             return true;
           }
@@ -317,7 +323,7 @@ describe('owners bot', () => {
 
   describe('rerequest check run', () => {
     test('should re-evaluate pull request', async () => {
-      expect.assertions(3);
+      expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -372,6 +378,7 @@ describe('owners bot', () => {
                 'Reviewer: _erwinmombay_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
+            expect(body.output.text).toContain('HELP TEXT');
 
             return true;
           }
@@ -384,7 +391,7 @@ describe('owners bot', () => {
 
   describe('has approvals met', () => {
     test('with passing check when there is 1 approver on a pull request', async () => {
-      expect.assertions(2);
+      expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -427,6 +434,7 @@ describe('owners bot', () => {
               '### Current Coverage\n\n' +
                 '- dir2/dir1/dir1/file.txt _(erwinmombay)_'
             );
+            expect(body.output.text).toContain('HELP TEXT');
 
             return true;
           }
@@ -437,7 +445,7 @@ describe('owners bot', () => {
     });
 
     test('with passing check when author themselves are owners', async () => {
-      expect.assertions(2);
+      expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -479,6 +487,7 @@ describe('owners bot', () => {
             expect(body.output.text).toContain(
               '### Current Coverage\n\n- dir2/new-file.txt _(erwinmombay)_'
             );
+            expect(body.output.text).toContain('HELP TEXT');
 
             return true;
           }
@@ -491,7 +500,7 @@ describe('owners bot', () => {
 
   describe('pull request review', () => {
     test('triggers pull request re-evaluation', async () => {
-      expect.assertions(2);
+      expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
         .reply(200, {token: 'test'});
@@ -537,6 +546,7 @@ describe('owners bot', () => {
               '### Current Coverage\n\n' +
                 '- dir2/dir1/dir1/file.txt _(erwinmombay)_'
             );
+            expect(body.output.text).toContain('HELP TEXT');
 
             return true;
           }
