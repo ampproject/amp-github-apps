@@ -29,8 +29,15 @@ const {
 } = require('../src/owners_check');
 
 describe('owners bot', () => {
+  const silentLogger = {
+    debug: () => {},
+    log: () => {},
+    warn: () => {},
+    error: () => {},
+  };
+
   let sandbox;
-  const github = new GitHub({}, 'ampproject', 'amphtml', console);
+  const github = new GitHub({}, 'ampproject', 'amphtml', silentLogger);
   const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'descrption');
   const localRepo = new LocalRepository('path/to/repo');
   const ownersBot = new OwnersBot(localRepo);
@@ -105,14 +112,14 @@ describe('owners bot', () => {
     it('warns about parsing errors', async () => {
       expect.assertions(1);
       const error = new Error('Oops!');
-      sandbox.stub(console, 'warn');
+      sandbox.stub(silentLogger, 'warn');
       sandbox.stub(OwnersParser.prototype, 'parseOwnersTree').returns({
         tree: new OwnersTree(),
         errors: [error],
       });
       await ownersBot.initPr(github, pr);
 
-      sandbox.assert.calledWith(console.warn, error);
+      sandbox.assert.calledWith(silentLogger.warn, error);
       // Ensures the test fails if the assertion is never run.
       expect(true).toBe(true);
     });
