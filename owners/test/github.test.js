@@ -25,6 +25,7 @@ const {GitHub, PullRequest, Review, Team} = require('../src/github');
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
 const requestedReviewsResponse = require('./fixtures/reviews/requested_reviewers.24574.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
+const issueCommentsResponse = require('./fixtures/comments/issue_comments.438.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
@@ -188,8 +189,25 @@ describe('GitHub API', () => {
         .reply(200, '_DATA_');
 
       await withContext(async (context, github) => {
-        const responseData = await github._customRequest('/api/endpoint');
+        const responseData = await github._customRequest(
+          'GET',
+          '/api/endpoint'
+        );
         expect(responseData.data).toEqual('_DATA_');
+      })();
+    });
+
+    it('includes POST data', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .post('/api/endpoint', body => {
+          expect(body).toEqual({body: 'BODY'});
+          return true;
+        })
+        .reply(200);
+
+      await withContext(async (context, github) => {
+        await github._customRequest('POST', '/api/endpoint', {body: 'BODY'});
       })();
     });
 
@@ -207,7 +225,7 @@ describe('GitHub API', () => {
         });
 
       await withContext(async (context, github) => {
-        await github._customRequest('/api/endpoint');
+        await github._customRequest('GET', '/api/endpoint');
       })();
     });
   });
@@ -338,6 +356,40 @@ describe('GitHub API', () => {
         const reviewers = await github.getReviewRequests(24574);
 
         expect(reviewers).toEqual(['jridgewell', 'jpettitt', 'sparhami']);
+      })();
+    });
+  });
+
+  describe('getBotComments', () => {
+    it('fetches a list of comments by the bot user', async () => {
+      expect.assertions(1);
+      sandbox.stub(process, 'env').value({
+        GITHUB_BOT_USERNAME: 'ampprojectbot',
+      });
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/issues/24574/comments')
+        .reply(200, issueCommentsResponse);
+
+      await withContext(async (context, github) => {
+        const comments = await github.getBotComments(24574);
+
+        expect(comments).toEqual(['Test comment by ampprojectbot']);
+      })();
+    });
+  });
+
+  describe('createBotComment', () => {
+    it('adds a comment to the pull request', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .post('/repos/test_owner/test_repo/issues/24574/comments', body => {
+          expect(body).toMatchObject({body: 'test comment'});
+          return true;
+        })
+        .reply(200);
+
+      await withContext(async (context, github) => {
+        await github.createBotComment(24574, 'test comment');
       })();
     });
   });

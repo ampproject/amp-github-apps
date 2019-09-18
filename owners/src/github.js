@@ -139,20 +139,27 @@ class GitHub {
    * implementation),  so this method makes an arbitrary request with the
    * required headers.
    *
-   * @param {!string} endpoint API endpoint URL path (ie. `/repos`).
-   * @return {*} the response data.
+   * @param {!string} method HTTP request method.
+   * @param {!string} url API endpoint URL path (ie. `/repos`).
+   * @param {*} data optional request data.
+   * @return {*} the response.
    */
-  async _customRequest(endpoint) {
-    const response = await this.client.request({
+  async _customRequest(method, url, data) {
+    const request = {
       headers: {
         authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
         // This accept header adds support for fetching members of nested teams.
         accept: 'application/vnd.github.hellcat-preview+json',
       },
-      url: endpoint,
-    });
+      method,
+      url,
+    };
 
-    return response;
+    if (typeof data !== 'undefined') {
+      request.data = data;
+    }
+
+    return await this.client.request(request);
   }
 
   /**
@@ -168,6 +175,7 @@ class GitHub {
     let isNextLink = true;
     while (isNextLink) {
       const response = await this._customRequest(
+        'GET',
         `/orgs/${this.owner}/teams?page=${pageNum}`
       );
       const nextLink = response.headers.link || '';
@@ -191,7 +199,10 @@ class GitHub {
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
 
-    const response = await this._customRequest(`/teams/${teamId}/members`);
+    const response = await this._customRequest(
+      'GET',
+      `/teams/${teamId}/members`
+    );
     const memberList = response.data;
     this.logger.debug('[getTeamMembers]', teamId, memberList);
 
@@ -267,6 +278,47 @@ class GitHub {
     this.logger.debug('[getReviewRequests]', number, response.data);
 
     return response.data.users.map(({login}) => login);
+  }
+
+  /**
+   * Retrieves PR comments by the bot user.
+   *
+   * Note that pull request comments fall under the Issues API, while comments
+   * created via the Pulls API require a file path/position.
+   *
+   * @param {number} number PR number.
+   * @return {string[]} list of comments by the bot user.
+   */
+  async getBotComments(number) {
+    this.logger.info(`Fetching bot comments for PR #${number}`);
+
+    const response = await this.client.issues.listComments(this.repo({number}));
+    this.logger.debug('[getBotComments]', number, response.data);
+
+    return response.data
+      .filter(({user}) => user.login === process.env.GITHUB_BOT_USERNAME)
+      .map(({body}) => body);
+  }
+
+  /**
+   * Creates a comment on a PR.
+   *
+   * Note that pull request comments fall under the Issues API, while comments
+   * created via the Pulls API require a file path/position.
+   *
+   * @param {number} number PR number.
+   * @param {!string} body comment body.
+   * @return {string[]} list of comments by the bot user.
+   */
+  async createBotComment(number, body) {
+    this.logger.info(`Adding bot comment to PR #${number}`);
+    this.logger.debug('[createBotComment]', number, body);
+
+    await this._customRequest(
+      'POST',
+      `/repos/${this.owner}/${this.repository}/issues/${number}/comments`,
+      {body}
+    );
   }
 
   /**
