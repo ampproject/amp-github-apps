@@ -19,6 +19,7 @@ const {GitHub, PullRequest, Review, Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
 const {OwnersBot} = require('../src/owners_bot');
+const {OwnersRule} = require('../src/rules');
 const {OwnersParser} = require('../src/parser');
 const {OwnersTree} = require('../src/owners_tree');
 const {
@@ -282,23 +283,37 @@ describe('owners bot', () => {
     const tree = new OwnersTree();
     const busyTeam = new Team(42, 'ampproject', 'busy_team');
     busyTeam.members = ['busy_member'];
+    let fileTreeMap;
 
     beforeEach(() => {
       sandbox
         .stub(OwnersTree.prototype, 'getModifiedOwners')
         .withArgs(OWNER_MODIFIER.SILENT)
         .returns([new UserOwner('busy_user'), new TeamOwner(busyTeam)]);
+
+      tree.addRule(
+        new OwnersRule('foo/OWNERS.yaml', [
+          new UserOwner('busy_user', OWNER_MODIFIER.SILENT)
+        ])
+      );
+      tree.addRule(
+        new OwnersRule('foo/OWNERS.yaml', [
+          new TeamOwner(busyTeam, OWNER_MODIFIER.SILENT)
+        ])
+      );
+
+      fileTreeMap = tree.buildFileTreeMap(['foo/script.js']);
     });
 
     it('includes suggested reviewers', () => {
-      const reviewRequests = ownersBot._getReviewRequests([tree], ['auser']);
+      const reviewRequests = ownersBot._getReviewRequests(fileTreeMap, ['auser']);
 
       expect(Array.from(reviewRequests)).toContain('auser');
     });
 
     it('excludes user owners with the no-notify modifier', () => {
       const reviewRequests = ownersBot._getReviewRequests(
-        [tree],
+        fileTreeMap,
         ['busy_user']
       );
 
@@ -307,7 +322,7 @@ describe('owners bot', () => {
 
     it('excludes members of team owners with the no-notify modifier', () => {
       const reviewRequests = ownersBot._getReviewRequests(
-        [tree],
+        fileTreeMap,
         ['busy_member']
       );
 

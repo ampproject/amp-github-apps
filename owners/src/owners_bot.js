@@ -156,19 +156,21 @@ class OwnersBot {
   /**
    * Determine the set of users to request reviews from.
    *
-   * @param {Set<!OwnersTree>} trees set of ownership trees touched by the PR.
+   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    * @param {string[]} suggestedReviewers list of suggested reviewer usernames.
    * @return {Set<string>} set of usernames.
    */
-  _getReviewRequests(trees, suggestedReviewers) {
+  _getReviewRequests(fileTreeMap, suggestedReviewers) {
     const reviewers = new Set(suggestedReviewers);
-    trees.forEach(tree =>
-      tree
+    Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
+      // TODO(rcebulko): Update to pass filename once PR #452 is submitted and
+      // this branch is rebased.
+      subtree
         .getModifiedOwners(OWNER_MODIFIER.SILENT)
         .map(owner => owner.allUsernames)
         .reduce((left, right) => left.concat(right), [])
         .forEach(reviewers.delete, reviewers)
-    );
+    });
 
     return reviewers;
   }
