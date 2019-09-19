@@ -199,13 +199,13 @@ describe('owners parser', () => {
         );
       });
 
-      it('parses comma-separate patterns as separate rules', () => {  
-        sandbox.stub(repo, 'readFile').returns('- *.js, *.css: frontend\n');  
-        const fileParse = parser.parseOwnersFile(''); 
-        const rules = fileParse.result; 
+      it('parses comma-separate patterns as separate rules', () => {
+        sandbox.stub(repo, 'readFile').returns('- *.js, *.css: frontend\n');
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
 
-        expect(rules[0].pattern).toEqual('*.js'); 
-        expect(rules[1].pattern).toEqual('*.css');  
+        expect(rules[0].pattern).toEqual('*.js');
+        expect(rules[1].pattern).toEqual('*.css');
       });
     });
 
