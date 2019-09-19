@@ -150,6 +150,8 @@ class OwnersBot {
     const botComments = await github.getBotComments(prNumber);
     if (botComments.length) {
       // Avoid adding duplicate notification comment.
+      // TODO(rcebulko): Handle cases where the fileset changes after PR
+      // creation.
       return;
     }
 
