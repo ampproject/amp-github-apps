@@ -93,6 +93,9 @@ class OwnersParser {
     } else if (owner.startsWith('#')) {
       modifier = OWNER_MODIFIER.NOTIFY;
       owner = owner.slice(1);
+    } else if (owner.startsWith('!')) {
+      modifier = OWNER_MODIFIER.REQUIRE;
+      owner = owner.slice(1);
     }
 
     if (owner.startsWith('@')) {
