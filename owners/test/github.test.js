@@ -181,8 +181,8 @@ describe('GitHub API', () => {
   describe('customRequest', () => {
     beforeEach(() => {
       sandbox.stub(process, 'env').value({
-        ...process.env,
         GITHUB_ACCESS_TOKEN: '_TOKEN_',
+        NODE_ENV: 'test',
       });
     });
 
