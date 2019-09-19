@@ -101,6 +101,17 @@ class OwnersTree {
   }
 
   /**
+   * Provides a list of owners rules for a file.
+   *
+   * @return {Owner[]} list of all owners for the file.
+   */
+  fileOwners(filename) {
+    return this.fileRules(filename)
+        .map(rule => rule.owners)
+        .reduce((left, right) => left.concat(right), []);
+  }
+
+  /**
    * Provides the deepest ownership tree with rules applicable to a file or
    * directory.
    *

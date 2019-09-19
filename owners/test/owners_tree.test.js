@@ -165,6 +165,28 @@ describe('owners tree', () => {
     });
   });
 
+  describe('fileOwners', () => {
+    let childTree;
+
+    beforeEach(() => {
+      tree.addRule(rootDirRule);
+      tree.addRule(childDirRule);
+      tree.addRule(testFileRule);
+      tree.addRule(packageJsonRule);
+
+      childTree = tree.atPath('foo/bar.txt');
+    });
+
+    it('should include owners matching the filename', () => {
+      const owners = childTree.fileOwners('foo/script.test.js');
+      expect(owners.map(owner => owner.name)).toContain(
+        'root',
+        'child',
+        'ampproject/testers' 
+      );
+    });
+  });
+
   describe('atPath', () => {
     it("should produce the tree for the file's directory", () => {
       tree.addRule(childDirRule);
