@@ -20,7 +20,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@octokit/rest": "16.28.9",
+    "@octokit/rest": "16.29.0",
     "knex": "0.19.4",
     "pg": "7.12.1",
     "probot": "9.2.13",
