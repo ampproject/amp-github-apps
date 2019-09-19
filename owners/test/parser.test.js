@@ -225,8 +225,8 @@ describe('owners parser', () => {
 
     describe('owner modifiers', () => {
       describe('user owner', () => {
-        it('parses an always-notify `!` modifier', () => {
-          sandbox.stub(repo, 'readFile').returns('- "!auser"');
+        it('parses an always-notify `#` modifier', () => {
+          sandbox.stub(repo, 'readFile').returns('- "#auser"');
           const fileParse = parser.parseOwnersFile('');
           const rules = fileParse.result;
 
@@ -244,11 +244,21 @@ describe('owners parser', () => {
             new UserOwner('auser', OWNER_MODIFIER.SILENT)
           );
         });
+
+        it('parses a require-review `!` modifier', () => {
+          sandbox.stub(repo, 'readFile').returns('- "!auser"');
+          const fileParse = parser.parseOwnersFile('');
+          const rules = fileParse.result;
+
+          expect(rules[0].owners).toContainEqual(
+            new UserOwner('auser', OWNER_MODIFIER.REQUIRE)
+          );
+        });
       });
 
       describe('team owner', () => {
-        it('parses an always-notify `!` team modifier', () => {
-          sandbox.stub(repo, 'readFile').returns('- "!ampproject/my_team"');
+        it('parses an always-notify `#` team modifier', () => {
+          sandbox.stub(repo, 'readFile').returns('- "#ampproject/my_team"');
           const fileParse = parser.parseOwnersFile('');
           const teamOwner = fileParse.result[0].owners[0];
 
@@ -264,11 +274,20 @@ describe('owners parser', () => {
           expect(teamOwner.name).toEqual('ampproject/my_team');
           expect(teamOwner.modifier).toEqual(OWNER_MODIFIER.SILENT);
         });
+
+        it('parses a require-review `!` team modifier', () => {
+          sandbox.stub(repo, 'readFile').returns('- "!ampproject/my_team"');
+          const fileParse = parser.parseOwnersFile('');
+          const teamOwner = fileParse.result[0].owners[0];
+
+          expect(teamOwner.name).toEqual('ampproject/my_team');
+          expect(teamOwner.modifier).toEqual(OWNER_MODIFIER.REQUIRE);
+        });
       });
 
       describe('wildcard owner', () => {
-        it('reports an error for an always-notify `!` modifier', () => {
-          sandbox.stub(repo, 'readFile').returns('- "!*"');
+        it('reports an error for an always-notify `#` modifier', () => {
+          sandbox.stub(repo, 'readFile').returns('- "#*"');
           const {result, errors} = parser.parseOwnersFile('');
 
           expect(result[0].owners[0]).toEqual(
@@ -281,6 +300,18 @@ describe('owners parser', () => {
 
         it('reports an error for a never-notify `?` modifier', () => {
           sandbox.stub(repo, 'readFile').returns('- "?*"');
+          const {result, errors} = parser.parseOwnersFile('');
+
+          expect(result[0].owners[0]).toEqual(
+            new WildcardOwner(OWNER_MODIFIER.NONE)
+          );
+          expect(errors[0].message).toEqual(
+            'Modifiers not supported on wildcard `*` owner'
+          );
+        });
+
+        it('reports an error for a require-review `!` modifier', () => {
+          sandbox.stub(repo, 'readFile').returns('- "!*"');
           const {result, errors} = parser.parseOwnersFile('');
 
           expect(result[0].owners[0]).toEqual(

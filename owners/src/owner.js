@@ -18,6 +18,7 @@ const OWNER_MODIFIER = {
   NONE: '',
   NOTIFY: 'always notify',
   SILENT: 'never notify',
+  REQUIRE: 'require review',
 };
 
 /**
