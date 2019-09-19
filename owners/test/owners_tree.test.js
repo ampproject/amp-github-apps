@@ -185,6 +185,11 @@ describe('owners tree', () => {
         'ampproject/testers'
       );
     });
+
+    it('should exclude owners on the path with non-matching rules', () => {
+      const owners = childTree.fileOwners('foo/script.test.js');
+      expect(owners.map(owner => owner.name)).not.toContain('anyone');
+    });
   });
 
   describe('atPath', () => {
