@@ -144,6 +144,27 @@ describe('owners tree', () => {
     });
   });
 
+  describe('fileRules', () => {
+    let childTree;
+
+    beforeEach(() => {
+      tree.addRule(testFileRule);
+      tree.addRule(packageJsonRule);
+
+      childTree = tree.atPath('foo/bar.txt');
+    });
+
+    it('should include rules matching the filename', () => {
+      expect(childTree.fileRules('foo/script.test.js')).toContain(testFileRule);
+    });
+
+    it('should exclude rules which do not match', () => {
+      expect(childTree.fileRules('foo/package.json')).not.toContain(
+        packageJsonRule
+      );
+    });
+  });
+
   describe('atPath', () => {
     it("should produce the tree for the file's directory", () => {
       tree.addRule(childDirRule);

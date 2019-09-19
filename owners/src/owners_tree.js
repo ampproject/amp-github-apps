@@ -88,6 +88,19 @@ class OwnersTree {
   }
 
   /**
+   * Provides a list of ownership rules for a file.
+   *
+   * Includes the node's own rules as well as inherited rules, in decreasing
+   * order of depth (ie. the root OWNERS rules will be last).
+   *
+   * @param {!string} filename filename to get rules for.
+   * @return {OwnersRule[]} list of all ownership rules for the file.
+   */
+  fileRules(filename) {
+    return this.allRules.filter(rule => rule.matchesFile(filename));
+  }
+
+  /**
    * Provides the deepest ownership tree with rules applicable to a file or
    * directory.
    *
