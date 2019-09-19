@@ -377,7 +377,10 @@ describe('GitHub API', () => {
       await withContext(async (context, github) => {
         const comments = await github.getBotComments(24574);
 
-        expect(comments).toEqual(['Test comment by ampprojectbot']);
+        expect(comments).toEqual([{
+          id: 532484354,
+          body: 'Test comment by ampprojectbot',
+        }]);
       })();
     });
   });

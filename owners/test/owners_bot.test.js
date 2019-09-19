@@ -295,7 +295,10 @@ describe('owners bot', () => {
 
     describe('when a comment by the bot already exists', () => {
       beforeEach(() => {
-        sandbox.stub(GitHub.prototype, 'getBotComments').returns(['a comment']);
+        sandbox.stub(GitHub.prototype, 'getBotComments').returns([{
+          id: 42,
+          body: 'a comment',
+        }]);
       });
 
       it('does not create a comment', async done => {

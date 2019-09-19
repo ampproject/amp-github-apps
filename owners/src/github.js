@@ -288,7 +288,7 @@ class GitHub {
    * created via the Pulls API require a file path/position.
    *
    * @param {number} number PR number.
-   * @return {string[]} list of comments by the bot user.
+   * @return {{body: string, id: number}[]} list of comments by the bot user.
    */
   async getBotComments(number) {
     this.logger.info(`Fetching bot comments for PR #${number}`);
@@ -298,7 +298,9 @@ class GitHub {
 
     return response.data
       .filter(({user}) => user.login === process.env.GITHUB_BOT_USERNAME)
-      .map(({body}) => body);
+      .map(({id, body}) => {
+        return {id, body};
+      });
   }
 
   /**
