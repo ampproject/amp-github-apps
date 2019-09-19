@@ -47,11 +47,13 @@ module.exports = app => {
 
   // Probot does not stream properly to GCE logs so we need to hook into
   // bunyan explicitly and stream it to process.stdout.
-  app.log.target.addStream({
-    name: 'app-custom-stream',
-    stream: process.stdout,
-    level: process.env.LOG_LEVEL || 'info',
-  });
+  if (process.env.NODE_ENV !== 'test') {
+    app.log.target.addStream({
+      name: 'app-custom-stream',
+      stream: process.stdout,
+      level: process.env.LOG_LEVEL || 'info',
+    });
+  }
 
   /** Health check server endpoints **/
   // TODO(rcebulko): Implement GitHub authentication to prevent spamming any of
