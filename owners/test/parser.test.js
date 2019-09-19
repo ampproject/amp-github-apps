@@ -225,8 +225,8 @@ describe('owners parser', () => {
 
     describe('owner modifiers', () => {
       describe('user owner', () => {
-        it('parses an always-notify `!` modifier', () => {
-          sandbox.stub(repo, 'readFile').returns('- "!auser"');
+        it('parses an always-notify `#` modifier', () => {
+          sandbox.stub(repo, 'readFile').returns('- "#auser"');
           const fileParse = parser.parseOwnersFile('');
           const rules = fileParse.result;
 
@@ -247,8 +247,8 @@ describe('owners parser', () => {
       });
 
       describe('team owner', () => {
-        it('parses an always-notify `!` team modifier', () => {
-          sandbox.stub(repo, 'readFile').returns('- "!ampproject/my_team"');
+        it('parses an always-notify `#` team modifier', () => {
+          sandbox.stub(repo, 'readFile').returns('- "#ampproject/my_team"');
           const fileParse = parser.parseOwnersFile('');
           const teamOwner = fileParse.result[0].owners[0];
 
@@ -267,8 +267,8 @@ describe('owners parser', () => {
       });
 
       describe('wildcard owner', () => {
-        it('reports an error for an always-notify `!` modifier', () => {
-          sandbox.stub(repo, 'readFile').returns('- "!*"');
+        it('reports an error for an always-notify `#` modifier', () => {
+          sandbox.stub(repo, 'readFile').returns('- "#*"');
           const {result, errors} = parser.parseOwnersFile('');
 
           expect(result[0].owners[0]).toEqual(
