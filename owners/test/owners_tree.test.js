@@ -233,7 +233,7 @@ describe('owners tree', () => {
     });
   });
 
-  describe('getModifiedOwners', () => {
+  describe('getModifiedFileOwners', () => {
     beforeEach(() => {
       tree.addRule(rootDirRule);
       tree.addRule(childDirRule);
@@ -242,7 +242,10 @@ describe('owners tree', () => {
 
     it('finds matching owners in the subtree', () => {
       const subtree = tree.atPath('foo/file.js');
-      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+      const modifiedOwners = subtree.getModifiedFileOwners(
+        'foo/file.js',
+        OWNER_MODIFIER.NOTIFY
+      );
 
       expect(modifiedOwners).toContainEqual(
         new UserOwner('child', OWNER_MODIFIER.NOTIFY)
@@ -251,7 +254,10 @@ describe('owners tree', () => {
 
     it('finds matching owners in parent trees', () => {
       const subtree = tree.atPath('foo/bar/baz/file.js');
-      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+      const modifiedOwners = subtree.getModifiedFileOwners(
+        'foo/bar/baz/file.js',
+        OWNER_MODIFIER.NOTIFY
+      );
 
       expect(modifiedOwners).toContainEqual(
         new UserOwner('descendant', OWNER_MODIFIER.NOTIFY),
@@ -261,7 +267,10 @@ describe('owners tree', () => {
 
     it('does not return non-matching owners', () => {
       const subtree = tree.atPath('foo/file.js');
-      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+      const modifiedOwners = subtree.getModifiedFileOwners(
+        'foo/file.js',
+        OWNER_MODIFIER.NOTIFY
+      );
 
       expect(modifiedOwners).not.toContainEqual(
         new UserOwner('root', OWNER_MODIFIER.SILENT)
@@ -275,7 +284,10 @@ describe('owners tree', () => {
         ])
       );
       const subtree = tree.atPath('foo/file.js');
-      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+      const modifiedOwners = subtree.getModifiedFileOwners(
+        'foo/file.js',
+        OWNER_MODIFIER.NOTIFY
+      );
 
       expect(modifiedOwners.length).toEqual(1);
     });

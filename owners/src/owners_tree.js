@@ -154,24 +154,20 @@ class OwnersTree {
   /**
    * Lists of owners which have modifiers from this tree to the root.
    *
-   * TODO(rcebulko): Update to use `fileOwners` and take a filename param once
-   * PR #443 is merged.
-   *
+   * @param {!string} filename file to test ownership for.
    * @param {!OWNER_MODIFIER} modifier owner modifier.
    * @return {Owner[]} list of owners.
    */
-  getModifiedOwners(modifier) {
+  getModifiedFileOwners(filename, modifier) {
     const modifiedOwners = {};
 
-    this.allRules.forEach(rule => {
-      rule.owners
-        .filter(owner => owner.modifier === modifier)
-        .forEach(owner => {
-          if (!modifiedOwners[owner.name]) {
-            modifiedOwners[owner.name] = owner;
-          }
-        });
-    });
+    this.fileOwners(filename)
+      .filter(owner => owner.modifier === modifier)
+      .forEach(owner => {
+        if (!modifiedOwners[owner.name]) {
+          modifiedOwners[owner.name] = owner;
+        }
+      });
 
     return Object.values(modifiedOwners);
   }
