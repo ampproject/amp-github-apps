@@ -251,15 +251,12 @@ describe('owners bot', () => {
         done();
       });
 
-    it('creates a notification comment', async () => {
-      expect.assertions(1);
-      getCheckRunIdsStub.returns({});
+    it('creates a notification comment', async done => {
       sandbox.stub(OwnersBot.prototype, 'createNotifications');
       await ownersBot.runOwnersCheck(github, pr);
 
       sandbox.assert.calledOnce(ownersBot.createNotifications);
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
   });
 
@@ -300,13 +297,11 @@ describe('owners bot', () => {
         sandbox.stub(GitHub.prototype, 'getBotComments').returns(['a comment']);
       });
 
-      it('does not create a comment', async () => {
-        expect.assertions(1);
+      it('does not create a comment', async done => {
         await ownersBot.createNotifications(github, 1337, fileTreeMap);
 
         sandbox.assert.notCalled(github.createBotComment);
-        // Ensures the test fails if the assertion is never run.
-        expect(true).toBe(true);
+        done();
       });
     });
 
@@ -315,14 +310,12 @@ describe('owners bot', () => {
         sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
       });
 
-      it('gets users and teams to notify', async () => {
-        expect.assertions(1);
+      it('gets users and teams to notify', async done => {
         sandbox.stub(OwnersBot.prototype, '_getNotifies').returns([]);
         await ownersBot.createNotifications(github, 1337, fileTreeMap);
 
         sandbox.assert.calledWith(ownersBot._getNotifies, fileTreeMap);
-        // Ensures the test fails if the assertion is never run.
-        expect(true).toBe(true);
+        done();
       });
 
       describe('when there are users or teams to notify', () => {
@@ -346,13 +339,11 @@ describe('owners bot', () => {
       });
 
       describe('when there are no users or teams to notify', () => {
-        it('does not create a comment', async () => {
-          expect.assertions(1);
+        it('does not create a comment', async done => {
           await ownersBot.createNotifications(github, 1337, fileTreeMap);
 
           sandbox.assert.notCalled(github.createBotComment);
-          // Ensures the test fails if the assertion is never run.
-          expect(true).toBe(true);
+          done();
         });
       });
     });
