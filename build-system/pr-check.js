@@ -37,12 +37,11 @@ function timedExecOrDie(cmd) {
 function main() {
   // TODO(danielrozenberg): conditional test running
   timedExecOrDie('eslint .');
-  timedExecOrDie('cd bundle-size && npm ci');
-  timedExecOrDie('cd bundle-size && npm test -u');
-  timedExecOrDie('cd test-status && npm ci');
-  timedExecOrDie('cd test-status && npm test -u');
-  timedExecOrDie('cd pr-deploy && npm ci');
-  timedExecOrDie('cd pr-deploy && npm test -u');
+  ['bundle-size', 'test-status', 'pr-deploy', 'owners'].forEach(appName => {
+    timedExecOrDie(`cd ${appName} && npm ci`);
+    timedExecOrDie(`cd ${appName} && npm test -u`);
+  });
+
   return 0;
 }
 
