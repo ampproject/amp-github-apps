@@ -148,6 +148,7 @@ describe('owners bot', () => {
 
     beforeEach(() => {
       getCheckRunIdsStub = sandbox.stub(GitHub.prototype, 'getCheckRunIds');
+      getCheckRunIdsStub.returns({});
       sandbox.stub(OwnersCheck.prototype, 'run').returns({
         checkRun,
         reviewers: ['root_owner'],
@@ -156,11 +157,11 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'createCheckRun');
       sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
       sandbox.stub(GitHub.prototype, 'listFiles').returns([]);
+      sandbox.stub(GitHub.prototype, 'createReviewRequests');
     });
 
     it('attempts to fetch the existing check-run ID', async () => {
       expect.assertions(1);
-      getCheckRunIdsStub.returns({});
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledWith(github.getCheckRunIds, '_test_hash_');
 
@@ -170,7 +171,6 @@ describe('owners bot', () => {
 
     it('checks out the latest master', async () => {
       expect.assertions(1);
-      getCheckRunIdsStub.returns({});
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledOnce(localRepo.checkout);
 
@@ -180,7 +180,6 @@ describe('owners bot', () => {
 
     it('runs the owners check', async () => {
       expect.assertions(1);
-      getCheckRunIdsStub.returns({});
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledOnce(OwnersCheck.prototype.run);
 
@@ -208,7 +207,6 @@ describe('owners bot', () => {
     describe('when no check-run exists yet', () => {
       it('creates a new check-run', async () => {
         expect.assertions(1);
-        getCheckRunIdsStub.returns({});
         await ownersBot.runOwnersCheck(github, pr);
 
         sandbox.assert.calledWith(
@@ -219,6 +217,34 @@ describe('owners bot', () => {
 
         // Ensures the test fails if the assertion is never run.
         expect(true).toBe(true);
+      });
+    });
+
+    it('does not create review requests', async (done) => {
+      await ownersBot.runOwnersCheck(github, pr);
+
+      sandbox.assert.notCalled(github.createReviewRequests);
+      done();
+    });
+
+    describe('when the PR description contains #addowners', () => {
+      beforeEach(() => {
+        pr.description = 'Assign reviewers please #addowners';
+      });
+
+      it('requests reviewers', async (done) => {
+        sandbox.stub(OwnersBot.prototype, '_getReviewRequests').returns([
+          'auser',
+          'anotheruser',
+        ]);
+        await ownersBot.runOwnersCheck(github, pr);
+
+        sandbox.assert.calledWith(
+          github.createReviewRequests,
+          1337,
+          ['auser', 'anotheruser']
+        );
+        done();
       });
     });
   });

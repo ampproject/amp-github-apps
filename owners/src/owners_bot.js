@@ -23,6 +23,7 @@ const {OwnersParser} = require('./parser');
 const GITHUB_CHECKRUN_DELAY = 2000;
 const GITHUB_GET_MEMBERS_DELAY = 3000;
 const OWNERS_CHECKRUN_NAME = 'owners-check';
+const ADD_REVIEWERS_TAG = /#add-?owners/i;
 
 /**
  * Bot to run the owners check and create/update the GitHub check-run.
@@ -110,6 +111,18 @@ class OwnersBot {
       // TODO(rcebulko): Verify this is still needed.
       await sleep(this.GITHUB_CHECKRUN_DELAY);
       await github.createCheckRun(pr.headSha, ownersCheckResult.checkRun);
+    }
+
+    const fileTreeMap = tree.buildFileTreeMap(
+      changedFiles.map(({filename}) => filename)
+    );
+    if (ADD_REVIEWERS_TAG.test(pr.description)) {
+      const reviewRequests = this._getReviewRequests(
+        fileTreeMap,
+        ownersCheckResult.reviewers
+      );
+
+      await github.createReviewRequests(pr.number, reviewRequests);
     }
   }
 
