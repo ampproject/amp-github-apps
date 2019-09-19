@@ -344,7 +344,6 @@ describe('owners bot', () => {
         it('creates a comment tagging users and teams', async () => {
           expect.assertions(2);
           await ownersBot.createNotifications(github, 1337, fileTreeMap);
-          console.log(1);
 
           sandbox.assert.calledOnce(github.createBotComment);
           const [prNumber, comment] = github.createBotComment.getCall(0).args;
@@ -467,7 +466,7 @@ describe('owners bot', () => {
     tree.addRule(new OwnersRule('baz/OWNERS.yaml', [new UserOwner('rando')]));
 
     it('includes user owners with the always-notify modifier', () => {
-      const fileTreeMap = tree.buildFileTreeMap(['foo/main.js']);
+      const fileTreeMap = tree.buildFileTreeMap(['foo/main.js', 'foo/bar.js']);
       const notifies = ownersBot._getNotifies(fileTreeMap);
 
       expect(notifies['relevant_user']).toContain('foo/main.js');
