@@ -182,7 +182,7 @@ class OwnersBot {
         .getModifiedOwners(OWNER_MODIFIER.SILENT)
         .map(owner => owner.allUsernames)
         .reduce((left, right) => left.concat(right), [])
-        .forEach(reviewers.delete, reviewers)
+        .forEach(reviewers.delete, reviewers);
     });
 
     return reviewers;

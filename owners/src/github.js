@@ -37,12 +37,7 @@ class PullRequest {
    * @return {PullRequest} a pull request instance.
    */
   static fromGitHubResponse(res) {
-    return new PullRequest(
-      res.number,
-      res.user.login,
-      res.head.sha,
-      res.body,
-    );
+    return new PullRequest(res.number, res.user.login, res.head.sha, res.body);
   }
 }
 
