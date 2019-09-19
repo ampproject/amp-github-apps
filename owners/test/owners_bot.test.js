@@ -321,7 +321,8 @@ describe('owners bot', () => {
       describe('when there are users or teams to notify', () => {
         beforeEach(() => {
           sandbox.stub(OwnersBot.prototype, '_getNotifies').returns({
-            'foo/main.js': ['a_subscriber', 'ampproject/some_team'],
+            'a_subscriber': ['foo/main.js'],
+            'ampproject/some_team': ['foo/main.js'],
           });
         });
 
@@ -333,7 +334,8 @@ describe('owners bot', () => {
           const [prNumber, comment] = github.createBotComment.getCall(0).args;
           expect(prNumber).toEqual(1337);
           expect(comment).toContain(
-            '- foo/main.js: @a_subscriber, @ampproject/some_team'
+            'Hey @a_subscriber, these files were changed:\n- foo/main.js',
+            'Hey @ampproject/some_team, these files were changed:\n- foo/main.js'
           );
         });
       });
@@ -445,26 +447,27 @@ describe('owners bot', () => {
         new TeamOwner(relevantTeam, OWNER_MODIFIER.NOTIFY),
       ])
     );
+    tree.addRule(new OwnersRule('baz/OWNERS.yaml', [new UserOwner('rando')]));
 
     it('includes user owners with the always-notify modifier', () => {
       const fileTreeMap = tree.buildFileTreeMap(['foo/main.js']);
       const notifies = ownersBot._getNotifies(fileTreeMap);
 
-      expect(notifies['foo/main.js']).toContain('relevant_user');
+      expect(notifies['relevant_user']).toContain('foo/main.js');
     });
 
     it('includes team owners with the always-notify modifier', () => {
       const fileTreeMap = tree.buildFileTreeMap(['bar/script.js']);
       const notifies = ownersBot._getNotifies(fileTreeMap);
 
-      expect(notifies['bar/script.js']).toContain('ampproject/relevant_team');
+      expect(notifies['ampproject/relevant_team']).toContain('bar/script.js');
     });
 
     it('excludes files with no always-notify owners', () => {
       const fileTreeMap = tree.buildFileTreeMap(['baz/test.js']);
       const notifies = ownersBot._getNotifies(fileTreeMap);
 
-      expect(notifies['baz/test.js']).toBeUndefined();
+      expect(notifies['rando']).toBeUndefined();
     });
   });
 });

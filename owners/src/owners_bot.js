@@ -157,15 +157,16 @@ class OwnersBot {
 
     const notifies = this._getNotifies(fileTreeMap);
 
-    const tag = name => `@${name}`;
-    const header = 'Some owners are notified of changes to files in this PR:';
     const fileNotifyComments = Object.entries(notifies).map(
-      ([filename, names]) => `- ${filename}: ${names.map(tag).join(', ')}`
+      ([name, filenames]) => {
+        const header = `Hey @${name}, these files were changed:`;
+        const files = filenames.map(filename => `- ${filename}`);
+        return [header, ...files].join('\n');
+      }
     );
 
     if (fileNotifyComments.length) {
-      const comment = [header, ...fileNotifyComments].join('\n');
-      await github.createBotComment(prNumber, comment);
+      await github.createBotComment(prNumber, fileNotifyComments.join('\n\n'));
     }
   }
 
@@ -223,17 +224,20 @@ class OwnersBot {
    * Determine the set of owners to notify/tag for each file.
    *
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @return {Object<string, string[]>} map from filenames to user/team names.
+   * @return {Object<string, string[]>} map from user/team names to filenames.
    */
   _getNotifies(fileTreeMap) {
     const notifies = {};
     Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
-      const fileNotifies = subtree
+      subtree
         .getModifiedOwners(OWNER_MODIFIER.NOTIFY)
-        .map(owner => owner.name);
-      if (fileNotifies.length) {
-        notifies[filename] = fileNotifies;
-      }
+        .map(owner => owner.name)
+        .forEach(name => {
+          if (!notifies[name]) {
+            notifies[name] = [];
+          }
+          notifies[name].push(filename);
+        });
     });
 
     return notifies;
