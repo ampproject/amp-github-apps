@@ -154,6 +154,9 @@ class OwnersTree {
   /**
    * Lists of owners which have modifiers from this tree to the root.
    *
+   * TODO(rcebulko): Update to use `fileOwners` and take a filename param once
+   * PR #443 is merged.
+   *
    * @param {!OWNER_MODIFIER} modifier owner modifier.
    * @return {Owner[]} list of owners.
    */
