@@ -30,7 +30,7 @@
         "type": "User",
         "site_admin": false
     },
-    "body": "",
+    "body": "Pull request description",
     "created_at": "2019-01-22T17:22:51Z",
     "updated_at": "2019-02-26T20:53:31Z",
     "closed_at": null,

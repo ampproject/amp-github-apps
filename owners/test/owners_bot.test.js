@@ -31,7 +31,7 @@ const {
 describe('owners bot', () => {
   let sandbox;
   const github = new GitHub({}, 'ampproject', 'amphtml', console);
-  const pr = new PullRequest(1337, 'the_author', '_test_hash_');
+  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'descrption');
   const localRepo = new LocalRepository('path/to/repo');
   const ownersBot = new OwnersBot(localRepo);
 
