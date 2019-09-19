@@ -250,6 +250,7 @@ describe('owners bot', () => {
         ]);
         done();
       });
+    });
 
     it('creates a notification comment', async done => {
       sandbox.stub(OwnersBot.prototype, 'createNotifications');
