@@ -79,14 +79,12 @@ describe('owners bot', () => {
       expect(ownersBot.teams['ampproject/other_team']).toBe(otherTeam);
     });
 
-    it('fetches members for each team', async () => {
-      expect.assertions(1);
+    it('fetches members for each team', async done => {
       await ownersBot.initTeams(github);
 
       sandbox.assert.calledWith(github.getTeamMembers, 1337);
       sandbox.assert.calledWith(github.getTeamMembers, 42);
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
   });
 
@@ -109,8 +107,7 @@ describe('owners bot', () => {
       expect(tree).toBeInstanceOf(OwnersTree);
     });
 
-    it('warns about parsing errors', async () => {
-      expect.assertions(1);
+    it('warns about parsing errors', async done => {
       const error = new Error('Oops!');
       sandbox.stub(silentLogger, 'warn');
       sandbox.stub(OwnersParser.prototype, 'parseOwnersTree').returns({
@@ -120,8 +117,7 @@ describe('owners bot', () => {
       await ownersBot.initPr(github, pr);
 
       sandbox.assert.calledWith(silentLogger.warn, error);
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
 
     it('finds the reviewers that approved', async () => {
@@ -168,36 +164,29 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'createBotComment');
     });
 
-    it('attempts to fetch the existing check-run ID', async () => {
-      expect.assertions(1);
+    it('attempts to fetch the existing check-run ID', async done => {
       await ownersBot.runOwnersCheck(github, pr);
 
       sandbox.assert.calledWith(github.getCheckRunIds, '_test_hash_');
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
 
-    it('checks out the latest master', async () => {
-      expect.assertions(1);
+    it('checks out the latest master', async done => {
       await ownersBot.runOwnersCheck(github, pr);
 
       sandbox.assert.calledOnce(localRepo.checkout);
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
 
-    it('runs the owners check', async () => {
-      expect.assertions(1);
+    it('runs the owners check', async done => {
       await ownersBot.runOwnersCheck(github, pr);
 
       sandbox.assert.calledOnce(OwnersCheck.prototype.run);
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
 
     describe('when a check-run exists', () => {
-      it('updates the existing check-run', async () => {
-        expect.assertions(1);
+      it('updates the existing check-run', async done => {
         getCheckRunIdsStub.returns({'owners-check': 42});
         await ownersBot.runOwnersCheck(github, pr);
 
@@ -206,14 +195,12 @@ describe('owners bot', () => {
           42,
           checkRun
         );
-        // Ensures the test fails if the assertion is never run.
-        expect(true).toBe(true);
+        done();
       });
     });
 
     describe('when no check-run exists yet', () => {
-      it('creates a new check-run', async () => {
-        expect.assertions(1);
+      it('creates a new check-run', async done => {
         await ownersBot.runOwnersCheck(github, pr);
 
         sandbox.assert.calledWith(
@@ -221,8 +208,7 @@ describe('owners bot', () => {
           '_test_hash_',
           checkRun
         );
-        // Ensures the test fails if the assertion is never run.
-        expect(true).toBe(true);
+        done();
       });
     });
 
@@ -267,22 +253,18 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'getPullRequest').returns(pr);
     });
 
-    it('fetches the PR from GitHub', async () => {
-      expect.assertions(1);
+    it('fetches the PR from GitHub', async done => {
       await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
 
       sandbox.assert.calledWith(github.getPullRequest, 1337);
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
 
-    it('runs the owners check on the retrieved PR', async () => {
-      expect.assertions(1);
+    it('runs the owners check on the retrieved PR', async done => {
       await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
 
       sandbox.assert.calledWith(ownersBot.runOwnersCheck, github, pr);
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
   });
 
