@@ -158,7 +158,6 @@ class OwnersBot {
       }
     );
 
-
     if (!fileNotifyComments.length) {
       return;
     }
