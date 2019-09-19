@@ -323,6 +323,27 @@ class GitHub {
   }
 
   /**
+   * Updates a comment on a PR.
+   *
+   * Note that pull request comments fall under the Issues API, while comments
+   * created via the Pulls API require a file path/position.
+   *
+   * @param {number} commentId ID of comment to update.
+   * @param {!string} body comment body.
+   * @return {string[]} list of comments by the bot user.
+   */
+  async updateComment(commentId, body) {
+    this.logger.info(`Replacing comment with ID ${commentId}`);
+    this.logger.debug('[updateComment]', commentId, body);
+
+    await this._customRequest(
+      'PATCH',
+      `/repos/${this.owner}/${this.repository}/issues/comments/${commentId}`,
+      {body}
+    );
+  }
+
+  /**
    * Fetches the contents of a file from GitHub.
    *
    * @param {!FileRef} file file ref to fetch.

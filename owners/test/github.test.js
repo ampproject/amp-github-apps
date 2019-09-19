@@ -398,6 +398,22 @@ describe('GitHub API', () => {
     });
   });
 
+  describe('updateComment', () => {
+    it('updates a PR comment', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .patch('/repos/test_owner/test_repo/issues/comments/24574', body => {
+          expect(body).toMatchObject({body: 'updated comment'});
+          return true;
+        })
+        .reply(200);
+
+      await withContext(async (context, github) => {
+        await github.updateComment(24574, 'updated comment');
+      })();
+    });
+  });
+
   describe('getFileContents', () => {
     it('fetches the contents of a file', async () => {
       expect.assertions(1);
