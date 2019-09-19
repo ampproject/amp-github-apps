@@ -180,10 +180,7 @@ class OwnersTree {
    * @return {boolean} true if the user is an owner of the file.
    */
   fileHasOwner(filename, username) {
-    const allRules = this.atPath(filename).allRules;
-    const fileRules = allRules.filter(rule => rule.matchesFile(filename));
-
-    return fileRules.some(rule =>
+    return this.atPath(filename).fileRules(filename).some(rule =>
       rule.owners.some(owner => owner.includes(username))
     );
   }
