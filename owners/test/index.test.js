@@ -20,6 +20,7 @@ const owners = require('..');
 const {Probot} = require('probot');
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
+const {GitHub} = require('../src/github');
 const {OwnersParser} = require('../src/parser');
 const {UserOwner} = require('../src/owner');
 const {OwnersRule} = require('../src/rules');
@@ -65,6 +66,7 @@ describe('owners bot', () => {
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox.stub(OwnersBot.prototype, 'initTeams');
+    sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')

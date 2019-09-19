@@ -99,7 +99,6 @@ class OwnersBot {
     const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
 
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
-    // TODO(rcebulko): Make this into a loop through multiple check/name pairs.
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
     const ownersCheckResult = ownersCheck.run();
 
@@ -124,6 +123,8 @@ class OwnersBot {
 
       await github.createReviewRequests(pr.number, reviewRequests);
     }
+
+    await this.createNotifications(github, pr.number, fileTreeMap);
   }
 
   /**
@@ -136,6 +137,37 @@ class OwnersBot {
   async runOwnersCheckOnPrNumber(github, prNumber) {
     const pr = await github.getPullRequest(prNumber);
     await this.runOwnersCheck(github, pr);
+  }
+
+  /**
+   * Adds a comment tagging always-notify owners of changed files.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   * @param {!number} prNumber pull request number.
+   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
+   */
+  async createNotifications(github, prNumber, fileTreeMap) {
+    const botComments = await github.getBotComments(prNumber);
+    if (botComments.length) {
+      // Avoid adding duplicate notification comment.
+      // TODO(rcebulko): Handle cases where the fileset changes after PR
+      // creation.
+      return;
+    }
+
+    const notifies = this._getNotifies(fileTreeMap);
+
+    const fileNotifyComments = Object.entries(notifies).map(
+      ([name, filenames]) => {
+        const header = `Hey @${name}, these files were changed:`;
+        const files = filenames.map(filename => `- ${filename}`);
+        return [header, ...files].join('\n');
+      }
+    );
+
+    if (fileNotifyComments.length) {
+      await github.createBotComment(prNumber, fileNotifyComments.join('\n\n'));
+    }
   }
 
   /**
@@ -189,19 +221,24 @@ class OwnersBot {
   }
 
   /**
-   * Determine the set of owners to notify/tag in the PR.
+   * Determine the set of owners to notify/tag for each file.
    *
-   * @param {Set<!OwnersTree>} trees set of ownership trees touched by the PR.
-   * @return {Set<string>} set of who to request a review from.
+   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
+   * @return {Object<string, string[]>} map from user/team names to filenames.
    */
-  _getNotifies(trees) {
-    const notifies = new Set();
-    trees.forEach(tree =>
-      tree
+  _getNotifies(fileTreeMap) {
+    const notifies = {};
+    Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
+      subtree
         .getModifiedOwners(OWNER_MODIFIER.NOTIFY)
         .map(owner => owner.name)
-        .forEach(notifies.add, notifies)
-    );
+        .forEach(name => {
+          if (!notifies[name]) {
+            notifies[name] = [];
+          }
+          notifies[name].push(filename);
+        });
+    });
 
     return notifies;
   }
