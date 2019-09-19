@@ -24,9 +24,10 @@ class PullRequest {
    * @param {number} number pull request number.
    * @param {!string} author username of the pull request author.
    * @param {!string} headSha SHA hash of the PR's HEAD commit.
+   * @param {!string} description pull request description.
    */
-  constructor(number, author, headSha) {
-    Object.assign(this, {number, author, headSha});
+  constructor(number, author, headSha, description) {
+    Object.assign(this, {number, author, headSha, description});
   }
 
   /**
@@ -36,7 +37,7 @@ class PullRequest {
    * @return {PullRequest} a pull request instance.
    */
   static fromGitHubResponse(res) {
-    return new PullRequest(res.number, res.user.login, res.head.sha);
+    return new PullRequest(res.number, res.user.login, res.head.sha, res.body);
   }
 }
 

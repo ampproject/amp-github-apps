@@ -42,6 +42,7 @@ describe('pull request', () => {
       expect(pr.number).toEqual(35);
       expect(pr.author).toEqual('ampprojectbot');
       expect(pr.headSha).toEqual('9272f18514cbd3fa935b3ced62ae1c2bf6efa76d');
+      expect(pr.description).toEqual('Pull request description');
     });
   });
 });

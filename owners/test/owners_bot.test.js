@@ -19,6 +19,7 @@ const {GitHub, PullRequest, Review, Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
 const {OwnersBot} = require('../src/owners_bot');
+const {OwnersRule} = require('../src/rules');
 const {OwnersParser} = require('../src/parser');
 const {OwnersTree} = require('../src/owners_tree');
 const {
@@ -30,7 +31,7 @@ const {
 describe('owners bot', () => {
   let sandbox;
   const github = new GitHub({}, 'ampproject', 'amphtml', console);
-  const pr = new PullRequest(1337, 'the_author', '_test_hash_');
+  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'descrption');
   const localRepo = new LocalRepository('path/to/repo');
   const ownersBot = new OwnersBot(localRepo);
 
@@ -147,6 +148,7 @@ describe('owners bot', () => {
 
     beforeEach(() => {
       getCheckRunIdsStub = sandbox.stub(GitHub.prototype, 'getCheckRunIds');
+      getCheckRunIdsStub.returns({});
       sandbox.stub(OwnersCheck.prototype, 'run').returns({
         checkRun,
         reviewers: ['root_owner'],
@@ -155,11 +157,11 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'createCheckRun');
       sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
       sandbox.stub(GitHub.prototype, 'listFiles').returns([]);
+      sandbox.stub(GitHub.prototype, 'createReviewRequests');
     });
 
     it('attempts to fetch the existing check-run ID', async () => {
       expect.assertions(1);
-      getCheckRunIdsStub.returns({});
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledWith(github.getCheckRunIds, '_test_hash_');
 
@@ -169,7 +171,6 @@ describe('owners bot', () => {
 
     it('checks out the latest master', async () => {
       expect.assertions(1);
-      getCheckRunIdsStub.returns({});
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledOnce(localRepo.checkout);
 
@@ -179,7 +180,6 @@ describe('owners bot', () => {
 
     it('runs the owners check', async () => {
       expect.assertions(1);
-      getCheckRunIdsStub.returns({});
       await ownersBot.runOwnersCheck(github, pr);
       sandbox.assert.calledOnce(OwnersCheck.prototype.run);
 
@@ -207,7 +207,6 @@ describe('owners bot', () => {
     describe('when no check-run exists yet', () => {
       it('creates a new check-run', async () => {
         expect.assertions(1);
-        getCheckRunIdsStub.returns({});
         await ownersBot.runOwnersCheck(github, pr);
 
         sandbox.assert.calledWith(
@@ -218,6 +217,32 @@ describe('owners bot', () => {
 
         // Ensures the test fails if the assertion is never run.
         expect(true).toBe(true);
+      });
+    });
+
+    it('does not create review requests', async done => {
+      await ownersBot.runOwnersCheck(github, pr);
+
+      sandbox.assert.notCalled(github.createReviewRequests);
+      done();
+    });
+
+    describe('when the PR description contains #addowners', () => {
+      beforeEach(() => {
+        pr.description = 'Assign reviewers please #addowners';
+      });
+
+      it('requests reviewers', async done => {
+        sandbox
+          .stub(OwnersBot.prototype, '_getReviewRequests')
+          .returns(['auser', 'anotheruser']);
+        await ownersBot.runOwnersCheck(github, pr);
+
+        sandbox.assert.calledWith(github.createReviewRequests, 1337, [
+          'auser',
+          'anotheruser',
+        ]);
+        done();
       });
     });
   });
@@ -282,34 +307,48 @@ describe('owners bot', () => {
     const tree = new OwnersTree();
     const busyTeam = new Team(42, 'ampproject', 'busy_team');
     busyTeam.members = ['busy_member'];
+    let fileTreeMap;
 
     beforeEach(() => {
       sandbox
         .stub(OwnersTree.prototype, 'getModifiedOwners')
         .withArgs(OWNER_MODIFIER.SILENT)
         .returns([new UserOwner('busy_user'), new TeamOwner(busyTeam)]);
+
+      tree.addRule(
+        new OwnersRule('foo/OWNERS.yaml', [
+          new UserOwner('busy_user', OWNER_MODIFIER.SILENT),
+        ])
+      );
+      tree.addRule(
+        new OwnersRule('foo/OWNERS.yaml', [
+          new TeamOwner(busyTeam, OWNER_MODIFIER.SILENT),
+        ])
+      );
+
+      fileTreeMap = tree.buildFileTreeMap(['foo/script.js']);
     });
 
     it('includes suggested reviewers', () => {
-      const reviewRequests = ownersBot._getReviewRequests([tree], ['auser']);
+      const reviewRequests = ownersBot._getReviewRequests(fileTreeMap, [
+        'auser',
+      ]);
 
       expect(Array.from(reviewRequests)).toContain('auser');
     });
 
     it('excludes user owners with the no-notify modifier', () => {
-      const reviewRequests = ownersBot._getReviewRequests(
-        [tree],
-        ['busy_user']
-      );
+      const reviewRequests = ownersBot._getReviewRequests(fileTreeMap, [
+        'busy_user',
+      ]);
 
       expect(Array.from(reviewRequests)).not.toContain('busy_user');
     });
 
     it('excludes members of team owners with the no-notify modifier', () => {
-      const reviewRequests = ownersBot._getReviewRequests(
-        [tree],
-        ['busy_member']
-      );
+      const reviewRequests = ownersBot._getReviewRequests(fileTreeMap, [
+        'busy_member',
+      ]);
 
       expect(Array.from(reviewRequests)).not.toContain('busy_member');
     });

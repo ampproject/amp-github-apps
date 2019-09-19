@@ -23,6 +23,7 @@ const {OwnersParser} = require('./parser');
 const GITHUB_CHECKRUN_DELAY = 2000;
 const GITHUB_GET_MEMBERS_DELAY = 3000;
 const OWNERS_CHECKRUN_NAME = 'owners-check';
+const ADD_REVIEWERS_TAG = /#add-?owners/i;
 
 /**
  * Bot to run the owners check and create/update the GitHub check-run.
@@ -111,6 +112,18 @@ class OwnersBot {
       await sleep(this.GITHUB_CHECKRUN_DELAY);
       await github.createCheckRun(pr.headSha, ownersCheckResult.checkRun);
     }
+
+    const fileTreeMap = tree.buildFileTreeMap(
+      changedFiles.map(({filename}) => filename)
+    );
+    if (ADD_REVIEWERS_TAG.test(pr.description)) {
+      const reviewRequests = this._getReviewRequests(
+        fileTreeMap,
+        ownersCheckResult.reviewers
+      );
+
+      await github.createReviewRequests(pr.number, reviewRequests);
+    }
   }
 
   /**
@@ -156,19 +169,21 @@ class OwnersBot {
   /**
    * Determine the set of users to request reviews from.
    *
-   * @param {Set<!OwnersTree>} trees set of ownership trees touched by the PR.
+   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    * @param {string[]} suggestedReviewers list of suggested reviewer usernames.
    * @return {Set<string>} set of usernames.
    */
-  _getReviewRequests(trees, suggestedReviewers) {
+  _getReviewRequests(fileTreeMap, suggestedReviewers) {
     const reviewers = new Set(suggestedReviewers);
-    trees.forEach(tree =>
-      tree
+    Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
+      // TODO(rcebulko): Update to pass filename once PR #452 is submitted and
+      // this branch is rebased.
+      subtree
         .getModifiedOwners(OWNER_MODIFIER.SILENT)
         .map(owner => owner.allUsernames)
         .reduce((left, right) => left.concat(right), [])
-        .forEach(reviewers.delete, reviewers)
-    );
+        .forEach(reviewers.delete, reviewers);
+    });
 
     return reviewers;
   }
