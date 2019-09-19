@@ -391,8 +391,8 @@ describe('owners bot', () => {
 
     beforeEach(() => {
       sandbox
-        .stub(OwnersTree.prototype, 'getModifiedOwners')
-        .withArgs(OWNER_MODIFIER.SILENT)
+        .stub(OwnersTree.prototype, 'getModifiedFileOwners')
+        .withArgs(sinon.match.string, OWNER_MODIFIER.SILENT)
         .returns([new UserOwner('busy_user'), new TeamOwner(busyTeam)]);
 
       tree.addRule(

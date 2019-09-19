@@ -208,10 +208,8 @@ class OwnersBot {
   _getReviewRequests(fileTreeMap, suggestedReviewers) {
     const reviewers = new Set(suggestedReviewers);
     Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
-      // TODO(rcebulko): Update to pass filename once PR #452 is submitted and
-      // this branch is rebased.
       subtree
-        .getModifiedOwners(OWNER_MODIFIER.SILENT)
+        .getModifiedFileOwners(filename, OWNER_MODIFIER.SILENT)
         .map(owner => owner.allUsernames)
         .reduce((left, right) => left.concat(right), [])
         .forEach(reviewers.delete, reviewers);
@@ -230,7 +228,7 @@ class OwnersBot {
     const notifies = {};
     Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
       subtree
-        .getModifiedOwners(OWNER_MODIFIER.NOTIFY)
+        .getModifiedFileOwners(filename, OWNER_MODIFIER.NOTIFY)
         .map(owner => owner.name)
         .forEach(name => {
           if (!notifies[name]) {
