@@ -93,7 +93,7 @@ class OwnersTree {
    * Includes the node's own rules as well as inherited rules, in decreasing
    * order of depth (ie. the root OWNERS rules will be last).
    *
-   * @param {!string} filename filename to get rules for.
+   * @param {!string} filename file to get rules for.
    * @return {OwnersRule[]} list of all ownership rules for the file.
    */
   fileRules(filename) {
@@ -103,12 +103,13 @@ class OwnersTree {
   /**
    * Provides a list of owners rules for a file.
    *
+   * @param {!string} filename file to get owners for.
    * @return {Owner[]} list of all owners for the file.
    */
   fileOwners(filename) {
     return this.fileRules(filename)
-        .map(rule => rule.owners)
-        .reduce((left, right) => left.concat(right), []);
+      .map(rule => rule.owners)
+      .reduce((left, right) => left.concat(right), []);
   }
 
   /**
@@ -180,9 +181,9 @@ class OwnersTree {
    * @return {boolean} true if the user is an owner of the file.
    */
   fileHasOwner(filename, username) {
-    return this.atPath(filename).fileRules(filename).some(rule =>
-      rule.owners.some(owner => owner.includes(username))
-    );
+    return this.atPath(filename)
+      .fileRules(filename)
+      .some(rule => rule.owners.some(owner => owner.includes(username)));
   }
 
   /**

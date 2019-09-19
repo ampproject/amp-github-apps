@@ -182,7 +182,7 @@ describe('owners tree', () => {
       expect(owners.map(owner => owner.name)).toContain(
         'root',
         'child',
-        'ampproject/testers' 
+        'ampproject/testers'
       );
     });
   });
