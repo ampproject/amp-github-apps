@@ -180,7 +180,10 @@ describe('GitHub API', () => {
 
   describe('customRequest', () => {
     beforeEach(() => {
-      sandbox.stub(process, 'env').value({GITHUB_ACCESS_TOKEN: '_TOKEN_'});
+      sandbox.stub(process, 'env').value({
+        GITHUB_ACCESS_TOKEN: '_TOKEN_',
+        NODE_ENV: 'test',
+      });
     });
 
     it('returns the response', async () => {

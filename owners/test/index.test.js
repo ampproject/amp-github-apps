@@ -62,7 +62,7 @@ describe('owners bot', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'env').value({GITHUB_REPO_DIR});
+    sandbox.stub(process, 'env').value({GITHUB_REPO_DIR, NODE_ENV: 'test'});
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox.stub(OwnersBot.prototype, 'initTeams');
