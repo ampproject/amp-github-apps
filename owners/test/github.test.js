@@ -336,15 +336,12 @@ describe('GitHub API', () => {
       })();
     });
 
-    it('skips the API call if no usernames are provided', async () => {
-      expect.assertions(1);
-
+    it('skips the API call if no usernames are provided', async done => {
       await withContext(async (context, github) => {
         // This will fail if it attempts to make an un-nocked network request.
         await github.createReviewRequests(24574, []);
 
-        // Ensures the test fails if the assertion is never run.
-        expect(true).toBe(true);
+        done();
       })();
     });
   });

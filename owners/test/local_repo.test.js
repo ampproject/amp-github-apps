@@ -50,30 +50,26 @@ describe('local repository', () => {
       sandbox.stub(repo, 'runCommands').returns('');
     });
 
-    it('fetches and checks out the requested branch', async () => {
-      expect.assertions(1);
+    it('fetches and checks out the requested branch', async done => {
       await repo.checkout('my_branch');
+
       sandbox.assert.calledWith(
         repo.runCommands,
         'git fetch origin my_branch',
         'git checkout -B my_branch origin/my_branch'
       );
-
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
 
-    it('defaults to master', async () => {
-      expect.assertions(1);
+    it('defaults to master', async done => {
       await repo.checkout();
+
       sandbox.assert.calledWith(
         repo.runCommands,
         'git fetch origin master',
         'git checkout -B master origin/master'
       );
-
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
   });
 
@@ -101,17 +97,15 @@ describe('local repository', () => {
       repo = new LocalRepository('path/to/repo');
     }
 
-    it('executes the provided commands in the repo directory', async () => {
-      expect.assertions(1);
+    it('executes the provided commands in the repo directory', async done => {
       stubExecAndSetRepo(false, '', '');
       await repo.runCommands('git status');
+
       sandbox.assert.calledWith(
         childProcess.exec,
         `cd path/to/repo && git status`
       );
-
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
+      done();
     });
 
     it('returns the contents of stdout', async () => {
@@ -148,12 +142,10 @@ describe('local repository', () => {
 
     it('reads from the absolute file path', () => {
       repo.readFile('my/file.txt');
+
       sandbox.assert.calledWith(fs.readFileSync, 'path/to/repo/my/file.txt', {
         encoding: 'utf8',
       });
-
-      // Ensures the test fails if the assertion is never run.
-      expect(true).toBe(true);
     });
 
     it('returns the contents of the file', () => {
