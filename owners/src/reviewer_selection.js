@@ -52,7 +52,7 @@ class ReviewerSelection {
 
     const deepRules = Object.entries(fileTreeMap)
       .filter(([filename, subtree]) => subtree.depth === maxDepth)
-      .map(([filename, subtree]) => 
+      .map(([filename, subtree]) =>
         subtree.rules.filter(rule => rule.matchesFile(filename))
       )
       .reduce((left, right) => left.concat(right), []);
@@ -71,12 +71,13 @@ class ReviewerSelection {
     const reviewers = new Set();
     const maxPriority = Math.max(...rules.map(rule => rule.priority));
 
-    rules.filter(rule => rule.priority === maxPriority)
-        .map(rule => rule.owners)
-        .reduce((left, right) => left.concat(right), [])
-        .map(owner => owner.allUsernames)
-        .reduce((left, right) => left.concat(right), [])
-        .forEach(username => reviewers.add(username));
+    rules
+      .filter(rule => rule.priority === maxPriority)
+      .map(rule => rule.owners)
+      .reduce((left, right) => left.concat(right), [])
+      .map(owner => owner.allUsernames)
+      .reduce((left, right) => left.concat(right), [])
+      .forEach(username => reviewers.add(username));
 
     return Array.from(reviewers);
   }

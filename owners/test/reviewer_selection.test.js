@@ -22,42 +22,36 @@ const {OwnersTree} = require('../src/owners_tree');
 const {
   OwnersRule,
   PatternOwnersRule,
-  SameDirPatternOwnersRule
+  SameDirPatternOwnersRule,
 } = require('../src/rules');
 
 describe('reviewer selection', () => {
   const sandbox = sinon.createSandbox();
   let ownersTree;
-  let dirTrees;
 
   const myTeam = new Team(42, 'ampproject', 'my_team');
   myTeam.members = ['child', 'kid'];
 
-
-  dirRules = {
+  const dirRules = {
     '/': new OwnersRule('OWNERS.yaml', [new UserOwner('rootOwner')]),
     '/foo': new OwnersRule('foo/OWNERS.yaml', [new UserOwner('child')]),
     '/biz': new OwnersRule('biz/OWNERS.yaml', [new TeamOwner(myTeam)]),
     '/buzz': new OwnersRule('buzz/OWNERS.yaml', [new UserOwner('thirdChild')]),
-    '/foo/bar/baz': new OwnersRule(
-      'foo/bar/baz/OWNERS.yaml',
-      [new UserOwner('descendant')],
-    ),
+    '/foo/bar/baz': new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+      new UserOwner('descendant'),
+    ]),
   };
-  const wildcardRule = new OwnersRule(
-    'foo/bar/baz/OWNERS.yaml',
-    [new WildcardOwner()],
-  );
+  const wildcardRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+    new WildcardOwner(),
+  ]);
 
   beforeEach(() => {
     ownersTree = new OwnersTree();
-    dirTrees = {
-      '/': ownersTree.addRule(dirRules['/']),
-      '/foo': ownersTree.addRule(dirRules['/foo']),
-      '/biz': ownersTree.addRule(dirRules['/biz']),
-      '/buzz': ownersTree.addRule(dirRules['/buzz']),
-      '/foo/bar/baz': ownersTree.addRule(dirRules['/foo/bar/baz']),
-    };
+    ownersTree.addRule(dirRules['/']);
+    ownersTree.addRule(dirRules['/foo']);
+    ownersTree.addRule(dirRules['/biz']);
+    ownersTree.addRule(dirRules['/buzz']);
+    ownersTree.addRule(dirRules['/foo/bar/baz']);
   });
 
   afterEach(() => {
@@ -136,27 +130,26 @@ describe('reviewer selection', () => {
       const sameDirPatternRule = new SameDirPatternOwnersRule(
         'priority/OWNERS.yaml',
         [new UserOwner('same_dir_pattern_owner')],
-        '*.css',
+        '*.css'
       );
       const recursivePatternRule = new PatternOwnersRule(
         'priority/OWNERS.yaml',
         [new UserOwner('recursive_pattern_owner')],
-        '*.js',
+        '*.js'
       );
-      const directoryRule = new OwnersRule(
-        'priority/OWNERS.yaml',
-        [new UserOwner('directory_owner')],
-      );
+      const directoryRule = new OwnersRule('priority/OWNERS.yaml', [
+        new UserOwner('directory_owner'),
+      ]);
 
       describe('when a same-directory pattern rule is present', () => {
         const reviewers = ReviewerSelection._reviewersForRules([
           directoryRule,
           recursivePatternRule,
-          sameDirPatternRule
+          sameDirPatternRule,
         ]);
 
         it('returns same-directory pattern rule owners', () => {
-          expect(reviewers).toContain('same_dir_pattern_owner')
+          expect(reviewers).toContain('same_dir_pattern_owner');
         });
 
         it('does not return recursive pattern rule owners', () => {
@@ -172,13 +165,13 @@ describe('reviewer selection', () => {
         describe('when a recursive pattern rule is present', () => {
           const reviewers = ReviewerSelection._reviewersForRules([
             directoryRule,
-            recursivePatternRule
+            recursivePatternRule,
           ]);
 
           it('returns recursive pattern rule owners', () => {
             expect(reviewers).toContain('recursive_pattern_owner');
           });
-            
+
           it('does not return directory owners', () => {
             expect(reviewers).not.toContain('directory_owner');
           });
@@ -186,7 +179,9 @@ describe('reviewer selection', () => {
 
         describe('when no recursive pattern rule is present', () => {
           it('returns directory owners', () => {
-            reviewers = ReviewerSelection._reviewersForRules([directoryRule]);
+            const reviewers = ReviewerSelection._reviewersForRules([
+              directoryRule,
+            ]);
             expect(reviewers).toContain('directory_owner');
           });
         });
