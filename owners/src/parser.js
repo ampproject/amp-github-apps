@@ -108,7 +108,7 @@ class OwnersParser {
       owner = owner.slice(1);
     }
 
-    if (owner.indexOf('/') !== -1) {
+    if (owner.includes('/')) {
       const team = this.teamMap[owner];
 
       if (team) {
@@ -167,53 +167,64 @@ class OwnersParser {
    *     rule.
    */
   _parseOwnersDict(ownersPath, ownersDict) {
-    let [[pattern, ownersList]] = Object.entries(ownersDict);
+    const [[fullPattern, ownersList]] = Object.entries(ownersDict);
     const rules = [];
     const errors = [];
+    let patternList = [];
 
-    const owners = [];
-    const isRecursive = pattern.startsWith(GLOB_PATTERN);
-    if (isRecursive) {
-      pattern = pattern.slice(GLOB_PATTERN.length);
-    }
-
-    if (pattern.indexOf('/') !== -1) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Failed to parse rule for pattern '${pattern}'; ` +
-            `directory patterns other than '${GLOB_PATTERN}' not supported`
-        )
-      );
-    } else if (typeof ownersList === 'string') {
-      const lineResult = this._parseOwnersLine(ownersPath, ownersList);
-      owners.push(...lineResult.result);
-      errors.push(...lineResult.errors);
+    // TODO(rcebulko): Remove backwards-compatibility once all owners files have
+    // been updated to use brace syntax.
+    if (!fullPattern.includes('{')) {
+      patternList = fullPattern.split(/\s*,\s*/);
     } else {
-      ownersList.forEach(owner => {
-        if (typeof owner === 'string') {
-          const lineResult = this._parseOwnersLine(ownersPath, owner);
-          owners.push(...lineResult.result);
-          errors.push(...lineResult.errors);
-        } else {
-          errors.push(
-            new OwnersParserError(
-              ownersPath,
-              `Failed to parse owner of type ${typeof owner} for pattern ` +
-                `rule '${pattern}'`
-            )
-          );
-        }
-      });
+      patternList = [fullPattern];
     }
 
-    if (owners.length) {
+    patternList.forEach(pattern => {
+      const owners = [];
+      const isRecursive = pattern.startsWith(GLOB_PATTERN);
       if (isRecursive) {
-        rules.push(new PatternOwnersRule(ownersPath, owners, pattern));
-      } else {
-        rules.push(new SameDirPatternOwnersRule(ownersPath, owners, pattern));
+        pattern = pattern.slice(GLOB_PATTERN.length);
       }
-    }
+
+      if (pattern.includes('/')) {
+        errors.push(
+          new OwnersParserError(
+            ownersPath,
+            `Failed to parse rule for pattern '${pattern}'; ` +
+              `directory patterns other than '${GLOB_PATTERN}' not supported`
+          )
+        );
+      } else if (typeof ownersList === 'string') {
+        const lineResult = this._parseOwnersLine(ownersPath, ownersList);
+        owners.push(...lineResult.result);
+        errors.push(...lineResult.errors);
+      } else {
+        ownersList.forEach(owner => {
+          if (typeof owner === 'string') {
+            const lineResult = this._parseOwnersLine(ownersPath, owner);
+            owners.push(...lineResult.result);
+            errors.push(...lineResult.errors);
+          } else {
+            errors.push(
+              new OwnersParserError(
+                ownersPath,
+                `Failed to parse owner of type ${typeof owner} for pattern ` +
+                  `rule '${pattern}'`
+              )
+            );
+          }
+        });
+      }
+
+      if (owners.length) {
+        if (isRecursive) {
+          rules.push(new PatternOwnersRule(ownersPath, owners, pattern));
+        } else {
+          rules.push(new SameDirPatternOwnersRule(ownersPath, owners, pattern));
+        }
+      }
+    });
 
     return {result: rules, errors};
   }

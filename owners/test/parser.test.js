@@ -198,6 +198,15 @@ describe('owners parser', () => {
           "Failed to parse rule for pattern 'foo/*.js'; directory patterns other than '**/' not supported"
         );
       });
+
+      it('parses comma-separate patterns as separate rules', () => {
+        sandbox.stub(repo, 'readFile').returns('- *.js, *.css: frontend\n');
+        const fileParse = parser.parseOwnersFile('');
+        const rules = fileParse.result;
+
+        expect(rules[0].pattern).toEqual('*.js');
+        expect(rules[1].pattern).toEqual('*.css');
+      });
     });
 
     describe('files containing top-level dictionaries', () => {
