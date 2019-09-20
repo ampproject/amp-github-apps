@@ -181,8 +181,8 @@ class OwnersTree {
    */
   fileHasOwner(filename, username) {
     return this.atPath(filename)
-      .fileRules(filename)
-      .some(rule => rule.owners.some(owner => owner.includes(username)));
+      .fileOwners(filename)
+      .some(owner => owner.includes(username));
   }
 
   /**
