@@ -174,7 +174,7 @@ class OwnersParser {
 
     // TODO(rcebulko): Remove backwards-compatibility once all owners files have
     // been updated to use brace syntax.
-    if (fullPattern.indexOf('{') === -1) {
+    if (!fullPattern.includes('{')) {
       patternList = fullPattern.split(/\s*,\s*/);
     } else {
       patternList = [fullPattern];
