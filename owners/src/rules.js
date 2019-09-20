@@ -17,6 +17,12 @@
 const path = require('path');
 const minimatch = require('minimatch');
 
+const RULE_PRIORITY = {
+  DIRECTORY: 1,
+  RECURSIVE_PATTERN: 2,
+  SAME_DIRECTORY_PATTERN: 3,
+}
+
 /**
  * A rule describing ownership for a directory.
  */
@@ -34,7 +40,7 @@ class OwnersRule {
     this.filePath = ownersPath;
     this.dirPath = path.dirname(ownersPath);
     this.owners = owners;
-    this.priority = 1;
+    this.priority = RULE_PRIORITY.DIRECTORY;
   }
 
   /**
@@ -98,7 +104,7 @@ class PatternOwnersRule extends OwnersRule {
       nocomment: true,
       nonegate: true,
     });
-    this.priority = 2;
+    this.priority = RULE_PRIORITY.RECURSIVE_PATTERN;
   }
 
   /**
@@ -134,7 +140,7 @@ class SameDirPatternOwnersRule extends PatternOwnersRule {
    */
   constructor(ownersPath, owners, pattern) {
     super(ownersPath, owners, pattern);
-    this.priority = 3;
+    this.priority = RULE_PRIORITY.SAME_DIRECTORY_PATTERN;
   }
 
   /**
@@ -159,4 +165,9 @@ class SameDirPatternOwnersRule extends PatternOwnersRule {
   }
 }
 
-module.exports = {OwnersRule, PatternOwnersRule, SameDirPatternOwnersRule};
+module.exports = {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+  RULE_PRIORITY,
+};
