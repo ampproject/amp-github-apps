@@ -108,7 +108,7 @@ class OwnersParser {
       owner = owner.slice(1);
     }
 
-    if (owner.indexOf('/') !== -1) {
+    if (owner.includes('/')) {
       const team = this.teamMap[owner];
 
       if (team) {
@@ -187,7 +187,7 @@ class OwnersParser {
         pattern = pattern.slice(GLOB_PATTERN.length);
       }
 
-      if (pattern.indexOf('/') !== -1) {
+      if (pattern.includes('/')) {
         errors.push(
           new OwnersParserError(
             ownersPath,

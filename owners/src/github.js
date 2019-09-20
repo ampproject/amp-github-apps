@@ -180,7 +180,7 @@ class GitHub {
         `/orgs/${this.owner}/teams?page=${pageNum}`
       );
       const nextLink = response.headers.link || '';
-      isNextLink = nextLink.indexOf('rel="next"') !== -1;
+      isNextLink = nextLink.includes('rel="next"');
 
       const teamPage = response.data;
       teamsList.push(...teamPage);
