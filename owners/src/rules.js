@@ -21,7 +21,7 @@ const RULE_PRIORITY = {
   DIRECTORY: 1,
   RECURSIVE_PATTERN: 2,
   SAME_DIRECTORY_PATTERN: 3,
-}
+};
 
 /**
  * A rule describing ownership for a directory.
