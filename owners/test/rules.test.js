@@ -54,6 +54,14 @@ describe('owners rules', () => {
       });
     });
 
+    describe('priority', () => {
+      it('is 1', () => {
+        const rule = new OwnersRule('OWNERS.yaml', []);
+
+        expect(rule.priority).toBe(1);
+      });
+    });
+
     describe('toString', () => {
       it('lists all owners', () => {
         const rule = new OwnersRule('OWNERS.yaml', ['rcebulko', 'erwinmombay']);
@@ -124,6 +132,14 @@ describe('owners rules', () => {
       });
     });
 
+    describe('priority', () => {
+      it('is 2', () => {
+        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.css');
+
+        expect(rule.priority).toBe(2);
+      });
+    });
+
     describe('toString', () => {
       it('lists all owners for the pattern', () => {
         const rule = new PatternOwnersRule(
@@ -142,6 +158,12 @@ describe('owners rules', () => {
       describe('label', () => {
         it('is the pattern in the "./" directory', () => {
           expect(rule.label).toEqual('./*.js');
+        });
+      });
+
+      describe('priority', () => {
+        it('is 3', () => {
+          expect(rule.priority).toBe(3);
         });
       });
 

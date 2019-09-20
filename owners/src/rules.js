@@ -34,6 +34,7 @@ class OwnersRule {
     this.filePath = ownersPath;
     this.dirPath = path.dirname(ownersPath);
     this.owners = owners;
+    this.priority = 1;
   }
 
   /**
@@ -97,6 +98,7 @@ class PatternOwnersRule extends OwnersRule {
       nocomment: true,
       nonegate: true,
     });
+    this.priority = 2;
   }
 
   /**
@@ -123,6 +125,18 @@ class PatternOwnersRule extends OwnersRule {
  * A pattern-based ownership rule applying only to files in the same directory.
  */
 class SameDirPatternOwnersRule extends PatternOwnersRule {
+  /**
+   * Constructor.
+   *
+   * @param {!string} ownersPath path to OWNERS file.
+   * @param {string[]} owners list of GitHub usernames of owners.
+   * @param {!string} pattern filename/type pattern.
+   */
+  constructor(ownersPath, owners, pattern) {
+    super(ownersPath, owners, pattern);
+    this.priority = 3;
+  }
+
   /**
    * The label to use when describing the rule.
    *
