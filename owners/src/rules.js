@@ -17,6 +17,14 @@
 const path = require('path');
 const minimatch = require('minimatch');
 
+/**
+ * The priority level for a rule.
+ *
+ * Since reviewer selection targets the most-specific rules, it should consider
+ * patterns to be more specific than directory owners. These priorities are used
+ * to determine which set of rules are the most specific so they can be targeted
+ * first.
+ */
 const RULE_PRIORITY = {
   DIRECTORY: 1,
   RECURSIVE_PATTERN: 2,
