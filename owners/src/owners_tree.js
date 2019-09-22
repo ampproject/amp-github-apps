@@ -88,6 +88,31 @@ class OwnersTree {
   }
 
   /**
+   * Provides a list of ownership rules for a file.
+   *
+   * Includes the node's own rules as well as inherited rules, in decreasing
+   * order of depth (ie. the root OWNERS rules will be last).
+   *
+   * @param {!string} filename file to get rules for.
+   * @return {OwnersRule[]} list of all ownership rules for the file.
+   */
+  fileRules(filename) {
+    return this.allRules.filter(rule => rule.matchesFile(filename));
+  }
+
+  /**
+   * Provides a list of owners rules for a file.
+   *
+   * @param {!string} filename file to get owners for.
+   * @return {Owner[]} list of all owners for the file.
+   */
+  fileOwners(filename) {
+    return this.fileRules(filename)
+      .map(rule => rule.owners)
+      .reduce((left, right) => left.concat(right), []);
+  }
+
+  /**
    * Provides the deepest ownership tree with rules applicable to a file or
    * directory.
    *
@@ -129,23 +154,20 @@ class OwnersTree {
   /**
    * Lists of owners which have modifiers from this tree to the root.
    *
+   * @param {!string} filename file to test ownership for.
    * @param {!OWNER_MODIFIER} modifier owner modifier.
    * @return {Owner[]} list of owners.
    */
-  getModifiedOwners(modifier) {
-    const modifiedOwners = {};
+  getModifiedFileOwners(filename, modifier) {
+    const modifiedOwners = new Map();
 
-    this.allRules.forEach(rule => {
-      rule.owners
-        .filter(owner => owner.modifier === modifier)
-        .forEach(owner => {
-          if (!modifiedOwners[owner.name]) {
-            modifiedOwners[owner.name] = owner;
-          }
-        });
-    });
+    this.fileOwners(filename)
+      .filter(owner => owner.modifier === modifier)
+      .forEach(owner => {
+        modifiedOwners.set(owner.name, owner);
+      });
 
-    return Object.values(modifiedOwners);
+    return Array.from(modifiedOwners.values());
   }
 
   /**
@@ -156,12 +178,9 @@ class OwnersTree {
    * @return {boolean} true if the user is an owner of the file.
    */
   fileHasOwner(filename, username) {
-    const allRules = this.atPath(filename).allRules;
-    const fileRules = allRules.filter(rule => rule.matchesFile(filename));
-
-    return fileRules.some(rule =>
-      rule.owners.some(owner => owner.includes(username))
-    );
+    return this.atPath(filename)
+      .fileOwners(filename)
+      .some(owner => owner.includes(username));
   }
 
   /**

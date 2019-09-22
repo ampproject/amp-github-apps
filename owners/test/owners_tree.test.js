@@ -144,6 +144,54 @@ describe('owners tree', () => {
     });
   });
 
+  describe('fileRules', () => {
+    let childTree;
+
+    beforeEach(() => {
+      tree.addRule(testFileRule);
+      tree.addRule(packageJsonRule);
+
+      childTree = tree.atPath('foo/bar.txt');
+    });
+
+    it('should include rules matching the filename', () => {
+      expect(childTree.fileRules('foo/script.test.js')).toContain(testFileRule);
+    });
+
+    it('should exclude rules which do not match', () => {
+      expect(childTree.fileRules('foo/package.json')).not.toContain(
+        packageJsonRule
+      );
+    });
+  });
+
+  describe('fileOwners', () => {
+    let childTree;
+
+    beforeEach(() => {
+      tree.addRule(rootDirRule);
+      tree.addRule(childDirRule);
+      tree.addRule(testFileRule);
+      tree.addRule(packageJsonRule);
+
+      childTree = tree.atPath('foo/bar.txt');
+    });
+
+    it('should include owners matching the filename', () => {
+      const owners = childTree.fileOwners('foo/script.test.js');
+      expect(owners.map(owner => owner.name)).toContain(
+        'root',
+        'child',
+        'ampproject/testers'
+      );
+    });
+
+    it('should exclude owners on the path with non-matching rules', () => {
+      const owners = childTree.fileOwners('foo/script.test.js');
+      expect(owners.map(owner => owner.name)).not.toContain('anyone');
+    });
+  });
+
   describe('atPath', () => {
     it("should produce the tree for the file's directory", () => {
       tree.addRule(childDirRule);
@@ -185,7 +233,7 @@ describe('owners tree', () => {
     });
   });
 
-  describe('getModifiedOwners', () => {
+  describe('getModifiedFileOwners', () => {
     beforeEach(() => {
       tree.addRule(rootDirRule);
       tree.addRule(childDirRule);
@@ -194,7 +242,10 @@ describe('owners tree', () => {
 
     it('finds matching owners in the subtree', () => {
       const subtree = tree.atPath('foo/file.js');
-      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+      const modifiedOwners = subtree.getModifiedFileOwners(
+        'foo/file.js',
+        OWNER_MODIFIER.NOTIFY
+      );
 
       expect(modifiedOwners).toContainEqual(
         new UserOwner('child', OWNER_MODIFIER.NOTIFY)
@@ -203,7 +254,10 @@ describe('owners tree', () => {
 
     it('finds matching owners in parent trees', () => {
       const subtree = tree.atPath('foo/bar/baz/file.js');
-      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+      const modifiedOwners = subtree.getModifiedFileOwners(
+        'foo/bar/baz/file.js',
+        OWNER_MODIFIER.NOTIFY
+      );
 
       expect(modifiedOwners).toContainEqual(
         new UserOwner('descendant', OWNER_MODIFIER.NOTIFY),
@@ -213,7 +267,10 @@ describe('owners tree', () => {
 
     it('does not return non-matching owners', () => {
       const subtree = tree.atPath('foo/file.js');
-      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+      const modifiedOwners = subtree.getModifiedFileOwners(
+        'foo/file.js',
+        OWNER_MODIFIER.NOTIFY
+      );
 
       expect(modifiedOwners).not.toContainEqual(
         new UserOwner('root', OWNER_MODIFIER.SILENT)
@@ -227,7 +284,10 @@ describe('owners tree', () => {
         ])
       );
       const subtree = tree.atPath('foo/file.js');
-      const modifiedOwners = subtree.getModifiedOwners(OWNER_MODIFIER.NOTIFY);
+      const modifiedOwners = subtree.getModifiedFileOwners(
+        'foo/file.js',
+        OWNER_MODIFIER.NOTIFY
+      );
 
       expect(modifiedOwners.length).toEqual(1);
     });
