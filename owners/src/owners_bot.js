@@ -203,7 +203,7 @@ class OwnersBot {
    *
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    * @param {string[]} suggestedReviewers list of suggested reviewer usernames.
-   * @return {Set<string>} set of usernames.
+   * @return {string[]} set of usernames.
    */
   _getReviewRequests(fileTreeMap, suggestedReviewers) {
     const reviewers = new Set(suggestedReviewers);
@@ -215,7 +215,7 @@ class OwnersBot {
         .forEach(reviewers.delete, reviewers);
     });
 
-    return reviewers;
+    return Array.from(reviewers);
   }
 
   /**
