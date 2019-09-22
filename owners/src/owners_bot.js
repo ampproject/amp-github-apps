@@ -83,6 +83,10 @@ class OwnersBot {
 
     const changedFiles = await github.listFiles(pr.number);
     const reviewers = await this._getCurrentReviewers(github, pr);
+    const pendingReviewers = await github.getReviewRequests(pr.number);
+    pendingReviewers.forEach(reviewer => {
+      reviewers[reviewer] = false;
+    });
 
     return {tree, changedFiles, reviewers};
   }
