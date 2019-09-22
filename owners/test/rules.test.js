@@ -18,6 +18,7 @@ const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
+  RULE_PRIORITY,
 } = require('../src/rules');
 
 describe('owners rules', () => {
@@ -51,6 +52,14 @@ describe('owners rules', () => {
         const rule = new OwnersRule('OWNERS.yaml', []);
 
         expect(rule.label).toEqual('**/*');
+      });
+    });
+
+    describe('priority', () => {
+      it('is DIRECTORY', () => {
+        const rule = new OwnersRule('OWNERS.yaml', []);
+
+        expect(rule.priority).toBe(RULE_PRIORITY.DIRECTORY);
       });
     });
 
@@ -124,6 +133,14 @@ describe('owners rules', () => {
       });
     });
 
+    describe('priority', () => {
+      it('is RECURSIVE_PATTERN', () => {
+        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.css');
+
+        expect(rule.priority).toBe(RULE_PRIORITY.RECURSIVE_PATTERN);
+      });
+    });
+
     describe('toString', () => {
       it('lists all owners for the pattern', () => {
         const rule = new PatternOwnersRule(
@@ -142,6 +159,12 @@ describe('owners rules', () => {
       describe('label', () => {
         it('is the pattern in the "./" directory', () => {
           expect(rule.label).toEqual('./*.js');
+        });
+      });
+
+      describe('priority', () => {
+        it('is SAME_DIRECTORY_PATTERN', () => {
+          expect(rule.priority).toBe(RULE_PRIORITY.SAME_DIRECTORY_PATTERN);
         });
       });
 

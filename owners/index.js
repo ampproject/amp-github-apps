@@ -92,7 +92,7 @@ module.exports = app => {
     const {tree, changedFiles, reviewers} = await ownersBot.initPr(github, pr);
     const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
 
-    const checkRun = ownersCheck.run();
+    const {checkRun} = ownersCheck.run();
 
     res.send(checkRun.json);
   });

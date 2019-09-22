@@ -17,54 +17,82 @@
 const sinon = require('sinon');
 const {ReviewerSelection} = require('../src/reviewer_selection');
 const {Team} = require('../src/github');
-const {UserOwner, TeamOwner} = require('../src/owner');
+const {UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
 const {OwnersTree} = require('../src/owners_tree');
-const {OwnersRule} = require('../src/rules');
+const {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+} = require('../src/rules');
 
 describe('reviewer selection', () => {
   const sandbox = sinon.createSandbox();
-  const ownersTree = new OwnersTree();
+  let ownersTree;
+
   const myTeam = new Team(42, 'ampproject', 'my_team');
   myTeam.members = ['child', 'kid'];
 
-  const dirTrees = {
-    '/': ownersTree.addRule(
-      new OwnersRule('OWNERS.yaml', [new UserOwner('rootOwner')])
-    ),
-    '/foo': ownersTree.addRule(
-      new OwnersRule('foo/OWNERS.yaml', [new UserOwner('child')])
-    ),
-    '/biz': ownersTree.addRule(
-      new OwnersRule('biz/OWNERS.yaml', [new TeamOwner(myTeam)])
-    ),
-    '/buzz': ownersTree.addRule(
-      new OwnersRule('buzz/OWNERS.yaml', [new UserOwner('thirdChild')])
-    ),
-    '/foo/bar/baz': ownersTree.addRule(
-      new OwnersRule('foo/bar/baz/OWNERS.yaml', [new UserOwner('descendant')])
-    ),
+  const dirRules = {
+    '/': new OwnersRule('OWNERS.yaml', [new UserOwner('rootOwner')]),
+    '/foo': new OwnersRule('foo/OWNERS.yaml', [new UserOwner('child')]),
+    '/biz': new OwnersRule('biz/OWNERS.yaml', [new TeamOwner(myTeam)]),
+    '/buzz': new OwnersRule('buzz/OWNERS.yaml', [new UserOwner('thirdChild')]),
+    '/foo/bar/baz': new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+      new UserOwner('descendant'),
+    ]),
   };
+  const wildcardRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+    new WildcardOwner(),
+  ]);
+
+  beforeEach(() => {
+    ownersTree = new OwnersTree();
+    ownersTree.addRule(dirRules['/']);
+    ownersTree.addRule(dirRules['/foo']);
+    ownersTree.addRule(dirRules['/biz']);
+    ownersTree.addRule(dirRules['/buzz']);
+    ownersTree.addRule(dirRules['/foo/bar/baz']);
+  });
 
   afterEach(() => {
     sandbox.restore();
   });
 
-  describe('nearestOwnersTrees', () => {
-    it('returns the nearest trees', () => {
+  describe('deepestOwnersRules', () => {
+    it('returns rules from the deepest trees', () => {
       const fileTreeMap = ownersTree.buildFileTreeMap([
         './main.js',
         'biz/style.css',
         'foo/bar/other_file.js',
       ]);
-      const nearestTrees = ReviewerSelection._nearestOwnersTrees(fileTreeMap);
+      const deepestRules = ReviewerSelection._deepestOwnersRules(fileTreeMap);
 
-      expect(nearestTrees).toEqual(
-        expect.arrayContaining([
-          dirTrees['/'],
-          dirTrees['/biz'],
-          dirTrees['/foo'],
-        ])
-      );
+      expect(deepestRules).toContain(dirRules['/biz'], dirRules['/foo']);
+    });
+
+    it('excludes rules from higher-level trees', () => {
+      const fileTreeMap = ownersTree.buildFileTreeMap([
+        './main.js',
+        'biz/style.css',
+        'foo/bar/other_file.js',
+      ]);
+      const deepestRules = ReviewerSelection._deepestOwnersRules(fileTreeMap);
+
+      expect(deepestRules).toContain(dirRules['/foo']);
+      expect(deepestRules).not.toContain(dirRules['.']);
+    });
+
+    it('excludes rules with wildcard owners', () => {
+      ownersTree.addRule(wildcardRule);
+      const fileTreeMap = ownersTree.buildFileTreeMap([
+        './main.js',
+        'biz/style.css',
+        'foo/bar/other_file.js',
+      ]);
+      const deepestRules = ReviewerSelection._deepestOwnersRules(fileTreeMap);
+
+      expect(deepestRules).toContain(dirRules['/foo']);
+      expect(deepestRules).not.toContain(dirRules['.']);
     });
 
     it('does not return duplicates', () => {
@@ -72,17 +100,17 @@ describe('reviewer selection', () => {
         'foo/file.js',
         'foo/bar/other_file.js',
       ]);
-      const nearestTrees = ReviewerSelection._nearestOwnersTrees(fileTreeMap);
+      const deepestRules = ReviewerSelection._deepestOwnersRules(fileTreeMap);
 
-      expect(nearestTrees).toEqual([dirTrees['/foo']]);
+      expect(deepestRules).toEqual([dirRules['/foo']]);
     });
   });
 
-  describe('reviewersForTrees', () => {
+  describe('reviewersForRules', () => {
     it('unions the owners for all subtrees', () => {
-      const reviewers = ReviewerSelection._reviewersForTrees([
-        dirTrees['/biz'],
-        dirTrees['/foo/bar/baz'],
+      const reviewers = ReviewerSelection._reviewersForRules([
+        dirRules['/biz'],
+        dirRules['/foo/bar/baz'],
       ]);
 
       expect(reviewers).toEqual(
@@ -91,11 +119,73 @@ describe('reviewer selection', () => {
     });
 
     it('does not include inherited owners', () => {
-      const reviewers = ReviewerSelection._reviewersForTrees([
-        dirTrees['/foo'],
+      const reviewers = ReviewerSelection._reviewersForRules([
+        dirRules['/foo'],
       ]);
 
       expect(reviewers).not.toContain('rootOwner');
+    });
+
+    describe('rule priority', () => {
+      const sameDirPatternRule = new SameDirPatternOwnersRule(
+        'priority/OWNERS.yaml',
+        [new UserOwner('same_dir_pattern_owner')],
+        '*.css'
+      );
+      const recursivePatternRule = new PatternOwnersRule(
+        'priority/OWNERS.yaml',
+        [new UserOwner('recursive_pattern_owner')],
+        '*.js'
+      );
+      const directoryRule = new OwnersRule('priority/OWNERS.yaml', [
+        new UserOwner('directory_owner'),
+      ]);
+
+      describe('when a same-directory pattern rule is present', () => {
+        const reviewers = ReviewerSelection._reviewersForRules([
+          directoryRule,
+          recursivePatternRule,
+          sameDirPatternRule,
+        ]);
+
+        it('returns same-directory pattern rule owners', () => {
+          expect(reviewers).toContain('same_dir_pattern_owner');
+        });
+
+        it('does not return recursive pattern rule owners', () => {
+          expect(reviewers).not.toContain('recursive_pattern_owner');
+        });
+
+        it('does not return directory owners', () => {
+          expect(reviewers).not.toContain('directory_owner');
+        });
+      });
+
+      describe('when no same-directory pattern rule is present', () => {
+        describe('when a recursive pattern rule is present', () => {
+          const reviewers = ReviewerSelection._reviewersForRules([
+            directoryRule,
+            recursivePatternRule,
+          ]);
+
+          it('returns recursive pattern rule owners', () => {
+            expect(reviewers).toContain('recursive_pattern_owner');
+          });
+
+          it('does not return directory owners', () => {
+            expect(reviewers).not.toContain('directory_owner');
+          });
+        });
+
+        describe('when no recursive pattern rule is present', () => {
+          it('returns directory owners', () => {
+            const reviewers = ReviewerSelection._reviewersForRules([
+              directoryRule,
+            ]);
+            expect(reviewers).toContain('directory_owner');
+          });
+        });
+      });
     });
   });
 
@@ -106,25 +196,18 @@ describe('reviewer selection', () => {
         'biz/style.css',
         'foo/bar/other_file.js',
       ]);
-      sandbox.stub(ReviewerSelection, '_reviewersForTrees').callThrough();
+      sandbox.stub(ReviewerSelection, '_reviewersForRules').callThrough();
       const reviewers = ReviewerSelection._findPotentialReviewers(fileTreeMap);
 
       sandbox.assert.calledWith(
-        ReviewerSelection._reviewersForTrees,
-        sinon.match.array.contains([dirTrees['/foo'], dirTrees['/biz']])
+        ReviewerSelection._reviewersForRules,
+        sinon.match.array.contains([dirRules['/foo'], dirRules['/biz']])
       );
       expect(reviewers).toEqual(expect.arrayContaining(['child', 'kid']));
     });
   });
 
   describe('filesOwnedByReviewer', () => {
-    const fileTreeMap = ownersTree.buildFileTreeMap([
-      './main.js', // root
-      'biz/style.css', // child, kid, root
-      'foo/bar/other_file.js', // child, root
-      'foo/bar/baz/README.md', // descendant, child, root
-    ]);
-
     const filesOwnedMap = {
       'rootOwner': [
         './main.js',
@@ -140,6 +223,16 @@ describe('reviewer selection', () => {
       'kid': ['biz/style.css'],
       'descendant': ['foo/bar/baz/README.md'],
     };
+    let fileTreeMap;
+
+    beforeAll(() => {
+      fileTreeMap = ownersTree.buildFileTreeMap([
+        './main.js', // root
+        'biz/style.css', // child, kid, root
+        'foo/bar/other_file.js', // child, root
+        'foo/bar/baz/README.md', // descendant, child, root
+      ]);
+    });
 
     it.each(Object.entries(filesOwnedMap))(
       'lists files for %p',
@@ -172,13 +265,17 @@ describe('reviewer selection', () => {
   });
 
   describe('pickBestReview', () => {
-    const fileTreeMap = ownersTree.buildFileTreeMap([
-      './main.js', // root
-      'biz/style.css', // child, kid, root
-      'foo/bar/other_file.js', // child, root
-      'buzz/info.txt', // thirdChild, root
-      'buzz/code.js', // thirdChild, root
-    ]);
+    let fileTreeMap;
+
+    beforeAll(() => {
+      fileTreeMap = ownersTree.buildFileTreeMap([
+        './main.js', // root
+        'biz/style.css', // child, kid, root
+        'foo/bar/other_file.js', // child, root
+        'buzz/info.txt', // thirdChild, root
+        'buzz/code.js', // thirdChild, root
+      ]);
+    });
 
     it('builds a map from deepest reviewers to files they own', () => {
       sandbox.stub(ReviewerSelection, '_reviewersWithMostFiles').callThrough();

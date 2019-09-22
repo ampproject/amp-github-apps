@@ -39,35 +39,46 @@ class ReviewerSelection {
   /** Part 1 **/
 
   /**
-   * Produce a set of all ownership subtrees directly owning a changed file.
+   * Produce a set of rules at the deepest layer of ownership.
    *
    * @private
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @return {Set<OwnersTree>} a set of the nearest ownership subtrees.
+   * @return {Set<OwnersRule>} a set of the most specific ownership rules.
    */
-  static _nearestOwnersTrees(fileTreeMap) {
-    const trees = new Set(Object.values(fileTreeMap));
-    return Array.from(trees);
+  static _deepestOwnersRules(fileTreeMap) {
+    const maxDepth = Math.max(
+      ...Object.values(fileTreeMap).map(tree => tree.depth)
+    );
+
+    const deepRules = Object.entries(fileTreeMap)
+      .filter(([filename, subtree]) => subtree.depth === maxDepth)
+      .map(([filename, subtree]) =>
+        subtree.rules.filter(rule => rule.matchesFile(filename))
+      )
+      .reduce((left, right) => left.concat(right), []);
+
+    return Array.from(new Set(deepRules));
   }
 
   /**
-   * Produce the set of all owners for a set of ownership trees.
+   * Produce the set of all owners for a set of ownership rules.
    *
    * @private
-   * @param {OwnersTree[]} trees list of ownership trees.
-   * @return {string[]} union of reviewers lists for all trees.
+   * @param {OwnersRule[]} rules list of ownership rules.
+   * @return {string[]} union of reviewers lists for highest priority rules.
    */
-  static _reviewersForTrees(trees) {
+  static _reviewersForRules(rules) {
     const reviewers = new Set();
-    trees.forEach(tree => {
-      tree.rules
-        .filter(rule => !rule.wildcardOwner)
-        .forEach(rule => {
-          rule.owners.forEach(owner => {
-            owner.allUsernames.forEach(username => reviewers.add(username));
-          });
-        });
-    });
+    const maxPriority = Math.max(...rules.map(rule => rule.priority));
+
+    rules
+      .filter(rule => rule.priority === maxPriority)
+      .map(rule => rule.owners)
+      .reduce((left, right) => left.concat(right), [])
+      .map(owner => owner.allUsernames)
+      .reduce((left, right) => left.concat(right), [])
+      .forEach(username => reviewers.add(username));
+
     return Array.from(reviewers);
   }
 
@@ -80,10 +91,8 @@ class ReviewerSelection {
    * @return {string[]} list of reviewer usernames.
    */
   static _findPotentialReviewers(fileTreeMap) {
-    const nearestTrees = this._nearestOwnersTrees(fileTreeMap);
-    const maxDepth = Math.max(...nearestTrees.map(tree => tree.depth));
-    const deepestTrees = nearestTrees.filter(tree => tree.depth === maxDepth);
-    return this._reviewersForTrees(deepestTrees);
+    const deepestRules = this._deepestOwnersRules(fileTreeMap);
+    return this._reviewersForRules(deepestRules);
   }
 
   /** Part 2 **/

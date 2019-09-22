@@ -18,6 +18,20 @@ const path = require('path');
 const minimatch = require('minimatch');
 
 /**
+ * The priority level for a rule.
+ *
+ * Since reviewer selection targets the most-specific rules, it should consider
+ * patterns to be more specific than directory owners. These priorities are used
+ * to determine which set of rules are the most specific so they can be targeted
+ * first.
+ */
+const RULE_PRIORITY = {
+  DIRECTORY: 1,
+  RECURSIVE_PATTERN: 2,
+  SAME_DIRECTORY_PATTERN: 3,
+};
+
+/**
  * A rule describing ownership for a directory.
  */
 class OwnersRule {
@@ -34,6 +48,7 @@ class OwnersRule {
     this.filePath = ownersPath;
     this.dirPath = path.dirname(ownersPath);
     this.owners = owners;
+    this.priority = RULE_PRIORITY.DIRECTORY;
   }
 
   /**
@@ -97,6 +112,7 @@ class PatternOwnersRule extends OwnersRule {
       nocomment: true,
       nonegate: true,
     });
+    this.priority = RULE_PRIORITY.RECURSIVE_PATTERN;
   }
 
   /**
@@ -124,6 +140,18 @@ class PatternOwnersRule extends OwnersRule {
  */
 class SameDirPatternOwnersRule extends PatternOwnersRule {
   /**
+   * Constructor.
+   *
+   * @param {!string} ownersPath path to OWNERS file.
+   * @param {string[]} owners list of GitHub usernames of owners.
+   * @param {!string} pattern filename/type pattern.
+   */
+  constructor(ownersPath, owners, pattern) {
+    super(ownersPath, owners, pattern);
+    this.priority = RULE_PRIORITY.SAME_DIRECTORY_PATTERN;
+  }
+
+  /**
    * The label to use when describing the rule.
    *
    * @return {string} the label for the rule.
@@ -145,4 +173,9 @@ class SameDirPatternOwnersRule extends PatternOwnersRule {
   }
 }
 
-module.exports = {OwnersRule, PatternOwnersRule, SameDirPatternOwnersRule};
+module.exports = {
+  OwnersRule,
+  PatternOwnersRule,
+  SameDirPatternOwnersRule,
+  RULE_PRIORITY,
+};
