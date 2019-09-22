@@ -311,7 +311,6 @@ class GitHub {
    *
    * @param {number} number PR number.
    * @param {!string} body comment body.
-   * @return {string[]} list of comments by the bot user.
    */
   async createBotComment(number, body) {
     this.logger.info(`Adding bot comment to PR #${number}`);
@@ -332,7 +331,6 @@ class GitHub {
    *
    * @param {number} commentId ID of comment to update.
    * @param {!string} body comment body.
-   * @return {string[]} list of comments by the bot user.
    */
   async updateComment(commentId, body) {
     this.logger.info(`Replacing comment with ID ${commentId}`);
