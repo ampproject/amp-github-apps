@@ -159,17 +159,15 @@ class OwnersTree {
    * @return {Owner[]} list of owners.
    */
   getModifiedFileOwners(filename, modifier) {
-    const modifiedOwners = {};
+    const modifiedOwners = new Map();
 
     this.fileOwners(filename)
       .filter(owner => owner.modifier === modifier)
       .forEach(owner => {
-        if (!modifiedOwners[owner.name]) {
-          modifiedOwners[owner.name] = owner;
-        }
+        modifiedOwners.set(owner.name, owner);
       });
 
-    return Object.values(modifiedOwners);
+    return Array.from(modifiedOwners.values());
   }
 
   /**
