@@ -32,6 +32,7 @@ describe('owners bot', () => {
   const silentLogger = {
     debug: () => {},
     log: () => {},
+    info: () => {},
     warn: () => {},
     error: () => {},
   };
@@ -270,45 +271,58 @@ describe('owners bot', () => {
 
   describe('createNotifications', () => {
     const fileTreeMap = {'main.js': new OwnersTree()};
+    let getCommentsStub;
 
     beforeEach(() => {
       sandbox.stub(GitHub.prototype, 'createBotComment');
+      sandbox.stub(GitHub.prototype, 'updateComment').returns();
+      getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
+      getCommentsStub.returns([]);
     });
 
-    describe('when a comment by the bot already exists', () => {
-      beforeEach(() => {
-        sandbox.stub(GitHub.prototype, 'getBotComments').returns(['a comment']);
-      });
+    it('gets users and teams to notify', async done => {
+      sandbox.stub(OwnersBot.prototype, '_getNotifies').returns([]);
+      await ownersBot.createNotifications(github, 1337, fileTreeMap);
 
-      it('does not create a comment', async done => {
-        await ownersBot.createNotifications(github, 1337, fileTreeMap);
-
-        sandbox.assert.notCalled(github.createBotComment);
-        done();
-      });
+      sandbox.assert.calledWith(ownersBot._getNotifies, fileTreeMap);
+      done();
     });
 
-    describe('when no comment by the bot exists yet', () => {
+    describe('when there are users or teams to notify', () => {
       beforeEach(() => {
-        sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
+        sandbox.stub(OwnersBot.prototype, '_getNotifies').returns({
+          'a_subscriber': ['foo/main.js'],
+          'ampproject/some_team': ['foo/main.js'],
+        });
       });
 
-      it('gets users and teams to notify', async done => {
-        sandbox.stub(OwnersBot.prototype, '_getNotifies').returns([]);
-        await ownersBot.createNotifications(github, 1337, fileTreeMap);
-
-        sandbox.assert.calledWith(ownersBot._getNotifies, fileTreeMap);
-        done();
-      });
-
-      describe('when there are users or teams to notify', () => {
+      describe('when a comment by the bot already exists', () => {
         beforeEach(() => {
-          sandbox.stub(OwnersBot.prototype, '_getNotifies').returns({
-            'a_subscriber': ['foo/main.js'],
-            'ampproject/some_team': ['foo/main.js'],
-          });
+          getCommentsStub.returns([{id: 42, body: 'a comment'}]);
         });
 
+        it('does not create a comment', async done => {
+          await ownersBot.createNotifications(github, 1337, fileTreeMap);
+
+          sandbox.assert.notCalled(github.createBotComment);
+          done();
+        });
+
+        it('updates the existing comment', async () => {
+          expect.assertions(2);
+          await ownersBot.createNotifications(github, 1337, fileTreeMap);
+
+          sandbox.assert.calledOnce(github.updateComment);
+          const [commentId, comment] = github.updateComment.getCall(0).args;
+          expect(commentId).toEqual(42);
+          expect(comment).toContain(
+            'Hey @a_subscriber, these files were changed:\n- foo/main.js',
+            'Hey @ampproject/some_team, these files were changed:\n- foo/main.js'
+          );
+        });
+      });
+
+      describe('when no comment by the bot exists yet', () => {
         it('creates a comment tagging users and teams', async () => {
           expect.assertions(2);
           await ownersBot.createNotifications(github, 1337, fileTreeMap);
@@ -322,14 +336,15 @@ describe('owners bot', () => {
           );
         });
       });
+    });
 
-      describe('when there are no users or teams to notify', () => {
-        it('does not create a comment', async done => {
-          await ownersBot.createNotifications(github, 1337, fileTreeMap);
+    describe('when there are no users or teams to notify', () => {
+      it('does not create or update a comment', async done => {
+        await ownersBot.createNotifications(github, 1337, fileTreeMap);
 
-          sandbox.assert.notCalled(github.createBotComment);
-          done();
-        });
+        sandbox.assert.notCalled(github.createBotComment);
+        sandbox.assert.notCalled(github.updateComment);
+        done();
       });
     });
   });
@@ -433,7 +448,7 @@ describe('owners bot', () => {
     tree.addRule(new OwnersRule('baz/OWNERS.yaml', [new UserOwner('rando')]));
 
     it('includes user owners with the always-notify modifier', () => {
-      const fileTreeMap = tree.buildFileTreeMap(['foo/main.js']);
+      const fileTreeMap = tree.buildFileTreeMap(['foo/main.js', 'foo/bar.js']);
       const notifies = ownersBot._getNotifies(fileTreeMap);
 
       expect(notifies['relevant_user']).toContain('foo/main.js');

@@ -147,14 +147,7 @@ class OwnersBot {
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    */
   async createNotifications(github, prNumber, fileTreeMap) {
-    const botComments = await github.getBotComments(prNumber);
-    if (botComments.length) {
-      // Avoid adding duplicate notification comment.
-      // TODO(rcebulko): Handle cases where the fileset changes after PR
-      // creation.
-      return;
-    }
-
+    const [botComment] = await github.getBotComments(prNumber);
     const notifies = this._getNotifies(fileTreeMap);
 
     const fileNotifyComments = Object.entries(notifies).map(
@@ -165,8 +158,15 @@ class OwnersBot {
       }
     );
 
-    if (fileNotifyComments.length) {
-      await github.createBotComment(prNumber, fileNotifyComments.join('\n\n'));
+    if (!fileNotifyComments.length) {
+      return;
+    }
+
+    const comment = fileNotifyComments.join('\n\n');
+    if (botComment) {
+      await github.updateComment(botComment.id, comment);
+    } else {
+      await github.createBotComment(prNumber, comment);
     }
   }
 

@@ -288,7 +288,7 @@ class GitHub {
    * created via the Pulls API require a file path/position.
    *
    * @param {number} number PR number.
-   * @return {string[]} list of comments by the bot user.
+   * @return {{body: string, id: number}[]} list of comments by the bot user.
    */
   async getBotComments(number) {
     this.logger.info(`Fetching bot comments for PR #${number}`);
@@ -298,7 +298,9 @@ class GitHub {
 
     return response.data
       .filter(({user}) => user.login === process.env.GITHUB_BOT_USERNAME)
-      .map(({body}) => body);
+      .map(({id, body}) => {
+        return {id, body};
+      });
   }
 
   /**
@@ -309,7 +311,6 @@ class GitHub {
    *
    * @param {number} number PR number.
    * @param {!string} body comment body.
-   * @return {string[]} list of comments by the bot user.
    */
   async createBotComment(number, body) {
     this.logger.info(`Adding bot comment to PR #${number}`);
@@ -318,6 +319,26 @@ class GitHub {
     await this._customRequest(
       'POST',
       `/repos/${this.owner}/${this.repository}/issues/${number}/comments`,
+      {body}
+    );
+  }
+
+  /**
+   * Updates a comment on a PR.
+   *
+   * Note that pull request comments fall under the Issues API, while comments
+   * created via the Pulls API require a file path/position.
+   *
+   * @param {number} commentId ID of comment to update.
+   * @param {!string} body comment body.
+   */
+  async updateComment(commentId, body) {
+    this.logger.info(`Replacing comment with ID ${commentId}`);
+    this.logger.debug('[updateComment]', commentId, body);
+
+    await this._customRequest(
+      'PATCH',
+      `/repos/${this.owner}/${this.repository}/issues/comments/${commentId}`,
       {body}
     );
   }

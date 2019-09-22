@@ -374,7 +374,12 @@ describe('GitHub API', () => {
       await withContext(async (context, github) => {
         const comments = await github.getBotComments(24574);
 
-        expect(comments).toEqual(['Test comment by ampprojectbot']);
+        expect(comments).toEqual([
+          {
+            id: 532484354,
+            body: 'Test comment by ampprojectbot',
+          },
+        ]);
       })();
     });
   });
@@ -391,6 +396,22 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         await github.createBotComment(24574, 'test comment');
+      })();
+    });
+  });
+
+  describe('updateComment', () => {
+    it('updates a PR comment', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .patch('/repos/test_owner/test_repo/issues/comments/24574', body => {
+          expect(body).toMatchObject({body: 'updated comment'});
+          return true;
+        })
+        .reply(200);
+
+      await withContext(async (context, github) => {
+        await github.updateComment(24574, 'updated comment');
       })();
     });
   });
