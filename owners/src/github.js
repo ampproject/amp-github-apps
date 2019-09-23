@@ -246,7 +246,7 @@ class GitHub {
           json.user.login.toLowerCase(),
           json.state,
           new Date(json.submitted_at)
-      )
+        )
     );
   }
 
