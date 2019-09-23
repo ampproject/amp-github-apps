@@ -347,6 +347,22 @@ describe('owners bot', () => {
         done();
       });
     });
+
+    describe('when the author is on the notify list', () => {
+      beforeEach(() => {
+        sandbox.stub(OwnersBot.prototype, '_getNotifies').returns({
+          'the_author': ['foo/main.js'],
+        });
+      });
+
+      it('does not notify the author', async done => {
+        await ownersBot.createNotifications(github, 1337, fileTreeMap);
+
+        sandbox.assert.notCalled(github.createBotComment);
+        sandbox.assert.notCalled(github.updateComment);
+        done();
+      });
+    });
   });
 
   describe('getCurrentReviewers', () => {
