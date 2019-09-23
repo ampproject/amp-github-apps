@@ -67,6 +67,7 @@ describe('owners bot', () => {
     sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox.stub(OwnersBot.prototype, 'initTeams');
     sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
+    sandbox.stub(GitHub.prototype, 'getReviewRequests').returns([]);
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
