@@ -100,9 +100,9 @@ describe('owners bot', () => {
           {filename: 'changed_file1.js', sha: '_sha1_'},
           {filename: 'foo/changed_file2.js', sha: '_sha2_'},
         ]);
-      sandbox.stub(GitHub.prototype, 'getReviewRequests').returns([
-        'requested'
-      ]);
+      sandbox
+        .stub(GitHub.prototype, 'getReviewRequests')
+        .returns(['requested']);
     });
 
     it('parses the owners tree', async () => {
