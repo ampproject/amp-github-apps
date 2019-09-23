@@ -37,7 +37,12 @@ class PullRequest {
    * @return {PullRequest} a pull request instance.
    */
   static fromGitHubResponse(res) {
-    return new PullRequest(res.number, res.user.login, res.head.sha, res.body);
+    return new PullRequest(
+      res.number,
+      res.user.login.toLowerCase(),
+      res.head.sha,
+      res.body
+    );
   }
 }
 
@@ -207,7 +212,7 @@ class GitHub {
     const memberList = response.data;
     this.logger.debug('[getTeamMembers]', teamId, memberList);
 
-    return memberList.map(({login}) => login);
+    return memberList.map(({login}) => login.toLowerCase());
   }
 
   /**
@@ -237,7 +242,11 @@ class GitHub {
 
     return response.data.map(
       json =>
-        new Review(json.user.login, json.state, new Date(json.submitted_at))
+        new Review(
+          json.user.login.toLowerCase(),
+          json.state,
+          new Date(json.submitted_at)
+        )
     );
   }
 
@@ -278,7 +287,7 @@ class GitHub {
     );
     this.logger.debug('[getReviewRequests]', number, response.data);
 
-    return response.data.users.map(({login}) => login);
+    return response.data.users.map(({login}) => login.toLowerCase());
   }
 
   /**
