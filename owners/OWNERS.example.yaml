@@ -3,9 +3,10 @@
 # OWNERS.yaml file.
 
 # IMPORTANT NOTE: YAML syntax does not like non-alphanumeric characters to start
-# dictionary keys, so patterns or globs starting with `*` must be wrapped in
-# quotes to ensure it is parsed correctly. For consistency, it is preferred to 
-# wrap all patterns and globs in quotes.
+# dictionary keys, so patterns or globs starting with `*`, as well as owners 
+# declarations with the `?` or `#` modifiers, must be wrapped in quotes to
+# ensure it is parsed correctly. For consistency, it is preferred to wrap all
+# patterns and globs in quotes.
 
 # The top-level structure must be a list. Any usernames in this top-level list
 # will be considered owners of all files and subdirectories of this directory.
@@ -58,17 +59,40 @@
 - "*.{js,css}": frontend
 - "package.{,lock.}json": somebodyelse
 
+# Prepending a user or team name with a `?` will prevent this owner from being
+# automatically notified or requested as a reviewer. They may still be requested
+# or tagged manually.
+- "**/*.css":
+  - "?someoneimportant"
+  - "?ampproject/important-team"
+
+# Prepending a user or team name with a `?` will prevent this owner from being
+# automatically notified or requested as a reviewer. They may still be requested
+# or tagged manually.
+- "**/*.css": "?someoneimportant"
+- "yarn.lock": "?ampproject/important-team"
+
+# Alternately, the `#` modifier will ensure that the user is @mentioned in any
+# PR touching those files, even if they are not added as a reviewer. The bot
+# will add a comment to these PRs to notify the owners.
+- "**/*.test.js": "#stakeholder"
+- "**/validator-*.{out,html}": "#ampproject/wg-caching"
+
 
 # The result of parsing this file would be a tree with these rules:
 #
-# */**:                  someuser, dothisinstead, thiswillworkbutdontdoit
-#                        ampproject/wg-cool-team [member, othermember, etc]
-# ./package.json:        fileowner
-# ./.eslintrc:           styleperson, infraperson
-# ./*.js:                scripter
-# ./package*.json:       infraperson, developer
-# **/.eslintrc:          styleperson
-# **/*.protoascii:       languageperson, translator
-# *.{js,css}:            frontend
-# package.{,lock.}json:  somebodyelse
-# **/.eslintrc:          somebodyelse
+# */**: someuser, dothisinstead, thiswillworkbutdontdoit
+# ampproject/wg-cool-team [member, othermember, etc]
+# ./package.json: fileowner
+# ./.eslintrc: styleperson, infraperson
+# ./*.js: scripter
+# ./package*.json: infraperson, developer
+# **/.eslintrc: styleperson
+# **/*.protoascii: languageperson, translator
+# *.{js,css}: frontend
+# package.{,lock.}json: somebodyelse
+# **/.eslintrc: somebodyelse
+# **/*.css: someoneimportant (never notify)
+# ./yarn.lock: ampproject/important-team (never notify)
+# **/*.test.js: stakeholder (always notify)
+# **/validator-*.{out,html}: ampproject/wg-caching (always notify)
