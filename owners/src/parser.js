@@ -87,6 +87,8 @@ class OwnersParser {
     const errors = [];
     let modifier = OWNER_MODIFIER.NONE;
 
+    owner = owner.toLowerCase();
+
     if (owner.startsWith('?')) {
       modifier = OWNER_MODIFIER.SILENT;
       owner = owner.slice(1);
