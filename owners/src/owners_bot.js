@@ -239,7 +239,6 @@ class OwnersBot {
         });
     });
 
-
     return notifies;
   }
 }
