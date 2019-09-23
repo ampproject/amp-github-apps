@@ -1,3 +1,7 @@
+# AMPHTML uses a custom owners bot to enforce ownership rules across its
+# codebase to ensure that all incoming pull requests are reviewed by the right
+# people. This file is an example of the supported format.
+
 # OWNERS files support standard YAML syntax, including comments and blank lines.
 # In this file, "this directory" refers to the directory containing the
 # OWNERS.yaml file.
@@ -19,7 +23,8 @@
 
 # GitHub teams are also supported as owners. When a team is declared as an
 # owner, it is treated the same as if all members of the team were listed as
-# owners individually
+# owners individually (see AMPHTML teams
+# [here](https://github.com/orgs/ampproject/teams)).
 - ampproject/wg-cool-team
 
 # Individual filenames can be listed, with owners as the value. The value can be
@@ -55,7 +60,9 @@
 # appropriate OWNERS file should be created/updated in that subdirectory.
 - this/pattern/will/be/ignored.txt: doesntmatter
 
-# Filename and pattern rules may be combined with brace expansion.
+# Filename and pattern rules may be combined with brace expansion. The pattern
+# parser uses `[minimatch](https://www.npmjs.com/package/minimatch)`, the
+# matching library used internally by npm.
 - "*.{js,css}": frontend
 - "package.{,lock.}json": somebodyelse
 
@@ -67,8 +74,8 @@
   - "?ampproject/important-team"
 
 # Prepending a user or team name with a `?` will prevent this owner from being
-# automatically notified or requested as a reviewer. They may still be requested
-# or tagged manually.
+# automatically notified or requested as a reviewer. They are still an owner,
+# may still be requested or tagged manually.
 - "**/*.css": "?someoneimportant"
 - "yarn.lock": "?ampproject/important-team"
 
@@ -96,3 +103,6 @@
 # ./yarn.lock: ampproject/important-team (never notify)
 # **/*.test.js: stakeholder (always notify)
 # **/validator-*.{out,html}: ampproject/wg-caching (always notify)
+
+# For any questions about the owners bot or supported syntax, contact @rcebulko
+# or @ampproject/wg-infra.
