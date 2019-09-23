@@ -23,8 +23,7 @@
 
 # GitHub teams are also supported as owners. When a team is declared as an
 # owner, it is treated the same as if all members of the team were listed as
-# owners individually (see AMPHTML teams
-# [here](https://github.com/orgs/ampproject/teams)).
+# owners individually (see https://github.com/orgs/ampproject/teams).
 - ampproject/wg-cool-team
 
 # Individual filenames can be listed, with owners as the value. The value can be
@@ -65,13 +64,6 @@
 # matching library used internally by npm.
 - "*.{js,css}": frontend
 - "package.{,lock.}json": somebodyelse
-
-# Prepending a user or team name with a `?` will prevent this owner from being
-# automatically notified or requested as a reviewer. They may still be requested
-# or tagged manually.
-- "**/*.css":
-  - "?someoneimportant"
-  - "?ampproject/important-team"
 
 # Prepending a user or team name with a `?` will prevent this owner from being
 # automatically notified or requested as a reviewer. They are still an owner,
