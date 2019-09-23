@@ -124,7 +124,7 @@ class OwnersBot {
       await github.createReviewRequests(pr.number, reviewRequests);
     }
 
-    await this.createNotifications(github, pr.number, fileTreeMap);
+    await this.createNotifications(github, pr, fileTreeMap);
   }
 
   /**
@@ -143,12 +143,13 @@ class OwnersBot {
    * Adds a comment tagging always-notify owners of changed files.
    *
    * @param {!GitHub} github GitHub API interface.
-   * @param {!number} prNumber pull request number.
+   * @param {!PullRequest} pr pull request to create notifications on.
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    */
-  async createNotifications(github, prNumber, fileTreeMap) {
-    const [botComment] = await github.getBotComments(prNumber);
+  async createNotifications(github, pr, fileTreeMap) {
+    const [botComment] = await github.getBotComments(pr.number);
     const notifies = this._getNotifies(fileTreeMap);
+    delete notifies[pr.author];
 
     const fileNotifyComments = Object.entries(notifies).map(
       ([name, filenames]) => {
@@ -166,7 +167,7 @@ class OwnersBot {
     if (botComment) {
       await github.updateComment(botComment.id, comment);
     } else {
-      await github.createBotComment(prNumber, comment);
+      await github.createBotComment(pr.number, comment);
     }
   }
 

@@ -282,7 +282,7 @@ describe('owners bot', () => {
 
     it('gets users and teams to notify', async done => {
       sandbox.stub(OwnersBot.prototype, '_getNotifies').returns([]);
-      await ownersBot.createNotifications(github, 1337, fileTreeMap);
+      await ownersBot.createNotifications(github, pr, fileTreeMap);
 
       sandbox.assert.calledWith(ownersBot._getNotifies, fileTreeMap);
       done();
@@ -302,7 +302,7 @@ describe('owners bot', () => {
         });
 
         it('does not create a comment', async done => {
-          await ownersBot.createNotifications(github, 1337, fileTreeMap);
+          await ownersBot.createNotifications(github, pr, fileTreeMap);
 
           sandbox.assert.notCalled(github.createBotComment);
           done();
@@ -310,7 +310,7 @@ describe('owners bot', () => {
 
         it('updates the existing comment', async () => {
           expect.assertions(2);
-          await ownersBot.createNotifications(github, 1337, fileTreeMap);
+          await ownersBot.createNotifications(github, pr, fileTreeMap);
 
           sandbox.assert.calledOnce(github.updateComment);
           const [commentId, comment] = github.updateComment.getCall(0).args;
@@ -325,7 +325,7 @@ describe('owners bot', () => {
       describe('when no comment by the bot exists yet', () => {
         it('creates a comment tagging users and teams', async () => {
           expect.assertions(2);
-          await ownersBot.createNotifications(github, 1337, fileTreeMap);
+          await ownersBot.createNotifications(github, pr, fileTreeMap);
 
           sandbox.assert.calledOnce(github.createBotComment);
           const [prNumber, comment] = github.createBotComment.getCall(0).args;
@@ -340,7 +340,23 @@ describe('owners bot', () => {
 
     describe('when there are no users or teams to notify', () => {
       it('does not create or update a comment', async done => {
-        await ownersBot.createNotifications(github, 1337, fileTreeMap);
+        await ownersBot.createNotifications(github, pr, fileTreeMap);
+
+        sandbox.assert.notCalled(github.createBotComment);
+        sandbox.assert.notCalled(github.updateComment);
+        done();
+      });
+    });
+
+    describe('when the author is on the notify list', () => {
+      beforeEach(() => {
+        sandbox.stub(OwnersBot.prototype, '_getNotifies').returns({
+          'the_author': ['foo/main.js'],
+        });
+      });
+
+      it('does not notify the author', async done => {
+        await ownersBot.createNotifications(github, pr, fileTreeMap);
 
         sandbox.assert.notCalled(github.createBotComment);
         sandbox.assert.notCalled(github.updateComment);
