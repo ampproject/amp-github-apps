@@ -305,8 +305,14 @@ class GitHub {
     const response = await this.client.issues.listComments(this.repo({number}));
     this.logger.debug('[getBotComments]', number, response.data);
 
+    // GitHub appears to respond with the bot's username suffixed by `[bot]`,
+    // though this doesn't appear to be documented anywhere. Since it's not
+    // documented, rather than testing for that suffix explicitly, we just test
+    // for the presence of the username and ignore whatever extras GitHub tacks
+    // on.
+    const regex = new RegExp(`\\b${process.env.GITHUB_BOT_USERNAME}\\b`);
     return response.data
-      .filter(({user}) => user.login === process.env.GITHUB_BOT_USERNAME)
+      .filter(({user}) => regex.test(user.login))
       .map(({id, body}) => {
         return {id, body};
       });

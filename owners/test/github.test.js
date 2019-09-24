@@ -365,7 +365,7 @@ describe('GitHub API', () => {
     it('fetches a list of comments by the bot user', async () => {
       expect.assertions(1);
       sandbox.stub(process, 'env').value({
-        GITHUB_BOT_USERNAME: 'ampprojectbot',
+        GITHUB_BOT_USERNAME: 'amp-owners-bot',
       });
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/issues/24574/comments')
