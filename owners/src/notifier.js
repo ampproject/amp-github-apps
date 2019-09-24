@@ -30,6 +30,37 @@ class OwnersNotifier {
   }
 
   /**
+   * Adds a comment tagging always-notify owners of changed files.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   * @param {!PullRequest} pr pull request to create notifications on.
+   */
+  async createNotificationComments(github, pr) {
+    const [botComment] = await github.getBotComments(pr.number);
+    const notifies = this.getOwnersToNotify();
+    delete notifies[pr.author];
+
+    const fileNotifyComments = Object.entries(notifies).map(
+      ([name, filenames]) => {
+        const header = `Hey @${name}, these files were changed:`;
+        const files = filenames.map(filename => `- ${filename}`);
+        return [header, ...files].join('\n');
+      }
+    );
+
+    if (!fileNotifyComments.length) {
+      return;
+    }
+
+    const comment = fileNotifyComments.join('\n\n');
+    if (botComment) {
+      await github.updateComment(botComment.id, comment);
+    } else {
+      await github.createBotComment(pr.number, comment);
+    }
+  }
+
+  /**
    * Determine the set of users to request reviews from.
    *
    * @param {string[]} suggestedReviewers list of suggested reviewer usernames.

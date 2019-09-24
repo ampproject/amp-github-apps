@@ -152,29 +152,8 @@ class OwnersBot {
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    */
   async createNotifications(github, pr, fileTreeMap) {
-    const [botComment] = await github.getBotComments(pr.number);
     const notifier = new OwnersNotifier(fileTreeMap);
-    const notifies = notifier.getOwnersToNotify();
-    delete notifies[pr.author];
-
-    const fileNotifyComments = Object.entries(notifies).map(
-      ([name, filenames]) => {
-        const header = `Hey @${name}, these files were changed:`;
-        const files = filenames.map(filename => `- ${filename}`);
-        return [header, ...files].join('\n');
-      }
-    );
-
-    if (!fileNotifyComments.length) {
-      return;
-    }
-
-    const comment = fileNotifyComments.join('\n\n');
-    if (botComment) {
-      await github.updateComment(botComment.id, comment);
-    } else {
-      await github.createBotComment(pr.number, comment);
-    }
+    await notifier.createNotificationComments(github, pr)
   }
 
   /**
