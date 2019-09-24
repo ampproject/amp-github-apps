@@ -117,10 +117,7 @@ class OwnersBot {
       await github.createCheckRun(pr.headSha, ownersCheckResult.checkRun);
     }
 
-    const fileTreeMap = tree.buildFileTreeMap(
-      changedFiles.map(({filename}) => filename)
-    );
-    const notifier = new OwnersNotifier(pr, fileTreeMap);
+    const notifier = new OwnersNotifier(pr, tree, changedFiles);
     if (ADD_REVIEWERS_TAG.test(pr.description)) {
       const reviewRequests = notifier.getReviewersToRequest(
         ownersCheckResult.reviewers

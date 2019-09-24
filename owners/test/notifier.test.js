@@ -37,7 +37,6 @@ describe('notifier', () => {
   });
 
   describe('createNotificationComment', () => {
-    const fileTreeMap = {'main.js': new OwnersTree()};
     let getCommentsStub;
     let notifier;
 
@@ -47,7 +46,10 @@ describe('notifier', () => {
       getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
       getCommentsStub.returns([]);
 
-      notifier = new OwnersNotifier(pr, fileTreeMap);
+      notifier = new OwnersNotifier(pr, new OwnersTree(), [{
+        filename: 'main.js',
+        sha: '_sha_',
+      }]);
     });
 
     it('gets users and teams to notify', async done => {
@@ -123,7 +125,6 @@ describe('notifier', () => {
     let tree;
     const busyTeam = new Team(42, 'ampproject', 'busy_team');
     busyTeam.members = ['busy_member'];
-    let fileTreeMap;
     let notifier;
 
     beforeEach(() => {
@@ -144,8 +145,10 @@ describe('notifier', () => {
         ])
       );
 
-      fileTreeMap = tree.buildFileTreeMap(['foo/script.js']);
-      notifier = new OwnersNotifier(pr, fileTreeMap);
+      notifier = new OwnersNotifier(pr, tree, [{
+        filename: 'foo/script.js',
+        sha: '_sha_',
+      }]);
     });
 
     it('includes suggested reviewers', () => {
@@ -181,24 +184,30 @@ describe('notifier', () => {
     tree.addRule(new OwnersRule('baz/OWNERS.yaml', [new UserOwner('rando')]));
 
     it('includes user owners with the always-notify modifier', () => {
-      const fileTreeMap = tree.buildFileTreeMap(['foo/main.js', 'foo/bar.js']);
-      const notifier = new OwnersNotifier(pr, fileTreeMap);
+      const notifier = new OwnersNotifier(pr, tree, [
+        {filename: 'foo/main.js', sha: '_sha_'},
+        {filename: 'foo/bar.js', sha: '_sha_'},
+      ]);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['relevant_user']).toContain('foo/main.js');
     });
 
     it('includes team owners with the always-notify modifier', () => {
-      const fileTreeMap = tree.buildFileTreeMap(['bar/script.js']);
-      const notifier = new OwnersNotifier(pr, fileTreeMap);
+      const notifier = new OwnersNotifier(pr, tree, [{
+        filename: 'bar/script.js',
+        sha: '_sha_',
+      }]);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['ampproject/relevant_team']).toContain('bar/script.js');
     });
 
     it('excludes files with no always-notify owners', () => {
-      const fileTreeMap = tree.buildFileTreeMap(['baz/test.js']);
-      const notifier = new OwnersNotifier(pr, fileTreeMap);
+      const notifier = new OwnersNotifier(pr, tree, [{
+        filename: 'baz/test.js',
+        sha: '_sha_',
+      }]);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['rando']).toBeUndefined();

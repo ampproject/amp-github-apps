@@ -24,10 +24,14 @@ class OwnersNotifier {
    * Constructor.
    *
    * @param {!PullRequest} pr pull request to add notifications to.
-   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
+   * @param {!OwnersTree} tree file ownership tree.
+   * @param {FileRef[]} changedFiles list of change files.
    */
-  constructor(pr, fileTreeMap) {
-    Object.assign(this, {pr, fileTreeMap});
+  constructor(pr, tree, changedFiles) {
+    Object.assign(this, {pr});
+    this.fileTreeMap = tree.buildFileTreeMap(
+      changedFiles.map(({filename}) => filename)
+    );
   }
 
   /**
