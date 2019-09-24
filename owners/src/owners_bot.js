@@ -19,6 +19,7 @@ const sleep = require('sleep-promise');
 const {OWNER_MODIFIER} = require('./owner');
 const {OwnersCheck} = require('./owners_check');
 const {OwnersParser} = require('./parser');
+const {OwnersNotifier} = require('./notifier');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
 const GITHUB_GET_MEMBERS_DELAY = 3000;
@@ -208,19 +209,11 @@ class OwnersBot {
    *
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    * @param {string[]} suggestedReviewers list of suggested reviewer usernames.
-   * @return {string[]} set of usernames.
+   * @return {string[]} list of usernames.
    */
   _getReviewRequests(fileTreeMap, suggestedReviewers) {
-    const reviewers = new Set(suggestedReviewers);
-    Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
-      subtree
-        .getModifiedFileOwners(filename, OWNER_MODIFIER.SILENT)
-        .map(owner => owner.allUsernames)
-        .reduce((left, right) => left.concat(right), [])
-        .forEach(reviewers.delete, reviewers);
-    });
-
-    return Array.from(reviewers);
+    const notifier = new OwnersNotifier(fileTreeMap);
+    return notifier.getReviewersToRequest(suggestedReviewers);
   }
 
   /**
@@ -230,20 +223,8 @@ class OwnersBot {
    * @return {Object<string, string[]>} map from user/team names to filenames.
    */
   _getNotifies(fileTreeMap) {
-    const notifies = {};
-    Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
-      subtree
-        .getModifiedFileOwners(filename, OWNER_MODIFIER.NOTIFY)
-        .map(owner => owner.name)
-        .forEach(name => {
-          if (!notifies[name]) {
-            notifies[name] = [];
-          }
-          notifies[name].push(filename);
-        });
-    });
-
-    return notifies;
+    const notifier = new OwnersNotifier(fileTreeMap);
+    return notifier.getOwnersToNotify();
   }
 }
 
