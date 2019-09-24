@@ -23,22 +23,22 @@ class OwnersNotifier {
   /**
    * Constructor.
    *
+   * @param {!PullRequest} pr pull request to add notifications to.
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    */
-  constructor(fileTreeMap) {
-    Object.assign(this, {fileTreeMap});
+  constructor(pr, fileTreeMap) {
+    Object.assign(this, {pr, fileTreeMap});
   }
 
   /**
    * Adds a comment tagging always-notify owners of changed files.
    *
    * @param {!GitHub} github GitHub API interface.
-   * @param {!PullRequest} pr pull request to create notifications on.
    */
-  async createNotificationComment(github, pr) {
-    const [botComment] = await github.getBotComments(pr.number);
+  async createNotificationComment(github) {
+    const [botComment] = await github.getBotComments(this.pr.number);
     const notifies = this.getOwnersToNotify();
-    delete notifies[pr.author];
+    delete notifies[this.pr.author];
 
     const fileNotifyComments = Object.entries(notifies).map(
       ([name, filenames]) => {
@@ -56,7 +56,7 @@ class OwnersNotifier {
     if (botComment) {
       await github.updateComment(botComment.id, comment);
     } else {
-      await github.createBotComment(pr.number, comment);
+      await github.createBotComment(this.pr.number, comment);
     }
   }
 

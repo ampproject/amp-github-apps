@@ -40,7 +40,7 @@ describe('owners bot', () => {
 
   let sandbox;
   const github = new GitHub({}, 'ampproject', 'amphtml', silentLogger);
-  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'descrption');
+  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'description');
   const localRepo = new LocalRepository('path/to/repo');
   const ownersBot = new OwnersBot(localRepo);
 
@@ -258,7 +258,6 @@ describe('owners bot', () => {
       sandbox.assert.calledWith(
         OwnersNotifier.prototype.createNotificationComment,
         github,
-        pr,
       );
       done();
     });

@@ -120,7 +120,7 @@ class OwnersBot {
     const fileTreeMap = tree.buildFileTreeMap(
       changedFiles.map(({filename}) => filename)
     );
-    const notifier = new OwnersNotifier(fileTreeMap);
+    const notifier = new OwnersNotifier(pr, fileTreeMap);
     if (ADD_REVIEWERS_TAG.test(pr.description)) {
       const reviewRequests = notifier.getReviewersToRequest(
         ownersCheckResult.reviewers
@@ -129,7 +129,7 @@ class OwnersBot {
       await github.createReviewRequests(pr.number, reviewRequests);
     }
 
-    await notifier.createNotificationComment(github, pr);
+    await notifier.createNotificationComment(github);
   }
 
   /**

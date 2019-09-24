@@ -30,7 +30,7 @@ describe('notifier', () => {
     'amphtml',
     loggerStub,
   );
-  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'descrption');
+  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'description');
 
   afterEach(() => {
     sandbox.restore();
@@ -47,12 +47,12 @@ describe('notifier', () => {
       getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
       getCommentsStub.returns([]);
 
-      notifier = new OwnersNotifier(fileTreeMap);
+      notifier = new OwnersNotifier(pr, fileTreeMap);
     });
 
     it('gets users and teams to notify', async done => {
       sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns([]);
-      await notifier.createNotificationComment(github, pr);
+      await notifier.createNotificationComment(github);
 
       sandbox.assert.calledOnce(notifier.getOwnersToNotify);
       done();
@@ -72,7 +72,7 @@ describe('notifier', () => {
         });
 
         it('does not create a comment', async done => {
-          await notifier.createNotificationComment(github, pr);
+          await notifier.createNotificationComment(github);
 
           sandbox.assert.notCalled(github.createBotComment);
           done();
@@ -80,7 +80,7 @@ describe('notifier', () => {
 
         it('updates the existing comment', async () => {
           expect.assertions(2);
-          await notifier.createNotificationComment(github, pr);
+          await notifier.createNotificationComment(github);
 
           sandbox.assert.calledOnce(github.updateComment);
           const [commentId, comment] = github.updateComment.getCall(0).args;
@@ -95,7 +95,7 @@ describe('notifier', () => {
       describe('when no comment by the bot exists yet', () => {
         it('creates a comment tagging users and teams', async () => {
           expect.assertions(2);
-          await notifier.createNotificationComment(github, pr);
+          await notifier.createNotificationComment(github);
 
           sandbox.assert.calledOnce(github.createBotComment);
           const [prNumber, comment] = github.createBotComment.getCall(0).args;
@@ -110,7 +110,7 @@ describe('notifier', () => {
 
     describe('when there are no users or teams to notify', () => {
       it('does not create or update a comment', async done => {
-        await notifier.createNotificationComment(github, pr);
+        await notifier.createNotificationComment(github);
 
         sandbox.assert.notCalled(github.createBotComment);
         sandbox.assert.notCalled(github.updateComment);
@@ -145,7 +145,7 @@ describe('notifier', () => {
       );
 
       fileTreeMap = tree.buildFileTreeMap(['foo/script.js']);
-      notifier = new OwnersNotifier(fileTreeMap);
+      notifier = new OwnersNotifier(pr, fileTreeMap);
     });
 
     it('includes suggested reviewers', () => {
@@ -182,7 +182,7 @@ describe('notifier', () => {
 
     it('includes user owners with the always-notify modifier', () => {
       const fileTreeMap = tree.buildFileTreeMap(['foo/main.js', 'foo/bar.js']);
-      const notifier = new OwnersNotifier(fileTreeMap);
+      const notifier = new OwnersNotifier(pr, fileTreeMap);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['relevant_user']).toContain('foo/main.js');
@@ -190,7 +190,7 @@ describe('notifier', () => {
 
     it('includes team owners with the always-notify modifier', () => {
       const fileTreeMap = tree.buildFileTreeMap(['bar/script.js']);
-      const notifier = new OwnersNotifier(fileTreeMap);
+      const notifier = new OwnersNotifier(pr, fileTreeMap);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['ampproject/relevant_team']).toContain('bar/script.js');
@@ -198,7 +198,7 @@ describe('notifier', () => {
 
     it('excludes files with no always-notify owners', () => {
       const fileTreeMap = tree.buildFileTreeMap(['baz/test.js']);
-      const notifier = new OwnersNotifier(fileTreeMap);
+      const notifier = new OwnersNotifier(pr, fileTreeMap);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['rando']).toBeUndefined();
