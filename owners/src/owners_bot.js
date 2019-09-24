@@ -121,8 +121,8 @@ class OwnersBot {
       changedFiles.map(({filename}) => filename)
     );
     if (ADD_REVIEWERS_TAG.test(pr.description)) {
-      const reviewRequests = this._getReviewRequests(
-        fileTreeMap,
+      const notifier = new OwnersNotifier(fileTreeMap);
+      const reviewRequests = notifier.getReviewersToRequest(
         ownersCheckResult.reviewers
       );
 
@@ -202,18 +202,6 @@ class OwnersBot {
     approvals[pr.author] = true;
 
     return approvals;
-  }
-
-  /**
-   * Determine the set of users to request reviews from.
-   *
-   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @param {string[]} suggestedReviewers list of suggested reviewer usernames.
-   * @return {string[]} list of usernames.
-   */
-  _getReviewRequests(fileTreeMap, suggestedReviewers) {
-    const notifier = new OwnersNotifier(fileTreeMap);
-    return notifier.getReviewersToRequest(suggestedReviewers);
   }
 
   /**

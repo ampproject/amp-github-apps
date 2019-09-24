@@ -58,17 +58,17 @@ describe('notifier', () => {
 
     it('includes suggested reviewers', () => {
       const reviewRequests = notifier.getReviewersToRequest(['auser']);
-      expect(Array.from(reviewRequests)).toContain('auser');
+      expect(reviewRequests).toContain('auser');
     });
 
     it('excludes user owners with the no-notify modifier', () => {
       const reviewRequests = notifier.getReviewersToRequest(['busy_user']);
-      expect(Array.from(reviewRequests)).not.toContain('busy_user');
+      expect(reviewRequests).not.toContain('busy_user');
     });
 
     it('excludes members of team owners with the no-notify modifier', () => {
       const reviewRequests = notifier.getReviewersToRequest(['busy_member']);
-      expect(Array.from(reviewRequests)).not.toContain('busy_member');
+      expect(reviewRequests).not.toContain('busy_member');
     });
   });
 
@@ -91,7 +91,7 @@ describe('notifier', () => {
     it('includes user owners with the always-notify modifier', () => {
       const fileTreeMap = tree.buildFileTreeMap(['foo/main.js', 'foo/bar.js']);
       const notifier = new OwnersNotifier(fileTreeMap);
-      const notifies = notifier.getOwnersToNotify(fileTree);
+      const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['relevant_user']).toContain('foo/main.js');
     });
@@ -99,7 +99,7 @@ describe('notifier', () => {
     it('includes team owners with the always-notify modifier', () => {
       const fileTreeMap = tree.buildFileTreeMap(['bar/script.js']);
       const notifier = new OwnersNotifier(fileTreeMap);
-      const notifies = notifier.getOwnersToNotify(fileTree);
+      const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['ampproject/relevant_team']).toContain('bar/script.js');
     });
@@ -107,7 +107,7 @@ describe('notifier', () => {
     it('excludes files with no always-notify owners', () => {
       const fileTreeMap = tree.buildFileTreeMap(['baz/test.js']);
       const notifier = new OwnersNotifier(fileTreeMap);
-      const notifies = notifier.getOwnersToNotify(fileTree);
+      const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['rando']).toBeUndefined();
     });
