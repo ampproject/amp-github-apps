@@ -15,7 +15,7 @@
  */
 
 const sinon = require('sinon');
-const {GitHub, Team} = require('../src/github');
+const {GitHub, PullRequest, Team} = require('../src/github');
 const {OwnersTree} = require('../src/owners_tree');
 const {OwnersRule} = require('../src/rules');
 const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
@@ -30,12 +30,13 @@ describe('notifier', () => {
     'amphtml',
     loggerStub,
   );
+  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'descrption');
 
   afterEach(() => {
     sandbox.restore();
   });
 
-  describe('createNotifications', () => {
+  describe('createNotificationComment', () => {
     const fileTreeMap = {'main.js': new OwnersTree()};
     let getCommentsStub;
     let notifier;
@@ -51,7 +52,7 @@ describe('notifier', () => {
 
     it('gets users and teams to notify', async done => {
       sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns([]);
-      await notifier.createNotificationComments(github, 1337);
+      await notifier.createNotificationComment(github, pr);
 
       sandbox.assert.calledOnce(notifier.getOwnersToNotify);
       done();
@@ -71,7 +72,7 @@ describe('notifier', () => {
         });
 
         it('does not create a comment', async done => {
-          await notifier.createNotificationComments(github, 1337);
+          await notifier.createNotificationComment(github, pr);
 
           sandbox.assert.notCalled(github.createBotComment);
           done();
@@ -79,7 +80,7 @@ describe('notifier', () => {
 
         it('updates the existing comment', async () => {
           expect.assertions(2);
-          await notifier.createNotificationComments(github, 1337);
+          await notifier.createNotificationComment(github, pr);
 
           sandbox.assert.calledOnce(github.updateComment);
           const [commentId, comment] = github.updateComment.getCall(0).args;
@@ -94,7 +95,7 @@ describe('notifier', () => {
       describe('when no comment by the bot exists yet', () => {
         it('creates a comment tagging users and teams', async () => {
           expect.assertions(2);
-          await notifier.createNotificationComments(github, 1337);
+          await notifier.createNotificationComment(github, pr);
 
           sandbox.assert.calledOnce(github.createBotComment);
           const [prNumber, comment] = github.createBotComment.getCall(0).args;
@@ -109,7 +110,7 @@ describe('notifier', () => {
 
     describe('when there are no users or teams to notify', () => {
       it('does not create or update a comment', async done => {
-        await notifier.createNotificationComments(github, 1337);
+        await notifier.createNotificationComment(github, pr);
 
         sandbox.assert.notCalled(github.createBotComment);
         sandbox.assert.notCalled(github.updateComment);

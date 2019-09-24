@@ -120,8 +120,8 @@ class OwnersBot {
     const fileTreeMap = tree.buildFileTreeMap(
       changedFiles.map(({filename}) => filename)
     );
+    const notifier = new OwnersNotifier(fileTreeMap);
     if (ADD_REVIEWERS_TAG.test(pr.description)) {
-      const notifier = new OwnersNotifier(fileTreeMap);
       const reviewRequests = notifier.getReviewersToRequest(
         ownersCheckResult.reviewers
       );
@@ -129,7 +129,7 @@ class OwnersBot {
       await github.createReviewRequests(pr.number, reviewRequests);
     }
 
-    await this.createNotifications(github, pr, fileTreeMap);
+    await notifier.createNotificationComment(github, pr);
   }
 
   /**
@@ -142,18 +142,6 @@ class OwnersBot {
   async runOwnersCheckOnPrNumber(github, prNumber) {
     const pr = await github.getPullRequest(prNumber);
     await this.runOwnersCheck(github, pr);
-  }
-
-  /**
-   * Adds a comment tagging always-notify owners of changed files.
-   *
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!PullRequest} pr pull request to create notifications on.
-   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   */
-  async createNotifications(github, pr, fileTreeMap) {
-    const notifier = new OwnersNotifier(fileTreeMap);
-    await notifier.createNotificationComments(github, pr)
   }
 
   /**

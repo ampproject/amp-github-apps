@@ -35,7 +35,7 @@ class OwnersNotifier {
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to create notifications on.
    */
-  async createNotificationComments(github, pr) {
+  async createNotificationComment(github, pr) {
     const [botComment] = await github.getBotComments(pr.number);
     const notifies = this.getOwnersToNotify();
     delete notifies[pr.author];

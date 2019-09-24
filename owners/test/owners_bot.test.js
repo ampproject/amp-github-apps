@@ -252,10 +252,14 @@ describe('owners bot', () => {
     });
 
     it('creates a notification comment', async done => {
-      sandbox.stub(OwnersBot.prototype, 'createNotifications');
+      sandbox.stub(OwnersNotifier.prototype, 'createNotificationComment');
       await ownersBot.runOwnersCheck(github, pr);
 
-      sandbox.assert.calledOnce(ownersBot.createNotifications);
+      sandbox.assert.calledWith(
+        OwnersNotifier.prototype.createNotificationComment,
+        github,
+        pr,
+      );
       done();
     });
   });
@@ -278,102 +282,6 @@ describe('owners bot', () => {
 
       sandbox.assert.calledWith(ownersBot.runOwnersCheck, github, pr);
       done();
-    });
-  });
-
-  describe('createNotifications', () => {
-    const fileTreeMap = {'main.js': new OwnersTree()};
-    let getCommentsStub;
-
-    beforeEach(() => {
-      sandbox.stub(GitHub.prototype, 'createBotComment');
-      sandbox.stub(GitHub.prototype, 'updateComment').returns();
-      getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
-      getCommentsStub.returns([]);
-    });
-
-    it('gets users and teams to notify', async done => {
-      sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns([]);
-      await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-      sandbox.assert.calledOnce(OwnersNotifier.prototype.getOwnersToNotify);
-      done();
-    });
-
-    describe('when there are users or teams to notify', () => {
-      beforeEach(() => {
-        sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns({
-          'a_subscriber': ['foo/main.js'],
-          'ampproject/some_team': ['foo/main.js'],
-        });
-      });
-
-      describe('when a comment by the bot already exists', () => {
-        beforeEach(() => {
-          getCommentsStub.returns([{id: 42, body: 'a comment'}]);
-        });
-
-        it('does not create a comment', async done => {
-          await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-          sandbox.assert.notCalled(github.createBotComment);
-          done();
-        });
-
-        it('updates the existing comment', async () => {
-          expect.assertions(2);
-          await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-          sandbox.assert.calledOnce(github.updateComment);
-          const [commentId, comment] = github.updateComment.getCall(0).args;
-          expect(commentId).toEqual(42);
-          expect(comment).toContain(
-            'Hey @a_subscriber, these files were changed:\n- foo/main.js',
-            'Hey @ampproject/some_team, these files were changed:\n- foo/main.js'
-          );
-        });
-      });
-
-      describe('when no comment by the bot exists yet', () => {
-        it('creates a comment tagging users and teams', async () => {
-          expect.assertions(2);
-          await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-          sandbox.assert.calledOnce(github.createBotComment);
-          const [prNumber, comment] = github.createBotComment.getCall(0).args;
-          expect(prNumber).toEqual(1337);
-          expect(comment).toContain(
-            'Hey @a_subscriber, these files were changed:\n- foo/main.js',
-            'Hey @ampproject/some_team, these files were changed:\n- foo/main.js'
-          );
-        });
-      });
-    });
-
-    describe('when there are no users or teams to notify', () => {
-      it('does not create or update a comment', async done => {
-        await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-        sandbox.assert.notCalled(github.createBotComment);
-        sandbox.assert.notCalled(github.updateComment);
-        done();
-      });
-    });
-
-    describe('when the author is on the notify list', () => {
-      beforeEach(() => {
-        sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns({
-          'the_author': ['foo/main.js'],
-        });
-      });
-
-      it('does not notify the author', async done => {
-        await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-        sandbox.assert.notCalled(github.createBotComment);
-        sandbox.assert.notCalled(github.updateComment);
-        done();
-      });
     });
   });
 
