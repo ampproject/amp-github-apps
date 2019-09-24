@@ -153,7 +153,8 @@ class OwnersBot {
    */
   async createNotifications(github, pr, fileTreeMap) {
     const [botComment] = await github.getBotComments(pr.number);
-    const notifies = this._getNotifies(fileTreeMap);
+    const notifier = new OwnersNotifier(fileTreeMap);
+    const notifies = notifier.getOwnersToNotify();
     delete notifies[pr.author];
 
     const fileNotifyComments = Object.entries(notifies).map(
@@ -202,17 +203,6 @@ class OwnersBot {
     approvals[pr.author] = true;
 
     return approvals;
-  }
-
-  /**
-   * Determine the set of owners to notify/tag for each file.
-   *
-   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @return {Object<string, string[]>} map from user/team names to filenames.
-   */
-  _getNotifies(fileTreeMap) {
-    const notifier = new OwnersNotifier(fileTreeMap);
-    return notifier.getOwnersToNotify();
   }
 }
 
