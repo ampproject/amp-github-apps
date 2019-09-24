@@ -15,7 +15,7 @@
  */
 
 const sinon = require('sinon');
-const {Team} = require('../src/github');
+const {GitHub, Team} = require('../src/github');
 const {OwnersTree} = require('../src/owners_tree');
 const {OwnersRule} = require('../src/rules');
 const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
@@ -23,8 +23,99 @@ const {OwnersNotifier} = require('../src/notifier');
 
 describe('notifier', () => {
   const sandbox = sinon.createSandbox();
+  const loggerStub = sinon.stub();
+  const github = new GitHub(
+    sinon.stub(),
+    'ampproject',
+    'amphtml',
+    loggerStub,
+  );
+
   afterEach(() => {
     sandbox.restore();
+  });
+
+  describe('createNotifications', () => {
+    const fileTreeMap = {'main.js': new OwnersTree()};
+    let getCommentsStub;
+    let notifier;
+
+    beforeEach(() => {
+      sandbox.stub(GitHub.prototype, 'createBotComment');
+      sandbox.stub(GitHub.prototype, 'updateComment').returns();
+      getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
+      getCommentsStub.returns([]);
+
+      notifier = new OwnersNotifier(fileTreeMap);
+    });
+
+    it('gets users and teams to notify', async done => {
+      sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns([]);
+      await notifier.createNotificationComments(github, 1337);
+
+      sandbox.assert.calledOnce(notifier.getOwnersToNotify);
+      done();
+    });
+
+    describe('when there are users or teams to notify', () => {
+      beforeEach(() => {
+        sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns({
+          'a_subscriber': ['foo/main.js'],
+          'ampproject/some_team': ['foo/main.js'],
+        });
+      });
+
+      describe('when a comment by the bot already exists', () => {
+        beforeEach(() => {
+          getCommentsStub.returns([{id: 42, body: 'a comment'}]);
+        });
+
+        it('does not create a comment', async done => {
+          await notifier.createNotificationComments(github, 1337);
+
+          sandbox.assert.notCalled(github.createBotComment);
+          done();
+        });
+
+        it('updates the existing comment', async () => {
+          expect.assertions(2);
+          await notifier.createNotificationComments(github, 1337);
+
+          sandbox.assert.calledOnce(github.updateComment);
+          const [commentId, comment] = github.updateComment.getCall(0).args;
+          expect(commentId).toEqual(42);
+          expect(comment).toContain(
+            'Hey @a_subscriber, these files were changed:\n- foo/main.js',
+            'Hey @ampproject/some_team, these files were changed:\n- foo/main.js'
+          );
+        });
+      });
+
+      describe('when no comment by the bot exists yet', () => {
+        it('creates a comment tagging users and teams', async () => {
+          expect.assertions(2);
+          await notifier.createNotificationComments(github, 1337);
+
+          sandbox.assert.calledOnce(github.createBotComment);
+          const [prNumber, comment] = github.createBotComment.getCall(0).args;
+          expect(prNumber).toEqual(1337);
+          expect(comment).toContain(
+            'Hey @a_subscriber, these files were changed:\n- foo/main.js',
+            'Hey @ampproject/some_team, these files were changed:\n- foo/main.js'
+          );
+        });
+      });
+    });
+
+    describe('when there are no users or teams to notify', () => {
+      it('does not create or update a comment', async done => {
+        await notifier.createNotificationComments(github, 1337);
+
+        sandbox.assert.notCalled(github.createBotComment);
+        sandbox.assert.notCalled(github.updateComment);
+        done();
+      });
+    });
   });
 
   describe('getReviewersToRequest', () => {
