@@ -43,7 +43,8 @@ class OwnersNotifier {
    * @param {string[]} suggestedReviewers suggested reviewers to add.
    */
   async notify(github, suggestedReviewers) {
-    await this.requestReviews(github, suggestedReviewers);
+    const requested = await this.requestReviews(github, suggestedReviewers);
+    // TODO(#473): Add requested reviews to current reviewer set.
     await this.createNotificationComment(github);
   }
 
@@ -54,12 +55,16 @@ class OwnersNotifier {
    *
    * @param {!GitHub} github GitHub API interface.
    * @param {string[]} suggestedReviewers suggested reviewers to add.
+   * @return {string[]} list of reviewers requested.
    */
   async requestReviews(github, suggestedReviewers) {
     if (ADD_REVIEWERS_TAG.test(this.pr.description)) {
       const reviewRequests = this.getReviewersToRequest(suggestedReviewers);
       await github.createReviewRequests(this.pr.number, reviewRequests);
+      return reviewRequests;
     }
+
+    return [];
   }
 
   /**

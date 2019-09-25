@@ -74,16 +74,23 @@ describe('notifier', () => {
       sandbox.assert.notCalled(github.createReviewRequests);
       done();
     });
+  
+    it('returns an empty list', async () => {
+      expect.assertions(1);
+      const requested = await notifier.requestReviews(github, ['auser']);
+
+      expect(requested).toEqual([]);
+    });
 
     describe('when the PR description contains #addowners', () => {
       beforeEach(() => {
+        sandbox
+          .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
+          .returns(['auser']);
         pr.description = 'Assign reviewers please #addowners';
       });
 
       it('requests reviewers', async done => {
-        sandbox
-          .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
-          .returns(['auser']);
         await notifier.requestReviews(github, ['auser', 'anotheruser']);
 
         sandbox.assert.calledWith(notifier.getReviewersToRequest, [
@@ -92,6 +99,16 @@ describe('notifier', () => {
         ]);
         sandbox.assert.calledWith(github.createReviewRequests, 1337, ['auser']);
         done();
+      });
+
+      it('returns the requested reviewers', async () => {
+        expect.assertions(1);
+        const requested = await notifier.requestReviews(
+          github,
+          ['auser', 'anotheruser']
+        );
+
+        expect(requested).toEqual(['auser']);
       });
     });
   });
