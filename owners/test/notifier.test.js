@@ -25,7 +25,11 @@ describe('notifier', () => {
   const sandbox = sinon.createSandbox();
   const loggerStub = sinon.stub();
   const github = new GitHub(sinon.stub(), 'ampproject', 'amphtml', loggerStub);
-  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'description');
+  let pr;
+
+  beforeEach(() => {
+    pr = new PullRequest(1337, 'the_author', '_test_hash_', 'description');
+  });
 
   afterEach(() => {
     sandbox.restore();
@@ -61,6 +65,9 @@ describe('notifier', () => {
     beforeEach(() => {
       notifier = new OwnersNotifier(pr, {}, new OwnersTree(), []);
       sandbox.stub(GitHub.prototype, 'createReviewRequests');
+      sandbox
+        .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
+        .returns(['auser']);
     });
 
     describe('when reviewer assignment is opt-in', () => {
@@ -84,9 +91,6 @@ describe('notifier', () => {
 
       describe('when the PR description contains #addowners', () => {
         beforeEach(() => {
-          sandbox
-            .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
-            .returns(['auser']);
           pr.description = 'Assign reviewers please #addowners';
         });
 
@@ -141,10 +145,7 @@ describe('notifier', () => {
 
       describe('when the PR description contains #noaddowners', () => {
         beforeEach(() => {
-          sandbox
-            .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
-            .returns(['auser']);
-          pr.description = 'Do not assign reviewers #noaddowners';
+          pr.description = 'Please do not assign reviewers #noaddowners';
         });
 
         it('does not create review requests', async done => {
