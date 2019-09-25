@@ -240,10 +240,13 @@ class GitHub {
     );
     this.logger.debug('[getReviews]', number, response.data);
 
-    // Reviews may also have "commented" state, which should indicate neither
-    // approval or rejection (and often comes after existng approvals)
+    // See https://developer.github.com/v4/enum/pullrequestreviewstate/ for
+    // possible review states. The only ones we care about are "APPROVED" and
+    // "CHANGES_REQUESTED", since the rest do not indicate a definite approval
+    // or rejection.
+    const allowedStates = ['approved', 'changes_requested']
     return response.data
-        .filter(({state}) => state.toLowerCase() !== 'commented')
+        .filter(({state}) => allowedStates.includes(state.toLowerCase()))
         .map(
           json =>
             new Review(
