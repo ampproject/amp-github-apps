@@ -240,14 +240,18 @@ class GitHub {
     );
     this.logger.debug('[getReviews]', number, response.data);
 
-    return response.data.map(
-      json =>
-        new Review(
-          json.user.login.toLowerCase(),
-          json.state,
-          new Date(json.submitted_at)
-        )
-    );
+    // Reviews may also have "commented" state, which should indicate neither
+    // approval or rejection (and often comes after existng approvals)
+    return response.data
+        .filter(({state}) => state.toLowerCase() !== 'commented')
+        .map(
+          json =>
+            new Review(
+              json.user.login.toLowerCase(),
+              json.state,
+              new Date(json.submitted_at)
+            )
+        );
   }
 
   /**
