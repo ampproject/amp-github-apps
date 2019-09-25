@@ -36,6 +36,30 @@ describe('notifier', () => {
     sandbox.restore();
   });
 
+  describe('notify', () => {
+    let notifier;
+
+    beforeEach(() => {
+      notifier = new OwnersNotifier(pr, {}, new OwnersTree(), []);
+      sandbox.stub(OwnersNotifier.prototype, 'requestReviews');
+      sandbox.stub(OwnersNotifier.prototype, 'createNotificationComment');
+    });
+
+    it('requests reviews for the suggested reviewers', async done => {
+      await notifier.notify(github, ['auser']);
+
+      sandbox.assert.calledWith(notifier.requestReviews, github, ['auser']);
+      done();
+    });
+
+    it('creates a notification comment', async done => {
+      await notifier.notify(github, ['auser']);
+
+      sandbox.assert.calledWith(notifier.createNotificationComment, github);
+      done();
+    });
+  });
+
   describe('requestReviews', () => {
     let notifier;
 

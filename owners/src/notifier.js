@@ -37,6 +37,17 @@ class OwnersNotifier {
   }
 
   /**
+   * Notify reviewers and owners about the PR.
+   *
+   * @param {!ReviewerApprovalMap} currentReviewers existing reviewers.
+   * @param {string[]} suggestedReviewers suggested reviewers to add.
+   */
+  async notify(github, suggestedReviewers) {
+    await this.requestReviews(github, suggestedReviewers);
+    await this.createNotificationComment(github);
+  }
+
+  /**
    * Requests reviews from owners.
    *
    * Only requests reviews if the PR description contains the #addowners tag.

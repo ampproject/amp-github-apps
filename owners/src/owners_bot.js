@@ -117,8 +117,7 @@ class OwnersBot {
     }
 
     const notifier = new OwnersNotifier(pr, reviewers, tree, changedFiles);
-    await notifier.requestReviews(github, ownersCheckResult.reviewers)
-    await notifier.createNotificationComment(github);
+    await notifier.notify(github, ownersCheckResult.reviewers);
   }
 
   /**
