@@ -63,26 +63,59 @@ describe('notifier', () => {
       sandbox.stub(GitHub.prototype, 'createReviewRequests');
     });
 
-    it('does not create review requests', async done => {
-      await notifier.requestReviews(github, ['auser']);
-
-      sandbox.assert.notCalled(github.createReviewRequests);
-      done();
-    });
-
-    it('returns an empty list', async () => {
-      expect.assertions(1);
-      const requested = await notifier.requestReviews(github, ['auser']);
-
-      expect(requested).toEqual([]);
-    });
-
-    describe('when the PR description contains #addowners', () => {
+    describe('when reviewer assignment is opt-in', () => {
       beforeEach(() => {
-        sandbox
-          .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
-          .returns(['auser']);
-        pr.description = 'Assign reviewers please #addowners';
+        sandbox.stub(process, 'env').value({ADD_REVIEWERS_OPT_OUT: false})
+      });
+
+      it('does not create review requests', async done => {
+        await notifier.requestReviews(github, ['auser']);
+
+        sandbox.assert.notCalled(github.createReviewRequests);
+        done();
+      });
+
+      it('returns an empty list', async () => {
+        expect.assertions(1);
+        const requested = await notifier.requestReviews(github, ['auser']);
+
+        expect(requested).toEqual([]);
+      });
+
+      describe('when the PR description contains #addowners', () => {
+        beforeEach(() => {
+          sandbox
+            .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
+            .returns(['auser']);
+          pr.description = 'Assign reviewers please #addowners';
+        });
+
+        it('requests reviewers', async done => {
+          await notifier.requestReviews(github, ['auser', 'anotheruser']);
+
+          sandbox.assert.calledWith(notifier.getReviewersToRequest, [
+            'auser',
+            'anotheruser',
+          ]);
+          sandbox.assert.calledWith(github.createReviewRequests, 1337, ['auser']);
+          done();
+        });
+
+        it('returns the requested reviewers', async () => {
+          expect.assertions(1);
+          const requested = await notifier.requestReviews(github, [
+            'auser',
+            'anotheruser',
+          ]);
+
+          expect(requested).toEqual(['auser']);
+        });
+      });
+    });
+
+    describe('when reviewer assignment is opt-out', () => {
+      beforeEach(() => {
+        sandbox.stub(process, 'env').value({ADD_REVIEWERS_OPT_OUT: true})
       });
 
       it('requests reviewers', async done => {
@@ -104,6 +137,29 @@ describe('notifier', () => {
         ]);
 
         expect(requested).toEqual(['auser']);
+      });
+
+      describe('when the PR description contains #noaddowners', () => {
+        beforeEach(() => {
+          sandbox
+            .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
+            .returns(['auser']);
+          pr.description = 'Do not assign reviewers #noaddowners';
+        });
+
+        it('does not create review requests', async done => {
+          await notifier.requestReviews(github, ['auser']);
+
+          sandbox.assert.notCalled(github.createReviewRequests);
+          done();
+        });
+
+        it('returns an empty list', async () => {
+          expect.assertions(1);
+          const requested = await notifier.requestReviews(github, ['auser']);
+
+          expect(requested).toEqual([]);
+        });
       });
     });
   });
