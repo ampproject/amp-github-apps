@@ -83,6 +83,10 @@ class OwnersBot {
 
     const changedFiles = await github.listFiles(pr.number);
     const reviewers = await this._getCurrentReviewers(github, pr);
+    const pendingReviewers = await github.getReviewRequests(pr.number);
+    pendingReviewers.forEach(reviewer => {
+      reviewers[reviewer] = false;
+    });
 
     return {tree, changedFiles, reviewers};
   }
@@ -204,7 +208,7 @@ class OwnersBot {
    *
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
    * @param {string[]} suggestedReviewers list of suggested reviewer usernames.
-   * @return {Set<string>} set of usernames.
+   * @return {string[]} set of usernames.
    */
   _getReviewRequests(fileTreeMap, suggestedReviewers) {
     const reviewers = new Set(suggestedReviewers);
@@ -216,7 +220,7 @@ class OwnersBot {
         .forEach(reviewers.delete, reviewers);
     });
 
-    return reviewers;
+    return Array.from(reviewers);
   }
 
   /**

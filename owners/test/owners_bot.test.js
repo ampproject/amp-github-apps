@@ -100,6 +100,9 @@ describe('owners bot', () => {
           {filename: 'changed_file1.js', sha: '_sha1_'},
           {filename: 'foo/changed_file2.js', sha: '_sha2_'},
         ]);
+      sandbox
+        .stub(GitHub.prototype, 'getReviewRequests')
+        .returns(['requested']);
     });
 
     it('parses the owners tree', async () => {
@@ -127,6 +130,13 @@ describe('owners bot', () => {
 
       expect(reviewers['approver']).toBe(true);
       expect(reviewers['other_approver']).toBe(true);
+    });
+
+    it('finds the requested reviewers', async () => {
+      expect.assertions(1);
+      const {reviewers} = await ownersBot.initPr(github, pr);
+
+      expect(reviewers['requested']).toBe(false);
     });
 
     it('fetches the files changed in the PR', async () => {
@@ -160,6 +170,7 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'createCheckRun');
       sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
       sandbox.stub(GitHub.prototype, 'listFiles').returns([]);
+      sandbox.stub(GitHub.prototype, 'getReviewRequests').returns([]);
       sandbox.stub(GitHub.prototype, 'createReviewRequests');
       sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
       sandbox.stub(GitHub.prototype, 'createBotComment');
