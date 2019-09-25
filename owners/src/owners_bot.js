@@ -24,7 +24,6 @@ const {OwnersNotifier} = require('./notifier');
 const GITHUB_CHECKRUN_DELAY = 2000;
 const GITHUB_GET_MEMBERS_DELAY = 3000;
 const OWNERS_CHECKRUN_NAME = 'owners-check';
-const ADD_REVIEWERS_TAG = /#add-?owners/i;
 
 /**
  * Bot to run the owners check and create/update the GitHub check-run.
@@ -118,14 +117,7 @@ class OwnersBot {
     }
 
     const notifier = new OwnersNotifier(pr, tree, changedFiles);
-    if (ADD_REVIEWERS_TAG.test(pr.description)) {
-      const reviewRequests = notifier.getReviewersToRequest(
-        ownersCheckResult.reviewers
-      );
-
-      await github.createReviewRequests(pr.number, reviewRequests);
-    }
-
+    await notifier.requestReviews(github, ownersCheckResult.reviewers)
     await notifier.createNotificationComment(github);
   }
 

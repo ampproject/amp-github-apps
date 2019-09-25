@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
- const {OWNER_MODIFIER} = require('./owner')
+const {OWNER_MODIFIER} = require('./owner')
+const ADD_REVIEWERS_TAG = /#add-?owners/i;
 
 /**
  * Notifier for to tagging and requesting reviewers for a PR.
@@ -32,6 +33,21 @@ class OwnersNotifier {
     this.fileTreeMap = tree.buildFileTreeMap(
       changedFiles.map(({filename}) => filename)
     );
+  }
+
+  /**
+   * Requests reviews from owners.
+   *
+   * Only requests reviews if the PR description contains the #addowners tag.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   * @param {string[]} suggestedReviewers suggested reviewers to add.
+   */
+  async requestReviews(github, suggestedReviewers) {
+    if (ADD_REVIEWERS_TAG.test(this.pr.description)) {
+      const reviewRequests = this.getReviewersToRequest(suggestedReviewers);
+      await github.createReviewRequests(this.pr.number, reviewRequests);
+    }
   }
 
   /**
