@@ -16,7 +16,6 @@
 
 const _ = require('lodash');
 const sleep = require('sleep-promise');
-const {OWNER_MODIFIER} = require('./owner');
 const {OwnersCheck} = require('./owners_check');
 const {OwnersParser} = require('./parser');
 const {OwnersNotifier} = require('./notifier');

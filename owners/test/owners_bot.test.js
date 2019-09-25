@@ -17,9 +17,7 @@
 const sinon = require('sinon');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
-const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
 const {OwnersBot} = require('../src/owners_bot');
-const {OwnersRule} = require('../src/rules');
 const {OwnersParser} = require('../src/parser');
 const {OwnersNotifier} = require('../src/notifier');
 const {OwnersTree} = require('../src/owners_tree');
@@ -229,9 +227,10 @@ describe('owners bot', () => {
       sandbox.stub(OwnersNotifier.prototype, 'requestReviews');
       await ownersBot.runOwnersCheck(github, pr);
 
-      sandbox.assert.calledWith(OwnersNotifier.prototype.requestReviews,
+      sandbox.assert.calledWith(
+        OwnersNotifier.prototype.requestReviews,
         github,
-        ['root_owner'],
+        ['root_owner']
       );
       done();
     });
@@ -242,7 +241,7 @@ describe('owners bot', () => {
 
       sandbox.assert.calledWith(
         OwnersNotifier.prototype.createNotificationComment,
-        github,
+        github
       );
       done();
     });

@@ -24,12 +24,7 @@ const {OwnersNotifier} = require('../src/notifier');
 describe('notifier', () => {
   const sandbox = sinon.createSandbox();
   const loggerStub = sinon.stub();
-  const github = new GitHub(
-    sinon.stub(),
-    'ampproject',
-    'amphtml',
-    loggerStub,
-  );
+  const github = new GitHub(sinon.stub(), 'ampproject', 'amphtml', loggerStub);
   const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'description');
 
   afterEach(() => {
@@ -67,14 +62,14 @@ describe('notifier', () => {
       notifier = new OwnersNotifier(pr, {}, new OwnersTree(), []);
       sandbox.stub(GitHub.prototype, 'createReviewRequests');
     });
-  
+
     it('does not create review requests', async done => {
       await notifier.requestReviews(github, ['auser']);
 
       sandbox.assert.notCalled(github.createReviewRequests);
       done();
     });
-  
+
     it('returns an empty list', async () => {
       expect.assertions(1);
       const requested = await notifier.requestReviews(github, ['auser']);
@@ -95,7 +90,7 @@ describe('notifier', () => {
 
         sandbox.assert.calledWith(notifier.getReviewersToRequest, [
           'auser',
-          'anotheruser'
+          'anotheruser',
         ]);
         sandbox.assert.calledWith(github.createReviewRequests, 1337, ['auser']);
         done();
@@ -103,10 +98,10 @@ describe('notifier', () => {
 
       it('returns the requested reviewers', async () => {
         expect.assertions(1);
-        const requested = await notifier.requestReviews(
-          github,
-          ['auser', 'anotheruser']
-        );
+        const requested = await notifier.requestReviews(github, [
+          'auser',
+          'anotheruser',
+        ]);
 
         expect(requested).toEqual(['auser']);
       });
@@ -123,10 +118,12 @@ describe('notifier', () => {
       getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
       getCommentsStub.returns([]);
 
-      notifier = new OwnersNotifier(pr, {}, new OwnersTree(), [{
-        filename: 'main.js',
-        sha: '_sha_',
-      }]);
+      notifier = new OwnersNotifier(pr, {}, new OwnersTree(), [
+        {
+          filename: 'main.js',
+          sha: '_sha_',
+        },
+      ]);
     });
 
     it('gets users and teams to notify', async done => {
@@ -210,7 +207,7 @@ describe('notifier', () => {
         .withArgs(sinon.match.string, OWNER_MODIFIER.SILENT)
         .returns([new UserOwner('busy_user'), new TeamOwner(busyTeam)]);
 
-      tree = new OwnersTree()
+      tree = new OwnersTree();
       tree.addRule(
         new OwnersRule('foo/OWNERS.yaml', [
           new UserOwner('busy_user', OWNER_MODIFIER.SILENT),
@@ -222,10 +219,12 @@ describe('notifier', () => {
         ])
       );
 
-      notifier = new OwnersNotifier(pr, {}, tree, [{
-        filename: 'foo/script.js',
-        sha: '_sha_',
-      }]);
+      notifier = new OwnersNotifier(pr, {}, tree, [
+        {
+          filename: 'foo/script.js',
+          sha: '_sha_',
+        },
+      ]);
     });
 
     it('includes suggested reviewers', () => {
@@ -271,20 +270,24 @@ describe('notifier', () => {
     });
 
     it('includes team owners with the always-notify modifier', () => {
-      const notifier = new OwnersNotifier(pr, {}, tree, [{
-        filename: 'bar/script.js',
-        sha: '_sha_',
-      }]);
+      const notifier = new OwnersNotifier(pr, {}, tree, [
+        {
+          filename: 'bar/script.js',
+          sha: '_sha_',
+        },
+      ]);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['ampproject/relevant_team']).toContain('bar/script.js');
     });
 
     it('excludes files with no always-notify owners', () => {
-      const notifier = new OwnersNotifier(pr, {}, tree, [{
-        filename: 'baz/test.js',
-        sha: '_sha_',
-      }]);
+      const notifier = new OwnersNotifier(pr, {}, tree, [
+        {
+          filename: 'baz/test.js',
+          sha: '_sha_',
+        },
+      ]);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['rando']).toBeUndefined();

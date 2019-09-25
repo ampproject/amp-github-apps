@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const {OWNER_MODIFIER} = require('./owner')
+const {OWNER_MODIFIER} = require('./owner');
 const ADD_REVIEWERS_TAG = /#add-?owners/i;
 
 /**
@@ -39,11 +39,11 @@ class OwnersNotifier {
   /**
    * Notify reviewers and owners about the PR.
    *
-   * @param {!ReviewerApprovalMap} currentReviewers existing reviewers.
+   * @param {!GitHub} github GitHub API interface.
    * @param {string[]} suggestedReviewers suggested reviewers to add.
    */
   async notify(github, suggestedReviewers) {
-    const requested = await this.requestReviews(github, suggestedReviewers);
+    await this.requestReviews(github, suggestedReviewers);
     // TODO(#473): Add requested reviews to current reviewer set.
     await this.createNotificationComment(github);
   }
