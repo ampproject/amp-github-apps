@@ -140,7 +140,7 @@
       "site_admin": false
     },
     "body": "",
-    "state": "COMMENTED",
+    "state": "CHANGES_REQUESTED",
     "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980596",
     "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
     "author_association": "MEMBER",
@@ -179,7 +179,7 @@
       "site_admin": false
     },
     "body": "",
-    "state": "COMMENTED",
+    "state": "DISMISSED",
     "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980756",
     "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
     "author_association": "MEMBER",
@@ -218,7 +218,7 @@
       "site_admin": false
     },
     "body": "",
-    "state": "COMMENTED",
+    "state": "PENDING",
     "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980900",
     "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
     "author_association": "MEMBER",

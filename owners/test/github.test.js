@@ -318,8 +318,8 @@ describe('GitHub API', () => {
       })();
     });
 
-    it('ignores comment reviews', async () => {
-      expect.assertions(2);
+    it('returns only approving and rejecting reviews', async () => {
+      expect.assertions(5);
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/pulls/24686/reviews')
         .reply(200, commentReviewsResponse);
@@ -327,8 +327,11 @@ describe('GitHub API', () => {
       await withContext(async (context, github) => {
         const reviews = await github.getReviews(24686);
 
+        expect(reviews.length).toEqual(2);
+        expect(reviews[0].reviewer).toBe('rsimha');
         expect(reviews[0].isApproved).toBe(true);
-        expect(reviews.length).toEqual(1);
+        expect(reviews[1].reviewer).toBe('estherkim');
+        expect(reviews[1].isApproved).toBe(false);
       })();
     });
   });
