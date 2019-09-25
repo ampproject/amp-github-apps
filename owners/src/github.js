@@ -244,17 +244,17 @@ class GitHub {
     // possible review states. The only ones we care about are "APPROVED" and
     // "CHANGES_REQUESTED", since the rest do not indicate a definite approval
     // or rejection.
-    const allowedStates = ['approved', 'changes_requested']
+    const allowedStates = ['approved', 'changes_requested'];
     return response.data
-        .filter(({state}) => allowedStates.includes(state.toLowerCase()))
-        .map(
-          json =>
-            new Review(
-              json.user.login.toLowerCase(),
-              json.state,
-              new Date(json.submitted_at)
-            )
-        );
+      .filter(({state}) => allowedStates.includes(state.toLowerCase()))
+      .map(
+        json =>
+          new Review(
+            json.user.login.toLowerCase(),
+            json.state,
+            new Date(json.submitted_at)
+          )
+      );
   }
 
   /**
