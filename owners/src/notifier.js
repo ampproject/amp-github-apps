@@ -25,11 +25,12 @@ class OwnersNotifier {
    * Constructor.
    *
    * @param {!PullRequest} pr pull request to add notifications to.
+   * @param {!ReviewerApprovalMap} currentReviewers current reviewer approvals.
    * @param {!OwnersTree} tree file ownership tree.
    * @param {FileRef[]} changedFiles list of change files.
    */
-  constructor(pr, tree, changedFiles) {
-    Object.assign(this, {pr});
+  constructor(pr, currentReviewers, tree, changedFiles) {
+    Object.assign(this, {pr, currentReviewers});
     this.fileTreeMap = tree.buildFileTreeMap(
       changedFiles.map(({filename}) => filename)
     );
@@ -101,6 +102,8 @@ class OwnersNotifier {
 
   /**
    * Determine the set of owners to notify/tag for each file.
+   *
+   * TODO(#473): Exclude existing & suggested reviewers from the notify set.
    *
    * @return {Object<string, string[]>} map from user/team names to filenames.
    */

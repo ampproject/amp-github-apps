@@ -40,7 +40,7 @@ describe('notifier', () => {
     let notifier;
 
     beforeEach(() => {
-      notifier = new OwnersNotifier(pr, new OwnersTree(), []);
+      notifier = new OwnersNotifier(pr, {}, new OwnersTree(), []);
       sandbox.stub(GitHub.prototype, 'createReviewRequests');
     });
   
@@ -82,7 +82,7 @@ describe('notifier', () => {
       getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
       getCommentsStub.returns([]);
 
-      notifier = new OwnersNotifier(pr, new OwnersTree(), [{
+      notifier = new OwnersNotifier(pr, {}, new OwnersTree(), [{
         filename: 'main.js',
         sha: '_sha_',
       }]);
@@ -181,7 +181,7 @@ describe('notifier', () => {
         ])
       );
 
-      notifier = new OwnersNotifier(pr, tree, [{
+      notifier = new OwnersNotifier(pr, {}, tree, [{
         filename: 'foo/script.js',
         sha: '_sha_',
       }]);
@@ -220,7 +220,7 @@ describe('notifier', () => {
     tree.addRule(new OwnersRule('baz/OWNERS.yaml', [new UserOwner('rando')]));
 
     it('includes user owners with the always-notify modifier', () => {
-      const notifier = new OwnersNotifier(pr, tree, [
+      const notifier = new OwnersNotifier(pr, {}, tree, [
         {filename: 'foo/main.js', sha: '_sha_'},
         {filename: 'foo/bar.js', sha: '_sha_'},
       ]);
@@ -230,7 +230,7 @@ describe('notifier', () => {
     });
 
     it('includes team owners with the always-notify modifier', () => {
-      const notifier = new OwnersNotifier(pr, tree, [{
+      const notifier = new OwnersNotifier(pr, {}, tree, [{
         filename: 'bar/script.js',
         sha: '_sha_',
       }]);
@@ -240,7 +240,7 @@ describe('notifier', () => {
     });
 
     it('excludes files with no always-notify owners', () => {
-      const notifier = new OwnersNotifier(pr, tree, [{
+      const notifier = new OwnersNotifier(pr, {}, tree, [{
         filename: 'baz/test.js',
         sha: '_sha_',
       }]);
