@@ -225,30 +225,15 @@ describe('owners bot', () => {
       });
     });
 
-    it('does not create review requests', async done => {
+    it('requests reviewers', async done => {
+      sandbox.stub(OwnersNotifier.prototype, 'requestReviews');
       await ownersBot.runOwnersCheck(github, pr);
 
-      sandbox.assert.notCalled(github.createReviewRequests);
+      sandbox.assert.calledWith(OwnersNotifier.prototype.requestReviews,
+        github,
+        ['root_owner'],
+      );
       done();
-    });
-
-    describe('when the PR description contains #addowners', () => {
-      beforeEach(() => {
-        pr.description = 'Assign reviewers please #addowners';
-      });
-
-      it('requests reviewers', async done => {
-        sandbox
-          .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
-          .returns(['auser', 'anotheruser']);
-        await ownersBot.runOwnersCheck(github, pr);
-
-        sandbox.assert.calledWith(github.createReviewRequests, 1337, [
-          'auser',
-          'anotheruser',
-        ]);
-        done();
-      });
     });
 
     it('creates a notification comment', async done => {

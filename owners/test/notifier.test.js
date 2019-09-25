@@ -36,6 +36,42 @@ describe('notifier', () => {
     sandbox.restore();
   });
 
+  describe('requestReviews', () => {
+    let notifier;
+
+    beforeEach(() => {
+      notifier = new OwnersNotifier(pr, new OwnersTree(), []);
+      sandbox.stub(GitHub.prototype, 'createReviewRequests');
+    });
+  
+    it('does not create review requests', async done => {
+      await notifier.requestReviews(github, ['auser']);
+
+      sandbox.assert.notCalled(github.createReviewRequests);
+      done();
+    });
+
+    describe('when the PR description contains #addowners', () => {
+      beforeEach(() => {
+        pr.description = 'Assign reviewers please #addowners';
+      });
+
+      it('requests reviewers', async done => {
+        sandbox
+          .stub(OwnersNotifier.prototype, 'getReviewersToRequest')
+          .returns(['auser']);
+        await notifier.requestReviews(github, ['auser', 'anotheruser']);
+
+        sandbox.assert.calledWith(notifier.getReviewersToRequest, [
+          'auser',
+          'anotheruser'
+        ]);
+        sandbox.assert.calledWith(github.createReviewRequests, 1337, ['auser']);
+        done();
+      });
+    });
+  });
+
   describe('createNotificationComment', () => {
     let getCommentsStub;
     let notifier;
