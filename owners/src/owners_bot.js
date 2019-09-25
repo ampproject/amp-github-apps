@@ -100,10 +100,10 @@ class OwnersBot {
    */
   async runOwnersCheck(github, pr) {
     const {tree, changedFiles, reviewers} = await this.initPr(github, pr);
-    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
 
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
+    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
     const ownersCheckResult = ownersCheck.run();
 
     if (checkRunId) {
