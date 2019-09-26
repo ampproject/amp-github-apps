@@ -43,8 +43,11 @@ class OwnersNotifier {
    * @param {string[]} suggestedReviewers suggested reviewers to add.
    */
   async notify(github, suggestedReviewers) {
-    await this.requestReviews(github, suggestedReviewers);
-    // TODO(#473): Add requested reviews to current reviewer set.
+    const requested = await this.requestReviews(github, suggestedReviewers);
+    requested.forEach(reviewer => {
+      this.currentReviewers[reviewer] = false;
+    });
+
     await this.createNotificationComment(github);
   }
 

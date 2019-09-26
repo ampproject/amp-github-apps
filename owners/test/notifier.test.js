@@ -25,7 +25,11 @@ describe('notifier', () => {
   const sandbox = sinon.createSandbox();
   const loggerStub = sinon.stub();
   const github = new GitHub(sinon.stub(), 'ampproject', 'amphtml', loggerStub);
-  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'description');
+  let pr;
+
+  beforeEach(() => {
+    pr = new PullRequest(1337, 'the_author', '_test_hash_', 'description');
+  });
 
   afterEach(() => {
     sandbox.restore();
@@ -36,15 +40,24 @@ describe('notifier', () => {
 
     beforeEach(() => {
       notifier = new OwnersNotifier(pr, {}, new OwnersTree(), []);
-      sandbox.stub(OwnersNotifier.prototype, 'requestReviews');
+      sandbox.stub(GitHub.prototype, 'createReviewRequests');
       sandbox.stub(OwnersNotifier.prototype, 'createNotificationComment');
     });
 
     it('requests reviews for the suggested reviewers', async done => {
+      sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
       await notifier.notify(github, ['auser']);
 
       sandbox.assert.calledWith(notifier.requestReviews, github, ['auser']);
       done();
+    });
+
+    it('adds requested reviews to the current reviewer set', async () => {
+      expect.assertions(1);
+      pr.description = '#addowners'
+      await notifier.notify(github, ['auser']);
+
+      expect(notifier.currentReviewers['auser']).toBe(false)
     });
 
     it('creates a notification comment', async done => {
