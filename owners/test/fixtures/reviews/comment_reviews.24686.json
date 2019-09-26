@@ -1,0 +1,236 @@
+[
+  {
+    "id": 291948551,
+    "node_id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MjkxOTQ4NTUx",
+    "user": {
+      "login": "rsimha",
+      "id": 26553114,
+      "node_id": "MDQ6VXNlcjI2NTUzMTE0",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/26553114?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/rsimha",
+      "html_url": "https://github.com/rsimha",
+      "followers_url": "https://api.github.com/users/rsimha/followers",
+      "following_url": "https://api.github.com/users/rsimha/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rsimha/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/rsimha/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/rsimha/subscriptions",
+      "organizations_url": "https://api.github.com/users/rsimha/orgs",
+      "repos_url": "https://api.github.com/users/rsimha/repos",
+      "events_url": "https://api.github.com/users/rsimha/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/rsimha/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "Generally LGTM. Few suggestions below. Approving to unblock.",
+    "state": "APPROVED",
+    "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291948551",
+    "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
+    "author_association": "MEMBER",
+    "_links": {
+      "html": {
+        "href": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291948551"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/ampproject/amphtml/pulls/24686"
+      }
+    },
+    "submitted_at": "2019-09-23T17:53:30Z",
+    "commit_id": "0eb0df37c5b84a4f722c4acd0b2cff462011cbf5"
+  },
+  {
+    "id": 291951016,
+    "node_id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MjkxOTUxMDE2",
+    "user": {
+      "login": "rsimha",
+      "id": 26553114,
+      "node_id": "MDQ6VXNlcjI2NTUzMTE0",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/26553114?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/rsimha",
+      "html_url": "https://github.com/rsimha",
+      "followers_url": "https://api.github.com/users/rsimha/followers",
+      "following_url": "https://api.github.com/users/rsimha/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rsimha/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/rsimha/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/rsimha/subscriptions",
+      "organizations_url": "https://api.github.com/users/rsimha/orgs",
+      "repos_url": "https://api.github.com/users/rsimha/repos",
+      "events_url": "https://api.github.com/users/rsimha/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/rsimha/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "",
+    "state": "COMMENTED",
+    "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291951016",
+    "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
+    "author_association": "MEMBER",
+    "_links": {
+      "html": {
+        "href": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291951016"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/ampproject/amphtml/pulls/24686"
+      }
+    },
+    "submitted_at": "2019-09-23T17:54:05Z",
+    "commit_id": "0eb0df37c5b84a4f722c4acd0b2cff462011cbf5"
+  },
+  {
+    "id": 291979719,
+    "node_id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MjkxOTc5NzE5",
+    "user": {
+      "login": "estherkim",
+      "id": 44627152,
+      "node_id": "MDQ6VXNlcjQ0NjI3MTUy",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/44627152?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/estherkim",
+      "html_url": "https://github.com/estherkim",
+      "followers_url": "https://api.github.com/users/estherkim/followers",
+      "following_url": "https://api.github.com/users/estherkim/following{/other_user}",
+      "gists_url": "https://api.github.com/users/estherkim/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/estherkim/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/estherkim/subscriptions",
+      "organizations_url": "https://api.github.com/users/estherkim/orgs",
+      "repos_url": "https://api.github.com/users/estherkim/repos",
+      "events_url": "https://api.github.com/users/estherkim/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/estherkim/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "",
+    "state": "COMMENTED",
+    "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291979719",
+    "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
+    "author_association": "MEMBER",
+    "_links": {
+      "html": {
+        "href": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291979719"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/ampproject/amphtml/pulls/24686"
+      }
+    },
+    "submitted_at": "2019-09-23T18:44:57Z",
+    "commit_id": "0eb0df37c5b84a4f722c4acd0b2cff462011cbf5"
+  },
+  {
+    "id": 291980596,
+    "node_id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MjkxOTgwNTk2",
+    "user": {
+      "login": "estherkim",
+      "id": 44627152,
+      "node_id": "MDQ6VXNlcjQ0NjI3MTUy",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/44627152?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/estherkim",
+      "html_url": "https://github.com/estherkim",
+      "followers_url": "https://api.github.com/users/estherkim/followers",
+      "following_url": "https://api.github.com/users/estherkim/following{/other_user}",
+      "gists_url": "https://api.github.com/users/estherkim/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/estherkim/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/estherkim/subscriptions",
+      "organizations_url": "https://api.github.com/users/estherkim/orgs",
+      "repos_url": "https://api.github.com/users/estherkim/repos",
+      "events_url": "https://api.github.com/users/estherkim/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/estherkim/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "",
+    "state": "CHANGES_REQUESTED",
+    "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980596",
+    "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
+    "author_association": "MEMBER",
+    "_links": {
+      "html": {
+        "href": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980596"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/ampproject/amphtml/pulls/24686"
+      }
+    },
+    "submitted_at": "2019-09-23T18:46:38Z",
+    "commit_id": "938507d25ab05f405526945a94228ab1a445b166"
+  },
+  {
+    "id": 291980756,
+    "node_id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MjkxOTgwNzU2",
+    "user": {
+      "login": "estherkim",
+      "id": 44627152,
+      "node_id": "MDQ6VXNlcjQ0NjI3MTUy",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/44627152?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/estherkim",
+      "html_url": "https://github.com/estherkim",
+      "followers_url": "https://api.github.com/users/estherkim/followers",
+      "following_url": "https://api.github.com/users/estherkim/following{/other_user}",
+      "gists_url": "https://api.github.com/users/estherkim/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/estherkim/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/estherkim/subscriptions",
+      "organizations_url": "https://api.github.com/users/estherkim/orgs",
+      "repos_url": "https://api.github.com/users/estherkim/repos",
+      "events_url": "https://api.github.com/users/estherkim/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/estherkim/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "",
+    "state": "DISMISSED",
+    "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980756",
+    "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
+    "author_association": "MEMBER",
+    "_links": {
+      "html": {
+        "href": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980756"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/ampproject/amphtml/pulls/24686"
+      }
+    },
+    "submitted_at": "2019-09-23T18:46:55Z",
+    "commit_id": "938507d25ab05f405526945a94228ab1a445b166"
+  },
+  {
+    "id": 291980900,
+    "node_id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MjkxOTgwOTAw",
+    "user": {
+      "login": "estherkim",
+      "id": 44627152,
+      "node_id": "MDQ6VXNlcjQ0NjI3MTUy",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/44627152?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/estherkim",
+      "html_url": "https://github.com/estherkim",
+      "followers_url": "https://api.github.com/users/estherkim/followers",
+      "following_url": "https://api.github.com/users/estherkim/following{/other_user}",
+      "gists_url": "https://api.github.com/users/estherkim/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/estherkim/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/estherkim/subscriptions",
+      "organizations_url": "https://api.github.com/users/estherkim/orgs",
+      "repos_url": "https://api.github.com/users/estherkim/repos",
+      "events_url": "https://api.github.com/users/estherkim/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/estherkim/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "",
+    "state": "PENDING",
+    "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980900",
+    "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
+    "author_association": "MEMBER",
+    "_links": {
+      "html": {
+        "href": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980900"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/ampproject/amphtml/pulls/24686"
+      }
+    },
+    "submitted_at": "2019-09-23T18:47:09Z",
+    "commit_id": "938507d25ab05f405526945a94228ab1a445b166"
+  }
+]

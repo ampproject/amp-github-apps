@@ -24,6 +24,7 @@ const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
 const requestedReviewsResponse = require('./fixtures/reviews/requested_reviewers.24574.json');
+const commentReviewsResponse = require('./fixtures/reviews/comment_reviews.24686.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
 const issueCommentsResponse = require('./fixtures/comments/issue_comments.438.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
@@ -314,6 +315,23 @@ describe('GitHub API', () => {
         expect(review.reviewer).toEqual('erwinmombay');
         expect(review.isApproved).toBe(true);
         expect(review.submittedAt).toEqual(new Date('2019-02-26T20:39:13Z'));
+      })();
+    });
+
+    it('returns only approving and rejecting reviews', async () => {
+      expect.assertions(5);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews')
+        .reply(200, commentReviewsResponse);
+
+      await withContext(async (context, github) => {
+        const reviews = await github.getReviews(24686);
+
+        expect(reviews.length).toEqual(2);
+        expect(reviews[0].reviewer).toBe('rsimha');
+        expect(reviews[0].isApproved).toBe(true);
+        expect(reviews[1].reviewer).toBe('estherkim');
+        expect(reviews[1].isApproved).toBe(false);
       })();
     });
   });
