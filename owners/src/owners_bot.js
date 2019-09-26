@@ -16,14 +16,13 @@
 
 const _ = require('lodash');
 const sleep = require('sleep-promise');
-const {OWNER_MODIFIER} = require('./owner');
 const {OwnersCheck} = require('./owners_check');
 const {OwnersParser} = require('./parser');
+const {OwnersNotifier} = require('./notifier');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
 const GITHUB_GET_MEMBERS_DELAY = 3000;
 const OWNERS_CHECKRUN_NAME = 'owners-check';
-const ADD_REVIEWERS_TAG = /#add-?owners/i;
 
 /**
  * Bot to run the owners check and create/update the GitHub check-run.
@@ -100,10 +99,10 @@ class OwnersBot {
    */
   async runOwnersCheck(github, pr) {
     const {tree, changedFiles, reviewers} = await this.initPr(github, pr);
-    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
 
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
+    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
     const ownersCheckResult = ownersCheck.run();
 
     if (checkRunId) {
@@ -116,19 +115,8 @@ class OwnersBot {
       await github.createCheckRun(pr.headSha, ownersCheckResult.checkRun);
     }
 
-    const fileTreeMap = tree.buildFileTreeMap(
-      changedFiles.map(({filename}) => filename)
-    );
-    if (ADD_REVIEWERS_TAG.test(pr.description)) {
-      const reviewRequests = this._getReviewRequests(
-        fileTreeMap,
-        ownersCheckResult.reviewers
-      );
-
-      await github.createReviewRequests(pr.number, reviewRequests);
-    }
-
-    await this.createNotifications(github, pr, fileTreeMap);
+    const notifier = new OwnersNotifier(pr, reviewers, tree, changedFiles);
+    await notifier.notify(github, ownersCheckResult.reviewers);
   }
 
   /**
@@ -141,38 +129,6 @@ class OwnersBot {
   async runOwnersCheckOnPrNumber(github, prNumber) {
     const pr = await github.getPullRequest(prNumber);
     await this.runOwnersCheck(github, pr);
-  }
-
-  /**
-   * Adds a comment tagging always-notify owners of changed files.
-   *
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!PullRequest} pr pull request to create notifications on.
-   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   */
-  async createNotifications(github, pr, fileTreeMap) {
-    const [botComment] = await github.getBotComments(pr.number);
-    const notifies = this._getNotifies(fileTreeMap);
-    delete notifies[pr.author];
-
-    const fileNotifyComments = Object.entries(notifies).map(
-      ([name, filenames]) => {
-        const header = `Hey @${name}, these files were changed:`;
-        const files = filenames.map(filename => `- ${filename}`);
-        return [header, ...files].join('\n');
-      }
-    );
-
-    if (!fileNotifyComments.length) {
-      return;
-    }
-
-    const comment = fileNotifyComments.join('\n\n');
-    if (botComment) {
-      await github.updateComment(botComment.id, comment);
-    } else {
-      await github.createBotComment(pr.number, comment);
-    }
   }
 
   /**
@@ -201,49 +157,6 @@ class OwnersBot {
     approvals[pr.author] = true;
 
     return approvals;
-  }
-
-  /**
-   * Determine the set of users to request reviews from.
-   *
-   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @param {string[]} suggestedReviewers list of suggested reviewer usernames.
-   * @return {string[]} set of usernames.
-   */
-  _getReviewRequests(fileTreeMap, suggestedReviewers) {
-    const reviewers = new Set(suggestedReviewers);
-    Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
-      subtree
-        .getModifiedFileOwners(filename, OWNER_MODIFIER.SILENT)
-        .map(owner => owner.allUsernames)
-        .reduce((left, right) => left.concat(right), [])
-        .forEach(reviewers.delete, reviewers);
-    });
-
-    return Array.from(reviewers);
-  }
-
-  /**
-   * Determine the set of owners to notify/tag for each file.
-   *
-   * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @return {Object<string, string[]>} map from user/team names to filenames.
-   */
-  _getNotifies(fileTreeMap) {
-    const notifies = {};
-    Object.entries(fileTreeMap).forEach(([filename, subtree]) => {
-      subtree
-        .getModifiedFileOwners(filename, OWNER_MODIFIER.NOTIFY)
-        .map(owner => owner.name)
-        .forEach(name => {
-          if (!notifies[name]) {
-            notifies[name] = [];
-          }
-          notifies[name].push(filename);
-        });
-    });
-
-    return notifies;
   }
 }
 

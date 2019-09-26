@@ -17,10 +17,9 @@
 const sinon = require('sinon');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
-const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
 const {OwnersBot} = require('../src/owners_bot');
-const {OwnersRule} = require('../src/rules');
 const {OwnersParser} = require('../src/parser');
+const {OwnersNotifier} = require('../src/notifier');
 const {OwnersTree} = require('../src/owners_tree');
 const {
   CheckRun,
@@ -39,7 +38,7 @@ describe('owners bot', () => {
 
   let sandbox;
   const github = new GitHub({}, 'ampproject', 'amphtml', silentLogger);
-  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'descrption');
+  const pr = new PullRequest(1337, 'the_author', '_test_hash_', 'description');
   const localRepo = new LocalRepository('path/to/repo');
   const ownersBot = new OwnersBot(localRepo);
 
@@ -224,37 +223,26 @@ describe('owners bot', () => {
       });
     });
 
-    it('does not create review requests', async done => {
+    it('requests reviewers', async done => {
+      sandbox.stub(OwnersNotifier.prototype, 'requestReviews');
       await ownersBot.runOwnersCheck(github, pr);
 
-      sandbox.assert.notCalled(github.createReviewRequests);
+      sandbox.assert.calledWith(
+        OwnersNotifier.prototype.requestReviews,
+        github,
+        ['root_owner']
+      );
       done();
     });
 
-    describe('when the PR description contains #addowners', () => {
-      beforeEach(() => {
-        pr.description = 'Assign reviewers please #addowners';
-      });
-
-      it('requests reviewers', async done => {
-        sandbox
-          .stub(OwnersBot.prototype, '_getReviewRequests')
-          .returns(['auser', 'anotheruser']);
-        await ownersBot.runOwnersCheck(github, pr);
-
-        sandbox.assert.calledWith(github.createReviewRequests, 1337, [
-          'auser',
-          'anotheruser',
-        ]);
-        done();
-      });
-    });
-
     it('creates a notification comment', async done => {
-      sandbox.stub(OwnersBot.prototype, 'createNotifications');
+      sandbox.stub(OwnersNotifier.prototype, 'createNotificationComment');
       await ownersBot.runOwnersCheck(github, pr);
 
-      sandbox.assert.calledOnce(ownersBot.createNotifications);
+      sandbox.assert.calledWith(
+        OwnersNotifier.prototype.createNotificationComment,
+        github
+      );
       done();
     });
   });
@@ -277,102 +265,6 @@ describe('owners bot', () => {
 
       sandbox.assert.calledWith(ownersBot.runOwnersCheck, github, pr);
       done();
-    });
-  });
-
-  describe('createNotifications', () => {
-    const fileTreeMap = {'main.js': new OwnersTree()};
-    let getCommentsStub;
-
-    beforeEach(() => {
-      sandbox.stub(GitHub.prototype, 'createBotComment');
-      sandbox.stub(GitHub.prototype, 'updateComment').returns();
-      getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
-      getCommentsStub.returns([]);
-    });
-
-    it('gets users and teams to notify', async done => {
-      sandbox.stub(OwnersBot.prototype, '_getNotifies').returns([]);
-      await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-      sandbox.assert.calledWith(ownersBot._getNotifies, fileTreeMap);
-      done();
-    });
-
-    describe('when there are users or teams to notify', () => {
-      beforeEach(() => {
-        sandbox.stub(OwnersBot.prototype, '_getNotifies').returns({
-          'a_subscriber': ['foo/main.js'],
-          'ampproject/some_team': ['foo/main.js'],
-        });
-      });
-
-      describe('when a comment by the bot already exists', () => {
-        beforeEach(() => {
-          getCommentsStub.returns([{id: 42, body: 'a comment'}]);
-        });
-
-        it('does not create a comment', async done => {
-          await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-          sandbox.assert.notCalled(github.createBotComment);
-          done();
-        });
-
-        it('updates the existing comment', async () => {
-          expect.assertions(2);
-          await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-          sandbox.assert.calledOnce(github.updateComment);
-          const [commentId, comment] = github.updateComment.getCall(0).args;
-          expect(commentId).toEqual(42);
-          expect(comment).toContain(
-            'Hey @a_subscriber, these files were changed:\n- foo/main.js',
-            'Hey @ampproject/some_team, these files were changed:\n- foo/main.js'
-          );
-        });
-      });
-
-      describe('when no comment by the bot exists yet', () => {
-        it('creates a comment tagging users and teams', async () => {
-          expect.assertions(2);
-          await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-          sandbox.assert.calledOnce(github.createBotComment);
-          const [prNumber, comment] = github.createBotComment.getCall(0).args;
-          expect(prNumber).toEqual(1337);
-          expect(comment).toContain(
-            'Hey @a_subscriber, these files were changed:\n- foo/main.js',
-            'Hey @ampproject/some_team, these files were changed:\n- foo/main.js'
-          );
-        });
-      });
-    });
-
-    describe('when there are no users or teams to notify', () => {
-      it('does not create or update a comment', async done => {
-        await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-        sandbox.assert.notCalled(github.createBotComment);
-        sandbox.assert.notCalled(github.updateComment);
-        done();
-      });
-    });
-
-    describe('when the author is on the notify list', () => {
-      beforeEach(() => {
-        sandbox.stub(OwnersBot.prototype, '_getNotifies').returns({
-          'the_author': ['foo/main.js'],
-        });
-      });
-
-      it('does not notify the author', async done => {
-        await ownersBot.createNotifications(github, pr, fileTreeMap);
-
-        sandbox.assert.notCalled(github.createBotComment);
-        sandbox.assert.notCalled(github.updateComment);
-        done();
-      });
     });
   });
 
@@ -404,95 +296,6 @@ describe('owners bot', () => {
       const reviewers = await ownersBot._getCurrentReviewers(github, pr);
 
       expect(reviewers['rejector']).toBe(false);
-    });
-  });
-
-  describe('getReviewRequests', () => {
-    const tree = new OwnersTree();
-    const busyTeam = new Team(42, 'ampproject', 'busy_team');
-    busyTeam.members = ['busy_member'];
-    let fileTreeMap;
-
-    beforeEach(() => {
-      sandbox
-        .stub(OwnersTree.prototype, 'getModifiedFileOwners')
-        .withArgs(sinon.match.string, OWNER_MODIFIER.SILENT)
-        .returns([new UserOwner('busy_user'), new TeamOwner(busyTeam)]);
-
-      tree.addRule(
-        new OwnersRule('foo/OWNERS.yaml', [
-          new UserOwner('busy_user', OWNER_MODIFIER.SILENT),
-        ])
-      );
-      tree.addRule(
-        new OwnersRule('foo/OWNERS.yaml', [
-          new TeamOwner(busyTeam, OWNER_MODIFIER.SILENT),
-        ])
-      );
-
-      fileTreeMap = tree.buildFileTreeMap(['foo/script.js']);
-    });
-
-    it('includes suggested reviewers', () => {
-      const reviewRequests = ownersBot._getReviewRequests(fileTreeMap, [
-        'auser',
-      ]);
-
-      expect(Array.from(reviewRequests)).toContain('auser');
-    });
-
-    it('excludes user owners with the no-notify modifier', () => {
-      const reviewRequests = ownersBot._getReviewRequests(fileTreeMap, [
-        'busy_user',
-      ]);
-
-      expect(Array.from(reviewRequests)).not.toContain('busy_user');
-    });
-
-    it('excludes members of team owners with the no-notify modifier', () => {
-      const reviewRequests = ownersBot._getReviewRequests(fileTreeMap, [
-        'busy_member',
-      ]);
-
-      expect(Array.from(reviewRequests)).not.toContain('busy_member');
-    });
-  });
-
-  describe('getNotifies', () => {
-    const tree = new OwnersTree();
-    const relevantTeam = new Team(42, 'ampproject', 'relevant_team');
-    relevantTeam.members = ['relevant_member'];
-    tree.addRule(
-      new OwnersRule('foo/OWNERS.yaml', [
-        new UserOwner('relevant_user', OWNER_MODIFIER.NOTIFY),
-      ])
-    );
-    tree.addRule(
-      new OwnersRule('bar/OWNERS.yaml', [
-        new TeamOwner(relevantTeam, OWNER_MODIFIER.NOTIFY),
-      ])
-    );
-    tree.addRule(new OwnersRule('baz/OWNERS.yaml', [new UserOwner('rando')]));
-
-    it('includes user owners with the always-notify modifier', () => {
-      const fileTreeMap = tree.buildFileTreeMap(['foo/main.js', 'foo/bar.js']);
-      const notifies = ownersBot._getNotifies(fileTreeMap);
-
-      expect(notifies['relevant_user']).toContain('foo/main.js');
-    });
-
-    it('includes team owners with the always-notify modifier', () => {
-      const fileTreeMap = tree.buildFileTreeMap(['bar/script.js']);
-      const notifies = ownersBot._getNotifies(fileTreeMap);
-
-      expect(notifies['ampproject/relevant_team']).toContain('bar/script.js');
-    });
-
-    it('excludes files with no always-notify owners', () => {
-      const fileTreeMap = tree.buildFileTreeMap(['baz/test.js']);
-      const notifies = ownersBot._getNotifies(fileTreeMap);
-
-      expect(notifies['rando']).toBeUndefined();
     });
   });
 });
