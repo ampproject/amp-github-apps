@@ -137,7 +137,7 @@ class OwnersNotifier {
           notifies[name].push(filename);
         });
     });
-    
+
     Object.keys(this.currentReviewers).forEach(name => {
       delete notifies[name];
     });

@@ -310,11 +310,13 @@ describe('notifier', () => {
           tree,
           [{filename: 'baz/test.js', sha: '_sha_'}]
         );
-      
-        sandbox.stub(OwnersTree.prototype, 'getModifiedFileOwners').returns([
-          new UserOwner('current_approver'),
-          new UserOwner('pending_reviewer'),
-        ]);
+
+        sandbox
+          .stub(OwnersTree.prototype, 'getModifiedFileOwners')
+          .returns([
+            new UserOwner('current_approver'),
+            new UserOwner('pending_reviewer'),
+          ]);
       });
 
       it('excludes approving reviewers', () => {
