@@ -16,6 +16,7 @@
 
 const {OWNER_MODIFIER} = require('./owner');
 const ADD_REVIEWERS_TAG = /#add-?owners/i;
+const DONT_ADD_REVIEWERS_TAG = /#no-?add-?owners/i;
 
 /**
  * Notifier for to tagging and requesting reviewers for a PR.
@@ -58,7 +59,11 @@ class OwnersNotifier {
    * @return {string[]} list of reviewers requested.
    */
   async requestReviews(github, suggestedReviewers) {
-    if (ADD_REVIEWERS_TAG.test(this.pr.description)) {
+    const optOut = process.env.ADD_REVIEWERS_OPT_OUT;
+    const optOutTagPresent = DONT_ADD_REVIEWERS_TAG.test(this.pr.description);
+    const optInTagPresent = ADD_REVIEWERS_TAG.test(this.pr.description);
+
+    if ((optOut && !optOutTagPresent) || (!optOut && optInTagPresent)) {
       const reviewRequests = this.getReviewersToRequest(suggestedReviewers);
       await github.createReviewRequests(this.pr.number, reviewRequests);
       return reviewRequests;
