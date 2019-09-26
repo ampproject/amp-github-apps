@@ -44,8 +44,11 @@ class OwnersNotifier {
    * @param {string[]} suggestedReviewers suggested reviewers to add.
    */
   async notify(github, suggestedReviewers) {
-    await this.requestReviews(github, suggestedReviewers);
-    // TODO(#473): Add requested reviews to current reviewer set.
+    const requested = await this.requestReviews(github, suggestedReviewers);
+    requested.forEach(reviewer => {
+      this.currentReviewers[reviewer] = false;
+    });
+
     await this.createNotificationComment(github);
   }
 
@@ -124,8 +127,6 @@ class OwnersNotifier {
   /**
    * Determine the set of owners to notify/tag for each file.
    *
-   * TODO(#473): Exclude existing & suggested reviewers from the notify set.
-   *
    * @return {Object<string, string[]>} map from user/team names to filenames.
    */
   getOwnersToNotify() {
@@ -140,6 +141,10 @@ class OwnersNotifier {
           }
           notifies[name].push(filename);
         });
+    });
+
+    Object.keys(this.currentReviewers).forEach(name => {
+      delete notifies[name];
     });
 
     return notifies;

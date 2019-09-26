@@ -40,15 +40,24 @@ describe('notifier', () => {
 
     beforeEach(() => {
       notifier = new OwnersNotifier(pr, {}, new OwnersTree(), []);
-      sandbox.stub(OwnersNotifier.prototype, 'requestReviews');
+      sandbox.stub(GitHub.prototype, 'createReviewRequests');
       sandbox.stub(OwnersNotifier.prototype, 'createNotificationComment');
     });
 
     it('requests reviews for the suggested reviewers', async done => {
+      sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
       await notifier.notify(github, ['auser']);
 
       sandbox.assert.calledWith(notifier.requestReviews, github, ['auser']);
       done();
+    });
+
+    it('adds requested reviews to the current reviewer set', async () => {
+      expect.assertions(1);
+      pr.description = '#addowners';
+      await notifier.notify(github, ['auser']);
+
+      expect(notifier.currentReviewers['auser']).toBe(false);
     });
 
     it('creates a notification comment', async done => {
@@ -330,10 +339,7 @@ describe('notifier', () => {
 
     it('includes team owners with the always-notify modifier', () => {
       const notifier = new OwnersNotifier(pr, {}, tree, [
-        {
-          filename: 'bar/script.js',
-          sha: '_sha_',
-        },
+        {filename: 'bar/script.js', sha: '_sha_'},
       ]);
       const notifies = notifier.getOwnersToNotify();
 
@@ -342,14 +348,40 @@ describe('notifier', () => {
 
     it('excludes files with no always-notify owners', () => {
       const notifier = new OwnersNotifier(pr, {}, tree, [
-        {
-          filename: 'baz/test.js',
-          sha: '_sha_',
-        },
+        {filename: 'baz/test.js', sha: '_sha_'},
       ]);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['rando']).toBeUndefined();
+    });
+
+    describe('with existing reviewers', () => {
+      let notifier;
+
+      beforeEach(() => {
+        notifier = new OwnersNotifier(
+          pr,
+          {'current_approver': true, 'pending_reviewer': false},
+          tree,
+          [{filename: 'baz/test.js', sha: '_sha_'}]
+        );
+
+        sandbox
+          .stub(OwnersTree.prototype, 'getModifiedFileOwners')
+          .returns([
+            new UserOwner('current_approver'),
+            new UserOwner('pending_reviewer'),
+          ]);
+      });
+
+      it('excludes approving reviewers', () => {
+        const notifies = notifier.getOwnersToNotify();
+        expect(notifies['current_approver']).toBeUndefined();
+      });
+      it('excludes pending reviewers', () => {
+        const notifies = notifier.getOwnersToNotify();
+        expect(notifies['pending_reviewer']).toBeUndefined();
+      });
     });
   });
 });
