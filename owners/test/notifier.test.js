@@ -72,7 +72,7 @@ describe('notifier', () => {
 
     describe('when reviewer assignment is opt-in', () => {
       beforeEach(() => {
-        sandbox.stub(process, 'env').value({ADD_REVIEWERS_OPT_OUT: false})
+        sandbox.stub(process, 'env').value({ADD_REVIEWERS_OPT_OUT: false});
       });
 
       it('does not create review requests', async done => {
@@ -101,7 +101,9 @@ describe('notifier', () => {
             'auser',
             'anotheruser',
           ]);
-          sandbox.assert.calledWith(github.createReviewRequests, 1337, ['auser']);
+          sandbox.assert.calledWith(github.createReviewRequests, 1337, [
+            'auser',
+          ]);
           done();
         });
 
@@ -119,7 +121,7 @@ describe('notifier', () => {
 
     describe('when reviewer assignment is opt-out', () => {
       beforeEach(() => {
-        sandbox.stub(process, 'env').value({ADD_REVIEWERS_OPT_OUT: true})
+        sandbox.stub(process, 'env').value({ADD_REVIEWERS_OPT_OUT: true});
       });
 
       it('requests reviewers', async done => {
