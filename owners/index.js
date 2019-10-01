@@ -83,13 +83,15 @@ module.exports = app => {
   });
 
   /** Health check server endpoints **/
-  server({ port: process.env.ADMIN_SERVER_PORT || 8081 }, [
+  server({ port: process.env.INFO_SERVER_PORT || 8081 }, [
     server.router.get('/status', ctx => 
       [
         `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
         `Project: ${GCLOUD_PROJECT}`,
         `App ID: ${APP_ID}`,
         `Deployed commit: <code>${APP_COMMIT_SHA}</code> ${APP_COMMIT_MSG}`,
+        '<a href="/tree">Owners Tree</a>',
+        '<a href="/teams">Organization Teams</a>',
       ].join('<br>')
     ),
 
@@ -126,6 +128,8 @@ module.exports = app => {
     }),
   ]);
 
+  // Since this endpoint triggers a ton of GitHub API requests, there is a risk
+  // of it being spammed; so it is not exposed through the info server.
   app.route('/admin').get('/check/:prNumber', async (req, res) => {
     const pr = await github.getPullRequest(req.params.prNumber);
     const {tree, changedFiles, reviewers} = await ownersBot.initPr(github, pr);
