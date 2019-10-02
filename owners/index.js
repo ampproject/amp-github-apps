@@ -116,7 +116,7 @@ module.exports = app => {
     await ownersBot.runOwnersCheck(
       GitHub.fromContext(context),
       PullRequest.fromGitHubResponse(context.payload.pull_request),
-      /* requestOwners=*/ true
+      /* requestOwners */ true
     );
   });
 
