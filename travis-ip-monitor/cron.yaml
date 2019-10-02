@@ -1,4 +1,0 @@
-cron:
-- description: "Fetch the current Travis API IP addresses and store them"
-  url: /_cron/refresh_travis_ip_list
-  schedule: every 2 hours
