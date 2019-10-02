@@ -270,7 +270,6 @@ describe('owners bot', () => {
   describe('getCurrentReviewers', () => {
     const today = new Date('2019-01-02T00:00:00Z');
     const yesterday = new Date('2019-01-01T00:00:00Z');
-    const tomorrowTimestamp = '2019-01-03T00:00:00Z';
 
     it("includes true for approvers' usernames", async () => {
       expect.assertions(2);

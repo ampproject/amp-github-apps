@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-const _ = require('lodash');
 const sleep = require('sleep-promise');
 const {OwnersCheck} = require('./owners_check');
 const {OwnersParser} = require('./parser');
