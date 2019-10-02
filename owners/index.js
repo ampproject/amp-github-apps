@@ -53,7 +53,7 @@ module.exports = app => {
       level: process.env.LOG_LEVEL || 'info',
     });
   }
-  
+
   /** Probot request handlers **/
   app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
     await ownersBot.runOwnersCheck(
@@ -83,8 +83,8 @@ module.exports = app => {
   });
 
   /** Health check server endpoints **/
-  server({ port: process.env.INFO_SERVER_PORT || 8081 }, [
-    server.router.get('/status', ctx => 
+  server({port: process.env.INFO_SERVER_PORT || 8081}, [
+    server.router.get('/status', ctx =>
       [
         `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
         `Project: ${GCLOUD_PROJECT}`,
@@ -110,7 +110,7 @@ module.exports = app => {
         output += `${errorHeader}<code>${errorDisplay}</code>`;
       }
 
-      return output
+      return output;
     }),
 
     server.router.get('/teams', (req, res) => {
