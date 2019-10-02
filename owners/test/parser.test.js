@@ -90,10 +90,18 @@ describe('owners parser', () => {
 
     it('parses a wildcard owner', () => {
       sandbox.stub(repo, 'readFile').returns('- "*"');
-      const fileParse = parser.parseOwnersFile('hat');
+      const fileParse = parser.parseOwnersFile('');
       const rules = fileParse.result;
 
       expect(rules[0].owners).toEqual([new WildcardOwner()]);
+    });
+
+    it('handles and reports YAML syntax errors', () => {
+      sandbox.stub(repo, 'readFile').returns('- *');
+      const {result, errors} = parser.parseOwnersFile('');
+
+      expect(result).toEqual([]);
+      expect(errors[0].message).toContain('<ParseException>');
     });
 
     describe('team rule declarations', () => {
