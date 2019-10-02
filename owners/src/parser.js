@@ -239,7 +239,17 @@ class OwnersParser {
    */
   parseOwnersFile(ownersPath) {
     const contents = this.localRepo.readFile(ownersPath);
-    const lines = yaml.parse(contents);
+
+    let lines;
+    try {
+      lines = yaml.parse(contents);
+    } catch (error) {
+      return {
+        result: [],
+        errors: [new OwnersParserError(ownersPath, error.toString())],
+      };
+    }
+
     const errors = [];
     const rules = [];
 
