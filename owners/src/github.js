@@ -61,18 +61,18 @@ class Review {
     Object.assign(this, {
       reviewer,
       submittedAt,
-      state: state.toLowerCase(),
+      _state: state.toLowerCase(),
     });
   }
 
   /** If the review is an approval */
   get isApproved() {
-    return this.state === 'approved';
+    return this._state === 'approved';
   }
 
   /** If the review is a comment */
   get isComment() {
-    return this.state === 'commented';
+    return this._state === 'commented';
   }
 
   /** If the review is a rejection */
