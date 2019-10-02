@@ -44,7 +44,7 @@ module.exports = app => {
     app.log
   );
   // TODO(rcebulko): Add a mechanism to periodically refresh teams.
-  ownersBot.initTeams(github);
+  const teamsInitialized = ownersBot.initTeams(github);
 
   // Probot does not stream properly to GCE logs so we need to hook into
   // bunyan explicitly and stream it to process.stdout.
@@ -105,7 +105,7 @@ module.exports = app => {
         treeParse = parse;
       });
     }
-    updateTree();
+    teamsInitialized.then(updateTree);
     setInterval(updateTree, CACHED_TREE_REFRESH_MS);
 
     /** Health check server endpoints **/
