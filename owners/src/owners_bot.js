@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-const _ = require('lodash');
 const sleep = require('sleep-promise');
 const {OwnersCheck} = require('./owners_check');
 const {OwnersParser} = require('./parser');
@@ -145,13 +144,14 @@ class OwnersBot {
   async _getCurrentReviewers(github, pr) {
     const reviews = await github.getReviews(pr.number);
     // Sort by the latest submitted_at date to get the latest review.
-    const sortedReviews = reviews.sort((a, b) => b.submittedAt - a.submittedAt);
-    // This should always pick out the first instance.
-    const uniqueReviews = _.uniqBy(sortedReviews, 'reviewer');
-
+    const sortedReviews = reviews.sort((a, b) => a.submittedAt - b.submittedAt);
     const approvals = {};
-    uniqueReviews.forEach(review => {
-      approvals[review.reviewer] = review.isApproved;
+    sortedReviews.forEach(review => {
+      // Only treat comments as rejecting reviews if they do not follow an
+      // existing approval or rejection.
+      if (approvals[review.reviewer] === undefined || !review.isComment) {
+        approvals[review.reviewer] = review.isApproved;
+      }
     });
     // The author of a PR implicitly gives approval over files they own.
     approvals[pr.author] = true;

@@ -159,7 +159,7 @@
     "id": 291980756,
     "node_id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MjkxOTgwNzU2",
     "user": {
-      "login": "estherkim",
+      "login": "rcebulko",
       "id": 44627152,
       "node_id": "MDQ6VXNlcjQ0NjI3MTUy",
       "avatar_url": "https://avatars2.githubusercontent.com/u/44627152?v=4",
@@ -179,7 +179,7 @@
       "site_admin": false
     },
     "body": "",
-    "state": "DISMISSED",
+    "state": "COMMENTED",
     "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980756",
     "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
     "author_association": "MEMBER",
@@ -218,7 +218,7 @@
       "site_admin": false
     },
     "body": "",
-    "state": "PENDING",
+    "state": "DISMISSED",
     "html_url": "https://github.com/ampproject/amphtml/pull/24686#pullrequestreview-291980900",
     "pull_request_url": "https://api.github.com/repos/ampproject/amphtml/pulls/24686",
     "author_association": "MEMBER",

@@ -61,8 +61,23 @@ class Review {
     Object.assign(this, {
       reviewer,
       submittedAt,
-      isApproved: state.toLowerCase() === 'approved',
+      _state: state.toLowerCase(),
     });
+  }
+
+  /** If the review is an approval */
+  get isApproved() {
+    return this._state === 'approved';
+  }
+
+  /** If the review is a comment */
+  get isComment() {
+    return this._state === 'commented';
+  }
+
+  /** If the review is a rejection */
+  get isRejected() {
+    return !(this.isApproved || this.isComment);
   }
 }
 
@@ -244,7 +259,7 @@ class GitHub {
     // possible review states. The only ones we care about are "APPROVED" and
     // "CHANGES_REQUESTED", since the rest do not indicate a definite approval
     // or rejection.
-    const allowedStates = ['approved', 'changes_requested'];
+    const allowedStates = ['approved', 'changes_requested', 'commented'];
     return response.data
       .filter(({state}) => allowedStates.includes(state.toLowerCase()))
       .map(

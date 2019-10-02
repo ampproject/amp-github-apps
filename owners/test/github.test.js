@@ -318,20 +318,92 @@ describe('GitHub API', () => {
       })();
     });
 
-    it('returns only approving and rejecting reviews', async () => {
-      expect.assertions(5);
+    it('returns approvals', async () => {
+      expect.assertions(2);
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/pulls/24686/reviews')
         .reply(200, commentReviewsResponse);
 
       await withContext(async (context, github) => {
         const reviews = await github.getReviews(24686);
+        const review = reviews[0];
 
-        expect(reviews.length).toEqual(2);
-        expect(reviews[0].reviewer).toBe('rsimha');
-        expect(reviews[0].isApproved).toBe(true);
-        expect(reviews[1].reviewer).toBe('estherkim');
-        expect(reviews[1].isApproved).toBe(false);
+        expect(review.reviewer).toEqual('rsimha');
+        expect(review.isApproved).toBe(true);
+      })();
+    });
+
+    it('returns post-review comments', async () => {
+      expect.assertions(2);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews')
+        .reply(200, commentReviewsResponse);
+
+      await withContext(async (context, github) => {
+        const reviews = await github.getReviews(24686);
+        const review = reviews[1];
+
+        expect(review.reviewer).toEqual('rsimha');
+        expect(review.isComment).toBe(true);
+      })();
+    });
+
+    it('returns pre-review comments', async () => {
+      expect.assertions(2);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews')
+        .reply(200, commentReviewsResponse);
+
+      await withContext(async (context, github) => {
+        const reviews = await github.getReviews(24686);
+        const review = reviews[2];
+
+        expect(review.reviewer).toEqual('estherkim');
+        expect(review.isComment).toBe(true);
+      })();
+    });
+
+    it('returns rejections', async () => {
+      expect.assertions(2);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews')
+        .reply(200, commentReviewsResponse);
+
+      await withContext(async (context, github) => {
+        const reviews = await github.getReviews(24686);
+        const review = reviews[3];
+
+        expect(review.reviewer).toEqual('estherkim');
+        expect(review.isRejected).toBe(true);
+      })();
+    });
+
+    it('returns comment-only reviews', async () => {
+      expect.assertions(2);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews')
+        .reply(200, commentReviewsResponse);
+
+      await withContext(async (context, github) => {
+        const reviews = await github.getReviews(24686);
+        const review = reviews[4];
+
+        expect(review.reviewer).toEqual('rcebulko');
+        expect(review.isComment).toBe(true);
+      })();
+    });
+
+    it('ignores irrelevant review states', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews')
+        .reply(200, commentReviewsResponse);
+
+      await withContext(async (context, github) => {
+        const reviews = await github.getReviews(24686);
+        const review = reviews[5];
+
+        expect(review).toBeUndefined();
       })();
     });
   });

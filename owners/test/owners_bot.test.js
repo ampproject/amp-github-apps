@@ -42,11 +42,6 @@ describe('owners bot', () => {
   const localRepo = new LocalRepository('path/to/repo');
   const ownersBot = new OwnersBot(localRepo);
 
-  const timestamp = '2019-01-01T00:00:00Z';
-  const approval = new Review('approver', 'approved', timestamp);
-  const otherApproval = new Review('other_approver', 'approved', timestamp);
-  const rejection = new Review('rejector', 'changes_requested', timestamp);
-
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     sandbox.stub(LocalRepository.prototype, 'checkout');
@@ -90,9 +85,13 @@ describe('owners bot', () => {
 
   describe('initPr', () => {
     beforeEach(() => {
+      const timestamp = new Date('2019-01-02T00:00:00Z');
       sandbox
         .stub(GitHub.prototype, 'getReviews')
-        .returns([approval, otherApproval]);
+        .returns([
+          new Review('approver', 'approved', timestamp),
+          new Review('other_approver', 'approved', timestamp),
+        ]);
       sandbox
         .stub(GitHub.prototype, 'listFiles')
         .returns([
@@ -269,11 +268,17 @@ describe('owners bot', () => {
   });
 
   describe('getCurrentReviewers', () => {
+    const today = new Date('2019-01-02T00:00:00Z');
+    const yesterday = new Date('2019-01-01T00:00:00Z');
+
     it("includes true for approvers' usernames", async () => {
       expect.assertions(2);
       sandbox
         .stub(GitHub.prototype, 'getReviews')
-        .returns([approval, otherApproval]);
+        .returns([
+          new Review('approver', 'approved', today),
+          new Review('other_approver', 'approved', today),
+        ]);
       const reviewers = await ownersBot._getCurrentReviewers(github, pr);
 
       expect(reviewers['approver']).toBe(true);
@@ -292,10 +297,100 @@ describe('owners bot', () => {
       expect.assertions(1);
       sandbox
         .stub(GitHub.prototype, 'getReviews')
-        .returns([approval, rejection]);
+        .returns([new Review('rejector', 'changes_requested', today)]);
       const reviewers = await ownersBot._getCurrentReviewers(github, pr);
 
       expect(reviewers['rejector']).toBe(false);
+    });
+
+    it('includes false for reviewers who approved then rejected', async () => {
+      expect.assertions(1);
+      sandbox
+        .stub(GitHub.prototype, 'getReviews')
+        .returns([
+          new Review('rejector', 'approved', yesterday),
+          new Review('rejector', 'changes_requested', today),
+        ]);
+      const reviewers = await ownersBot._getCurrentReviewers(github, pr);
+
+      expect(reviewers['rejector']).toBe(false);
+    });
+
+    it('includes true for reviewers who rejected then approved', async () => {
+      expect.assertions(1);
+      sandbox
+        .stub(GitHub.prototype, 'getReviews')
+        .returns([
+          new Review('approver', 'changes_requested', yesterday),
+          new Review('approver', 'approved', today),
+        ]);
+      const reviewers = await ownersBot._getCurrentReviewers(github, pr);
+
+      expect(reviewers['approver']).toBe(true);
+    });
+
+    describe('with comment reviews', () => {
+      it('includes false for reviewers who only commented', async () => {
+        expect.assertions(1);
+        sandbox
+          .stub(GitHub.prototype, 'getReviews')
+          .returns([new Review('commenter', 'commented', today)]);
+        const reviewers = await ownersBot._getCurrentReviewers(github, pr);
+
+        expect(reviewers['commenter']).toBe(false);
+      });
+
+      it('includes false for reviewers who rejected then commented', async () => {
+        expect.assertions(1);
+        sandbox
+          .stub(GitHub.prototype, 'getReviews')
+          .returns([
+            new Review('rejector', 'changes_requested', yesterday),
+            new Review('rejector', 'commented', today),
+          ]);
+        const reviewers = await ownersBot._getCurrentReviewers(github, pr);
+
+        expect(reviewers['rejector']).toBe(false);
+      });
+
+      it('includes true for reviewers who approved then commented', async () => {
+        expect.assertions(1);
+        sandbox
+          .stub(GitHub.prototype, 'getReviews')
+          .returns([
+            new Review('approver', 'approved', yesterday),
+            new Review('approver', 'commented', today),
+          ]);
+        const reviewers = await ownersBot._getCurrentReviewers(github, pr);
+
+        expect(reviewers['approver']).toBe(true);
+      });
+
+      it('includes false for reviewers who commented then rejected', async () => {
+        expect.assertions(1);
+        sandbox
+          .stub(GitHub.prototype, 'getReviews')
+          .returns([
+            new Review('rejector', 'commented', yesterday),
+            new Review('rejector', 'changes_requested', today),
+          ]);
+        const reviewers = await ownersBot._getCurrentReviewers(github, pr);
+
+        expect(reviewers['rejector']).toBe(false);
+      });
+
+      it('includes true for reviewers who commented then approved', async () => {
+        expect.assertions(1);
+        sandbox
+          .stub(GitHub.prototype, 'getReviews')
+          .returns([
+            new Review('approver', 'commented', yesterday),
+            new Review('approver', 'approved', today),
+          ]);
+        const reviewers = await ownersBot._getCurrentReviewers(github, pr);
+
+        expect(reviewers['approver']).toBe(true);
+      });
     });
   });
 });
