@@ -82,51 +82,53 @@ module.exports = app => {
     );
   });
 
-  /** Health check server endpoints **/
-  server({port: process.env.INFO_SERVER_PORT || 8081}, [
-    server.router.get('/status', ctx =>
-      [
-        `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
-        `Project: ${GCLOUD_PROJECT}`,
-        `App ID: ${APP_ID}`,
-        `Deployed commit: <code>${APP_COMMIT_SHA}</code> ${APP_COMMIT_MSG}`,
-        '<a href="/tree">Owners Tree</a>',
-        '<a href="/teams">Organization Teams</a>',
-      ].join('<br>')
-    ),
+  if (process.env.NODE_ENV !== 'test') {
+    /** Health check server endpoints **/
+    server({port: process.env.INFO_SERVER_PORT || 8081}, [
+      server.router.get('/status', ctx =>
+        [
+          `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
+          `Project: ${GCLOUD_PROJECT}`,
+          `App ID: ${APP_ID}`,
+          `Deployed commit: <code>${APP_COMMIT_SHA}</code> ${APP_COMMIT_MSG}`,
+          '<a href="/tree">Owners Tree</a>',
+          '<a href="/teams">Organization Teams</a>',
+        ].join('<br>')
+      ),
 
-    server.router.get('/tree', async ctx => {
-      const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
-      const treeParse = await parser.parseOwnersTree();
-      const treeHeader = '<h3>OWNERS tree</h3>';
-      const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
+      server.router.get('/tree', async ctx => {
+        const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
+        const treeParse = await parser.parseOwnersTree();
+        const treeHeader = '<h3>OWNERS tree</h3>';
+        const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
 
-      let output = `${treeHeader}${treeDisplay}`;
-      if (treeParse.errors.length) {
-        const errorHeader = '<h3>Parser Errors</h3>';
-        const errorDisplay = treeParse.errors
-          .map(error => error.toString())
-          .join('<br>');
-        output += `${errorHeader}<code>${errorDisplay}</code>`;
-      }
+        let output = `${treeHeader}${treeDisplay}`;
+        if (treeParse.errors.length) {
+          const errorHeader = '<h3>Parser Errors</h3>';
+          const errorDisplay = treeParse.errors
+            .map(error => error.toString())
+            .join('<br>');
+          output += `${errorHeader}<code>${errorDisplay}</code>`;
+        }
 
-      return output;
-    }),
+        return output;
+      }),
 
-    server.router.get('/teams', (req, res) => {
-      const teamSections = [];
-      Object.entries(ownersBot.teams).forEach(([name, team]) => {
-        teamSections.push(
-          [
-            `Team "${name}" (ID: ${team.id}):`,
-            ...team.members.map(username => `- ${username}`),
-          ].join('<br>')
-        );
-      });
+      server.router.get('/teams', (req, res) => {
+        const teamSections = [];
+        Object.entries(ownersBot.teams).forEach(([name, team]) => {
+          teamSections.push(
+            [
+              `Team "${name}" (ID: ${team.id}):`,
+              ...team.members.map(username => `- ${username}`),
+            ].join('<br>')
+          );
+        });
 
-      return ['<h2>Teams</h2>', ...teamSections].join('<br><br>');
-    }),
-  ]);
+        return ['<h2>Teams</h2>', ...teamSections].join('<br><br>');
+      }),
+    ]);
+  }
 
   // Since this endpoint triggers a ton of GitHub API requests, there is a risk
   // of it being spammed; so it is not exposed through the info server.
