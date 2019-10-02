@@ -10,7 +10,7 @@ cycler==0.10.0
 decorator==4.4.0
 Flask==1.1.1
 Flask-API==1.1
-gitdb2==2.0.5
+gitdb2==2.0.6
 google-api-core==1.14.2
 google-auth==1.6.3
 google-cloud-core==1.0.3
