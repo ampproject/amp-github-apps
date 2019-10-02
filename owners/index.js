@@ -20,6 +20,7 @@ const {LocalRepository} = require('./src/local_repo');
 const {OwnersBot} = require('./src/owners_bot');
 const {OwnersParser} = require('./src/parser');
 const {OwnersCheck} = require('./src/owners_check');
+const server = require('server');
 
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
@@ -43,8 +44,6 @@ module.exports = app => {
   // TODO(rcebulko): Add a mechanism to periodically refresh teams.
   ownersBot.initTeams(github);
 
-  const adminRouter = app.route('/admin');
-
   // Probot does not stream properly to GCE logs so we need to hook into
   // bunyan explicitly and stream it to process.stdout.
   if (process.env.NODE_ENV !== 'test') {
@@ -54,62 +53,6 @@ module.exports = app => {
       level: process.env.LOG_LEVEL || 'info',
     });
   }
-
-  /** Health check server endpoints **/
-  // TODO(rcebulko): Implement GitHub authentication to prevent spamming any of
-  // these endpoints.
-  adminRouter.get('/status', (req, res) => {
-    res.send(
-      [
-        `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
-        `Project: ${GCLOUD_PROJECT}`,
-        `App ID: ${APP_ID}`,
-        `Deployed commit: <code>${APP_COMMIT_SHA}</code> ${APP_COMMIT_MSG}`,
-      ].join('<br>')
-    );
-  });
-
-  adminRouter.get('/tree', async (req, res) => {
-    const parser = new OwnersParser(localRepo, ownersBot.teams, req.log);
-    const treeParse = await parser.parseOwnersTree();
-    const treeHeader = '<h3>OWNERS tree</h3>';
-    const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
-
-    let output = `${treeHeader}${treeDisplay}`;
-    if (treeParse.errors.length) {
-      const errorHeader = '<h3>Parser Errors</h3>';
-      const errorDisplay = treeParse.errors
-        .map(error => error.toString())
-        .join('<br>');
-      output += `${errorHeader}<code>${errorDisplay}</code>`;
-    }
-
-    res.send(output);
-  });
-
-  adminRouter.get('/check/:prNumber', async (req, res) => {
-    const pr = await github.getPullRequest(req.params.prNumber);
-    const {tree, changedFiles, reviewers} = await ownersBot.initPr(github, pr);
-    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
-
-    const {checkRun} = ownersCheck.run();
-
-    res.send(checkRun.json);
-  });
-
-  adminRouter.get('/teams', (req, res) => {
-    const teamSections = [];
-    Object.entries(ownersBot.teams).forEach(([name, team]) => {
-      teamSections.push(
-        [
-          `Team "${name}" (ID: ${team.id}):`,
-          ...team.members.map(username => `- ${username}`),
-        ].join('<br>')
-      );
-    });
-
-    res.send(teamSections.join('<br><br>'));
-  });
 
   /** Probot request handlers **/
   app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
@@ -137,5 +80,65 @@ module.exports = app => {
       GitHub.fromContext(context),
       prNumber
     );
+  });
+
+  if (process.env.NODE_ENV !== 'test') {
+    /** Health check server endpoints **/
+    server({port: process.env.INFO_SERVER_PORT || 8081}, [
+      server.router.get('/status', ctx =>
+        [
+          `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
+          `Project: ${GCLOUD_PROJECT}`,
+          `App ID: ${APP_ID}`,
+          `Deployed commit: <code>${APP_COMMIT_SHA}</code> ${APP_COMMIT_MSG}`,
+          '<a href="/tree">Owners Tree</a>',
+          '<a href="/teams">Organization Teams</a>',
+        ].join('<br>')
+      ),
+
+      server.router.get('/tree', async ctx => {
+        const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
+        const treeParse = await parser.parseOwnersTree();
+        const treeHeader = '<h3>OWNERS tree</h3>';
+        const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
+
+        let output = `${treeHeader}${treeDisplay}`;
+        if (treeParse.errors.length) {
+          const errorHeader = '<h3>Parser Errors</h3>';
+          const errorDisplay = treeParse.errors
+            .map(error => error.toString())
+            .join('<br>');
+          output += `${errorHeader}<code>${errorDisplay}</code>`;
+        }
+
+        return output;
+      }),
+
+      server.router.get('/teams', (req, res) => {
+        const teamSections = [];
+        Object.entries(ownersBot.teams).forEach(([name, team]) => {
+          teamSections.push(
+            [
+              `Team "${name}" (ID: ${team.id}):`,
+              ...team.members.map(username => `- ${username}`),
+            ].join('<br>')
+          );
+        });
+
+        return ['<h2>Teams</h2>', ...teamSections].join('<br><br>');
+      }),
+    ]);
+  }
+
+  // Since this endpoint triggers a ton of GitHub API requests, there is a risk
+  // of it being spammed; so it is not exposed through the info server.
+  app.route('/admin').get('/check/:prNumber', async (req, res) => {
+    const pr = await github.getPullRequest(req.params.prNumber);
+    const {tree, changedFiles, reviewers} = await ownersBot.initPr(github, pr);
+    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
+
+    const {checkRun} = ownersCheck.run();
+
+    res.send(checkRun.json);
   });
 };

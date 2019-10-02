@@ -19,6 +19,7 @@
     "lodash": "4.17.15",
     "minimatch": "3.0.4",
     "probot": "7.5.0",
+    "server": "1.0.19",
     "sleep-promise": "8.0.1",
     "yamljs": "0.3.0"
   },
