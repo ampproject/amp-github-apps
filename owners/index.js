@@ -115,14 +115,16 @@ module.exports = app => {
     /** Health check server endpoints **/
     const expressApp = express();
     expressApp.get('/status', (req, res) => {
-      res.send([
-        `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
-        `Project: ${GCLOUD_PROJECT}`,
-        `App ID: ${APP_ID}`,
-        `Deployed commit: <code>${APP_COMMIT_SHA}</code> ${APP_COMMIT_MSG}`,
-        '<a href="/tree">Owners Tree</a>',
-        '<a href="/teams">Organization Teams</a>',
-      ].join('<br>'));
+      res.send(
+        [
+          `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
+          `Project: ${GCLOUD_PROJECT}`,
+          `App ID: ${APP_ID}`,
+          `Deployed commit: <code>${APP_COMMIT_SHA}</code> ${APP_COMMIT_MSG}`,
+          '<a href="/tree">Owners Tree</a>',
+          '<a href="/teams">Organization Teams</a>',
+        ].join('<br>')
+      );
     });
 
     expressApp.get('/tree', (req, res) => {
