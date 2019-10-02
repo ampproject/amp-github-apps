@@ -239,7 +239,7 @@ class OwnersParser {
    */
   parseOwnersFile(ownersPath) {
     const contents = this.localRepo.readFile(ownersPath);
-    
+
     let lines;
     try {
       lines = yaml.parse(contents);
