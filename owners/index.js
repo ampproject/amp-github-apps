@@ -31,6 +31,8 @@ const APP_ID = process.env.APP_ID || 'UNKNOWN';
 const APP_COMMIT_SHA = process.env.APP_COMMIT_SHA || 'UNKNOWN';
 const APP_COMMIT_MSG = process.env.APP_COMMIT_MSG || 'UNKNOWN';
 
+const CACHED_TREE_REFRESH_MS = 10 * 60 * 1000;
+
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
 
@@ -42,7 +44,7 @@ module.exports = app => {
     app.log
   );
   // TODO(rcebulko): Add a mechanism to periodically refresh teams.
-  ownersBot.initTeams(github);
+  const teamsInitialized = ownersBot.initTeams(github);
 
   // Probot does not stream properly to GCE logs so we need to hook into
   // bunyan explicitly and stream it to process.stdout.
@@ -90,8 +92,26 @@ module.exports = app => {
     );
   });
 
+  // Since the status server is publicly accessible, we don't want any
+  // endpoints to be making API calls or doing disk I/O. Rather than parsing
+  // the file tree from the local repo on every request, we keep a local copy
+  // and update it every ten minutes.
+  const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
+  let treeParse = {result: {}, errors: []};
+  /** Updates the cached copy of the parsed ownership tree. */
+  function updateTree() {
+    app.log('Updating cached owners tree');
+    parser.parseOwnersTree().then(parse => {
+      treeParse = parse;
+    });
+  }
+
   if (process.env.NODE_ENV !== 'test') {
+    teamsInitialized.then(updateTree);
+    setInterval(updateTree, CACHED_TREE_REFRESH_MS);
+
     /** Health check server endpoints **/
+    app.log(`Starting status server on port ${process.env.INFO_SERVER_PORT}`);
     server({port: process.env.INFO_SERVER_PORT || 8081}, [
       server.router.get('/status', ctx =>
         [
@@ -105,8 +125,6 @@ module.exports = app => {
       ),
 
       server.router.get('/tree', async ctx => {
-        const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
-        const treeParse = await parser.parseOwnersTree();
         const treeHeader = '<h3>OWNERS tree</h3>';
         const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
 
