@@ -111,6 +111,7 @@ module.exports = app => {
     setInterval(updateTree, CACHED_TREE_REFRESH_MS);
 
     /** Health check server endpoints **/
+    app.log(`Starting status server on port ${process.env.INFO_SERVER_PORT}`);
     server({port: process.env.INFO_SERVER_PORT || 8081}, [
       server.router.get('/status', ctx =>
         [
