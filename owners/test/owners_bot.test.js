@@ -222,14 +222,26 @@ describe('owners bot', () => {
       });
     });
 
-    it('requests reviewers', async done => {
+    it('requests reviewers if flag is set', async done => {
+      sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
+      await ownersBot.runOwnersCheck(github, pr, true);
+
+      sandbox.assert.calledWith(
+        OwnersNotifier.prototype.requestReviews,
+        github,
+        ['root_owner']
+      );
+      done();
+    });
+
+    it('requests no reviewers by default', async done => {
       sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
       await ownersBot.runOwnersCheck(github, pr);
 
       sandbox.assert.calledWith(
         OwnersNotifier.prototype.requestReviews,
         github,
-        ['root_owner']
+        []
       );
       done();
     });

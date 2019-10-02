@@ -55,7 +55,15 @@ module.exports = app => {
   }
 
   /** Probot request handlers **/
-  app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
+  app.on(['pull_request.opened'], async context => {
+    await ownersBot.runOwnersCheck(
+      GitHub.fromContext(context),
+      PullRequest.fromGitHubResponse(context.payload.pull_request),
+      /* requestOwners */ true
+    );
+  });
+
+  app.on(['pull_request.synchronize'], async context => {
     await ownersBot.runOwnersCheck(
       GitHub.fromContext(context),
       PullRequest.fromGitHubResponse(context.payload.pull_request)

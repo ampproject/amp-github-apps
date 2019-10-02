@@ -95,8 +95,9 @@ class OwnersBot {
    *
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to run owners check on.
+   * @param {boolean=} requestOwners whether to request reviews from owners.
    */
-  async runOwnersCheck(github, pr) {
+  async runOwnersCheck(github, pr, requestOwners) {
     const {tree, changedFiles, reviewers} = await this.initPr(github, pr);
 
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
@@ -114,8 +115,9 @@ class OwnersBot {
       await github.createCheckRun(pr.headSha, ownersCheckResult.checkRun);
     }
 
+    const suggestedReviewers = requestOwners ? ownersCheckResult.reviewers : [];
     const notifier = new OwnersNotifier(pr, reviewers, tree, changedFiles);
-    await notifier.notify(github, ownersCheckResult.reviewers);
+    await notifier.notify(github, suggestedReviewers);
   }
 
   /**
