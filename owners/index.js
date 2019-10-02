@@ -91,6 +91,18 @@ module.exports = app => {
   });
 
   if (process.env.NODE_ENV !== 'test') {
+    const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
+    let treeParse = {result: {}, errors: []};
+    function updateTree() {
+      app.log('Updating cached owners tree');
+      parser.parseOwnersTree().then(parse => {
+        treeParse = parse;
+      });
+    }
+    /** Update the cached tree every ten minutes. */
+    updateTree();
+    setInterval(updateTree, 10 * 60 * 1000);
+
     /** Health check server endpoints **/
     server({port: process.env.INFO_SERVER_PORT || 8081}, [
       server.router.get('/status', ctx =>
@@ -105,8 +117,6 @@ module.exports = app => {
       ),
 
       server.router.get('/tree', async ctx => {
-        const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
-        const treeParse = await parser.parseOwnersTree();
         const treeHeader = '<h3>OWNERS tree</h3>';
         const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
 
