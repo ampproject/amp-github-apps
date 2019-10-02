@@ -31,6 +31,8 @@ const APP_ID = process.env.APP_ID || 'UNKNOWN';
 const APP_COMMIT_SHA = process.env.APP_COMMIT_SHA || 'UNKNOWN';
 const APP_COMMIT_MSG = process.env.APP_COMMIT_MSG || 'UNKNOWN';
 
+CACHED_TREE_REFRESH_MS = 10 * 60 * 1000;
+
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
 
@@ -91,6 +93,10 @@ module.exports = app => {
   });
 
   if (process.env.NODE_ENV !== 'test') {
+    // Since the status server is publicly accessible, we don't want any
+    // endpoints to be making API calls or doing disk I/O. Rather than parsing
+    // the file tree from the local repo on every request, we keep a local copy
+    // and update it every ten minutes.
     const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
     let treeParse = {result: {}, errors: []};
     function updateTree() {
@@ -99,9 +105,8 @@ module.exports = app => {
         treeParse = parse;
       });
     }
-    /** Update the cached tree every ten minutes. */
     updateTree();
-    setInterval(updateTree, 10 * 60 * 1000);
+    setInterval(updateTree, CACHED_TREE_REFRESH_MS);
 
     /** Health check server endpoints **/
     server({port: process.env.INFO_SERVER_PORT || 8081}, [
