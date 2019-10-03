@@ -587,6 +587,8 @@ module.exports = app => {
           'build artifacts repository on GitHub. Skipping...'
       );
     } catch (unusedException) {
+      // The file was not found in the GitHub repository, so continue to create
+      // it...
       try {
         await storeBuildArtifactsFile(
           userBasedGithub,
