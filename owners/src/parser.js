@@ -82,7 +82,7 @@ class OwnersParser {
    * @param {!string} owner owner username.
    * @return {OwnersParserResult<Owner[]>} list of owners.
    */
-  _parseOwnersLine(ownersPath, owner) {
+  _legacyParseOwnersLine(ownersPath, owner) {
     const owners = [];
     const errors = [];
     let modifier = OWNER_MODIFIER.NONE;
@@ -142,12 +142,12 @@ class OwnersParser {
    * @param {string[]} ownersList list of owners.
    * @return {OwnersParserResult<Owner[]>} list of owners' usernames.
    */
-  _parseOwnersList(ownersPath, ownersList) {
+  _legacyParseOwnersList(ownersPath, ownersList) {
     const owners = [];
     const errors = [];
 
     ownersList.forEach(owner => {
-      const lineResult = this._parseOwnersLine(ownersPath, owner);
+      const lineResult = this._legacyParseOwnersLine(ownersPath, owner);
       owners.push(...lineResult.result);
       errors.push(...lineResult.errors);
     });
@@ -168,7 +168,7 @@ class OwnersParser {
    * @return {OwnersParserResult<PatternOwnersRule[]>} parsed OWNERS pattern
    *     rule.
    */
-  _parseOwnersDict(ownersPath, ownersDict) {
+  _legacyParseOwnersDict(ownersPath, ownersDict) {
     const [[fullPattern, ownersList]] = Object.entries(ownersDict);
     const rules = [];
     const errors = [];
@@ -198,13 +198,13 @@ class OwnersParser {
           )
         );
       } else if (typeof ownersList === 'string') {
-        const lineResult = this._parseOwnersLine(ownersPath, ownersList);
+        const lineResult = this._legacyParseOwnersLine(ownersPath, ownersList);
         owners.push(...lineResult.result);
         errors.push(...lineResult.errors);
       } else {
         ownersList.forEach(owner => {
           if (typeof owner === 'string') {
-            const lineResult = this._parseOwnersLine(ownersPath, owner);
+            const lineResult = this._legacyParseOwnersLine(ownersPath, owner);
             owners.push(...lineResult.result);
             errors.push(...lineResult.errors);
           } else {
@@ -237,7 +237,7 @@ class OwnersParser {
    * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
    * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
    */
-  parseOwnersFile(ownersPath) {
+  _parseYamlOwnersFile(ownersPath) {
     const contents = this.localRepo.readFile(ownersPath);
 
     let lines;
@@ -256,7 +256,7 @@ class OwnersParser {
     if (lines instanceof Array) {
       const stringLines = lines.filter(line => typeof line === 'string');
 
-      const fileOwners = this._parseOwnersList(ownersPath, stringLines);
+      const fileOwners = this._legacyParseOwnersList(ownersPath, stringLines);
       errors.push(...fileOwners.errors);
       if (fileOwners.result.length) {
         rules.push(new OwnersRule(ownersPath, fileOwners.result));
@@ -264,7 +264,7 @@ class OwnersParser {
 
       const dictLines = lines.filter(line => typeof line === 'object');
       dictLines.forEach(dict => {
-        const dictResult = this._parseOwnersDict(ownersPath, dict);
+        const dictResult = this._legacyParseOwnersDict(ownersPath, dict);
         rules.push(...dictResult.result);
         errors.push(...dictResult.errors);
       });
@@ -278,6 +278,20 @@ class OwnersParser {
     }
 
     return {result: rules, errors};
+  }
+
+  /**
+   * Parse an OWNERS file in YAML or JSON format.
+   *
+   * @param {!string} ownersPath OWNERS file path (for error reporting).
+   * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rules.
+   */
+  parseOwnersFile(ownersPath) {
+    if (ownersPath.toLowerCase().endsWith('.yaml')) {
+      return this._parseYamlOwnersFile(ownersPath);
+    }
+
+    return {result: [], errors: []};
   }
 
   /**
