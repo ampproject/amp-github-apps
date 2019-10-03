@@ -21,7 +21,7 @@
   "dependencies": {
     "dotenv": "8.0.0",
     "express": "4.17.1",
-    "probot": "9.2.15",
+    "probot": "9.5.0",
     "typescript": "3.5.3"
   },
   "devDependencies": {

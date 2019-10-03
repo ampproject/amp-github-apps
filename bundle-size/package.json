@@ -23,7 +23,7 @@
     "@octokit/rest": "16.30.1",
     "knex": "0.19.4",
     "pg": "7.12.1",
-    "probot": "9.2.13",
+    "probot": "9.5.0",
     "sleep-promise": "8.0.1"
   },
   "devDependencies": {
