@@ -358,7 +358,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
           brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
@@ -422,7 +421,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
           brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
@@ -486,7 +484,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
           brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
@@ -542,7 +539,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
           brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
@@ -598,7 +594,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
           brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
@@ -668,7 +663,6 @@ describe('bundle-size', () => {
         .send({
           baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
           bundleSize: 12.34,
-          gzippedBundleSize: 12.34,
           brotliBundleSize: 12.34,
         })
         .set('Content-Type', 'application/json')
@@ -726,7 +720,6 @@ describe('bundle-size', () => {
       .send({
         baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
         bundleSize: 12.34,
-        gzippedBundleSize: 12.34,
         brotliBundleSize: 12.34,
       })
       .set('Content-Type', 'application/json')
@@ -741,7 +734,6 @@ describe('bundle-size', () => {
       .send({
         baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
         bundleSize: 12.34,
-        gzippedBundleSize: 12.34,
         brotliBundleSize: 12.34,
       })
       .set('Content-Type', 'application/json')
@@ -767,22 +759,6 @@ describe('bundle-size', () => {
 
   test('store new bundle-size', async () => {
     const nocks = nock('https://api.github.com')
-      .get(
-        '/repos/ampproject/amphtml-build-artifacts/contents/' +
-          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
-      )
-      .reply(404)
-      .put(
-        '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size' +
-          '/5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
-        {
-          message:
-            'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33 ' +
-            '(23.45KB)',
-          content: Buffer.from('23.45KB').toString('base64'),
-        }
-      )
-      .reply(201)
       .get(
         '/repos/ampproject/amphtml-build-artifacts/contents/' +
           'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
@@ -820,7 +796,6 @@ describe('bundle-size', () => {
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
         token: '0123456789abcdefghijklmnopqrstuvwxyz',
-        gzippedBundleSize: 23.45,
         brotliBundleSize: 12.34,
       })
       .set('Content-Type', 'application/json')
@@ -831,11 +806,6 @@ describe('bundle-size', () => {
 
   test('ignore already existing bundle-size when called to store', async () => {
     const nocks = nock('https://api.github.com')
-      .get(
-        '/repos/ampproject/amphtml-build-artifacts/contents/' +
-          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
-      )
-      .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33'))
       .get(
         '/repos/ampproject/amphtml-build-artifacts/contents/' +
           'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
@@ -851,7 +821,6 @@ describe('bundle-size', () => {
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
         token: '0123456789abcdefghijklmnopqrstuvwxyz',
-        gzippedBundleSize: 12.34,
         brotliBundleSize: 12.34,
       })
       .set('Content-Type', 'application/json')
@@ -864,15 +833,15 @@ describe('bundle-size', () => {
     const nocks = nock('https://api.github.com')
       .get(
         '/repos/ampproject/amphtml-build-artifacts/contents/' +
-          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
       )
       .reply(404)
       .put(
         '/repos/ampproject/amphtml-build-artifacts/contents/' +
-          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br',
         {
           message:
-            'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33 ' +
+            'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br ' +
             '(12.34KB)',
           content: Buffer.from('12.34KB').toString('base64'),
         }
@@ -883,7 +852,6 @@ describe('bundle-size', () => {
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
         token: '0123456789abcdefghijklmnopqrstuvwxyz',
-        gzippedBundleSize: 12.34,
         brotliBundleSize: 12.34,
       })
       .set('Content-Type', 'application/json')
@@ -897,15 +865,13 @@ describe('bundle-size', () => {
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
         token: '0123456789abcdefghijklmnopqrstuvwxyz',
-        // Deliberately not add a `gzippedBundleSize` field,
-        brotliBundleSize: 12.34,
+        // Deliberately not add a `brotliBundleSize` field,
       })
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
       .expect(
         400,
-        'POST request to /store must have numeric fields "gzippedBundleSize" ' +
-          'and "brotliBundleSize"'
+        'POST request to /store must have numeric field "brotliBundleSize"'
       );
   });
 
@@ -914,7 +880,6 @@ describe('bundle-size', () => {
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
       .send({
         token: 'wrong token',
-        gzippedBundleSize: 12.34,
         brotliBundleSize: 12.34,
       })
       .set('Content-Type', 'application/json')

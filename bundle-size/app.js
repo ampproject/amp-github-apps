@@ -562,43 +562,33 @@ module.exports = app => {
 
   v0.post('/commit/:headSha/store', async (request, response) => {
     const {headSha} = request.params;
-    const {gzippedBundleSize, brotliBundleSize} = request.body;
+    const {brotliBundleSize} = request.body;
 
     if (request.body['token'] !== process.env.TRAVIS_PUSH_BUILD_TOKEN) {
       return response.status(403).end('You are not Travis!');
     }
-    for (const bundleSize of [gzippedBundleSize, brotliBundleSize]) {
-      if (typeof bundleSize !== 'number') {
-        return response
-          .status(400)
-          .end(
-            'POST request to /store must have numeric fields ' +
-              '"gzippedBundleSize" and "brotliBundleSize"'
-          );
-      }
+    if (typeof brotliBundleSize !== 'number') {
+      return response
+        .status(400)
+        .end(
+          'POST request to /store must have numeric field "brotliBundleSize"'
+        );
     }
 
-    // TODO(danielrozenberg): remove this block once we switch entirely to the
+    // TODO(danielrozenberg): remove this section once we switch entirely to the
     // JSON format.
-    for (const [compression, extension, bundleSizeValue] of [
-      ['gzip', '', gzippedBundleSize],
-      ['brotli', '.br', brotliBundleSize],
-    ]) {
-      const bundleSizeText = `${bundleSizeValue}KB`;
-      const bundleSizeFile = `${headSha}${extension}`;
+    const bundleSizeText = `${brotliBundleSize}KB`;
+    const bundleSizeFile = `${headSha}.br`;
 
-      try {
-        await getBuildArtifactsFile(userBasedGithub, bundleSizeFile);
-        app.log(
-          `The file bundle-size/${bundleSizeFile} already exists in the ` +
-            'build artifacts repository on GitHub. Skipping...'
-        );
-        continue;
-      } catch (unusedException) {
-        // The file was not found in the GitHub repository, so continue to
-        // create it...
-      }
-
+    try {
+      await getBuildArtifactsFile(userBasedGithub, bundleSizeFile);
+      app.log(
+        `The file bundle-size/${bundleSizeFile} already exists in the ` +
+          'build artifacts repository on GitHub. Skipping...'
+      );
+    } catch (unusedException) {
+      // The file was not found in the GitHub repository, so continue to create
+      // it...
       try {
         await storeBuildArtifactsFile(
           userBasedGithub,
@@ -606,7 +596,7 @@ module.exports = app => {
           bundleSizeText
         );
         app.log(
-          `Stored the new ${compression} bundle size of ${bundleSizeText} in ` +
+          `Stored the new brotli bundle size of ${bundleSizeText} in ` +
             `the bundle-size/${bundleSizeFile} file artifacts repository on ` +
             'GitHub'
         );
