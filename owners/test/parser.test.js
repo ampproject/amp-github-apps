@@ -1,4 +1,22 @@
+/**
+ * Copyright 2019 The AMP HTML Authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS-IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 const sinon = require('sinon');
+const path = require('path');
+const fs = require('fs');
 const {Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
@@ -13,6 +31,8 @@ const {
   PatternOwnersRule,
   SameDirPatternOwnersRule,
 } = require('../src/rules');
+
+const EXAMPLE_FILE_PATH = path.resolve(__dirname, '../OWNERS.example.json');
 
 describe('owners parser error', () => {
   describe('toString', () => {
@@ -33,13 +53,21 @@ describe('owners parser', () => {
   let repo;
   let parser;
   let myTeam;
+  const wgCool = new Team(1, 'ampproject', 'wg-cool-team');
+  const wgCaching = new Team(2, 'ampproject', 'wg-caching');
+  const wgInfra = new Team(3, 'ampproject', 'wg-infra');
 
   beforeEach(() => {
     myTeam = new Team(1337, 'ampproject', 'my_team');
     myTeam.members = ['team_member', 'other_member'];
 
     repo = new LocalRepository('path/to/repo');
-    parser = new OwnersParser(repo, {'ampproject/my_team': myTeam});
+    parser = new OwnersParser(repo, {
+      'ampproject/my_team': myTeam,
+      'ampproject/wg-cool-team': wgCool,
+      'ampproject/wg-caching': wgCaching,
+      'ampproject/wg-infra': wgInfra,
+    });
 
     sandbox.stub(repo, 'getAbsolutePath').callsFake(relativePath => {
       return `path/to/repo/${relativePath}`;
@@ -173,7 +201,9 @@ describe('owners parser', () => {
     describe('when given something not a rule definition', () => {
       it('reports an error', () => {
         const {errors} = parser._parseRuleDefinition('', 'NOT A RULE DEF');
-        expect(errors[0].message).toEqual('Expected rule definition; got string');
+        expect(errors[0].message).toEqual(
+          'Expected rule definition; got string'
+        );
       });
 
       it('returns no result', () => {
@@ -199,7 +229,7 @@ describe('owners parser', () => {
     describe('for a rule with no valid owners', () => {
       it('reports an error', () => {
         const {errors} = parser._parseRuleDefinition('', {
-          owners: ['NOT AN OWNER DEF', 24]
+          owners: ['NOT AN OWNER DEF', 24],
         });
         const errorMessages = errors.map(({message}) => message);
 
@@ -212,19 +242,17 @@ describe('owners parser', () => {
 
       it('returns no result', () => {
         const {result} = parser._parseRuleDefinition('', {
-          owners: ['NOT AN OWNER DEF', 24]
+          owners: ['NOT AN OWNER DEF', 24],
         });
         expect(result).toBeUndefined();
       });
     });
 
     it('creates an owners rule', () => {
-      const {result, errors} = parser._parseRuleDefinition('', {
-        owners: [{ name: 'rcebulko' }],
+      const {result} = parser._parseRuleDefinition('', {
+        owners: [{name: 'rcebulko'}],
       });
-      expect(result).toEqual(
-        new OwnersRule('', [new UserOwner('rcebulko')])
-      );
+      expect(result).toEqual(new OwnersRule('', [new UserOwner('rcebulko')]));
     });
 
     describe('when a pattern is specified', () => {
@@ -232,7 +260,7 @@ describe('owners parser', () => {
         it('reports an error', () => {
           const {errors} = parser._parseRuleDefinition('', {
             pattern: {},
-            owners: [{ name: 'rcebulko' }],
+            owners: [{name: 'rcebulko'}],
           });
           expect(errors[0].message).toEqual(
             'Expected "pattern" to be a string; got object'
@@ -242,7 +270,7 @@ describe('owners parser', () => {
         it('returns no result', () => {
           const {result} = parser._parseRuleDefinition('', {
             pattern: {},
-            owners: [{ name: 'rcebulko' }],
+            owners: [{name: 'rcebulko'}],
           });
           expect(result).toBeUndefined();
         });
@@ -252,7 +280,7 @@ describe('owners parser', () => {
         it('reports an error', () => {
           const {errors} = parser._parseRuleDefinition('', {
             pattern: 'foo-*/*.js',
-            owners: [{ name: 'rcebulko' }],
+            owners: [{name: 'rcebulko'}],
           });
           expect(errors[0].message).toContain(
             "directory patterns other than '**/' not supported"
@@ -262,7 +290,7 @@ describe('owners parser', () => {
         it('returns no result', () => {
           const {result} = parser._parseRuleDefinition('', {
             pattern: 'foo-*/*.js',
-            owners: [{ name: 'rcebulko' }],
+            owners: [{name: 'rcebulko'}],
           });
           expect(result).toBeUndefined();
         });
@@ -271,20 +299,38 @@ describe('owners parser', () => {
       it('creates a same-directory rule', () => {
         const {result} = parser._parseRuleDefinition('', {
           pattern: '*.js',
-          owners: [{ name: 'rcebulko' }],
+          owners: [{name: 'rcebulko'}],
         });
         expect(result).toEqual(
-          new SameDirPatternOwnersRule('', [new UserOwner('rcebulko')], '*.js')
+          new SameDirPatternOwnersRule(
+            '',
+            [new UserOwner('rcebulko')],
+            '{*.js}'
+          )
         );
       });
 
       it('creates a recursive rule for a pattern starting with **/', () => {
         const {result} = parser._parseRuleDefinition('', {
           pattern: '**/*.js',
-          owners: [{ name: 'rcebulko' }],
+          owners: [{name: 'rcebulko'}],
         });
         expect(result).toEqual(
-          new PatternOwnersRule('', [new UserOwner('rcebulko')], '*.js')
+          new PatternOwnersRule('', [new UserOwner('rcebulko')], '{*.js}')
+        );
+      });
+
+      it('parses comma-delimited rules', () => {
+        const {result} = parser._parseRuleDefinition('', {
+          pattern: 'package.json,yarn.lock',
+          owners: [{name: 'rcebulko'}],
+        });
+        expect(result).toEqual(
+          new PatternOwnersRule(
+            '',
+            [new UserOwner('rcebulko')],
+            '{package.json,yarn.lock}'
+          )
         );
       });
     });

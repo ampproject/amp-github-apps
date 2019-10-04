@@ -15,6 +15,7 @@
  */
 
 const yaml = require('yamljs');
+const JSON5 = require('json5');
 const {
   OwnersRule,
   PatternOwnersRule,
@@ -433,6 +434,7 @@ class OwnersParser {
       if (isRecursive) {
         pattern = pattern.slice(GLOB_PATTERN.length);
       }
+      pattern = `${pattern}`;
 
       if (pattern.includes('/')) {
         errors.push(
