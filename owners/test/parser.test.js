@@ -191,7 +191,7 @@ describe('owners parser', () => {
       });
     });
 
-    describe('wildcard owner declarations', () => {        
+    describe('wildcard owner declarations', () => {
       it('parses a wildcard owner', () => {
         const {result} = parser._parseOwnerDefinition('', {name: '*'});
         expect(result).toEqual(new WildcardOwner());
@@ -315,11 +315,7 @@ describe('owners parser', () => {
           owners: [{name: 'rcebulko'}],
         });
         expect(result).toEqual(
-          new SameDirPatternOwnersRule(
-            '',
-            [new UserOwner('rcebulko')],
-            '*.js'
-          )
+          new SameDirPatternOwnersRule('', [new UserOwner('rcebulko')], '*.js')
         );
       });
 
@@ -651,9 +647,9 @@ describe('owners parser', () => {
       });
 
       it('assigns the OWNERS directory path', () => {
-        sandbox.stub(repo, 'readFile').returns(
-          '{rules: [{owners: [{name: "rcebulko"}]}]}'
-        );
+        sandbox
+          .stub(repo, 'readFile')
+          .returns('{rules: [{owners: [{name: "rcebulko"}]}]}');
         const fileParse = parser.parseOwnersFile('foo/OWNERS');
         const rules = fileParse.result;
 
@@ -679,7 +675,6 @@ describe('owners parser', () => {
       });
 
       describe('for valid owners files', () => {
-        let result;
         let errors;
         const rules = {};
 
@@ -761,7 +756,7 @@ describe('owners parser', () => {
           const errorMessages = errors.map(({message}) => message);
           expect(errorMessages).toContain(
             "Failed to parse rule for pattern 'foo*/*.js'; " +
-            "directory patterns other than '**/' not supported"
+              "directory patterns other than '**/' not supported"
           );
         });
 
@@ -779,28 +774,24 @@ describe('owners parser', () => {
   describe('parseAllOwnersRules', () => {
     it('reads all owners files in the repo', async () => {
       expect.assertions(4);
-      sandbox
-        .stub(repo, 'findOwnersFiles')
-        .returns(['OWNERS', 'foo/OWNERS']);
+      sandbox.stub(repo, 'findOwnersFiles').returns(['OWNERS', 'foo/OWNERS']);
       const readFileStub = sandbox.stub(repo, 'readFile');
       readFileStub.onCall(0).returns(
         JSON.stringify({
-          rules: [{ 
-            owners: [
-              { name: 'user1' },
-              { name: 'user2' },
-            ],
-          }],
+          rules: [
+            {
+              owners: [{name: 'user1'}, {name: 'user2'}],
+            },
+          ],
         })
       );
       readFileStub.onCall(1).returns(
         JSON.stringify({
-          rules: [{ 
-            owners: [
-              { name: 'user3' },
-              { name: 'user4' },
-            ],
-          }],
+          rules: [
+            {
+              owners: [{name: 'user3'}, {name: 'user4'}],
+            },
+          ],
         })
       );
       const ruleParse = await parser.parseAllOwnersRules();
@@ -830,9 +821,7 @@ describe('owners parser', () => {
 
     it('collects errors from all parsed files', async () => {
       expect.assertions(1);
-      sandbox
-        .stub(repo, 'findOwnersFiles')
-        .returns(['OWNERS', 'foo/OWNERS']);
+      sandbox.stub(repo, 'findOwnersFiles').returns(['OWNERS', 'foo/OWNERS']);
       sandbox.stub(repo, 'readFile').returns('dict:\n  key: value');
       const {errors} = await parser.parseAllOwnersRules();
 
