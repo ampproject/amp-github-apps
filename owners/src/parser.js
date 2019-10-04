@@ -434,7 +434,6 @@ class OwnersParser {
       if (isRecursive) {
         pattern = pattern.slice(GLOB_PATTERN.length);
       }
-      pattern = `${pattern}`;
 
       if (pattern.includes('/')) {
         errors.push(
@@ -462,6 +461,45 @@ class OwnersParser {
   }
 
   /**
+   * Parse an OWNERS.json file.
+   *
+   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
+   */
+  _parseJsonOwnersFile(ownersPath) {
+    const errors = [];
+    const rules = [];
+    const contents = this.localRepo.readFile(ownersPath);
+
+    let file;
+    try {
+      file = JSON5.parse(contents);
+    } catch (error) {
+      errors.push(new OwnersParserError(ownersPath, error.toString()));
+      return {result: rules, errors};
+    }
+
+    if (file.rules instanceof Array) {
+      file.rules.forEach(ruleDef => {
+        const ruleParse = this._parseRuleDefinition(ownersPath, ruleDef);
+        if (ruleParse.result) {
+          rules.push(ruleParse.result);
+        }
+        errors.push(...ruleParse.errors);
+      });
+    } else {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          'Failed to parse file; top-level "rules" key must contain a list'
+        )
+      );
+    }
+
+    return {result: rules, errors};
+  }
+
+  /**
    * Parse an OWNERS file in YAML or JSON format.
    *
    * @param {!string} ownersPath OWNERS file path (for error reporting).
@@ -470,6 +508,9 @@ class OwnersParser {
   parseOwnersFile(ownersPath) {
     if (ownersPath.toLowerCase().endsWith('.yaml')) {
       return this._parseYamlOwnersFile(ownersPath);
+    }
+    if (ownersPath.toLowerCase().endsWith('.json')) {
+      return this._parseJsonOwnersFile(ownersPath);
     }
 
     return {

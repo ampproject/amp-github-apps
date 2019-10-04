@@ -110,13 +110,6 @@
       pattern: "*.{js,css}",
       owners: [{ name: "frontend" }],
     },
-
-    {
-      // Rules may be comma-delimited (not including spaces) for convenience;
-      // this is treated the same as if the whole pattern were wrapped in braces.
-      pattern: "package.json,yarn.lock",
-      owners: [{ name: "ampproject/wg-infra" }],
-    },
   ]
 }
 
