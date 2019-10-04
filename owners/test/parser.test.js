@@ -32,7 +32,7 @@ const {
   SameDirPatternOwnersRule,
 } = require('../src/rules');
 
-const EXAMPLE_FILE_PATH = path.resolve(__dirname, '../OWNERS.example.json');
+const EXAMPLE_FILE_PATH = path.resolve(__dirname, '../OWNERS.example');
 
 describe('owners parser error', () => {
   describe('toString', () => {
@@ -645,16 +645,16 @@ describe('owners parser', () => {
 
       it('reads the file from the local repository', () => {
         sandbox.stub(repo, 'readFile').returns('{rules: []}');
-        parser.parseOwnersFile('foo/OWNERS.json');
+        parser.parseOwnersFile('foo/OWNERS');
 
-        sandbox.assert.calledWith(repo.readFile, 'foo/OWNERS.json');
+        sandbox.assert.calledWith(repo.readFile, 'foo/OWNERS');
       });
 
       it('assigns the OWNERS directory path', () => {
         sandbox.stub(repo, 'readFile').returns(
           '{rules: [{owners: [{name: "rcebulko"}]}]}'
         );
-        const fileParse = parser.parseOwnersFile('foo/OWNERS.json');
+        const fileParse = parser.parseOwnersFile('foo/OWNERS');
         const rules = fileParse.result;
 
         expect(rules[0].dirPath).toEqual('foo');
@@ -662,7 +662,7 @@ describe('owners parser', () => {
 
       it('handles and reports JSON syntax errors', () => {
         sandbox.stub(repo, 'readFile').returns('hello!');
-        const {result, errors} = parser.parseOwnersFile('OWNERS.json');
+        const {result, errors} = parser.parseOwnersFile('OWNERS');
 
         expect(result).toEqual([]);
         expect(errors[0].message).toContain('SyntaxError: JSON5');
@@ -670,7 +670,7 @@ describe('owners parser', () => {
 
       it('handles and reports JSON files without a `rules` property', () => {
         sandbox.stub(repo, 'readFile').returns('{}');
-        const {result, errors} = parser.parseOwnersFile('OWNERS.json');
+        const {result, errors} = parser.parseOwnersFile('OWNERS');
 
         expect(result).toEqual([]);
         expect(errors[0].message).toEqual(
@@ -685,7 +685,7 @@ describe('owners parser', () => {
 
         beforeEach(() => {
           sandbox.stub(repo, 'readFile').returns(exampleJson);
-          const fileParse = parser.parseOwnersFile('OWNERS.example.json');
+          const fileParse = parser.parseOwnersFile('OWNERS.example');
           errors = fileParse.errors;
           Object.assign(rules, {
             basic: fileParse.result[0],
@@ -772,16 +772,6 @@ describe('owners parser', () => {
           expect(rule.matchesFile('main.html')).toBe(false);
           expect(rule.owners[0].name).toEqual('frontend');
         });
-      });
-    });
-
-    describe('other formats', () => {
-      it('reports an error', () => {
-        sandbox.stub(repo, 'readFile').returns('');
-        const {errors, result} = parser.parseOwnersFile('foo/OWNERS.xml');
-
-        expect(errors[0].message).toEqual('Unsupported file format');
-        expect(result).toEqual([]);
       });
     });
   });

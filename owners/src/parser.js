@@ -509,14 +509,7 @@ class OwnersParser {
     if (ownersPath.toLowerCase().endsWith('.yaml')) {
       return this._parseYamlOwnersFile(ownersPath);
     }
-    if (ownersPath.toLowerCase().endsWith('.json')) {
-      return this._parseJsonOwnersFile(ownersPath);
-    }
-
-    return {
-      result: [],
-      errors: [new OwnersParserError(ownersPath, 'Unsupported file format')],
-    };
+    return this._parseJsonOwnersFile(ownersPath);
   }
 
   /**

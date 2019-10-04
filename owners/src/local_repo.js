@@ -112,7 +112,7 @@ class LocalRepository {
         // Cuts out the first three columns.
         'cut -f2',
         // Finds OWNERS files.
-        'grep OWNERS.yaml$',
+        'egrep "OWNERS(.yaml)?$"',
       ].join('|')
     );
 
