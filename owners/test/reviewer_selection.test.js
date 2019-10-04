@@ -33,15 +33,15 @@ describe('reviewer selection', () => {
   myTeam.members = ['child', 'kid'];
 
   const dirRules = {
-    '/': new OwnersRule('OWNERS.yaml', [new UserOwner('rootOwner')]),
-    '/foo': new OwnersRule('foo/OWNERS.yaml', [new UserOwner('child')]),
-    '/biz': new OwnersRule('biz/OWNERS.yaml', [new TeamOwner(myTeam)]),
-    '/buzz': new OwnersRule('buzz/OWNERS.yaml', [new UserOwner('thirdChild')]),
-    '/foo/bar/baz': new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+    '/': new OwnersRule('OWNERS', [new UserOwner('rootOwner')]),
+    '/foo': new OwnersRule('foo/OWNERS', [new UserOwner('child')]),
+    '/biz': new OwnersRule('biz/OWNERS', [new TeamOwner(myTeam)]),
+    '/buzz': new OwnersRule('buzz/OWNERS', [new UserOwner('thirdChild')]),
+    '/foo/bar/baz': new OwnersRule('foo/bar/baz/OWNERS', [
       new UserOwner('descendant'),
     ]),
   };
-  const wildcardRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+  const wildcardRule = new OwnersRule('foo/bar/baz/OWNERS', [
     new WildcardOwner(),
   ]);
 
@@ -128,16 +128,16 @@ describe('reviewer selection', () => {
 
     describe('rule priority', () => {
       const sameDirPatternRule = new SameDirPatternOwnersRule(
-        'priority/OWNERS.yaml',
+        'priority/OWNERS',
         [new UserOwner('same_dir_pattern_owner')],
         '*.css'
       );
       const recursivePatternRule = new PatternOwnersRule(
-        'priority/OWNERS.yaml',
+        'priority/OWNERS',
         [new UserOwner('recursive_pattern_owner')],
         '*.js'
       );
-      const directoryRule = new OwnersRule('priority/OWNERS.yaml', [
+      const directoryRule = new OwnersRule('priority/OWNERS', [
         new UserOwner('directory_owner'),
       ]);
 

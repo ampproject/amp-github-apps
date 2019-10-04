@@ -38,7 +38,7 @@ class OwnersParserError extends Error {
   /**
    * Constructor
    *
-   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!string} ownersPath OWNERS file path (for error reporting).
    * @param {!string} message error message;
    */
   constructor(ownersPath, message) {
@@ -57,7 +57,7 @@ class OwnersParserError extends Error {
 }
 
 /**
- * Parser for OWNERS.yaml files.
+ * Parser for OWNERS files.
  */
 class OwnersParser {
   /**
@@ -79,7 +79,7 @@ class OwnersParser {
    * TODO(rcebulko): Add support for teams.
    *
    * @private
-   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!string} ownersPath OWNERS file path (for error reporting).
    * @param {!string} owner owner username.
    * @return {OwnersParserResult<Owner[]>} list of owners.
    */
@@ -139,7 +139,7 @@ class OwnersParser {
    * Parse a list of owners.
    *
    * @private
-   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!string} ownersPath OWNERS file path (for error reporting).
    * @param {string[]} ownersList list of owners.
    * @return {OwnersParserResult<Owner[]>} list of owners' usernames.
    */
@@ -163,7 +163,7 @@ class OwnersParser {
    * matching this will not be parsed correctly.
    *
    * @private
-   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!string} ownersPath OWNERS file path (for error reporting).
    * @param {!object} ownersDict dictionary with a pattern as the key and a list
    * of owners as the value.
    * @return {OwnersParserResult<PatternOwnersRule[]>} parsed OWNERS pattern
@@ -233,9 +233,9 @@ class OwnersParser {
   }
 
   /**
-   * Parse an OWNERS.yaml file.
+   * Parse an OWNERS file.
    *
-   * @param {!string} ownersPath OWNERS.yaml file path (for error reporting).
+   * @param {!string} ownersPath OWNERS file path (for error reporting).
    * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
    */
   _parseYamlOwnersFile(ownersPath) {

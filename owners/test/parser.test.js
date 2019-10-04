@@ -36,10 +36,10 @@ const EXAMPLE_FILE_PATH = path.resolve(__dirname, '../OWNERS.example');
 
 describe('owners parser error', () => {
   describe('toString', () => {
-    const error = new OwnersParserError('foo/OWNERS.yaml', 'Oops!');
+    const error = new OwnersParserError('foo/OWNERS', 'Oops!');
 
     it('displays the file containing the error', () => {
-      expect(error.toString()).toContain('[foo/OWNERS.yaml]');
+      expect(error.toString()).toContain('[foo/OWNERS]');
     });
 
     it('displays the error message', () => {
@@ -781,10 +781,28 @@ describe('owners parser', () => {
       expect.assertions(4);
       sandbox
         .stub(repo, 'findOwnersFiles')
-        .returns(['OWNERS.yaml', 'foo/OWNERS.yaml']);
+        .returns(['OWNERS', 'foo/OWNERS']);
       const readFileStub = sandbox.stub(repo, 'readFile');
-      readFileStub.onCall(0).returns('- user1\n- user2\n');
-      readFileStub.onCall(1).returns('- user3\n- user4\n');
+      readFileStub.onCall(0).returns(
+        JSON.stringify({
+          rules: [{ 
+            owners: [
+              { name: 'user1' },
+              { name: 'user2' },
+            ],
+          }],
+        })
+      );
+      readFileStub.onCall(1).returns(
+        JSON.stringify({
+          rules: [{ 
+            owners: [
+              { name: 'user3' },
+              { name: 'user4' },
+            ],
+          }],
+        })
+      );
       const ruleParse = await parser.parseAllOwnersRules();
       const rules = ruleParse.result;
 
@@ -802,7 +820,7 @@ describe('owners parser', () => {
 
     it('does not include invalid rules', async () => {
       expect.assertions(1);
-      sandbox.stub(repo, 'findOwnersFiles').returns(['OWNERS.yaml']);
+      sandbox.stub(repo, 'findOwnersFiles').returns(['OWNERS']);
       sandbox.stub(repo, 'readFile').returns('dict:\n  key: value');
       const ruleParse = await parser.parseAllOwnersRules();
       const rules = ruleParse.result;
@@ -814,7 +832,7 @@ describe('owners parser', () => {
       expect.assertions(1);
       sandbox
         .stub(repo, 'findOwnersFiles')
-        .returns(['OWNERS.yaml', 'foo/OWNERS.yaml']);
+        .returns(['OWNERS', 'foo/OWNERS']);
       sandbox.stub(repo, 'readFile').returns('dict:\n  key: value');
       const {errors} = await parser.parseAllOwnersRules();
 
@@ -823,8 +841,8 @@ describe('owners parser', () => {
   });
 
   describe('parseOwnersTree', () => {
-    const rootRule = new OwnersRule('OWNERS.yaml', ['user1', 'user2']);
-    const childRule = new OwnersRule('foo/OWNERS.yaml', ['user3', 'user4']);
+    const rootRule = new OwnersRule('OWNERS', ['user1', 'user2']);
+    const childRule = new OwnersRule('foo/OWNERS', ['user3', 'user4']);
 
     it('adds each rule to the tree', async () => {
       expect.assertions(2);

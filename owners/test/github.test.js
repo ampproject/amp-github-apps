@@ -517,7 +517,7 @@ describe('GitHub API', () => {
 
       await withContext(async (context, github) => {
         const contents = await github.getFileContents({
-          filename: 'third_party/subscriptions-project/OWNERS.yaml',
+          filename: 'third_party/subscriptions-project/OWNERS',
           sha: 'eeae1593f4ecbae3f4453c9ceee2940a0e98ddca',
         });
 

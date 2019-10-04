@@ -59,14 +59,14 @@ describe('owners check', () => {
   beforeEach(() => {
     const ownersTree = new OwnersTree();
     [
-      new OwnersRule('OWNERS.yaml', [new UserOwner('root_owner')]),
-      new OwnersRule('foo/OWNERS.yaml', [
+      new OwnersRule('OWNERS', [new UserOwner('root_owner')]),
+      new OwnersRule('foo/OWNERS', [
         new UserOwner('approver'),
         new UserOwner('some_user'),
       ]),
-      new OwnersRule('bar/OWNERS.yaml', [new UserOwner('other_approver')]),
-      new OwnersRule('buzz/OWNERS.yaml', [new UserOwner('the_author')]),
-      new OwnersRule('extra/OWNERS.yaml', [new UserOwner('extra_reviewer')]),
+      new OwnersRule('bar/OWNERS', [new UserOwner('other_approver')]),
+      new OwnersRule('buzz/OWNERS', [new UserOwner('the_author')]),
+      new OwnersRule('extra/OWNERS', [new UserOwner('extra_reviewer')]),
     ].forEach(rule => ownersTree.addRule(rule));
 
     ownersCheck = new OwnersCheck(
