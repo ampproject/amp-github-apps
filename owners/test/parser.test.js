@@ -753,6 +753,16 @@ describe('owners parser', () => {
         });
       });
     });
+
+    describe('other formats', () => {
+      it('reports an error', () => {
+        sandbox.stub(repo, 'readFile').returns('');
+        const {errors, result} = parser.parseOwnersFile('foo/OWNERS.xml');
+
+        expect(errors[0].message).toEqual('Unsupported file format');
+        expect(result).toEqual([]);
+      });
+    });
   });
 
   describe('parseAllOwnersRules', () => {
