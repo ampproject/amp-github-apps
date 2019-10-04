@@ -164,7 +164,7 @@ describe('owners parser', () => {
       });
     });
 
-    describe('team rule declarations', () => {
+    describe('team owner declarations', () => {
       it('returns a team owner', () => {
         const {result} = parser._parseOwnerDefinition('', {
           name: 'ampproject/my_team',
@@ -191,9 +191,22 @@ describe('owners parser', () => {
       });
     });
 
-    it('parses a wildcard owner', () => {
-      const {result} = parser._parseOwnerDefinition('', {name: '*'});
-      expect(result).toEqual(new WildcardOwner());
+    describe('wildcard owner declarations', () => {        
+      it('parses a wildcard owner', () => {
+        const {result} = parser._parseOwnerDefinition('', {name: '*'});
+        expect(result).toEqual(new WildcardOwner());
+      });
+
+      it('ignores modifiers', () => {
+        const {result, errors} = parser._parseOwnerDefinition('', {
+          name: '*',
+          notify: true,
+        });
+        expect(result).toEqual(new WildcardOwner());
+        expect(errors[0].message).toEqual(
+          'Modifiers not supported on wildcard `*` owner'
+        );
+      });
     });
   });
 
@@ -482,6 +495,14 @@ describe('owners parser', () => {
           );
         });
 
+        it('parses brace-set glob patterns', () => {
+          sandbox.stub(repo, 'readFile').returns('- *.{js,css}: frontend\n');
+          const fileParse = parser.parseOwnersFile('OWNERS.yaml');
+          const rules = fileParse.result;
+
+          expect(rules[0].pattern).toEqual('*.{js,css}');
+        });
+
         it('parses comma-separate patterns as separate rules', () => {
           sandbox.stub(repo, 'readFile').returns('- *.js, *.css: frontend\n');
           const fileParse = parser.parseOwnersFile('OWNERS.yaml');
@@ -617,7 +638,7 @@ describe('owners parser', () => {
       });
     });
 
-    describe('JSON format', () => {
+    describe('JSON5 format', () => {
       // These tests directly parse the example owners file to ensure it always
       // stays in sync and valid.
       const exampleJson = fs.readFileSync(EXAMPLE_FILE_PATH);
