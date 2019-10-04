@@ -281,6 +281,185 @@ class OwnersParser {
   }
 
   /**
+   * Parse an owner definition.
+   *
+   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @param {!OwnerDefinition} ownerDef owners definition.
+   * @return {OwnersParserResult<?Owner>} parsed owner.
+   */
+  _parseOwnerDefinition(ownersPath, ownerDef) {
+    const errors = [];
+
+    // Validate the owner definition itself.
+    if (typeof ownerDef !== 'object') {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Expected owner definition; got ${typeof ownerDef}`
+        )
+      );
+      return {errors};
+    }
+
+    // Validate and sanitize the owner name.
+    let ownerName = ownerDef.name;
+    if (typeof ownerName !== 'string') {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Expected "name" to be a string; got ${typeof ownerName}`
+        )
+      );
+      return {errors};
+    }
+    ownerName = ownerName.toLowerCase();
+
+    if (ownerName.startsWith('@')) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Ignoring unnecessary '@' in '${ownerName}'`
+        )
+      );
+      ownerName = ownerName.slice(1);
+    }
+
+    // Validate and determine modifier.
+    let modifier = OWNER_MODIFIER.NONE;
+    const notify = ownerDef.notify === undefined ? false : ownerDef.notify;
+    const requestReviews =
+      ownerDef.requestReviews === undefined ? true : ownerDef.requestReviews;
+
+    if (notify && !requestReviews) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          'Cannot specify both "notify: true" and "requestReviews: false"; ' +
+            'ignoring modifiers'
+        )
+      );
+    } else if (notify) {
+      modifier = OWNER_MODIFIER.NOTIFY;
+    } else if (!requestReviews) {
+      modifier = OWNER_MODIFIER.SILENT;
+    }
+
+    // Determine the owner from the name.
+    if (ownerName.includes('/')) {
+      const team = this.teamMap[ownerName];
+
+      if (team) {
+        return {errors, result: new TeamOwner(team, modifier)};
+      } else {
+        errors.push(
+          new OwnersParserError(ownersPath, `Unrecognized team: '${ownerName}'`)
+        );
+      }
+      return {errors};
+    }
+
+    if (ownerName === '*') {
+      try {
+        return {errors, result: new WildcardOwner(modifier)};
+      } catch (error) {
+        errors.push(new OwnersParserError(ownersPath, error.message));
+        return {errors, result: new WildcardOwner()};
+      }
+    }
+
+    return {errors, result: new UserOwner(ownerName, modifier)};
+  }
+
+  /**
+   * Parse an owners rule definition.
+   *
+   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @param {!RuleDefinition} ruleDef owners rule definition.
+   * @return {OwnersParserResult<?OwnersRule>} parsed rule.
+   */
+  _parseRuleDefinition(ownersPath, ruleDef) {
+    const errors = [];
+    const owners = [];
+
+    // Validate rule definition and parse owners list.
+    if (typeof ruleDef !== 'object') {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Expected rule definition; got ${typeof ruleDef}`
+        )
+      );
+    } else if (!(ruleDef.owners instanceof Array)) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Expected "owners" to be a list; got ${typeof ruleDef.owners}`
+        )
+      );
+    } else {
+      ruleDef.owners.forEach(ownerDef => {
+        const ownerParse = this._parseOwnerDefinition(ownersPath, ownerDef);
+        if (ownerParse.result) {
+          owners.push(ownerParse.result);
+        }
+        errors.push(...ownerParse.errors);
+      });
+    }
+
+    if (!owners.length) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          'No valid owners found; skipping rule'
+        )
+      );
+      return {errors};
+    }
+
+    // Validate rule pattern, if present.
+    let pattern = ruleDef.pattern;
+    if (pattern && typeof pattern !== 'string') {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Expected "pattern" to be a string; got ${typeof pattern}`
+        )
+      );
+      return {errors};
+    }
+
+    const isRecursive = pattern && pattern.startsWith(GLOB_PATTERN);
+    if (pattern) {
+      if (isRecursive) {
+        pattern = pattern.slice(GLOB_PATTERN.length);
+      }
+
+      if (pattern.includes('/')) {
+        errors.push(
+          new OwnersParserError(
+            ownersPath,
+            `Failed to parse rule for pattern '${pattern}'; ` +
+              `directory patterns other than '${GLOB_PATTERN}' not supported`
+          )
+        );
+        return {errors};
+      }
+    }
+
+    // Create rule based on pattern and owners list.
+    let rule;
+    if (pattern && isRecursive) {
+      rule = new PatternOwnersRule(ownersPath, owners, pattern);
+    } else if (pattern) {
+      rule = new SameDirPatternOwnersRule(ownersPath, owners, pattern);
+    } else {
+      rule = new OwnersRule(ownersPath, owners);
+    }
+
+    return {errors, result: rule};
+  }
+
+  /**
    * Parse an OWNERS file in YAML or JSON format.
    *
    * @param {!string} ownersPath OWNERS file path (for error reporting).
@@ -291,7 +470,10 @@ class OwnersParser {
       return this._parseYamlOwnersFile(ownersPath);
     }
 
-    return {result: [], errors: []};
+    return {
+      result: [],
+      errors: [new OwnersParserError(ownersPath, 'Unsupported file format')],
+    };
   }
 
   /**

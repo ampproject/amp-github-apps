@@ -50,6 +50,246 @@ describe('owners parser', () => {
     sandbox.restore();
   });
 
+  describe('parseOwnerDefinition', () => {
+    describe('when given something not an owner definition', () => {
+      it('reports an error', () => {
+        const {errors} = parser._parseOwnerDefinition('', 'HELLO!');
+        expect(errors[0].message).toEqual(
+          'Expected owner definition; got string'
+        );
+      });
+
+      it('returns no result', () => {
+        const {result} = parser._parseOwnerDefinition('', 'HELLO!');
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe('for a non-string name', () => {
+      it('reports an error', () => {
+        const {errors} = parser._parseOwnerDefinition('', {name: {}});
+        expect(errors[0].message).toEqual(
+          'Expected "name" to be a string; got object'
+        );
+      });
+
+      it('returns no result', () => {
+        const {result} = parser._parseOwnerDefinition('', {name: {}});
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe('for a name with a leading "@"', () => {
+      it('reports an error', () => {
+        const {errors} = parser._parseOwnerDefinition('', {name: '@me'});
+        expect(errors[0].message).toEqual("Ignoring unnecessary '@' in '@me'");
+      });
+
+      it('ignores the "@"', () => {
+        const {result} = parser._parseOwnerDefinition('', {name: '@me'});
+        expect(result).toEqual(new UserOwner('me'));
+      });
+    });
+
+    describe('modifiers', () => {
+      describe('when multiple options are specified', () => {
+        it('reports an error', () => {
+          const {errors} = parser._parseOwnerDefinition('', {
+            name: 'me',
+            notify: true,
+            requestReviews: false,
+          });
+          expect(errors[0].message).toContain(
+            'Cannot specify both "notify: true" and "requestReviews: false"'
+          );
+        });
+
+        it('ignores the options', () => {
+          const {result} = parser._parseOwnerDefinition('', {
+            name: 'me',
+            notify: true,
+            requestReviews: false,
+          });
+          expect(result.modifier).toBe(OWNER_MODIFIER.NONE);
+        });
+      });
+
+      it('defaults to no modifier', () => {
+        const {result} = parser._parseOwnerDefinition('', {name: 'me'});
+        expect(result.modifier).toEqual(OWNER_MODIFIER.NONE);
+      });
+
+      it('selects always-notify modifier when "notify" is true', () => {
+        const {result} = parser._parseOwnerDefinition('', {
+          name: 'me',
+          notify: true,
+        });
+        expect(result.modifier).toEqual(OWNER_MODIFIER.NOTIFY);
+      });
+
+      it('selects never-notify modifier when "requestReviews" is false', () => {
+        const {result} = parser._parseOwnerDefinition('', {
+          name: 'me',
+          requestReviews: false,
+        });
+        expect(result.modifier).toEqual(OWNER_MODIFIER.SILENT);
+      });
+    });
+
+    describe('team rule declarations', () => {
+      it('returns a team owner', () => {
+        const {result} = parser._parseOwnerDefinition('', {
+          name: 'ampproject/my_team',
+        });
+        expect(result).toEqual(new TeamOwner(myTeam));
+      });
+
+      describe('when the team is unknown', () => {
+        it('reports an error', () => {
+          const {errors} = parser._parseOwnerDefinition('', {
+            name: 'ampproject/other_team',
+          });
+          expect(errors[0].message).toEqual(
+            "Unrecognized team: 'ampproject/other_team'"
+          );
+        });
+
+        it('returns no result', () => {
+          const {result} = parser._parseOwnerDefinition('', {
+            name: 'ampproject/other_team',
+          });
+          expect(result).toBeUndefined();
+        });
+      });
+    });
+
+    it('parses a wildcard owner', () => {
+      const {result} = parser._parseOwnerDefinition('', {name: '*'});
+      expect(result).toEqual(new WildcardOwner());
+    });
+  });
+
+  describe('parseRuleDefinition', () => {
+    describe('when given something not a rule definition', () => {
+      it('reports an error', () => {
+        const {errors} = parser._parseRuleDefinition('', 'NOT A RULE DEF');
+        expect(errors[0].message).toEqual('Expected rule definition; got string');
+      });
+
+      it('returns no result', () => {
+        const {result} = parser._parseRuleDefinition('', 'NOT A RULE DEF');
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe('for a non-list owners property', () => {
+      it('reports an error', () => {
+        const {errors} = parser._parseRuleDefinition('', {owners: 1337});
+        expect(errors[0].message).toEqual(
+          'Expected "owners" to be a list; got number'
+        );
+      });
+
+      it('returns no result', () => {
+        const {result} = parser._parseRuleDefinition('', {owners: 1337});
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe('for a rule with no valid owners', () => {
+      it('reports an error', () => {
+        const {errors} = parser._parseRuleDefinition('', {
+          owners: ['NOT AN OWNER DEF', 24]
+        });
+        const errorMessages = errors.map(({message}) => message);
+
+        expect(errorMessages).toEqual([
+          'Expected owner definition; got string',
+          'Expected owner definition; got number',
+          'No valid owners found; skipping rule',
+        ]);
+      });
+
+      it('returns no result', () => {
+        const {result} = parser._parseRuleDefinition('', {
+          owners: ['NOT AN OWNER DEF', 24]
+        });
+        expect(result).toBeUndefined();
+      });
+    });
+
+    it('creates an owners rule', () => {
+      const {result, errors} = parser._parseRuleDefinition('', {
+        owners: [{ name: 'rcebulko' }],
+      });
+      expect(result).toEqual(
+        new OwnersRule('', [new UserOwner('rcebulko')])
+      );
+    });
+
+    describe('when a pattern is specified', () => {
+      describe('for a non-string pattern', () => {
+        it('reports an error', () => {
+          const {errors} = parser._parseRuleDefinition('', {
+            pattern: {},
+            owners: [{ name: 'rcebulko' }],
+          });
+          expect(errors[0].message).toEqual(
+            'Expected "pattern" to be a string; got object'
+          );
+        });
+
+        it('returns no result', () => {
+          const {result} = parser._parseRuleDefinition('', {
+            pattern: {},
+            owners: [{ name: 'rcebulko' }],
+          });
+          expect(result).toBeUndefined();
+        });
+      });
+
+      describe('for a directory glob pattern', () => {
+        it('reports an error', () => {
+          const {errors} = parser._parseRuleDefinition('', {
+            pattern: 'foo-*/*.js',
+            owners: [{ name: 'rcebulko' }],
+          });
+          expect(errors[0].message).toContain(
+            "directory patterns other than '**/' not supported"
+          );
+        });
+
+        it('returns no result', () => {
+          const {result} = parser._parseRuleDefinition('', {
+            pattern: 'foo-*/*.js',
+            owners: [{ name: 'rcebulko' }],
+          });
+          expect(result).toBeUndefined();
+        });
+      });
+
+      it('creates a same-directory rule', () => {
+        const {result} = parser._parseRuleDefinition('', {
+          pattern: '*.js',
+          owners: [{ name: 'rcebulko' }],
+        });
+        expect(result).toEqual(
+          new SameDirPatternOwnersRule('', [new UserOwner('rcebulko')], '*.js')
+        );
+      });
+
+      it('creates a recursive rule for a pattern starting with **/', () => {
+        const {result} = parser._parseRuleDefinition('', {
+          pattern: '**/*.js',
+          owners: [{ name: 'rcebulko' }],
+        });
+        expect(result).toEqual(
+          new PatternOwnersRule('', [new UserOwner('rcebulko')], '*.js')
+        );
+      });
+    });
+  });
+
   describe('parseOwnersFile', () => {
     describe('YAML format', () => {
       it('reads the file from the local repository', () => {
@@ -79,7 +319,9 @@ describe('owners parser', () => {
       });
 
       it('parses a YAML list with blank lines and comments', () => {
-        sandbox.stub(repo, 'readFile').returns('- user1\n# comment\n\n- user2\n');
+        sandbox
+          .stub(repo, 'readFile')
+          .returns('- user1\n# comment\n\n- user2\n');
         const fileParse = parser.parseOwnersFile('OWNERS.yaml');
         const rules = fileParse.result;
 
