@@ -23,6 +23,22 @@
  * writable variant of JSON which supports comments, unquoted obeject keys,
  * single quotes, and trailing commas. In this file, "this directory" refers to
  * the directory containing the OWNERS.yaml file.
+ *
+ * Example OWNERS file definition for a directory owned by the team
+ * `ampproject/wg-ui-and-a11y` and `rcebulko`, who should always be notified of
+ * changes:
+ *
+ * {
+ *   rules: [{
+ *     owners: [
+ *       { name: 'ampproject/wg-ui-and-a11y' },
+ *       {
+ *         name: 'rcebulko',
+ *         notify: true,
+ *       },
+ *     ],
+ *   }],
+ * }
  */
 
 // All owners files must contain a single `rules` key containing a list of owners
