@@ -17,6 +17,7 @@
 const sinon = require('sinon');
 const path = require('path');
 const fs = require('fs');
+const JSON5 = require('json5');
 const {Team} = require('../src/github');
 const {LocalRepository} = require('../src/local_repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
@@ -331,6 +332,116 @@ describe('owners parser', () => {
     });
   });
 
+  describe('parseOwnersFileDefinition', () => {
+    it('handles and reports JSON files without a `rules` property', () => {
+      const {result, errors} = parser.parseOwnersFileDefinition('OWNERS', {});
+
+      expect(result).toEqual([]);
+      expect(errors[0].message).toEqual(
+        'Failed to parse file; top-level "rules" key must contain a list'
+      );
+    });
+
+    describe('for valid owners files', () => {
+      // These tests directly parse the example owners file to ensure it always
+      // stays in sync and valid.
+      const exampleJson = fs.readFileSync(EXAMPLE_FILE_PATH);
+      const fileDef = JSON5.parse(exampleJson);
+      let errors;
+      const rules = {};
+
+      beforeEach(() => {
+        const fileParse = parser.parseOwnersFileDefinition('OWNERS', fileDef);
+
+        errors = fileParse.errors;
+        Object.assign(rules, {
+          basic: fileParse.result[0],
+          filename: fileParse.result[1],
+          pattern: fileParse.result[2],
+          recursive: fileParse.result[3],
+          braces: fileParse.result[4],
+        });
+      });
+
+      it('parses basic owner rules', () => {
+        const rule = rules.basic;
+        expect(rule.matchesFile('main.js')).toBe(true);
+        expect(rule.matchesFile('foo/script.js')).toBe(true);
+        expect(rule.matchesFile('bar/style.css')).toBe(true);
+      });
+
+      describe('owner definitions', () => {
+        const owners = {};
+
+        beforeEach(() => {
+          Object.assign(owners, {
+            user: rules.basic.owners[0],
+            atSign: rules.basic.owners[1],
+            team: rules.basic.owners[2],
+            noReview: rules.basic.owners[3],
+            notify: rules.basic.owners[4],
+            doubleModifier: rules.basic.owners[5],
+          });
+        });
+
+        it('parses user owners', () => {
+          expect(owners.user.name).toEqual('someuser');
+          expect(owners.atSign.name).toEqual('dontdothis');
+        });
+
+        it('parses team owners', () => {
+          expect(owners.team.name).toEqual('ampproject/wg-cool-team');
+        });
+
+        it('parses owner modifiers', () => {
+          expect(owners.user.modifier).toEqual(OWNER_MODIFIER.NONE);
+          expect(owners.noReview.modifier).toEqual(OWNER_MODIFIER.SILENT);
+          expect(owners.notify.modifier).toEqual(OWNER_MODIFIER.NOTIFY);
+          expect(owners.doubleModifier.modifier).toEqual(OWNER_MODIFIER.NONE);
+        });
+      });
+
+      it('parses filename rules', () => {
+        const rule = rules.filename;
+        expect(rule.matchesFile('package.json')).toBe(true);
+        expect(rule.matchesFile('package-lock.json')).toBe(false);
+        expect(rule.owners[0].name).toEqual('packager');
+      });
+
+      it('parses pattern rules', () => {
+        const rule = rules.pattern;
+        expect(rule.matchesFile('script.js')).toBe(true);
+        expect(rule.matchesFile('main.js')).toBe(true);
+        expect(rule.matchesFile('style.css')).toBe(false);
+        expect(rule.owners[0].name).toEqual('scripter');
+      });
+
+      it('parses recursive pattern rules', () => {
+        const rule = rules.recursive;
+        expect(rule.matchesFile('validate.protoascii')).toBe(true);
+        expect(rule.matchesFile('foo/cache.protoascii')).toBe(true);
+        expect(rule.matchesFile('style.css')).toBe(false);
+        expect(rule.owners[0].name).toEqual('ampproject/wg-caching');
+      });
+
+      it('reports an error for directory glob patterns', () => {
+        const errorMessages = errors.map(({message}) => message);
+        expect(errorMessages).toContain(
+          "Failed to parse rule for pattern 'foo*/*.js'; " +
+            "directory patterns other than '**/' not supported"
+        );
+      });
+
+      it('parses brace-set rules', () => {
+        const rule = rules.braces;
+        expect(rule.matchesFile('main.css')).toBe(true);
+        expect(rule.matchesFile('main.js')).toBe(true);
+        expect(rule.matchesFile('main.html')).toBe(false);
+        expect(rule.owners[0].name).toEqual('frontend');
+      });
+    });
+  });
+
   describe('parseOwnersFile', () => {
     describe('YAML format', () => {
       it('reads the file from the local repository', () => {
@@ -635,10 +746,6 @@ describe('owners parser', () => {
     });
 
     describe('JSON5 format', () => {
-      // These tests directly parse the example owners file to ensure it always
-      // stays in sync and valid.
-      const exampleJson = fs.readFileSync(EXAMPLE_FILE_PATH);
-
       it('reads the file from the local repository', () => {
         sandbox.stub(repo, 'readFile').returns('{rules: []}');
         parser.parseOwnersFile('foo/OWNERS');
@@ -661,113 +768,20 @@ describe('owners parser', () => {
         const {result, errors} = parser.parseOwnersFile('OWNERS');
 
         expect(result).toEqual([]);
-        expect(errors[0].message).toContain('SyntaxError: JSON5');
+        expect(errors[0].message).toContain('SyntaxError:');
       });
 
-      it('handles and reports JSON files without a `rules` property', () => {
-        sandbox.stub(repo, 'readFile').returns('{}');
-        const {result, errors} = parser.parseOwnersFile('OWNERS');
+      it('parses the owners file definition', () => {
+        sandbox.stub(repo, 'readFile').returns('{rules: []}');
+        sandbox.stub(parser, 'parseOwnersFileDefinition').callThrough();
+        const fileParse = parser.parseOwnersFile('foo/OWNERS');
 
-        expect(result).toEqual([]);
-        expect(errors[0].message).toEqual(
-          'Failed to parse file; top-level "rules" key must contain a list'
+        sandbox.assert.calledWith(
+          parser.parseOwnersFileDefinition,
+          'foo/OWNERS',
+          {rules: []},
         );
-      });
-
-      describe('for valid owners files', () => {
-        let errors;
-        const rules = {};
-
-        beforeEach(() => {
-          sandbox.stub(repo, 'readFile').returns(exampleJson);
-          const fileParse = parser.parseOwnersFile('OWNERS.example');
-          errors = fileParse.errors;
-          Object.assign(rules, {
-            basic: fileParse.result[0],
-            filename: fileParse.result[1],
-            pattern: fileParse.result[2],
-            recursive: fileParse.result[3],
-            braces: fileParse.result[4],
-          });
-        });
-
-        it('parses basic owner rules', () => {
-          const rule = rules.basic;
-          expect(rule.matchesFile('main.js')).toBe(true);
-          expect(rule.matchesFile('foo/script.js')).toBe(true);
-          expect(rule.matchesFile('bar/style.css')).toBe(true);
-        });
-
-        describe('owner definitions', () => {
-          const owners = {};
-
-          beforeEach(() => {
-            Object.assign(owners, {
-              user: rules.basic.owners[0],
-              atSign: rules.basic.owners[1],
-              team: rules.basic.owners[2],
-              noReview: rules.basic.owners[3],
-              notify: rules.basic.owners[4],
-              doubleModifier: rules.basic.owners[5],
-            });
-          });
-
-          it('parses user owners', () => {
-            expect(owners.user.name).toEqual('someuser');
-            expect(owners.atSign.name).toEqual('dontdothis');
-          });
-
-          it('parses team owners', () => {
-            expect(owners.team.name).toEqual('ampproject/wg-cool-team');
-          });
-
-          it('parses owner modifiers', () => {
-            expect(owners.user.modifier).toEqual(OWNER_MODIFIER.NONE);
-            expect(owners.noReview.modifier).toEqual(OWNER_MODIFIER.SILENT);
-            expect(owners.notify.modifier).toEqual(OWNER_MODIFIER.NOTIFY);
-            expect(owners.doubleModifier.modifier).toEqual(OWNER_MODIFIER.NONE);
-          });
-        });
-
-        it('parses filename rules', () => {
-          const rule = rules.filename;
-          expect(rule.matchesFile('package.json')).toBe(true);
-          expect(rule.matchesFile('package-lock.json')).toBe(false);
-          expect(rule.owners[0].name).toEqual('packager');
-        });
-
-        it('parses pattern rules', () => {
-          const rule = rules.pattern;
-          expect(rule.matchesFile('script.js')).toBe(true);
-          expect(rule.matchesFile('main.js')).toBe(true);
-          expect(rule.matchesFile('style.css')).toBe(false);
-          expect(rule.owners[0].name).toEqual('scripter');
-        });
-
-        it('parses recursive pattern rules', () => {
-          const rule = rules.recursive;
-          expect(rule.matchesFile('validate.protoascii')).toBe(true);
-          expect(rule.matchesFile('foo/cache.protoascii')).toBe(true);
-          expect(rule.matchesFile('style.css')).toBe(false);
-          expect(rule.owners[0].name).toEqual('ampproject/wg-caching');
-        });
-
-        it('reports an error for directory glob patterns', () => {
-          const errorMessages = errors.map(({message}) => message);
-          expect(errorMessages).toContain(
-            "Failed to parse rule for pattern 'foo*/*.js'; " +
-              "directory patterns other than '**/' not supported"
-          );
-        });
-
-        it('parses brace-set rules', () => {
-          const rule = rules.braces;
-          expect(rule.matchesFile('main.css')).toBe(true);
-          expect(rule.matchesFile('main.js')).toBe(true);
-          expect(rule.matchesFile('main.html')).toBe(false);
-          expect(rule.owners[0].name).toEqual('frontend');
-        });
-      });
+      })
     });
   });
 

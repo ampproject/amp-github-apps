@@ -101,6 +101,15 @@ let OwnerDefinition;
  */
 let RuleDefinition;
 
+/**
+ * A JSON owners file definition.
+ *
+ * @typedef {{
+ *   rules: RuleDefinition[],
+ * }}
+ */
+let OwnersFileDefinition;
+
 module.exports = {
   FileTreeMap,
   Logger,
@@ -111,4 +120,5 @@ module.exports = {
   ReviewerApprovalMap,
   OwnerDefinition,
   RuleDefinition,
+  OwnersFileDefinition,
 };

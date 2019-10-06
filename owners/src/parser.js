@@ -79,6 +79,7 @@ class OwnersParser {
    * TODO(rcebulko): Add support for teams.
    *
    * @private
+   * @deprecated
    * @param {!string} ownersPath OWNERS file path (for error reporting).
    * @param {!string} owner owner username.
    * @return {OwnersParserResult<Owner[]>} list of owners.
@@ -139,6 +140,7 @@ class OwnersParser {
    * Parse a list of owners.
    *
    * @private
+   * @deprecated
    * @param {!string} ownersPath OWNERS file path (for error reporting).
    * @param {string[]} ownersList list of owners.
    * @return {OwnersParserResult<Owner[]>} list of owners' usernames.
@@ -163,6 +165,7 @@ class OwnersParser {
    * matching this will not be parsed correctly.
    *
    * @private
+   * @deprecated
    * @param {!string} ownersPath OWNERS file path (for error reporting).
    * @param {!object} ownersDict dictionary with a pattern as the key and a list
    * of owners as the value.
@@ -235,6 +238,7 @@ class OwnersParser {
   /**
    * Parse an OWNERS file.
    *
+   * @deprecated
    * @param {!string} ownersPath OWNERS file path (for error reporting).
    * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
    */
@@ -464,23 +468,15 @@ class OwnersParser {
    * Parse an OWNERS.json file.
    *
    * @param {!string} ownersPath OWNERS.json file path (for error reporting).
-   * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
+   * @param {!OwnersFileDefinition} fileDef owners file definition.
+   * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rules.
    */
-  _parseJsonOwnersFile(ownersPath) {
-    const errors = [];
+  parseOwnersFileDefinition(ownersPath, fileDef) {
     const rules = [];
-    const contents = this.localRepo.readFile(ownersPath);
+    const errors = [];
 
-    let file;
-    try {
-      file = JSON5.parse(contents);
-    } catch (error) {
-      errors.push(new OwnersParserError(ownersPath, error.toString()));
-      return {result: rules, errors};
-    }
-
-    if (file.rules instanceof Array) {
-      file.rules.forEach(ruleDef => {
+    if (fileDef.rules instanceof Array) {
+      fileDef.rules.forEach(ruleDef => {
         const ruleParse = this._parseRuleDefinition(ownersPath, ruleDef);
         if (ruleParse.result) {
           rules.push(ruleParse.result);
@@ -497,6 +493,27 @@ class OwnersParser {
     }
 
     return {result: rules, errors};
+  }
+
+  /**
+   * Parse an OWNERS.json file.
+   *
+   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
+   */
+  _parseJsonOwnersFile(ownersPath) {
+    const errors = [];
+    const contents = this.localRepo.readFile(ownersPath);
+
+    let file;
+    try {
+      file = JSON5.parse(contents);
+    } catch (error) {
+      errors.push(new OwnersParserError(ownersPath, error.toString()));
+      return {errors, result: []};
+    }
+
+    return this.parseOwnersFileDefinition(ownersPath, file);
   }
 
   /**
