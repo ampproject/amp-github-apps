@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-// AMPHTML uses a custom owners bot to enforce ownership rules across its
-// codebase to ensure that all incoming pull requests are reviewed by the right
-// people. This file is an example of the supported format.
-
-// OWNERS files support JSON5 syntax (see json5.org), a more human-readable and
-// writable variant of JSON which supports comments, unquoted obeject keys,
-// single quotes, and trailing commas. In this file, "this directory" refers to
-// the directory containing the OWNERS.yaml file.
+/**
+ * @fileoverview
+ * AMPHTML uses a custom owners bot to enforce ownership rules across its
+ * codebase to ensure that all incoming pull requests are reviewed by the right
+ * people. This file is an example of the supported format.
+ * OWNERS files support JSON5 syntax (see json5.org), a more human-readable and
+ * writable variant of JSON which supports comments, unquoted obeject keys,
+ * single quotes, and trailing commas. In this file, "this directory" refers to
+ * the directory containing the OWNERS.yaml file.
+ */
 
 // All owners files must contain a single `rules` key containing a list of owners
 // rules.
@@ -102,10 +104,10 @@
     },
 
     {
-      // Filename and pattern rules may be combined with brace expansion. The 
+      // Filename and pattern rules may be combined with brace expansion. The
       // pattern parser uses
       // `[minimatch](https://www.npmjs.com/package/minimatch)`, the matching
-      // library used internally by npm. The pattern `*.{js,css}` applies to 
+      // library used internally by npm. The pattern `*.{js,css}` applies to
       // `./script.js` and `./style.css`.
       pattern: "*.{js,css}",
       owners: [{ name: "frontend" }],
