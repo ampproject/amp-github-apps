@@ -774,14 +774,14 @@ describe('owners parser', () => {
       it('parses the owners file definition', () => {
         sandbox.stub(repo, 'readFile').returns('{rules: []}');
         sandbox.stub(parser, 'parseOwnersFileDefinition').callThrough();
-        const fileParse = parser.parseOwnersFile('foo/OWNERS');
+        parser.parseOwnersFile('foo/OWNERS');
 
         sandbox.assert.calledWith(
           parser.parseOwnersFileDefinition,
           'foo/OWNERS',
-          {rules: []},
+          {rules: []}
         );
-      })
+      });
     });
   });
 
