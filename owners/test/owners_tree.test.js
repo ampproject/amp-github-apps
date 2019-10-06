@@ -30,32 +30,32 @@ const {
 
 describe('owners tree', () => {
   let tree;
-  const rootDirRule = new OwnersRule('OWNERS.yaml', [
+  const rootDirRule = new OwnersRule('OWNERS', [
     new UserOwner('root', OWNER_MODIFIER.SILENT),
   ]);
-  const childDirRule = new OwnersRule('foo/OWNERS.yaml', [
+  const childDirRule = new OwnersRule('foo/OWNERS', [
     new UserOwner('child', OWNER_MODIFIER.NOTIFY),
   ]);
-  const otherChildDirRule = new OwnersRule('biz/OWNERS.yaml', [
+  const otherChildDirRule = new OwnersRule('biz/OWNERS', [
     new UserOwner('child', OWNER_MODIFIER.SILENT),
   ]);
-  const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS.yaml', [
+  const descendantDirRule = new OwnersRule('foo/bar/baz/OWNERS', [
     new UserOwner('descendant', OWNER_MODIFIER.NOTIFY),
   ]);
-  const wildcardDirRule = new OwnersRule('shared/OWNERS.yaml', [
+  const wildcardDirRule = new OwnersRule('shared/OWNERS', [
     new WildcardOwner(),
   ]);
 
   const testerTeam = new Team(42, 'ampproject', 'testers');
   testerTeam.members.push('tester');
   const testFileRule = new PatternOwnersRule(
-    'OWNERS.yaml',
+    'OWNERS',
     [new TeamOwner(testerTeam)],
     '*.test.js'
   );
 
   const packageJsonRule = new SameDirPatternOwnersRule(
-    'OWNERS.yaml',
+    'OWNERS',
     [new UserOwner('anyone')],
     'package.json'
   );
@@ -279,7 +279,7 @@ describe('owners tree', () => {
 
     it('does not return duplicate owners', () => {
       tree.addRule(
-        new OwnersRule('OWNERS.yaml', [
+        new OwnersRule('OWNERS', [
           new UserOwner('child', OWNER_MODIFIER.NOTIFY),
         ])
       );

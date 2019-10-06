@@ -80,6 +80,36 @@ let OwnersCheckResult;
  */
 let ReviewerApprovalMap;
 
+/**
+ * A JSON owner definition.
+ *
+ * @typedef {{
+ *   name: !string,
+ *   requestReviews: ?boolean,
+ *   notify: ?boolean,
+ * }}
+ */
+let OwnerDefinition;
+
+/**
+ * A JSON owners rule definition.
+ *
+ * @typedef {{
+ *   owners: OwnerDefinition[],
+ *   pattern: ?string,
+ * }}
+ */
+let RuleDefinition;
+
+/**
+ * A JSON owners file definition.
+ *
+ * @typedef {{
+ *   rules: RuleDefinition[],
+ * }}
+ */
+let OwnersFileDefinition;
+
 module.exports = {
   FileTreeMap,
   Logger,
@@ -88,4 +118,7 @@ module.exports = {
   FileRef,
   OwnersCheckResult,
   ReviewerApprovalMap,
+  OwnerDefinition,
+  RuleDefinition,
+  OwnersFileDefinition,
 };

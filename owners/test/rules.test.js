@@ -39,7 +39,7 @@ describe('owners rules', () => {
   describe('basic directory ownership', () => {
     describe('matchesFile', () => {
       it('matches all files', () => {
-        const rule = new OwnersRule('src/OWNERS.yaml', []);
+        const rule = new OwnersRule('src/OWNERS', []);
 
         expect(rule).toMatchFile('src/foo.txt');
         expect(rule).toMatchFile('src/foo/bar.txt');
@@ -49,7 +49,7 @@ describe('owners rules', () => {
 
     describe('label', () => {
       it('is "**/*"', () => {
-        const rule = new OwnersRule('OWNERS.yaml', []);
+        const rule = new OwnersRule('OWNERS', []);
 
         expect(rule.label).toEqual('**/*');
       });
@@ -57,7 +57,7 @@ describe('owners rules', () => {
 
     describe('priority', () => {
       it('is DIRECTORY', () => {
-        const rule = new OwnersRule('OWNERS.yaml', []);
+        const rule = new OwnersRule('OWNERS', []);
 
         expect(rule.priority).toBe(RULE_PRIORITY.DIRECTORY);
       });
@@ -65,7 +65,7 @@ describe('owners rules', () => {
 
     describe('toString', () => {
       it('lists all owners', () => {
-        const rule = new OwnersRule('OWNERS.yaml', ['rcebulko', 'erwinmombay']);
+        const rule = new OwnersRule('OWNERS', ['rcebulko', 'erwinmombay']);
 
         expect(rule.toString()).toEqual('**/*: rcebulko, erwinmombay');
       });
@@ -75,13 +75,13 @@ describe('owners rules', () => {
   describe('with glob patterns', () => {
     describe('matchesFile', () => {
       it('matches literal filenames', () => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], 'package.json');
+        const rule = new PatternOwnersRule('OWNERS', [], 'package.json');
 
         expect(rule).toMatchFile('package.json');
       });
 
       it('matches glob patterns', () => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.js');
+        const rule = new PatternOwnersRule('OWNERS', [], '*.js');
 
         expect(rule).toMatchFile('main.js');
       });
@@ -92,7 +92,7 @@ describe('owners rules', () => {
         ['with space.txt', 'with space.txt'],
         ['with-hyphen.txt', 'with-hyphen.txt'],
       ])('simple file name %p matches file %p', (pattern, filePath) => {
-        expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(
+        expect(new PatternOwnersRule('OWNERS', [], pattern)).toMatchFile(
           filePath
         );
       });
@@ -102,13 +102,13 @@ describe('owners rules', () => {
         ['*.test.txt', 'file.test.txt'],
         ['package*.json', 'package.lock.json'],
       ])('pattern %p matches file %p', (pattern, filePath) => {
-        expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(
+        expect(new PatternOwnersRule('OWNERS', [], pattern)).toMatchFile(
           filePath
         );
       });
 
       it('fails for non-matching patterns', () => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.js');
+        const rule = new PatternOwnersRule('OWNERS', [], '*.js');
 
         expect(rule).not.toMatchFile('style.css');
       });
@@ -119,7 +119,7 @@ describe('owners rules', () => {
         ['package{,-lock}.json', 'package.json'],
         ['package{,.lock}.json', 'package.lock.json'],
       ])('brace-set pattern %p matches file %p', (pattern, filePath) => {
-        expect(new PatternOwnersRule('OWNERS.yaml', [], pattern)).toMatchFile(
+        expect(new PatternOwnersRule('OWNERS', [], pattern)).toMatchFile(
           filePath
         );
       });
@@ -127,7 +127,7 @@ describe('owners rules', () => {
 
     describe('label', () => {
       it('is the pattern', () => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.css');
+        const rule = new PatternOwnersRule('OWNERS', [], '*.css');
 
         expect(rule.label).toEqual('**/*.css');
       });
@@ -135,7 +135,7 @@ describe('owners rules', () => {
 
     describe('priority', () => {
       it('is RECURSIVE_PATTERN', () => {
-        const rule = new PatternOwnersRule('OWNERS.yaml', [], '*.css');
+        const rule = new PatternOwnersRule('OWNERS', [], '*.css');
 
         expect(rule.priority).toBe(RULE_PRIORITY.RECURSIVE_PATTERN);
       });
@@ -144,7 +144,7 @@ describe('owners rules', () => {
     describe('toString', () => {
       it('lists all owners for the pattern', () => {
         const rule = new PatternOwnersRule(
-          'OWNERS.yaml',
+          'OWNERS',
           ['rcebulko', 'erwinmombay'],
           '*.css'
         );
@@ -154,7 +154,7 @@ describe('owners rules', () => {
     });
 
     describe('in the same directory', () => {
-      const rule = new SameDirPatternOwnersRule('foo/OWNERS.yaml', [], '*.js');
+      const rule = new SameDirPatternOwnersRule('foo/OWNERS', [], '*.js');
 
       describe('label', () => {
         it('is the pattern in the "./" directory', () => {
@@ -183,7 +183,7 @@ describe('owners rules', () => {
 
         it('works for files and rules in the root directory', () => {
           expect(
-            new SameDirPatternOwnersRule('OWNERS.yaml', [], '*.js')
+            new SameDirPatternOwnersRule('OWNERS', [], '*.js')
           ).toMatchFile('main.js');
         });
       });

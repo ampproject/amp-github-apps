@@ -277,12 +277,12 @@ describe('notifier', () => {
 
       tree = new OwnersTree();
       tree.addRule(
-        new OwnersRule('foo/OWNERS.yaml', [
+        new OwnersRule('foo/OWNERS', [
           new UserOwner('busy_user', OWNER_MODIFIER.SILENT),
         ])
       );
       tree.addRule(
-        new OwnersRule('foo/OWNERS.yaml', [
+        new OwnersRule('foo/OWNERS', [
           new TeamOwner(busyTeam, OWNER_MODIFIER.SILENT),
         ])
       );
@@ -316,16 +316,16 @@ describe('notifier', () => {
     const relevantTeam = new Team(42, 'ampproject', 'relevant_team');
     relevantTeam.members = ['relevant_member'];
     tree.addRule(
-      new OwnersRule('foo/OWNERS.yaml', [
+      new OwnersRule('foo/OWNERS', [
         new UserOwner('relevant_user', OWNER_MODIFIER.NOTIFY),
       ])
     );
     tree.addRule(
-      new OwnersRule('bar/OWNERS.yaml', [
+      new OwnersRule('bar/OWNERS', [
         new TeamOwner(relevantTeam, OWNER_MODIFIER.NOTIFY),
       ])
     );
-    tree.addRule(new OwnersRule('baz/OWNERS.yaml', [new UserOwner('rando')]));
+    tree.addRule(new OwnersRule('baz/OWNERS', [new UserOwner('rando')]));
 
     it('includes user owners with the always-notify modifier', () => {
       const notifier = new OwnersNotifier(pr, {}, tree, [
