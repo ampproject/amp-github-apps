@@ -68,7 +68,7 @@ async function getBuildArtifactsFile(github, filename) {
 async function storeBuildArtifactsFile(github, filename, contents) {
   return await github.repos.createOrUpdateFile({
     ...getBuildArtifactsFileParams(filename),
-    message: `bundle-size: ${filename} (${contents})`,
+    message: `bundle-size: ${filename}`,
     content: Buffer.from(contents).toString('base64'),
   });
 }
@@ -629,6 +629,63 @@ module.exports = app => {
       const jsonBundleSizeText = JSON.stringify({
         'dist/v0.js': brotliBundleSize,
       });
+      await storeBuildArtifactsFile(
+        userBasedGithub,
+        jsonBundleSizeFile,
+        jsonBundleSizeText
+      );
+      app.log(
+        `Stored the new bundle size file bundle-size/${jsonBundleSizeFile} ` +
+          'the artifacts repository on GitHub'
+      );
+    } catch (error) {
+      const errorMessage =
+        `ERROR: Failed to create the bundle-size/${jsonBundleSizeFile} file ` +
+        'in the build artifacts repository on GitHub!\n' +
+        `Error message was: ${error}`;
+      app.log(errorMessage);
+      return response.status(500).end(errorMessage);
+    }
+
+    response.end();
+  });
+
+  // TODO(danielrozenberg): replace the /store with this one, once the amphtml
+  // repo is in sync with this new change.
+  v0.post('/commit/:headSha/store.json', async (request, response) => {
+    const {headSha} = request.params;
+    const {bundleSizes} = request.body;
+
+    if (request.body['token'] !== process.env.TRAVIS_PUSH_BUILD_TOKEN) {
+      return response.status(403).end('You are not Travis!');
+    }
+    if (
+      !bundleSizes ||
+      Object.values(bundleSizes).some(value => typeof value !== 'number')
+    ) {
+      return response
+        .status(400)
+        .end(
+          'POST request to /store must have a key/value object ' +
+            '(string->numeric) field "bundleSizes"'
+        );
+    }
+
+    const jsonBundleSizeFile = `${headSha}.json`;
+    try {
+      await getBuildArtifactsFile(userBasedGithub, jsonBundleSizeFile);
+      app.log(
+        `The file bundle-size/${jsonBundleSizeFile} already exists in the ` +
+          'build artifacts repository on GitHub. Skipping...'
+      );
+      return response.end();
+    } catch (unusedException) {
+      // The file was not found in the GitHub repository, so continue to
+      // create it...
+    }
+
+    try {
+      const jsonBundleSizeText = JSON.stringify(bundleSizes);
       await storeBuildArtifactsFile(
         userBasedGithub,
         jsonBundleSizeFile,
