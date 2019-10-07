@@ -1,0 +1,18 @@
+{
+  "name": "5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json",
+  "path": "bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json",
+  "sha": "1eb3d58e1a0f2c344ccdf47062bdaafb5c8c3700",
+  "size": 208,
+  "url": "https://api.github.com/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json?ref=master",
+  "html_url": "https://github.com/ampproject/amphtml-build-artifacts/blob/master/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json",
+  "git_url": "https://api.github.com/repos/ampproject/amphtml-build-artifacts/git/blobs/1eb3d58e1a0f2c344ccdf47062bdaafb5c8c3700",
+  "download_url": "https://raw.githubusercontent.com/ampproject/amphtml-build-artifacts/master/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json",
+  "type": "file",
+  "content": "eyJkaXN0L3YwLmpzIjoxMi4zNH0=",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json?ref=master",
+    "git": "https://api.github.com/repos/ampproject/amphtml-build-artifacts/git/blobs/1eb3d58e1a0f2c344ccdf47062bdaafb5c8c3700",
+    "html": "https://github.com/ampproject/amphtml-build-artifacts/blob/master/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json"
+  }
+}
