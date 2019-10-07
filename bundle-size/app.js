@@ -208,9 +208,11 @@ module.exports = app => {
     };
 
     try {
-      const baseBundleSize = parseFloat(
-        await getBuildArtifactsFile(github, `${baseSha}.br`)
+      const bundleSizesJson = JSON.parse(
+        await getBuildArtifactsFile(github, `${baseSha}.json`)
       );
+      const baseBundleSize = bundleSizesJson['dist/v0.js'];
+
       const bundleSizeDelta = bundleSize - baseBundleSize;
       const bundleSizeDeltaFormatted = formatBundleSizeDelta(bundleSizeDelta);
 

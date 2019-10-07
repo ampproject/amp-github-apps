@@ -15,8 +15,9 @@
 
 const bundleSizeApp = require('../app');
 const {dbConnect} = require('../db');
-const deepcopy = require('deepcopy');
+const fs = require('fs');
 const nock = require('nock');
+const path = require('path');
 const {Probot} = require('probot');
 const request = require('supertest');
 const {setupDb} = require('../setup-db');
@@ -33,15 +34,13 @@ jest.setTimeout(30000);
 /**
  * Get a JSON test fixture object.
  *
- * Returns a copy of the object, since modifying the object that gets returned
- * via `require` directly will cause all future calls to `require(sameFile)` to
- * return the previously modified object.
- *
  * @param {!string} name name of the JSON fixture file (without .json).
  * @return {!object} the named JSON test fixture file.
  */
 function getFixture(name) {
-  return deepcopy(require(`./fixtures/${name}`));
+  return JSON.parse(
+    fs.readFileSync(path.join(__dirname, `fixtures/${name}.json`))
+  );
 }
 
 /**
@@ -316,11 +315,11 @@ describe('bundle-size', () => {
   });
 
   test.each([
-    ['12.44KB', 'Δ -0.10KB | no approval necessary'],
-    ['12.34KB', 'Δ +0.00KB | no approval necessary'],
-    ['12.24KB', 'Δ +0.10KB | no approval necessary'],
+    [12.44, 'Δ -0.10KB | no approval necessary'],
+    [12.34, 'Δ +0.00KB | no approval necessary'],
+    [12.24, 'Δ +0.10KB | no approval necessary'],
   ])(
-    'update a check on bundle-size report (report/base = 12.34KB/%s)',
+    'update a check on bundle-size report (report/base = 12.34KB/%dKB)',
     async (baseSize, message) => {
       await db('checks').insert({
         head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
@@ -333,13 +332,15 @@ describe('bundle-size', () => {
       });
 
       const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       );
-      baseBundleSizeFixture.content = Buffer.from(baseSize).toString('base64');
+      baseBundleSizeFixture.content = Buffer.from(
+        `{"dist/v0.js":${baseSize}}`
+      ).toString('base64');
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -382,13 +383,15 @@ describe('bundle-size', () => {
       });
 
       const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       );
-      baseBundleSizeFixture.content = Buffer.from('12.00KB').toString('base64');
+      baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
+        'base64'
+      );
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -445,13 +448,15 @@ describe('bundle-size', () => {
       });
 
       const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       );
-      baseBundleSizeFixture.content = Buffer.from('12.00KB').toString('base64');
+      baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
+        'base64'
+      );
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -508,15 +513,17 @@ describe('bundle-size', () => {
       });
 
       const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       );
-      baseBundleSizeFixture.content = Buffer.from('12.00KB').toString('base64');
+      baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
+        'base64'
+      );
       const reviews = getFixture('reviews');
       reviews[0].user.login = 'aghassemi';
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -563,19 +570,21 @@ describe('bundle-size', () => {
       });
 
       const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       );
-      baseBundleSizeFixture.content = Buffer.from('12.34KB').toString('base64');
+      baseBundleSizeFixture.content = Buffer.from(
+        '{"dist/v0.js":12.34}'
+      ).toString('base64');
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
         )
         .times(2)
         .reply(404)
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -618,19 +627,21 @@ describe('bundle-size', () => {
       });
 
       const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33'
+        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       );
-      baseBundleSizeFixture.content = Buffer.from('12.23KB').toString('base64');
+      baseBundleSizeFixture.content = Buffer.from(
+        '{"dist/v0.js":12.23}'
+      ).toString('base64');
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
         )
         .times(2)
         .reply(404)
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/' +
-            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+            'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
         )
         .reply(200, baseBundleSizeFixture)
         .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
@@ -686,7 +697,7 @@ describe('bundle-size', () => {
     const nocks = nock('https://api.github.com')
       .get(
         '/repos/ampproject/amphtml-build-artifacts/contents/' +
-          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
+          'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       )
       .times(60)
       .reply(404)
@@ -810,12 +821,12 @@ describe('bundle-size', () => {
         '/repos/ampproject/amphtml-build-artifacts/contents/' +
           'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
       )
-      .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33'))
+      .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'))
       .get(
         '/repos/ampproject/amphtml-build-artifacts/contents/' +
           'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       )
-      .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33'));
+      .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'));
 
     await request(probot.server)
       .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
