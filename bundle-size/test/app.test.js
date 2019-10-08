@@ -849,8 +849,6 @@ describe('bundle-size', () => {
       });
     });
 
-    // TODO(danielrozenberg): remove all legacy code tests once the amphtml repo
-    // is in sync with the new full-json endpoint
     describe('/commit/:headSha/store', () => {
       let jsonPayload;
 
