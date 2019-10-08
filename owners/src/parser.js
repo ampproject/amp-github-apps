@@ -82,22 +82,31 @@ class OwnersParser {
   _parseOwnerDefinitionModifier(ownersPath, ownerDef) {
     let modifier = OWNER_MODIFIER.NONE;
     const errors = [];
-    const notify = ownerDef.notify === undefined ? false : ownerDef.notify;
-    const requestReviews =
-      ownerDef.requestReviews === undefined ? true : ownerDef.requestReviews;
+    const defaultOptions = {
+      notify: false,
+      requestReviews: true,
+      required: false,
+    };
+    const setOpts = Object.keys(ownerDef)
+      .filter(opt => defaultOptions[opt] !== undefined);
+    ownerDef = Object.assign(defaultOptions, ownerDef);
 
-    if (notify && !requestReviews) {
+
+    if (setOpts.length > 1) {
       errors.push(
         new OwnersParserError(
           ownersPath,
-          'Cannot specify both "notify: true" and "requestReviews: false"; ' +
-            'ignoring modifiers'
+          'Cannot specify more than one of ' +
+          `(${setOpts.join(', ')}); ` +
+          'ignoring modifiers'
         )
       );
-    } else if (notify) {
+    } else if (ownerDef.notify) {
       modifier = OWNER_MODIFIER.NOTIFY;
-    } else if (!requestReviews) {
+    } else if (!ownerDef.requestReviews) {
       modifier = OWNER_MODIFIER.SILENT;
+    } else if (ownerDef.required) {
+      modifier = OWNER_MODIFIER.REQUIRE;
     }
 
     return {errors, result: modifier};

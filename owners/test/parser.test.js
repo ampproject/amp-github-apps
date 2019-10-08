@@ -129,7 +129,7 @@ describe('owners parser', () => {
             requestReviews: false,
           });
           expect(errors[0].message).toContain(
-            'Cannot specify both "notify: true" and "requestReviews: false"'
+            'Cannot specify more than one of (notify, requestReviews)'
           );
         });
 
