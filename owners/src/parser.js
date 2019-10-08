@@ -73,6 +73,46 @@ class OwnersParser {
   }
 
   /**
+   * Parse the modifier from an owner definition.
+   *
+   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @param {!OwnerDefinition} ownerDef owners definition.
+   * @return {OwnersParserResult<OWNER_MODIFIER>} parsed owner modifier.
+   */
+  _parseOwnerDefinitionModifier(ownersPath, ownerDef) {
+    let modifier = OWNER_MODIFIER.NONE;
+    const errors = [];
+    const defaultOptions = {
+      notify: false,
+      requestReviews: true,
+      required: false,
+    };
+    const setOpts = Object.keys(ownerDef).filter(
+      opt => defaultOptions[opt] !== undefined
+    );
+    ownerDef = Object.assign(defaultOptions, ownerDef);
+
+    if (setOpts.length > 1) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          'Cannot specify more than one of ' +
+            `(${setOpts.join(', ')}); ` +
+            'ignoring modifiers'
+        )
+      );
+    } else if (ownerDef.notify) {
+      modifier = OWNER_MODIFIER.NOTIFY;
+    } else if (!ownerDef.requestReviews) {
+      modifier = OWNER_MODIFIER.SILENT;
+    } else if (ownerDef.required) {
+      modifier = OWNER_MODIFIER.REQUIRE;
+    }
+
+    return {errors, result: modifier};
+  }
+
+  /**
    * Parse an owner definition.
    *
    * @param {!string} ownersPath OWNERS.json file path (for error reporting).
@@ -117,24 +157,9 @@ class OwnersParser {
     }
 
     // Validate and determine modifier.
-    let modifier = OWNER_MODIFIER.NONE;
-    const notify = ownerDef.notify === undefined ? false : ownerDef.notify;
-    const requestReviews =
-      ownerDef.requestReviews === undefined ? true : ownerDef.requestReviews;
-
-    if (notify && !requestReviews) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          'Cannot specify both "notify: true" and "requestReviews: false"; ' +
-            'ignoring modifiers'
-        )
-      );
-    } else if (notify) {
-      modifier = OWNER_MODIFIER.NOTIFY;
-    } else if (!requestReviews) {
-      modifier = OWNER_MODIFIER.SILENT;
-    }
+    const modParse = this._parseOwnerDefinitionModifier(ownersPath, ownerDef);
+    const modifier = modParse.result;
+    errors.push(...modParse.errors);
 
     // Determine the owner from the name.
     if (ownerName.includes('/')) {
