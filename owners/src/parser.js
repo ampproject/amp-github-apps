@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-const yaml = require('yamljs');
 const JSON5 = require('json5');
 const {
   OwnersRule,
@@ -71,218 +70,6 @@ class OwnersParser {
     this.localRepo = localRepo;
     this.teamMap = teamMap;
     this.logger = logger || console;
-  }
-
-  /**
-   * Parse a single owner declaration.
-   *
-   * TODO(rcebulko): Add support for teams.
-   *
-   * @private
-   * @deprecated
-   * @param {!string} ownersPath OWNERS file path (for error reporting).
-   * @param {!string} owner owner username.
-   * @return {OwnersParserResult<Owner[]>} list of owners.
-   */
-  _legacyParseOwnersLine(ownersPath, owner) {
-    const owners = [];
-    const errors = [];
-    let modifier = OWNER_MODIFIER.NONE;
-
-    owner = owner.toLowerCase();
-
-    if (owner.startsWith('?')) {
-      modifier = OWNER_MODIFIER.SILENT;
-      owner = owner.slice(1);
-    } else if (owner.startsWith('#')) {
-      modifier = OWNER_MODIFIER.NOTIFY;
-      owner = owner.slice(1);
-    } else if (owner.startsWith('!')) {
-      modifier = OWNER_MODIFIER.REQUIRE;
-      owner = owner.slice(1);
-    }
-
-    if (owner.startsWith('@')) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Ignoring unnecessary '@' in '${owner}'`
-        )
-      );
-      owner = owner.slice(1);
-    }
-
-    if (owner.includes('/')) {
-      const team = this.teamMap[owner];
-
-      if (team) {
-        owners.push(new TeamOwner(team, modifier));
-      } else {
-        errors.push(
-          new OwnersParserError(ownersPath, `Unrecognized team: '${owner}'`)
-        );
-      }
-    } else if (owner === '*') {
-      try {
-        owners.push(new WildcardOwner(modifier));
-      } catch (error) {
-        errors.push(new OwnersParserError(ownersPath, error.message));
-        owners.push(new WildcardOwner());
-      }
-    } else {
-      owners.push(new UserOwner(owner, modifier));
-    }
-
-    return {result: owners, errors};
-  }
-
-  /**
-   * Parse a list of owners.
-   *
-   * @private
-   * @deprecated
-   * @param {!string} ownersPath OWNERS file path (for error reporting).
-   * @param {string[]} ownersList list of owners.
-   * @return {OwnersParserResult<Owner[]>} list of owners' usernames.
-   */
-  _legacyParseOwnersList(ownersPath, ownersList) {
-    const owners = [];
-    const errors = [];
-
-    ownersList.forEach(owner => {
-      const lineResult = this._legacyParseOwnersLine(ownersPath, owner);
-      owners.push(...lineResult.result);
-      errors.push(...lineResult.errors);
-    });
-
-    return {result: owners, errors};
-  }
-
-  /**
-   * Parse an owners dictionary as a pattern-based rule.
-   *
-   * Note: All YAML parsed dictionaries have a single key-value pair; a dict not
-   * matching this will not be parsed correctly.
-   *
-   * @private
-   * @deprecated
-   * @param {!string} ownersPath OWNERS file path (for error reporting).
-   * @param {!object} ownersDict dictionary with a pattern as the key and a list
-   * of owners as the value.
-   * @return {OwnersParserResult<PatternOwnersRule[]>} parsed OWNERS pattern
-   *     rule.
-   */
-  _legacyParseOwnersDict(ownersPath, ownersDict) {
-    const [[fullPattern, ownersList]] = Object.entries(ownersDict);
-    const rules = [];
-    const errors = [];
-    let patternList = [];
-
-    // TODO(rcebulko): Remove backwards-compatibility once all owners files have
-    // been updated to use brace syntax.
-    if (!fullPattern.includes('{')) {
-      patternList = fullPattern.split(/\s*,\s*/);
-    } else {
-      patternList = [fullPattern];
-    }
-
-    patternList.forEach(pattern => {
-      const owners = [];
-      const isRecursive = pattern.startsWith(GLOB_PATTERN);
-      if (isRecursive) {
-        pattern = pattern.slice(GLOB_PATTERN.length);
-      }
-
-      if (pattern.includes('/')) {
-        errors.push(
-          new OwnersParserError(
-            ownersPath,
-            `Failed to parse rule for pattern '${pattern}'; ` +
-              `directory patterns other than '${GLOB_PATTERN}' not supported`
-          )
-        );
-      } else if (typeof ownersList === 'string') {
-        const lineResult = this._legacyParseOwnersLine(ownersPath, ownersList);
-        owners.push(...lineResult.result);
-        errors.push(...lineResult.errors);
-      } else {
-        ownersList.forEach(owner => {
-          if (typeof owner === 'string') {
-            const lineResult = this._legacyParseOwnersLine(ownersPath, owner);
-            owners.push(...lineResult.result);
-            errors.push(...lineResult.errors);
-          } else {
-            errors.push(
-              new OwnersParserError(
-                ownersPath,
-                `Failed to parse owner of type ${typeof owner} for pattern ` +
-                  `rule '${pattern}'`
-              )
-            );
-          }
-        });
-      }
-
-      if (owners.length) {
-        if (isRecursive) {
-          rules.push(new PatternOwnersRule(ownersPath, owners, pattern));
-        } else {
-          rules.push(new SameDirPatternOwnersRule(ownersPath, owners, pattern));
-        }
-      }
-    });
-
-    return {result: rules, errors};
-  }
-
-  /**
-   * Parse an OWNERS file.
-   *
-   * @deprecated
-   * @param {!string} ownersPath OWNERS file path (for error reporting).
-   * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
-   */
-  _parseYamlOwnersFile(ownersPath) {
-    const contents = this.localRepo.readFile(ownersPath);
-
-    let lines;
-    try {
-      lines = yaml.parse(contents);
-    } catch (error) {
-      return {
-        result: [],
-        errors: [new OwnersParserError(ownersPath, error.toString())],
-      };
-    }
-
-    const errors = [];
-    const rules = [];
-
-    if (lines instanceof Array) {
-      const stringLines = lines.filter(line => typeof line === 'string');
-
-      const fileOwners = this._legacyParseOwnersList(ownersPath, stringLines);
-      errors.push(...fileOwners.errors);
-      if (fileOwners.result.length) {
-        rules.push(new OwnersRule(ownersPath, fileOwners.result));
-      }
-
-      const dictLines = lines.filter(line => typeof line === 'object');
-      dictLines.forEach(dict => {
-        const dictResult = this._legacyParseOwnersDict(ownersPath, dict);
-        rules.push(...dictResult.result);
-        errors.push(...dictResult.errors);
-      });
-    } else {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Failed to parse file; must be a YAML list`
-        )
-      );
-    }
-
-    return {result: rules, errors};
   }
 
   /**
@@ -501,7 +288,7 @@ class OwnersParser {
    * @param {!string} ownersPath OWNERS.json file path (for error reporting).
    * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
    */
-  _parseJsonOwnersFile(ownersPath) {
+  parseOwnersFile(ownersPath) {
     const errors = [];
     const contents = this.localRepo.readFile(ownersPath);
 
@@ -514,19 +301,6 @@ class OwnersParser {
     }
 
     return this.parseOwnersFileDefinition(ownersPath, file);
-  }
-
-  /**
-   * Parse an OWNERS file in YAML or JSON format.
-   *
-   * @param {!string} ownersPath OWNERS file path (for error reporting).
-   * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rules.
-   */
-  parseOwnersFile(ownersPath) {
-    if (ownersPath.toLowerCase().endsWith('.yaml')) {
-      return this._parseYamlOwnersFile(ownersPath);
-    }
-    return this._parseJsonOwnersFile(ownersPath);
   }
 
   /**
