@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+const {OWNER_MODIFIER} = require('./owner');
 const {ReviewerSelection} = require('./reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
@@ -98,7 +99,7 @@ class OwnersCheck {
       // approved, so we build the coverage text first.
       this.changedFilenames.forEach(filename => {
         const subtree = fileTreeMap[filename];
-        if (this._hasOwnersApproval(filename, subtree)) {
+        if (this._hasFullOwnersCoverage(filename, subtree)) {
           delete fileTreeMap[filename];
         }
       });
@@ -120,6 +121,8 @@ class OwnersCheck {
           delete fileTreeMap[filename];
         }
       });
+
+      // TODO(#516): Include missing required reviewers.
       const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
       const reviewers = reviewSuggestions.map(([reviewer, files]) => reviewer);
       const suggestionsText = this.buildReviewSuggestionsText(
@@ -148,20 +151,51 @@ class OwnersCheck {
   }
 
   /**
-   * Tests whether a file has been approved by an owner.
+   * Tests whether a file has an owner in the reviewer set.
    *
    * Must be called after `init`.
    *
    * @param {!string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @param {boolean} isApproved approval status to filter by.
-   * @return {boolean} if the file is approved.
+   * @return {boolean} if the file is reviewed.
    */
   _hasOwnersReview(filename, subtree, isApproved) {
     return Object.entries(this.reviewers)
       .filter(([username, approved]) => approved === isApproved)
       .map(([username, approved]) => username)
       .some(approver => this.tree.fileHasOwner(filename, approver));
+  }
+
+  /**
+   * Determines the set of missing required owners.
+   *
+   * Must be called after `init`.
+   *
+   * @param {!string} filename file to check.
+   * @param {!OwnersTree} subtree nearest ownership tree to file.
+   * @return {Owner[]} required owners that have not approved.
+   */
+  _missingRequiredOwners(filename, subtree) {
+    return subtree
+      .getModifiedFileOwners(filename, OWNER_MODIFIER.REQUIRE)
+      .filter(
+        owner => !owner.allUsernames.some(username => this.reviewers[username])
+      );
+  }
+
+  /**
+   * Tests whether a file has full owners coverage, including any required
+   * reviewers.
+   *
+   * Must be called after `init`.
+   *
+   * @param {!string} filename file to check.
+   * @param {!OwnersTree} subtree nearest ownership tree to file.
+   * @return {boolean} if the file has approval coverage.
+   */
+  _hasRequiredOwnersApproval(filename, subtree) {
+    return this._missingRequiredOwners(filename, subtree).length === 0;
   }
 
   /**
@@ -173,8 +207,11 @@ class OwnersCheck {
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {boolean} if the file is approved.
    */
-  _hasOwnersApproval(filename, subtree) {
-    return this._hasOwnersReview(filename, subtree, true);
+  _hasFullOwnersCoverage(filename, subtree) {
+    return (
+      this._hasOwnersReview(filename, subtree, true) &&
+      this._hasRequiredOwnersApproval(filename, subtree)
+    );
   }
 
   /**
@@ -209,13 +246,25 @@ class OwnersCheck {
         const pending = reviewers
           .filter(([username, approved]) => !approved)
           .map(([username, approved]) => username);
+        const missing = this._missingRequiredOwners(filename, subtree).map(
+          owner => owner.name
+        );
 
-        if (approving.length) {
+        if (approving.length && !missing.length) {
           return `- ${filename} _(${approving.join(', ')})_`;
         } else {
           let line = `- **[NEEDS APPROVAL]** ${filename}`;
+
+          const names = [];
           if (pending.length) {
-            line += ` _(requested: ${pending.join(', ')})_`;
+            names.push(`requested: ${pending.join(', ')}`);
+          }
+          if (missing.length) {
+            names.push(`required: ${missing.join(', ')}`);
+          }
+
+          if (names.length) {
+            line += ` _(${names.join('; ')})_`;
           }
           return line;
         }
