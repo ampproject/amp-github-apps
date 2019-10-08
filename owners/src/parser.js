@@ -301,7 +301,7 @@ class OwnersParser {
         try {
           rules.push(
             new ReviewerSetRule(ownersPath, [new TeamOwner(reviewerTeam)])
-          )
+          );
         } catch (error) {
           errors.push(new OwnersParserError(ownersPath, error.message));
         }
@@ -311,7 +311,7 @@ class OwnersParser {
         new OwnersParserError(
           ownersPath,
           'Expected "reviewerTeam" to be a string; ' +
-          `got ${typeof fileDef.reviewerTeam}`
+            `got ${typeof fileDef.reviewerTeam}`
         )
       );
     }
