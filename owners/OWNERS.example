@@ -128,11 +128,19 @@
       pattern: "*.{js,css}",
       owners: [{ name: "frontend" }],
     },
-  ]
+  ],
+
+  // The root-level owners file--and ONLY the root-level owners file--may
+  // specify an optional `reviewerTeam` property, providing the name of a GitHub
+  // team. If present, the owners check will require that at least one member of
+  // this team has given approval. It is possible that one reviewer is both a
+  // member of this reviewer team and provides owners coverage.
+  reviewerTeam: 'ampproject/reviewers-amphtml'
 }
 
 // The result of parsing this file would be a tree with these rules:
 //
+// Reviewers: ampproject/reviewers-amphtml [members...]
 // **/*: someuser, dontdothis, ampproject/wg-cool-team [members...],
 //       dvoytenko (never notify), rcebulko (always notify), rando
 // ./{package.json}: packager

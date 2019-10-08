@@ -19,6 +19,7 @@ const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
+  ReviewerSetRule,
 } = require('./rules');
 const {OwnersTree} = require('./owners_tree');
 const {
@@ -165,14 +166,13 @@ class OwnersParser {
     if (ownerName.includes('/')) {
       const team = this.teamMap[ownerName];
 
-      if (team) {
-        return {errors, result: new TeamOwner(team, modifier)};
-      } else {
+      if (!team) {
         errors.push(
           new OwnersParserError(ownersPath, `Unrecognized team: '${ownerName}'`)
         );
+        return {errors};
       }
-      return {errors};
+      return {errors, result: new TeamOwner(team, modifier)};
     }
 
     if (ownerName === '*') {
@@ -286,6 +286,35 @@ class OwnersParser {
   parseOwnersFileDefinition(ownersPath, fileDef) {
     const rules = [];
     const errors = [];
+
+    if (typeof fileDef.reviewerTeam === 'string') {
+      const reviewerTeam = this.teamMap[fileDef.reviewerTeam];
+
+      if (!reviewerTeam) {
+        errors.push(
+          new OwnersParserError(
+            ownersPath,
+            `Unrecognized team: '${fileDef.reviewerTeam}`
+          )
+        );
+      } else {
+        try {
+          rules.push(
+            new ReviewerSetRule(ownersPath, [new TeamOwner(reviewerTeam)])
+          );
+        } catch (error) {
+          errors.push(new OwnersParserError(ownersPath, error.message));
+        }
+      }
+    } else if (fileDef.reviewerTeam !== undefined) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          'Expected "reviewerTeam" to be a string; ' +
+            `got ${typeof fileDef.reviewerTeam}`
+        )
+      );
+    }
 
     if (fileDef.rules instanceof Array) {
       fileDef.rules.forEach(ruleDef => {

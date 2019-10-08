@@ -31,6 +31,7 @@ const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
+  ReviewerSetRule,
 } = require('../src/rules');
 
 const EXAMPLE_FILE_PATH = path.resolve(__dirname, '../OWNERS.example');
@@ -57,6 +58,7 @@ describe('owners parser', () => {
   const wgCool = new Team(1, 'ampproject', 'wg-cool-team');
   const wgCaching = new Team(2, 'ampproject', 'wg-caching');
   const wgInfra = new Team(3, 'ampproject', 'wg-infra');
+  const reviewerTeam = new Team(0, 'ampproject', 'reviewers-amphtml');
 
   beforeEach(() => {
     myTeam = new Team(1337, 'ampproject', 'my_team');
@@ -68,6 +70,7 @@ describe('owners parser', () => {
       'ampproject/wg-cool-team': wgCool,
       'ampproject/wg-caching': wgCaching,
       'ampproject/wg-infra': wgInfra,
+      'ampproject/reviewers-amphtml': reviewerTeam,
     });
 
     sandbox.stub(repo, 'getAbsolutePath').callsFake(relativePath => {
@@ -363,12 +366,20 @@ describe('owners parser', () => {
 
         errors = fileParse.errors;
         Object.assign(rules, {
-          basic: fileParse.result[0],
-          filename: fileParse.result[1],
-          pattern: fileParse.result[2],
-          recursive: fileParse.result[3],
-          braces: fileParse.result[4],
+          reviewerSet: fileParse.result[0],
+          basic: fileParse.result[1],
+          filename: fileParse.result[2],
+          pattern: fileParse.result[3],
+          recursive: fileParse.result[4],
+          braces: fileParse.result[5],
         });
+      });
+
+      it('parses the reviewer team', () => {
+        const rule = rules.reviewerSet;
+        expect(rule.owners.map(owner => owner.name)).toEqual([
+          'ampproject/reviewers-amphtml',
+        ]);
       });
 
       it('parses basic owner rules', () => {
@@ -446,6 +457,66 @@ describe('owners parser', () => {
         expect(rule.matchesFile('main.js')).toBe(true);
         expect(rule.matchesFile('main.html')).toBe(false);
         expect(rule.owners[0].name).toEqual('frontend');
+      });
+    });
+
+    describe('reviewer team', () => {
+      describe('in the repository root OWNERS file', () => {
+        it('records the reviewer set from "reviewerTeam', () => {
+          const fileDef = {
+            reviewerTeam: 'ampproject/reviewers-amphtml',
+            rules: [],
+          };
+          const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
+
+          expect(result[0]).toEqual(
+            new ReviewerSetRule('OWNERS', [new TeamOwner(reviewerTeam)])
+          );
+        });
+      });
+
+      describe('specified outside the repository root OWNERS file', () => {
+        const fileDef = {
+          reviewerTeam: 'ampproject/reviewers-amphtml',
+          rules: [],
+        };
+
+        it('reports an error', () => {
+          const {errors} = parser.parseOwnersFileDefinition(
+            'src/OWNERS',
+            fileDef
+          );
+          expect(errors[0].message).toEqual(
+            'A reviewer team rule may only be specified at the repository root'
+          );
+        });
+
+        it('does not produce a reviewer set rule', () => {
+          const {result} = parser.parseOwnersFileDefinition(
+            'src/OWNERS',
+            fileDef
+          );
+          expect(result.length).toEqual(0);
+        });
+      });
+
+      describe('for a non-string "reviewerTeam" property', () => {
+        const fileDef = {
+          reviewerTeam: {name: 'ampproject/reviewers-amphtml'},
+          rules: [],
+        };
+
+        it('reports an error', () => {
+          const {errors} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
+          expect(errors[0].message).toEqual(
+            'Expected "reviewerTeam" to be a string; got object'
+          );
+        });
+
+        it('does not produce a reviewer set rule', () => {
+          const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
+          expect(result.length).toEqual(0);
+        });
       });
     });
   });
