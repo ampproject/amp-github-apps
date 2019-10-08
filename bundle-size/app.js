@@ -264,13 +264,13 @@ module.exports = app => {
     } catch (error) {
       const partialHeadSha = check.head_sha.substr(0, 7);
       const partialBaseSha = baseSha.substr(0, 7);
-      app.log(
+      app.log.error(
         'ERROR: Failed to retrieve the bundle size of ' +
           `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
           `point ${partialBaseSha} from GitHub: ${error}`
       );
       if (lastAttempt) {
-        app.log('No more retries left. Reporting failure');
+        app.log.warn('No more retries left. Reporting failure');
         Object.assign(updatedCheckOptions, {
           conclusion: 'action_required',
           output: {
@@ -338,11 +338,11 @@ module.exports = app => {
         ...pullRequest,
       });
     } catch (error) {
-      app.log(
+      app.log.error(
         'ERROR: Failed to add a reviewer to pull request ' +
           `${pullRequest.pull_number}. Skipping...`
       );
-      app.log(`Error message: ${error}`);
+      app.log.error(`Error message: ${error}`);
       throw error;
     }
   }
@@ -482,7 +482,9 @@ module.exports = app => {
       'TRAVIS_IP_ADDRESSES' in process.env &&
       !process.env['TRAVIS_IP_ADDRESSES'].includes(request.ip)
     ) {
-      app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
+      app.log.warn(
+        `Refused a request to ${request.originalUrl} from ${request.ip}`
+      );
       response.status(403).end('You are not Travis!');
     } else {
       next();
@@ -607,7 +609,7 @@ module.exports = app => {
           `ERROR: Failed to create the bundle-size/${bundleSizeFile} file in ` +
           'the build artifacts repository on GitHub!\n' +
           `Error message was: ${error}`;
-        app.log(errorMessage);
+        app.log.error(errorMessage);
         return response.status(500).end(errorMessage);
       }
     }
@@ -643,7 +645,7 @@ module.exports = app => {
         `ERROR: Failed to create the bundle-size/${jsonBundleSizeFile} file ` +
         'in the build artifacts repository on GitHub!\n' +
         `Error message was: ${error}`;
-      app.log(errorMessage);
+      app.log.error(errorMessage);
       return response.status(500).end(errorMessage);
     }
 
@@ -700,7 +702,7 @@ module.exports = app => {
         `ERROR: Failed to create the bundle-size/${jsonBundleSizeFile} file ` +
         'in the build artifacts repository on GitHub!\n' +
         `Error message was: ${error}`;
-      app.log(errorMessage);
+      app.log.error(errorMessage);
       return response.status(500).end(errorMessage);
     }
 
