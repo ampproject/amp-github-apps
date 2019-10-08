@@ -284,7 +284,7 @@ describe('owners check', () => {
       it('fails if required user owners are pending approval', () => {
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new UserOwner('extra_reviewerr', OWNER_MODIFIER.REQUIRE),
+            new UserOwner('extra_reviewer', OWNER_MODIFIER.REQUIRE),
           ])
         );
         expect(
