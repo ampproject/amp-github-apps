@@ -241,13 +241,24 @@ class OwnersCheck {
         const pending = reviewers
           .filter(([username, approved]) => !approved)
           .map(([username, approved]) => username);
+        const missing = this._missingRequiredOwners(filename, subtree)
+          .map(owner => owner.name);
 
-        if (approving.length) {
+        if (approving.length && !missing.length) {
           return `- ${filename} _(${approving.join(', ')})_`;
         } else {
           let line = `- **[NEEDS APPROVAL]** ${filename}`;
+
+          let names = [];
           if (pending.length) {
-            line += ` _(requested: ${pending.join(', ')})_`;
+            names.push(`requested: ${pending.join(', ')}`);
+          }
+          if (missing.length) {
+            names.push(`required: ${missing.join(', ')}`);
+          }
+
+          if (names.length) {
+            line += ` _(${names.join('; ')})_`
           }
           return line;
         }
