@@ -20,8 +20,7 @@
     "json5": "2.1.1",
     "minimatch": "3.0.4",
     "probot": "7.5.0",
-    "sleep-promise": "8.0.1",
-    "yamljs": "0.3.0"
+    "sleep-promise": "8.0.1"
   },
   "devDependencies": {
     "jest": "23.6.0",
