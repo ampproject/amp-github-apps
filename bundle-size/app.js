@@ -669,7 +669,7 @@ module.exports = app => {
         .status(400)
         .end(
           'POST request to /store must have a key/value object ' +
-            '(string->numeric) field "bundleSizes"'
+            'Map<string, number> field "bundleSizes"'
         );
     }
 
