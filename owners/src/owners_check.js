@@ -98,7 +98,7 @@ class OwnersCheck {
       // approved, so we build the coverage text first.
       this.changedFilenames.forEach(filename => {
         const subtree = fileTreeMap[filename];
-        if (this._hasOwnersApproval(filename, subtree)) {
+        if (this._hasFullOwnersCoverage(filename, subtree)) {
           delete fileTreeMap[filename];
         }
       });
@@ -148,20 +148,34 @@ class OwnersCheck {
   }
 
   /**
-   * Tests whether a file has been approved by an owner.
+   * Tests whether a file has an owner in the reviewer set.
    *
    * Must be called after `init`.
    *
    * @param {!string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @param {boolean} isApproved approval status to filter by.
-   * @return {boolean} if the file is approved.
+   * @return {boolean} if the file is reviewed.
    */
   _hasOwnersReview(filename, subtree, isApproved) {
     return Object.entries(this.reviewers)
       .filter(([username, approved]) => approved === isApproved)
       .map(([username, approved]) => username)
       .some(approver => this.tree.fileHasOwner(filename, approver));
+  }
+
+  /**
+   * Tests whether a file has full owners coverage, including any required
+   * reviewers.
+   *
+   * Must be called after `init`.
+   *
+   * @param {!string} filename file to check.
+   * @param {!OwnersTree} subtree nearest ownership tree to file.
+   * @return {boolean} if the file has approval coverage.
+   */
+  _hasRequiredOwnersApproval(filename, subtree) {
+    return true;
   }
 
   /**
@@ -173,8 +187,9 @@ class OwnersCheck {
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {boolean} if the file is approved.
    */
-  _hasOwnersApproval(filename, subtree) {
-    return this._hasOwnersReview(filename, subtree, true);
+  _hasFullOwnersCoverage(filename, subtree) {
+    return this._hasOwnersReview(filename, subtree, true) &&
+      this._hasRequiredOwnersApproval(filename, subtree);
   }
 
   /**

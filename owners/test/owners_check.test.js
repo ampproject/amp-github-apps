@@ -257,22 +257,22 @@ describe('owners check', () => {
     });
   });
 
-  describe('hasOwnersApproval', () => {
+  describe('hasFullOwnersCoverage', () => {
     it('returns true if any approver is an owner of the file', () => {
       expect(
-        ownersCheck._hasOwnersApproval(
+        ownersCheck._hasFullOwnersCoverage(
           'foo/test.js',
           ownersCheck.tree.atPath('foo/test.js')
         )
       ).toBe(true);
       expect(
-        ownersCheck._hasOwnersApproval(
+        ownersCheck._hasFullOwnersCoverage(
           'bar/baz/file.txt',
           ownersCheck.tree.atPath('bar/baz/file.txt')
         )
       ).toBe(true);
       expect(
-        ownersCheck._hasOwnersApproval(
+        ownersCheck._hasFullOwnersCoverage(
           'buzz/README.md',
           ownersCheck.tree.atPath('buzz/README.md')
         )
@@ -281,13 +281,13 @@ describe('owners check', () => {
 
     it('returns false if no owner has given approval', () => {
       expect(
-        ownersCheck._hasOwnersApproval(
+        ownersCheck._hasFullOwnersCoverage(
           'main.js',
           ownersCheck.tree.atPath('main.js')
         )
       ).toBe(false);
       expect(
-        ownersCheck._hasOwnersApproval(
+        ownersCheck._hasFullOwnersCoverage(
           'baz/README.md',
           ownersCheck.tree.atPath('baz/README.md')
         )
@@ -296,7 +296,7 @@ describe('owners check', () => {
 
     it('ignores reviewers that have not yet approved', () => {
       expect(
-        ownersCheck._hasOwnersApproval(
+        ownersCheck._hasFullOwnersCoverage(
           'extra/script.js',
           ownersCheck.tree.atPath('extra/script.js')
         )
