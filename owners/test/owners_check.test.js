@@ -579,4 +579,20 @@ describe('owners check', () => {
       );
     });
   });
+
+  describe('buildReviewerSetText', () => {
+    it('displays review suggestions', () => {
+      const team = new Team(0, 'ampproject', 'my_team');
+      team.members.push('someone');
+      const reviewers = [
+        new UserOwner('rcebulko'),
+        new TeamOwner(team),
+      ];
+
+      expect(ownersCheck.buildReviewerSetText(reviewers)).toEqual(
+        'All PRs need approval from at least one member of the reviewer set: ' +
+        'rcebulko, ampproject/my_team [someone]'
+      );
+    });
+  });
 });

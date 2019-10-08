@@ -307,6 +307,17 @@ class OwnersCheck {
 
     return ['### Suggested Reviewers', ...suggestionsText].join('\n\n');
   }
+
+  /**
+   * Build the check-run comment describing the need for a reviewer approval.
+   *
+   * @param {Owner[]} reviewers list of reviewer owners.
+   * @return {string} explanation of reviewer set, if present.
+   */
+  buildReviewerSetText(reviewers) {
+    return 'All PRs need approval from at least one member of the reviewer ' +
+      `set: ${reviewers.join(', ')}`;
+  }
 }
 
 module.exports = {
