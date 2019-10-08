@@ -486,6 +486,11 @@ describe('owners check', () => {
     let coverageText;
 
     beforeEach(() => {
+      ownersTree.addRule(
+        new OwnersRule('foo/required/OWNERS', [
+          new UserOwner('required_reviewer', OWNER_MODIFIER.REQUIRE)
+        ])
+      );
       const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
         ownersCheck.changedFilenames
       );
@@ -508,6 +513,14 @@ describe('owners check', () => {
       expect(coverageText).toContain('### Current Coverage');
       expect(coverageText).toContain(
         '- **[NEEDS APPROVAL]** extra/script.js _(requested: extra_reviewer)_'
+      );
+    });
+
+    it('shows missing required', () => {
+      expect(coverageText).toContain('### Current Coverage');
+      expect(coverageText).toContain(
+        '- **[NEEDS APPROVAL]** foo/required/info.html ' +
+        '_(required: required_reviewer)_'
       );
     });
   });
