@@ -121,6 +121,8 @@ class OwnersCheck {
           delete fileTreeMap[filename];
         }
       });
+
+      // TODO(#516): Include missing required reviewers.
       const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
       const reviewers = reviewSuggestions.map(([reviewer, files]) => reviewer);
       const suggestionsText = this.buildReviewSuggestionsText(
