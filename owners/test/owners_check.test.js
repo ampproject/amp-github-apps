@@ -57,6 +57,8 @@ describe('owners check', () => {
   const sandbox = sinon.createSandbox();
   let ownersTree;
   let ownersCheck;
+  let reviewerTeam;
+  let reviewerSetRule;
 
   beforeEach(() => {
     ownersTree = new OwnersTree();
@@ -70,6 +72,11 @@ describe('owners check', () => {
       new OwnersRule('buzz/OWNERS', [new UserOwner('the_author')]),
       new OwnersRule('extra/OWNERS', [new UserOwner('extra_reviewer')]),
     ].forEach(rule => ownersTree.addRule(rule));
+
+    reviewerTeam = new Team(0, 'ampproject', 'reviewers-amphtml');
+    reviewerSetRule = new ReviewerSetRule('OWNERS', [
+      new TeamOwner(reviewerTeam),
+    ]);
 
     ownersCheck = new OwnersCheck(
       ownersTree,
@@ -164,43 +171,73 @@ describe('owners check', () => {
         expect(checkRun.text).toContain('%% COVERAGE INFO %%');
       });
 
-      describe('for a fully-approved PR', () => {
+      describe('for a PR with owners coverage', () => {
         beforeEach(() => {
           sandbox.stub(OwnersTree.prototype, 'fileHasOwner').returns(true);
         });
 
-        it('has a success conclusion', () => {
-          const {checkRun} = ownersCheck.run();
+        describe('without approval from a reviewer team member', () => {
+          beforeEach(() => {
+            ownersTree.addRule(reviewerSetRule);
+          });
 
-          expect(checkRun.json.conclusion).toEqual('success');
+          it('has an action-required conclusion', () => {
+            const {checkRun} = ownersCheck.run();
+            expect(checkRun.json.conclusion).toEqual('action_required');
+          });
+
+          it('has a failing summary', () => {
+            const {checkRun} = ownersCheck.run();
+            expect(checkRun.summary).toEqual(
+              'Missing review from a member of the reviewer set'
+            );
+          });
+
+          it('contains the reviewer set in the output', () => {
+            sandbox
+              .stub(OwnersCheck.prototype, 'buildReviewerSetText')
+              .returns('%% REVIEWER SET %%');
+            const {checkRun} = ownersCheck.run();
+            expect(checkRun.text).toContain('%% REVIEWER SET %%');
+          });
+
+          it('returns no reviewers to add', () => {
+            // TODO(rcebulko): Integrate into reviewer selection and suggest a
+            // reviewer if possible.
+            const {reviewers} = ownersCheck.run();
+            expect(reviewers).toEqual([]);
+          });
         });
 
-        it('has a passing summary', () => {
-          const {checkRun} = ownersCheck.run();
+        describe('with approval from a reviewer team member', () => {
+          it('has a success conclusion', () => {
+            const {checkRun} = ownersCheck.run();
+            expect(checkRun.json.conclusion).toEqual('success');
+          });
 
-          expect(checkRun.summary).toEqual(
-            'All files in this PR have OWNERS approval'
-          );
-        });
+          it('has a passing summary', () => {
+            const {checkRun} = ownersCheck.run();
+            expect(checkRun.summary).toEqual(
+              'All files in this PR have OWNERS approval'
+            );
+          });
 
-        it('does not run reviewer selection', () => {
-          sandbox.stub(ReviewerSelection, 'pickReviews');
-          ownersCheck.run();
+          it('does not run reviewer selection', () => {
+            sandbox.stub(ReviewerSelection, 'pickReviews');
+            ownersCheck.run();
+            sandbox.assert.notCalled(ReviewerSelection.pickReviews);
+          });
 
-          sandbox.assert.notCalled(ReviewerSelection.pickReviews);
-        });
+          it('does output review suggestions', () => {
+            sandbox.stub(OwnersCheck.prototype, 'buildReviewSuggestionsText');
+            ownersCheck.run();
+            sandbox.assert.notCalled(ownersCheck.buildReviewSuggestionsText);
+          });
 
-        it('does output review suggestions', () => {
-          sandbox.stub(OwnersCheck.prototype, 'buildReviewSuggestionsText');
-          ownersCheck.run();
-
-          sandbox.assert.notCalled(ownersCheck.buildReviewSuggestionsText);
-        });
-
-        it('returns no reviewers to add', () => {
-          const {reviewers} = ownersCheck.run();
-
-          expect(reviewers).toEqual([]);
+          it('returns no reviewers to add', () => {
+            const {reviewers} = ownersCheck.run();
+            expect(reviewers).toEqual([]);
+          });
         });
       });
 
@@ -482,16 +519,6 @@ describe('owners check', () => {
   });
 
   describe('prHasReviewerSetApproval', () => {
-    let reviewerTeam;
-    let reviewerSetRule;
-
-    beforeEach(() => {
-      reviewerTeam = new Team(0, 'ampproject', 'reviewers-amphtml');
-      reviewerSetRule = new ReviewerSetRule('OWNERS', [
-        new TeamOwner(reviewerTeam),
-      ]);
-    });
-
     it('returns true if there is no reviewer set', () => {
       expect(ownersCheck._prHasReviewerSetApproval()).toBe(true);
     });

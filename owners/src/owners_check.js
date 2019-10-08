@@ -103,14 +103,28 @@ class OwnersCheck {
           delete fileTreeMap[filename];
         }
       });
-      const passing = !Object.keys(fileTreeMap).length;
+      const prHasFullOwnersCoverage = !Object.keys(fileTreeMap).length;
+      const prHasReviewerSetApproval = this._prHasReviewerSetApproval();
 
-      if (passing) {
+      if (prHasFullOwnersCoverage && prHasReviewerSetApproval) {
         return {
           checkRun: new CheckRun(
             CheckRunConclusion.SUCCESS,
             'All files in this PR have OWNERS approval',
             coverageText
+          ),
+          reviewers: [],
+        };
+      } else if (prHasFullOwnersCoverage) {
+        const reviewerSetText = this.buildReviewerSetText(
+          this.tree.reviewerSetRule.owners
+        );
+
+        return {
+          checkRun: new CheckRun(
+            CheckRunConclusion.ACTION_REQUIRED,
+            'Missing review from a member of the reviewer set',
+            `${reviewerSetText}\n\n${coverageText}`
           ),
           reviewers: [],
         };
