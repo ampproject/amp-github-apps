@@ -137,7 +137,7 @@ describe('owners parser', () => {
           const {result} = parser._parseOwnerDefinition('', {
             name: 'me',
             notify: true,
-            requestReviews: false,
+            required: true,
           });
           expect(result.modifier).toBe(OWNER_MODIFIER.NONE);
         });
@@ -162,6 +162,14 @@ describe('owners parser', () => {
           requestReviews: false,
         });
         expect(result.modifier).toEqual(OWNER_MODIFIER.SILENT);
+      });
+
+      it('selects require-review modifier when "required" is true', () => {
+        const {result} = parser._parseOwnerDefinition('', {
+          name: 'me',
+          required: true,
+        });
+        expect(result.modifier).toEqual(OWNER_MODIFIER.REQUIRE);
       });
     });
 
