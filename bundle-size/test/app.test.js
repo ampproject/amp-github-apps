@@ -1092,7 +1092,7 @@ describe('bundle-size', () => {
           .set('Accept', 'application/json')
           .expect(
             400,
-            'POST request to /store must have a key/value object (string->numeric) field "bundleSizes"'
+            'POST request to /store must have a key/value object Map<string, number> field "bundleSizes"'
           );
       });
 
@@ -1108,7 +1108,7 @@ describe('bundle-size', () => {
           .set('Accept', 'application/json')
           .expect(
             400,
-            'POST request to /store must have a key/value object (string->numeric) field "bundleSizes"'
+            'POST request to /store must have a key/value object Map<string, number> field "bundleSizes"'
           );
       });
 
