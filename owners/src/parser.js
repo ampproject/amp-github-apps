@@ -87,18 +87,18 @@ class OwnersParser {
       requestReviews: true,
       required: false,
     };
-    const setOpts = Object.keys(ownerDef)
-      .filter(opt => defaultOptions[opt] !== undefined);
+    const setOpts = Object.keys(ownerDef).filter(
+      opt => defaultOptions[opt] !== undefined
+    );
     ownerDef = Object.assign(defaultOptions, ownerDef);
-
 
     if (setOpts.length > 1) {
       errors.push(
         new OwnersParserError(
           ownersPath,
           'Cannot specify more than one of ' +
-          `(${setOpts.join(', ')}); ` +
-          'ignoring modifiers'
+            `(${setOpts.join(', ')}); ` +
+            'ignoring modifiers'
         )
       );
     } else if (ownerDef.notify) {
