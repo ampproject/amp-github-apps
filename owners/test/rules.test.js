@@ -18,6 +18,7 @@ const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
+  ReviewerSetRule,
   RULE_PRIORITY,
 } = require('../src/rules');
 
@@ -186,6 +187,42 @@ describe('owners rules', () => {
             new SameDirPatternOwnersRule('OWNERS', [], '*.js')
           ).toMatchFile('main.js');
         });
+      });
+    });
+  });
+
+  describe('reviewer set', () => {
+    describe('constructor', () => {
+      it('throws an error in non-root owners files', () => {
+        expect(() => new ReviewerSetRule('src/OWNERS', [])).toThrow(
+          'A reviewer team rule may only be specified at the repository root'
+        );
+      });
+    });
+
+    describe('matchesFile', () => {
+      it('matches all files', () => {
+        const rule = new ReviewerSetRule('OWNERS', []);
+
+        expect(rule).toMatchFile('src/foo.txt');
+        expect(rule).toMatchFile('src/foo/bar.txt');
+        expect(rule).toMatchFile('src/foo/bar/baz.txt');
+      });
+    });
+
+    describe('label', () => {
+      it('is "Reviewers"', () => {
+        const rule = new ReviewerSetRule('OWNERS', []);
+
+        expect(rule.label).toEqual('Reviewers');
+      });
+    });
+
+    describe('toString', () => {
+      it('lists all owners', () => {
+        const rule = new ReviewerSetRule('OWNERS', ['rcebulko', 'erwinmombay']);
+
+        expect(rule.toString()).toEqual('Reviewers: rcebulko, erwinmombay');
       });
     });
   });

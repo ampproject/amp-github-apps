@@ -15,6 +15,7 @@
  */
 
 const path = require('path');
+const {ReviewerSetRule} = require('./rules');
 
 /**
  * A tree of ownership keyed by directory.
@@ -34,6 +35,7 @@ class OwnersTree {
     this.depth = this.isRoot ? 0 : this.parent.depth + 1;
 
     this.rules = [];
+    this.reviewerSetRule = new ReviewerSetRule('OWNERS');
     this.children = {};
   }
 
@@ -58,7 +60,12 @@ class OwnersTree {
    */
   addRule(rule) {
     if (rule.dirPath === this.dirPath) {
-      this.rules.push(rule);
+      if (rule instanceof ReviewerSetRule) {
+        this.reviewerSetRule = rule;
+      } else {
+        this.rules.push(rule);
+      }
+
       return this;
     }
 

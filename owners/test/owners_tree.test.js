@@ -26,6 +26,7 @@ const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
+  ReviewerSetRule,
 } = require('../src/rules');
 
 describe('owners tree', () => {
@@ -91,6 +92,16 @@ describe('owners tree', () => {
       const subtree = tree.addRule(descendantDirRule);
 
       expect(subtree.dirPath).toEqual('foo/bar/baz');
+    });
+
+    it('saves a reviewer set rule', () => {
+      const reviewerSetRule = new ReviewerSetRule('OWNERS', [
+        new UserOwner('rcebulko'),
+      ]);
+      tree.addRule(reviewerSetRule);
+
+      expect(tree.rules).not.toContain(reviewerSetRule);
+      expect(tree.reviewerSetRule).toEqual(reviewerSetRule);
     });
   });
 

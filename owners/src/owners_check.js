@@ -103,14 +103,28 @@ class OwnersCheck {
           delete fileTreeMap[filename];
         }
       });
-      const passing = !Object.keys(fileTreeMap).length;
+      const prHasFullOwnersCoverage = !Object.keys(fileTreeMap).length;
+      const prHasReviewerSetApproval = this._prHasReviewerSetApproval();
 
-      if (passing) {
+      if (prHasFullOwnersCoverage && prHasReviewerSetApproval) {
         return {
           checkRun: new CheckRun(
             CheckRunConclusion.SUCCESS,
             'All files in this PR have OWNERS approval',
             coverageText
+          ),
+          reviewers: [],
+        };
+      } else if (prHasFullOwnersCoverage) {
+        const reviewerSetText = this.buildReviewerSetText(
+          this.tree.reviewerSetRule.owners
+        );
+
+        return {
+          checkRun: new CheckRun(
+            CheckRunConclusion.ACTION_REQUIRED,
+            'Missing review from a member of the reviewer set',
+            `${reviewerSetText}\n\n${coverageText}`
           ),
           reviewers: [],
         };
@@ -228,6 +242,22 @@ class OwnersCheck {
   }
 
   /**
+   * Tests whether the PR has been approved by a member of the reviewer set, if
+   * present.
+   *
+   * Must be called after `init`.
+   *
+   * @return {boolean} if the PR has reviewer approval.
+   */
+  _prHasReviewerSetApproval() {
+    return Object.entries(this.reviewers)
+      .filter(([username, approved]) => approved)
+      .map(([username]) => username)
+      .some(username =>
+        this.tree.reviewerSetRule.owners.some(owner => owner.includes(username))
+      );
+  }
+  /**
    * Build the check-run comment describing current approval coverage.
    *
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
@@ -290,6 +320,19 @@ class OwnersCheck {
     );
 
     return ['### Suggested Reviewers', ...suggestionsText].join('\n\n');
+  }
+
+  /**
+   * Build the check-run comment describing the need for a reviewer approval.
+   *
+   * @param {Owner[]} reviewers list of reviewer owners.
+   * @return {string} explanation of reviewer set, if present.
+   */
+  buildReviewerSetText(reviewers) {
+    return (
+      'All PRs need approval from at least one member of the reviewer ' +
+      `set: ${reviewers.join(', ')}`
+    );
   }
 }
 

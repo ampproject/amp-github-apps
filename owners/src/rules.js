@@ -16,6 +16,7 @@
 
 const path = require('path');
 const minimatch = require('minimatch');
+const {WildcardOwner} = require('./owner');
 
 /**
  * The priority level for a rule.
@@ -42,7 +43,7 @@ class OwnersRule {
    * any reviewer.
    *
    * @param {!string} ownersPath path to OWNERS file.
-   * @param {string[]} owners list of GitHub usernames of owners.
+   * @param {Owner[]} owners list of owners.
    */
   constructor(ownersPath, owners) {
     this.filePath = ownersPath;
@@ -98,7 +99,7 @@ class PatternOwnersRule extends OwnersRule {
    * Constructor.
    *
    * @param {!string} ownersPath path to OWNERS file.
-   * @param {string[]} owners list of GitHub usernames of owners.
+   * @param {Owner[]} owners list of owners.
    * @param {!string} pattern filename/type pattern.
    */
   constructor(ownersPath, owners, pattern) {
@@ -143,7 +144,7 @@ class SameDirPatternOwnersRule extends PatternOwnersRule {
    * Constructor.
    *
    * @param {!string} ownersPath path to OWNERS file.
-   * @param {string[]} owners list of GitHub usernames of owners.
+   * @param {Owner[]} owners list of owners.
    * @param {!string} pattern filename/type pattern.
    */
   constructor(ownersPath, owners, pattern) {
@@ -173,9 +174,44 @@ class SameDirPatternOwnersRule extends PatternOwnersRule {
   }
 }
 
+/**
+ * A rule which, if present at the root of the ownership tree, requires at least
+ * one approving review on any PR regardless of the files it contains.
+ */
+class ReviewerSetRule extends OwnersRule {
+  /**
+   * Constructor.
+   *
+   * @param {!string} ownersPath path to OWNERS file.
+   * @param {Owner[]=} owners list of owners (defaults to a wildcard owner).
+   */
+  constructor(ownersPath, owners) {
+    if (!owners) {
+      owners = [new WildcardOwner()];
+    }
+    super(ownersPath, owners);
+
+    if (this.dirPath !== '.') {
+      throw new Error(
+        'A reviewer team rule may only be specified at the repository root'
+      );
+    }
+  }
+
+  /**
+   * The label to use when describing the rule.
+   *
+   * @return {string} the label for the rule.
+   */
+  get label() {
+    return 'Reviewers';
+  }
+}
+
 module.exports = {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
+  ReviewerSetRule,
   RULE_PRIORITY,
 };
