@@ -228,6 +228,24 @@ class OwnersCheck {
   }
 
   /**
+   * Tests whether the PR has been approved by a member of the reviewer set, if
+   * present.
+   *
+   * Must be called after `init`.
+   *
+   * @return {boolean} if the PR has reviewer approval.
+   */
+   _prHasReviewerSetApproval() {
+    return Object.entries(this.reviewers)
+      .filter(([username, approved]) => approved)
+      .map(([username]) => username)
+      .some(
+        username => this.tree.reviewerSetRule.owners.some(
+          owner => owner.includes(username)
+        )
+      );
+    }
+  /**
    * Build the check-run comment describing current approval coverage.
    *
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.

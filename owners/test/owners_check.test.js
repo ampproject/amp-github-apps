@@ -23,7 +23,7 @@ const {
 const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
 const {Team} = require('../src/github');
 const {OwnersTree} = require('../src/owners_tree');
-const {OwnersRule} = require('../src/rules');
+const {OwnersRule, ReviewerSetRule} = require('../src/rules');
 const {ReviewerSelection} = require('../src/reviewer_selection');
 
 describe('check run', () => {
@@ -478,6 +478,44 @@ describe('owners check', () => {
           ownersCheck.tree.atPath('extra/script.js')
         )
       ).toBe(true);
+    });
+  });
+
+  describe('prHasReviewerSetApproval', () => {
+    let reviewerTeam;
+    let reviewerSetRule;
+
+    beforeEach(() => {
+      reviewerTeam = new Team(0, 'ampproject', 'reviewers-amphtml');
+      reviewerSetRule = new ReviewerSetRule(
+        'OWNERS',
+        [new TeamOwner(reviewerTeam)],
+      );
+    });
+
+    it('returns true if there is no reviewer set', () => {
+      expect(ownersCheck._prHasReviewerSetApproval()).toBe(true);
+    });
+
+    describe('with a reviewer set team', () => {
+      beforeEach(() => {
+        ownersTree.addRule(reviewerSetRule);
+      });
+
+      it('returns true if there are approvers in the reviewer set', () => {
+        reviewerTeam.members.push('approver');
+        expect(ownersCheck._prHasReviewerSetApproval()).toBe(true);
+      });
+
+      it('returns false if no one in the reviewer set is a reviewer', () => {
+        reviewerTeam.members.push('not_a_reviewer');
+        expect(ownersCheck._prHasReviewerSetApproval()).toBe(false);
+      });
+
+      it('returns false if the only reviewer set member is pending', () => {
+        reviewerTeam.members.push('extra_reviewer');
+        expect(ownersCheck._prHasReviewerSetApproval()).toBe(false);
+      });
     });
   });
 

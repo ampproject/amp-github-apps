@@ -35,7 +35,7 @@ class OwnersTree {
     this.depth = this.isRoot ? 0 : this.parent.depth + 1;
 
     this.rules = [];
-    this.reviewerSetRule = null;
+    this.reviewerSetRule = new ReviewerSetRule('OWNERS');
     this.children = {};
   }
 
