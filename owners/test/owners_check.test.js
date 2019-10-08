@@ -487,10 +487,9 @@ describe('owners check', () => {
 
     beforeEach(() => {
       reviewerTeam = new Team(0, 'ampproject', 'reviewers-amphtml');
-      reviewerSetRule = new ReviewerSetRule(
-        'OWNERS',
-        [new TeamOwner(reviewerTeam)],
-      );
+      reviewerSetRule = new ReviewerSetRule('OWNERS', [
+        new TeamOwner(reviewerTeam),
+      ]);
     });
 
     it('returns true if there is no reviewer set', () => {
