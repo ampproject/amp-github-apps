@@ -366,12 +366,20 @@ describe('owners parser', () => {
 
         errors = fileParse.errors;
         Object.assign(rules, {
-          basic: fileParse.result[0],
-          filename: fileParse.result[1],
-          pattern: fileParse.result[2],
-          recursive: fileParse.result[3],
-          braces: fileParse.result[4],
+          reviewerSet: fileParse.result[0],
+          basic: fileParse.result[1],
+          filename: fileParse.result[2],
+          pattern: fileParse.result[3],
+          recursive: fileParse.result[4],
+          braces: fileParse.result[5],
         });
+      });
+
+      it('parses the reviewer team', () => {
+        const rule = rules.reviewerSet;
+        expect(rule.owners.map(owner => owner.name)).toEqual(
+          ['ampproject/reviewers-amphtml']
+        );
       });
 
       it('parses basic owner rules', () => {
