@@ -68,7 +68,7 @@ async function getBuildArtifactsFile(github, filename) {
 async function storeBuildArtifactsFile(github, filename, contents) {
   return await github.repos.createOrUpdateFile({
     ...getBuildArtifactsFileParams(filename),
-    message: `bundle-size: ${filename} (${contents})`,
+    message: `bundle-size: ${filename}`,
     content: Buffer.from(contents).toString('base64'),
   });
 }
@@ -264,13 +264,13 @@ module.exports = app => {
     } catch (error) {
       const partialHeadSha = check.head_sha.substr(0, 7);
       const partialBaseSha = baseSha.substr(0, 7);
-      app.log(
+      app.log.error(
         'ERROR: Failed to retrieve the bundle size of ' +
           `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
           `point ${partialBaseSha} from GitHub: ${error}`
       );
       if (lastAttempt) {
-        app.log('No more retries left. Reporting failure');
+        app.log.warn('No more retries left. Reporting failure');
         Object.assign(updatedCheckOptions, {
           conclusion: 'action_required',
           output: {
@@ -338,11 +338,11 @@ module.exports = app => {
         ...pullRequest,
       });
     } catch (error) {
-      app.log(
+      app.log.error(
         'ERROR: Failed to add a reviewer to pull request ' +
           `${pullRequest.pull_number}. Skipping...`
       );
-      app.log(`Error message: ${error}`);
+      app.log.error(`Error message: ${error}`);
       throw error;
     }
   }
@@ -482,7 +482,9 @@ module.exports = app => {
       'TRAVIS_IP_ADDRESSES' in process.env &&
       !process.env['TRAVIS_IP_ADDRESSES'].includes(request.ip)
     ) {
-      app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
+      app.log.warn(
+        `Refused a request to ${request.originalUrl} from ${request.ip}`
+      );
       response.status(403).end('You are not Travis!');
     } else {
       next();
@@ -607,7 +609,7 @@ module.exports = app => {
           `ERROR: Failed to create the bundle-size/${bundleSizeFile} file in ` +
           'the build artifacts repository on GitHub!\n' +
           `Error message was: ${error}`;
-        app.log(errorMessage);
+        app.log.error(errorMessage);
         return response.status(500).end(errorMessage);
       }
     }
@@ -643,7 +645,64 @@ module.exports = app => {
         `ERROR: Failed to create the bundle-size/${jsonBundleSizeFile} file ` +
         'in the build artifacts repository on GitHub!\n' +
         `Error message was: ${error}`;
-      app.log(errorMessage);
+      app.log.error(errorMessage);
+      return response.status(500).end(errorMessage);
+    }
+
+    response.end();
+  });
+
+  // TODO(danielrozenberg): replace the /store with this one, once the amphtml
+  // repo is in sync with this new change.
+  v0.post('/commit/:headSha/store.json', async (request, response) => {
+    const {headSha} = request.params;
+    const {bundleSizes} = request.body;
+
+    if (request.body['token'] !== process.env.TRAVIS_PUSH_BUILD_TOKEN) {
+      return response.status(403).end('You are not Travis!');
+    }
+    if (
+      !bundleSizes ||
+      Object.values(bundleSizes).some(value => typeof value !== 'number')
+    ) {
+      return response
+        .status(400)
+        .end(
+          'POST request to /store must have a key/value object ' +
+            'Map<string, number> field "bundleSizes"'
+        );
+    }
+
+    const jsonBundleSizeFile = `${headSha}.json`;
+    try {
+      await getBuildArtifactsFile(userBasedGithub, jsonBundleSizeFile);
+      app.log(
+        `The file bundle-size/${jsonBundleSizeFile} already exists in the ` +
+          'build artifacts repository on GitHub. Skipping...'
+      );
+      return response.end();
+    } catch (unusedException) {
+      // The file was not found in the GitHub repository, so continue to
+      // create it...
+    }
+
+    try {
+      const jsonBundleSizeText = JSON.stringify(bundleSizes);
+      await storeBuildArtifactsFile(
+        userBasedGithub,
+        jsonBundleSizeFile,
+        jsonBundleSizeText
+      );
+      app.log(
+        `Stored the new bundle size file bundle-size/${jsonBundleSizeFile} ` +
+          'the artifacts repository on GitHub'
+      );
+    } catch (error) {
+      const errorMessage =
+        `ERROR: Failed to create the bundle-size/${jsonBundleSizeFile} file ` +
+        'in the build artifacts repository on GitHub!\n' +
+        `Error message was: ${error}`;
+      app.log.error(errorMessage);
       return response.status(500).end(errorMessage);
     }
 
