@@ -329,8 +329,10 @@ class OwnersCheck {
    * @return {string} explanation of reviewer set, if present.
    */
   buildReviewerSetText(reviewers) {
-    return 'All PRs need approval from at least one member of the reviewer ' +
-      `set: ${reviewers.join(', ')}`;
+    return (
+      'All PRs need approval from at least one member of the reviewer ' +
+      `set: ${reviewers.join(', ')}`
+    );
   }
 }
 
