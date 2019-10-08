@@ -20,7 +20,8 @@ const {
   CheckRunConclusion,
   OwnersCheck,
 } = require('../src/owners_check');
-const {UserOwner} = require('../src/owner');
+const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
+const {Team} = require('../src/github');
 const {OwnersTree} = require('../src/owners_tree');
 const {OwnersRule} = require('../src/rules');
 const {ReviewerSelection} = require('../src/reviewer_selection');
@@ -54,10 +55,11 @@ describe('check run', () => {
 
 describe('owners check', () => {
   const sandbox = sinon.createSandbox();
+  let ownersTree;
   let ownersCheck;
 
   beforeEach(() => {
-    const ownersTree = new OwnersTree();
+    ownersTree = new OwnersTree();
     [
       new OwnersRule('OWNERS', [new UserOwner('root_owner')]),
       new OwnersRule('foo/OWNERS', [
@@ -81,6 +83,11 @@ describe('owners check', () => {
           // approver, some_user, root_owner
           filename: 'foo/test.js',
           sha: '_sha1_',
+        },
+        {
+          // approver, some_user, root_owner
+          filename: 'foo/required/info.html',
+          sha: '_sha5_',
         },
         {
           // other_approver, root_owner
@@ -119,6 +126,7 @@ describe('owners check', () => {
       sandbox.assert.calledWith(ownersCheck.tree.buildFileTreeMap, [
         'main.js',
         'foo/test.js',
+        'foo/required/info.html',
         'bar/baz/file.txt',
         'buzz/README.md',
         'extra/script.js',
@@ -257,6 +265,152 @@ describe('owners check', () => {
     });
   });
 
+  describe('hasRequiredOwnersApproval', () => {
+    describe('user owners', () => {
+      it('fails if required user owners have not yet approved', () => {
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new UserOwner('required_reviewer', OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+        expect(
+          ownersCheck._hasRequiredOwnersApproval(
+            'foo/required/info.html',
+            ownersCheck.tree.atPath('foo/required/info.html')
+          )
+        ).toBe(false);
+      });
+
+      it('fails if required user owners are pending approval', () => {
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new UserOwner('extra_reviewerr', OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+        expect(
+          ownersCheck._hasRequiredOwnersApproval(
+            'foo/required/info.html',
+            ownersCheck.tree.atPath('foo/required/info.html')
+          )
+        ).toBe(false);
+      });
+
+      it('passes if required user owners have approved', () => {
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new UserOwner('approver', OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+        expect(
+          ownersCheck._hasRequiredOwnersApproval(
+            'foo/required/info.html',
+            ownersCheck.tree.atPath('foo/required/info.html')
+          )
+        ).toBe(true);
+      });
+    });
+
+    describe('team owners', () => {
+      it('fails if no member of the required team has approved', () => {
+        const team = new Team(0, 'ampproject', 'my_team');
+        team.members.push('required_reviewer');
+
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new TeamOwner(team, OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+        expect(
+          ownersCheck._hasRequiredOwnersApproval(
+            'foo/required/info.html',
+            ownersCheck.tree.atPath('foo/required/info.html')
+          )
+        ).toBe(false);
+      });
+
+      it('fails if a member of the required team is pending approval', () => {
+        const team = new Team(0, 'ampproject', 'my_team');
+        team.members.push('extra_reviewer');
+
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new TeamOwner(team, OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+        expect(
+          ownersCheck._hasRequiredOwnersApproval(
+            'foo/required/info.html',
+            ownersCheck.tree.atPath('foo/required/info.html')
+          )
+        ).toBe(false);
+      });
+
+      it('passes if any member of the required team is pending approval', () => {
+        const team = new Team(0, 'ampproject', 'my_team');
+        team.members.push('approver');
+
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new TeamOwner(team, OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+        expect(
+          ownersCheck._hasRequiredOwnersApproval(
+            'foo/required/info.html',
+            ownersCheck.tree.atPath('foo/required/info.html')
+          )
+        ).toBe(true);
+      });
+    });
+
+    describe('with multiple required owners', () => {
+      beforeEach(() => {
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new UserOwner('approver', OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+      });
+
+      it('fails if not all required rules are satisfied', () => {
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new UserOwner('required_reviewer', OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+        expect(
+          ownersCheck._hasRequiredOwnersApproval(
+            'foo/required/info.html',
+            ownersCheck.tree.atPath('foo/required/info.html')
+          )
+        ).toBe(false);
+      });
+
+      it('passes if all required rules are satisfied', () => {
+        const team = new Team(0, 'ampproject', 'my_team');
+        team.members.push('other_approver');
+
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new UserOwner('the_author', OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+        ownersTree.addRule(
+          new OwnersRule('foo/required/OWNERS', [
+            new TeamOwner(team, OWNER_MODIFIER.REQUIRE)
+          ])
+        );
+
+        expect(
+          ownersCheck._hasRequiredOwnersApproval(
+            'foo/required/info.html',
+            ownersCheck.tree.atPath('foo/required/info.html')
+          )
+        ).toBe(true);
+      });
+    });
+  });
+
   describe('hasFullOwnersCoverage', () => {
     it('returns true if any approver is an owner of the file', () => {
       expect(
@@ -299,6 +453,19 @@ describe('owners check', () => {
         ownersCheck._hasFullOwnersCoverage(
           'extra/script.js',
           ownersCheck.tree.atPath('extra/script.js')
+        )
+      ).toBe(false);
+    });
+
+    it('fails if it does not have required reviewer approval', () => {
+      sandbox.stub(
+        OwnersCheck.prototype,
+        '_hasRequiredOwnersApproval',
+      ).returns(false);
+      expect(
+        ownersCheck._hasFullOwnersCoverage(
+          'foo/required/info.html',
+          ownersCheck.tree.atPath('foo/required/info.html')
         )
       ).toBe(false);
     });
