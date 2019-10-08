@@ -270,7 +270,7 @@ describe('owners check', () => {
       it('fails if required user owners have not yet approved', () => {
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new UserOwner('required_reviewer', OWNER_MODIFIER.REQUIRE)
+            new UserOwner('required_reviewer', OWNER_MODIFIER.REQUIRE),
           ])
         );
         expect(
@@ -284,7 +284,7 @@ describe('owners check', () => {
       it('fails if required user owners are pending approval', () => {
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new UserOwner('extra_reviewerr', OWNER_MODIFIER.REQUIRE)
+            new UserOwner('extra_reviewerr', OWNER_MODIFIER.REQUIRE),
           ])
         );
         expect(
@@ -298,7 +298,7 @@ describe('owners check', () => {
       it('passes if required user owners have approved', () => {
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new UserOwner('approver', OWNER_MODIFIER.REQUIRE)
+            new UserOwner('approver', OWNER_MODIFIER.REQUIRE),
           ])
         );
         expect(
@@ -317,7 +317,7 @@ describe('owners check', () => {
 
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new TeamOwner(team, OWNER_MODIFIER.REQUIRE)
+            new TeamOwner(team, OWNER_MODIFIER.REQUIRE),
           ])
         );
         expect(
@@ -334,7 +334,7 @@ describe('owners check', () => {
 
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new TeamOwner(team, OWNER_MODIFIER.REQUIRE)
+            new TeamOwner(team, OWNER_MODIFIER.REQUIRE),
           ])
         );
         expect(
@@ -351,7 +351,7 @@ describe('owners check', () => {
 
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new TeamOwner(team, OWNER_MODIFIER.REQUIRE)
+            new TeamOwner(team, OWNER_MODIFIER.REQUIRE),
           ])
         );
         expect(
@@ -367,7 +367,7 @@ describe('owners check', () => {
       beforeEach(() => {
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new UserOwner('approver', OWNER_MODIFIER.REQUIRE)
+            new UserOwner('approver', OWNER_MODIFIER.REQUIRE),
           ])
         );
       });
@@ -375,7 +375,7 @@ describe('owners check', () => {
       it('fails if not all required rules are satisfied', () => {
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new UserOwner('required_reviewer', OWNER_MODIFIER.REQUIRE)
+            new UserOwner('required_reviewer', OWNER_MODIFIER.REQUIRE),
           ])
         );
         expect(
@@ -392,12 +392,12 @@ describe('owners check', () => {
 
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new UserOwner('the_author', OWNER_MODIFIER.REQUIRE)
+            new UserOwner('the_author', OWNER_MODIFIER.REQUIRE),
           ])
         );
         ownersTree.addRule(
           new OwnersRule('foo/required/OWNERS', [
-            new TeamOwner(team, OWNER_MODIFIER.REQUIRE)
+            new TeamOwner(team, OWNER_MODIFIER.REQUIRE),
           ])
         );
 
@@ -458,10 +458,9 @@ describe('owners check', () => {
     });
 
     it('fails if it does not have required reviewer approval', () => {
-      sandbox.stub(
-        OwnersCheck.prototype,
-        '_hasRequiredOwnersApproval',
-      ).returns(false);
+      sandbox
+        .stub(OwnersCheck.prototype, '_hasRequiredOwnersApproval')
+        .returns(false);
       expect(
         ownersCheck._hasFullOwnersCoverage(
           'foo/required/info.html',
@@ -488,7 +487,7 @@ describe('owners check', () => {
     beforeEach(() => {
       ownersTree.addRule(
         new OwnersRule('foo/required/OWNERS', [
-          new UserOwner('required_reviewer', OWNER_MODIFIER.REQUIRE)
+          new UserOwner('required_reviewer', OWNER_MODIFIER.REQUIRE),
         ])
       );
       const fileTreeMap = ownersCheck.tree.buildFileTreeMap(
@@ -520,7 +519,7 @@ describe('owners check', () => {
       expect(coverageText).toContain('### Current Coverage');
       expect(coverageText).toContain(
         '- **[NEEDS APPROVAL]** foo/required/info.html ' +
-        '_(required: required_reviewer)_'
+          '_(required: required_reviewer)_'
       );
     });
   });

@@ -177,9 +177,10 @@ class OwnersCheck {
    * @return {Owner[]} required owners that have not approved.
    */
   _missingRequiredOwners(filename, subtree) {
-    return subtree.getModifiedFileOwners(filename, OWNER_MODIFIER.REQUIRE)
-      .filter(owner =>
-        !owner.allUsernames.some(username => this.reviewers[username])
+    return subtree
+      .getModifiedFileOwners(filename, OWNER_MODIFIER.REQUIRE)
+      .filter(
+        owner => !owner.allUsernames.some(username => this.reviewers[username])
       );
   }
 
@@ -207,8 +208,10 @@ class OwnersCheck {
    * @return {boolean} if the file is approved.
    */
   _hasFullOwnersCoverage(filename, subtree) {
-    return this._hasOwnersReview(filename, subtree, true) &&
-      this._hasRequiredOwnersApproval(filename, subtree);
+    return (
+      this._hasOwnersReview(filename, subtree, true) &&
+      this._hasRequiredOwnersApproval(filename, subtree)
+    );
   }
 
   /**
@@ -243,15 +246,16 @@ class OwnersCheck {
         const pending = reviewers
           .filter(([username, approved]) => !approved)
           .map(([username, approved]) => username);
-        const missing = this._missingRequiredOwners(filename, subtree)
-          .map(owner => owner.name);
+        const missing = this._missingRequiredOwners(filename, subtree).map(
+          owner => owner.name
+        );
 
         if (approving.length && !missing.length) {
           return `- ${filename} _(${approving.join(', ')})_`;
         } else {
           let line = `- **[NEEDS APPROVAL]** ${filename}`;
 
-          let names = [];
+          const names = [];
           if (pending.length) {
             names.push(`requested: ${pending.join(', ')}`);
           }
@@ -260,7 +264,7 @@ class OwnersCheck {
           }
 
           if (names.length) {
-            line += ` _(${names.join('; ')})_`
+            line += ` _(${names.join('; ')})_`;
           }
           return line;
         }
