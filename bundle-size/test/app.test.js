@@ -849,141 +849,7 @@ describe('bundle-size', () => {
       });
     });
 
-    // TODO(danielrozenberg): remove all legacy code tests once the amphtml repo
-    // is in sync with the new full-json endpoint
-    describe('/commit/:headSha/store (legacy code)', () => {
-      test('store new bundle-size', async () => {
-        const nocks = nock('https://api.github.com')
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/' +
-              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
-          )
-          .reply(404)
-          .put(
-            '/repos/ampproject/amphtml-build-artifacts/contents/' +
-              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br',
-            {
-              message:
-                'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br',
-              content: Buffer.from('12.34KB').toString('base64'),
-            }
-          )
-          .reply(201)
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/' +
-              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-          )
-          .reply(404)
-          .put(
-            '/repos/ampproject/amphtml-build-artifacts/contents/' +
-              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
-            {
-              message:
-                'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
-              content: Buffer.from('{"dist/v0.js":12.34}').toString('base64'),
-            }
-          )
-          .reply(201);
-
-        await request(probot.server)
-          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
-          .send({
-            token: '0123456789abcdefghijklmnopqrstuvwxyz',
-            brotliBundleSize: 12.34,
-          })
-          .set('Content-Type', 'application/json')
-          .set('Accept', 'application/json')
-          .expect(200);
-        await waitUntilNockScopeIsDone(nocks);
-      });
-
-      test('ignore already existing bundle-size when called to store', async () => {
-        const nocks = nock('https://api.github.com')
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/' +
-              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
-          )
-          .reply(200, getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'))
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/' +
-              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-          )
-          .reply(
-            200,
-            getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
-          );
-
-        await request(probot.server)
-          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
-          .send({
-            token: '0123456789abcdefghijklmnopqrstuvwxyz',
-            brotliBundleSize: 12.34,
-          })
-          .set('Content-Type', 'application/json')
-          .set('Accept', 'application/json')
-          .expect(200);
-        await waitUntilNockScopeIsDone(nocks);
-      });
-
-      test('show error when failed to store bundle-size', async () => {
-        const nocks = nock('https://api.github.com')
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/' +
-              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br'
-          )
-          .reply(404)
-          .put(
-            '/repos/ampproject/amphtml-build-artifacts/contents/' +
-              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br',
-            {
-              message:
-                'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.br',
-              content: Buffer.from('12.34KB').toString('base64'),
-            }
-          )
-          .reply(418, 'I am a tea pot');
-
-        await request(probot.server)
-          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
-          .send({
-            token: '0123456789abcdefghijklmnopqrstuvwxyz',
-            brotliBundleSize: 12.34,
-          })
-          .set('Content-Type', 'application/json')
-          .set('Accept', 'application/json')
-          .expect(500, /I am a tea pot/);
-        await waitUntilNockScopeIsDone(nocks);
-      });
-
-      test('fail on missing values when called to store bundle-size', async () => {
-        await request(probot.server)
-          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
-          .send({
-            token: '0123456789abcdefghijklmnopqrstuvwxyz',
-            // Deliberately not add a `brotliBundleSize` field,
-          })
-          .set('Content-Type', 'application/json')
-          .set('Accept', 'application/json')
-          .expect(
-            400,
-            'POST request to /store must have numeric field "brotliBundleSize"'
-          );
-      });
-
-      test('rejects calls to store without the Travis token', async () => {
-        await request(probot.server)
-          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
-          .send({
-            token: 'wrong token',
-            brotliBundleSize: 12.34,
-          })
-          .set('Content-Type', 'application/json')
-          .set('Accept', 'application/json')
-          .expect(403, 'You are not Travis!');
-      });
-    });
-
-    describe('/commit/:headSha/store.json', () => {
+    describe('/commit/:headSha/store', () => {
       let jsonPayload;
 
       beforeEach(() => {
@@ -1017,9 +883,7 @@ describe('bundle-size', () => {
           .reply(201);
 
         await request(probot.server)
-          .post(
-            '/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store.json'
-          )
+          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
@@ -1039,9 +903,7 @@ describe('bundle-size', () => {
           );
 
         await request(probot.server)
-          .post(
-            '/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store.json'
-          )
+          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
@@ -1070,9 +932,7 @@ describe('bundle-size', () => {
           .reply(418, 'I am a tea pot');
 
         await request(probot.server)
-          .post(
-            '/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store.json'
-          )
+          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
@@ -1084,9 +944,7 @@ describe('bundle-size', () => {
         jsonPayload.bundleSizes['dist/shadow-v0.js'] = '23.45KB';
 
         await request(probot.server)
-          .post(
-            '/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store.json'
-          )
+          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
@@ -1100,9 +958,7 @@ describe('bundle-size', () => {
         delete jsonPayload.bundleSizes;
 
         await request(probot.server)
-          .post(
-            '/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store.json'
-          )
+          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
@@ -1116,9 +972,7 @@ describe('bundle-size', () => {
         jsonPayload.token = 'wrong token';
 
         await request(probot.server)
-          .post(
-            '/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store.json'
-          )
+          .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
