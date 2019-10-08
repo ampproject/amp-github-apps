@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+const {OWNER_MODIFIER} = require('./owner');
 const {ReviewerSelection} = require('./reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
@@ -165,6 +166,22 @@ class OwnersCheck {
   }
 
   /**
+   * Determines the set of missing required owners.
+   *
+   * Must be called after `init`.
+   *
+   * @param {!string} filename file to check.
+   * @param {!OwnersTree} subtree nearest ownership tree to file.
+   * @return {Owner[]} required owners that have not approved.
+   */
+  _missingRequiredOwners(filename, subtree) {
+    return subtree.getModifiedFileOwners(filename, OWNER_MODIFIER.REQUIRE)
+      .filter(owner =>
+        !owner.allUsernames.some(username => this.reviewers[username])
+      );
+  }
+
+  /**
    * Tests whether a file has full owners coverage, including any required
    * reviewers.
    *
@@ -175,7 +192,7 @@ class OwnersCheck {
    * @return {boolean} if the file has approval coverage.
    */
   _hasRequiredOwnersApproval(filename, subtree) {
-    return true;
+    return this._missingRequiredOwners(filename, subtree).length === 0;
   }
 
   /**
