@@ -180,6 +180,17 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'createBotComment');
     });
 
+    it.each([
+      ['closed'],
+      ['merged']
+    ])('does not run on %p PRs', async (state, done) => {
+      sandbox.stub(ownersBot, 'initPr').callThrough();
+      const pr = new PullRequest(0, '', '', '', state);
+      await ownersBot.runOwnersCheck(github, pr);
+      sandbox.assert.notCalled(ownersBot.initPr)
+      done();
+    });
+
     it('attempts to fetch the existing check-run ID', async done => {
       await ownersBot.runOwnersCheck(github, pr);
 
