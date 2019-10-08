@@ -25,9 +25,19 @@ class PullRequest {
    * @param {!string} author username of the pull request author.
    * @param {!string} headSha SHA hash of the PR's HEAD commit.
    * @param {!string} description pull request description.
+   * @param {!string} state pull request status.
    */
-  constructor(number, author, headSha, description) {
-    Object.assign(this, {number, author, headSha, description});
+  constructor(number, author, headSha, description, state) {
+    Object.assign(this, {number, author, headSha, description, state});
+  }
+
+  /**
+   * Whether or not the pull request is open.
+   *
+   * @return {boolean} true if the pull request is open.
+   */
+  get isOpen() {
+    return this.state.toLowerCase() === 'open';
   }
 
   /**
@@ -41,7 +51,8 @@ class PullRequest {
       res.number,
       res.user.login.toLowerCase(),
       res.head.sha,
-      res.body
+      res.body,
+      res.state
     );
   }
 }

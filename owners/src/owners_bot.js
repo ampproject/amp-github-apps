@@ -98,6 +98,10 @@ class OwnersBot {
    * @param {boolean=} requestOwners whether to request reviews from owners.
    */
   async runOwnersCheck(github, pr, requestOwners) {
+    if (!pr.isOpen) {
+      return;
+    }
+
     const {tree, changedFiles, reviewers} = await this.initPr(github, pr);
 
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);

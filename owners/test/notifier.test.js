@@ -28,7 +28,13 @@ describe('notifier', () => {
   let pr;
 
   beforeEach(() => {
-    pr = new PullRequest(1337, 'the_author', '_test_hash_', 'description');
+    pr = new PullRequest(
+      1337,
+      'the_author',
+      '_test_hash_',
+      'description',
+      'open'
+    );
   });
 
   afterEach(() => {

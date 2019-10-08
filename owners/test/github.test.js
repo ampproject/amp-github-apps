@@ -35,6 +35,16 @@ const getFileResponse = require('./fixtures/files/file_blob.24523.json');
 nock.disableNetConnect();
 
 describe('pull request', () => {
+  describe('isOpen', () => {
+    it.each([['open', true], ['closed', false], ['merged', false]])(
+      'with status %p returns %p',
+      (state, result) => {
+        const pr = new PullRequest(0, '', '', '', state);
+        expect(pr.isOpen).toBe(result);
+      }
+    );
+  });
+
   describe('fromGitHubResponse', () => {
     it('creates a pull request instance', () => {
       const response = pullRequestResponse;
@@ -44,6 +54,7 @@ describe('pull request', () => {
       expect(pr.author).toEqual('ampprojectbot');
       expect(pr.headSha).toEqual('9272f18514cbd3fa935b3ced62ae1c2bf6efa76d');
       expect(pr.description).toEqual('Pull request description');
+      expect(pr.state).toEqual('open');
     });
   });
 });
