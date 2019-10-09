@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+const MAX_REVIEWS_PER_PAGE = 100;
+
 /**
  * Maps the github json payload to a simpler data structure.
  */
@@ -267,7 +269,8 @@ class GitHub {
     while (isNextLink) {
       const response = await this._customRequest(
         'GET',
-        `/repos/${this.owner}/${this.repository}/pulls/${number}/reviews?page=${pageNum}`
+        `/repos/${this.owner}/${this.repository}/pulls/${number}/reviews` +
+        `?page=${pageNum}&per_page=${MAX_REVIEWS_PER_PAGE}`
       );
       const nextLink = response.headers.link || '';
       isNextLink = nextLink.includes('rel="next"');
