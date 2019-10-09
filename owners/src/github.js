@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+const MAX_REVIEWS_PER_PAGE = 100;
+
 /**
  * Maps the github json payload to a simpler data structure.
  */
@@ -203,7 +205,7 @@ class GitHub {
     this.logger.info(`Fetching teams for organization '${this.owner}'`);
 
     const teamsList = [];
-    let pageNum = 0;
+    let pageNum = 1;
     let isNextLink = true;
     while (isNextLink) {
       const response = await this._customRequest(
@@ -261,17 +263,30 @@ class GitHub {
   async getReviews(number) {
     this.logger.info(`Fetching reviews for PR #${number}`);
 
-    const response = await this.client.pullRequests.listReviews(
-      this.repo({number})
-    );
-    this.logger.debug('[getReviews]', number, response.data);
+    const reviewList = [];
+    let pageNum = 1;
+    let isNextLink = true;
+    while (isNextLink) {
+      const response = await this._customRequest(
+        'GET',
+        `/repos/${this.owner}/${this.repository}/pulls/${number}/reviews` +
+          `?page=${pageNum}&per_page=${MAX_REVIEWS_PER_PAGE}`
+      );
+      const nextLink = response.headers.link || '';
+      isNextLink = nextLink.includes('rel="next"');
+
+      const reviewPage = response.data;
+      reviewList.push(...reviewPage);
+      pageNum++;
+    }
+    this.logger.debug('[getReviews]', number, reviewList);
 
     // See https://developer.github.com/v4/enum/pullrequestreviewstate/ for
     // possible review states. The only ones we care about are "APPROVED" and
     // "CHANGES_REQUESTED", since the rest do not indicate a definite approval
     // or rejection.
     const allowedStates = ['approved', 'changes_requested', 'commented'];
-    return response.data
+    return reviewList
       .filter(({state}) => allowedStates.includes(state.toLowerCase()))
       .map(
         json =>
