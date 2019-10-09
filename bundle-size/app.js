@@ -564,9 +564,7 @@ module.exports = app => {
     }
   });
 
-  // TODO(danielrozenberg): remove the .json optional endpoint once the amphtml
-  // repo is in sync with this new change.
-  v0.post('/commit/:headSha/store(.json)?', async (request, response) => {
+  v0.post('/commit/:headSha/store', async (request, response) => {
     const {headSha} = request.params;
     const {bundleSizes} = request.body;
 
