@@ -393,6 +393,7 @@ describe('owners tree', () => {
 
       expect(tree.toString()).toEqual(
         [
+          'Reviewers: *',
           'ROOT',
           ' • **/*: root (never notify)',
           ' • **/*.test.js: ampproject/testers [tester]',
