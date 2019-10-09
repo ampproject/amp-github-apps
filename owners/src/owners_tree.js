@@ -212,6 +212,10 @@ class OwnersTree {
   toString() {
     const lines = [];
 
+    if (this.isRoot) {
+      lines.push(this.reviewerSetRule);
+    }
+
     const rulePrefix = ' •';
     const childPrefix = '└───';
     const indent = Math.max(0, this.depth - 1) * childPrefix.length;
