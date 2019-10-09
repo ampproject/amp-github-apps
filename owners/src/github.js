@@ -105,6 +105,8 @@ class Team {
    */
   constructor(id, org, slug) {
     Object.assign(this, {id, org, slug, members: []});
+    const message = 'something something' + 'something';
+    console.log(message);
   }
 
   /**
