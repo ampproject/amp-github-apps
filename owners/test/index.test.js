@@ -100,7 +100,9 @@ describe('owners bot', () => {
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews')
+        .get(
+          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+        )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
@@ -159,7 +161,9 @@ describe('owners bot', () => {
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews')
+        .get(
+          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+        )
         .reply(200, reviews35);
 
       // Get check runs for a specific commit
@@ -222,7 +226,9 @@ describe('owners bot', () => {
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews')
+        .get(
+          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+        )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
@@ -279,7 +285,9 @@ describe('owners bot', () => {
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews')
+        .get(
+          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+        )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
@@ -346,7 +354,9 @@ describe('owners bot', () => {
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews')
+        .get(
+          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+        )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
@@ -408,7 +418,9 @@ describe('owners bot', () => {
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews')
+        .get(
+          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+        )
         .reply(200, reviews35Approved);
 
       nock('https://api.github.com')
@@ -462,7 +474,9 @@ describe('owners bot', () => {
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/36/reviews')
+        .get(
+          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/36/reviews?page=1&per_page=100'
+        )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
@@ -520,7 +534,9 @@ describe('owners bot', () => {
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews')
+        .get(
+          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+        )
         .reply(200, reviews35Approved);
 
       nock('https://api.github.com')
