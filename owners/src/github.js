@@ -270,7 +270,7 @@ class GitHub {
       const response = await this._customRequest(
         'GET',
         `/repos/${this.owner}/${this.repository}/pulls/${number}/reviews` +
-        `?page=${pageNum}&per_page=${MAX_REVIEWS_PER_PAGE}`
+          `?page=${pageNum}&per_page=${MAX_REVIEWS_PER_PAGE}`
       );
       const nextLink = response.headers.link || '';
       isNextLink = nextLink.includes('rel="next"');

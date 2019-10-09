@@ -334,12 +334,16 @@ describe('GitHub API', () => {
     it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/23928/reviews?page=1&per_page=100')
+        .get(
+          '/repos/test_owner/test_repo/pulls/23928/reviews?page=1&per_page=100'
+        )
         .reply(200, manyReviewsPage1Response, {
           link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
         });
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/23928/reviews?page=2&per_page=100')
+        .get(
+          '/repos/test_owner/test_repo/pulls/23928/reviews?page=2&per_page=100'
+        )
         .reply(200, manyReviewsPage2Response);
 
       await withContext(async (context, github) => {
@@ -352,7 +356,9 @@ describe('GitHub API', () => {
     it('returns approvals', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100')
+        .get(
+          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
+        )
         .reply(200, commentReviewsResponse);
 
       await withContext(async (context, github) => {
@@ -367,7 +373,9 @@ describe('GitHub API', () => {
     it('returns post-review comments', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100')
+        .get(
+          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
+        )
         .reply(200, commentReviewsResponse);
 
       await withContext(async (context, github) => {
@@ -382,7 +390,9 @@ describe('GitHub API', () => {
     it('returns pre-review comments', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100')
+        .get(
+          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
+        )
         .reply(200, commentReviewsResponse);
 
       await withContext(async (context, github) => {
@@ -397,7 +407,9 @@ describe('GitHub API', () => {
     it('returns rejections', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100')
+        .get(
+          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
+        )
         .reply(200, commentReviewsResponse);
 
       await withContext(async (context, github) => {
@@ -412,7 +424,9 @@ describe('GitHub API', () => {
     it('returns comment-only reviews', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100')
+        .get(
+          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
+        )
         .reply(200, commentReviewsResponse);
 
       await withContext(async (context, github) => {
@@ -427,7 +441,9 @@ describe('GitHub API', () => {
     it('ignores irrelevant review states', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100')
+        .get(
+          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
+        )
         .reply(200, commentReviewsResponse);
 
       await withContext(async (context, github) => {
