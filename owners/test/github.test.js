@@ -27,6 +27,8 @@ const requestedReviewsResponse = require('./fixtures/reviews/requested_reviewers
 const commentReviewsResponse = require('./fixtures/reviews/comment_reviews.24686.json');
 const manyReviewsPage1Response = require('./fixtures/reviews/many_reviews.23928.page_1.json');
 const manyReviewsPage2Response = require('./fixtures/reviews/many_reviews.23928.page_2.json');
+const manyTeamsResponsePage1 = require('./fixtures/teams/many_members.page_1.json');
+const manyTeamsResponsePage2 = require('./fixtures/teams/many_members.page_2.json');
 const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
 const issueCommentsResponse = require('./fixtures/comments/issue_comments.438.json');
 const listFilesResponse = require('./fixtures/files/files.35.json');
@@ -287,13 +289,29 @@ describe('GitHub API', () => {
     it('returns a list of team objects', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/teams/1337/members')
+        .get('/teams/1337/members?page=1&per_page=100')
         .reply(200, [{login: 'rcebulko'}, {login: 'erwinmombay'}]);
 
       await withContext(async (context, github) => {
         const members = await github.getTeamMembers(1337);
 
         expect(members).toEqual(['rcebulko', 'erwinmombay']);
+      })();
+    });
+
+    it('pages automatically', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/teams/1337/members?page=1&per_page=100')
+        .reply(200, manyTeamsResponsePage1);
+      nock('https://api.github.com')
+        .get('/teams/1337/members?page=2&per_page=100')
+        .reply(200, manyTeamsResponsePage2);
+
+      await withContext(async (context, github) => {
+        const members = await github.getTeamMembers(1337);
+
+        expect(members.length).toEqual(40);
       })();
     });
   });
