@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const MAX_REVIEWS_PER_PAGE = 100;
+const MAX_PER_PAGE = 100;
 
 /**
  * Maps the github json payload to a simpler data structure.
@@ -197,6 +197,34 @@ class GitHub {
   }
 
   /**
+   * Automatically fetch multiple pages from a GitHub endpoint
+   *
+   * @param {!string} url API endpoint URL path (ie. `/teams/###/members`).
+   * @return {*[]} list of results across all pages.
+   */
+  async _autoPage(url) {
+    const resultList = [];
+
+    let pageNum = 1;
+    let isNextLink = true;
+    while (isNextLink) {
+      this.logger.info(`Fetching page ${pageNum}`);
+      const response = await this._customRequest(
+        'GET',
+        `${url}?page=${pageNum}&per_page=${MAX_PER_PAGE}`
+      );
+      const nextLink = response.headers.link || '';
+      isNextLink = nextLink.includes('rel="next"');
+
+      const resultPage = response.data;
+      resultList.push(...resultPage);
+      pageNum++;
+    }
+
+    return resultList;
+  }
+
+  /**
    * Fetch all teams for the organization.
    *
    * @return {Team[]} list of teams.
@@ -204,21 +232,7 @@ class GitHub {
   async getTeams() {
     this.logger.info(`Fetching teams for organization '${this.owner}'`);
 
-    const teamsList = [];
-    let pageNum = 1;
-    let isNextLink = true;
-    while (isNextLink) {
-      const response = await this._customRequest(
-        'GET',
-        `/orgs/${this.owner}/teams?page=${pageNum}`
-      );
-      const nextLink = response.headers.link || '';
-      isNextLink = nextLink.includes('rel="next"');
-
-      const teamPage = response.data;
-      teamsList.push(...teamPage);
-      pageNum++;
-    }
+    const teamsList = await this._autoPage(`/orgs/${this.owner}/teams`);
     this.logger.debug('[getTeams]', teamsList);
 
     return teamsList.map(({id, slug}) => new Team(id, this.owner, slug));
@@ -233,11 +247,7 @@ class GitHub {
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
 
-    const response = await this._customRequest(
-      'GET',
-      `/teams/${teamId}/members`
-    );
-    const memberList = response.data;
+    const memberList = await this._autoPage(`/teams/${teamId}/members`);
     this.logger.debug('[getTeamMembers]', teamId, memberList);
 
     return memberList.map(({login}) => login.toLowerCase());
@@ -263,22 +273,9 @@ class GitHub {
   async getReviews(number) {
     this.logger.info(`Fetching reviews for PR #${number}`);
 
-    const reviewList = [];
-    let pageNum = 1;
-    let isNextLink = true;
-    while (isNextLink) {
-      const response = await this._customRequest(
-        'GET',
-        `/repos/${this.owner}/${this.repository}/pulls/${number}/reviews` +
-          `?page=${pageNum}&per_page=${MAX_REVIEWS_PER_PAGE}`
-      );
-      const nextLink = response.headers.link || '';
-      isNextLink = nextLink.includes('rel="next"');
-
-      const reviewPage = response.data;
-      reviewList.push(...reviewPage);
-      pageNum++;
-    }
+    const reviewList = await this._autoPage(
+      `/repos/${this.owner}/${this.repository}/pulls/${number}/reviews`
+    );
     this.logger.debug('[getReviews]', number, reviewList);
 
     // See https://developer.github.com/v4/enum/pullrequestreviewstate/ for
