@@ -208,10 +208,10 @@ class GitHub {
     let pageNum = 1;
     let isNextLink = true;
     while (isNextLink) {
-      this.logger.info(`Fetching page ${pageNum}`)
+      this.logger.info(`Fetching page ${pageNum}`);
       const response = await this._customRequest(
         'GET',
-        `${url}?page=${pageNum}&per_page=${MAX_PER_PAGE}`,
+        `${url}?page=${pageNum}&per_page=${MAX_PER_PAGE}`
       );
       const nextLink = response.headers.link || '';
       isNextLink = nextLink.includes('rel="next"');
