@@ -254,7 +254,7 @@ describe('GitHub API', () => {
     it('returns a list of team objects', async () => {
       expect.assertions(3);
       nock('https://api.github.com')
-        .get('/orgs/test_owner/teams?page=1')
+        .get('/orgs/test_owner/teams?page=1&per_page=100')
         .reply(200, [{id: 1337, slug: 'my_team'}]);
 
       await withContext(async (context, github) => {
@@ -269,12 +269,12 @@ describe('GitHub API', () => {
     it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/orgs/test_owner/teams?page=1')
+        .get('/orgs/test_owner/teams?page=1&per_page=100')
         .reply(200, Array(30).fill([{id: 1337, slug: 'my_team'}]), {
           link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
         });
       nock('https://api.github.com')
-        .get('/orgs/test_owner/teams?page=2')
+        .get('/orgs/test_owner/teams?page=2&per_page=100')
         .reply(200, Array(10).fill([{id: 1337, slug: 'my_team'}]));
 
       await withContext(async (context, github) => {
@@ -303,7 +303,9 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .get('/teams/1337/members?page=1&per_page=100')
-        .reply(200, manyTeamsResponsePage1);
+        .reply(200, manyTeamsResponsePage1, {
+          link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
+        });
       nock('https://api.github.com')
         .get('/teams/1337/members?page=2&per_page=100')
         .reply(200, manyTeamsResponsePage2);
