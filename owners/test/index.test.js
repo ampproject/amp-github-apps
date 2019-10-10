@@ -590,15 +590,15 @@ describe('owners bot', () => {
     ])('updates the team members on event %p', async (name, done) => {
       nock('https://api.github.com')
         .get('/teams/42/members?page=1&per_page=100')
-        .reply(200, [{login: 'rcebulko'}])
+        .reply(200, [{login: 'rcebulko'}]);
 
       await probot.receive({
         name,
         payload: {
-          team: {id: 42, slug: 'my-team'}
-        }
+          team: {id: 42, slug: 'my-team'},
+        },
       });
-      sandbox.assert.calledOnce(Team.prototype.fetchMembers)
+      sandbox.assert.calledOnce(Team.prototype.fetchMembers);
       done();
     });
   });

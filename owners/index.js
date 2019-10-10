@@ -92,19 +92,22 @@ module.exports = app => {
     );
   });
 
-  app.on([
-    'team.created',
-    'team.deleted',
-    'team.edited',
-    'membership.added',
-    'membership.removed',
-  ], async context => {
-    const {id, slug} = context.payload.team;
-    const team = new Team(id, GITHUB_REPO_OWNER, slug);
+  app.on(
+    [
+      'team.created',
+      'team.deleted',
+      'team.edited',
+      'membership.added',
+      'membership.removed',
+    ],
+    async context => {
+      const {id, slug} = context.payload.team;
+      const team = new Team(id, GITHUB_REPO_OWNER, slug);
 
-    await team.fetchMembers(github);
-    ownersBot.teams[team.toString()] = team;
-  });
+      await team.fetchMembers(github);
+      ownersBot.teams[team.toString()] = team;
+    }
+  );
 
   // Since the status server is publicly accessible, we don't want any
   // endpoints to be making API calls or doing disk I/O. Rather than parsing
