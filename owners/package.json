@@ -19,15 +19,15 @@
     "express": "4.17.1",
     "json5": "2.1.1",
     "minimatch": "3.0.4",
-    "probot": "7.5.0",
+    "probot": "7.5.3",
     "sleep-promise": "8.0.1"
   },
   "devDependencies": {
     "jest": "23.6.0",
-    "nock": "11.3.6",
+    "nock": "11.4.0",
     "nodemon": "1.19.3",
     "sinon": "7.5.0",
-    "smee-client": "1.0.2"
+    "smee-client": "1.1.0"
   },
   "standard": {
     "env": [
