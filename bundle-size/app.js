@@ -498,7 +498,12 @@ module.exports = app => {
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
-      return response.status(404).end(`${headSha} not in database`);
+      return response
+        .status(404)
+        .end(
+          `${headSha} was not found in bundle-size database; try to rebase ` +
+            'this pull request on the latest commit in the `master` to fix this'
+        );
     }
     const github = await app.auth(check.installation_id);
     await github.checks.update({
@@ -541,7 +546,12 @@ module.exports = app => {
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
-      return response.status(404).end(`${headSha} not in database`);
+      return response
+        .status(404)
+        .end(
+          `${headSha} was not found in bundle-size database; try to rebase ` +
+            'this pull request on the latest commit in the `master` to fix this'
+        );
     }
 
     let reportSuccess = await tryReport(check, baseSha, bundleSize);
@@ -595,7 +605,12 @@ module.exports = app => {
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
-      return response.status(404).end(`${headSha} not in database`);
+      return response
+        .status(404)
+        .end(
+          `${headSha} was not found in bundle-size database; try to rebase ` +
+            'this pull request on the latest commit in the `master` to fix this'
+        );
     }
 
     let reportSuccess = await tryReport(check, baseSha, bundleSize);
