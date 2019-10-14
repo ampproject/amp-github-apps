@@ -20,7 +20,7 @@ const owners = require('..');
 const {Probot} = require('probot');
 const sinon = require('sinon');
 const {LocalRepository} = require('../src/local_repo');
-const {GitHub} = require('../src/github');
+const {GitHub, Team} = require('../src/github');
 const {OwnersParser} = require('../src/parser');
 const {UserOwner} = require('../src/owner');
 const {OwnersRule} = require('../src/rules');
@@ -573,6 +573,33 @@ describe('owners bot', () => {
         .reply(200);
 
       await probot.receive({name: 'pull_request_review', payload: review35});
+    });
+  });
+
+  describe('team membership changes', () => {
+    beforeEach(() => {
+      sandbox.stub(Team.prototype, 'fetchMembers');
+    });
+
+    it.each([
+      ['team.created'],
+      ['team.deleted'],
+      ['team.edited'],
+      ['membership.added'],
+      ['membership.removed'],
+    ])('updates the team members on event %p', async (name, done) => {
+      nock('https://api.github.com')
+        .get('/teams/42/members?page=1&per_page=100')
+        .reply(200, [{login: 'rcebulko'}]);
+
+      await probot.receive({
+        name,
+        payload: {
+          team: {id: 42, slug: 'my-team'},
+        },
+      });
+      sandbox.assert.calledOnce(Team.prototype.fetchMembers);
+      done();
     });
   });
 });

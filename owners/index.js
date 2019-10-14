@@ -15,7 +15,7 @@
  */
 
 const Octokit = require('@octokit/rest');
-const {GitHub, PullRequest} = require('./src/github');
+const {GitHub, PullRequest, Team} = require('./src/github');
 const {LocalRepository} = require('./src/local_repo');
 const {OwnersBot} = require('./src/owners_bot');
 const {OwnersParser} = require('./src/parser');
@@ -44,7 +44,6 @@ module.exports = app => {
     GITHUB_REPO_NAME,
     app.log
   );
-  // TODO(rcebulko): Add a mechanism to periodically refresh teams.
   const teamsInitialized = ownersBot.initTeams(github);
 
   // Probot does not stream properly to GCE logs so we need to hook into
@@ -92,6 +91,23 @@ module.exports = app => {
       prNumber
     );
   });
+
+  app.on(
+    [
+      'team.created',
+      'team.deleted',
+      'team.edited',
+      'membership.added',
+      'membership.removed',
+    ],
+    async context => {
+      const {id, slug} = context.payload.team;
+      const team = new Team(id, GITHUB_REPO_OWNER, slug);
+
+      await team.fetchMembers(github);
+      ownersBot.teams[team.toString()] = team;
+    }
+  );
 
   // Since the status server is publicly accessible, we don't want any
   // endpoints to be making API calls or doing disk I/O. Rather than parsing
