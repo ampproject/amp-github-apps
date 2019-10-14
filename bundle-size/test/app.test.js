@@ -389,6 +389,9 @@ describe('bundle-size', () => {
       });
     });
 
+    // TODO(#271, danielrozenberg): remove this once we override the single
+    // bundle-size /report endpoint with the logic of the mutliple bundle-size
+    // /report.json endpoint.
     describe('/commit/:headSha/report', () => {
       test.each([
         [12.44, 'Δ -0.10KB | no approval necessary'],
@@ -842,6 +845,491 @@ describe('bundle-size', () => {
       ])('ignore bundle-size report with incorrect input: %p', async data => {
         await request(probot.server)
           .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
+          .send(data)
+          .set('Content-Type', 'application/json')
+          .set('Accept', 'application/json')
+          .expect(400);
+      });
+    });
+
+    describe('/commit/:headSha/report.json', () => {
+      let jsonPayload;
+
+      beforeEach(() => {
+        jsonPayload = {
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSizes: {
+            'dist/v0.js': 12.34,
+            'dist/amp4ads-v0.js': 11.22,
+          },
+        };
+      });
+
+      test.each([
+        [12.44, 'Δ -0.10KB | no approval necessary'],
+        [12.34, 'Δ +0.00KB | no approval necessary'],
+        [12.24, 'Δ +0.10KB | no approval necessary'],
+      ])(
+        'update a check on bundle-size report (report/base = 12.34KB/%dKB)',
+        async (baseSize, message) => {
+          await db('checks').insert({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+            owner: 'ampproject',
+            repo: 'amphtml',
+            pull_request_id: 19603,
+            installation_id: 123456,
+            check_run_id: 555555,
+            delta: null,
+          });
+
+          const baseBundleSizeFixture = getFixture(
+            '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+          );
+          baseBundleSizeFixture.content = Buffer.from(
+            `{"dist/v0.js":${baseSize}}`
+          ).toString('base64');
+          const nocks = nock('https://api.github.com')
+            .get(
+              '/repos/ampproject/amphtml-build-artifacts/contents/' +
+                'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+            )
+            .reply(200, baseBundleSizeFixture)
+            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+              expect(body).toMatchObject({
+                conclusion: 'success',
+                output: {
+                  title: message,
+                },
+              });
+              return true;
+            })
+            .reply(200);
+
+          await request(probot.server)
+            .post(
+              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+            )
+            .send(jsonPayload)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .expect(200);
+          await waitUntilNockScopeIsDone(nocks);
+        }
+      );
+
+      test(
+        'update a check on bundle-size report with no capable reviewers ' +
+          '(report/base = 12.34KB/12.00KB)',
+        async () => {
+          await db('checks').insert({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+            owner: 'ampproject',
+            repo: 'amphtml',
+            pull_request_id: 19603,
+            installation_id: 123456,
+            check_run_id: 555555,
+            delta: null,
+          });
+
+          const baseBundleSizeFixture = getFixture(
+            '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+          );
+          baseBundleSizeFixture.content = Buffer.from(
+            '{"dist/v0.js":12}'
+          ).toString('base64');
+          const nocks = nock('https://api.github.com')
+            .get(
+              '/repos/ampproject/amphtml-build-artifacts/contents/' +
+                'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+            )
+            .reply(200, baseBundleSizeFixture)
+            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+              expect(body).toMatchObject({
+                conclusion: 'action_required',
+                output: {
+                  title: 'Δ +0.34KB | approval required',
+                },
+              });
+              return true;
+            })
+            .reply(200)
+            .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
+            .reply(200, getFixture('requested_reviewers'))
+            .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+            .reply(200, getFixture('reviews'))
+            .post(
+              '/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
+              body => {
+                expect(body).toMatchObject({
+                  reviewers: [expect.stringMatching(/erwinmombay|estherkim/)],
+                });
+                return true;
+              }
+            )
+            .reply(200);
+
+          await request(probot.server)
+            .post(
+              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+            )
+            .send(jsonPayload)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .expect(200);
+          await waitUntilNockScopeIsDone(nocks);
+        }
+      );
+
+      test(
+        'update a check on bundle-size report with a capable reviewer ' +
+          '(report/base = 12.34KB/12.00KB)',
+        async () => {
+          await db('checks').insert({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+            owner: 'ampproject',
+            repo: 'amphtml',
+            pull_request_id: 19603,
+            installation_id: 123456,
+            check_run_id: 555555,
+            delta: null,
+          });
+
+          const baseBundleSizeFixture = getFixture(
+            '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+          );
+          baseBundleSizeFixture.content = Buffer.from(
+            '{"dist/v0.js":12}'
+          ).toString('base64');
+          const nocks = nock('https://api.github.com')
+            .get(
+              '/repos/ampproject/amphtml-build-artifacts/contents/' +
+                'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+            )
+            .reply(200, baseBundleSizeFixture)
+            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+              expect(body).toMatchObject({
+                conclusion: 'action_required',
+                output: {
+                  title: 'Δ +0.34KB | approval required',
+                },
+              });
+              return true;
+            })
+            .reply(200)
+            .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
+            .reply(200, getFixture('requested_reviewers'))
+            .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+            .reply(200, getFixture('reviews'))
+            .post(
+              '/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
+              body => {
+                expect(body).toMatchObject({
+                  reviewers: [expect.stringMatching(/erwinmombay|estherkim/)],
+                });
+                return true;
+              }
+            )
+            .reply(200);
+
+          await request(probot.server)
+            .post(
+              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+            )
+            .send(jsonPayload)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .expect(200);
+          await waitUntilNockScopeIsDone(nocks);
+        }
+      );
+
+      test(
+        'update a check on bundle-size report with an existing capable ' +
+          'reviewer (report/base = 12.34KB/12.00KB)',
+        async () => {
+          await db('checks').insert({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+            owner: 'ampproject',
+            repo: 'amphtml',
+            pull_request_id: 19603,
+            installation_id: 123456,
+            check_run_id: 555555,
+            delta: null,
+          });
+
+          const baseBundleSizeFixture = getFixture(
+            '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+          );
+          baseBundleSizeFixture.content = Buffer.from(
+            '{"dist/v0.js":12}'
+          ).toString('base64');
+          const reviews = getFixture('reviews');
+          reviews[0].user.login = 'aghassemi';
+          const nocks = nock('https://api.github.com')
+            .get(
+              '/repos/ampproject/amphtml-build-artifacts/contents/' +
+                'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+            )
+            .reply(200, baseBundleSizeFixture)
+            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+              expect(body).toMatchObject({
+                conclusion: 'action_required',
+                output: {
+                  title: 'Δ +0.34KB | approval required',
+                },
+              });
+              return true;
+            })
+            .reply(200)
+            .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
+            .reply(200, getFixture('requested_reviewers'))
+            .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+            .reply(200, reviews);
+
+          await request(probot.server)
+            .post(
+              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+            )
+            .send(jsonPayload)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .expect(200);
+          await waitUntilNockScopeIsDone(nocks);
+        }
+      );
+
+      test(
+        'update check on bundle-size report (report/_delayed_-base = ' +
+          '12.34KB/12.34KB)',
+        async () => {
+          await db('checks').insert({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+            owner: 'ampproject',
+            repo: 'amphtml',
+            pull_request_id: 19603,
+            installation_id: 123456,
+            check_run_id: 555555,
+            delta: null,
+          });
+
+          const baseBundleSizeFixture = getFixture(
+            '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+          );
+          baseBundleSizeFixture.content = Buffer.from(
+            '{"dist/v0.js":12.34}'
+          ).toString('base64');
+          const nocks = nock('https://api.github.com')
+            .get(
+              '/repos/ampproject/amphtml-build-artifacts/contents/' +
+                'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+            )
+            .times(2)
+            .reply(404)
+            .get(
+              '/repos/ampproject/amphtml-build-artifacts/contents/' +
+                'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+            )
+            .reply(200, baseBundleSizeFixture)
+            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+              expect(body).toMatchObject({
+                conclusion: 'success',
+                output: {
+                  title: 'Δ +0.00KB | no approval necessary',
+                },
+              });
+              return true;
+            })
+            .reply(200);
+
+          await request(probot.server)
+            .post(
+              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+            )
+            .send(jsonPayload)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .expect(202);
+          await waitUntilNockScopeIsDone(nocks);
+        }
+      );
+
+      test(
+        'update check on bundle-size report (report/_delayed_-base = ' +
+          '12.34KB/12.23KB)',
+        async () => {
+          await db('checks').insert({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+            owner: 'ampproject',
+            repo: 'amphtml',
+            pull_request_id: 19603,
+            installation_id: 123456,
+            check_run_id: 555555,
+            delta: null,
+          });
+
+          const baseBundleSizeFixture = getFixture(
+            '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+          );
+          baseBundleSizeFixture.content = Buffer.from(
+            '{"dist/v0.js":12.23}'
+          ).toString('base64');
+          const nocks = nock('https://api.github.com')
+            .get(
+              '/repos/ampproject/amphtml-build-artifacts/contents/' +
+                'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+            )
+            .times(2)
+            .reply(404)
+            .get(
+              '/repos/ampproject/amphtml-build-artifacts/contents/' +
+                'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+            )
+            .reply(200, baseBundleSizeFixture)
+            .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+              expect(body).toMatchObject({
+                conclusion: 'action_required',
+                output: {
+                  title: 'Δ +0.11KB | approval required',
+                },
+              });
+              return true;
+            })
+            .reply(200)
+            .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
+            .reply(200, getFixture('requested_reviewers'))
+            .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+            .reply(200, getFixture('reviews'))
+            .post(
+              '/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
+              body => {
+                expect(body).toMatchObject({
+                  reviewers: [expect.stringMatching(/erwinmombay|estherkim/)],
+                });
+                return true;
+              }
+            )
+            .reply(200);
+
+          await request(probot.server)
+            .post(
+              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+            )
+            .send(jsonPayload)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .expect(202);
+          await waitUntilNockScopeIsDone(nocks);
+        }
+      );
+
+      test('update check on bundle-size report on missing base size', async () => {
+        await db('checks').insert({
+          head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          owner: 'ampproject',
+          repo: 'amphtml',
+          pull_request_id: 19603,
+          installation_id: 123456,
+          check_run_id: 555555,
+          delta: null,
+        });
+
+        const nocks = nock('https://api.github.com')
+          .get(
+            '/repos/ampproject/amphtml-build-artifacts/contents/' +
+              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+          )
+          .times(60)
+          .reply(404)
+          .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+            expect(body).toMatchObject({
+              conclusion: 'action_required',
+              output: {
+                title:
+                  'Failed to retrieve the bundle size of branch point 5f27002',
+              },
+            });
+            return true;
+          })
+          .reply(200)
+          .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
+          .reply(200, getFixture('requested_reviewers'))
+          .get('/repos/ampproject/amphtml/pulls/19603/reviews')
+          .reply(200, getFixture('reviews'))
+          .post(
+            '/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
+            body => {
+              expect(body).toMatchObject({
+                reviewers: [expect.stringMatching(/erwinmombay|estherkim/)],
+              });
+              return true;
+            }
+          )
+          .reply(200);
+
+        await request(probot.server)
+          .post(
+            '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+          )
+          .send(jsonPayload)
+          .set('Content-Type', 'application/json')
+          .set('Accept', 'application/json')
+          .expect(202);
+        await waitUntilNockScopeIsDone(nocks);
+      });
+
+      test('ignore bundle-size report for a missing head SHA', async () => {
+        await request(probot.server)
+          .post(
+            '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+          )
+          .send(jsonPayload)
+          .set('Content-Type', 'application/json')
+          .set('Accept', 'application/json')
+          .expect(404);
+      });
+
+      test.each([
+        {
+          // Missing everything.
+        },
+        {
+          // Missing bundleSizes field.
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSize: 12.34,
+        },
+        {
+          // Missing 'dist/v0.js' key.
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSizes: {
+            'dist/amp4ads-v0.js': 12.34,
+          },
+        },
+        {
+          // bashSha is a partial SHA, not a complete SHA.
+          baseSha: '5f27002',
+          bundleSizes: {
+            'dist/v0.js': 12.34,
+          },
+        },
+        {
+          // A bundle size is reporter as a string, not a number.
+          baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+          bundleSizes: {
+            'dist/v0.js': 12.34,
+            'dist/amp4ads-v0.js': '11.22',
+          },
+        },
+        {
+          // Missing baseSha field.
+          bundleSizes: {
+            'dist/v0.js': 12.34,
+          },
+        },
+      ])('ignore bundle-size report with incorrect input: %p', async data => {
+        await request(probot.server)
+          .post(
+            '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+          )
           .send(data)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')

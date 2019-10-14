@@ -498,7 +498,12 @@ module.exports = app => {
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
-      return response.status(404).end(`${headSha} not in database`);
+      return response
+        .status(404)
+        .end(
+          `${headSha} was not found in bundle-size database; try to rebase ` +
+            'this pull request on the latest commit in the `master` to fix this'
+        );
     }
     const github = await app.auth(check.installation_id);
     await github.checks.update({
@@ -541,7 +546,71 @@ module.exports = app => {
 
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
-      return response.status(404).end(`${headSha} not in database`);
+      return response
+        .status(404)
+        .end(
+          `${headSha} was not found in bundle-size database; try to rebase ` +
+            'this pull request on the latest commit in the `master` to fix this'
+        );
+    }
+
+    let reportSuccess = await tryReport(check, baseSha, bundleSize);
+    if (reportSuccess) {
+      response.end();
+    } else {
+      response.status(202).end();
+      let retriesLeft = RETRY_TIMES - 1;
+      do {
+        app.log(`Will retry ${retriesLeft} more time(s) in ${RETRY_MILLIS} ms`);
+        await sleep(RETRY_MILLIS);
+        retriesLeft--;
+        reportSuccess = await tryReport(
+          check,
+          baseSha,
+          bundleSize,
+          /* lastAttempt */ retriesLeft == 0
+        );
+      } while (retriesLeft > 0 && !reportSuccess);
+    }
+  });
+
+  v0.post('/commit/:headSha/report.json', async (request, response) => {
+    const {headSha} = request.params;
+    const {baseSha, bundleSizes} = request.body;
+
+    if (typeof baseSha !== 'string' || !/^[0-9a-f]{40}$/.test(baseSha)) {
+      return response
+        .status(400)
+        .end('POST request to /report must have commit SHA field "baseSha"');
+    }
+    if (
+      !bundleSizes ||
+      Object.values(bundleSizes).some(value => typeof value !== 'number') ||
+      !bundleSizes['dist/v0.js']
+    ) {
+      return response
+        .status(400)
+        .end(
+          'POST request to /report.json must have a key/value object ' +
+            'Map<string, number> field "bundleSizes", with at least one key ' +
+            'set to "dist/v0.js"'
+        );
+    }
+
+    // TODO(#271, danielrozenberg): this is a transitionary solution. This API
+    // endpoint accepts a JSON with multiple bundle sizes, but for now it only
+    // processes the size of dist/v0.js. Once we determine how we want to report
+    // and block PRs based on other bundle sizes we can start processing them.
+    const bundleSize = bundleSizes['dist/v0.js'];
+
+    const check = await getCheckFromDatabase(headSha);
+    if (!check) {
+      return response
+        .status(404)
+        .end(
+          `${headSha} was not found in bundle-size database; try to rebase ` +
+            'this pull request on the latest commit in the `master` to fix this'
+        );
     }
 
     let reportSuccess = await tryReport(check, baseSha, bundleSize);
