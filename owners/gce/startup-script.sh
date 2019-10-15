@@ -22,21 +22,22 @@
 set -v
 
 # [START env]
-APP_ID=22611  # Probot
-NODE_ENV="production"  # App
-LOG_LEVEL="trace"  # Probot + App
-REPO="ampproject/amphtml"  # Startup + App
-#REPO="erwinmombay/github-owners-bot-test-repo"
 APP_DIR="/opt/app"  # Startup
 REPO_DIR="/opt/amphtml"  # Startup + App
-#REPO_DIR="/opt/github-owners-bot-test-repo"
-GITHUB_BOT_USERNAME="amp-owners-bot"  # App
+REPO="ampproject/amphtml"  # Startup + App
+
+APP_ID=22611  # Probot
 WEBHOOK_SECRET="[REDACTED]"  # Probot
-CLOUD_BUCKET="[REDACTED]"  # Unused
+LOG_LEVEL="trace"  # Probot + App
+
+GITHUB_BOT_USERNAME="amp-owners-bot"  # App
+NODE_ENV="production"  # App
 GITHUB_ACCESS_TOKEN="[REDACTED]"  # App
+ADD_REVIEWERS_OPT_OUT=1  # App
+
+CLOUD_BUCKET="[REDACTED]"  # Unused
 OAUTH2_CLIENT_ID="[REDACTED]"  # Unknown
 OAUTH2_CLIENT_SECRET="[REDACTED]"  # Unknown
-ADD_REVIEWERS_OPT_OUT=1  # App
 # [END env]
 
 # Talk to the metadata server to get the project id
