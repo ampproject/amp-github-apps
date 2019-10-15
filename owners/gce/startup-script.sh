@@ -66,13 +66,12 @@ rm -rf "${APP_DIR}"
 git clone https://source.developers.google.com/p/$PROJECTID/r/amp-owners-bot "${APP_DIR}"
 mkdir -p ${APP_DIR}/.env
 
-cat > ${APP_DIR}/.env/amp-owners-bot.2019-01-22.private-key.pem << EOF
+PRIVATE_KEY=$(echo | base64 << EOF
 -----BEGIN RSA PRIVATE KEY-----
 [REDACTED]
 -----END RSA PRIVATE KEY-----
 EOF
-
-PRIVATE_KEY_PATH="${APP_DIR}/.env/amp-owners-bot.2019-01-22.private-key.pem"
+)
 
 # Install app dependencies
 cd "${APP_DIR}"
@@ -97,7 +96,7 @@ command=npm run start
 autostart=true
 autorestart=true
 user=nodeapp
-environment=HOME="/home/nodeapp",USER="nodeapp",NODE_ENV="${NODE_ENV}",LOG_LEVEL="${LOG_LEVEL}",GCLOUD_PROJECT="${PROJECTID}",DATA_BACKEND="datastore",GITHUB_ACCESS_TOKEN="${GITHUB_ACCESS_TOKEN}",GITHUB_REPO_DIR="${REPO_DIR}",WEBHOOK_SECRET="${WEBHOOK_SECRET}",GITHUB_BOT_USERNAME="${GITHUB_BOT_USERNAME}",PORT="8080",APP_ID="${APP_ID}",PRIVATE_KEY_PATH="${PRIVATE_KEY_PATH}",GITHUB_REPO="${REPO}",APP_COMMIT_SHA="${APP_COMMIT_SHA}",APP_COMMIT_MSG="${APP_COMMIT_MSG}",ADD_REVIEWERS_OPT_OUT=${ADD_REVIEWERS_OPT_OUT},INFO_SERVER_PORT="8081"
+environment=HOME="/home/nodeapp",USER="nodeapp",NODE_ENV="${NODE_ENV}",LOG_LEVEL="${LOG_LEVEL}",GCLOUD_PROJECT="${PROJECTID}",DATA_BACKEND="datastore",GITHUB_ACCESS_TOKEN="${GITHUB_ACCESS_TOKEN}",GITHUB_REPO_DIR="${REPO_DIR}",WEBHOOK_SECRET="${WEBHOOK_SECRET}",GITHUB_BOT_USERNAME="${GITHUB_BOT_USERNAME}",PORT="8080",APP_ID="${APP_ID}",PRIVATE_KEY="${PRIVATE_KEY}",GITHUB_REPO="${REPO}",APP_COMMIT_SHA="${APP_COMMIT_SHA}",APP_COMMIT_MSG="${APP_COMMIT_MSG}",ADD_REVIEWERS_OPT_OUT=${ADD_REVIEWERS_OPT_OUT},INFO_SERVER_PORT="8081"
 nodaemon=true
 stdout_logfile=syslog
 stdout_logfile_maxbytes=0
