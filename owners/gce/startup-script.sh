@@ -34,14 +34,10 @@ GITHUB_BOT_USERNAME="amp-owners-bot"  # App
 NODE_ENV="production"  # App
 GITHUB_ACCESS_TOKEN="[REDACTED]"  # App
 ADD_REVIEWERS_OPT_OUT=1  # App
-
-CLOUD_BUCKET="[REDACTED]"  # Unused
-OAUTH2_CLIENT_ID="[REDACTED]"  # Unknown
-OAUTH2_CLIENT_SECRET="[REDACTED]"  # Unknown
 # [END env]
 
 # Talk to the metadata server to get the project id
-PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")  # Startup (logging)
+PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")  # Startup (logging) + App (info server)
 echo "Project ID ${PROJECTID}"
 supervisorctl stop nodeapp
 
@@ -101,7 +97,7 @@ command=npm run start
 autostart=true
 autorestart=true
 user=nodeapp
-environment=HOME="/home/nodeapp",USER="nodeapp",NODE_ENV="${NODE_ENV}",LOG_LEVEL="${LOG_LEVEL}",GCLOUD_PROJECT="${PROJECTID}",CLOUD_BUCKET="${CLOUD_BUCKET}",DATA_BACKEND="datastore",OAUTH2_CLIENT_ID="${OAUTH2_CLIENT_ID}",OAUTH2_CLIENT_SECRET="${OAUTH2_CLIENT_SECRET}",GITHUB_ACCESS_TOKEN="${GITHUB_ACCESS_TOKEN}",GITHUB_REPO_DIR="${REPO_DIR}",WEBHOOK_SECRET="${WEBHOOK_SECRET}",GITHUB_BOT_USERNAME="${GITHUB_BOT_USERNAME}",PORT="8080",APP_ID="${APP_ID}",PRIVATE_KEY_PATH="${PRIVATE_KEY_PATH}",GITHUB_REPO="${REPO}",APP_COMMIT_SHA="${APP_COMMIT_SHA}",APP_COMMIT_MSG="${APP_COMMIT_MSG}",ADD_REVIEWERS_OPT_OUT=${ADD_REVIEWERS_OPT_OUT},INFO_SERVER_PORT="8081"
+environment=HOME="/home/nodeapp",USER="nodeapp",NODE_ENV="${NODE_ENV}",LOG_LEVEL="${LOG_LEVEL}",GCLOUD_PROJECT="${PROJECTID}",DATA_BACKEND="datastore",GITHUB_ACCESS_TOKEN="${GITHUB_ACCESS_TOKEN}",GITHUB_REPO_DIR="${REPO_DIR}",WEBHOOK_SECRET="${WEBHOOK_SECRET}",GITHUB_BOT_USERNAME="${GITHUB_BOT_USERNAME}",PORT="8080",APP_ID="${APP_ID}",PRIVATE_KEY_PATH="${PRIVATE_KEY_PATH}",GITHUB_REPO="${REPO}",APP_COMMIT_SHA="${APP_COMMIT_SHA}",APP_COMMIT_MSG="${APP_COMMIT_MSG}",ADD_REVIEWERS_OPT_OUT=${ADD_REVIEWERS_OPT_OUT},INFO_SERVER_PORT="8081"
 nodaemon=true
 stdout_logfile=syslog
 stdout_logfile_maxbytes=0
