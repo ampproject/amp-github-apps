@@ -436,9 +436,7 @@ class GitHub {
     );
     this.logger.debug('[listFiles]', number, response.data);
 
-    return response.data.map(({filename, sha}) => {
-      return {filename, sha};
-    });
+    return response.data.map(({filename, sha}) => filename);
   }
 
   /**

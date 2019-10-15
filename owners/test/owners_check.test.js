@@ -81,36 +81,12 @@ describe('owners check', () => {
     ownersCheck = new OwnersCheck(
       ownersTree,
       [
-        {
-          // root_owner
-          filename: 'main.js',
-          sha: '_sha0_',
-        },
-        {
-          // approver, some_user, root_owner
-          filename: 'foo/test.js',
-          sha: '_sha1_',
-        },
-        {
-          // approver, some_user, root_owner
-          filename: 'foo/required/info.html',
-          sha: '_sha5_',
-        },
-        {
-          // other_approver, root_owner
-          filename: 'bar/baz/file.txt',
-          sha: '_sha2_',
-        },
-        {
-          // the_author, root_owner
-          filename: 'buzz/README.md',
-          sha: '_sha3_',
-        },
-        {
-          // extra_reviewer, root_owner
-          filename: 'extra/script.js',
-          sha: '_sha4_',
-        },
+        'main.js', // root_owner
+        'foo/test.js', // approver, some_user, root_owner
+        'foo/required/info.html', // approver, some_user, root_owner
+        'bar/baz/file.txt', // other_approver, root_owner
+        'buzz/README.md', // the_author, root_owner
+        'extra/script.js', // extra_reviewer, root_owner
       ],
       {
         the_author: true,

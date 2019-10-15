@@ -192,12 +192,7 @@ describe('notifier', () => {
       getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
       getCommentsStub.returns([]);
 
-      notifier = new OwnersNotifier(pr, {}, new OwnersTree(), [
-        {
-          filename: 'main.js',
-          sha: '_sha_',
-        },
-      ]);
+      notifier = new OwnersNotifier(pr, {}, new OwnersTree(), ['main.js']);
     });
 
     it('gets users and teams to notify', async done => {
@@ -293,12 +288,7 @@ describe('notifier', () => {
         ])
       );
 
-      notifier = new OwnersNotifier(pr, {}, tree, [
-        {
-          filename: 'foo/script.js',
-          sha: '_sha_',
-        },
-      ]);
+      notifier = new OwnersNotifier(pr, {}, tree, ['foo/script.js']);
     });
 
     it('includes suggested reviewers', () => {
@@ -335,8 +325,8 @@ describe('notifier', () => {
 
     it('includes user owners with the always-notify modifier', () => {
       const notifier = new OwnersNotifier(pr, {}, tree, [
-        {filename: 'foo/main.js', sha: '_sha_'},
-        {filename: 'foo/bar.js', sha: '_sha_'},
+        'foo/main.js',
+        'foo/bar.js',
       ]);
       const notifies = notifier.getOwnersToNotify();
 
@@ -344,18 +334,14 @@ describe('notifier', () => {
     });
 
     it('includes team owners with the always-notify modifier', () => {
-      const notifier = new OwnersNotifier(pr, {}, tree, [
-        {filename: 'bar/script.js', sha: '_sha_'},
-      ]);
+      const notifier = new OwnersNotifier(pr, {}, tree, ['bar/script.js']);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['ampproject/relevant_team']).toContain('bar/script.js');
     });
 
     it('excludes files with no always-notify owners', () => {
-      const notifier = new OwnersNotifier(pr, {}, tree, [
-        {filename: 'baz/test.js', sha: '_sha_'},
-      ]);
+      const notifier = new OwnersNotifier(pr, {}, tree, ['baz/test.js']);
       const notifies = notifier.getOwnersToNotify();
 
       expect(notifies['rando']).toBeUndefined();
@@ -369,7 +355,7 @@ describe('notifier', () => {
           pr,
           {'current_approver': true, 'pending_reviewer': false},
           tree,
-          [{filename: 'baz/test.js', sha: '_sha_'}]
+          ['baz/test.js']
         );
 
         sandbox

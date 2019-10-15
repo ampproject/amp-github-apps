@@ -100,10 +100,7 @@ describe('owners bot', () => {
         ]);
       sandbox
         .stub(GitHub.prototype, 'listFiles')
-        .returns([
-          {filename: 'changed_file1.js', sha: '_sha1_'},
-          {filename: 'foo/changed_file2.js', sha: '_sha2_'},
-        ]);
+        .returns(['changed_file1.js', 'foo/changed_file2.js']);
       sandbox
         .stub(GitHub.prototype, 'getReviewRequests')
         .returns(['requested']);
@@ -149,8 +146,8 @@ describe('owners bot', () => {
 
       sandbox.assert.calledWith(github.listFiles, 1337);
       expect(changedFiles).toContainEqual(
-        {filename: 'changed_file1.js', sha: '_sha1_'},
-        {filename: 'foo/changed_file2.js', sha: '_sha2_'}
+        'changed_file1.js',
+        'foo/changed_file2'
       );
     });
   });
