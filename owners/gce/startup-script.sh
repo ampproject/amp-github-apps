@@ -25,9 +25,16 @@ set -v
 APP_DIR="/opt/app"  # Startup
 REPO_DIR="/opt/amphtml"  # Startup + App
 REPO="ampproject/amphtml"  # Startup + App
+PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")  # Startup (logging) + App (info server)
 
 APP_ID=22611  # Probot
 WEBHOOK_SECRET="[REDACTED]"  # Probot
+PRIVATE_KEY=$(echo | base64 << EOF
+-----BEGIN RSA PRIVATE KEY-----
+[REDACTED]
+-----END RSA PRIVATE KEY-----
+EOF
+)  # Probot
 LOG_LEVEL="trace"  # Probot + App
 
 GITHUB_BOT_USERNAME="amp-owners-bot"  # App
@@ -36,18 +43,23 @@ GITHUB_ACCESS_TOKEN="[REDACTED]"  # App
 ADD_REVIEWERS_OPT_OUT=1  # App
 # [END env]
 
-# Talk to the metadata server to get the project id
-PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")  # Startup (logging) + App (info server)
+
+## Steps for: Deployment
+
 echo "Project ID ${PROJECTID}"
 supervisorctl stop nodeapp
 
+
+## Steps for: Initialization
+
+# [START logging]
 # Install logging monitor. The monitor will automatically pick up logs sent to
 # syslog.
-# [START logging]
 curl -s "https://storage.googleapis.com/signals-agents/logging/google-fluentd-install.sh" | bash
 service google-fluentd restart &
 # [END logging]
 
+# [START installs]
 # Install dependencies from apt
 apt-get update
 apt-get install -yq ca-certificates git nodejs build-essential supervisor
@@ -57,37 +69,44 @@ mkdir /opt/nodejs
 curl https://nodejs.org/dist/v10.15.0/node-v10.15.0-linux-x64.tar.gz | tar xvzf - -C /opt/nodejs --strip-components=1
 ln -s /opt/nodejs/bin/node /usr/bin/node
 ln -s /opt/nodejs/bin/npm /usr/bin/npm
+# [END installs]
 
+# [START git]
 # Get the application source code from the Google Cloud Repository.
 # git requires $HOME and it's not set during the startup script.
 export HOME=/root
 git config --global credential.helper gcloud.sh
 rm -rf "${APP_DIR}"
+# TODO(#500): Deploy from `amphtml/amp-github-apps`
 git clone https://source.developers.google.com/p/$PROJECTID/r/amp-owners-bot "${APP_DIR}"
-mkdir -p ${APP_DIR}/.env
+# [END git]
 
-PRIVATE_KEY=$(echo | base64 << EOF
------BEGIN RSA PRIVATE KEY-----
-[REDACTED]
------END RSA PRIVATE KEY-----
-EOF
-)
+## Steps for: Deployment
 
+# [START update]
 # Install app dependencies
 cd "${APP_DIR}"
-APP_COMMIT_SHA=$(git log --max-count=1 --pretty='format:%h')
-APP_COMMIT_MSG=$(git log --max-count=1 --pretty='format:%s')
+APP_COMMIT_SHA=$(git log --max-count=1 --pretty='format:%h')  # App
+APP_COMMIT_MSG=$(git log --max-count=1 --pretty='format:%s')  # App
 npm install
+# [END update]
 
-# get a clean copy of the target repository to be evaluated
+
+## Steps for: Initialization
+# [START clone]
+# Get a clean copy of the target repository to be evaluated
 rm -rf "${REPO_DIR}"
 git clone "https://github.com/${REPO}.git" "${REPO_DIR}"
+# [END clone]
 
+# [START auth]
 # Create a nodeapp user. The application will run as this user.
 useradd -m -d /home/nodeapp nodeapp
 chown -R nodeapp:nodeapp "${APP_DIR}"
 chown -R nodeapp:nodeapp "${REPO_DIR}"
+# [END auth]
 
+# [START supervisor]
 # Configure supervisor to run the node app.
 cat >/etc/supervisor/conf.d/node-app.conf << EOF
 [program:nodeapp]
@@ -104,8 +123,12 @@ stderr_logfile=syslog
 stderr_logfile_maxbytes=0
 EOF
 
+
+## Steps for: Deployment
+
 supervisorctl reread
 supervisorctl update
+# [END supervisor]
 
 # Application should now be running under supervisor
 # [END startup]
