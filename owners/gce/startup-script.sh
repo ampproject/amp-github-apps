@@ -17,27 +17,30 @@
 # command is run.
 # TODO(#500): Move as much of this as possible to checked-in scripts and split
 #   startup code from re-deployment code.
+
 # [START startup]
 set -v
 
-APP_ID=22611
-NODE_ENV="production"
-LOG_LEVEL="trace"
-REPO="ampproject/amphtml"
+# [START env]
+APP_ID=22611  # Probot
+NODE_ENV="production"  # App
+LOG_LEVEL="trace"  # Probot + App
+REPO="ampproject/amphtml"  # Startup + App
 #REPO="erwinmombay/github-owners-bot-test-repo"
-APP_DIR="/opt/app"
-REPO_DIR="/opt/amphtml"
+APP_DIR="/opt/app"  # Startup
+REPO_DIR="/opt/amphtml"  # Startup + App
 #REPO_DIR="/opt/github-owners-bot-test-repo"
-GITHUB_BOT_USERNAME="amp-owners-bot"
-WEBHOOK_SECRET="[REDACTED]"
-CLOUD_BUCKET="[REDACTED]"
-GITHUB_ACCESS_TOKEN="[REDACTED]"
-OAUTH2_CLIENT_ID="[REDACTED]"
-OAUTH2_CLIENT_SECRET="[REDACTED]"
-ADD_REVIEWERS_OPT_OUT=1
+GITHUB_BOT_USERNAME="amp-owners-bot"  # App
+WEBHOOK_SECRET="[REDACTED]"  # Probot
+CLOUD_BUCKET="[REDACTED]"  # Unused
+GITHUB_ACCESS_TOKEN="[REDACTED]"  # App
+OAUTH2_CLIENT_ID="[REDACTED]"  # Unknown
+OAUTH2_CLIENT_SECRET="[REDACTED]"  # Unknown
+ADD_REVIEWERS_OPT_OUT=1  # App
+# [END env]
 
 # Talk to the metadata server to get the project id
-PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")
+PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")  # Startup (logging)
 echo "Project ID ${PROJECTID}"
 supervisorctl stop nodeapp
 
