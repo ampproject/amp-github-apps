@@ -81,12 +81,12 @@ describe('owners check', () => {
     ownersCheck = new OwnersCheck(
       ownersTree,
       [
-        'main.js',  // root_owner
-        'foo/test.js',  // approver, some_user, root_owner
-        'foo/required/info.html',  // approver, some_user, root_owner
-        'bar/baz/file.txt',  // other_approver, root_owner
-        'buzz/README.md',  // the_author, root_owner
-        'extra/script.js',  // extra_reviewer, root_owner
+        'main.js', // root_owner
+        'foo/test.js', // approver, some_user, root_owner
+        'foo/required/info.html', // approver, some_user, root_owner
+        'bar/baz/file.txt', // other_approver, root_owner
+        'buzz/README.md', // the_author, root_owner
+        'extra/script.js', // extra_reviewer, root_owner
       ],
       {
         the_author: true,

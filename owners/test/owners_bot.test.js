@@ -147,7 +147,7 @@ describe('owners bot', () => {
       sandbox.assert.calledWith(github.listFiles, 1337);
       expect(changedFiles).toContainEqual(
         'changed_file1.js',
-        'foo/changed_file2',
+        'foo/changed_file2'
       );
     });
   });
