@@ -32,9 +32,7 @@ class OwnersNotifier {
    */
   constructor(pr, currentReviewers, tree, changedFiles) {
     Object.assign(this, {pr, currentReviewers});
-    this.fileTreeMap = tree.buildFileTreeMap(
-      changedFiles.map(({filename}) => filename)
-    );
+    this.fileTreeMap = tree.buildFileTreeMap(changedFiles);
   }
 
   /**

@@ -80,7 +80,7 @@ class OwnersCheck {
   constructor(tree, changedFiles, reviewers) {
     Object.assign(this, {
       tree,
-      changedFilenames: changedFiles.map(({filename}) => filename),
+      changedFilenames: changedFiles,
       reviewers,
     });
   }
