@@ -19,22 +19,27 @@ import express, {IRouter} from 'express';
 import {PullRequest} from './github';
 import {unzipAndMove} from './zipper';
 
+const BASE_URL = 'https://storage.googleapis.com/amp-test-website-1/';
+
 /**
  * Creates or resets the GitHub PR Deploy check
  * when a pull request is opened or synchronized.
  */
 function initializeCheck(app: Application) {
-  app.on([
-    'pull_request.opened',
-    'pull_request.synchronize',
-    'pull_request.reopened',
-  ], async context => {
-    const pr = new PullRequest(
-      context.github,
-      context.payload.pull_request.head.sha,
-    );
-    return pr.createOrResetCheck();
-  });
+  app.on(
+    [
+      'pull_request.opened',
+      'pull_request.synchronize',
+      'pull_request.reopened',
+    ],
+    async context => {
+      const pr = new PullRequest(
+        context.github,
+        context.payload.pull_request.head.sha
+      );
+      return pr.createOrResetCheck();
+    }
+  );
 }
 
 /**
@@ -45,8 +50,9 @@ function initializeCheck(app: Application) {
 function initializeRouter(app: Application) {
   const router: IRouter<void> = app.route('/v0/pr-deploy');
   router.use(express.json());
-  router.post('/travisbuilds/:travisBuild/headshas/:headSha/:result',
-    async(request, response) => {
+  router.post(
+    '/travisbuilds/:travisBuild/headshas/:headSha/:result',
+    async (request, response) => {
       const {travisBuild, headSha, result} = request.params;
       const github = await app.auth(Number(process.env.INSTALLATION_ID));
       const pr = new PullRequest(github, headSha);
@@ -63,7 +69,8 @@ function initializeRouter(app: Application) {
           break;
       }
       response.send({status: 200});
-    });
+    }
+  );
 }
 
 /**
@@ -78,13 +85,16 @@ function initializeDeployment(app: Application) {
 
     const pr = new PullRequest(
       context.github,
-      context.payload.check_run.head_sha,
+      context.payload.check_run.head_sha
     );
     await pr.deploymentInProgress();
     const travisBuild = await pr.getTravisBuildNumber();
     await unzipAndMove(travisBuild)
-      .then(serveUrl => {
-        pr.deploymentCompleted(serveUrl);
+      .then(bucketUrl => {
+        pr.deploymentCompleted(
+          bucketUrl,
+          `${BASE_URL}amp_dist_${travisBuild}/`
+        );
       })
       .catch(e => {
         pr.deploymentErrored(e);
