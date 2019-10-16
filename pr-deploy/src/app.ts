@@ -19,7 +19,7 @@ import express, {IRouter} from 'express';
 import {PullRequest} from './github';
 import {unzipAndMove} from './zipper';
 
-const BASE_URL = 'https://storage.googleapis.com/amp-test-website-1/';
+const BASE_URL = `https://storage.googleapis.com/${process.env.SERVE_BUCKET}/`;
 
 /**
  * Creates or resets the GitHub PR Deploy check
