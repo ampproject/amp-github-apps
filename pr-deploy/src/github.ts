@@ -58,8 +58,7 @@ export class PullRequest {
       status: 'in_progress',
       output: {
         title: 'Creating a test site...',
-        summary:
-          'Please wait while a test site is being created. ' +
+        summary: 'Please wait while a test site is being created. ' +
           'When finished, a link will appear here.',
         text: check.output.text,
       },
@@ -134,10 +133,9 @@ export class PullRequest {
       conclusion: 'neutral',
       output: {
         title: 'Ready to create a test site.',
-        summary:
-          'Please click the `Create a test site` button above to ' +
-          'deploy the minified build of this PR along with examples from ' +
-          '`examples/` and `test/manual/`. It should only take a minute.',
+        summary: 'Please click the `Create a test site` button above to ' +
+        'deploy the minified build of this PR along with examples from ' +
+        '`examples/` and `test/manual/`. It should only take a minute.',
         text: `Travis build number: ${id}`,
       },
       actions: [ACTION],
@@ -160,9 +158,8 @@ export class PullRequest {
       conclusion: 'neutral',
       output: {
         title: 'Build error.',
-        summary:
-          'A test site cannot be created because this PR ' +
-          'failed to build. Please check the Travis logs for more information.',
+        summary: 'A test site cannot be created because this PR ' +
+        'failed to build. Please check the Travis logs for more information.',
       },
     };
 
@@ -183,11 +180,10 @@ export class PullRequest {
       conclusion: 'neutral',
       output: {
         title: 'Build skipped.',
-        summary:
-          'A test site cannot be created because the ' +
-          'compilation step was skipped in Travis. This happens when ' +
-          'a PR only includes non-code changes, such as documentation. ' +
-          'Please check the Travis logs for more information.',
+        summary: 'A test site cannot be created because the ' +
+         'compilation step was skipped in Travis. This happens when ' +
+         'a PR only includes non-code changes, such as documentation. ' +
+         'Please check the Travis logs for more information.',
       },
     };
 
@@ -216,8 +212,7 @@ export class PullRequest {
       status: 'queued',
       output: {
         title: 'Waiting for the build to finish...',
-        summary:
-          'When Travis is finished compiling this PR, ' +
+        summary: 'When Travis is finished compiling this PR, ' +
           'a "Create a test site!" button will appear here.',
       },
     };
@@ -229,19 +224,14 @@ export class PullRequest {
    * Reset the check and set it to 'queued'.
    */
   private async resetCheck_(
-    check: Octokit.ChecksListForRefResponseCheckRunsItem
-  ) {
+    check: Octokit.ChecksListForRefResponseCheckRunsItem) {
     let output: Octokit.ChecksListForRefResponseCheckRunsItemOutput;
-    if (
-      check.status == 'completed' &&
-      check.conclusion == 'success' &&
-      check.output.text
-    ) {
+    if (check.status == 'completed'
+      && check.conclusion == 'success' && check.output.text) {
       output = {
         title: 'A new build is being compiled...',
-        summary:
-          `To view the existing test site, visit ${check.output.text} ` +
-          'This site will be overwritten if you recreate the test site.',
+        summary: `To view the existing test site, visit ${check.output.text} ` +
+        'This site will be overwritten if you recreate the test site.',
       } as Octokit.ChecksListForRefResponseCheckRunsItemOutput;
     }
 
