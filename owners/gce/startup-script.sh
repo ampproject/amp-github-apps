@@ -36,6 +36,7 @@ EOF
 echo > "${APP_DIR}/.env" <<EOF
 NODE_ENV=production
 LOG_LEVEL=trace
+PORT=8080
 INFO_SERVER_PORT=8081
 
 # Provided when creating a new GitHub App
@@ -122,7 +123,7 @@ command=npm run start
 autostart=true
 autorestart=true
 user=nodeapp
-environment=HOME="/home/nodeapp",USER="nodeapp",NODE_ENV="${NODE_ENV}",LOG_LEVEL="${LOG_LEVEL}",GITHUB_ACCESS_TOKEN="${GITHUB_ACCESS_TOKEN}",GITHUB_REPO_DIR="${REPO_DIR}",WEBHOOK_SECRET="${WEBHOOK_SECRET}",GITHUB_BOT_USERNAME="${GITHUB_BOT_USERNAME}",PORT="8080",APP_ID="${APP_ID}",PRIVATE_KEY="${PRIVATE_KEY}",GITHUB_REPO="${REPO}",APP_COMMIT_SHA="${APP_COMMIT_SHA}",APP_COMMIT_MSG="${APP_COMMIT_MSG}",ADD_REVIEWERS_OPT_OUT=${ADD_REVIEWERS_OPT_OUT},INFO_SERVER_PORT="8081"
+environment=HOME="/home/nodeapp",USER="nodeapp",APP_COMMIT_SHA="${APP_COMMIT_SHA}",APP_COMMIT_MSG="${APP_COMMIT_MSG}"
 nodaemon=true
 stdout_logfile=syslog
 stdout_logfile_maxbytes=0
