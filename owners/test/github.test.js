@@ -617,7 +617,9 @@ describe('GitHub API', () => {
     it('fetches the list of matching files', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/search/code?q=filename%3AREADME.md%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100')
+        .get(
+          '/search/code?q=filename%3AREADME.md%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100'
+        )
         .reply(200, searchReadmeResponse);
 
       await withContext(async (context, github) => {
@@ -629,12 +631,16 @@ describe('GitHub API', () => {
     it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100')
+        .get(
+          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100'
+        )
         .reply(200, searchOwnersPage1Response, {
           link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
         });
       nock('https://api.github.com')
-        .get('/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100')
+        .get(
+          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100'
+        )
         .reply(200, searchOwnersPage2Response);
 
       await withContext(async (context, github) => {
@@ -652,9 +658,9 @@ describe('GitHub API', () => {
         .reply(200, {
           total_count: 3,
           items: [
-            { name: 'not-exact-match', path: 'foo/not-exact-match', sha: '' },
-            { name: 'exact-match', path: 'foo/exact-match', sha: '' },
-            { name: 'exact-match', path: 'exact-match', sha: '' },
+            {name: 'not-exact-match', path: 'foo/not-exact-match', sha: ''},
+            {name: 'exact-match', path: 'foo/exact-match', sha: ''},
+            {name: 'exact-match', path: 'exact-match', sha: ''},
           ],
         });
 

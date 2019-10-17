@@ -207,11 +207,11 @@ class GitHub {
     let isNextLink = true;
     while (isNextLink) {
       this.logger.info(`Fetching page ${page}`);
-      const response = await this._customRequest(
-        'GET',
-        url,
-        { page, per_page: MAX_PER_PAGE, ...data },
-      );
+      const response = await this._customRequest('GET', url, {
+        page,
+        per_page: MAX_PER_PAGE,
+        ...data,
+      });
       const nextLink = response.headers.link || '';
       isNextLink = nextLink.includes('rel="next"');
 
@@ -451,7 +451,8 @@ class GitHub {
 
     const files = [];
     let page = 1;
-    while (true) {
+    let isLastPage = false;
+    while (!isLastPage) {
       this.logger.info(`Fetching page ${page}`);
       const response = await this.client.search.code({
         q: `filename:${filename} repo:${this.owner}/${this.repository}`,
@@ -459,21 +460,20 @@ class GitHub {
         page,
       });
 
-      const {total_count, items} = response.data;
-      this.logger.debug(
-        `Received ${items.length} results out of ${total_count}`
-      );
+      const {items} = response.data;
+      const total = response.data.total_count;
+      this.logger.debug(`Received ${items.length} results out of ${total}`);
       files.push(...items);
 
-      if (files.length >= total_count || !items.length) {
-        break;
-      }
+      isLastPage = files.length >= total || !items.length;
       page++;
     }
 
-    return files.filter(({name}) => name === filename).map(({path, sha}) => {
-      return {filename: path, sha};
-    });
+    return files
+      .filter(({name}) => name === filename)
+      .map(({path, sha}) => {
+        return {filename: path, sha};
+      });
   }
 
   /**
