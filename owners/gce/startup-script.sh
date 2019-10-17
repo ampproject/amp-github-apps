@@ -26,22 +26,31 @@ APP_DIR="/opt/app"  # Startup
 REPO_DIR="/opt/amphtml"  # Startup + App
 REPO="ampproject/amphtml"  # Startup + App
 
-APP_ID=22611  # Probot
-WEBHOOK_SECRET="[REDACTED]"  # Probot
-PRIVATE_KEY=$(echo | base64 -w 0 << EOF
+PRIVATE_KEY=$(echo | base64 -w 0 <<EOF
 -----BEGIN RSA PRIVATE KEY-----
 [REDACTED]
 -----END RSA PRIVATE KEY-----
 EOF
 )  # Probot
-LOG_LEVEL="trace"  # Probot + App
 
-GITHUB_BOT_USERNAME="amp-owners-bot"  # App
-NODE_ENV="production"  # App
-GITHUB_ACCESS_TOKEN="[REDACTED]"  # App
-ADD_REVIEWERS_OPT_OUT=1  # App
+echo > "${APP_DIR}/.env" <<EOF
+NODE_ENV=production
+LOG_LEVEL=trace
+INFO_SERVER_PORT=8081
+
+# Provided when creating a new GitHub App
+APP_ID=22611
+WEBHOOK_SECRET=[REDACTED]
+# `> cat private-key-file.pem | base64 -w 0` to generate
+PRIVATE_KEY=${PRIVATE_KEY}
+GITHUB_ACCESS_TOKEN=[REDACTED]
+
+GITHUB_REPO=${REPO}
+GITHUB_REPO_DIR=${REPO_DIR}
+GITHUB_BOT_USERNAME=amp-owners-bot
+ADD_REVIEWERS_OPT_OUT=1
+EOF
 # [END env]
-
 
 ## Steps for: Deployment
 
