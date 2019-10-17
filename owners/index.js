@@ -45,16 +45,6 @@ module.exports = app => {
   );
   const teamsInitialized = ownersBot.initTeams(github);
 
-  // Probot does not stream properly to GCE logs so we need to hook into
-  // bunyan explicitly and stream it to process.stdout.
-  if (process.env.NODE_ENV !== 'test') {
-    app.log.target.addStream({
-      name: 'app-custom-stream',
-      stream: process.stdout,
-      level: process.env.LOG_LEVEL || 'info',
-    });
-  }
-
   /** Probot request handlers **/
   app.on(['pull_request.opened'], async context => {
     await ownersBot.runOwnersCheck(
