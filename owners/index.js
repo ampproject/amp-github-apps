@@ -17,8 +17,8 @@
 require('dotenv').config();
 
 const Octokit = require('@octokit/rest');
-const express = require('express');
 
+const infoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/github');
 const {LocalRepository} = require('./src/repo');
 const {OwnersBot} = require('./src/owners_bot');
@@ -32,7 +32,6 @@ const INFO_SERVER_PORT = Number(process.env.INFO_SERVER_PORT || 8081);
 
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
-
   const ownersBot = new OwnersBot(localRepo);
   const github = new GitHub(
     new Octokit({auth: `token ${GITHUB_ACCESS_TOKEN}`}),
@@ -102,7 +101,7 @@ module.exports = app => {
     // and update it every ten minutes.
     const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
     teamsInitialized.then(() => {
-      healthServer(INFO_SERVER_PORT, parser, app.log);
+      infoServer(INFO_SERVER_PORT, parser, app.log);
     });
   }
 

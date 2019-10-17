@@ -15,7 +15,6 @@
  */
 
 const express = require('express');
-const JSON5 = require('json5');
 const bodyParser = require('body-parser');
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
