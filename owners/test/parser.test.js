@@ -19,7 +19,7 @@ const path = require('path');
 const fs = require('fs');
 const JSON5 = require('json5');
 const {Team} = require('../src/github');
-const {LocalRepository} = require('../src/local_repo');
+const {LocalRepository} = require('../src/repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
 const {
   UserOwner,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const {LocalRepository} = require('../src/local_repo');
+const {LocalRepository} = require('../src/repo');
 const childProcess = require('child_process');
 const sinon = require('sinon');
 const fs = require('fs');
@@ -93,7 +93,7 @@ describe('local repository', () => {
         return callback(error ? {stdout, stderr} : null, {stdout, stderr});
       });
 
-      const {LocalRepository} = require('../src/local_repo');
+      const {LocalRepository} = require('../src/repo');
       repo = new LocalRepository('path/to/repo');
     }
 

@@ -30,7 +30,7 @@ class OwnersBot {
   /**
    * Constructor.
    *
-   * @param {!LocalRepository} repo local copy of the repository.
+   * @param {!Repository} repo local copy of the repository.
    */
   constructor(repo) {
     this.repo = repo;

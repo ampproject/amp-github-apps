@@ -36,9 +36,14 @@ async function runCommands(...commands) {
 }
 
 /**
+ * Interface for reading from a GitHub repository.
+ */
+class Repository {}
+
+/**
  * Interface for reading from a checked out repository using relative paths.
  */
-class LocalRepository {
+class LocalRepository extends Repository {
   /**
    * Constructor.
    *
@@ -47,6 +52,7 @@ class LocalRepository {
    * @param {!string=} remote git remote to clone (default: 'origin').
    */
   constructor(pathToRepoDir, remote) {
+    super();
     this.rootDir = pathToRepoDir;
     this.remote = remote || 'origin';
   }
@@ -120,4 +126,4 @@ class LocalRepository {
   }
 }
 
-module.exports = {LocalRepository};
+module.exports = {Repository, LocalRepository};
