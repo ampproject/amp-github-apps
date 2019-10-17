@@ -56,7 +56,10 @@ let OwnersParserResult;
 /**
  * A file ref from a commit.
  *
- * @typedef {!string}
+ * @typedef {{
+ *   filename: !string,
+ *   sha: !string,
+ * }}
  */
 let FileRef;
 

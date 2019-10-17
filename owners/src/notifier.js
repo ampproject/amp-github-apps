@@ -28,7 +28,7 @@ class OwnersNotifier {
    * @param {!PullRequest} pr pull request to add notifications to.
    * @param {!ReviewerApprovalMap} currentReviewers current reviewer approvals.
    * @param {!OwnersTree} tree file ownership tree.
-   * @param {FileRef[]} changedFiles list of change files.
+   * @param {string[]} changedFiles list of change files.
    */
   constructor(pr, currentReviewers, tree, changedFiles) {
     Object.assign(this, {pr, currentReviewers});
