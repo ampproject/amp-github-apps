@@ -342,9 +342,9 @@ class OwnersParser {
    * @param {!string} ownersPath OWNERS.json file path (for error reporting).
    * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
    */
-  parseOwnersFile(ownersPath) {
+  async parseOwnersFile(ownersPath) {
     const errors = [];
-    const contents = this.repo.readFile(ownersPath);
+    const contents = await this.repo.readFile(ownersPath);
 
     let file;
     try {
@@ -371,11 +371,11 @@ class OwnersParser {
     const rules = [];
     const errors = [];
 
-    ownersPaths.forEach(ownersPath => {
-      const fileParse = this.parseOwnersFile(ownersPath);
+    for (const ownersPath of ownersPaths) {
+      const fileParse = await this.parseOwnersFile(ownersPath);
       rules.push(...fileParse.result);
       errors.push(...fileParse.errors);
-    });
+    }
 
     return {
       result: rules,

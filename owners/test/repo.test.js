@@ -25,7 +25,9 @@ describe('repository', () => {
 
   describe('readFile', () => {
     it('throws an error', () => {
-      expect(() => repo.readFile('foo/file.txt')).toThrow('Not implemented')
+      expect(repo.readFile('foo/file.txt')).rejects.toEqual(
+        new Error('Not implemented')
+      );
     });
   });
 
@@ -158,16 +160,18 @@ describe('local repository', () => {
       sandbox.stub(fs, 'readFileSync').returns(FAKE_OWNERS_CONTENTS);
     });
 
-    it('reads from the absolute file path', () => {
-      repo.readFile('my/file.txt');
+    it('reads from the absolute file path', async done => {
+      await repo.readFile('my/file.txt');
 
       sandbox.assert.calledWith(fs.readFileSync, 'path/to/repo/my/file.txt', {
         encoding: 'utf8',
       });
+      done();
     });
 
-    it('returns the contents of the file', () => {
-      const contents = repo.readFile('');
+    it('returns the contents of the file', async () => {
+      expect.assertions(1);
+      const contents = await repo.readFile('');
       expect(contents).toEqual(FAKE_OWNERS_CONTENTS);
     });
   });

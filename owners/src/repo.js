@@ -45,7 +45,7 @@ class Repository {
    * @param {!string} relativePath file to read.
    * @return {string} file contents.
    */
-  readFile(relativePath) {
+  async readFile(relativePath) {
     throw new Error('Not implemented');
   }
 
@@ -117,7 +117,7 @@ class LocalRepository extends Repository {
    * @param {!string} relativePath file to read.
    * @return {string} file contents.
    */
-  readFile(relativePath) {
+  async readFile(relativePath) {
     const filePath = this._getAbsolutePath(relativePath);
     return fs.readFileSync(filePath, {encoding: 'utf8'});
   }
