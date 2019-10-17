@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+require('dotenv').config();
+
 const Octokit = require('@octokit/rest');
 const {GitHub, PullRequest, Team} = require('./src/github');
 const {LocalRepository} = require('./src/repo');

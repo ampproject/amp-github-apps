@@ -25,28 +25,34 @@ set -v
 APP_DIR="/opt/app"  # Startup
 REPO_DIR="/opt/amphtml"  # Startup + App
 REPO="ampproject/amphtml"  # Startup + App
-PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")  # Startup (logging) + App (info server)
 
-APP_ID=22611  # Probot
-WEBHOOK_SECRET="[REDACTED]"  # Probot
-PRIVATE_KEY=$(echo | base64 << EOF
+PRIVATE_KEY=$(echo | base64 -w 0 <<EOF
 -----BEGIN RSA PRIVATE KEY-----
 [REDACTED]
 -----END RSA PRIVATE KEY-----
 EOF
 )  # Probot
-LOG_LEVEL="trace"  # Probot + App
 
-GITHUB_BOT_USERNAME="amp-owners-bot"  # App
-NODE_ENV="production"  # App
-GITHUB_ACCESS_TOKEN="[REDACTED]"  # App
-ADD_REVIEWERS_OPT_OUT=1  # App
+echo > "${APP_DIR}/.env" <<EOF
+NODE_ENV=production
+LOG_LEVEL=trace
+PORT=8080
+INFO_SERVER_PORT=8081
+
+APP_ID=22611
+WEBHOOK_SECRET=[REDACTED]
+PRIVATE_KEY=${PRIVATE_KEY}
+GITHUB_ACCESS_TOKEN=[REDACTED]
+
+GITHUB_REPO=${REPO}
+GITHUB_REPO_DIR=${REPO_DIR}
+GITHUB_BOT_USERNAME=amp-owners-bot
+ADD_REVIEWERS_OPT_OUT=1
+EOF
 # [END env]
-
 
 ## Steps for: Deployment
 
-echo "Project ID ${PROJECTID}"
 supervisorctl stop nodeapp
 
 
@@ -115,7 +121,7 @@ command=npm run start
 autostart=true
 autorestart=true
 user=nodeapp
-environment=HOME="/home/nodeapp",USER="nodeapp",NODE_ENV="${NODE_ENV}",LOG_LEVEL="${LOG_LEVEL}",GCLOUD_PROJECT="${PROJECTID}",DATA_BACKEND="datastore",GITHUB_ACCESS_TOKEN="${GITHUB_ACCESS_TOKEN}",GITHUB_REPO_DIR="${REPO_DIR}",WEBHOOK_SECRET="${WEBHOOK_SECRET}",GITHUB_BOT_USERNAME="${GITHUB_BOT_USERNAME}",PORT="8080",APP_ID="${APP_ID}",PRIVATE_KEY="${PRIVATE_KEY}",GITHUB_REPO="${REPO}",APP_COMMIT_SHA="${APP_COMMIT_SHA}",APP_COMMIT_MSG="${APP_COMMIT_MSG}",ADD_REVIEWERS_OPT_OUT=${ADD_REVIEWERS_OPT_OUT},INFO_SERVER_PORT="8081"
+environment=HOME="/home/nodeapp",USER="nodeapp",APP_COMMIT_SHA="${APP_COMMIT_SHA}",APP_COMMIT_MSG="${APP_COMMIT_MSG}"
 nodaemon=true
 stdout_logfile=syslog
 stdout_logfile_maxbytes=0
