@@ -16,7 +16,7 @@
 
 const Octokit = require('@octokit/rest');
 const {GitHub, PullRequest, Team} = require('./src/github');
-const {LocalRepository} = require('./src/local_repo');
+const {LocalRepository} = require('./src/repo');
 const {OwnersBot} = require('./src/owners_bot');
 const {OwnersParser} = require('./src/parser');
 const {OwnersCheck} = require('./src/owners_check');

@@ -16,7 +16,7 @@
 
 const sinon = require('sinon');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
-const {LocalRepository} = require('../src/local_repo');
+const {LocalRepository} = require('../src/repo');
 const {OwnersBot} = require('../src/owners_bot');
 const {OwnersParser} = require('../src/parser');
 const {OwnersNotifier} = require('../src/notifier');
@@ -45,8 +45,8 @@ describe('owners bot', () => {
     'description',
     'open'
   );
-  const localRepo = new LocalRepository('path/to/repo');
-  const ownersBot = new OwnersBot(localRepo);
+  const repo = new LocalRepository('path/to/repo');
+  const ownersBot = new OwnersBot(repo);
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -198,7 +198,7 @@ describe('owners bot', () => {
     it('checks out the latest master', async done => {
       await ownersBot.runOwnersCheck(github, pr);
 
-      sandbox.assert.calledOnce(localRepo.checkout);
+      sandbox.assert.calledOnce(repo.checkout);
       done();
     });
 

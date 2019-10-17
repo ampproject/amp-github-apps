@@ -19,7 +19,7 @@ const path = require('path');
 const fs = require('fs');
 const JSON5 = require('json5');
 const {Team} = require('../src/github');
-const {LocalRepository} = require('../src/local_repo');
+const {LocalRepository} = require('../src/repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
 const {
   UserOwner,
@@ -73,7 +73,7 @@ describe('owners parser', () => {
       'ampproject/reviewers-amphtml': reviewerTeam,
     });
 
-    sandbox.stub(repo, 'getAbsolutePath').callsFake(relativePath => {
+    sandbox.stub(repo, '_getAbsolutePath').callsFake(relativePath => {
       return `path/to/repo/${relativePath}`;
     });
   });
@@ -522,41 +522,45 @@ describe('owners parser', () => {
   });
 
   describe('parseOwnersFile', () => {
-    it('reads the file from the local repository', () => {
+    it('reads the file from the local repository', async done => {
       sandbox.stub(repo, 'readFile').returns('{rules: []}');
-      parser.parseOwnersFile('foo/OWNERS');
+      await parser.parseOwnersFile('foo/OWNERS');
 
       sandbox.assert.calledWith(repo.readFile, 'foo/OWNERS');
+      done();
     });
 
-    it('assigns the OWNERS directory path', () => {
+    it('assigns the OWNERS directory path', async () => {
+      expect.assertions(1);
       sandbox
         .stub(repo, 'readFile')
         .returns('{rules: [{owners: [{name: "rcebulko"}]}]}');
-      const fileParse = parser.parseOwnersFile('foo/OWNERS');
+      const fileParse = await parser.parseOwnersFile('foo/OWNERS');
       const rules = fileParse.result;
 
       expect(rules[0].dirPath).toEqual('foo');
     });
 
-    it('handles and reports JSON syntax errors', () => {
+    it('handles and reports JSON syntax errors', async () => {
+      expect.assertions(2);
       sandbox.stub(repo, 'readFile').returns('hello!');
-      const {result, errors} = parser.parseOwnersFile('OWNERS');
+      const {result, errors} = await parser.parseOwnersFile('OWNERS');
 
       expect(result).toEqual([]);
       expect(errors[0].message).toContain('SyntaxError:');
     });
 
-    it('parses the owners file definition', () => {
+    it('parses the owners file definition', async done => {
       sandbox.stub(repo, 'readFile').returns('{rules: []}');
       sandbox.stub(parser, 'parseOwnersFileDefinition').callThrough();
-      parser.parseOwnersFile('foo/OWNERS');
+      await parser.parseOwnersFile('foo/OWNERS');
 
       sandbox.assert.calledWith(
         parser.parseOwnersFileDefinition,
         'foo/OWNERS',
         {rules: []}
       );
+      done();
     });
   });
 

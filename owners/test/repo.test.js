@@ -14,11 +14,31 @@
  * limitations under the License.
  */
 
-const {LocalRepository} = require('../src/local_repo');
+const {Repository, LocalRepository} = require('../src/repo');
 const childProcess = require('child_process');
 const sinon = require('sinon');
 const fs = require('fs');
 const path = require('path');
+
+describe('repository', () => {
+  const repo = new Repository();
+
+  describe('readFile', () => {
+    it('throws an error', () => {
+      expect(repo.readFile('foo/file.txt')).rejects.toEqual(
+        new Error('Not implemented')
+      );
+    });
+  });
+
+  describe('findOwnersFiles', () => {
+    it('throws an error', () => {
+      expect(repo.findOwnersFiles()).rejects.toEqual(
+        new Error('Not implemented')
+      );
+    });
+  });
+});
 
 describe('local repository', () => {
   const sandbox = sinon.createSandbox();
@@ -47,14 +67,14 @@ describe('local repository', () => {
 
   describe('checkout', () => {
     beforeEach(() => {
-      sandbox.stub(repo, 'runCommands').returns('');
+      sandbox.stub(repo, '_runCommands').returns('');
     });
 
     it('fetches and checks out the requested branch', async done => {
       await repo.checkout('my_branch');
 
       sandbox.assert.calledWith(
-        repo.runCommands,
+        repo._runCommands,
         'git fetch origin my_branch',
         'git checkout -B my_branch origin/my_branch'
       );
@@ -65,7 +85,7 @@ describe('local repository', () => {
       await repo.checkout();
 
       sandbox.assert.calledWith(
-        repo.runCommands,
+        repo._runCommands,
         'git fetch origin master',
         'git checkout -B master origin/master'
       );
@@ -93,13 +113,13 @@ describe('local repository', () => {
         return callback(error ? {stdout, stderr} : null, {stdout, stderr});
       });
 
-      const {LocalRepository} = require('../src/local_repo');
+      const {LocalRepository} = require('../src/repo');
       repo = new LocalRepository('path/to/repo');
     }
 
     it('executes the provided commands in the repo directory', async done => {
       stubExecAndSetRepo(false, '', '');
-      await repo.runCommands('git status');
+      await repo._runCommands('git status');
 
       sandbox.assert.calledWith(
         childProcess.exec,
@@ -111,7 +131,7 @@ describe('local repository', () => {
     it('returns the contents of stdout', async () => {
       expect.assertions(1);
       stubExecAndSetRepo(false, 'Hello world!', 'Some extra output');
-      await expect(repo.runCommands('echo "Hello world!"')).resolves.toEqual(
+      await expect(repo._runCommands('echo "Hello world!"')).resolves.toEqual(
         'Hello world!'
       );
     });
@@ -119,7 +139,7 @@ describe('local repository', () => {
     it('throws the contents of stderr if there is an error', async () => {
       expect.assertions(1);
       stubExecAndSetRepo(true, '', 'ERROR!');
-      await expect(repo.runCommands('failing command')).rejects.toEqual(
+      await expect(repo._runCommands('failing command')).rejects.toEqual(
         'ERROR!'
       );
     });
@@ -127,7 +147,7 @@ describe('local repository', () => {
 
   describe('getAbsolutePath', () => {
     it('prepends the repository root directory path', () => {
-      expect(repo.getAbsolutePath('file/path.txt')).toEqual(
+      expect(repo._getAbsolutePath('file/path.txt')).toEqual(
         'path/to/repo/file/path.txt'
       );
     });
@@ -140,16 +160,18 @@ describe('local repository', () => {
       sandbox.stub(fs, 'readFileSync').returns(FAKE_OWNERS_CONTENTS);
     });
 
-    it('reads from the absolute file path', () => {
-      repo.readFile('my/file.txt');
+    it('reads from the absolute file path', async done => {
+      await repo.readFile('my/file.txt');
 
       sandbox.assert.calledWith(fs.readFileSync, 'path/to/repo/my/file.txt', {
         encoding: 'utf8',
       });
+      done();
     });
 
-    it('returns the contents of the file', () => {
-      const contents = repo.readFile('');
+    it('returns the contents of the file', async () => {
+      expect.assertions(1);
+      const contents = await repo.readFile('');
       expect(contents).toEqual(FAKE_OWNERS_CONTENTS);
     });
   });
@@ -159,7 +181,7 @@ describe('local repository', () => {
 
     it('splits the owners list from the command line output', async () => {
       expect.assertions(1);
-      sandbox.stub(repo, 'runCommands').returns(FAKE_OWNERS_LIST_OUTPUT);
+      sandbox.stub(repo, '_runCommands').returns(FAKE_OWNERS_LIST_OUTPUT);
       const ownersFiles = await repo.findOwnersFiles();
       expect(ownersFiles).toEqual(['foo.txt', 'bar/baz.txt']);
     });

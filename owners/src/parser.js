@@ -63,12 +63,12 @@ class OwnersParser {
   /**
    * Constructor.
    *
-   * @param {!LocalRepository} localRepo local repository to read from.
+   * @param {!Repository} repo local repository to read from.
    * @param {!Object<!string, !Team>} teamMap map from team slugs to teams.
    * @param {!Logger=} logger logging interface (defaults to console).
    */
-  constructor(localRepo, teamMap, logger) {
-    this.localRepo = localRepo;
+  constructor(repo, teamMap, logger) {
+    this.repo = repo;
     this.teamMap = teamMap;
     this.logger = logger || console;
   }
@@ -342,9 +342,9 @@ class OwnersParser {
    * @param {!string} ownersPath OWNERS.json file path (for error reporting).
    * @return {OwnersParserResult<OwnersRule[]>} parsed OWNERS file rule.
    */
-  parseOwnersFile(ownersPath) {
+  async parseOwnersFile(ownersPath) {
     const errors = [];
-    const contents = this.localRepo.readFile(ownersPath);
+    const contents = await this.repo.readFile(ownersPath);
 
     let file;
     try {
@@ -367,15 +367,15 @@ class OwnersParser {
    *     the local repo.
    */
   async parseAllOwnersRules() {
-    const ownersPaths = await this.localRepo.findOwnersFiles();
+    const ownersPaths = await this.repo.findOwnersFiles();
     const rules = [];
     const errors = [];
 
-    ownersPaths.forEach(ownersPath => {
-      const fileParse = this.parseOwnersFile(ownersPath);
+    for (const ownersPath of ownersPaths) {
+      const fileParse = await this.parseOwnersFile(ownersPath);
       rules.push(...fileParse.result);
       errors.push(...fileParse.errors);
-    });
+    }
 
     return {
       result: rules,
@@ -389,7 +389,7 @@ class OwnersParser {
    * @return {OwnersParserResult<OwnersTree>} owners rule hierarchy.
    */
   async parseOwnersTree() {
-    const tree = new OwnersTree(this.localRepo.rootPath);
+    const tree = new OwnersTree();
     const ruleParse = await this.parseAllOwnersRules();
     ruleParse.result.forEach(rule => tree.addRule(rule));
 

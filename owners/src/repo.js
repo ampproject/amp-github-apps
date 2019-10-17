@@ -36,9 +36,35 @@ async function runCommands(...commands) {
 }
 
 /**
+ * Interface for reading from a GitHub repository.
+ */
+class Repository {
+  /**
+   * Read the contents of a file from the repo.
+   *
+   * @param {!string} relativePath file to read.
+   * @return {string} file contents.
+   */
+  async readFile(relativePath) {
+    throw new Error('Not implemented');
+  }
+
+  /**
+   * Finds all OWNERS files in the checked out repository.
+   *
+   * Assumes repo is already checked out.
+   *
+   * @return {string[]} a list of relative OWNERS file paths.
+   */
+  async findOwnersFiles() {
+    throw new Error('Not implemented');
+  }
+}
+
+/**
  * Interface for reading from a checked out repository using relative paths.
  */
-class LocalRepository {
+class LocalRepository extends Repository {
   /**
    * Constructor.
    *
@@ -47,6 +73,7 @@ class LocalRepository {
    * @param {!string=} remote git remote to clone (default: 'origin').
    */
   constructor(pathToRepoDir, remote) {
+    super();
     this.rootDir = pathToRepoDir;
     this.remote = remote || 'origin';
   }
@@ -57,7 +84,7 @@ class LocalRepository {
    * @param {...!string} commands list of commands to execute.
    * @return {string[]} command output
    */
-  async runCommands(...commands) {
+  async _runCommands(...commands) {
     return await runCommands(`cd ${this.rootDir}`, ...commands);
   }
 
@@ -68,7 +95,7 @@ class LocalRepository {
    */
   async checkout(branch) {
     branch = branch || 'master';
-    await this.runCommands(
+    await this._runCommands(
       `git fetch ${this.remote} ${branch}`,
       `git checkout -B ${branch} ${this.remote}/${branch}`
     );
@@ -80,7 +107,7 @@ class LocalRepository {
    * @param {!string} relativePath file or directory path relative to the root.
    * @return {string} absolute path to the file in the checked out repo.
    */
-  getAbsolutePath(relativePath) {
+  _getAbsolutePath(relativePath) {
     return path.resolve(this.rootDir, relativePath);
   }
 
@@ -90,8 +117,8 @@ class LocalRepository {
    * @param {!string} relativePath file to read.
    * @return {string} file contents.
    */
-  readFile(relativePath) {
-    const filePath = this.getAbsolutePath(relativePath);
+  async readFile(relativePath) {
+    const filePath = this._getAbsolutePath(relativePath);
     return fs.readFileSync(filePath, {encoding: 'utf8'});
   }
 
@@ -105,7 +132,7 @@ class LocalRepository {
   async findOwnersFiles() {
     // NOTE: for some reason `git ls-tree --full-tree -r HEAD **/OWNERS*`
     // doesn't work from here.
-    const ownersFiles = await this.runCommands(
+    const ownersFiles = await this._runCommands(
       [
         // Lists all files in the repo with extra metadata.
         'git ls-tree --full-tree -r HEAD',
@@ -120,4 +147,4 @@ class LocalRepository {
   }
 }
 
-module.exports = {LocalRepository};
+module.exports = {Repository, LocalRepository};
