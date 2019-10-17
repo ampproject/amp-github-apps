@@ -14,11 +14,29 @@
  * limitations under the License.
  */
 
-const {LocalRepository} = require('../src/repo');
+const {Repository, LocalRepository} = require('../src/repo');
 const childProcess = require('child_process');
 const sinon = require('sinon');
 const fs = require('fs');
 const path = require('path');
+
+describe('repository', () => {
+  let repo = new Repository();
+
+  describe('readFile', () => {
+    it('throws an error', () => {
+      expect(() => repo.readFile('foo/file.txt')).toThrow('Not implemented')
+    });
+  });
+
+  describe('findOwnersFiles', () => {
+    it('throws an error', () => {
+      expect(repo.findOwnersFiles()).rejects.toEqual(
+        new Error('Not implemented')
+      );
+    });
+  });
+});
 
 describe('local repository', () => {
   const sandbox = sinon.createSandbox();

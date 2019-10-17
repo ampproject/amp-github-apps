@@ -38,7 +38,28 @@ async function runCommands(...commands) {
 /**
  * Interface for reading from a GitHub repository.
  */
-class Repository {}
+class Repository {
+  /**
+   * Read the contents of a file from the repo.
+   *
+   * @param {!string} relativePath file to read.
+   * @return {string} file contents.
+   */
+  readFile(relativePath) {
+    throw new Error('Not implemented');
+  }
+
+  /**
+   * Finds all OWNERS files in the checked out repository.
+   *
+   * Assumes repo is already checked out.
+   *
+   * @return {string[]} a list of relative OWNERS file paths.
+   */
+  async findOwnersFiles() {
+    throw new Error('Not implemented');
+  }
+}
 
 /**
  * Interface for reading from a checked out repository using relative paths.
