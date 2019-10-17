@@ -439,22 +439,22 @@ class GitHub {
   }
 
   /**
-   * Searches for files in a repo.
+   * Searches for files in a repo with a given name.
    *
    * See https://developer.github.com/v3/search/#search-code
    *
-   * @param {!string} query GitHub search query.
+   * @param {!string} filename filename to search for.
    * @return {FileRef[]} list of returned results.
    */
-  async searchCode(query) {
-    this.logger.info(`Searching repo with query "${query}"`);
+  async searchFilename(filename) {
+    this.logger.info(`Searching repo for files named "${filename}"`);
 
     const files = [];
     let page = 1;
     while (true) {
       this.logger.info(`Fetching page ${page}`);
       const response = await this.client.search.code({
-        q: `${query} repo:${this.owner}/${this.repository}`,
+        q: `filename:${filename} repo:${this.owner}/${this.repository}`,
         per_page: MAX_PER_PAGE,
         page,
       });
@@ -463,11 +463,7 @@ class GitHub {
       this.logger.debug(
         `Received ${items.length} results out of ${total_count}`
       );
-
-      items.forEach(({path, sha}) => files.push({
-        filename: path,
-        sha,
-      }));
+      files.push(...items);
 
       if (files.length >= total_count || !items.length) {
         break;
@@ -475,7 +471,9 @@ class GitHub {
       page++;
     }
 
-    return files;
+    return files.filter(({name}) => name === filename).map(({path, sha}) => {
+      return {filename: path, sha};
+    });
   }
 
   /**
