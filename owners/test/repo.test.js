@@ -21,7 +21,7 @@ const fs = require('fs');
 const path = require('path');
 
 describe('repository', () => {
-  let repo = new Repository();
+  const repo = new Repository();
 
   describe('readFile', () => {
     it('throws an error', () => {
