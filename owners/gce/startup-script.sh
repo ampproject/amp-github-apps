@@ -29,7 +29,7 @@ PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/
 
 APP_ID=22611  # Probot
 WEBHOOK_SECRET="[REDACTED]"  # Probot
-PRIVATE_KEY=$(echo | base64 << EOF
+PRIVATE_KEY=$(echo | base64 -w 0 << EOF
 -----BEGIN RSA PRIVATE KEY-----
 [REDACTED]
 -----END RSA PRIVATE KEY-----
