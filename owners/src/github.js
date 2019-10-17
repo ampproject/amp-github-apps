@@ -187,11 +187,8 @@ class GitHub {
       },
       method,
       url,
+      ...data,
     };
-
-    if (typeof data !== 'undefined') {
-      request.data = data;
-    }
 
     return await this.client.request(request);
   }
@@ -200,25 +197,27 @@ class GitHub {
    * Automatically fetch multiple pages from a GitHub endpoint
    *
    * @param {!string} url API endpoint URL path (ie. `/teams/###/members`).
+   * @param {*} data optional request data.
    * @return {*[]} list of results across all pages.
    */
-  async _autoPage(url) {
+  async _autoPage(url, data) {
     const resultList = [];
 
-    let pageNum = 1;
+    let page = 1;
     let isNextLink = true;
     while (isNextLink) {
-      this.logger.info(`Fetching page ${pageNum}`);
+      this.logger.info(`Fetching page ${page}`);
       const response = await this._customRequest(
         'GET',
-        `${url}?page=${pageNum}&per_page=${MAX_PER_PAGE}`
+        url,
+        { page, per_page: MAX_PER_PAGE, ...data },
       );
       const nextLink = response.headers.link || '';
       isNextLink = nextLink.includes('rel="next"');
 
       const resultPage = response.data;
       resultList.push(...resultPage);
-      pageNum++;
+      page++;
     }
 
     return resultList;
