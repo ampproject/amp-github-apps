@@ -52,10 +52,20 @@ class OwnersBot {
   async initTeams(github) {
     const teamList = await github.getTeams();
     for (const team of teamList) {
-      await team.fetchMembers(github);
-      this.teams[team.toString()] = team;
+      await this.syncTeam(team, github);
       sleep(this.GITHUB_GET_MEMBERS_DELAY);
     }
+  }
+
+  /**
+   * Fetch or update a team's members.
+   *
+   * @param {!Team} team GitHub Team to update.
+   * @param {!GitHub} github GitHub API interface.
+   */
+  async syncTeam(team, github) {
+    await team.fetchMembers(github);
+    this.teams[team.toString()] = team;
   }
 
   /**

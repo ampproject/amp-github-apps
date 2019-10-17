@@ -87,10 +87,7 @@ module.exports = app => {
     ],
     async context => {
       const {id, slug} = context.payload.team;
-      const team = new Team(id, GITHUB_REPO_OWNER, slug);
-
-      await team.fetchMembers(github);
-      ownersBot.teams[team.toString()] = team;
+      await ownersBot.syncTeam(new Team(id, GITHUB_REPO_OWNER, slug), github);
     }
   );
 
