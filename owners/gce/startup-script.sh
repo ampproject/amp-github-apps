@@ -39,10 +39,8 @@ LOG_LEVEL=trace
 PORT=8080
 INFO_SERVER_PORT=8081
 
-# Provided when creating a new GitHub App
 APP_ID=22611
 WEBHOOK_SECRET=[REDACTED]
-# `> cat private-key-file.pem | base64 -w 0` to generate
 PRIVATE_KEY=${PRIVATE_KEY}
 GITHUB_ACCESS_TOKEN=[REDACTED]
 
