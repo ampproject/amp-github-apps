@@ -35,6 +35,9 @@ const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
 const getFileResponse = require('./fixtures/files/file_blob.24523.json');
+const searchMetadataResponse = require('./fixtures/files/search.metadata.json');
+const searchOwnersPage1Response = require('./fixtures/files/search.owners.page_1.json');
+const searchOwnersPage2Response = require('./fixtures/files/search.owners.page_2.json');
 
 nock.disableNetConnect();
 
@@ -606,6 +609,49 @@ describe('GitHub API', () => {
         const [file] = await github.listFiles(35);
 
         expect(file).toEqual('dir2/dir1/dir1/file.txt');
+      })();
+    });
+  });
+
+  describe('searchCode', () => {
+    it('fetches the list of matching files', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get('/search/code?q=filename%3AMETADATA%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100')
+        .reply(200, searchMetadataResponse);
+
+      await withContext(async (context, github) => {
+        const files = await github.searchCode('filename:METADATA');
+
+        expect(files.map(({filename}) => filename)).toEqual([
+          '3p/frame-metadata.js',
+          'build-system/babel-plugins/log-module-metadata.js',
+          'build-system/babel-plugins/static-template-metadata.js',
+          'extensions/amp-ad-network-fake-impl/0.1/amp-ad-metadata-transformer.js',
+          'extensions/amp-ad-network-fake-impl/0.1/test/test-amp-ad-metadata-transformer.js',
+        ]);
+      })();
+    });
+
+    it('pages automatically', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get(
+          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100'
+        )
+        .reply(200, searchOwnersPage1Response, {
+          link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
+        });
+      nock('https://api.github.com')
+        .get(
+          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100'
+        )
+        .reply(200, searchOwnersPage2Response);
+
+      await withContext(async (context, github) => {
+        const files = await github.searchCode('filename:OWNERS');
+
+        expect(files.length).toEqual(172);
       })();
     });
   });

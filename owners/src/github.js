@@ -440,6 +440,46 @@ class GitHub {
   }
 
   /**
+   * Searches for files in a repo.
+   *
+   * See https://developer.github.com/v3/search/#search-code
+   *
+   * @param {!string} query GitHub search query.
+   * @return {FileRef[]} list of returned results.
+   */
+  async searchCode(query) {
+    this.logger.info(`Searching repo with query "${query}"`);
+
+    const files = [];
+    let page = 1;
+    while (true) {
+      this.logger.info(`Fetching page ${page}`);
+      const response = await this.client.search.code({
+        q: `${query} repo:${this.owner}/${this.repository}`,
+        per_page: MAX_PER_PAGE,
+        page,
+      });
+
+      const {total_count, items} = response.data;
+      this.logger.debug(
+        `Received ${items.length} results out of ${total_count}`
+      );
+
+      items.forEach(({path, sha}) => files.push({
+        filename: path,
+        sha,
+      }));
+
+      if (files.length >= total_count || !items.length) {
+        break;
+      }
+      page++;
+    }
+
+    return files;
+  }
+
+  /**
    * Creates a check-run status for a commit.
    *
    * @param {!string} sha commit SHA for HEAD ref to create check-run
