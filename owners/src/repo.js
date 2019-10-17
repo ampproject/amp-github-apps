@@ -84,7 +84,7 @@ class LocalRepository extends Repository {
    * @param {...!string} commands list of commands to execute.
    * @return {string[]} command output
    */
-  async runCommands(...commands) {
+  async _runCommands(...commands) {
     return await runCommands(`cd ${this.rootDir}`, ...commands);
   }
 
@@ -95,7 +95,7 @@ class LocalRepository extends Repository {
    */
   async checkout(branch) {
     branch = branch || 'master';
-    await this.runCommands(
+    await this._runCommands(
       `git fetch ${this.remote} ${branch}`,
       `git checkout -B ${branch} ${this.remote}/${branch}`
     );
@@ -107,7 +107,7 @@ class LocalRepository extends Repository {
    * @param {!string} relativePath file or directory path relative to the root.
    * @return {string} absolute path to the file in the checked out repo.
    */
-  getAbsolutePath(relativePath) {
+  _getAbsolutePath(relativePath) {
     return path.resolve(this.rootDir, relativePath);
   }
 
@@ -118,7 +118,7 @@ class LocalRepository extends Repository {
    * @return {string} file contents.
    */
   readFile(relativePath) {
-    const filePath = this.getAbsolutePath(relativePath);
+    const filePath = this._getAbsolutePath(relativePath);
     return fs.readFileSync(filePath, {encoding: 'utf8'});
   }
 
@@ -132,7 +132,7 @@ class LocalRepository extends Repository {
   async findOwnersFiles() {
     // NOTE: for some reason `git ls-tree --full-tree -r HEAD **/OWNERS*`
     // doesn't work from here.
-    const ownersFiles = await this.runCommands(
+    const ownersFiles = await this._runCommands(
       [
         // Lists all files in the repo with extra metadata.
         'git ls-tree --full-tree -r HEAD',

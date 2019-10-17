@@ -73,7 +73,7 @@ describe('owners parser', () => {
       'ampproject/reviewers-amphtml': reviewerTeam,
     });
 
-    sandbox.stub(repo, 'getAbsolutePath').callsFake(relativePath => {
+    sandbox.stub(repo, '_getAbsolutePath').callsFake(relativePath => {
       return `path/to/repo/${relativePath}`;
     });
   });
