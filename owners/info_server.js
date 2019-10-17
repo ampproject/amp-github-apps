@@ -19,11 +19,6 @@ const JSON5 = require('json5');
 const bodyParser = require('body-parser');
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
-const GCLOUD_PROJECT = process.env.GCLOUD_PROJECT || 'UNKNOWN';
-const APP_ID = process.env.APP_ID || 'UNKNOWN';
-const APP_COMMIT_SHA = process.env.APP_COMMIT_SHA || 'UNKNOWN';
-const APP_COMMIT_MSG = process.env.APP_COMMIT_MSG || 'UNKNOWN';
-
 const CACHED_TREE_REFRESH_MS = 10 * 60 * 1000;
 
 /**
@@ -53,9 +48,6 @@ module.exports = (port, parser, logger) => {
     res.send(
       [
         `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
-        `Project: ${GCLOUD_PROJECT}`,
-        `App ID: ${APP_ID}`,
-        `Deployed commit: <code>${APP_COMMIT_SHA}</code> ${APP_COMMIT_MSG}`,
         '<a href="/tree">Owners Tree</a>',
         '<a href="/teams">Organization Teams</a>',
       ].join('<br>')
@@ -93,6 +85,6 @@ module.exports = (port, parser, logger) => {
   });
 
   app.listen(port, () => {
-    logger.info(`Starting status server on port ${port}`);
+    logger.info(`Starting info server on port ${port}`);
   });
 };
