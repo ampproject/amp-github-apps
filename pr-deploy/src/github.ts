@@ -71,7 +71,7 @@ export class PullRequest {
    * Set check to 'completed' and remove the 'Deploy Me' action once
    * deployment is finished. Display the serve url in the check's output.
    */
-  async deploymentCompleted(serveUrl: string) {
+  async deploymentCompleted(bucketUrl: string, serveUrl: string) {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
@@ -84,8 +84,12 @@ export class PullRequest {
       details_url: serveUrl,
       output: {
         title: 'Success! A test site was created.',
-        summary: `You can find it here: ${serveUrl}`,
-        text: serveUrl,
+        summary:
+          `You can now access the [**website**](${serveUrl}examples/article.amp.html) or browse the deployed [**Google Cloud Platform Bucket**](${bucketUrl}).<br/>` +
+          `To browse examples or manual tests, append your specific example/test to the following URL:<br/>` +
+          `\`${serveUrl}examples/[YOUR_EXAMPLE_HERE]\`<br/>` +
+          `**For example:** You can access the sample [AMP article example](${serveUrl}examples/article.amp.html) at <br/>` +
+          `\`${serveUrl}examples/article.amp.html\``,
       },
     };
 
@@ -264,4 +268,3 @@ export class PullRequest {
 module.exports = {
   PullRequest,
 };
-
