@@ -65,12 +65,10 @@ class OwnersParser {
    *
    * @param {!Repository} repo local repository to read from.
    * @param {!Object<!string, !Team>} teamMap map from team slugs to teams.
-   * @param {!Logger=} logger logging interface (defaults to console).
    */
-  constructor(repo, teamMap, logger) {
+  constructor(repo, teamMap) {
     this.repo = repo;
     this.teamMap = teamMap;
-    this.logger = logger || console;
   }
 
   /**

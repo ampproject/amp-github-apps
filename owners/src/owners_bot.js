@@ -82,7 +82,7 @@ class OwnersBot {
   async initPr(github, pr) {
     await this.repo.checkout();
 
-    const parser = new OwnersParser(this.repo, this.teams, github.log);
+    const parser = new OwnersParser(this.repo, this.teams);
     const treeParse = await parser.parseOwnersTree();
     treeParse.errors.forEach(error => {
       github.logger.warn(error);
