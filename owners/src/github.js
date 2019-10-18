@@ -36,7 +36,7 @@ class PullRequest {
   /**
    * Whether or not the pull request is open.
    *
-   * @return {boolean} true if the pull request is open.
+   * @return {!boolean} true if the pull request is open.
    */
   get isOpen() {
     return this.state.toLowerCase() === 'open';
@@ -46,7 +46,7 @@ class PullRequest {
    * Initialize a Pull Request from a GitHub response data structure.
    *
    * @param {!object} res GitHub PullRequest response structure.
-   * @return {PullRequest} a pull request instance.
+   * @return {!PullRequest} a pull request instance.
    */
   static fromGitHubResponse(res) {
     return new PullRequest(
@@ -112,7 +112,7 @@ class Team {
   /**
    * Represent the team as a string.
    *
-   * @return {string} the full organization-prefixed team name.
+   * @return {!string} the full organization-prefixed team name.
    */
   toString() {
     return `${this.org}/${this.slug}`;
@@ -149,7 +149,7 @@ class GitHub {
    * Creates a GitHub API interface from a Probot request context.
    *
    * @param {!Context} context Probot request context.
-   * @return {GitHub} a GitHub API interface.
+   * @return {!GitHub} a GitHub API interface.
    */
   static fromContext(context) {
     const {repo, owner} = context.repo();
@@ -160,7 +160,7 @@ class GitHub {
    * Adds the owner and repo name to an object.
    *
    * @param {?object} obj object to add fields to.
-   * @return {object} object with owner and repo fields set.
+   * @return {{repo: !string, owner: !string}} object with owner and repo set.
    */
   repo(obj) {
     return Object.assign({}, obj, {repo: this.repository, owner: this.owner});
@@ -198,7 +198,7 @@ class GitHub {
    *
    * @param {!string} url API endpoint URL path (ie. `/teams/###/members`).
    * @param {*} data optional request data.
-   * @return {*[]} list of results across all pages.
+   * @return {!Array} list of results across all pages.
    */
   async _autoPage(url, data) {
     const resultList = [];
@@ -226,7 +226,7 @@ class GitHub {
   /**
    * Fetch all teams for the organization.
    *
-   * @return {Team[]} list of teams.
+   * @return {!Array<!Team>} list of teams.
    */
   async getTeams() {
     this.logger.info(`Fetching teams for organization '${this.owner}'`);
@@ -241,7 +241,7 @@ class GitHub {
    * Fetch all members of a team.
    *
    * @param {number} teamId ID of team to find members for.
-   * @return {string[]} list of member usernames.
+   * @return {!Array<!string>} list of member usernames.
    */
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
@@ -256,7 +256,7 @@ class GitHub {
    * Fetches a pull request.
    *
    * @param {number} number pull request number.
-   * @return {PullRequest} pull request instance.
+   * @return {!PullRequest} pull request instance.
    */
   async getPullRequest(number) {
     const response = await this.client.pullRequests.get(this.repo({number}));
@@ -267,7 +267,7 @@ class GitHub {
    * Retrives code reviews for a PR from GitHub.
    *
    * @param {number} number PR number.
-   * @return {Review[]} the list of code reviews.
+   * @return {!Array<!Review>} the list of code reviews.
    */
   async getReviews(number) {
     this.logger.info(`Fetching reviews for PR #${number}`);
@@ -298,7 +298,7 @@ class GitHub {
    * Requests a review from GitHub users.
    *
    * @param {number} number PR number.
-   * @param {string[]} reviewers the list of usernames to request reviews from.
+   * @param {!Array<!string>} reviewers the list of usernames to request reviews from.
    */
   async createReviewRequests(number, reviewers) {
     if (!reviewers.length) {
@@ -321,7 +321,7 @@ class GitHub {
    * Retrieves code review requests for a PR from GitHub.
    *
    * @param {number} number PR number.
-   * @return {string[]} the list of code reviews.
+   * @return {!Array<!string>} the list of code reviews.
    */
   async getReviewRequests(number) {
     this.logger.info(`Fetching review requests for PR #${number}`);
@@ -341,7 +341,7 @@ class GitHub {
    * created via the Pulls API require a file path/position.
    *
    * @param {number} number PR number.
-   * @return {{body: string, id: number}[]} list of comments by the bot user.
+   * @return {!Array<{body: !string, id: number}>} list of comments by the bot.
    */
   async getBotComments(number) {
     this.logger.info(`Fetching bot comments for PR #${number}`);
@@ -406,7 +406,7 @@ class GitHub {
    * Fetches the contents of a file from GitHub.
    *
    * @param {!FileRef} file file ref to fetch.
-   * @return {string} file contents as a string.
+   * @return {!string} file contents as a string.
    */
   async getFileContents(file) {
     this.logger.info(
@@ -425,7 +425,7 @@ class GitHub {
    * Lists all modified files for a PR.
    *
    * @param {number} number PR number
-   * @return {string[]} list of relative file paths.
+   * @return {!Array<!string>} list of relative file paths.
    */
   async listFiles(number) {
     this.logger.info(`Fetching changed files for PR #${number}`);
@@ -502,7 +502,7 @@ class GitHub {
    * will return `null`.
    *
    * @param {!string} sha SHA hash for head commit to lookup check-runs on.
-   * @return {Object<!string, number>} map from check names to check-run IDs.
+   * @return {!Object<!string, number>} map from check names to check-run IDs.
    */
   async getCheckRunIds(sha) {
     this.logger.info(`Fetching check run ID for commit ${sha.substr(0, 7)}`);
