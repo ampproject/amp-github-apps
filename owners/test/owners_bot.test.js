@@ -151,7 +151,7 @@ describe('owners bot', () => {
       sandbox.stub(OwnersBot.prototype, 'refreshTree');
       await ownersBot.initPr(github, pr);
 
-      sandbox.assert.calledWith(ownersBot.refreshTree, null, github.logger)
+      sandbox.assert.calledWith(ownersBot.refreshTree, null, github.logger);
       done();
     });
 
