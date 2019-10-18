@@ -39,7 +39,7 @@ module.exports = app => {
     GITHUB_REPO_NAME,
     app.log
   );
-  const teamsInitialized = ownersBot.initTeams(sharedGithub);
+  ownersBot.initTeams(sharedGithub);
 
   function listen(events, cb) {
     app.on(events, async context => {
@@ -92,7 +92,7 @@ module.exports = app => {
 
   if (process.env.NODE_ENV !== 'test') {
     teamsInitialized.then(() => {
-      infoServer(INFO_SERVER_PORT, ownersBot.parser, app.log);
+      infoServer(INFO_SERVER_PORT, ownersBot, app.log);
     });
   }
 

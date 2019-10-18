@@ -108,8 +108,9 @@ describe('owners bot', () => {
 
     it('parses the owners tree', async () => {
       expect.assertions(1);
-      const {tree} = await ownersBot.initPr(github, pr);
-      expect(tree).toBeInstanceOf(OwnersTree);
+      ownersBot.treeParse = null;
+      await ownersBot.initPr(github, pr);
+      expect(ownersBot.treeParse.result).toBeInstanceOf(OwnersTree);
     });
 
     it('warns about parsing errors', async done => {

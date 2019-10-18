@@ -17,6 +17,7 @@
 const sleep = require('sleep-promise');
 const {OwnersCheck} = require('./owners_check');
 const {OwnersParser} = require('./parser');
+const {OwnersTree} = require('./owners_tree');
 const {OwnersNotifier} = require('./notifier');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
@@ -36,6 +37,7 @@ class OwnersBot {
     this.repo = repo;
     this.teams = {};
     this.parser = new OwnersParser(this.repo, this.teams);
+    this.treeParse = { errors: [], result: new OwnersTree() };
 
     // Defined as a property, to allow overriding in tests.
     this.GITHUB_CHECKRUN_DELAY = GITHUB_CHECKRUN_DELAY;
@@ -76,7 +78,6 @@ class OwnersBot {
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to initialize data for.
    * @return {{
-   *     tree: !OwnersTree,
    *     reviewers: !ReviewerApprovalMap,
    *     changedFiles: string[],
    * }} key structures needed to check PR ownership.
@@ -84,11 +85,10 @@ class OwnersBot {
   async initPr(github, pr) {
     await this.repo.checkout();
 
-    const treeParse = await this.parser.parseOwnersTree();
-    treeParse.errors.forEach(error => {
+    this.treeParse = await this.parser.parseOwnersTree();
+    this.treeParse.errors.forEach(error => {
       github.logger.warn(error);
     });
-    const tree = treeParse.result;
 
     const changedFiles = await github.listFiles(pr.number);
     const reviewers = await this._getCurrentReviewers(github, pr);
@@ -97,7 +97,7 @@ class OwnersBot {
       reviewers[reviewer] = false;
     });
 
-    return {tree, changedFiles, reviewers};
+    return {changedFiles, reviewers};
   }
 
   /**
@@ -113,7 +113,8 @@ class OwnersBot {
       return;
     }
 
-    const {tree, changedFiles, reviewers} = await this.initPr(github, pr);
+    const {changedFiles, reviewers} = await this.initPr(github, pr);
+    const tree = this.treeParse.result;
 
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
