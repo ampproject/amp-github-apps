@@ -35,6 +35,8 @@ class OwnersBot {
   constructor(repo) {
     this.repo = repo;
     this.teams = {};
+    this.parser = new OwnersParser(this.repo, this.teams);
+
     // Defined as a property, to allow overriding in tests.
     this.GITHUB_CHECKRUN_DELAY = GITHUB_CHECKRUN_DELAY;
     this.GITHUB_GET_MEMBERS_DELAY = GITHUB_GET_MEMBERS_DELAY;
@@ -82,8 +84,7 @@ class OwnersBot {
   async initPr(github, pr) {
     await this.repo.checkout();
 
-    const parser = new OwnersParser(this.repo, this.teams);
-    const treeParse = await parser.parseOwnersTree();
+    const treeParse = await this.parser.parseOwnersTree();
     treeParse.errors.forEach(error => {
       github.logger.warn(error);
     });

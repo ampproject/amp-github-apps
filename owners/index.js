@@ -91,13 +91,8 @@ module.exports = app => {
   );
 
   if (process.env.NODE_ENV !== 'test') {
-    // Since the status server is publicly accessible, we don't want any
-    // endpoints to be making API calls or doing disk I/O. Rather than parsing
-    // the file tree from the local repo on every request, we keep a local copy
-    // and update it every ten minutes.
-    const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
     teamsInitialized.then(() => {
-      infoServer(INFO_SERVER_PORT, parser, app.log);
+      infoServer(INFO_SERVER_PORT, ownersBot.parser, app.log);
     });
   }
 
