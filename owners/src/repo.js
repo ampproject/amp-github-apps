@@ -79,13 +79,36 @@ class VirtualRepository extends Repository {
   }
 
   /**
+   * Read the contents of a file from the repo.
+   *
+   * @param {string} relativePath file to read.
+   * @return {string} file contents.
+   */
+  async readFile(relativePath) {
+    const file = this._knownFiles.get(relativePath);
+    if (!file) {
+      throw new Error(
+        `File "${relativePath}" not found in virtual repository; ` +
+        'can only read files found through `findOwnersFiles`.' );
+    }
+
+    if (file.contents === null) {
+      file.contents = await this.github.getFileContents({
+        filename: relativePath,
+        sha: file.sha,
+      });
+    }
+
+    return file.contents;
+  }
+
+  /**
    * Finds all OWNERS files in the repository and records them as known files.
    *
    * @return {!Array<string>} a list of relative OWNERS file paths.
    */
   async findOwnersFiles() {
     const ownersFiles = await this.github.searchFilename('OWNERS');
-    console.log(this.logger)
 
     ownersFiles.forEach(({filename, sha}) => {
       const file = this._knownFiles.get(filename);

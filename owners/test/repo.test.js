@@ -48,25 +48,61 @@ describe('virtual repository', () => {
 
   beforeEach(() => {
     repo = new VirtualRepository(github);
+    sandbox.stub(GitHub.prototype, 'searchFilename')
+      .withArgs('OWNERS')
+      .onFirstCall().returns([
+        {filename: 'OWNERS', sha: 'sha_1'},
+        {filename: 'foo/OWNERS', sha: 'sha_2'},
+      ])
+      .onSecondCall().returns([
+        {filename: 'OWNERS', sha: 'sha_updated'},
+      ]);
   });
 
   afterEach(() => {
     sandbox.restore();
   });
 
-  describe('findOwnersFiles', () => {
-    beforeEach(() => {
-      sandbox.stub(GitHub.prototype, 'searchFilename')
-        .withArgs('OWNERS')
-        .onFirstCall().returns([
-          {filename: 'OWNERS', sha: 'sha_1'},
-          {filename: 'foo/OWNERS', sha: 'sha_2'},
-        ])
-        .onSecondCall().returns([
-          {filename: 'OWNERS', sha: 'sha_updated'},
-        ]);
+  describe('readFile', () => {
+    it('throws an error for unknown files', () => {
+      expect(repo.readFile('OWNERS')).rejects.toContain(
+        'File "OWNERS" not found in virtual repository'
+      );
     });
 
+    describe('for files found through findOwnersFiles', () => {
+      beforeEach(() => {
+        sandbox.stub(GitHub.prototype, 'getFileContents').returns('contents');
+      });
+
+      it('fetches the file contents from GitHub', async () => {
+        expect.assertions(1);
+        await repo.findOwnersFiles();
+        const contents = await repo.readFile("OWNERS");
+
+        sandbox.assert.calledWith(github.getFileContents, {
+          filename: "OWNERS",
+          sha: 'sha_1',
+        });
+        expect(contents).toEqual('contents');
+      });
+
+      it('returns the file from the cache when available', async () => {
+        expect.assertions(1);
+        await repo.findOwnersFiles();
+        await repo.readFile("OWNERS");
+        await repo.readFile("OWNERS");
+        await repo.readFile("OWNERS");
+        await repo.readFile("OWNERS");
+        const contents = await repo.readFile("OWNERS");
+
+        sandbox.assert.calledOnce(github.getFileContents)
+        expect(contents).toEqual('contents');
+      });
+    });
+  });
+
+  describe('findOwnersFiles', () => {
     it('returns the owners file names', async () => {
       expect.assertions(1);
       const ownersFiles = await repo.findOwnersFiles();
