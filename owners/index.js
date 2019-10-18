@@ -106,9 +106,12 @@ module.exports = app => {
 
     const pr = PullRequest.fromGitHubResponse(payload.pull_request);
     const changedFiles = await github.listFiles(pr.number);
+    const changedOwners = changedFiles.filter(
+      filename => OWNERS_FILE_REGEX.test(filename)
+    );
 
-    if (changedFiles.some(filename => OWNERS_FILE_REGEX.test(filename))) {
-      await ownersBot.refreshTree(github.logger);
+    if (changedOwners.length) {
+      await ownersBot.refreshTree(changedOwners, github.logger);
     }
   });
 
