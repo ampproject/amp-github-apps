@@ -18,28 +18,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
-const CACHED_TREE_REFRESH_MS = 10 * 60 * 1000;
 
 /**
  * Info server entrypoint.
  *
  * @param {number} port port to run the server on.
- * @param {!OwnersParser} parser owners file parser.
+ * @param {!OwnersBot} ownersBot owners bot instance.
  * @param {!Logger} logger logging interface.
  */
-module.exports = (port, parser, logger) => {
-  let treeParse = {result: {}, errors: []};
-
-  /** Updates the cached copy of the parsed ownership tree. */
-  function updateTree() {
-    app.log('Updating cached owners tree');
-    parser.parseOwnersTree().then(parse => {
-      treeParse = parse;
-    });
-  }
-  updateTree();
-  setInterval(updateTree, CACHED_TREE_REFRESH_MS);
-
+module.exports = (port, ownersBot, logger) => {
   const app = express();
   app.use(bodyParser.json());
 
@@ -54,15 +41,14 @@ module.exports = (port, parser, logger) => {
   });
 
   app.get('/tree', (req, res) => {
+    const {result, errors} = ownersBot.treeParse;
     const treeHeader = '<h3>OWNERS tree</h3>';
-    const treeDisplay = `<pre>${treeParse.result.toString()}</pre>`;
+    const treeDisplay = `<pre>${result.toString()}</pre>`;
 
     let output = `${treeHeader}${treeDisplay}`;
-    if (treeParse.errors.length) {
+    if (errors.length) {
       const errorHeader = '<h3>Parser Errors</h3>';
-      const errorDisplay = treeParse.errors
-        .map(error => error.toString())
-        .join('<br>');
+      const errorDisplay = errors.join('<br>');
       output += `${errorHeader}<code>${errorDisplay}</code>`;
     }
 
@@ -71,7 +57,7 @@ module.exports = (port, parser, logger) => {
 
   app.get('/teams', (req, res) => {
     const teamSections = [];
-    Object.entries(parser.teamMap).forEach(([name, team]) => {
+    Object.entries(ownersBot.teams).forEach(([name, team]) => {
       teamSections.push(
         [
           `Team "${name}" (ID: ${team.id}):`,

@@ -46,12 +46,13 @@ describe('owners bot', () => {
     'open'
   );
   const repo = new LocalRepository('path/to/repo');
-  const ownersBot = new OwnersBot(repo);
+  let ownersBot;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox.stub(LocalRepository.prototype, 'findOwnersFiles').returns([]);
+    ownersBot = new OwnersBot(repo);
     ownersBot.GITHUB_CHECKRUN_DELAY = 0;
     ownersBot.GITHUB_GET_MEMBERS_DELAY = 0;
   });
@@ -89,6 +90,46 @@ describe('owners bot', () => {
     });
   });
 
+  describe('syncTeam', () => {
+    let myTeam;
+
+    beforeEach(() => {
+      myTeam = new Team(1337, 'ampproject', 'my_team');
+      sandbox.stub(GitHub.prototype, 'getTeamMembers').returns(['rcebulko']);
+    });
+
+    it('fetches members for the team', async done => {
+      await ownersBot.syncTeam(myTeam, github);
+      sandbox.assert.calledWith(github.getTeamMembers, 1337);
+      done();
+    });
+
+    it('updates the owners bot team map', async () => {
+      expect.assertions(3);
+      expect(ownersBot.teams['ampproject/my_team']).toBeUndefined();
+
+      await ownersBot.syncTeam(myTeam, github);
+
+      expect(ownersBot.teams['ampproject/my_team']).toBe(myTeam);
+      expect(myTeam.members).toEqual(['rcebulko']);
+    });
+  });
+
+  describe('refreshTree', () => {
+    it('checks out the repository', async done => {
+      await ownersBot.refreshTree();
+      sandbox.assert.calledOnce(repo.checkout);
+      done();
+    });
+
+    it('parses the owners tree', async () => {
+      expect.assertions(1);
+      ownersBot.treeParse = null;
+      await ownersBot.refreshTree();
+      expect(ownersBot.treeParse.result).toBeInstanceOf(OwnersTree);
+    });
+  });
+
   describe('initPr', () => {
     beforeEach(() => {
       const timestamp = new Date('2019-01-02T00:00:00Z');
@@ -104,12 +145,6 @@ describe('owners bot', () => {
       sandbox
         .stub(GitHub.prototype, 'getReviewRequests')
         .returns(['requested']);
-    });
-
-    it('parses the owners tree', async () => {
-      expect.assertions(1);
-      const {tree} = await ownersBot.initPr(github, pr);
-      expect(tree).toBeInstanceOf(OwnersTree);
     });
 
     it('warns about parsing errors', async done => {

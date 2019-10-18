@@ -22,7 +22,6 @@ const infoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/github');
 const {LocalRepository} = require('./src/repo');
 const {OwnersBot} = require('./src/owners_bot');
-const {OwnersParser} = require('./src/parser');
 const {OwnersCheck} = require('./src/owners_check');
 
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
@@ -33,51 +32,57 @@ const INFO_SERVER_PORT = Number(process.env.INFO_SERVER_PORT || 8081);
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(localRepo);
-  const github = new GitHub(
+  const sharedGithub = new GitHub(
     new Octokit({auth: `token ${GITHUB_ACCESS_TOKEN}`}),
     GITHUB_REPO_OWNER,
     GITHUB_REPO_NAME,
     app.log
   );
-  const teamsInitialized = ownersBot.initTeams(github);
+  ownersBot.initTeams(sharedGithub);
+
+  /**
+   * Listen for webhooks and provide handlers with a GitHub interface and the
+   * event payload.
+   *
+   * @param {!string|string[]} events event or list of events to listen to.
+   * @param {!function} cb callback function.
+   */
+  function listen(events, cb) {
+    app.on(events, async context => {
+      let github;
+      try {
+        github = GitHub.fromContext(context);
+      } catch (e) {
+        // Some webhooks do not provide a GitHub instance in their context.
+        github = sharedGithub;
+      }
+
+      await cb(github, context.payload);
+    });
+  }
 
   /** Probot request handlers **/
-  app.on(['pull_request.opened'], async context => {
-    await ownersBot.runOwnersCheck(
-      GitHub.fromContext(context),
-      PullRequest.fromGitHubResponse(context.payload.pull_request),
-      /* requestOwners */ true
-    );
+  listen('pull_request.opened', async (github, payload) => {
+    const pr = PullRequest.fromGitHubResponse(payload.pull_request);
+    await ownersBot.runOwnersCheck(github, pr, /* requestOwners */ true);
   });
 
-  app.on(['pull_request.synchronize'], async context => {
-    await ownersBot.runOwnersCheck(
-      GitHub.fromContext(context),
-      PullRequest.fromGitHubResponse(context.payload.pull_request)
-    );
+  listen('pull_request.synchronize', async (github, payload) => {
+    const pr = PullRequest.fromGitHubResponse(payload.pull_request);
+    await ownersBot.runOwnersCheck(github, pr);
   });
 
-  app.on('check_run.rerequested', async context => {
-    const payload = context.payload;
+  listen('check_run.rerequested', async (github, payload) => {
     const prNumber = payload.check_run.check_suite.pull_requests[0].number;
-
-    await ownersBot.runOwnersCheckOnPrNumber(
-      GitHub.fromContext(context),
-      prNumber
-    );
+    await ownersBot.runOwnersCheckOnPrNumber(github, prNumber);
   });
 
-  app.on('pull_request_review.submitted', async context => {
-    const payload = context.payload;
+  listen('pull_request_review.submitted', async (github, payload) => {
     const prNumber = payload.pull_request.number;
-
-    await ownersBot.runOwnersCheckOnPrNumber(
-      GitHub.fromContext(context),
-      prNumber
-    );
+    await ownersBot.runOwnersCheckOnPrNumber(github, prNumber);
   });
 
-  app.on(
+  listen(
     [
       'team.created',
       'team.deleted',
@@ -85,32 +90,26 @@ module.exports = app => {
       'membership.added',
       'membership.removed',
     ],
-    async context => {
-      const {id, slug} = context.payload.team;
-      const team = new Team(id, GITHUB_REPO_OWNER, slug);
-
-      await team.fetchMembers(github);
-      ownersBot.teams[team.toString()] = team;
+    async (github, payload) => {
+      const {id, slug} = payload.team;
+      await ownersBot.syncTeam(new Team(id, GITHUB_REPO_OWNER, slug), github);
     }
   );
 
   if (process.env.NODE_ENV !== 'test') {
-    // Since the status server is publicly accessible, we don't want any
-    // endpoints to be making API calls or doing disk I/O. Rather than parsing
-    // the file tree from the local repo on every request, we keep a local copy
-    // and update it every ten minutes.
-    const parser = new OwnersParser(localRepo, ownersBot.teams, app.log);
-    teamsInitialized.then(() => {
-      infoServer(INFO_SERVER_PORT, parser, app.log);
-    });
+    infoServer(INFO_SERVER_PORT, ownersBot, app.log);
   }
 
   // Since this endpoint triggers a ton of GitHub API requests, there is a risk
   // of it being spammed; so it is not exposed through the info server.
   app.route('/admin').get('/check/:prNumber', async (req, res) => {
-    const pr = await github.getPullRequest(req.params.prNumber);
-    const {tree, changedFiles, reviewers} = await ownersBot.initPr(github, pr);
-    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
+    const pr = await sharedGithub.getPullRequest(req.params.prNumber);
+    const {changedFiles, reviewers} = await ownersBot.initPr(sharedGithub, pr);
+    const ownersCheck = new OwnersCheck(
+      ownersBot.treeParse.result,
+      changedFiles,
+      reviewers
+    );
 
     const {checkRun} = ownersCheck.run();
 
