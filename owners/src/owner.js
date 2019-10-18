@@ -104,7 +104,7 @@ class UserOwner extends Owner {
    * Tests if this owner matches a username.
    *
    * @param {!string} username username to check.
-   * @return {!boolean} true if this owner has the username.
+   * @return {boolean} true if this owner has the username.
    */
   includes(username) {
     return this.username === username;
@@ -148,7 +148,7 @@ class TeamOwner extends Owner {
    * Tests if this owner matches a username.
    *
    * @param {!string} username username to check.
-   * @return {!boolean} true if this team owner has the username.
+   * @return {boolean} true if this team owner has the username.
    */
   includes(username) {
     return this.team.members.includes(username);
@@ -193,7 +193,7 @@ class WildcardOwner extends Owner {
    * Tests if this owner matches a username.
    *
    * @param {!string} unusedUsername username to check.
-   * @return {!boolean} always true
+   * @return {boolean} always true
    */
   includes(unusedUsername) {
     return true;

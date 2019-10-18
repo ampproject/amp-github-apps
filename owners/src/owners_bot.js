@@ -151,7 +151,7 @@ class OwnersBot {
    * Request.
    *
    * @param {!GitHub} github GitHub API interface.
-   * @param {!number} prNumber pull request number.
+   * @param {number} prNumber pull request number.
    */
   async runOwnersCheckOnPrNumber(github, prNumber) {
     const pr = await github.getPullRequest(prNumber);

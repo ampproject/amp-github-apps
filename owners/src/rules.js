@@ -71,7 +71,7 @@ class OwnersRule {
    * TODO(Issue #278): Implement pattern matching.
    *
    * @param {!string} filePath relative path in repo to the file being checked.
-   * @return {!boolean} true if the rule applies to the file.
+   * @return {boolean} true if the rule applies to the file.
    */
   matchesFile(filePath) {
     return true;
@@ -129,7 +129,7 @@ class PatternOwnersRule extends OwnersRule {
    * Test if a file is matched by the pattern rule.
    *
    * @param {!string} filePath relative path in repo to the file being checked.
-   * @return {!boolean} true if the rule applies to the file.
+   * @return {boolean} true if the rule applies to the file.
    */
   matchesFile(filePath) {
     return this.regex.test(path.basename(filePath));
@@ -165,7 +165,7 @@ class SameDirPatternOwnersRule extends PatternOwnersRule {
    * Test if a file is in the rule directory and matched by the pattern rule.
    *
    * @param {!string} filePath relative path in repo to the file being checked.
-   * @return {!boolean} true if the rule applies to the file.
+   * @return {boolean} true if the rule applies to the file.
    */
   matchesFile(filePath) {
     return (

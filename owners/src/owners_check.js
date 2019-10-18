@@ -171,8 +171,8 @@ class OwnersCheck {
    *
    * @param {!string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
-   * @param {!boolean} isApproved approval status to filter by.
-   * @return {!boolean} if the file is reviewed.
+   * @param {boolean} isApproved approval status to filter by.
+   * @return {boolean} if the file is reviewed.
    */
   _hasOwnersReview(filename, subtree, isApproved) {
     return Object.entries(this.reviewers)
@@ -206,7 +206,7 @@ class OwnersCheck {
    *
    * @param {!string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
-   * @return {!boolean} if the file has approval coverage.
+   * @return {boolean} if the file has approval coverage.
    */
   _hasRequiredOwnersApproval(filename, subtree) {
     return this._missingRequiredOwners(filename, subtree).length === 0;
@@ -219,7 +219,7 @@ class OwnersCheck {
    *
    * @param {!string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
-   * @return {!boolean} if the file is approved.
+   * @return {boolean} if the file is approved.
    */
   _hasFullOwnersCoverage(filename, subtree) {
     return (
@@ -235,7 +235,7 @@ class OwnersCheck {
    *
    * @param {!string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
-   * @return {!boolean} if the file is approved.
+   * @return {boolean} if the file is approved.
    */
   _hasOwnersPendingReview(filename, subtree) {
     return this._hasOwnersReview(filename, subtree, false);
@@ -247,7 +247,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @return {!boolean} if the PR has reviewer approval.
+   * @return {boolean} if the PR has reviewer approval.
    */
   _prHasReviewerSetApproval() {
     return Object.entries(this.reviewers)

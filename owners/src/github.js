@@ -36,7 +36,7 @@ class PullRequest {
   /**
    * Whether or not the pull request is open.
    *
-   * @return {!boolean} true if the pull request is open.
+   * @return {boolean} true if the pull request is open.
    */
   get isOpen() {
     return this.state.toLowerCase() === 'open';

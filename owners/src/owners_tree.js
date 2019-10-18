@@ -182,7 +182,7 @@ class OwnersTree {
    *
    * @param {!string} filename file to test ownership for.
    * @param {!string} username user to check ownership of.
-   * @return {!boolean} true if the user is an owner of the file.
+   * @return {boolean} true if the user is an owner of the file.
    */
   fileHasOwner(filename, username) {
     return this.atPath(filename)
