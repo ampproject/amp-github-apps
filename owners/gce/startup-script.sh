@@ -33,24 +33,6 @@ PRIVATE_KEY=$(echo | base64 -w 0 <<EOF
 EOF
 )  # Probot
 
-echo > "${APP_DIR}/.env" <<EOF
-NODE_ENV=production
-LOG_LEVEL=trace
-PORT=8080
-INFO_SERVER_PORT=8081
-
-APP_ID=22611
-WEBHOOK_SECRET=[REDACTED]
-PRIVATE_KEY=${PRIVATE_KEY}
-GITHUB_ACCESS_TOKEN=[REDACTED]
-
-GITHUB_REPO=${REPO}
-GITHUB_REPO_DIR=${REPO_DIR}
-GITHUB_BOT_USERNAME=amp-owners-bot
-ADD_REVIEWERS_OPT_OUT=1
-EOF
-# [END env]
-
 ## Steps for: Deployment
 
 supervisorctl stop nodeapp
@@ -84,7 +66,7 @@ export HOME=/root
 git config --global credential.helper gcloud.sh
 rm -rf "${APP_DIR}"
 # TODO(#500): Deploy from `amphtml/amp-github-apps`
-git clone https://source.developers.google.com/p/$PROJECTID/r/amp-owners-bot "${APP_DIR}"
+git clone https://source.developers.google.com/p/amp-owners-bot/r/amp-owners-bot "${APP_DIR}"
 # [END git]
 
 ## Steps for: Deployment
@@ -97,8 +79,29 @@ APP_COMMIT_MSG=$(git log --max-count=1 --pretty='format:%s')  # App
 npm install
 # [END update]
 
+cat > .env <<EOF
+NODE_ENV=production
+LOG_LEVEL=trace
+PORT=8080
+INFO_SERVER_PORT=8081
+
+APP_ID=22611
+WEBHOOK_SECRET=[REDACTED]
+PRIVATE_KEY=${PRIVATE_KEY}
+GITHUB_ACCESS_TOKEN=[REDACTED]
+
+GITHUB_REPO=${REPO}
+GITHUB_REPO_DIR=${REPO_DIR}
+GITHUB_BOT_USERNAME=amp-owners-bot
+ADD_REVIEWERS_OPT_OUT=1
+AMP_COMMIT_SHA=${AMP_COMMIT_SHA}
+AMP_COMMIT_MSG=${AMP_COMMIT_MSG}
+EOF
+# [END env]
+
 
 ## Steps for: Initialization
+
 # [START clone]
 # Get a clean copy of the target repository to be evaluated
 rm -rf "${REPO_DIR}"
@@ -121,7 +124,7 @@ command=npm run start
 autostart=true
 autorestart=true
 user=nodeapp
-environment=HOME="/home/nodeapp",USER="nodeapp",APP_COMMIT_SHA="${APP_COMMIT_SHA}",APP_COMMIT_MSG="${APP_COMMIT_MSG}"
+environment=HOME="/home/nodeapp",USER="nodeapp"
 nodaemon=true
 stdout_logfile=syslog
 stdout_logfile_maxbytes=0
@@ -133,7 +136,7 @@ EOF
 ## Steps for: Deployment
 
 supervisorctl reread
-supervisorctl update
+supervisorctl start nodeapp
 # [END supervisor]
 
 # Application should now be running under supervisor
