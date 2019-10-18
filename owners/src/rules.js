@@ -43,7 +43,7 @@ class OwnersRule {
    * any reviewer.
    *
    * @param {!string} ownersPath path to OWNERS file.
-   * @param {Owner[]} owners list of owners.
+   * @param {!Array<!Owner>} owners list of owners.
    */
   constructor(ownersPath, owners) {
     this.filePath = ownersPath;
@@ -55,7 +55,7 @@ class OwnersRule {
   /**
    * The label to use when describing the rule.
    *
-   * @return {string} the label for the rule.
+   * @return {!string} the label for the rule.
    */
   get label() {
     return '**/*';
@@ -71,7 +71,7 @@ class OwnersRule {
    * TODO(Issue #278): Implement pattern matching.
    *
    * @param {!string} filePath relative path in repo to the file being checked.
-   * @return {boolean} true if the rule applies to the file.
+   * @return {!boolean} true if the rule applies to the file.
    */
   matchesFile(filePath) {
     return true;
@@ -80,7 +80,7 @@ class OwnersRule {
   /**
    * Describe the rule.
    *
-   * @return {string} description of the rule.
+   * @return {!string} description of the rule.
    */
   toString() {
     return `${this.label}: ${this.owners.join(', ')}`;
@@ -99,7 +99,7 @@ class PatternOwnersRule extends OwnersRule {
    * Constructor.
    *
    * @param {!string} ownersPath path to OWNERS file.
-   * @param {Owner[]} owners list of owners.
+   * @param {!Array<!Owner>} owners list of owners.
    * @param {!string} pattern filename/type pattern.
    */
   constructor(ownersPath, owners, pattern) {
@@ -119,7 +119,7 @@ class PatternOwnersRule extends OwnersRule {
   /**
    * The label to use when describing the rule.
    *
-   * @return {string} the label for the rule.
+   * @return {!string} the label for the rule.
    */
   get label() {
     return `**/${this.pattern}`;
@@ -129,7 +129,7 @@ class PatternOwnersRule extends OwnersRule {
    * Test if a file is matched by the pattern rule.
    *
    * @param {!string} filePath relative path in repo to the file being checked.
-   * @return {boolean} true if the rule applies to the file.
+   * @return {!boolean} true if the rule applies to the file.
    */
   matchesFile(filePath) {
     return this.regex.test(path.basename(filePath));
@@ -144,7 +144,7 @@ class SameDirPatternOwnersRule extends PatternOwnersRule {
    * Constructor.
    *
    * @param {!string} ownersPath path to OWNERS file.
-   * @param {Owner[]} owners list of owners.
+   * @param {!Array<!Owner>} owners list of owners.
    * @param {!string} pattern filename/type pattern.
    */
   constructor(ownersPath, owners, pattern) {
@@ -155,7 +155,7 @@ class SameDirPatternOwnersRule extends PatternOwnersRule {
   /**
    * The label to use when describing the rule.
    *
-   * @return {string} the label for the rule.
+   * @return {!string} the label for the rule.
    */
   get label() {
     return `./${this.pattern}`;
@@ -165,7 +165,7 @@ class SameDirPatternOwnersRule extends PatternOwnersRule {
    * Test if a file is in the rule directory and matched by the pattern rule.
    *
    * @param {!string} filePath relative path in repo to the file being checked.
-   * @return {boolean} true if the rule applies to the file.
+   * @return {!boolean} true if the rule applies to the file.
    */
   matchesFile(filePath) {
     return (
@@ -183,7 +183,7 @@ class ReviewerSetRule extends OwnersRule {
    * Constructor.
    *
    * @param {!string} ownersPath path to OWNERS file.
-   * @param {Owner[]=} owners list of owners (defaults to a wildcard owner).
+   * @param {Array<!Owner>=} owners list of owners (defaults to a wildcard owner).
    */
   constructor(ownersPath, owners) {
     if (!owners) {
@@ -201,7 +201,7 @@ class ReviewerSetRule extends OwnersRule {
   /**
    * The label to use when describing the rule.
    *
-   * @return {string} the label for the rule.
+   * @return {!string} the label for the rule.
    */
   get label() {
     return 'Reviewers';
