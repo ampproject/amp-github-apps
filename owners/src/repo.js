@@ -70,7 +70,7 @@ class LocalRepository extends Repository {
    *
    * @param {!string} pathToRepoDir absolute path to the repository root
    *     directory.
-   * @param {string=} remote git remote to clone (default: 'origin').
+   * @param {?string=} remote git remote to clone (default: 'origin').
    */
   constructor(pathToRepoDir, remote) {
     super();
@@ -91,7 +91,7 @@ class LocalRepository extends Repository {
   /**
    * Check out a branch locally.
    *
-   * @param {string=} branch git branch to checkout (default: 'master').
+   * @param {?string=} branch git branch to checkout (default: 'master').
    */
   async checkout(branch) {
     branch = branch || 'master';

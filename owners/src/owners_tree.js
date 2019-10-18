@@ -25,7 +25,7 @@ class OwnersTree {
    * Constructor.
    *
    * @param {!string=} dirPath relative the directory containing owners file.
-   * @param {OwnersTree=} parent parent tree of the node (null for root)
+   * @param {?OwnersTree=} parent parent tree of the node (null for root)
    */
   constructor(dirPath, parent) {
     this.parent = parent || null;
@@ -56,7 +56,7 @@ class OwnersTree {
    * keyed by the next directory name.
    *
    * @param {!OwnersRule} rule rule to add.
-   * @return {OwnersTree} the tree node the rule was added to.
+   * @return {!OwnersTree} the tree node the rule was added to.
    */
   addRule(rule) {
     if (rule.dirPath === this.dirPath) {
@@ -87,7 +87,7 @@ class OwnersTree {
    * Includes the node's own rule as well as inherited rules, in decreasing
    * order of depth (ie. the root OWNERS rules will be last).
    *
-   * @return {OwnersRule[]} list of all ownership rules for the directory.
+   * @return {!Array<!OwnersRule>} list of all ownership rules for the directory.
    */
   get allRules() {
     const parentRules = this.isRoot ? [] : this.parent.allRules;
@@ -101,7 +101,7 @@ class OwnersTree {
    * order of depth (ie. the root OWNERS rules will be last).
    *
    * @param {!string} filename file to get rules for.
-   * @return {OwnersRule[]} list of all ownership rules for the file.
+   * @return {!Array<!OwnersRule>} list of all ownership rules for the file.
    */
   fileRules(filename) {
     return this.allRules.filter(rule => rule.matchesFile(filename));
@@ -111,7 +111,7 @@ class OwnersTree {
    * Provides a list of owners rules for a file.
    *
    * @param {!string} filename file to get owners for.
-   * @return {Owner[]} list of all owners for the file.
+   * @return {!Array<!Owner>} list of all owners for the file.
    */
   fileOwners(filename) {
     return this.fileRules(filename)
@@ -124,7 +124,7 @@ class OwnersTree {
    * directory.
    *
    * @param {!string} filePath relative path to file/directory.
-   * @return {OwnersRule[]} list of rules for the file/directory.
+   * @return {!Array<!OwnersRule>} list of rules for the file/directory.
    */
   atPath(filePath) {
     const segments = filePath.split(path.sep);
@@ -163,7 +163,7 @@ class OwnersTree {
    *
    * @param {!string} filename file to test ownership for.
    * @param {!OWNER_MODIFIER} modifier owner modifier.
-   * @return {Owner[]} list of owners.
+   * @return {!Array<!Owner>} list of owners.
    */
   getModifiedFileOwners(filename, modifier) {
     const modifiedOwners = new Map();
@@ -182,7 +182,7 @@ class OwnersTree {
    *
    * @param {!string} filename file to test ownership for.
    * @param {!string} username user to check ownership of.
-   * @return {boolean} true if the user is an owner of the file.
+   * @return {!boolean} true if the user is an owner of the file.
    */
   fileHasOwner(filename, username) {
     return this.atPath(filename)
@@ -193,8 +193,8 @@ class OwnersTree {
   /**
    * Builds the map from filenames to ownership subtrees.
    *
-   * @param {string[]} filenames list of changed files.
-   * @return {FileTreeMap} map from filenames to nearest ownership subtrees.
+   * @param {!Array<!string>} filenames list of changed files.
+   * @return {!FileTreeMap} map from filenames to nearest ownership subtrees.
    */
   buildFileTreeMap(filenames) {
     const fileTreeMap = {};
@@ -207,7 +207,7 @@ class OwnersTree {
   /**
    * Renders the ownership tree as a string.
    *
-   * @return {string} visual representation of the tree.
+   * @return {!string} visual representation of the tree.
    */
   toString() {
     const lines = [];
