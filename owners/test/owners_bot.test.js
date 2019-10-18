@@ -106,11 +106,11 @@ describe('owners bot', () => {
 
     it('updates the owners bot team map', async () => {
       expect.assertions(3);
-      expect(ownersBot['ampproject/my_team']).toBeUndefined();
+      expect(ownersBot.teams['ampproject/my_team']).toBeUndefined();
 
       await ownersBot.syncTeam(myTeam, github);
 
-      expect(ownersBot['ampproject/my_team']).toBe(myTeam);
+      expect(ownersBot.teams['ampproject/my_team']).toBe(myTeam);
       expect(myTeam.members).toEqual(['rcebulko']);
     });
   });
