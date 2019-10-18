@@ -20,10 +20,10 @@
  * May be the console, a request context, or a shared logger.
  *
  * @typedef {{
- *   debug: function(*),
- *   log: function(*),
- *   warn: function(*),
- *   error: function(*),
+ *   debug: !function(*),
+ *   log: !function(*),
+ *   warn: !function(*),
+ *   error: !function(*),
  * }}
  */
 let Logger;
@@ -31,7 +31,7 @@ let Logger;
 /**
  * A map from filenames to the nearest ownership subtree.
  *
- * @typedef {!Object<string, !OwnersTree>}
+ * @typedef {!Object<!string, !OwnersTree>}
  */
 let FileTreeMap;
 
@@ -48,7 +48,7 @@ let ReviewerFiles;
  * @template T
  * @typedef {{
  *   result: T,
- *   errors: OwnersParserError[],
+ *   errors: !Array<!OwnersParserError>,
  * }}
  */
 let OwnersParserResult;
@@ -67,8 +67,8 @@ let FileRef;
  * The result of an owners check.
  *
  * @typedef {{
- *   checkRun: CheckRun,
- *   reviewers: string[],
+ *   checkRun: !CheckRun,
+ *   reviewers: !Array<!string>,
  * }}
  */
 let OwnersCheckResult;
@@ -76,7 +76,7 @@ let OwnersCheckResult;
 /**
  * A map from reviewer usernames to their approval status.
  *
- * @typedef {!Object<!string, boolean>}
+ * @typedef {!Object<!string, !boolean>}
  */
 let ReviewerApprovalMap;
 
@@ -95,7 +95,7 @@ let OwnerDefinition;
  * A JSON owners rule definition.
  *
  * @typedef {{
- *   owners: OwnerDefinition[],
+ *   owners: !Array<!OwnerDefinition>,
  *   pattern: ?string,
  * }}
  */
@@ -105,7 +105,7 @@ let RuleDefinition;
  * A JSON owners file definition.
  *
  * @typedef {{
- *   rules: RuleDefinition[],
+ *   rules: !Array<!RuleDefinition>,
  * }}
  */
 let OwnersFileDefinition;
