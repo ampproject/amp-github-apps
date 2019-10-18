@@ -17,6 +17,7 @@
 require('dotenv').config();
 
 const Octokit = require('@octokit/rest');
+const path = require('path');
 
 const infoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/github');
@@ -29,7 +30,6 @@ const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const INFO_SERVER_PORT = Number(process.env.INFO_SERVER_PORT || 8081);
 
-const OWNERS_FILE_REGEX = /(^|\/)OWNERS$/;
 const CACHED_TREE_REFRESH_MS = 10 * 60 * 1000;
 
 module.exports = app => {
@@ -106,8 +106,8 @@ module.exports = app => {
 
     const pr = PullRequest.fromGitHubResponse(payload.pull_request);
     const changedFiles = await github.listFiles(pr.number);
-    const changedOwners = changedFiles.filter(
-      filename => OWNERS_FILE_REGEX.test(filename)
+    const changedOwners = changedFiles.filter(filename =>
+      path.basename(filename) === 'OWNERS'
     );
 
     if (changedOwners.length) {
