@@ -40,6 +40,11 @@ async function runCommands(...commands) {
  */
 class Repository {
   /**
+   * Perform any required syncing with the repository.
+   */
+  async sync() {};
+
+  /**
    * Read the contents of a file from the repo.
    *
    * @param {string} relativePath file to read.
@@ -76,6 +81,13 @@ class VirtualRepository extends Repository {
     this.logger = github.logger;
     /** @type {!Map<string, !VirtualFile>} */
     this._knownFiles = new Map();
+  }
+
+  /**
+   * Fetch the latest versions of all OWNERS files.
+   */
+  async sync() {
+    await this.findOwnersFiles();
   }
 
   /**
@@ -145,6 +157,13 @@ class LocalRepository extends Repository {
     super();
     this.rootDir = pathToRepoDir;
     this.remote = remote || 'origin';
+  }
+
+  /**
+   * Checks out the master branch.
+   */
+  async sync() {
+    await this.checkout();
   }
 
   /**

@@ -448,7 +448,6 @@ class GitHub {
    */
   async searchFilename(filename) {
     this.logger.info(`Searching repo for files named "${filename}"`);
-    console.log(this.logger);
 
     const files = [];
     let page = 1;
