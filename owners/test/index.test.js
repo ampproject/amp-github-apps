@@ -602,4 +602,49 @@ describe('owners bot', () => {
       done();
     });
   });
+
+  describe('closed PRs', () => {
+    let pull_request;
+    let payload;
+
+    beforeEach(() => {
+      sandbox.stub(OwnersBot.prototype, 'refreshTree');
+      pull_request = require('./fixtures/pulls/pull_request.35');
+      payload = {pull_request};
+    });
+
+    it('does nothing for a non-merged PR', async done => {
+      pull_request.merged = false;
+      await probot.receive({name: 'pull_request.closed', payload});
+
+      sandbox.assert.notCalled(OwnersBot.prototype.refreshTree);
+      done();
+    });
+
+    describe('merged PRs', () => {
+      beforeEach(() => {
+        pull_request.merged = true;
+      });
+
+      it('does nothing for a PR without owners files', async done => {
+        nock('https://api.github.com')
+          .get('/repos/ampproject/amphtml/pulls/35/files')
+          .reply(200, [{filename: 'foo.txt', sha: '12345'}]);
+        await probot.receive({name: 'pull_request.closed', payload});
+
+        sandbox.assert.notCalled(OwnersBot.prototype.refreshTree);
+        done();
+      });
+
+      it('refreshes the owners tree for a PR with owners files', async done => {
+        nock('https://api.github.com')
+          .get('/repos/ampproject/amphtml/pulls/35/files')
+          .reply(200, [{filename: 'OWNERS', sha: '12345'}]);
+        await probot.receive({name: 'pull_request.closed', payload});
+
+        sandbox.assert.calledOnce(OwnersBot.prototype.refreshTree);
+        done();
+      });
+    });
+  });
 });

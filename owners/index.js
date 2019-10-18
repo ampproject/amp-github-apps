@@ -29,6 +29,9 @@ const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const INFO_SERVER_PORT = Number(process.env.INFO_SERVER_PORT || 8081);
 
+const OWNERS_FILE_REGEX = /(^|\/)OWNERS$/;
+const CACHED_TREE_REFRESH_MS = 10 * 60 * 1000;
+
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(localRepo);
@@ -95,6 +98,19 @@ module.exports = app => {
       await ownersBot.syncTeam(new Team(id, GITHUB_REPO_OWNER, slug), github);
     }
   );
+
+  listen('pull_request.closed', async (github, payload) => {
+    if (!payload.pull_request.merged) {
+      return;
+    }
+
+    const pr = PullRequest.fromGitHubResponse(payload.pull_request);
+    const changedFiles = await github.listFiles(pr.number);
+
+    if (changedFiles.some(filename => OWNERS_FILE_REGEX.test(filename))) {
+      await ownersBot.refreshTree(github.logger);
+    }
+  });
 
   if (process.env.NODE_ENV !== 'test') {
     infoServer(INFO_SERVER_PORT, ownersBot, app.log);
