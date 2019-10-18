@@ -65,7 +65,7 @@ class ReviewerSelection {
    *
    * @private
    * @param {!Array<!OwnersRule>} rules list of ownership rules.
-   * @return {string[]} union of reviewers lists for highest priority rules.
+   * @return {!Array<!string>} union of reviewers lists for highest priority rules.
    */
   static _reviewersForRules(rules) {
     const reviewers = new Set();

@@ -444,7 +444,7 @@ class GitHub {
    * See https://developer.github.com/v3/search/#search-code
    *
    * @param {!string} filename filename to search for.
-   * @return {FileRef[]} list of returned results.
+   * @return {!Array<!FileRef>} list of returned results.
    */
   async searchFilename(filename) {
     this.logger.info(`Searching repo for files named "${filename}"`);
