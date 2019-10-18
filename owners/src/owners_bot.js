@@ -75,7 +75,7 @@ class OwnersBot {
   /**
    * Update the owners tree.
    *
-   * @param {!Logger=} logger logging interface
+   * @param {Logger=} logger logging interface
    */
   async refreshTree(logger) {
     logger = logger || console;
