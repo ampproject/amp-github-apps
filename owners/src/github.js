@@ -187,11 +187,8 @@ class GitHub {
       },
       method,
       url,
+      ...data,
     };
-
-    if (typeof data !== 'undefined') {
-      request.data = data;
-    }
 
     return await this.client.request(request);
   }
@@ -200,25 +197,27 @@ class GitHub {
    * Automatically fetch multiple pages from a GitHub endpoint
    *
    * @param {!string} url API endpoint URL path (ie. `/teams/###/members`).
+   * @param {*} data optional request data.
    * @return {*[]} list of results across all pages.
    */
-  async _autoPage(url) {
+  async _autoPage(url, data) {
     const resultList = [];
 
-    let pageNum = 1;
+    let page = 1;
     let isNextLink = true;
     while (isNextLink) {
-      this.logger.info(`Fetching page ${pageNum}`);
-      const response = await this._customRequest(
-        'GET',
-        `${url}?page=${pageNum}&per_page=${MAX_PER_PAGE}`
-      );
+      this.logger.info(`Fetching page ${page}`);
+      const response = await this._customRequest('GET', url, {
+        page,
+        per_page: MAX_PER_PAGE,
+        ...data,
+      });
       const nextLink = response.headers.link || '';
       isNextLink = nextLink.includes('rel="next"');
 
       const resultPage = response.data;
       resultList.push(...resultPage);
-      pageNum++;
+      page++;
     }
 
     return resultList;
@@ -426,7 +425,7 @@ class GitHub {
    * Lists all modified files for a PR.
    *
    * @param {number} number PR number
-   * @return {FileRef[]} list of relative file paths.
+   * @return {string[]} list of relative file paths.
    */
   async listFiles(number) {
     this.logger.info(`Fetching changed files for PR #${number}`);
@@ -436,7 +435,45 @@ class GitHub {
     );
     this.logger.debug('[listFiles]', number, response.data);
 
-    return response.data.map(({filename, sha}) => filename);
+    return response.data.map(({filename}) => filename);
+  }
+
+  /**
+   * Searches for files in a repo with a given name.
+   *
+   * See https://developer.github.com/v3/search/#search-code
+   *
+   * @param {!string} filename filename to search for.
+   * @return {FileRef[]} list of returned results.
+   */
+  async searchFilename(filename) {
+    this.logger.info(`Searching repo for files named "${filename}"`);
+
+    const files = [];
+    let page = 1;
+    let isLastPage = false;
+    while (!isLastPage) {
+      this.logger.info(`Fetching page ${page}`);
+      const response = await this.client.search.code({
+        q: `filename:${filename} repo:${this.owner}/${this.repository}`,
+        per_page: MAX_PER_PAGE,
+        page,
+      });
+
+      const {items} = response.data;
+      const total = response.data.total_count;
+      this.logger.debug(`Received ${items.length} results out of ${total}`);
+      files.push(...items);
+
+      isLastPage = files.length >= total || !items.length;
+      page++;
+    }
+
+    return files
+      .filter(({name}) => name === filename)
+      .map(({path, sha}) => {
+        return {filename: path, sha};
+      });
   }
 
   /**

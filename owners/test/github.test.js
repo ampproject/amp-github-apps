@@ -35,6 +35,9 @@ const listFilesResponse = require('./fixtures/files/files.35.json');
 const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
 const getFileResponse = require('./fixtures/files/file_blob.24523.json');
+const searchReadmeResponse = require('./fixtures/files/search.readme.json');
+const searchOwnersPage1Response = require('./fixtures/files/search.owners.page_1.json');
+const searchOwnersPage2Response = require('./fixtures/files/search.owners.page_2.json');
 
 nock.disableNetConnect();
 
@@ -606,6 +609,68 @@ describe('GitHub API', () => {
         const [file] = await github.listFiles(35);
 
         expect(file).toEqual('dir2/dir1/dir1/file.txt');
+      })();
+    });
+  });
+
+  describe('searchCode', () => {
+    it('fetches the list of matching files', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get(
+          '/search/code?q=filename%3AREADME.md%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100'
+        )
+        .reply(200, searchReadmeResponse);
+
+      await withContext(async (context, github) => {
+        const files = await github.searchFilename('README.md');
+        expect(files.length).toEqual(23);
+      })();
+    });
+
+    it('pages automatically', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .get(
+          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100'
+        )
+        .reply(200, searchOwnersPage1Response, {
+          link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
+        });
+      nock('https://api.github.com')
+        .get(
+          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100'
+        )
+        .reply(200, searchOwnersPage2Response);
+
+      await withContext(async (context, github) => {
+        const files = await github.searchFilename('OWNERS');
+        expect(files.length).toEqual(168);
+      })();
+    });
+
+    it('only includes exact file matches', async () => {
+      expect.assertions(3);
+      nock('https://api.github.com')
+        .get(
+          '/search/code?q=filename%3Aexact-match%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100'
+        )
+        .reply(200, {
+          total_count: 3,
+          items: [
+            {name: 'not-exact-match', path: 'foo/not-exact-match', sha: ''},
+            {name: 'exact-match', path: 'foo/exact-match', sha: ''},
+            {name: 'exact-match', path: 'exact-match', sha: ''},
+          ],
+        });
+
+      await withContext(async (context, github) => {
+        const files = await github.searchFilename('exact-match');
+        const filenames = files.map(({filename}) => filename);
+
+        expect(filenames).not.toContainEqual('foo/not-exact-match');
+        expect(filenames).toContainEqual('foo/exact-match');
+        expect(filenames).toContainEqual('exact-match');
       })();
     });
   });
