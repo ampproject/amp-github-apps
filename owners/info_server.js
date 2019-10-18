@@ -18,7 +18,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
-const CACHED_TREE_REFRESH_MS = 10 * 60 * 1000;
 
 /**
  * Info server entrypoint.

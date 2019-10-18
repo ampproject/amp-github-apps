@@ -97,9 +97,7 @@ module.exports = app => {
   );
 
   if (process.env.NODE_ENV !== 'test') {
-    teamsInitialized.then(() => {
-      infoServer(INFO_SERVER_PORT, ownersBot, app.log);
-    });
+    infoServer(INFO_SERVER_PORT, ownersBot, app.log);
   }
 
   // Since this endpoint triggers a ton of GitHub API requests, there is a risk
