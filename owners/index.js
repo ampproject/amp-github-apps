@@ -22,7 +22,6 @@ const infoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/github');
 const {LocalRepository} = require('./src/repo');
 const {OwnersBot} = require('./src/owners_bot');
-const {OwnersParser} = require('./src/parser');
 const {OwnersCheck} = require('./src/owners_check');
 
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
@@ -41,6 +40,13 @@ module.exports = app => {
   );
   ownersBot.initTeams(sharedGithub);
 
+  /**
+   * Listen for webhooks and provide handlers with a GitHub interface and the
+   * event payload.
+   *
+   * @param {!string|string[]} events event or list of events to listen to.
+   * @param {!function} cb callback function.
+   */
   function listen(events, cb) {
     app.on(events, async context => {
       let github;
@@ -104,7 +110,7 @@ module.exports = app => {
     const ownersCheck = new OwnersCheck(
       ownersBot.treeParse.result,
       changedFiles,
-      reviewers,
+      reviewers
     );
 
     const {checkRun} = ownersCheck.run();

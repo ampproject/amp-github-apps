@@ -37,7 +37,7 @@ class OwnersBot {
     this.repo = repo;
     this.teams = {};
     this.parser = new OwnersParser(this.repo, this.teams);
-    this.treeParse = { errors: [], result: new OwnersTree() };
+    this.treeParse = {errors: [], result: new OwnersTree()};
 
     // Defined as a property, to allow overriding in tests.
     this.GITHUB_CHECKRUN_DELAY = GITHUB_CHECKRUN_DELAY;

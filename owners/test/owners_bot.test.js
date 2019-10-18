@@ -111,7 +111,7 @@ describe('owners bot', () => {
       await ownersBot.syncTeam(myTeam, github);
 
       expect(ownersBot['ampproject/my_team']).toBe(myTeam);
-      expect(myTeam.members).toEqual(['rcebulko'])
+      expect(myTeam.members).toEqual(['rcebulko']);
     });
   });
 
