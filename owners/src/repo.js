@@ -62,6 +62,52 @@ class Repository {
 }
 
 /**
+ * Virtual in-memory repository holding owners files.
+ */
+class VirtualRepository extends Repository {
+  /**
+   * Constructor.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   */
+  constructor(github) {
+    super();
+    this.github = github;
+    this.logger = github.logger;
+    /** @type {!Map<string, !VirtualFile>} */
+    this._knownFiles = new Map();
+  }
+
+  /**
+   * Finds all OWNERS files in the repository and records them as known files.
+   *
+   * @return {!Array<string>} a list of relative OWNERS file paths.
+   */
+  async findOwnersFiles() {
+    const ownersFiles = await this.github.searchFilename('OWNERS');
+    console.log(this.logger)
+
+    ownersFiles.forEach(({filename, sha}) => {
+      const file = this._knownFiles.get(filename);
+      if (!file) {
+        // File has never been fetched and should be added to the cache.
+        this.logger.info(`Recording SHA for file "${filename}"`);
+        this._knownFiles.set(filename, {sha, contents: null});
+      } else if (file.sha !== sha) {
+        // File has been updated and needs to be re-fetched.
+        this.logger.info(
+          `Updating SHA and clearing cache for file "${filename}"`
+        );
+        file.sha = sha;
+        file.contents = null;
+      }
+    })
+
+    return ownersFiles.map(({filename}) => filename);
+  } 
+}
+
+/**
  * Interface for reading from a checked out repository using relative paths.
  */
 class LocalRepository extends Repository {
@@ -147,4 +193,4 @@ class LocalRepository extends Repository {
   }
 }
 
-module.exports = {Repository, LocalRepository};
+module.exports = {Repository, LocalRepository, VirtualRepository};
