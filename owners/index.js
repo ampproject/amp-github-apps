@@ -17,6 +17,7 @@
 require('dotenv').config();
 
 const Octokit = require('@octokit/rest');
+const path = require('path');
 
 const infoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/github');
@@ -95,6 +96,22 @@ module.exports = app => {
       await ownersBot.syncTeam(new Team(id, GITHUB_REPO_OWNER, slug), github);
     }
   );
+
+  listen('pull_request.closed', async (github, payload) => {
+    if (!payload.pull_request.merged) {
+      return;
+    }
+
+    const pr = PullRequest.fromGitHubResponse(payload.pull_request);
+    const changedFiles = await github.listFiles(pr.number);
+    const changedOwners = changedFiles.filter(
+      filename => path.basename(filename) === 'OWNERS'
+    );
+
+    if (changedOwners.length) {
+      await ownersBot.refreshTree(changedOwners, github.logger);
+    }
+  });
 
   if (process.env.NODE_ENV !== 'test') {
     infoServer(INFO_SERVER_PORT, ownersBot, app.log);

@@ -57,6 +57,7 @@ const ownersRules = [
 ];
 
 describe('owners bot', () => {
+  let app;
   let probot;
   let sandbox;
 
@@ -74,7 +75,7 @@ describe('owners bot', () => {
       .returns({result: ownersRules, errors: []});
 
     probot = new Probot({});
-    const app = probot.load(owners);
+    app = probot.load(owners);
 
     // just return a test token
     app.app = () => 'test';
@@ -600,6 +601,73 @@ describe('owners bot', () => {
       });
       sandbox.assert.calledOnce(Team.prototype.fetchMembers);
       done();
+    });
+  });
+
+  describe('closed PRs', () => {
+    let pullRequest;
+    let payload;
+
+    beforeEach(() => {
+      sandbox.stub(OwnersBot.prototype, 'refreshTree');
+      pullRequest = require('./fixtures/pulls/pull_request.35');
+      payload = {pull_request: pullRequest};
+    });
+
+    it('does nothing for a non-merged PR', async done => {
+      pullRequest.merged = false;
+      await probot.receive({name: 'pull_request.closed', payload});
+
+      sandbox.assert.notCalled(OwnersBot.prototype.refreshTree);
+      done();
+    });
+
+    describe('merged PRs', () => {
+      beforeEach(() => {
+        pullRequest.merged = true;
+      });
+
+      it('does nothing for a PR without owners files', async done => {
+        nock('https://api.github.com')
+          .get('/repos/ampproject/amphtml/pulls/35/files')
+          .reply(200, [{filename: 'foo.txt', sha: ''}]);
+        await probot.receive({name: 'pull_request.closed', payload});
+
+        sandbox.assert.notCalled(OwnersBot.prototype.refreshTree);
+        done();
+      });
+
+      it('refreshes the owners tree for a PR with owners files', async done => {
+        nock('https://api.github.com')
+          .get('/repos/ampproject/amphtml/pulls/35/files')
+          .reply(200, [{filename: 'OWNERS', sha: ''}]);
+        await probot.receive({name: 'pull_request.closed', payload});
+
+        sandbox.assert.calledOnce(OwnersBot.prototype.refreshTree);
+        done();
+      });
+
+      it('provides a list of updated owners files', async done => {
+        nock('https://api.github.com')
+          .get('/repos/ampproject/amphtml/pulls/35/files')
+          .reply(200, [
+            {filename: 'index.js', sha: ''},
+            {filename: 'OWNERS', sha: ''},
+            {filename: 'foo/OWNERS', sha: ''},
+            {filename: 'foo/OWNERS.yaml', sha: ''},
+            {filename: 'foo/file-owners', sha: ''},
+            {filename: 'foo/bar/OWNERS', sha: ''},
+            {filename: 'foo/bar/style.css', sha: ''},
+          ]);
+        await probot.receive({name: 'pull_request.closed', payload});
+
+        sandbox.assert.calledWith(
+          OwnersBot.prototype.refreshTree,
+          ['OWNERS', 'foo/OWNERS', 'foo/bar/OWNERS'],
+          app.log
+        );
+        done();
+      });
     });
   });
 });

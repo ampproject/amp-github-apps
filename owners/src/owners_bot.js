@@ -75,10 +75,13 @@ class OwnersBot {
   /**
    * Update the owners tree.
    *
-   * @param {Logger=} logger logging interface
+   * @param {Array<!string>} changedOwners list of changed owners files
+   * @param {Logger=} [logger=console] logging interface
    */
-  async refreshTree(logger) {
+  async refreshTree(changedOwners, logger) {
     logger = logger || console;
+    logger.info(`Refreshing owners tree for files: ${changedOwners}`);
+
     await this.repo.checkout();
     this.treeParse = await this.parser.parseOwnersTree();
     this.treeParse.errors.forEach(logger.warn, logger);
@@ -95,7 +98,7 @@ class OwnersBot {
    * }} key structures needed to check PR ownership.
    */
   async initPr(github, pr) {
-    await this.refreshTree(github.logger);
+    await this.refreshTree(null, github.logger);
 
     const changedFiles = await github.listFiles(pr.number);
     const reviewers = await this._getCurrentReviewers(github, pr);
