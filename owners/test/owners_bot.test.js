@@ -115,6 +115,21 @@ describe('owners bot', () => {
     });
   });
 
+  describe('refreshTree', () => {
+    it('checks out the repository', async done => {
+      await ownersBot.refreshTree();
+      sandbox.assert.calledOnce(repo.checkout);
+      done();
+    });
+
+    it('parses the owners tree', async () => {
+      expect.assertions(1);
+      ownersBot.treeParse = null;
+      await ownersBot.refreshTree();
+      expect(ownersBot.treeParse.result).toBeInstanceOf(OwnersTree);
+    });
+  });
+
   describe('initPr', () => {
     beforeEach(() => {
       const timestamp = new Date('2019-01-02T00:00:00Z');
@@ -130,13 +145,6 @@ describe('owners bot', () => {
       sandbox
         .stub(GitHub.prototype, 'getReviewRequests')
         .returns(['requested']);
-    });
-
-    it('parses the owners tree', async () => {
-      expect.assertions(1);
-      ownersBot.treeParse = null;
-      await ownersBot.initPr(github, pr);
-      expect(ownersBot.treeParse.result).toBeInstanceOf(OwnersTree);
     });
 
     it('warns about parsing errors', async done => {
