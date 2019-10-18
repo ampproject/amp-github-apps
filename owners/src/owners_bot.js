@@ -94,7 +94,7 @@ class OwnersBot {
    * @param {!PullRequest} pr pull request to initialize data for.
    * @return {{
    *     reviewers: !ReviewerApprovalMap,
-   *     changedFiles: string[],
+   *     changedFiles: !Array<!string>,
    * }} key structures needed to check PR ownership.
    */
   async initPr(github, pr) {
@@ -116,7 +116,7 @@ class OwnersBot {
    *
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to run owners check on.
-   * @param {boolean=} requestOwners whether to request reviews from owners.
+   * @param {?boolean=} [requestOwners=false] request reviews from owners.
    */
   async runOwnersCheck(github, pr, requestOwners) {
     if (!pr.isOpen) {
