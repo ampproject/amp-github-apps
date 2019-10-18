@@ -36,8 +36,8 @@ class CheckRun {
    * Constructor.
    *
    * @param {!CheckRunConclusion} conclusion result of the check-run.
-   * @param {!string} summary check-run summary text to show in PR.
-   * @param {!string} text description of check-run results.
+   * @param {string} summary check-run summary text to show in PR.
+   * @param {string} text description of check-run results.
    */
   constructor(conclusion, summary, text) {
     Object.assign(this, {conclusion, summary, text});
@@ -74,7 +74,7 @@ class OwnersCheck {
    * Constructor.
    *
    * @param {!OwnersTree} tree file ownership tree.
-   * @param {!Array<!string>} changedFiles list of change files.
+   * @param {!Array<string>} changedFiles list of change files.
    * @param {!ReviewerApprovalMap} reviewers map of reviewer approval statuses.
    */
   constructor(tree, changedFiles, reviewers) {
@@ -169,7 +169,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @param {boolean} isApproved approval status to filter by.
    * @return {boolean} if the file is reviewed.
@@ -186,7 +186,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {!Array<!Owner>} required owners that have not approved.
    */
@@ -204,7 +204,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {boolean} if the file has approval coverage.
    */
@@ -217,7 +217,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {boolean} if the file is approved.
    */
@@ -233,7 +233,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {boolean} if the file is approved.
    */
@@ -261,7 +261,7 @@ class OwnersCheck {
    * Build the check-run comment describing current approval coverage.
    *
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @return {!string} a list of files and which owners approved them, if any.
+   * @return {string} a list of files and which owners approved them, if any.
    */
   buildCurrentCoverageText(fileTreeMap) {
     const allFilesText = Object.entries(fileTreeMap)
@@ -308,7 +308,7 @@ class OwnersCheck {
    * Build the check-run comment suggesting a reviewer set.
    *
    * @param {!ReviewerFiles} reviewSuggestions suggested reviewer set.
-   * @return {!string} suggested reviewers and the files they could approve.
+   * @return {string} suggested reviewers and the files they could approve.
    */
   buildReviewSuggestionsText(reviewSuggestions) {
     const suggestionsText = reviewSuggestions.map(
@@ -326,7 +326,7 @@ class OwnersCheck {
    * Build the check-run comment describing the need for a reviewer approval.
    *
    * @param {!Array<!Owner>} reviewers list of reviewer owners.
-   * @return {!string} explanation of reviewer set, if present.
+   * @return {string} explanation of reviewer set, if present.
    */
   buildReviewerSetText(reviewers) {
     return (

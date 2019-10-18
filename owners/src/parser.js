@@ -38,8 +38,8 @@ class OwnersParserError extends Error {
   /**
    * Constructor
    *
-   * @param {!string} ownersPath OWNERS file path (for error reporting).
-   * @param {!string} message error message;
+   * @param {string} ownersPath OWNERS file path (for error reporting).
+   * @param {string} message error message;
    */
   constructor(ownersPath, message) {
     super(message);
@@ -49,7 +49,7 @@ class OwnersParserError extends Error {
   /**
    * Displays the error message.
    *
-   * @return {!string} error message.
+   * @return {string} error message.
    */
   toString() {
     return `OwnersParserError [${this.ownersPath}]: ${this.message}`;
@@ -64,7 +64,7 @@ class OwnersParser {
    * Constructor.
    *
    * @param {!Repository} repo local repository to read from.
-   * @param {!Object<!string, !Team>} teamMap map from team slugs to teams.
+   * @param {!Object<string, !Team>} teamMap map from team slugs to teams.
    */
   constructor(repo, teamMap) {
     this.repo = repo;
@@ -74,7 +74,7 @@ class OwnersParser {
   /**
    * Parse the modifier from an owner definition.
    *
-   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @param {string} ownersPath OWNERS.json file path (for error reporting).
    * @param {!OwnerDefinition} ownerDef owners definition.
    * @return {!OwnersParserResult<!OWNER_MODIFIER>} parsed owner modifier.
    */
@@ -114,7 +114,7 @@ class OwnersParser {
   /**
    * Parse an owner definition.
    *
-   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @param {string} ownersPath OWNERS.json file path (for error reporting).
    * @param {!OwnerDefinition} ownerDef owners definition.
    * @return {!OwnersParserResult<?Owner>} parsed owner.
    */
@@ -188,7 +188,7 @@ class OwnersParser {
   /**
    * Parse an owners rule definition.
    *
-   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @param {string} ownersPath OWNERS.json file path (for error reporting).
    * @param {!RuleDefinition} ruleDef owners rule definition.
    * @return {!OwnersParserResult<?OwnersRule>} parsed rule.
    */
@@ -277,7 +277,7 @@ class OwnersParser {
   /**
    * Parse an OWNERS.json file.
    *
-   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @param {string} ownersPath OWNERS.json file path (for error reporting).
    * @param {!OwnersFileDefinition} fileDef owners file definition.
    * @return {!OwnersParserResult<!Array<!OwnersRule>>} parsed OWNERS rules.
    */
@@ -337,7 +337,7 @@ class OwnersParser {
   /**
    * Parse an OWNERS.json file.
    *
-   * @param {!string} ownersPath OWNERS.json file path (for error reporting).
+   * @param {string} ownersPath OWNERS.json file path (for error reporting).
    * @return {!OwnersParserResult<!Array<!OwnersRule>>} parsed OWNERS rules.
    */
   async parseOwnersFile(ownersPath) {

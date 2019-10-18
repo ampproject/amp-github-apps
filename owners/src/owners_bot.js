@@ -75,7 +75,7 @@ class OwnersBot {
   /**
    * Update the owners tree.
    *
-   * @param {Array<!string>} changedOwners list of changed owners files
+   * @param {Array<string>} changedOwners list of changed owners files
    * @param {Logger=} [logger=console] logging interface
    */
   async refreshTree(changedOwners, logger) {
@@ -94,7 +94,7 @@ class OwnersBot {
    * @param {!PullRequest} pr pull request to initialize data for.
    * @return {{
    *     reviewers: !ReviewerApprovalMap,
-   *     changedFiles: !Array<!string>,
+   *     changedFiles: !Array<string>,
    * }} key structures needed to check PR ownership.
    */
   async initPr(github, pr) {

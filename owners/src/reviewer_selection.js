@@ -65,7 +65,7 @@ class ReviewerSelection {
    *
    * @private
    * @param {!Array<!OwnersRule>} rules list of ownership rules.
-   * @return {!Array<!string>} union of reviewers lists for highest priority rules.
+   * @return {!Array<string>} union of reviewers lists for highest priority rules.
    */
   static _reviewersForRules(rules) {
     const reviewers = new Set();
@@ -88,7 +88,7 @@ class ReviewerSelection {
    *
    * @private
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @return {!Array<!string>} list of reviewer usernames.
+   * @return {!Array<string>} list of reviewer usernames.
    */
   static _findPotentialReviewers(fileTreeMap) {
     const deepestRules = this._deepestOwnersRules(fileTreeMap);
@@ -102,8 +102,8 @@ class ReviewerSelection {
    *
    * @private
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
-   * @param {!string} reviewer reviewer username.
-   * @return {!Array<!string>} list of filenames.
+   * @param {string} reviewer reviewer username.
+   * @return {!Array<string>} list of filenames.
    */
   static _filesOwnedByReviewer(fileTreeMap, reviewer) {
     return Object.entries(fileTreeMap)
@@ -115,9 +115,9 @@ class ReviewerSelection {
    * Identifies the reviewer(s) who can approve the most files.
    *
    * @private
-   * @param {!Object<!string, !Array<!string>>} reviewerFilesMap map from
+   * @param {!Object<string, !Array<string>>} reviewerFilesMap map from
    *     reviewer usernames to the list of files they own.
-   * @return {!Array<!string>} list of reviewer usernames.
+   * @return {!Array<string>} list of reviewer usernames.
    */
   static _reviewersWithMostFiles(reviewerFilesMap) {
     const mostFilesOwned = Math.max(

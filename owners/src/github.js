@@ -24,10 +24,10 @@ class PullRequest {
    * Constructor.
    *
    * @param {number} number pull request number.
-   * @param {!string} author username of the pull request author.
-   * @param {!string} headSha SHA hash of the PR's HEAD commit.
-   * @param {!string} description pull request description.
-   * @param {!string} state pull request status.
+   * @param {string} author username of the pull request author.
+   * @param {string} headSha SHA hash of the PR's HEAD commit.
+   * @param {string} description pull request description.
+   * @param {string} state pull request status.
    */
   constructor(number, author, headSha, description, state) {
     Object.assign(this, {number, author, headSha, description, state});
@@ -66,8 +66,8 @@ class Review {
   /**
    * Constructor.
    *
-   * @param {!string} reviewer username of the reviewer giving approval.
-   * @param {!string} state status of the review (ie. "approved" or not).
+   * @param {string} reviewer username of the reviewer giving approval.
+   * @param {string} state status of the review (ie. "approved" or not).
    * @param {!Date} submittedAt timestamp when the review was submitted.
    */
   constructor(reviewer, state, submittedAt) {
@@ -102,8 +102,8 @@ class Team {
    * Constructor.
    *
    * @param {number} id team ID.
-   * @param {!string} org GitHub organization the team belongs to.
-   * @param {!string} slug team name slug.
+   * @param {string} org GitHub organization the team belongs to.
+   * @param {string} slug team name slug.
    */
   constructor(id, org, slug) {
     Object.assign(this, {id, org, slug, members: []});
@@ -112,7 +112,7 @@ class Team {
   /**
    * Represent the team as a string.
    *
-   * @return {!string} the full organization-prefixed team name.
+   * @return {string} the full organization-prefixed team name.
    */
   toString() {
     return `${this.org}/${this.slug}`;
@@ -137,8 +137,8 @@ class GitHub {
    *
    * @param {!GitHubAPI} client Probot GitHub client (see
    *     https://probot.github.io/api/latest/interfaces/githubapi.html).
-   * @param {!string} owner GitHub repository owner.
-   * @param {!string} repository GitHub repository name.
+   * @param {string} owner GitHub repository owner.
+   * @param {string} repository GitHub repository name.
    * @param {!Logger} logger logging interface.
    */
   constructor(client, owner, repository, logger) {
@@ -160,7 +160,7 @@ class GitHub {
    * Adds the owner and repo name to an object.
    *
    * @param {?object} obj object to add fields to.
-   * @return {{repo: !string, owner: !string}} object with owner and repo set.
+   * @return {{repo: string, owner: string}} object with owner and repo set.
    */
   repo(obj) {
     return Object.assign({}, obj, {repo: this.repository, owner: this.owner});
@@ -173,8 +173,8 @@ class GitHub {
    * implementation),  so this method makes an arbitrary request with the
    * required headers.
    *
-   * @param {!string} method HTTP request method.
-   * @param {!string} url API endpoint URL path (ie. `/repos`).
+   * @param {string} method HTTP request method.
+   * @param {string} url API endpoint URL path (ie. `/repos`).
    * @param {*} data optional request data.
    * @return {*} the response.
    */
@@ -196,7 +196,7 @@ class GitHub {
   /**
    * Automatically fetch multiple pages from a GitHub endpoint
    *
-   * @param {!string} url API endpoint URL path (ie. `/teams/###/members`).
+   * @param {string} url API endpoint URL path (ie. `/teams/###/members`).
    * @param {*} data optional request data.
    * @return {!Array} list of results across all pages.
    */
@@ -241,7 +241,7 @@ class GitHub {
    * Fetch all members of a team.
    *
    * @param {number} teamId ID of team to find members for.
-   * @return {!Array<!string>} list of member usernames.
+   * @return {!Array<string>} list of member usernames.
    */
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
@@ -298,7 +298,7 @@ class GitHub {
    * Requests a review from GitHub users.
    *
    * @param {number} number PR number.
-   * @param {!Array<!string>} reviewers the list of usernames to request reviews from.
+   * @param {!Array<string>} reviewers the list of usernames to request reviews from.
    */
   async createReviewRequests(number, reviewers) {
     if (!reviewers.length) {
@@ -321,7 +321,7 @@ class GitHub {
    * Retrieves code review requests for a PR from GitHub.
    *
    * @param {number} number PR number.
-   * @return {!Array<!string>} the list of code reviews.
+   * @return {!Array<string>} the list of code reviews.
    */
   async getReviewRequests(number) {
     this.logger.info(`Fetching review requests for PR #${number}`);
@@ -341,7 +341,7 @@ class GitHub {
    * created via the Pulls API require a file path/position.
    *
    * @param {number} number PR number.
-   * @return {!Array<{body: !string, id: number}>} list of comments by the bot.
+   * @return {!Array<{body: string, id: number}>} list of comments by the bot.
    */
   async getBotComments(number) {
     this.logger.info(`Fetching bot comments for PR #${number}`);
@@ -369,7 +369,7 @@ class GitHub {
    * created via the Pulls API require a file path/position.
    *
    * @param {number} number PR number.
-   * @param {!string} body comment body.
+   * @param {string} body comment body.
    */
   async createBotComment(number, body) {
     this.logger.info(`Adding bot comment to PR #${number}`);
@@ -389,7 +389,7 @@ class GitHub {
    * created via the Pulls API require a file path/position.
    *
    * @param {number} commentId ID of comment to update.
-   * @param {!string} body comment body.
+   * @param {string} body comment body.
    */
   async updateComment(commentId, body) {
     this.logger.info(`Replacing comment with ID ${commentId}`);
@@ -406,7 +406,7 @@ class GitHub {
    * Fetches the contents of a file from GitHub.
    *
    * @param {!FileRef} file file ref to fetch.
-   * @return {!string} file contents as a string.
+   * @return {string} file contents as a string.
    */
   async getFileContents(file) {
     this.logger.info(
@@ -425,7 +425,7 @@ class GitHub {
    * Lists all modified files for a PR.
    *
    * @param {number} number PR number
-   * @return {!Array<!string>} list of relative file paths.
+   * @return {!Array<string>} list of relative file paths.
    */
   async listFiles(number) {
     this.logger.info(`Fetching changed files for PR #${number}`);
@@ -443,7 +443,7 @@ class GitHub {
    *
    * See https://developer.github.com/v3/search/#search-code
    *
-   * @param {!string} filename filename to search for.
+   * @param {string} filename filename to search for.
    * @return {!Array<!FileRef>} list of returned results.
    */
   async searchFilename(filename) {
@@ -479,7 +479,7 @@ class GitHub {
   /**
    * Creates a check-run status for a commit.
    *
-   * @param {!string} sha commit SHA for HEAD ref to create check-run
+   * @param {string} sha commit SHA for HEAD ref to create check-run
    *     status on.
    * @param {!CheckRun} checkRun check-run data to create.
    */
@@ -501,8 +501,8 @@ class GitHub {
    * If an error is encountered contacting the GitHub API, it will be logged and
    * will return `null`.
    *
-   * @param {!string} sha SHA hash for head commit to lookup check-runs on.
-   * @return {!Object<!string, number>} map from check names to check-run IDs.
+   * @param {string} sha SHA hash for head commit to lookup check-runs on.
+   * @return {!Object<string, number>} map from check names to check-run IDs.
    */
   async getCheckRunIds(sha) {
     this.logger.info(`Fetching check run ID for commit ${sha.substr(0, 7)}`);

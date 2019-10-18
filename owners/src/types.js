@@ -31,14 +31,14 @@ let Logger;
 /**
  * A map from filenames to the nearest ownership subtree.
  *
- * @typedef {!Object<!string, !OwnersTree>}
+ * @typedef {!Object<string, !OwnersTree>}
  */
 let FileTreeMap;
 
 /**
  * A tuple of a reviewer username and the files they need to approve.
  *
- * @typedef {!Tuple<!string, string[]>}
+ * @typedef {!Tuple<string, string[]>}
  */
 let ReviewerFiles;
 
@@ -57,8 +57,8 @@ let OwnersParserResult;
  * A file ref from a commit.
  *
  * @typedef {{
- *   filename: !string,
- *   sha: !string,
+ *   filename: string,
+ *   sha: string,
  * }}
  */
 let FileRef;
@@ -68,7 +68,7 @@ let FileRef;
  *
  * @typedef {{
  *   checkRun: !CheckRun,
- *   reviewers: !Array<!string>,
+ *   reviewers: !Array<string>,
  * }}
  */
 let OwnersCheckResult;
@@ -76,7 +76,7 @@ let OwnersCheckResult;
 /**
  * A map from reviewer usernames to their approval status.
  *
- * @typedef {!Object<!string, !boolean>}
+ * @typedef {!Object<string, !boolean>}
  */
 let ReviewerApprovalMap;
 
@@ -84,7 +84,7 @@ let ReviewerApprovalMap;
  * A JSON owner definition.
  *
  * @typedef {{
- *   name: !string,
+ *   name: string,
  *   requestReviews: ?boolean,
  *   notify: ?boolean,
  * }}

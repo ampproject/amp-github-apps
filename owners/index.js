@@ -45,7 +45,7 @@ module.exports = app => {
    * Listen for webhooks and provide handlers with a GitHub interface and the
    * event payload.
    *
-   * @param {!string|string[]} events event or list of events to listen to.
+   * @param {string|Array<string>} events event or list of events to listen to.
    * @param {!function} cb callback function.
    */
   function listen(events, cb) {
