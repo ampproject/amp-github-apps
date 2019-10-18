@@ -42,7 +42,7 @@ class Repository {
   /**
    * Perform any required syncing with the repository.
    */
-  async sync() {};
+  async sync() {}
 
   /**
    * Read the contents of a file from the repo.
@@ -101,7 +101,8 @@ class VirtualRepository extends Repository {
     if (!file) {
       throw new Error(
         `File "${relativePath}" not found in virtual repository; ` +
-        'can only read files found through `findOwnersFiles`.' );
+          'can only read files found through `findOwnersFiles`.'
+      );
     }
 
     if (file.contents === null) {
@@ -136,10 +137,10 @@ class VirtualRepository extends Repository {
         file.sha = sha;
         file.contents = null;
       }
-    })
+    });
 
     return ownersFiles.map(({filename}) => filename);
-  } 
+  }
 }
 
 /**

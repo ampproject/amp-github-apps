@@ -48,15 +48,16 @@ describe('virtual repository', () => {
 
   beforeEach(() => {
     repo = new VirtualRepository(github);
-    sandbox.stub(GitHub.prototype, 'searchFilename')
+    sandbox
+      .stub(GitHub.prototype, 'searchFilename')
       .withArgs('OWNERS')
-      .onFirstCall().returns([
+      .onFirstCall()
+      .returns([
         {filename: 'OWNERS', sha: 'sha_1'},
         {filename: 'foo/OWNERS', sha: 'sha_2'},
       ])
-      .onSecondCall().returns([
-        {filename: 'OWNERS', sha: 'sha_updated'},
-      ]);
+      .onSecondCall()
+      .returns([{filename: 'OWNERS', sha: 'sha_updated'}]);
   });
 
   afterEach(() => {
@@ -78,10 +79,10 @@ describe('virtual repository', () => {
       it('fetches the file contents from GitHub', async () => {
         expect.assertions(1);
         await repo.findOwnersFiles();
-        const contents = await repo.readFile("OWNERS");
+        const contents = await repo.readFile('OWNERS');
 
         sandbox.assert.calledWith(github.getFileContents, {
-          filename: "OWNERS",
+          filename: 'OWNERS',
           sha: 'sha_1',
         });
         expect(contents).toEqual('contents');
@@ -90,13 +91,13 @@ describe('virtual repository', () => {
       it('returns the file from the cache when available', async () => {
         expect.assertions(1);
         await repo.findOwnersFiles();
-        await repo.readFile("OWNERS");
-        await repo.readFile("OWNERS");
-        await repo.readFile("OWNERS");
-        await repo.readFile("OWNERS");
-        const contents = await repo.readFile("OWNERS");
+        await repo.readFile('OWNERS');
+        await repo.readFile('OWNERS');
+        await repo.readFile('OWNERS');
+        await repo.readFile('OWNERS');
+        const contents = await repo.readFile('OWNERS');
 
-        sandbox.assert.calledOnce(github.getFileContents)
+        sandbox.assert.calledOnce(github.getFileContents);
         expect(contents).toEqual('contents');
       });
     });
@@ -138,11 +139,10 @@ describe('virtual repository', () => {
       });
       expect(repo._knownFiles.get('foo/OWNERS')).toEqual({
         sha: 'sha_2',
-        contents: 'old foo contents'
+        contents: 'old foo contents',
       });
     });
   });
-
 });
 
 describe('local repository', () => {
