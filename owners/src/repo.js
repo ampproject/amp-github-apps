@@ -91,7 +91,7 @@ class LocalRepository extends Repository {
   /**
    * Check out a branch locally.
    *
-   * @param {?string=} branch git branch to checkout (default: 'master').
+   * @param {?string=} [branch=master] git branch to checkout.
    */
   async checkout(branch) {
     branch = branch || 'master';
