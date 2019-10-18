@@ -80,7 +80,7 @@ class OwnersBot {
    */
   async refreshTree(changedOwners, logger) {
     logger = logger || console;
-    logger.info(`Refreshing owners tree for files: ${changedOwners}`)
+    logger.info(`Refreshing owners tree for files: ${changedOwners}`);
 
     await this.repo.checkout();
     this.treeParse = await this.parser.parseOwnersTree();

@@ -30,8 +30,6 @@ const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const INFO_SERVER_PORT = Number(process.env.INFO_SERVER_PORT || 8081);
 
-const CACHED_TREE_REFRESH_MS = 10 * 60 * 1000;
-
 module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(localRepo);
@@ -106,8 +104,8 @@ module.exports = app => {
 
     const pr = PullRequest.fromGitHubResponse(payload.pull_request);
     const changedFiles = await github.listFiles(pr.number);
-    const changedOwners = changedFiles.filter(filename =>
-      path.basename(filename) === 'OWNERS'
+    const changedOwners = changedFiles.filter(
+      filename => path.basename(filename) === 'OWNERS'
     );
 
     if (changedOwners.length) {

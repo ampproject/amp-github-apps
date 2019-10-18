@@ -605,17 +605,17 @@ describe('owners bot', () => {
   });
 
   describe('closed PRs', () => {
-    let pull_request;
+    let pullRequest;
     let payload;
 
     beforeEach(() => {
       sandbox.stub(OwnersBot.prototype, 'refreshTree');
-      pull_request = require('./fixtures/pulls/pull_request.35');
-      payload = {pull_request};
+      pullRequest = require('./fixtures/pulls/pull_request.35');
+      payload = {pull_request: pullRequest};
     });
 
     it('does nothing for a non-merged PR', async done => {
-      pull_request.merged = false;
+      pullRequest.merged = false;
       await probot.receive({name: 'pull_request.closed', payload});
 
       sandbox.assert.notCalled(OwnersBot.prototype.refreshTree);
@@ -624,7 +624,7 @@ describe('owners bot', () => {
 
     describe('merged PRs', () => {
       beforeEach(() => {
-        pull_request.merged = true;
+        pullRequest.merged = true;
       });
 
       it('does nothing for a PR without owners files', async done => {
@@ -664,7 +664,7 @@ describe('owners bot', () => {
         sandbox.assert.calledWith(
           OwnersBot.prototype.refreshTree,
           ['OWNERS', 'foo/OWNERS', 'foo/bar/OWNERS'],
-          app.log,
+          app.log
         );
         done();
       });
