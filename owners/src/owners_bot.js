@@ -75,7 +75,7 @@ class OwnersBot {
   /**
    * Update the owners tree.
    *
-   * @param {Array<!string>} changedOwners list of changed owners files
+   * @param {Array<string>} changedOwners list of changed owners files
    * @param {Logger=} [logger=console] logging interface
    */
   async refreshTree(changedOwners, logger) {
@@ -94,7 +94,7 @@ class OwnersBot {
    * @param {!PullRequest} pr pull request to initialize data for.
    * @return {{
    *     reviewers: !ReviewerApprovalMap,
-   *     changedFiles: string[],
+   *     changedFiles: !Array<string>,
    * }} key structures needed to check PR ownership.
    */
   async initPr(github, pr) {
@@ -116,7 +116,7 @@ class OwnersBot {
    *
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to run owners check on.
-   * @param {boolean=} requestOwners whether to request reviews from owners.
+   * @param {?boolean=} [requestOwners=false] request reviews from owners.
    */
   async runOwnersCheck(github, pr, requestOwners) {
     if (!pr.isOpen) {
@@ -151,7 +151,7 @@ class OwnersBot {
    * Request.
    *
    * @param {!GitHub} github GitHub API interface.
-   * @param {!number} prNumber pull request number.
+   * @param {number} prNumber pull request number.
    */
   async runOwnersCheckOnPrNumber(github, prNumber) {
     const pr = await github.getPullRequest(prNumber);

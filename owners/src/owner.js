@@ -30,7 +30,7 @@ class Owner {
   /**
    * Constructor.
    *
-   * @param {!string} name readable name identifying the owner user/team.
+   * @param {string} name readable name identifying the owner user/team.
    * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
    */
   constructor(name, modifier) {
@@ -42,7 +42,7 @@ class Owner {
    * Tests if this owner matches a username.
    *
    * @throws {Error} if called on the abstract base `Owner` class.
-   * @param {!string} username username to check.
+   * @param {string} username username to check.
    */
   includes(username) {
     throw new Error('Not implemented for abstract class `Owner`');
@@ -51,7 +51,7 @@ class Owner {
   /**
    * Returns a list of all usernames included by the owner.
    *
-   * @return {string[]} list of GitHub usernames.
+   * @return {!Array<string>} list of GitHub usernames.
    */
   get allUsernames() {
     return [];
@@ -92,7 +92,7 @@ class UserOwner extends Owner {
   /**
    * Constructor.
    *
-   * @param {!string} username owner's GitHub username.
+   * @param {string} username owner's GitHub username.
    * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
    */
   constructor(username, modifier) {
@@ -103,7 +103,7 @@ class UserOwner extends Owner {
   /**
    * Tests if this owner matches a username.
    *
-   * @param {!string} username username to check.
+   * @param {string} username username to check.
    * @return {boolean} true if this owner has the username.
    */
   includes(username) {
@@ -113,7 +113,7 @@ class UserOwner extends Owner {
   /**
    * Returns a list of all usernames included by the owner.
    *
-   * @return {string[]} list containing the user's GitHub username.
+   * @return {!Array<string>} list containing the user's GitHub username.
    */
   get allUsernames() {
     return [this.username];
@@ -147,7 +147,7 @@ class TeamOwner extends Owner {
   /**
    * Tests if this owner matches a username.
    *
-   * @param {!string} username username to check.
+   * @param {string} username username to check.
    * @return {boolean} true if this team owner has the username.
    */
   includes(username) {
@@ -157,7 +157,7 @@ class TeamOwner extends Owner {
   /**
    * Returns a list of all usernames included by the owner.
    *
-   * @return {string[]} list containing the user's GitHub username.
+   * @return {!Array<string>} list containing the user's GitHub username.
    */
   get allUsernames() {
     return this.team.members;
@@ -192,7 +192,7 @@ class WildcardOwner extends Owner {
   /**
    * Tests if this owner matches a username.
    *
-   * @param {!string} unusedUsername username to check.
+   * @param {string} unusedUsername username to check.
    * @return {boolean} always true
    */
   includes(unusedUsername) {

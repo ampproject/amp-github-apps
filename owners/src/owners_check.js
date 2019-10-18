@@ -36,8 +36,8 @@ class CheckRun {
    * Constructor.
    *
    * @param {!CheckRunConclusion} conclusion result of the check-run.
-   * @param {!string} summary check-run summary text to show in PR.
-   * @param {!string} text description of check-run results.
+   * @param {string} summary check-run summary text to show in PR.
+   * @param {string} text description of check-run results.
    */
   constructor(conclusion, summary, text) {
     Object.assign(this, {conclusion, summary, text});
@@ -46,7 +46,7 @@ class CheckRun {
   /**
    * Produces a JSON version of the object for use with GitHub API.
    *
-   * @return {object} JSON object describing check-run.
+   * @return {!object} JSON object describing check-run.
    */
   get json() {
     return {
@@ -74,7 +74,7 @@ class OwnersCheck {
    * Constructor.
    *
    * @param {!OwnersTree} tree file ownership tree.
-   * @param {string[]} changedFiles list of change files.
+   * @param {!Array<string>} changedFiles list of change files.
    * @param {!ReviewerApprovalMap} reviewers map of reviewer approval statuses.
    */
   constructor(tree, changedFiles, reviewers) {
@@ -88,7 +88,7 @@ class OwnersCheck {
   /**
    * Runs the owners check and, if necessary, the reviewer selection algorithm.
    *
-   * @return {OwnersCheckResult} a GitHub check-run and reviewers to add.
+   * @return {!OwnersCheckResult} a GitHub check-run and reviewers to add.
    */
   run() {
     try {
@@ -169,7 +169,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @param {boolean} isApproved approval status to filter by.
    * @return {boolean} if the file is reviewed.
@@ -186,9 +186,9 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
-   * @return {Owner[]} required owners that have not approved.
+   * @return {!Array<!Owner>} required owners that have not approved.
    */
   _missingRequiredOwners(filename, subtree) {
     return subtree
@@ -204,7 +204,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {boolean} if the file has approval coverage.
    */
@@ -217,7 +217,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {boolean} if the file is approved.
    */
@@ -233,7 +233,7 @@ class OwnersCheck {
    *
    * Must be called after `init`.
    *
-   * @param {!string} filename file to check.
+   * @param {string} filename file to check.
    * @param {!OwnersTree} subtree nearest ownership tree to file.
    * @return {boolean} if the file is approved.
    */
@@ -325,7 +325,7 @@ class OwnersCheck {
   /**
    * Build the check-run comment describing the need for a reviewer approval.
    *
-   * @param {Owner[]} reviewers list of reviewer owners.
+   * @param {!Array<!Owner>} reviewers list of reviewer owners.
    * @return {string} explanation of reviewer set, if present.
    */
   buildReviewerSetText(reviewers) {

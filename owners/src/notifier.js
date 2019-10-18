@@ -28,7 +28,7 @@ class OwnersNotifier {
    * @param {!PullRequest} pr pull request to add notifications to.
    * @param {!ReviewerApprovalMap} currentReviewers current reviewer approvals.
    * @param {!OwnersTree} tree file ownership tree.
-   * @param {string[]} changedFiles list of change files.
+   * @param {!Array<string>} changedFiles list of change files.
    */
   constructor(pr, currentReviewers, tree, changedFiles) {
     Object.assign(this, {pr, currentReviewers});
@@ -39,7 +39,7 @@ class OwnersNotifier {
    * Notify reviewers and owners about the PR.
    *
    * @param {!GitHub} github GitHub API interface.
-   * @param {string[]} suggestedReviewers suggested reviewers to add.
+   * @param {!Array<string>} suggestedReviewers suggested reviewers to add.
    */
   async notify(github, suggestedReviewers) {
     const requested = await this.requestReviews(github, suggestedReviewers);
@@ -56,8 +56,8 @@ class OwnersNotifier {
    * Only requests reviews if the PR description contains the #addowners tag.
    *
    * @param {!GitHub} github GitHub API interface.
-   * @param {string[]} suggestedReviewers suggested reviewers to add.
-   * @return {string[]} list of reviewers requested.
+   * @param {!Array<string>} suggestedReviewers suggested reviewers to add.
+   * @return {!Array<string>} list of reviewers requested.
    */
   async requestReviews(github, suggestedReviewers) {
     const optOut = process.env.ADD_REVIEWERS_OPT_OUT;
@@ -106,8 +106,8 @@ class OwnersNotifier {
   /**
    * Determine the set of users to request reviews from.
    *
-   * @param {string[]} suggestedReviewers list of suggested reviewer usernames.
-   * @return {string[]} list of usernames.
+   * @param {!Array<string>} suggestedReviewers list of suggested reviewer usernames.
+   * @return {!Array<string>} list of usernames.
    */
   getReviewersToRequest(suggestedReviewers) {
     const reviewers = new Set(suggestedReviewers);
@@ -125,7 +125,7 @@ class OwnersNotifier {
   /**
    * Determine the set of owners to notify/tag for each file.
    *
-   * @return {Object<string, string[]>} map from user/team names to filenames.
+   * @return {!Object<string, !Array<string>>} map owner names to filenames.
    */
   getOwnersToNotify() {
     const notifies = {};

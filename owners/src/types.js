@@ -20,10 +20,10 @@
  * May be the console, a request context, or a shared logger.
  *
  * @typedef {{
- *   debug: function(*),
- *   log: function(*),
- *   warn: function(*),
- *   error: function(*),
+ *   debug: !function(*),
+ *   log: !function(*),
+ *   warn: !function(*),
+ *   error: !function(*),
  * }}
  */
 let Logger;
@@ -38,7 +38,7 @@ let FileTreeMap;
 /**
  * A tuple of a reviewer username and the files they need to approve.
  *
- * @typedef {!Tuple<!string, string[]>}
+ * @typedef {!Tuple<string, string[]>}
  */
 let ReviewerFiles;
 
@@ -48,7 +48,7 @@ let ReviewerFiles;
  * @template T
  * @typedef {{
  *   result: T,
- *   errors: OwnersParserError[],
+ *   errors: !Array<!OwnersParserError>,
  * }}
  */
 let OwnersParserResult;
@@ -57,8 +57,8 @@ let OwnersParserResult;
  * A file ref from a commit.
  *
  * @typedef {{
- *   filename: !string,
- *   sha: !string,
+ *   filename: string,
+ *   sha: string,
  * }}
  */
 let FileRef;
@@ -67,8 +67,8 @@ let FileRef;
  * The result of an owners check.
  *
  * @typedef {{
- *   checkRun: CheckRun,
- *   reviewers: string[],
+ *   checkRun: !CheckRun,
+ *   reviewers: !Array<string>,
  * }}
  */
 let OwnersCheckResult;
@@ -76,7 +76,7 @@ let OwnersCheckResult;
 /**
  * A map from reviewer usernames to their approval status.
  *
- * @typedef {!Object<!string, boolean>}
+ * @typedef {!Object<string, !boolean>}
  */
 let ReviewerApprovalMap;
 
@@ -84,7 +84,7 @@ let ReviewerApprovalMap;
  * A JSON owner definition.
  *
  * @typedef {{
- *   name: !string,
+ *   name: string,
  *   requestReviews: ?boolean,
  *   notify: ?boolean,
  * }}
@@ -95,7 +95,7 @@ let OwnerDefinition;
  * A JSON owners rule definition.
  *
  * @typedef {{
- *   owners: OwnerDefinition[],
+ *   owners: !Array<!OwnerDefinition>,
  *   pattern: ?string,
  * }}
  */
@@ -105,7 +105,7 @@ let RuleDefinition;
  * A JSON owners file definition.
  *
  * @typedef {{
- *   rules: RuleDefinition[],
+ *   rules: !Array<!RuleDefinition>,
  * }}
  */
 let OwnersFileDefinition;

@@ -24,8 +24,8 @@ const exec = util.promisify(childProcess.exec);
  * Execute raw shell commands.
  *
  * @private
- * @param {...!string} commands list of commands to execute.
- * @return {string[]} command output
+ * @param {...string} commands list of commands to execute.
+ * @return {!Array<string>} command output
  */
 async function runCommands(...commands) {
   return exec(commands.join(' && '))
@@ -42,7 +42,7 @@ class Repository {
   /**
    * Read the contents of a file from the repo.
    *
-   * @param {!string} relativePath file to read.
+   * @param {string} relativePath file to read.
    * @return {string} file contents.
    */
   async readFile(relativePath) {
@@ -54,7 +54,7 @@ class Repository {
    *
    * Assumes repo is already checked out.
    *
-   * @return {string[]} a list of relative OWNERS file paths.
+   * @return {!Array<string>} a list of relative OWNERS file paths.
    */
   async findOwnersFiles() {
     throw new Error('Not implemented');
@@ -68,9 +68,9 @@ class LocalRepository extends Repository {
   /**
    * Constructor.
    *
-   * @param {!string} pathToRepoDir absolute path to the repository root
+   * @param {string} pathToRepoDir absolute path to the repository root
    *     directory.
-   * @param {!string=} remote git remote to clone (default: 'origin').
+   * @param {?string=} remote git remote to clone (default: 'origin').
    */
   constructor(pathToRepoDir, remote) {
     super();
@@ -81,8 +81,8 @@ class LocalRepository extends Repository {
   /**
    * Runs commands in the repository's root directory.
    *
-   * @param {...!string} commands list of commands to execute.
-   * @return {string[]} command output
+   * @param {...string} commands list of commands to execute.
+   * @return {!Array<string>} command output
    */
   async _runCommands(...commands) {
     return await runCommands(`cd ${this.rootDir}`, ...commands);
@@ -91,7 +91,7 @@ class LocalRepository extends Repository {
   /**
    * Check out a branch locally.
    *
-   * @param {!string=} branch git branch to checkout (default: 'master').
+   * @param {?string=} [branch=master] git branch to checkout.
    */
   async checkout(branch) {
     branch = branch || 'master';
@@ -104,7 +104,7 @@ class LocalRepository extends Repository {
   /**
    * Get an absolute path for a relative repo path.
    *
-   * @param {!string} relativePath file or directory path relative to the root.
+   * @param {string} relativePath file or directory path relative to the root.
    * @return {string} absolute path to the file in the checked out repo.
    */
   _getAbsolutePath(relativePath) {
@@ -114,7 +114,7 @@ class LocalRepository extends Repository {
   /**
    * Read the contents of a file from the checked out repo.
    *
-   * @param {!string} relativePath file to read.
+   * @param {string} relativePath file to read.
    * @return {string} file contents.
    */
   async readFile(relativePath) {
@@ -127,7 +127,7 @@ class LocalRepository extends Repository {
    *
    * Assumes repo is already checked out.
    *
-   * @return {string[]} a list of relative OWNERS file paths.
+   * @return {!Array<string>} a list of relative OWNERS file paths.
    */
   async findOwnersFiles() {
     // NOTE: for some reason `git ls-tree --full-tree -r HEAD **/OWNERS*`

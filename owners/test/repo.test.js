@@ -105,8 +105,8 @@ describe('local repository', () => {
      * requiring the module.
      *
      * @param {number} error error code from executing the command.
-     * @param {!string} stdout content to output as stdout.
-     * @param {!string} stderr content to output as stderr.
+     * @param {string} stdout content to output as stdout.
+     * @param {string} stderr content to output as stderr.
      */
     function stubExecAndSetRepo(error, stdout, stderr) {
       sandbox.stub(childProcess, 'exec').callsFake((commands, callback) => {
