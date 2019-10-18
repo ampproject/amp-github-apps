@@ -46,12 +46,13 @@ describe('owners bot', () => {
     'open'
   );
   const repo = new LocalRepository('path/to/repo');
-  const ownersBot = new OwnersBot(repo);
+  let ownersBot;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox.stub(LocalRepository.prototype, 'findOwnersFiles').returns([]);
+    ownersBot = new OwnersBot(repo);
     ownersBot.GITHUB_CHECKRUN_DELAY = 0;
     ownersBot.GITHUB_GET_MEMBERS_DELAY = 0;
   });
@@ -86,6 +87,31 @@ describe('owners bot', () => {
       sandbox.assert.calledWith(github.getTeamMembers, 1337);
       sandbox.assert.calledWith(github.getTeamMembers, 42);
       done();
+    });
+  });
+
+  describe('syncTeam', () => {
+    let myTeam;
+
+    beforeEach(() => {
+      myTeam = new Team(1337, 'ampproject', 'my_team');
+      sandbox.stub(GitHub.prototype, 'getTeamMembers').returns(['rcebulko']);
+    });
+
+    it('fetches members for the team', async done => {
+      await ownersBot.syncTeam(myTeam, github);
+      sandbox.assert.calledWith(github.getTeamMembers, 1337);
+      done();
+    });
+
+    it('updates the owners bot team map', async () => {
+      expect.assertions(3);
+      expect(ownersBot['ampproject/my_team']).toBeUndefined();
+
+      await ownersBot.syncTeam(myTeam, github);
+
+      expect(ownersBot['ampproject/my_team']).toBe(myTeam);
+      expect(myTeam.members).toEqual(['rcebulko'])
     });
   });
 
