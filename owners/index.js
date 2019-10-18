@@ -100,8 +100,12 @@ module.exports = app => {
   // of it being spammed; so it is not exposed through the info server.
   app.route('/admin').get('/check/:prNumber', async (req, res) => {
     const pr = await sharedGithub.getPullRequest(req.params.prNumber);
-    const {tree, changedFiles, reviewers} = await ownersBot.initPr(github, pr);
-    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
+    const {changedFiles, reviewers} = await ownersBot.initPr(sharedGithub, pr);
+    const ownersCheck = new OwnersCheck(
+      ownersBot.treeParse.result,
+      changedFiles,
+      reviewers,
+    );
 
     const {checkRun} = ownersCheck.run();
 
