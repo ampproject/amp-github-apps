@@ -95,4 +95,48 @@ class MemoryCache {
   }
 }
 
-module.exports = {CloudStorageCache, MemoryCache};
+/**
+ * A compound cache maintaining files in-memory and backed up by Cloud Storage.
+ *
+ * The memory cache allows the app to keep key owners files in memory for when
+ * the ownership tree needs to be re-parsed (minimizing requests to Cloud
+ * Storage APIs), while the Cloud Storage cache allows the app to bootstrap its
+ * collection of OWNERS files on startup (preventing it from blasting the GitHub
+ * API on startup).
+ */
+class CompoundCache {
+  /**
+   * Constructor.
+   *
+   * @param {string} bucketName Cloud Storage bucket name.
+   */
+  constructor(bucketName) {
+    this.cloudStorageCache = new CloudStorageCache(bucketName);
+    this.memoryCache = new MemoryCache();
+  }
+
+  /**
+   * Fetch the contents of a file.
+   *
+   * @param {string} filename file to get contents of.
+   * @param {string} getContents function to get contents if file not in cache.
+   * @return {string} file contents.
+   */
+  async readFile(filename, getContents) {
+    return await this.memoryCache.readFile(filename, async () => {
+      return await this.cloudStorageCache.readFile(filename, getContents);
+    });
+  }
+
+  /**
+   * Invalidate the cache for a file.
+   *
+   * @param {string} filename file to drop from the cache.
+   */
+  async invalidate(filename) {
+    await this.memoryCache.invalidate(filename);
+    await this.cloudStorageCache.invalidate(filename);
+  }
+}
+
+module.exports = {CloudStorageCache, CompoundCache, MemoryCache};

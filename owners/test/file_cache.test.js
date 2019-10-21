@@ -17,14 +17,18 @@
 const sinon = require('sinon');
 
 const {CloudStorage} = require('../src/cloud_storage');
-const {CloudStorageCache, MemoryCache} = require('../src/file_cache');
+const {
+  CloudStorageCache,
+  CompoundCache,
+  MemoryCache,
+} = require('../src/file_cache');
 
 describe('file caches', () => {
-  let sandbox;
-  const getContents = sinon.spy(async () => 'OWNERS file contents');
+  const sandbox = sinon.createSandbox();
+  let getContents;
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
+    getContents = sinon.spy(async () => 'OWNERS file contents');
   });
 
   afterEach(() => {
@@ -152,6 +156,128 @@ describe('file caches', () => {
         await cache.invalidate('foo/OWNERS');
 
         expect(cache.files.has('foo/OWNERS')).toBe(false);
+      });
+    });
+  });
+
+  describe('compound', () => {
+    let cache;
+
+    beforeEach(() => {
+      cache = new CompoundCache('my-storage-bucket');
+    });
+
+    describe('readFile', () => {
+      describe('when the file is in the memory cache', () => {
+        beforeEach(() => {
+          cache.memoryCache.files.set('foo/OWNERS', 'OWNERS file contents');
+        });
+
+        it('returns the file contents', async () => {
+          const contents = await cache.readFile('foo/OWNERS', getContents);
+          expect(contents).toEqual('OWNERS file contents');
+        });
+
+        it('does not get the contents from the provided method', async done => {
+          await cache.readFile('foo/OWNERS', getContents);
+          sandbox.assert.notCalled(getContents);
+          done();
+        });
+      });
+
+      describe('when the file is not in the memory cache', () => {
+        describe('when the file is in the Cloud Storage cache', async () => {
+          beforeEach(() => {
+            sandbox.stub(CloudStorage.prototype, 'download').returns(
+              'OWNERS file contents'
+            );
+          });
+
+          it('returns the file contents', async () => {
+            const contents = await cache.readFile('foo/OWNERS', getContents);
+            expect(contents).toEqual('OWNERS file contents');
+          });
+
+          it('does not get the contents from the provided method', async done => {
+            await cache.readFile('foo/OWNERS', getContents);
+            sandbox.assert.notCalled(getContents);
+            done();
+          });
+
+          it('saves the contents to the memory cache', async () => {
+            expect.assertions(1);
+            await cache.readFile('foo/OWNERS', getContents);
+
+            expect(cache.memoryCache.files.get('foo/OWNERS')).toEqual(
+              'OWNERS file contents'
+            );
+          });
+        });
+
+        describe('when the file is not in the Cloud Storage cache', async () => {
+          beforeEach(() => {
+            sandbox.stub(CloudStorage.prototype, 'upload');
+            sandbox.stub(CloudStorage.prototype, 'download').returns(
+              Promise.reject('Not found!')
+            );
+          });
+
+          it('returns the file contents', async () => {
+            const contents = await cache.readFile('foo/OWNERS', getContents);
+            expect(contents).toEqual('OWNERS file contents');
+          });
+
+          it('calls the provided method to get the file contents', async done => {
+            await cache.readFile('foo/OWNERS', getContents);
+            sandbox.assert.calledOnce(getContents);
+            done();
+          });
+
+          it('saves the contents to the memory cache', async () => {
+            expect.assertions(1);
+            await cache.readFile('foo/OWNERS', getContents);
+
+            expect(cache.memoryCache.files.get('foo/OWNERS')).toEqual(
+              'OWNERS file contents'
+            );
+          });
+
+          it('saves the contents to the Cloud Storage cache', async done => {
+            await cache.readFile('foo/OWNERS', getContents);
+
+            sandbox.assert.calledWith(
+              cache.cloudStorageCache.storage.upload,
+              'foo/OWNERS',
+              'OWNERS file contents',
+            );
+            done();
+          });
+        });
+      });
+    });
+
+    describe('invalidate', () => {
+      beforeEach(() => {
+        sandbox.stub(MemoryCache.prototype, 'invalidate');
+        sandbox.stub(CloudStorageCache.prototype, 'invalidate');
+      });
+
+      it('invalidates the memory cache', async done => {
+        await cache.invalidate('foo/OWNERS');
+        sandbox.assert.calledWith(
+          MemoryCache.prototype.invalidate,
+          'foo/OWNERS',
+        );
+        done();
+      });
+
+      it('invalidates the Cloud Storage cache', async done => {
+        await cache.invalidate('foo/OWNERS');
+        sandbox.assert.calledWith(
+          CloudStorageCache.prototype.invalidate,
+          'foo/OWNERS',
+        );
+        done();
       });
     });
   });
