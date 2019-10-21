@@ -24,7 +24,7 @@ describe('cloud storage', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    storage = new CloudStorage('my-storage-bucket');
+    storage = new CloudStorage('my-storage-bucket', sandbox.stub(console));
   });
 
   afterEach(() => {
