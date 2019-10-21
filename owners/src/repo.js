@@ -40,6 +40,11 @@ async function runCommands(...commands) {
  */
 class Repository {
   /**
+   * Perform any required syncing with the repository.
+   */
+  async sync() {}
+
+  /**
    * Read the contents of a file from the repo.
    *
    * @param {string} relativePath file to read.
@@ -62,6 +67,83 @@ class Repository {
 }
 
 /**
+ * Virtual in-memory repository holding owners files.
+ */
+class VirtualRepository extends Repository {
+  /**
+   * Constructor.
+   *
+   * @param {!GitHub} github GitHub API interface.
+   */
+  constructor(github) {
+    super();
+    this.github = github;
+    this.logger = github.logger;
+    /** @type {!Map<string, !VirtualFile>} */
+    this._knownFiles = new Map();
+  }
+
+  /**
+   * Fetch the latest versions of all OWNERS files.
+   */
+  async sync() {
+    await this.findOwnersFiles();
+  }
+
+  /**
+   * Read the contents of a file from the repo.
+   *
+   * @param {string} relativePath file to read.
+   * @return {string} file contents.
+   */
+  async readFile(relativePath) {
+    const file = this._knownFiles.get(relativePath);
+    if (!file) {
+      throw new Error(
+        `File "${relativePath}" not found in virtual repository; ` +
+          'can only read files found through `findOwnersFiles`.'
+      );
+    }
+
+    if (file.contents === null) {
+      file.contents = await this.github.getFileContents({
+        filename: relativePath,
+        sha: file.sha,
+      });
+    }
+
+    return file.contents;
+  }
+
+  /**
+   * Finds all OWNERS files in the repository and records them as known files.
+   *
+   * @return {!Array<string>} a list of relative OWNERS file paths.
+   */
+  async findOwnersFiles() {
+    const ownersFiles = await this.github.searchFilename('OWNERS');
+
+    ownersFiles.forEach(({filename, sha}) => {
+      const file = this._knownFiles.get(filename);
+      if (!file) {
+        // File has never been fetched and should be added to the cache.
+        this.logger.info(`Recording SHA for file "${filename}"`);
+        this._knownFiles.set(filename, {sha, contents: null});
+      } else if (file.sha !== sha) {
+        // File has been updated and needs to be re-fetched.
+        this.logger.info(
+          `Updating SHA and clearing cache for file "${filename}"`
+        );
+        file.sha = sha;
+        file.contents = null;
+      }
+    });
+
+    return ownersFiles.map(({filename}) => filename);
+  }
+}
+
+/**
  * Interface for reading from a checked out repository using relative paths.
  */
 class LocalRepository extends Repository {
@@ -76,6 +158,13 @@ class LocalRepository extends Repository {
     super();
     this.rootDir = pathToRepoDir;
     this.remote = remote || 'origin';
+  }
+
+  /**
+   * Checks out the master branch.
+   */
+  async sync() {
+    await this.checkout();
   }
 
   /**
@@ -147,4 +236,4 @@ class LocalRepository extends Repository {
   }
 }
 
-module.exports = {Repository, LocalRepository};
+module.exports = {Repository, LocalRepository, VirtualRepository};

@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-const {Repository, LocalRepository} = require('../src/repo');
+const {GitHub} = require('../src/github');
+const {Repository, LocalRepository, VirtualRepository} = require('../src/repo');
 const childProcess = require('child_process');
 const sinon = require('sinon');
 const fs = require('fs');
@@ -36,6 +37,110 @@ describe('repository', () => {
       expect(repo.findOwnersFiles()).rejects.toEqual(
         new Error('Not implemented')
       );
+    });
+  });
+});
+
+describe('virtual repository', () => {
+  const sandbox = sinon.createSandbox();
+  const github = new GitHub({}, 'ampproject', 'amphtml', sinon.stub(console));
+  let repo;
+
+  beforeEach(() => {
+    repo = new VirtualRepository(github);
+    sandbox
+      .stub(GitHub.prototype, 'searchFilename')
+      .withArgs('OWNERS')
+      .onFirstCall()
+      .returns([
+        {filename: 'OWNERS', sha: 'sha_1'},
+        {filename: 'foo/OWNERS', sha: 'sha_2'},
+      ])
+      .onSecondCall()
+      .returns([{filename: 'OWNERS', sha: 'sha_updated'}]);
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+  });
+
+  describe('readFile', () => {
+    it('throws an error for unknown files', () => {
+      expect(repo.readFile('OWNERS')).rejects.toContain(
+        'File "OWNERS" not found in virtual repository'
+      );
+    });
+
+    describe('for files found through findOwnersFiles', () => {
+      beforeEach(() => {
+        sandbox.stub(GitHub.prototype, 'getFileContents').returns('contents');
+      });
+
+      it('fetches the file contents from GitHub', async () => {
+        expect.assertions(1);
+        await repo.findOwnersFiles();
+        const contents = await repo.readFile('OWNERS');
+
+        sandbox.assert.calledWith(github.getFileContents, {
+          filename: 'OWNERS',
+          sha: 'sha_1',
+        });
+        expect(contents).toEqual('contents');
+      });
+
+      it('returns the file from the cache when available', async () => {
+        expect.assertions(1);
+        await repo.findOwnersFiles();
+        await repo.readFile('OWNERS');
+        await repo.readFile('OWNERS');
+        await repo.readFile('OWNERS');
+        await repo.readFile('OWNERS');
+        const contents = await repo.readFile('OWNERS');
+
+        sandbox.assert.calledOnce(github.getFileContents);
+        expect(contents).toEqual('contents');
+      });
+    });
+  });
+
+  describe('findOwnersFiles', () => {
+    it('returns the owners file names', async () => {
+      expect.assertions(1);
+      const ownersFiles = await repo.findOwnersFiles();
+      expect(ownersFiles).toEqual(['OWNERS', 'foo/OWNERS']);
+    });
+
+    it('records new owners files', async () => {
+      expect.assertions(2);
+      await repo.findOwnersFiles();
+
+      expect(repo._knownFiles.get('OWNERS')).toEqual({
+        sha: 'sha_1',
+        contents: null,
+      });
+      expect(repo._knownFiles.get('foo/OWNERS')).toEqual({
+        sha: 'sha_2',
+        contents: null,
+      });
+    });
+
+    it('updates changed owners files', async () => {
+      expect.assertions(2);
+
+      await repo.findOwnersFiles();
+      // Pretend the contents for the known files have been fetched
+      repo._knownFiles.get('OWNERS').contents = 'old root contents';
+      repo._knownFiles.get('foo/OWNERS').contents = 'old foo contents';
+      await repo.findOwnersFiles();
+
+      expect(repo._knownFiles.get('OWNERS')).toEqual({
+        sha: 'sha_updated',
+        contents: null,
+      });
+      expect(repo._knownFiles.get('foo/OWNERS')).toEqual({
+        sha: 'sha_2',
+        contents: 'old foo contents',
+      });
     });
   });
 });

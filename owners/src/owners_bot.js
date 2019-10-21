@@ -82,7 +82,7 @@ class OwnersBot {
     logger = logger || console;
     logger.info(`Refreshing owners tree for files: ${changedOwners}`);
 
-    await this.repo.checkout();
+    await this.repo.sync();
     this.treeParse = await this.parser.parseOwnersTree();
     this.treeParse.errors.forEach(logger.warn, logger);
   }

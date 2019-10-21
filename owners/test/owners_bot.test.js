@@ -50,7 +50,7 @@ describe('owners bot', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    sandbox.stub(LocalRepository.prototype, 'checkout');
+    sandbox.stub(LocalRepository.prototype, 'sync');
     sandbox.stub(LocalRepository.prototype, 'findOwnersFiles').returns([]);
     ownersBot = new OwnersBot(repo);
     ownersBot.GITHUB_CHECKRUN_DELAY = 0;
@@ -116,10 +116,10 @@ describe('owners bot', () => {
   });
 
   describe('refreshTree', () => {
-    it('checks out the repository', async done => {
+    it('refreshes the repository', async done => {
       sandbox.stub(console);
       await ownersBot.refreshTree(null);
-      sandbox.assert.calledOnce(repo.checkout);
+      sandbox.assert.calledOnce(repo.sync);
       done();
     });
 
@@ -239,10 +239,10 @@ describe('owners bot', () => {
       done();
     });
 
-    it('checks out the latest master', async done => {
+    it('synchronizes the repository', async done => {
       await ownersBot.runOwnersCheck(github, pr);
 
-      sandbox.assert.calledOnce(repo.checkout);
+      sandbox.assert.calledOnce(repo.sync);
       done();
     });
 
