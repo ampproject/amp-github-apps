@@ -19,9 +19,10 @@ const sinon = require('sinon');
 const {CloudStorage} = require('../src/cloud_storage');
 const {CloudStorageCache, MemoryCache} = require('../src/file_cache');
 
-describe('cloud storage file cache', () => {
+describe('Cloud Storage file cache', () => {
   let sandbox;
   let cache;
+  const getContents = sinon.spy(async () => 'OWNERS file contents');
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -41,10 +42,16 @@ describe('cloud storage file cache', () => {
       });
 
       it('downloads and returns the file contents', async () => {
-        const contents = await cache.readFile('foo/OWNERS');
+        const contents = await cache.readFile('foo/OWNERS', getContents);
 
         expect(contents).toEqual('OWNERS file contents');
         sandbox.assert.calledWith(cache.storage.download, 'foo/OWNERS');
+      });
+
+      it('does not get the contents from the provided method', async done => {
+        await cache.readFile('foo/OWNERS', getContents);
+        sandbox.assert.notCalled(getContents);
+        done();
       });
     });
 
@@ -93,6 +100,7 @@ describe('cloud storage file cache', () => {
 describe('in-memory file cache', () => {
   let sandbox;
   let cache;
+  const getContents = sinon.spy(async () => 'OWNERS file contents');
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -110,14 +118,18 @@ describe('in-memory file cache', () => {
       });
 
       it('returns the file contents', async () => {
-        const contents = await cache.readFile('foo/OWNERS');
+        const contents = await cache.readFile('foo/OWNERS', getContents);
         expect(contents).toEqual('OWNERS file contents');
+      });
+
+      it('does not get the contents from the provided method', async done => {
+        await cache.readFile('foo/OWNERS', getContents);
+        sandbox.assert.notCalled(getContents);
+        done();
       });
     });
 
     describe('when the file is not in the cache', () => {
-      const getContents = sinon.spy(async () => 'OWNERS file contents');
-
       it('calls the provided method to get the file contents', async () => {
         expect.assertions(1);
         const contents = await cache.readFile('foo/OWNERS', getContents);
