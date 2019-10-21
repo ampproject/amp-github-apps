@@ -42,7 +42,9 @@ class CloudStorageCache {
     } catch (e) {
       const contents = await getContents();
       // Do not `await`` the upload; this can happen async in the background.
-      this.storage.upload(filename, contents);
+      this.storage.upload(filename, contents).catch(err =>
+        console.error(`Error uploading "${filename}": `, err)
+      );
       return contents;
     }
   }
