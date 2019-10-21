@@ -70,7 +70,7 @@ describe('file caches', () => {
         beforeEach(() => {
           sandbox
             .stub(CloudStorage.prototype, 'download')
-            .returns(Promise.reject('Not found!'));
+            .returns(Promise.reject(new Error('Not found!')));
           sandbox.stub(CloudStorage.prototype, 'upload');
         });
 
@@ -219,7 +219,7 @@ describe('file caches', () => {
             sandbox.stub(CloudStorage.prototype, 'upload');
             sandbox
               .stub(CloudStorage.prototype, 'download')
-              .returns(Promise.reject('Not found!'));
+              .returns(Promise.reject(new Error('Not found!')));
           });
 
           it('returns the file contents', async () => {
