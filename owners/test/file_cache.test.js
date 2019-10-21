@@ -39,15 +39,15 @@ describe('file caches', () => {
     let cache;
 
     beforeEach(() => {
-      cache = new CloudStorageCache('my-storage-bucket')
+      cache = new CloudStorageCache('my-storage-bucket');
     });
 
     describe('readFile', () => {
       describe('when the file is in the cache', () => {
         beforeEach(() => {
-          sandbox.stub(CloudStorage.prototype, 'download').returns(
-            'OWNERS file contents'
-          );
+          sandbox
+            .stub(CloudStorage.prototype, 'download')
+            .returns('OWNERS file contents');
         });
 
         it('downloads and returns the file contents', async () => {
@@ -68,9 +68,9 @@ describe('file caches', () => {
         const getContents = sinon.spy(async () => 'OWNERS file contents');
 
         beforeEach(() => {
-          sandbox.stub(CloudStorage.prototype, 'download').returns(
-            Promise.reject('Not found!')
-          );
+          sandbox
+            .stub(CloudStorage.prototype, 'download')
+            .returns(Promise.reject('Not found!'));
           sandbox.stub(CloudStorage.prototype, 'upload');
         });
 
@@ -88,7 +88,7 @@ describe('file caches', () => {
           sandbox.assert.calledWith(
             cache.storage.upload,
             'foo/OWNERS',
-            'OWNERS file contents',
+            'OWNERS file contents'
           );
           done();
         });
@@ -152,7 +152,7 @@ describe('file caches', () => {
     describe('invalidate', () => {
       it('deletes the invalidated file cache from memory', async () => {
         expect.assertions(1);
-        cache.files.set('foo/OWNERS', 'outdated file contents')
+        cache.files.set('foo/OWNERS', 'outdated file contents');
         await cache.invalidate('foo/OWNERS');
 
         expect(cache.files.has('foo/OWNERS')).toBe(false);
@@ -188,9 +188,9 @@ describe('file caches', () => {
       describe('when the file is not in the memory cache', () => {
         describe('when the file is in the Cloud Storage cache', async () => {
           beforeEach(() => {
-            sandbox.stub(CloudStorage.prototype, 'download').returns(
-              'OWNERS file contents'
-            );
+            sandbox
+              .stub(CloudStorage.prototype, 'download')
+              .returns('OWNERS file contents');
           });
 
           it('returns the file contents', async () => {
@@ -217,9 +217,9 @@ describe('file caches', () => {
         describe('when the file is not in the Cloud Storage cache', async () => {
           beforeEach(() => {
             sandbox.stub(CloudStorage.prototype, 'upload');
-            sandbox.stub(CloudStorage.prototype, 'download').returns(
-              Promise.reject('Not found!')
-            );
+            sandbox
+              .stub(CloudStorage.prototype, 'download')
+              .returns(Promise.reject('Not found!'));
           });
 
           it('returns the file contents', async () => {
@@ -248,7 +248,7 @@ describe('file caches', () => {
             sandbox.assert.calledWith(
               cache.cloudStorageCache.storage.upload,
               'foo/OWNERS',
-              'OWNERS file contents',
+              'OWNERS file contents'
             );
             done();
           });
@@ -266,7 +266,7 @@ describe('file caches', () => {
         await cache.invalidate('foo/OWNERS');
         sandbox.assert.calledWith(
           MemoryCache.prototype.invalidate,
-          'foo/OWNERS',
+          'foo/OWNERS'
         );
         done();
       });
@@ -275,7 +275,7 @@ describe('file caches', () => {
         await cache.invalidate('foo/OWNERS');
         sandbox.assert.calledWith(
           CloudStorageCache.prototype.invalidate,
-          'foo/OWNERS',
+          'foo/OWNERS'
         );
         done();
       });

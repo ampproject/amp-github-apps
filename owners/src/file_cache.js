@@ -44,7 +44,7 @@ class CloudStorageCache {
       // Do not `await`` the upload; this can happen async in the background.
       this.storage.upload(filename, contents);
       return contents;
-    };
+    }
   }
 
   /**
@@ -64,7 +64,7 @@ class MemoryCache {
   /**
    * Constructor.
    */
-  constructor(bucketName) {
+  constructor() {
     this.files = new Map();
   }
 
