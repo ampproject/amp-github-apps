@@ -117,7 +117,8 @@ describe('owners bot', () => {
 
   describe('refreshTree', () => {
     it('checks out the repository', async done => {
-      await ownersBot.refreshTree(null, silentLogger);
+      sandbox.stub(console);
+      await ownersBot.refreshTree(null);
       sandbox.assert.calledOnce(repo.checkout);
       done();
     });

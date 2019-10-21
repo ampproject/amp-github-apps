@@ -518,6 +518,25 @@ describe('owners parser', () => {
           expect(result.length).toEqual(0);
         });
       });
+
+      describe('for an unknown team name', () => {
+        const fileDef = {
+          reviewerTeam: 'ampproject/unknown-team',
+          rules: [],
+        };
+
+        it('reports an error', () => {
+          const {errors} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
+          expect(errors[0].message).toEqual(
+            "Unrecognized team: 'ampproject/unknown-team'"
+          );
+        });
+
+        it('does not produce a reviewer set rule', () => {
+          const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
+          expect(result.length).toEqual(0);
+        });
+      });
     });
   });
 
