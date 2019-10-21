@@ -89,15 +89,15 @@ class MemoryCache {
    * @return {string} file contents.
    */
   async readFile(filename, getContents) {
-    this.logger.info(`Fetching "${filename}" from in-memory cache`);
+    this.logger.debug(`Fetching "${filename}" from in-memory cache`);
     if (this.files.has(filename)) {
       return this.files.get(filename);
     }
 
-    this.logger.info(`Cache miss on "${filename}"`);
+    this.logger.debug(`Cache miss on "${filename}"`);
     const contents = await getContents();
 
-    this.logger.info(`Storing "${filename}" to in-memory cache`);
+    this.logger.debug(`Storing "${filename}" to in-memory cache`);
     this.files.set(filename, contents);
 
     return contents;
@@ -109,7 +109,7 @@ class MemoryCache {
    * @param {string} filename file to drop from the cache.
    */
   async invalidate(filename) {
-    this.logger.info(`Invalidating in-memory cache of "${filename}"`);
+    this.logger.debug(`Invalidating in-memory cache of "${filename}"`);
     this.files.delete(filename);
   }
 }
