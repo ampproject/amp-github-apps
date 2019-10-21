@@ -71,45 +71,4 @@ class CloudStorage {
   }
 }
 
-/**
- * A Cloud Storage-backed cache.
- */
-class CloudStorageCache {
-  /**
-   * Constructor.
-   *
-   * @param {string} bucketName Cloud Storage bucket name.
-   */
-  constructor(bucketName) {
-    this.storage = new CloudStorage(bucketName);
-  }
-
-  /**
-   * Fetch the contents of a file.
-   *
-   * @param {string} filename file to get contents of.
-   * @param {string} getContents function to get contents if file not in cache.
-   * @return {string} file contents.
-   */
-  async readFile(filename, getContents) {
-    try {
-      return await this.storage.download(filename);
-    } catch (e) {
-      const contents = getContents();
-      // Do not `await`` the upload; this can happen async in the background.
-      this.storage.upload(filename, contents);
-      return contents;
-    };
-  }
-
-  /**
-   * Invalidate the cache for a file.
-   *
-   * @param {string} filename file to drop from the cache.
-   */
-  async invalidate(filename) {
-    await this.storage.delete(filename);
-  }
-}
-
-module.exports = {CloudStorage, CloudStorageCache};
+module.exports = {CloudStorage};
