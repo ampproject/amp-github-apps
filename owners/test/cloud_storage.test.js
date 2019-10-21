@@ -17,7 +17,7 @@
 const nock = require('nock');
 const sinon = require('sinon');
 
-const {CloudStorage} = require('../src/cloud_storage');
+const {CloudStorage, CloudStorageCache} = require('../src/cloud_storage');
 
 describe('cloud storage', () => {
   let sandbox;
@@ -81,6 +81,78 @@ describe('cloud storage', () => {
         sandbox.assert.calledOnce(fileStub.delete);
         done();
       });
+    });
+  });
+});
+
+describe('cloud storage cache', () => {
+  let sandbox;
+  let cache;
+  let fileStub;
+
+  beforeEach(() => {
+    sandbox = sinon.createSandbox();
+    cache = new CloudStorageCache('my-storage-bucket')
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+  });
+
+  describe('readFile', () => {
+    describe('when the file is in the cache', () => {
+      beforeEach(() => {
+        sandbox.stub(CloudStorage.prototype, 'download').returns(
+          'OWNERS file contents'
+        );
+      });
+
+      it('downloads and returns the file contents', async () => {
+        const contents = await cache.readFile('foo/OWNERS');
+
+        expect(contents).toEqual('OWNERS file contents');
+        sandbox.assert.calledWith(cache.storage.download, 'foo/OWNERS');
+      });
+    });
+
+    describe('when the file is not in the cache', () => {
+      const getContents = sinon.spy(() => 'OWNERS file contents');
+
+      beforeEach(() => {
+        sandbox.stub(CloudStorage.prototype, 'download').returns(
+          Promise.reject('Not found!')
+        );
+        sandbox.stub(CloudStorage.prototype, 'upload');
+      });
+
+      it('calls the provided method to get the file contents', async () => {
+        expect.assertions(1);
+        const contents = await cache.readFile('foo/OWNERS', getContents);
+
+        expect(contents).toEqual('OWNERS file contents');
+        sandbox.assert.calledOnce(getContents);
+      });
+
+      it('saves the contents to the cache', async done => {
+        await cache.readFile('foo/OWNERS', getContents);
+
+        sandbox.assert.calledWith(
+          cache.storage.upload,
+          'foo/OWNERS',
+          'OWNERS file contents',
+        );
+        done();
+      });
+    });
+  });
+
+  describe('invalidate', () => {
+    it('deletes the invalidated file cache from storage', async done => {
+      sinon.stub(CloudStorage.prototype, 'delete');
+      await cache.invalidate('foo/OWNERS');
+
+      sandbox.assert.calledWith(cache.storage.delete, 'foo/OWNERS');
+      done();
     });
   });
 });
