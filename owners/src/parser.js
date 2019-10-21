@@ -292,7 +292,7 @@ class OwnersParser {
         errors.push(
           new OwnersParserError(
             ownersPath,
-            `Unrecognized team: '${fileDef.reviewerTeam}`
+            `Unrecognized team: '${fileDef.reviewerTeam}'`
           )
         );
       } else {
