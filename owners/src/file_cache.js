@@ -17,7 +17,7 @@
 const {CloudStorage} = require('./cloud_storage');
 
 /**
- * A Cloud Storage-backed cache.
+ * A Cloud Storage-backed file cache.
  */
 class CloudStorageCache {
   /**
@@ -40,7 +40,7 @@ class CloudStorageCache {
     try {
       return await this.storage.download(filename);
     } catch (e) {
-      const contents = getContents();
+      const contents = await getContents();
       // Do not `await`` the upload; this can happen async in the background.
       this.storage.upload(filename, contents);
       return contents;
@@ -57,4 +57,42 @@ class CloudStorageCache {
   }
 }
 
-module.exports = {CloudStorageCache};
+/**
+ * An in-memory file cache.
+ */
+class MemoryCache {
+  /**
+   * Constructor.
+   */
+  constructor(bucketName) {
+    this.files = new Map();
+  }
+
+  /**
+   * Fetch the contents of a file.
+   *
+   * @param {string} filename file to get contents of.
+   * @param {string} getContents function to get contents if file not in cache.
+   * @return {string} file contents.
+   */
+  async readFile(filename, getContents) {
+    if (this.files.has(filename)) {
+      return this.files.get(filename);
+    }
+
+    const contents = await getContents();
+    this.files.set(filename, contents);
+    return contents;
+  }
+
+  /**
+   * Invalidate the cache for a file.
+   *
+   * @param {string} filename file to drop from the cache.
+   */
+  async invalidate(filename) {
+    delete this.files.delete(filename);
+  }
+}
+
+module.exports = {CloudStorageCache, MemoryCache};
