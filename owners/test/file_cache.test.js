@@ -71,7 +71,7 @@ describe('file caches', () => {
           sandbox
             .stub(CloudStorage.prototype, 'download')
             .returns(Promise.reject(new Error('Not found!')));
-          sandbox.stub(CloudStorage.prototype, 'upload');
+          sandbox.stub(CloudStorage.prototype, 'upload').resolves();
         });
 
         it('calls the provided method to get the file contents', async () => {
@@ -216,7 +216,7 @@ describe('file caches', () => {
 
         describe('when the file is not in the Cloud Storage cache', async () => {
           beforeEach(() => {
-            sandbox.stub(CloudStorage.prototype, 'upload');
+            sandbox.stub(CloudStorage.prototype, 'upload').resolves();
             sandbox
               .stub(CloudStorage.prototype, 'download')
               .returns(Promise.reject(new Error('Not found!')));
