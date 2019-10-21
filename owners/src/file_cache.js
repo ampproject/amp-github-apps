@@ -91,7 +91,7 @@ class MemoryCache {
    * @param {string} filename file to drop from the cache.
    */
   async invalidate(filename) {
-    delete this.files.delete(filename);
+    this.files.delete(filename);
   }
 }
 
