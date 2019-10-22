@@ -661,11 +661,7 @@ describe('owners bot', () => {
           ]);
         await probot.receive({name: 'pull_request.closed', payload});
 
-        sandbox.assert.calledWith(
-          OwnersBot.prototype.refreshTree,
-          ['OWNERS', 'foo/OWNERS', 'foo/bar/OWNERS'],
-          app.log
-        );
+        sandbox.assert.calledWith(OwnersBot.prototype.refreshTree, app.log);
         done();
       });
     });

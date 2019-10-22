@@ -42,7 +42,9 @@ module.exports = app => {
   const ownersBot = new OwnersBot(repo);
 
   const teamsInitialized = ownersBot.initTeams(sharedGithub);
-  const appInitialized = teamsInitialized.then(() => ownersBot.refreshTree());
+  const appInitialized = teamsInitialized.then(
+    () => ownersBot.refreshTree(app.log)
+  );
 
   /**
    * Listen for webhooks and provide handlers with a GitHub interface and the
@@ -114,7 +116,7 @@ module.exports = app => {
     );
 
     if (changedOwners.length) {
-      await ownersBot.refreshTree(changedOwners, github.logger);
+      await ownersBot.refreshTree(github.logger);
     }
   });
 
