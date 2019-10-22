@@ -42,8 +42,8 @@ module.exports = app => {
   const ownersBot = new OwnersBot(repo);
 
   const teamsInitialized = ownersBot.initTeams(sharedGithub);
-  const appInitialized = teamsInitialized.then(
-    () => ownersBot.refreshTree(app.log)
+  const appInitialized = teamsInitialized.then(() =>
+    ownersBot.refreshTree(app.log)
   );
 
   /**
