@@ -33,6 +33,7 @@ describe('cloud storage', () => {
 
   describe('file', () => {
     it('provides a reference to a file in the storage bucket', () => {
+      const storage = new CloudStorage('my-storage-bucket');
       const file = storage.file('foo/OWNERS');
 
       expect(file.name).toEqual('foo/OWNERS');
