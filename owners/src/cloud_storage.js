@@ -24,10 +24,12 @@ class CloudStorage {
    * Constructor.
    *
    * @param {string} bucketName Cloud Storage bucket name.
+   * @param {Logger=} [logger=console] logging interface.
    */
-  constructor(bucketName) {
+  constructor(bucketName, logger) {
     this.storage = new Storage();
     this.bucketName = bucketName;
+    this.logger = logger || console;
   }
 
   /**
@@ -47,6 +49,7 @@ class CloudStorage {
    * @param {string} contents file contents.
    */
   async upload(filename, contents) {
+    this.logger.info(`Uploading "${filename}" to Cloud Storage`);
     await this.file(filename).save(contents, {resumable: false});
   }
 
@@ -57,6 +60,7 @@ class CloudStorage {
    * @return {string} file contents.
    */
   async download(filename) {
+    this.logger.info(`Downloading "${filename}" from Cloud Storage`);
     const [contents] = await this.file(filename).download();
     return contents.toString('utf8');
   }
@@ -67,6 +71,7 @@ class CloudStorage {
    * @param {string} filename file to delete.
    */
   async delete(filename) {
+    this.logger.info(`Deleting "${filename}" from Cloud Storage`);
     await this.file(filename).delete();
   }
 }
