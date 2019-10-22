@@ -34,7 +34,7 @@ module.exports = app => {
   const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(localRepo);
   const sharedGithub = new GitHub(
-    new Octokit({auth: `token ${GITHUB_ACCESS_TOKEN}`}),
+    new Octokit({auth: GITHUB_ACCESS_TOKEN}),
     GITHUB_REPO_OWNER,
     GITHUB_REPO_NAME,
     app.log
