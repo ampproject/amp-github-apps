@@ -20,7 +20,6 @@ const {Probot} = require('probot');
 const owners = require('..');
 const {OwnersBot} = require('../src/owners_bot');
 const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
-const {LocalRepository} = require('../src/repo');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');

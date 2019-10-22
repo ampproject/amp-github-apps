@@ -64,6 +64,15 @@ describe('virtual repository', () => {
     sandbox.restore();
   });
 
+  describe('sync', () => {
+    it('fetches the list of owners files', async done => {
+      sandbox.stub(VirtualRepository.prototype, 'findOwnersFiles');
+      await repo.sync();
+      sandbox.assert.calledOnce(repo.findOwnersFiles);
+      done();
+    });
+  });
+
   describe('readFile', () => {
     it('throws an error for unknown files', () => {
       expect(repo.readFile('OWNERS')).rejects.toContain(
