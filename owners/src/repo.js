@@ -125,12 +125,12 @@ class VirtualRepository extends Repository {
     const ownersFiles = await this.github.searchFilename('OWNERS');
 
     ownersFiles.forEach(({filename, sha}) => {
-      const file = this._fileRefs.get(filename);
-      if (!file) {
+      const fileSha = this._fileRefs.get(filename);
+      if (!fileSha) {
         // File has never been fetched and should be added to the cache.
         this.logger.info(`Recording SHA for file "${filename}"`);
         this._fileRefs.set(filename, sha);
-      } else if (file.sha !== sha) {
+      } else if (fileSha !== sha) {
         // File has been updated and needs to be re-fetched.
         this.logger.info(
           `Updating SHA and clearing cache for file "${filename}"`
