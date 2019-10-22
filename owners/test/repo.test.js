@@ -86,7 +86,7 @@ describe('virtual repository', () => {
 
   describe('readFile', () => {
     it('throws an error for unknown files', () => {
-      expect(repo.readFile('OWNERS')).rejects.toContain(
+      expect(repo.readFile('OWNERS')).rejects.toThrowError(
         'File "OWNERS" not found in virtual repository'
       );
     });
