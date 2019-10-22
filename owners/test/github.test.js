@@ -119,7 +119,9 @@ describe('GitHub API', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    sandbox.stub(OwnersBot.prototype, 'initTeams');
+    sandbox.stub(console);
+    sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
+    sandbox.stub(OwnersBot.prototype, 'refreshTree').resolves();
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
     probot = new Probot({});
     app = probot.load(owners);

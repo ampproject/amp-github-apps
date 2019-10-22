@@ -31,15 +31,18 @@ const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const INFO_SERVER_PORT = Number(process.env.INFO_SERVER_PORT || 8081);
 
 module.exports = app => {
-  const localRepo = new LocalRepository(process.env.GITHUB_REPO_DIR);
-  const ownersBot = new OwnersBot(localRepo);
   const sharedGithub = new GitHub(
     new Octokit({auth: `token ${GITHUB_ACCESS_TOKEN}`}),
     GITHUB_REPO_OWNER,
     GITHUB_REPO_NAME,
     app.log
   );
-  ownersBot.initTeams(sharedGithub);
+
+  const repo = new LocalRepository(process.env.GITHUB_REPO_DIR);
+  const ownersBot = new OwnersBot(repo);
+
+  const teamsInitialized = ownersBot.initTeams(sharedGithub);
+  const appInitialized = teamsInitialized.then(() => ownersBot.refreshTree());
 
   /**
    * Listen for webhooks and provide handlers with a GitHub interface and the
@@ -50,6 +53,8 @@ module.exports = app => {
    */
   function listen(events, cb) {
     app.on(events, async context => {
+      await appInitialized;
+
       let github;
       try {
         github = GitHub.fromContext(context);
