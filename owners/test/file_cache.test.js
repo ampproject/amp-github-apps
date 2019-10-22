@@ -72,11 +72,11 @@ describe('file caches', () => {
           sandbox
             .stub(CloudStorage.prototype, 'download')
             .returns(Promise.reject(new Error('Not found!')));
-          sandbox.stub(CloudStorage.prototype, 'upload').resolves();
         });
 
         it('calls the provided method to get the file contents', async () => {
           expect.assertions(1);
+          sandbox.stub(CloudStorage.prototype, 'upload').resolves();
           const contents = await cache.readFile('foo/OWNERS', getContents);
 
           expect(contents).toEqual('OWNERS file contents');
@@ -84,12 +84,24 @@ describe('file caches', () => {
         });
 
         it('saves the contents to the cache', async done => {
+          sandbox.stub(CloudStorage.prototype, 'upload').resolves();
           await cache.readFile('foo/OWNERS', getContents);
 
           sandbox.assert.calledWith(
             cache.storage.upload,
             'foo/OWNERS',
             'OWNERS file contents'
+          );
+          done();
+        });
+
+        it('reports errors uploading to the cache', async done => {
+          sandbox.stub(cache.storage, 'upload').rejects(new Error('Not found'));
+          await cache.readFile('foo/OWNERS', getContents);
+
+          sandbox.assert.calledWith(
+            console.error,
+            'Error uploading "foo/OWNERS": Not found'
           );
           done();
         });

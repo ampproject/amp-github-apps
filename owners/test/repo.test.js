@@ -75,9 +75,10 @@ describe('virtual repository', () => {
   });
 
   describe('sync', () => {
-    it('finds owners files', async done => {
-      sandbox.stub(repo, 'findOwnersFiles');
+    it('fetches the list of owners files', async done => {
+      sandbox.stub(VirtualRepository.prototype, 'findOwnersFiles');
       await repo.sync();
+
       sandbox.assert.calledOnce(repo.findOwnersFiles);
       done();
     });

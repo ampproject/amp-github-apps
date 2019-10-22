@@ -66,7 +66,7 @@ describe('owners bot', () => {
     sandbox.stub(process, 'env').value({GITHUB_REPO_DIR, NODE_ENV: 'test'});
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
-    sandbox.stub(OwnersBot.prototype, 'initTeams');
+    sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
     sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
     sandbox.stub(GitHub.prototype, 'getReviewRequests').returns([]);
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');

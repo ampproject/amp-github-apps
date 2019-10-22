@@ -74,7 +74,9 @@ class CloudStorageCache extends FileCache {
       // Do not `await`` the upload; this can happen async in the background.
       this.storage
         .upload(filename, contents)
-        .catch(err => console.error(`Error uploading "${filename}": `, err));
+        .catch(err =>
+          console.error(`Error uploading "${filename}": ${err.message}`)
+        );
 
       return contents;
     }
