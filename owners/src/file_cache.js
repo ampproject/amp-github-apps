@@ -24,9 +24,11 @@ class CloudStorageCache {
    * Constructor.
    *
    * @param {string} bucketName Cloud Storage bucket name.
+   * @param {Logger=} [logger=console] logging interface.
    */
-  constructor(bucketName) {
-    this.storage = new CloudStorage(bucketName);
+  constructor(bucketName, logger) {
+    this.logger = logger || console;
+    this.storage = new CloudStorage(bucketName, this.logger);
   }
 
   /**
@@ -38,13 +40,18 @@ class CloudStorageCache {
    */
   async readFile(filename, getContents) {
     try {
+      this.logger.info(`Fetching "${filename}" from Cloud Storage cache`);
       return await this.storage.download(filename);
     } catch (e) {
+      this.logger.info(`Cache miss on "${filename}"`);
       const contents = await getContents();
+
+      this.logger.info(`Uploading "${filename}" to Cloud Storage cache`);
       // Do not `await`` the upload; this can happen async in the background.
       this.storage
         .upload(filename, contents)
         .catch(err => console.error(`Error uploading "${filename}": `, err));
+
       return contents;
     }
   }
@@ -55,6 +62,7 @@ class CloudStorageCache {
    * @param {string} filename file to drop from the cache.
    */
   async invalidate(filename) {
+    this.logger.info(`Invalidating Cloud Storage cache of "${filename}"`);
     await this.storage.delete(filename);
   }
 }
@@ -65,9 +73,12 @@ class CloudStorageCache {
 class MemoryCache {
   /**
    * Constructor.
+   *
+   * @param {Logger=} [logger=console] logging interface.
    */
-  constructor() {
+  constructor(logger) {
     this.files = new Map();
+    this.logger = logger || console;
   }
 
   /**
@@ -78,12 +89,17 @@ class MemoryCache {
    * @return {string} file contents.
    */
   async readFile(filename, getContents) {
+    this.logger.debug(`Fetching "${filename}" from in-memory cache`);
     if (this.files.has(filename)) {
       return this.files.get(filename);
     }
 
+    this.logger.debug(`Cache miss on "${filename}"`);
     const contents = await getContents();
+
+    this.logger.debug(`Storing "${filename}" to in-memory cache`);
     this.files.set(filename, contents);
+
     return contents;
   }
 
@@ -93,6 +109,7 @@ class MemoryCache {
    * @param {string} filename file to drop from the cache.
    */
   async invalidate(filename) {
+    this.logger.debug(`Invalidating in-memory cache of "${filename}"`);
     this.files.delete(filename);
   }
 }
@@ -111,9 +128,11 @@ class CompoundCache {
    * Constructor.
    *
    * @param {string} bucketName Cloud Storage bucket name.
+   * @param {Logger=} [logger=console] logging interface.
    */
-  constructor(bucketName) {
-    this.cloudStorageCache = new CloudStorageCache(bucketName);
+  constructor(bucketName, logger) {
+    this.logger = logger || console;
+    this.cloudStorageCache = new CloudStorageCache(bucketName, this.logger);
     this.memoryCache = new MemoryCache();
   }
 

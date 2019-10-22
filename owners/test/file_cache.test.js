@@ -28,6 +28,7 @@ describe('file caches', () => {
   let getContents;
 
   beforeEach(() => {
+    sandbox.stub(console);
     getContents = sinon.spy(async () => 'OWNERS file contents');
   });
 
