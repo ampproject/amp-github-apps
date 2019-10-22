@@ -43,7 +43,6 @@ const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const CACHE_HIT_INTERVAL = 3000;
 
-console.log(GITHUB_ACCESS_TOKEN);
 const github = new GitHub(
   new Octokit({auth: GITHUB_ACCESS_TOKEN}),
   GITHUB_REPO_OWNER,
