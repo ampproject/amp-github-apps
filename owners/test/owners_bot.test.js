@@ -118,7 +118,7 @@ describe('owners bot', () => {
   describe('refreshTree', () => {
     it('refreshes the repository', async done => {
       sandbox.stub(console);
-      await ownersBot.refreshTree(null);
+      await ownersBot.refreshTree();
       sandbox.assert.calledOnce(repo.sync);
       done();
     });
@@ -126,7 +126,7 @@ describe('owners bot', () => {
     it('parses the owners tree', async () => {
       expect.assertions(1);
       ownersBot.treeParse = null;
-      await ownersBot.refreshTree(null, silentLogger);
+      await ownersBot.refreshTree(silentLogger);
       expect(ownersBot.treeParse.result).toBeInstanceOf(OwnersTree);
     });
   });
@@ -152,7 +152,7 @@ describe('owners bot', () => {
       sandbox.stub(OwnersBot.prototype, 'refreshTree');
       await ownersBot.initPr(github, pr);
 
-      sandbox.assert.calledWith(ownersBot.refreshTree, null, github.logger);
+      sandbox.assert.calledWith(ownersBot.refreshTree, github.logger);
       done();
     });
 

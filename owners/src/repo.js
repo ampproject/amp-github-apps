@@ -74,13 +74,15 @@ class VirtualRepository extends Repository {
    * Constructor.
    *
    * @param {!GitHub} github GitHub API interface.
+   * @param {!FileCache} cache file cache.
    */
-  constructor(github) {
+  constructor(github, cache) {
     super();
     this.github = github;
     this.logger = github.logger;
-    /** @type {!Map<string, !VirtualFile>} */
-    this._knownFiles = new Map();
+    /** @type {!Map<string, string>} */
+    this._fileRefs = new Map();
+    this.cache = cache;
   }
 
   /**
@@ -97,22 +99,20 @@ class VirtualRepository extends Repository {
    * @return {string} file contents.
    */
   async readFile(relativePath) {
-    const file = this._knownFiles.get(relativePath);
-    if (!file) {
+    const fileSha = this._fileRefs.get(relativePath);
+    if (!fileSha) {
       throw new Error(
         `File "${relativePath}" not found in virtual repository; ` +
           'can only read files found through `findOwnersFiles`.'
       );
     }
 
-    if (file.contents === null) {
-      file.contents = await this.github.getFileContents({
+    return await this.cache.readFile(relativePath, async () => {
+      return await this.github.getFileContents({
         filename: relativePath,
-        sha: file.sha,
+        sha: fileSha,
       });
-    }
-
-    return file.contents;
+    });
   }
 
   /**
@@ -124,18 +124,18 @@ class VirtualRepository extends Repository {
     const ownersFiles = await this.github.searchFilename('OWNERS');
 
     ownersFiles.forEach(({filename, sha}) => {
-      const file = this._knownFiles.get(filename);
-      if (!file) {
+      const fileSha = this._fileRefs.get(filename);
+      if (!fileSha) {
         // File has never been fetched and should be added to the cache.
         this.logger.info(`Recording SHA for file "${filename}"`);
-        this._knownFiles.set(filename, {sha, contents: null});
-      } else if (file.sha !== sha) {
+        this._fileRefs.set(filename, sha);
+      } else if (fileSha !== sha) {
         // File has been updated and needs to be re-fetched.
         this.logger.info(
           `Updating SHA and clearing cache for file "${filename}"`
         );
-        file.sha = sha;
-        file.contents = null;
+        this._fileRefs.set(filename, sha);
+        this.cache.invalidate(filename);
       }
     });
 

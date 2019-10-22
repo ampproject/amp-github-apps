@@ -16,6 +16,8 @@
 
 const {GitHub} = require('../src/github');
 const {Repository, LocalRepository, VirtualRepository} = require('../src/repo');
+const {CompoundCache} = require('../src/file_cache');
+const {CloudStorage} = require('../src/cloud_storage');
 const childProcess = require('child_process');
 const sinon = require('sinon');
 const fs = require('fs');
@@ -47,7 +49,15 @@ describe('virtual repository', () => {
   let repo;
 
   beforeEach(() => {
-    repo = new VirtualRepository(github);
+    const cache = new CompoundCache('my-bucket-name');
+    repo = new VirtualRepository(github, cache);
+
+    sandbox
+      .stub(CloudStorage.prototype, 'download')
+      .rejects(new Error('Not found'));
+    sandbox.stub(CloudStorage.prototype, 'upload').resolves();
+    sandbox.stub(CloudStorage.prototype, 'delete');
+
     sandbox
       .stub(GitHub.prototype, 'searchFilename')
       .withArgs('OWNERS')
@@ -68,6 +78,7 @@ describe('virtual repository', () => {
     it('fetches the list of owners files', async done => {
       sandbox.stub(VirtualRepository.prototype, 'findOwnersFiles');
       await repo.sync();
+
       sandbox.assert.calledOnce(repo.findOwnersFiles);
       done();
     });
@@ -75,7 +86,7 @@ describe('virtual repository', () => {
 
   describe('readFile', () => {
     it('throws an error for unknown files', () => {
-      expect(repo.readFile('OWNERS')).rejects.toContain(
+      expect(repo.readFile('OWNERS')).rejects.toThrowError(
         'File "OWNERS" not found in virtual repository'
       );
     });
@@ -109,6 +120,23 @@ describe('virtual repository', () => {
         sandbox.assert.calledOnce(github.getFileContents);
         expect(contents).toEqual('contents');
       });
+
+      it('re-fetches the file when the cache is invalidated', async () => {
+        expect.assertions(1);
+
+        await repo.findOwnersFiles();
+        await repo.readFile('OWNERS');
+        sandbox.assert.calledWith(github.getFileContents, {
+          filename: 'OWNERS',
+          sha: 'sha_1',
+        });
+
+        await repo.cache.invalidate('OWNERS');
+        const contents = await repo.readFile('OWNERS');
+        sandbox.assert.calledTwice(github.getFileContents);
+
+        expect(contents).toEqual('contents');
+      });
     });
   });
 
@@ -123,14 +151,8 @@ describe('virtual repository', () => {
       expect.assertions(2);
       await repo.findOwnersFiles();
 
-      expect(repo._knownFiles.get('OWNERS')).toEqual({
-        sha: 'sha_1',
-        contents: null,
-      });
-      expect(repo._knownFiles.get('foo/OWNERS')).toEqual({
-        sha: 'sha_2',
-        contents: null,
-      });
+      expect(repo._fileRefs.get('OWNERS')).toEqual('sha_1');
+      expect(repo._fileRefs.get('foo/OWNERS')).toEqual('sha_2');
     });
 
     it('updates changed owners files', async () => {
@@ -138,18 +160,22 @@ describe('virtual repository', () => {
 
       await repo.findOwnersFiles();
       // Pretend the contents for the known files have been fetched
-      repo._knownFiles.get('OWNERS').contents = 'old root contents';
-      repo._knownFiles.get('foo/OWNERS').contents = 'old foo contents';
+      repo._fileRefs.get('OWNERS').contents = 'old root contents';
+      repo._fileRefs.get('foo/OWNERS').contents = 'old foo contents';
       await repo.findOwnersFiles();
 
-      expect(repo._knownFiles.get('OWNERS')).toEqual({
-        sha: 'sha_updated',
-        contents: null,
-      });
-      expect(repo._knownFiles.get('foo/OWNERS')).toEqual({
-        sha: 'sha_2',
-        contents: 'old foo contents',
-      });
+      expect(repo._fileRefs.get('OWNERS')).toEqual('sha_updated');
+      expect(repo._fileRefs.get('foo/OWNERS')).toEqual('sha_2');
+    });
+
+    it('invalidates the cache for changed owners files', async done => {
+      sandbox.stub(CompoundCache.prototype, 'invalidate');
+      await repo.findOwnersFiles();
+      sandbox.assert.notCalled(repo.cache.invalidate);
+
+      await repo.findOwnersFiles();
+      sandbox.assert.calledWith(repo.cache.invalidate, 'OWNERS');
+      done();
     });
   });
 });

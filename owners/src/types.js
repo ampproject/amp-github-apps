@@ -110,16 +110,6 @@ let RuleDefinition;
  */
 let OwnersFileDefinition;
 
-/**
- * A file ref with possibly cached contents.
- *
- * @typedef {{
- *   sha: string,
- *   contents: ?string,
- * }}
- */
-let VirtualFile;
-
 module.exports = {
   FileTreeMap,
   Logger,
@@ -131,5 +121,4 @@ module.exports = {
   OwnerDefinition,
   RuleDefinition,
   OwnersFileDefinition,
-  VirtualFile,
 };
