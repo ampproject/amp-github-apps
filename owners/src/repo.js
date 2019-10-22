@@ -75,14 +75,15 @@ class VirtualRepository extends Repository {
    * Constructor.
    *
    * @param {!GitHub} github GitHub API interface.
+   * @param {!FileCache} cache file cache.
    */
-  constructor(github) {
+  constructor(github, cache) {
     super();
     this.github = github;
     this.logger = github.logger;
     /** @type {!Map<string, string>} */
     this._fileRefs = new Map();
-    this.cache = new CompoundCache();
+    this.cache = cache;
   }
 
   /**

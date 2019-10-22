@@ -17,9 +17,32 @@
 const {CloudStorage} = require('./cloud_storage');
 
 /**
+ * A generic cache interface.
+ */
+class FileCache {
+   /**
+   * Fetch the contents of a file.
+   *
+   * @param {string} filename file to get contents of.
+   * @param {string} getContents function to get contents if file not in cache.
+   * @return {string} file contents.
+   */
+  async readFile(filename, getContents) {
+    return await getContents();
+  }
+
+  /**
+   * Invalidate the cache for a file.
+   *
+   * @param {string} filename file to drop from the cache.
+   */
+  async invalidate(filename) {}
+}
+
+/**
  * A Cloud Storage-backed file cache.
  */
-class CloudStorageCache {
+class CloudStorageCache extends FileCache {
   /**
    * Constructor.
    *
@@ -27,6 +50,7 @@ class CloudStorageCache {
    * @param {Logger=} [logger=console] logging interface.
    */
   constructor(bucketName, logger) {
+    super();
     this.logger = logger || console;
     this.storage = new CloudStorage(bucketName, this.logger);
   }
@@ -70,13 +94,14 @@ class CloudStorageCache {
 /**
  * An in-memory file cache.
  */
-class MemoryCache {
+class MemoryCache extends FileCache {
   /**
    * Constructor.
    *
    * @param {Logger=} [logger=console] logging interface.
    */
   constructor(logger) {
+    super();
     this.files = new Map();
     this.logger = logger || console;
   }
@@ -123,7 +148,7 @@ class MemoryCache {
  * collection of OWNERS files on startup (preventing it from blasting the GitHub
  * API on startup).
  */
-class CompoundCache {
+class CompoundCache extends FileCache {
   /**
    * Constructor.
    *
@@ -131,6 +156,7 @@ class CompoundCache {
    * @param {Logger=} [logger=console] logging interface.
    */
   constructor(bucketName, logger) {
+    super();
     this.logger = logger || console;
     this.cloudStorageCache = new CloudStorageCache(bucketName, this.logger);
     this.memoryCache = new MemoryCache();

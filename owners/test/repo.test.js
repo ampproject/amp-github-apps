@@ -49,7 +49,8 @@ describe('virtual repository', () => {
   let repo;
 
   beforeEach(() => {
-    repo = new VirtualRepository(github);
+    const cache = new CompoundCache('my-bucket-name');
+    repo = new VirtualRepository(github, cache);
 
     sandbox
       .stub(CloudStorage.prototype, 'download')
