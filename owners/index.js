@@ -53,7 +53,7 @@ module.exports = app => {
    */
   function listen(events, cb) {
     app.on(events, async context => {
-      await appInitialized();
+      await appInitialized;
 
       let github;
       try {

@@ -20,6 +20,7 @@ const {Probot} = require('probot');
 const owners = require('..');
 const {OwnersBot} = require('../src/owners_bot');
 const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
+const {LocalRepository} = require('../src/repo');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
 const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
@@ -119,7 +120,9 @@ describe('GitHub API', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    sandbox.stub(OwnersBot.prototype, 'initTeams');
+    sandbox.stub(console);
+    sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
+    sandbox.stub(OwnersBot.prototype, 'refreshTree').resolves();
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
     probot = new Probot({});
     app = probot.load(owners);
