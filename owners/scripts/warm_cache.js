@@ -47,12 +47,15 @@ const github = new GitHub(
   new Octokit({auth: GITHUB_ACCESS_TOKEN}),
   GITHUB_REPO_OWNER,
   GITHUB_REPO_NAME,
-  console,
+  console
 );
 const cache = new CompoundCache(CLOUD_STORAGE_BUCKET);
 const repo = new VirtualRepository(github, cache);
 const parser = new OwnersParser(repo, {});
 
+/**
+ * Warm up the cache by slowly fetching each owners file.
+ */
 async function warmUp() {
   const ownersFiles = await repo.findOwnersFiles();
   let i = 1;

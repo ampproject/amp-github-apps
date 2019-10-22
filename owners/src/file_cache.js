@@ -20,7 +20,7 @@ const {CloudStorage} = require('./cloud_storage');
  * A generic cache interface.
  */
 class FileCache {
-   /**
+  /**
    * Fetch the contents of a file.
    *
    * @param {string} filename file to get contents of.

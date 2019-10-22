@@ -16,7 +16,7 @@
 
 const {GitHub} = require('../src/github');
 const {Repository, LocalRepository, VirtualRepository} = require('../src/repo');
-const {CompoundCache, MemoryCache} = require('../src/file_cache');
+const {CompoundCache} = require('../src/file_cache');
 const {CloudStorage} = require('../src/cloud_storage');
 const childProcess = require('child_process');
 const sinon = require('sinon');
@@ -173,7 +173,7 @@ describe('virtual repository', () => {
       sandbox.assert.notCalled(repo.cache.invalidate);
 
       await repo.findOwnersFiles();
-      sandbox.assert.calledWith(repo.cache.invalidate, 'OWNERS')
+      sandbox.assert.calledWith(repo.cache.invalidate, 'OWNERS');
       done();
     });
   });

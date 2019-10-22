@@ -19,7 +19,6 @@ const fs = require('fs');
 const childProcess = require('child_process');
 const util = require('util');
 const exec = util.promisify(childProcess.exec);
-const {CompoundCache} = require('./file_cache');
 
 /**
  * Execute raw shell commands.
