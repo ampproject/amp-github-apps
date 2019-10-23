@@ -115,9 +115,9 @@ class OwnersBot {
    *
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to run owners check on.
-   * @param {?boolean} [requestOwners=false] request reviews from owners.
+   * @param {?boolean} requestOwners request reviews from owners.
    */
-  async runOwnersCheck(github, pr, requestOwners) {
+  async runOwnersCheck(github, pr, requestOwners=false) {
     if (!pr.isOpen) {
       return;
     }
