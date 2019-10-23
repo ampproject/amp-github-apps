@@ -16,7 +16,7 @@
 
 const sinon = require('sinon');
 const {ReviewerSelection} = require('../src/reviewer_selection');
-const {Team} = require('../src/github');
+const {Team} = require('../src/api/github');
 const {UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
 const {OwnersTree} = require('../src/owners_tree');
 const {

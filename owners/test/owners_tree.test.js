@@ -15,7 +15,7 @@
  */
 
 const {OwnersTree} = require('../src/owners_tree');
-const {Team} = require('../src/github');
+const {Team} = require('../src/api/github');
 const {
   UserOwner,
   TeamOwner,

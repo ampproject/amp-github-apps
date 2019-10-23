@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const {GitHub} = require('../../src/github');
+const {GitHub} = require('../../src/api/github');
 const VirtualRepository = require('../../src/repo/virtual_repo');
 const CompoundCache = require('../../src/cache/compound_cache');
 const {CloudStorage} = require('../../src/cloud_storage');
