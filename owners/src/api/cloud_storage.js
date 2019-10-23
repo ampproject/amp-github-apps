@@ -74,4 +74,4 @@ module.exports = class CloudStorage {
     this.logger.info(`Deleting "${filename}" from Cloud Storage`);
     await this.file(filename).delete();
   }
-}
+};
