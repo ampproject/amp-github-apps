@@ -18,7 +18,7 @@ const sinon = require('sinon');
 const path = require('path');
 const fs = require('fs');
 const JSON5 = require('json5');
-const {Team} = require('../src/github');
+const {Team} = require('../src/api/github');
 const LocalRepository = require('../src/repo/local_repo');
 const {OwnersParser, OwnersParserError} = require('../src/parser');
 const {

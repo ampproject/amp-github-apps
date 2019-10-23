@@ -15,7 +15,7 @@
  */
 
 const sinon = require('sinon');
-const {GitHub, PullRequest, Team} = require('../src/github');
+const {GitHub, PullRequest, Team} = require('../src/api/github');
 const {OwnersTree} = require('../src/owners_tree');
 const {OwnersRule} = require('../src/rules');
 const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');

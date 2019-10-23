@@ -19,8 +19,9 @@ const nock = require('nock');
 const owners = require('..');
 const {Probot} = require('probot');
 const sinon = require('sinon');
+
 const LocalRepository = require('../src/repo/local_repo');
-const {GitHub, Team} = require('../src/github');
+const {GitHub, Team} = require('../src/api/github');
 const {OwnersParser} = require('../src/parser');
 const {UserOwner} = require('../src/owner');
 const {OwnersRule} = require('../src/rules');

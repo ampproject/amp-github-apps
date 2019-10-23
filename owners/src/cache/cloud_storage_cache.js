@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const {CloudStorage} = require('../cloud_storage');
+const CloudStorage = require('../api/cloud_storage');
 const FileCache = require('./file_cache');
 
 /**

@@ -17,7 +17,7 @@
 const path = require('path');
 const bootstrap = require('./bootstrap');
 const InfoServer = require('./info_server');
-const {GitHub, PullRequest, Team} = require('./src/github');
+const {GitHub, PullRequest, Team} = require('./src/api/github');
 const {OwnersCheck} = require('./src/owners_check');
 
 const INFO_SERVER_PORT = Number(process.env.INFO_SERVER_PORT || 8081);

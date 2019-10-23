@@ -17,25 +17,26 @@
 const nock = require('nock');
 const sinon = require('sinon');
 const Octokit = require('@octokit/rest');
-const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
-const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
-const reviewsApprovedResponse = require('./fixtures/reviews/reviews.35.approved.json');
-const requestedReviewsResponse = require('./fixtures/reviews/requested_reviewers.24574.json');
-const commentReviewsResponse = require('./fixtures/reviews/comment_reviews.24686.json');
-const manyReviewsPage1Response = require('./fixtures/reviews/many_reviews.23928.page_1.json');
-const manyReviewsPage2Response = require('./fixtures/reviews/many_reviews.23928.page_2.json');
-const manyTeamsResponsePage1 = require('./fixtures/teams/many_members.page_1.json');
-const manyTeamsResponsePage2 = require('./fixtures/teams/many_members.page_2.json');
-const pullRequestResponse = require('./fixtures/pulls/pull_request.35.json');
-const issueCommentsResponse = require('./fixtures/comments/issue_comments.438.json');
-const listFilesResponse = require('./fixtures/files/files.35.json');
-const checkRunsListResponse = require('./fixtures/check-runs/check-runs.get.35.multiple');
-const checkRunsEmptyResponse = require('./fixtures/check-runs/check-runs.get.35.empty');
-const getFileResponse = require('./fixtures/files/file_blob.24523.json');
-const searchReadmeResponse = require('./fixtures/files/search.readme.json');
-const searchOwnersPage1Response = require('./fixtures/files/search.owners.page_1.json');
-const searchOwnersPage2Response = require('./fixtures/files/search.owners.page_2.json');
+const {CheckRun, CheckRunConclusion} = require('../../src/owners_check');
+const {GitHub, PullRequest, Review, Team} = require('../../src/api/github');
+
+const reviewsApprovedResponse = require('../fixtures/reviews/reviews.35.approved.json');
+const requestedReviewsResponse = require('../fixtures/reviews/requested_reviewers.24574.json');
+const commentReviewsResponse = require('../fixtures/reviews/comment_reviews.24686.json');
+const manyReviewsPage1Response = require('../fixtures/reviews/many_reviews.23928.page_1.json');
+const manyReviewsPage2Response = require('../fixtures/reviews/many_reviews.23928.page_2.json');
+const manyTeamsResponsePage1 = require('../fixtures/teams/many_members.page_1.json');
+const manyTeamsResponsePage2 = require('../fixtures/teams/many_members.page_2.json');
+const pullRequestResponse = require('../fixtures/pulls/pull_request.35.json');
+const issueCommentsResponse = require('../fixtures/comments/issue_comments.438.json');
+const listFilesResponse = require('../fixtures/files/files.35.json');
+const checkRunsListResponse = require('../fixtures/check-runs/check-runs.get.35.multiple');
+const checkRunsEmptyResponse = require('../fixtures/check-runs/check-runs.get.35.empty');
+const getFileResponse = require('../fixtures/files/file_blob.24523.json');
+const searchReadmeResponse = require('../fixtures/files/search.readme.json');
+const searchOwnersPage1Response = require('../fixtures/files/search.owners.page_1.json');
+const searchOwnersPage2Response = require('../fixtures/files/search.owners.page_2.json');
 
 nock.disableNetConnect();
 

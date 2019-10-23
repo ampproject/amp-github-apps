@@ -179,7 +179,7 @@ if (require.main === module) {
   require('dotenv').config();
 
   const Octokit = require('@octokit/rest');
-  const {GitHub} = require('./src/github');
+  const {GitHub} = require('./src/api/github');
   const {LocalRepository} = require('./src/repo');
   const {OwnersBot} = require('./src/owners_bot');
 

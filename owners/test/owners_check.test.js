@@ -21,7 +21,7 @@ const {
   OwnersCheck,
 } = require('../src/owners_check');
 const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
-const {Team} = require('../src/github');
+const {Team} = require('../src/api/github');
 const {OwnersTree} = require('../src/owners_tree');
 const {OwnersRule, ReviewerSetRule} = require('../src/rules');
 const {ReviewerSelection} = require('../src/reviewer_selection');

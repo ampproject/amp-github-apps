@@ -16,7 +16,7 @@
 
 const sinon = require('sinon');
 
-const {CloudStorage} = require('../../src/cloud_storage');
+const CloudStorage = require('../../src/api/cloud_storage');
 const CompoundCache = require('../../src/cache/compound_cache');
 const CloudStorageCache = require('../../src/cache/cloud_storage_cache');
 const MemoryCache = require('../../src/cache/memory_cache');

@@ -16,7 +16,7 @@
 
 const sinon = require('sinon');
 
-const {CloudStorage} = require('../src/cloud_storage');
+const CloudStorage = require('../../src/api/cloud_storage');
 
 describe('cloud storage', () => {
   let sandbox;
