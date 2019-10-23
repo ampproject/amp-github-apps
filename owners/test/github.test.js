@@ -16,6 +16,7 @@
 
 const nock = require('nock');
 const sinon = require('sinon');
+const Octokit = require('@octokit/rest');
 const {Probot} = require('probot');
 const owners = require('..');
 const {OwnersBot} = require('../src/owners_bot');
@@ -116,12 +117,17 @@ describe('GitHub API', () => {
   let probot;
   let app;
   let sandbox = sinon.createSandbox();
+  let githubClient;
+  let github;
 
   beforeEach(() => {
     sandbox.stub(console);
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
     sandbox.stub(OwnersBot.prototype, 'refreshTree').resolves();
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
+
+    githubClient = new Octokit({auth: '_TOKEN_'});
+    github = new GitHub(githubClient, 'test_owner', 'test_repo');
     probot = new Probot({});
     app = probot.load(owners);
 
@@ -177,8 +183,6 @@ describe('GitHub API', () => {
   });
 
   describe('repo', () => {
-    const github = new GitHub({}, 'test_owner', 'test_repo');
-
     it('returns the repo and owner', () => {
       const repoInfo = github.repo();
 
@@ -197,7 +201,6 @@ describe('GitHub API', () => {
   describe('customRequest', () => {
     beforeEach(() => {
       sandbox.stub(process, 'env').value({
-        GITHUB_ACCESS_TOKEN: '_TOKEN_',
         NODE_ENV: 'test',
       });
     });
@@ -208,13 +211,8 @@ describe('GitHub API', () => {
         .get('/api/endpoint')
         .reply(200, '_DATA_');
 
-      await withContext(async (context, github) => {
-        const responseData = await github._customRequest(
-          'GET',
-          '/api/endpoint'
-        );
-        expect(responseData.data).toEqual('_DATA_');
-      })();
+      const response = await github._customRequest('GET', '/api/endpoint');
+      expect(response.data).toEqual('_DATA_');
     });
 
     it('includes POST data', async () => {
@@ -226,9 +224,7 @@ describe('GitHub API', () => {
         })
         .reply(200);
 
-      await withContext(async (context, github) => {
-        await github._customRequest('POST', '/api/endpoint', {body: 'BODY'});
-      })();
+      await github._customRequest('POST', '/api/endpoint', {body: 'BODY'});
     });
 
     it('adds the preview header', async () => {
@@ -244,9 +240,7 @@ describe('GitHub API', () => {
           );
         });
 
-      await withContext(async (context, github) => {
-        await github._customRequest('GET', '/api/endpoint');
-      })();
+      await github._customRequest('GET', '/api/endpoint');
     });
   });
 
@@ -256,14 +250,11 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?page=1&per_page=100')
         .reply(200, [{id: 1337, slug: 'my_team'}]);
+      const teams = await github.getTeams();
 
-      await withContext(async (context, github) => {
-        const teams = await github.getTeams();
-
-        expect(teams[0].id).toEqual(1337);
-        expect(teams[0].org).toEqual('test_owner');
-        expect(teams[0].slug).toEqual('my_team');
-      })();
+      expect(teams[0].id).toEqual(1337);
+      expect(teams[0].org).toEqual('test_owner');
+      expect(teams[0].slug).toEqual('my_team');
     });
 
     it('pages automatically', async () => {
@@ -276,12 +267,9 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?page=2&per_page=100')
         .reply(200, Array(10).fill([{id: 1337, slug: 'my_team'}]));
+      const teams = await github.getTeams();
 
-      await withContext(async (context, github) => {
-        const teams = await github.getTeams();
-
-        expect(teams.length).toEqual(40);
-      })();
+      expect(teams.length).toEqual(40);
     });
   });
 
