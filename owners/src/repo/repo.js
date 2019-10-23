@@ -15,26 +15,35 @@
  */
 
 /**
- * Generic file cache interface.
+ * Interface for reading from a GitHub repository.
+ * @Interface
  */
-module.exports = class AbstractFileCache {
+module.exports = class Repository {
   /**
-   * Fetch the contents of a file.
-   *
-   * @param {string} filename file to get contents of.
-   * @param {string} getContents function to get contents if file not in cache.
-   * @return {string} file contents.
+   * Perform any required syncing with the repository.
    */
-  async readFile(filename, getContents) {
+  async sync() {
     throw new Error('Not implemented');
   }
 
   /**
-   * Invalidate the cache for a file.
+   * Read the contents of a file from the repo.
    *
-   * @param {string} filename file to drop from the cache.
+   * @param {string} relativePath file to read.
+   * @return {string} file contents.
    */
-  async invalidate(filename) {
+  async readFile(relativePath) {
+    throw new Error('Not implemented');
+  }
+
+  /**
+   * Finds all OWNERS files in the checked out repository.
+   *
+   * Assumes repo is already checked out.
+   *
+   * @return {!Array<string>} a list of relative OWNERS file paths.
+   */
+  async findOwnersFiles() {
     throw new Error('Not implemented');
   }
 };

@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-const FileCache = require('./file_cache');
-
 /**
- * An in-memory file cache.
+ * Generic file cache interface.
+ * @interface
  */
-module.exports = class MemoryCache extends FileCache {
-  /**
-   * Constructor.
-   *
-   * @param {Logger=} [logger=console] logging interface.
-   */
-  constructor(logger) {
-    super();
-    this.files = new Map();
-    this.logger = logger || console;
-  }
-
+module.exports = class FileCache {
   /**
    * Fetch the contents of a file.
    *
@@ -39,18 +27,7 @@ module.exports = class MemoryCache extends FileCache {
    * @return {string} file contents.
    */
   async readFile(filename, getContents) {
-    this.logger.debug(`Fetching "${filename}" from in-memory cache`);
-    if (this.files.has(filename)) {
-      return this.files.get(filename);
-    }
-
-    this.logger.debug(`Cache miss on "${filename}"`);
-    const contents = await getContents();
-
-    this.logger.debug(`Storing "${filename}" to in-memory cache`);
-    this.files.set(filename, contents);
-
-    return contents;
+    throw new Error('Not implemented');
   }
 
   /**
@@ -59,7 +36,6 @@ module.exports = class MemoryCache extends FileCache {
    * @param {string} filename file to drop from the cache.
    */
   async invalidate(filename) {
-    this.logger.debug(`Invalidating in-memory cache of "${filename}"`);
-    this.files.delete(filename);
+    throw new Error('Not implemented');
   }
 };

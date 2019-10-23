@@ -21,7 +21,7 @@ const path = require('path');
 
 const InfoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/github');
-const {LocalRepository} = require('./src/repo');
+const LocalRepository = require('./src/repo/local_repo');
 const {OwnersBot} = require('./src/owners_bot');
 const {OwnersCheck} = require('./src/owners_check');
 

@@ -16,7 +16,7 @@
 
 const sinon = require('sinon');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
-const {LocalRepository} = require('../src/repo');
+const LocalRepository = require('../src/repo/local_repo');
 const {OwnersBot} = require('../src/owners_bot');
 const {OwnersParser} = require('../src/parser');
 const {OwnersNotifier} = require('../src/notifier');
