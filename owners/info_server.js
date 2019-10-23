@@ -16,9 +16,6 @@
 
 const express = require('express');
 
-const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
-const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
-
 /**
  * Generic server wrapping express routing.
  */
@@ -130,7 +127,7 @@ class InfoServer extends Server {
   initRoutes() {
     this.get('/status', async req =>
       [
-        `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
+        `The OWNERS bot is live and running on ${process.env.GITHUB_REPO}!`,
         '<a href="/tree">Owners Tree</a>',
         '<a href="/teams">Organization Teams</a>',
       ].join('<br>')
@@ -174,7 +171,6 @@ class InfoServer extends Server {
     });
   }
 }
-
 
 if (require.main === module) {
   const {github, ownersBot} = require('./bootstrap')(console);

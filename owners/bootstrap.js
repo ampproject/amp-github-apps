@@ -41,7 +41,6 @@ function bootstrap(logger) {
 
     const {
       GITHUB_REPO,
-      GITHUB_REPO_DIR,
       GITHUB_ACCESS_TOKEN,
       CLOUD_STORAGE_BUCKET,
     } = process.env;
@@ -60,9 +59,10 @@ function bootstrap(logger) {
     const ownersBot = new OwnersBot(repo);
 
     const teamsInitialized = ownersBot.initTeams(github);
-    cacheWarmed = repo.findOwnersFiles().then(
-      ownersFiles => Promise.all(ownersFiles.map(repo.readFile, repo))
-    );
+    const cacheWarmed = repo
+      .findOwnersFiles()
+      .then(ownersFiles => Promise.all(ownersFiles.map(repo.readFile, repo)))
+      .then(() => ownersBot.reparseTree(logger));
     const initialized = Promise.all([teamsInitialized, cacheWarmed])
       .then(() => ownersBot.reparseTree(logger))
       .catch(err => {
