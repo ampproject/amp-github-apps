@@ -132,13 +132,11 @@ module.exports = app => {
   app.route('/admin').get('/check/:prNumber', async (req, res) => {
     const pr = await sharedGithub.getPullRequest(req.params.prNumber);
     const {changedFiles, reviewers} = await ownersBot.initPr(sharedGithub, pr);
-    const ownersCheck = new OwnersCheck(
+    const {checkRun} = new OwnersCheck(
       ownersBot.treeParse.result,
       changedFiles,
       reviewers
-    );
-
-    const {checkRun} = ownersCheck.run();
+    ).run();
 
     res.send(checkRun.json);
   });
