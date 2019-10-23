@@ -19,7 +19,7 @@ require('dotenv').config();
 const Octokit = require('@octokit/rest');
 const path = require('path');
 
-const infoServer = require('./info_server');
+const InfoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/github');
 const {LocalRepository} = require('./src/repo');
 const {OwnersBot} = require('./src/owners_bot');
@@ -124,7 +124,8 @@ module.exports = app => {
   });
 
   if (process.env.NODE_ENV !== 'test') {
-    infoServer(INFO_SERVER_PORT, ownersBot, app.log);
+    const infoServer = new InfoServer(ownersBot, sharedGithub, null, app.log);
+    infoServer.listen(INFO_SERVER_PORT);
   }
 
   // Since this endpoint triggers a ton of GitHub API requests, there is a risk
