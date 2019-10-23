@@ -16,8 +16,9 @@
 
 /**
  * Generic file cache interface.
+ * @interface
  */
-module.exports = class AbstractFileCache {
+module.exports = class FileCache {
   /**
    * Fetch the contents of a file.
    *

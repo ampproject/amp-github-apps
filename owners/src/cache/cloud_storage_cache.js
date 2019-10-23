@@ -15,12 +15,12 @@
  */
 
 const {CloudStorage} = require('../cloud_storage');
-const AbstractFileCache = require('./abstract_file_cache');
+const FileCache = require('./file_cache');
 
 /**
  * A Cloud Storage-backed file cache.
  */
-module.exports = class CloudStorageCache extends AbstractFileCache {
+module.exports = class CloudStorageCache extends FileCache {
   /**
    * Constructor.
    *

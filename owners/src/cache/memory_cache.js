@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-const AbstractFileCache = require('./abstract_file_cache');
+const FileCache = require('./file_cache');
 
 /**
  * An in-memory file cache.
  */
-module.exports = class MemoryCache extends AbstractFileCache {
+module.exports = class MemoryCache extends FileCache {
   /**
    * Constructor.
    *

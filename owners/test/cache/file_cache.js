@@ -15,7 +15,7 @@
  */
 
 const sinon = require('sinon');
-const AbstractFileCache = require('../../src/cache/abstract_file_cache');
+const FileCache = require('../../src/cache/file_cache');
 
 describe('abstract file cache', () => {
   const sandbox = sinon.createSandbox();
@@ -24,7 +24,7 @@ describe('abstract file cache', () => {
 
   beforeEach(() => {
     sandbox.stub(console);
-    cache = new AbstractFileCache();
+    cache = new FileCache();
     getContents = sinon.spy(async () => 'OWNERS file contents');
   });
 

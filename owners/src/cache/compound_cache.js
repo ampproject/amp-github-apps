@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const AbstractFileCache = require('./abstract_file_cache');
+const FileCache = require('./file_cache');
 const MemoryCache = require('./memory_cache');
 const CloudStorageCache = require('./cloud_storage_cache');
 
@@ -27,7 +27,7 @@ const CloudStorageCache = require('./cloud_storage_cache');
  * collection of OWNERS files on startup (preventing it from blasting the GitHub
  * API on startup).
  */
-module.exports = class CompoundCache extends AbstractFileCache {
+module.exports = class CompoundCache extends FileCache {
   /**
    * Constructor.
    *
