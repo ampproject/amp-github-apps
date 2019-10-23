@@ -57,7 +57,7 @@ class OwnersBot {
     const teamList = await github.getTeams();
     for (const team of teamList) {
       await this.syncTeam(team, github);
-      sleep(this.GITHUB_GET_MEMBERS_DELAY);
+      await sleep(this.GITHUB_GET_MEMBERS_DELAY);
     }
   }
 
