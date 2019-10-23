@@ -15,34 +15,12 @@
  */
 
 const {CloudStorage} = require('../cloud_storage');
-
-/**
- * A generic cache interface.
- */
-class FileCache {
-  /**
-   * Fetch the contents of a file.
-   *
-   * @param {string} filename file to get contents of.
-   * @param {string} getContents function to get contents if file not in cache.
-   * @return {string} file contents.
-   */
-  async readFile(filename, getContents) {
-    return await getContents();
-  }
-
-  /**
-   * Invalidate the cache for a file.
-   *
-   * @param {string} filename file to drop from the cache.
-   */
-  async invalidate(filename) {}
-}
+const AbstractFileCache = require('./abstract_file_cache');
 
 /**
  * A Cloud Storage-backed file cache.
  */
-class CloudStorageCache extends FileCache {
+class CloudStorageCache extends AbstractFileCache {
   /**
    * Constructor.
    *
@@ -96,7 +74,7 @@ class CloudStorageCache extends FileCache {
 /**
  * An in-memory file cache.
  */
-class MemoryCache extends FileCache {
+class MemoryCache extends AbstractFileCache {
   /**
    * Constructor.
    *
@@ -150,7 +128,7 @@ class MemoryCache extends FileCache {
  * collection of OWNERS files on startup (preventing it from blasting the GitHub
  * API on startup).
  */
-class CompoundCache extends FileCache {
+class CompoundCache extends AbstractFileCache {
   /**
    * Constructor.
    *
@@ -188,4 +166,4 @@ class CompoundCache extends FileCache {
   }
 }
 
-module.exports = {FileCache, CloudStorageCache, CompoundCache, MemoryCache};
+module.exports = {CloudStorageCache, CompoundCache, MemoryCache};

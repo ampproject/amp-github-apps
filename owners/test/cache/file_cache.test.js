@@ -18,7 +18,6 @@ const sinon = require('sinon');
 
 const {CloudStorage} = require('../../src/cloud_storage');
 const {
-  FileCache,
   CloudStorageCache,
   CompoundCache,
   MemoryCache,
@@ -35,22 +34,6 @@ describe('file caches', () => {
 
   afterEach(() => {
     sandbox.restore();
-  });
-
-  describe('no cache backend', () => {
-    let cache;
-
-    beforeEach(() => {
-      cache = new FileCache();
-    });
-
-    describe('readFile', () => {
-      it('returns the result of the provided function', async () => {
-        expect.assertions(1);
-        const contents = await cache.readFile('foo/OWNERS', getContents);
-        expect(contents).toEqual('OWNERS file contents');
-      });
-    });
   });
 
   describe('Cloud Storage-backed', () => {
