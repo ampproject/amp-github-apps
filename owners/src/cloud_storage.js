@@ -24,7 +24,7 @@ class CloudStorage {
    * Constructor.
    *
    * @param {string} bucketName Cloud Storage bucket name.
-   * @param {Logger=} [logger=console] logging interface.
+   * @param {Logger} [logger=console] logging interface.
    */
   constructor(bucketName, logger) {
     this.storage = new Storage();

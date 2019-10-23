@@ -139,7 +139,7 @@ class GitHub {
    *     https://probot.github.io/api/latest/interfaces/githubapi.html).
    * @param {string} owner GitHub repository owner.
    * @param {string} repository GitHub repository name.
-   * @param {Logger=} [logger=console] logging interface.
+   * @param {Logger} [logger=console] logging interface.
    */
   constructor(client, owner, repository, logger) {
     Object.assign(this, {client, owner, repository, logger: logger || console});

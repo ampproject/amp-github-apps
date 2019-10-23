@@ -75,7 +75,7 @@ class OwnersBot {
   /**
    * Update the owners tree.
    *
-   * @param {Logger=} [logger=console] logging interface
+   * @param {Logger} [logger=console] logging interface
    */
   async refreshTree(logger) {
     logger = logger || console;
@@ -115,7 +115,7 @@ class OwnersBot {
    *
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to run owners check on.
-   * @param {?boolean=} [requestOwners=false] request reviews from owners.
+   * @param {?boolean} [requestOwners=false] request reviews from owners.
    */
   async runOwnersCheck(github, pr, requestOwners) {
     if (!pr.isOpen) {
