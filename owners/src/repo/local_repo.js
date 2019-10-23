@@ -127,4 +127,4 @@ module.exports = class LocalRepository extends AbstractRepository {
 
     return ownersFiles.trim().split('\n');
   }
-}
+};

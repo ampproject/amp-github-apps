@@ -18,7 +18,6 @@ const childProcess = require('child_process');
 const sinon = require('sinon');
 const fs = require('fs');
 const path = require('path');
-const {GitHub} = require('../../src/github');
 const LocalRepository = require('../../src/repo/local_repo');
 
 describe('local repository', () => {

@@ -43,4 +43,4 @@ module.exports = class AbstractRepository {
   async findOwnersFiles() {
     throw new Error('Not implemented');
   }
-}
+};
