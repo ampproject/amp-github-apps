@@ -120,6 +120,10 @@ describe('GitHub API', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     sandbox.stub(console);
+    sandbox.stub(process, 'env').value({
+      GITHUB_REPO: 'test_repo/test_owner',
+      NODE_ENV: 'test',
+    });
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
     sandbox.stub(OwnersBot.prototype, 'refreshTree').resolves();
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
