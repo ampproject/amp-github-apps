@@ -15,20 +15,17 @@
  */
 
 const express = require('express');
-const bodyParser = require('body-parser');
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 
 /**
  * Info server entrypoint.
  *
- * @param {number} port port to run the server on.
  * @param {!OwnersBot} ownersBot owners bot instance.
- * @param {!Logger} logger logging interface.
+ * @parma {!express.App} express app.
  */
-module.exports = (port, ownersBot, logger) => {
+module.exports = (ownersBot) => {
   const app = express();
-  app.use(bodyParser.json());
 
   app.get('/status', (req, res) => {
     res.send(
@@ -69,7 +66,5 @@ module.exports = (port, ownersBot, logger) => {
     res.send(['<h2>Teams</h2>', ...teamSections].join('<br><br>'));
   });
 
-  app.listen(port, () => {
-    logger.info(`Starting info server on port ${port}`);
-  });
+  return app;
 };

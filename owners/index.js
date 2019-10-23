@@ -121,7 +121,9 @@ module.exports = app => {
   });
 
   if (process.env.NODE_ENV !== 'test') {
-    infoServer(INFO_SERVER_PORT, ownersBot, app.log);
+    infoServer(ownersBot).listen(INFO_SERVER_PORT, () => {
+      app.log.info(`Starting info server on port ${INFO_SERVER_PORT}`);
+    });
   }
 
   // Since this endpoint triggers a ton of GitHub API requests, there is a risk
