@@ -19,7 +19,7 @@ const {Storage} = require('@google-cloud/storage');
 /**
  * Google Cloud Storage interface for uploading and downloading files.
  */
-class CloudStorage {
+module.exports = class CloudStorage {
   /**
    * Constructor.
    *
@@ -74,6 +74,4 @@ class CloudStorage {
     this.logger.info(`Deleting "${filename}" from Cloud Storage`);
     await this.file(filename).delete();
   }
-}
-
-module.exports = {CloudStorage};
+};
