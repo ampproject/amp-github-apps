@@ -141,7 +141,7 @@ class GitHub {
    * @param {string} repository GitHub repository name.
    * @param {Logger} logger logging interface.
    */
-  constructor(client, owner, repository, logger=console) {
+  constructor(client, owner, repository, logger = console) {
     Object.assign(this, {client, owner, repository, logger});
   }
 

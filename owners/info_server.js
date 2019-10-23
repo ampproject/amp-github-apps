@@ -30,7 +30,7 @@ class Server {
    * @param {Logger} logger logging interface.
    * @param {function} initRoutes function adding routes.
    */
-  constructor(app, logger=console) {
+  constructor(app, logger = console) {
     this.app = app || express();
     this.logger = logger;
     this.initRoutes();
@@ -99,7 +99,7 @@ class InfoServer extends Server {
    * @param {?express.App} app optional Express app to use.
    * @param {Logger} logger logging interface.
    */
-  constructor(ownersBot, github, app, logger=console) {
+  constructor(ownersBot, github, app, logger = console) {
     super(app, logger);
     this.github = github;
     this.ownersBot = ownersBot;

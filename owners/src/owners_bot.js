@@ -77,8 +77,7 @@ class OwnersBot {
    *
    * @param {Logger} logger logging interface
    */
-  async refreshTree(logger=console) {
-    logger = logger;
+  async refreshTree(logger = console) {
     logger.info(`Refreshing owners tree`);
 
     await this.repo.sync();
@@ -117,7 +116,7 @@ class OwnersBot {
    * @param {!PullRequest} pr pull request to run owners check on.
    * @param {?boolean} requestOwners request reviews from owners.
    */
-  async runOwnersCheck(github, pr, requestOwners=false) {
+  async runOwnersCheck(github, pr, requestOwners = false) {
     if (!pr.isOpen) {
       return;
     }

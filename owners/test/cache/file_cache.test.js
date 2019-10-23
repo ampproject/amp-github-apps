@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
 const FileCache = require('../../src/cache/file_cache');
 
 describe('abstract file cache', () => {

@@ -27,7 +27,7 @@ class OwnersTree {
    * @param {?string} dirPath relative directory containing owners file.
    * @param {?OwnersTree} parent parent tree of the node.
    */
-  constructor(dirPath='.', parent=null) {
+  constructor(dirPath = '.', parent = null) {
     this.parent = parent;
     this.dirPath = dirPath;
 
