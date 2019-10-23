@@ -75,10 +75,10 @@ class OwnersBot {
   /**
    * Update the owners tree.
    *
-   * @param {Logger} [logger=console] logging interface
+   * @param {Logger} logger logging interface
    */
-  async refreshTree(logger) {
-    logger = logger || console;
+  async refreshTree(logger=console) {
+    logger = logger;
     logger.info(`Refreshing owners tree`);
 
     await this.repo.sync();
