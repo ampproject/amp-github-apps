@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-const {Repository} = require('./repo');
+const AbstractRepository = require('./abstract_repo');
 
 /**
  * Virtual in-memory repository holding owners files.
  */
-module.exports = class VirtualRepository extends Repository {
+module.exports = class VirtualRepository extends AbstractRepository {
   /**
    * Constructor.
    *

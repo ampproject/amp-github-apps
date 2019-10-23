@@ -19,7 +19,7 @@ const fs = require('fs');
 const childProcess = require('child_process');
 const util = require('util');
 const exec = util.promisify(childProcess.exec);
-const {Repository} = require('./repo');
+const AbstractRepository = require('./abstract_repo');
 
 /**
  * Execute raw shell commands.
@@ -39,7 +39,7 @@ async function runCommands(...commands) {
 /**
  * Interface for reading from a checked out repository using relative paths.
  */
-module.exports = class LocalRepository extends Repository {
+module.exports = class LocalRepository extends AbstractRepository {
   /**
    * Constructor.
    *

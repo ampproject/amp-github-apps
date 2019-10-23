@@ -17,7 +17,7 @@
 /**
  * Interface for reading from a GitHub repository.
  */
-class Repository {
+module.exports = class AbstractRepository {
   /**
    * Perform any required syncing with the repository.
    */
@@ -44,5 +44,3 @@ class Repository {
     throw new Error('Not implemented');
   }
 }
-
-module.exports = {Repository};

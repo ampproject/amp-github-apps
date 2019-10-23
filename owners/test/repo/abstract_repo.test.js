@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-const {Repository} = require('../../src/repo/repo');
+const AbstractRepository = require('../../src/repo/abstract_repo');
 
-describe('repository', () => {
-  const repo = new Repository();
+describe('abstract repository', () => {
+  const repo = new AbstractRepository();
 
   describe('readFile', () => {
     it('throws an error', () => {
