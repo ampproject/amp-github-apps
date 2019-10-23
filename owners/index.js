@@ -42,12 +42,12 @@ module.exports = app => {
   const ownersBot = new OwnersBot(repo);
 
   const teamsInitialized = ownersBot.initTeams(sharedGithub);
-  const appInitialized = teamsInitialized.then(() =>
-    ownersBot.refreshTree(app.log)
-  ).catch(err => {
-    console.error(err);
-    process.exit(1);
-  });
+  const appInitialized = teamsInitialized
+    .then(() => ownersBot.refreshTree(app.log))
+    .catch(err => {
+      console.error(err);
+      process.exit(1);
+    });
 
   /**
    * Listen for webhooks and provide handlers with a GitHub interface and the

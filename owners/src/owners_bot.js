@@ -140,8 +140,10 @@ class OwnersBot {
     }
 
     const suggestedReviewers = requestOwners ? ownersCheck.reviewers : [];
-    await new OwnersNotifier(pr, reviewers, tree, changedFiles)
-      .notify(github, suggestedReviewers);
+    await new OwnersNotifier(pr, reviewers, tree, changedFiles).notify(
+      github,
+      suggestedReviewers
+    );
   }
 
   /**
