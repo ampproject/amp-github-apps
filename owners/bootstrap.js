@@ -60,8 +60,11 @@ function bootstrap(logger) {
     const ownersBot = new OwnersBot(repo);
 
     const teamsInitialized = ownersBot.initTeams(github);
-    const initialized = teamsInitialized
-      .then(() => ownersBot.refreshTree(logger))
+    cacheWarmed = repo.findOwnersFiles().then(
+      ownersFiles => Promise.all(ownersFiles.map(repo.readFile, repo))
+    );
+    const initialized = Promise.all([teamsInitialized, cacheWarmed])
+      .then(() => ownersBot.reparseTree(logger))
       .catch(err => {
         logger.error(err);
         process.exit(1);
