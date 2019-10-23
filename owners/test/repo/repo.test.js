@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-const {GitHub} = require('../src/github');
-const {Repository, LocalRepository, VirtualRepository} = require('../src/repo');
-const {CompoundCache} = require('../src/file_cache');
-const {CloudStorage} = require('../src/cloud_storage');
+const {GitHub} = require('../../src/github');
+const {Repository, LocalRepository, VirtualRepository} = require('../../src/repo/repo');
+const {CompoundCache} = require('../../src/file_cache');
+const {CloudStorage} = require('../../src/cloud_storage');
 const childProcess = require('child_process');
 const sinon = require('sinon');
 const fs = require('fs');
@@ -266,7 +266,7 @@ describe('local repository', () => {
         return callback(error ? {stdout, stderr} : null, {stdout, stderr});
       });
 
-      const {LocalRepository} = require('../src/repo');
+      const {LocalRepository} = require('../../src/repo/repo');
       repo = new LocalRepository('path/to/repo');
     }
 
