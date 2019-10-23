@@ -81,6 +81,15 @@ class OwnersBot {
     logger.info(`Refreshing owners tree`);
 
     await this.repo.sync();
+    await this.reparseTree(logger);
+  }
+
+  /**
+   * Update the owners tree.
+   *
+   * @param {Logger} logger logging interface
+   */
+  async reparseTree(logger = console) {
     this.treeParse = await this.parser.parseOwnersTree();
     this.treeParse.errors.forEach(logger.warn, logger);
   }
