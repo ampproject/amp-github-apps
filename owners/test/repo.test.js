@@ -67,7 +67,10 @@ describe('virtual repository', () => {
         {filename: 'foo/OWNERS', sha: 'sha_2'},
       ])
       .onSecondCall()
-      .returns([{filename: 'OWNERS', sha: 'sha_updated'}]);
+      .returns([
+        {filename: 'OWNERS', sha: 'sha_updated'},
+        {filename: 'foo/OWNERS', sha: 'sha_2'},
+      ]);
   });
 
   afterEach(() => {
@@ -202,6 +205,16 @@ describe('local repository', () => {
 
     it('defaults to "origin" remote', () => {
       expect(repo.remote).toEqual('origin');
+    });
+  });
+
+  describe('sync', () => {
+    it('checks out the local repository', async done => {
+      sandbox.stub(LocalRepository.prototype, 'checkout');
+      await repo.sync();
+
+      sandbox.assert.calledOnce(repo.checkout);
+      done();
     });
   });
 

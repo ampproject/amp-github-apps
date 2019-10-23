@@ -127,22 +127,23 @@ class OwnersBot {
 
     const checkRunIdMap = await github.getCheckRunIds(pr.headSha);
     const checkRunId = checkRunIdMap[OWNERS_CHECKRUN_NAME];
-    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers);
-    const ownersCheckResult = ownersCheck.run();
+    const ownersCheck = new OwnersCheck(tree, changedFiles, reviewers).run();
 
     if (checkRunId) {
-      await github.updateCheckRun(checkRunId, ownersCheckResult.checkRun);
+      await github.updateCheckRun(checkRunId, ownersCheck.checkRun);
     } else {
       // We need to add a delay on the PR creation and check creation since
       // GitHub might not be ready.
       // TODO(rcebulko): Verify this is still needed.
       await sleep(this.GITHUB_CHECKRUN_DELAY);
-      await github.createCheckRun(pr.headSha, ownersCheckResult.checkRun);
+      await github.createCheckRun(pr.headSha, ownersCheck.checkRun);
     }
 
-    const suggestedReviewers = requestOwners ? ownersCheckResult.reviewers : [];
-    const notifier = new OwnersNotifier(pr, reviewers, tree, changedFiles);
-    await notifier.notify(github, suggestedReviewers);
+    const suggestedReviewers = requestOwners ? ownersCheck.reviewers : [];
+    await new OwnersNotifier(pr, reviewers, tree, changedFiles).notify(
+      github,
+      suggestedReviewers
+    );
   }
 
   /**

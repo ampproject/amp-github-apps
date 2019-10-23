@@ -188,4 +188,4 @@ class CompoundCache extends FileCache {
   }
 }
 
-module.exports = {CloudStorageCache, CompoundCache, MemoryCache};
+module.exports = {FileCache, CloudStorageCache, CompoundCache, MemoryCache};

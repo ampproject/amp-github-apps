@@ -136,6 +136,8 @@ class VirtualRepository extends Repository {
         );
         this._fileRefs.set(filename, sha);
         this.cache.invalidate(filename);
+      } else {
+        this.logger.debug(`Ignoring unchanged file "${filename}"`);
       }
     });
 
