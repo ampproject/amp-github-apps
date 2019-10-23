@@ -20,8 +20,8 @@ const {CloudStorage} = require('../../src/cloud_storage');
 const {
   CloudStorageCache,
   CompoundCache,
-  MemoryCache,
 } = require('../../src/cache/file_cache');
+const MemoryCache = require('../../src/cache/memory_cache');
 
 describe('file caches', () => {
   const sandbox = sinon.createSandbox();
@@ -115,60 +115,6 @@ describe('file caches', () => {
 
         sandbox.assert.calledWith(cache.storage.delete, 'foo/OWNERS');
         done();
-      });
-    });
-  });
-
-  describe('memory-backed', () => {
-    let cache;
-
-    beforeEach(() => {
-      cache = new MemoryCache();
-    });
-
-    describe('readFile', () => {
-      describe('when the file is in the cache', () => {
-        beforeEach(() => {
-          cache.files.set('foo/OWNERS', 'OWNERS file contents');
-        });
-
-        it('returns the file contents', async () => {
-          const contents = await cache.readFile('foo/OWNERS', getContents);
-          expect(contents).toEqual('OWNERS file contents');
-        });
-
-        it('does not get the contents from the provided method', async done => {
-          await cache.readFile('foo/OWNERS', getContents);
-          sandbox.assert.notCalled(getContents);
-          done();
-        });
-      });
-
-      describe('when the file is not in the cache', () => {
-        it('calls the provided method to get the file contents', async () => {
-          expect.assertions(1);
-          const contents = await cache.readFile('foo/OWNERS', getContents);
-
-          expect(contents).toEqual('OWNERS file contents');
-          sandbox.assert.calledOnce(getContents);
-        });
-
-        it('saves the contents to the cache', async () => {
-          expect.assertions(1);
-          await cache.readFile('foo/OWNERS', getContents);
-
-          expect(cache.files.get('foo/OWNERS')).toEqual('OWNERS file contents');
-        });
-      });
-    });
-
-    describe('invalidate', () => {
-      it('deletes the invalidated file cache from memory', async () => {
-        expect.assertions(1);
-        cache.files.set('foo/OWNERS', 'outdated file contents');
-        await cache.invalidate('foo/OWNERS');
-
-        expect(cache.files.has('foo/OWNERS')).toBe(false);
       });
     });
   });

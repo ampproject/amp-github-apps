@@ -16,6 +16,7 @@
 
 const {CloudStorage} = require('../cloud_storage');
 const AbstractFileCache = require('./abstract_file_cache');
+const MemoryCache = require('./memory_cache');
 
 /**
  * A Cloud Storage-backed file cache.
@@ -72,54 +73,6 @@ class CloudStorageCache extends AbstractFileCache {
 }
 
 /**
- * An in-memory file cache.
- */
-class MemoryCache extends AbstractFileCache {
-  /**
-   * Constructor.
-   *
-   * @param {Logger=} [logger=console] logging interface.
-   */
-  constructor(logger) {
-    super();
-    this.files = new Map();
-    this.logger = logger || console;
-  }
-
-  /**
-   * Fetch the contents of a file.
-   *
-   * @param {string} filename file to get contents of.
-   * @param {string} getContents function to get contents if file not in cache.
-   * @return {string} file contents.
-   */
-  async readFile(filename, getContents) {
-    this.logger.debug(`Fetching "${filename}" from in-memory cache`);
-    if (this.files.has(filename)) {
-      return this.files.get(filename);
-    }
-
-    this.logger.debug(`Cache miss on "${filename}"`);
-    const contents = await getContents();
-
-    this.logger.debug(`Storing "${filename}" to in-memory cache`);
-    this.files.set(filename, contents);
-
-    return contents;
-  }
-
-  /**
-   * Invalidate the cache for a file.
-   *
-   * @param {string} filename file to drop from the cache.
-   */
-  async invalidate(filename) {
-    this.logger.debug(`Invalidating in-memory cache of "${filename}"`);
-    this.files.delete(filename);
-  }
-}
-
-/**
  * A compound cache maintaining files in-memory and backed up by Cloud Storage.
  *
  * The memory cache allows the app to keep key owners files in memory for when
@@ -166,4 +119,4 @@ class CompoundCache extends AbstractFileCache {
   }
 }
 
-module.exports = {CloudStorageCache, CompoundCache, MemoryCache};
+module.exports = {CloudStorageCache, CompoundCache};
