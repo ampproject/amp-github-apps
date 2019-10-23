@@ -27,7 +27,7 @@ const CloudStorageCache = require('./cloud_storage_cache');
  * collection of OWNERS files on startup (preventing it from blasting the GitHub
  * API on startup).
  */
-class CompoundCache extends AbstractFileCache {
+module.exports = class CompoundCache extends AbstractFileCache {
   /**
    * Constructor.
    *
@@ -64,5 +64,3 @@ class CompoundCache extends AbstractFileCache {
     await this.cloudStorageCache.invalidate(filename);
   }
 }
-
-module.exports = {CompoundCache};
