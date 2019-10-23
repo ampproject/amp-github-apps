@@ -137,4 +137,24 @@ class InfoServer extends Server {
   }
 }
 
+if (require.main === module) {
+  require('dotenv').config();
+
+  const {LocalRepository} = require('./src/repo');
+  const {OwnersBot} = require('./src/owners_bot');
+
+  const repo = new LocalRepository(process.env.GITHUB_REPO_DIR);
+  const ownersBot = new OwnersBot(repo);
+  const infoServer = new InfoServer(ownersBot);
+  infoServer.listen(process.env.INFO_SERVER_PORT);
+
+  const teamsInitialized = Promise.resolve();//ownersBot.initTeams(sharedGithub);
+  const appInitialized = teamsInitialized.then(() =>
+    ownersBot.refreshTree()
+  ).catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
+}
+
 module.exports = InfoServer;
