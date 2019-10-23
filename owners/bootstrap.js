@@ -36,7 +36,7 @@ function bootstrap(logger) {
 
     const Octokit = require('@octokit/rest');
     const {GitHub} = require('./src/github');
-    const {LocalRepository} = require('./src/repo');
+    const LocalRepository = require('./src/repo/local_repo');
     const {OwnersBot} = require('./src/owners_bot');
 
     const {GITHUB_REPO, GITHUB_REPO_DIR, GITHUB_ACCESS_TOKEN} = process.env;

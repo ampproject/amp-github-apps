@@ -19,6 +19,7 @@ const fs = require('fs');
 const childProcess = require('child_process');
 const util = require('util');
 const exec = util.promisify(childProcess.exec);
+const Repository = require('./repo');
 
 /**
  * Execute raw shell commands.
@@ -36,119 +37,9 @@ async function runCommands(...commands) {
 }
 
 /**
- * Interface for reading from a GitHub repository.
- */
-class Repository {
-  /**
-   * Perform any required syncing with the repository.
-   */
-  async sync() {}
-
-  /**
-   * Read the contents of a file from the repo.
-   *
-   * @param {string} relativePath file to read.
-   * @return {string} file contents.
-   */
-  async readFile(relativePath) {
-    throw new Error('Not implemented');
-  }
-
-  /**
-   * Finds all OWNERS files in the checked out repository.
-   *
-   * Assumes repo is already checked out.
-   *
-   * @return {!Array<string>} a list of relative OWNERS file paths.
-   */
-  async findOwnersFiles() {
-    throw new Error('Not implemented');
-  }
-}
-
-/**
- * Virtual in-memory repository holding owners files.
- */
-class VirtualRepository extends Repository {
-  /**
-   * Constructor.
-   *
-   * @param {!GitHub} github GitHub API interface.
-   * @param {!FileCache} cache file cache.
-   */
-  constructor(github, cache) {
-    super();
-    this.github = github;
-    this.logger = github.logger;
-    /** @type {!Map<string, string>} */
-    this._fileRefs = new Map();
-    this.cache = cache;
-  }
-
-  /**
-   * Fetch the latest versions of all OWNERS files.
-   */
-  async sync() {
-    await this.findOwnersFiles();
-  }
-
-  /**
-   * Read the contents of a file from the repo.
-   *
-   * @param {string} relativePath file to read.
-   * @return {string} file contents.
-   */
-  async readFile(relativePath) {
-    const fileSha = this._fileRefs.get(relativePath);
-    if (!fileSha) {
-      throw new Error(
-        `File "${relativePath}" not found in virtual repository; ` +
-          'can only read files found through `findOwnersFiles`.'
-      );
-    }
-
-    return await this.cache.readFile(relativePath, async () => {
-      return await this.github.getFileContents({
-        filename: relativePath,
-        sha: fileSha,
-      });
-    });
-  }
-
-  /**
-   * Finds all OWNERS files in the repository and records them as known files.
-   *
-   * @return {!Array<string>} a list of relative OWNERS file paths.
-   */
-  async findOwnersFiles() {
-    const ownersFiles = await this.github.searchFilename('OWNERS');
-
-    ownersFiles.forEach(({filename, sha}) => {
-      const fileSha = this._fileRefs.get(filename);
-      if (!fileSha) {
-        // File has never been fetched and should be added to the cache.
-        this.logger.info(`Recording SHA for file "${filename}"`);
-        this._fileRefs.set(filename, sha);
-      } else if (fileSha !== sha) {
-        // File has been updated and needs to be re-fetched.
-        this.logger.info(
-          `Updating SHA and clearing cache for file "${filename}"`
-        );
-        this._fileRefs.set(filename, sha);
-        this.cache.invalidate(filename);
-      } else {
-        this.logger.debug(`Ignoring unchanged file "${filename}"`);
-      }
-    });
-
-    return ownersFiles.map(({filename}) => filename);
-  }
-}
-
-/**
  * Interface for reading from a checked out repository using relative paths.
  */
-class LocalRepository extends Repository {
+module.exports = class LocalRepository extends Repository {
   /**
    * Constructor.
    *
@@ -236,6 +127,4 @@ class LocalRepository extends Repository {
 
     return ownersFiles.trim().split('\n');
   }
-}
-
-module.exports = {Repository, LocalRepository, VirtualRepository};
+};
