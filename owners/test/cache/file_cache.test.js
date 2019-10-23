@@ -16,13 +16,13 @@
 
 const sinon = require('sinon');
 
-const {CloudStorage} = require('../src/cloud_storage');
+const {CloudStorage} = require('../../src/cloud_storage');
 const {
   FileCache,
   CloudStorageCache,
   CompoundCache,
   MemoryCache,
-} = require('../src/file_cache');
+} = require('../../src/cache/file_cache');
 
 describe('file caches', () => {
   const sandbox = sinon.createSandbox();
