@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-const AbstractRepository = require('../../src/repo/abstract_repo');
+const Repository = require('../../src/repo/repo');
 
 describe('abstract repository', () => {
-  const repo = new AbstractRepository();
+  const repo = new Repository();
+
+  describe('sync', () => {
+    it('throws an error', () => {
+      expect(repo.sync()).rejects.toThrow('Not implemented');
+    });
+  });
 
   describe('readFile', () => {
     it('throws an error', () => {
-      expect(repo.readFile('foo/file.txt')).rejects.toEqual(
-        new Error('Not implemented')
-      );
+      expect(repo.readFile('foo/file.txt')).rejects.toThrow('Not implemented');
     });
   });
 
   describe('findOwnersFiles', () => {
     it('throws an error', () => {
-      expect(repo.findOwnersFiles()).rejects.toEqual(
-        new Error('Not implemented')
-      );
+      expect(repo.findOwnersFiles()).rejects.toThrow('Not implemented');
     });
   });
 });

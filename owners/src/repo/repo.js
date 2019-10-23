@@ -16,13 +16,15 @@
 
 /**
  * Interface for reading from a GitHub repository.
- * @interface
+ * @Interface
  */
-module.exports = class AbstractRepository {
+module.exports = class Repository {
   /**
    * Perform any required syncing with the repository.
    */
-  async sync() {}
+  async sync() {
+    throw new Error('Not implemented');
+  }
 
   /**
    * Read the contents of a file from the repo.
