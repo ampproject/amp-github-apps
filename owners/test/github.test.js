@@ -115,10 +115,9 @@ describe('team', () => {
 describe('GitHub API', () => {
   let probot;
   let app;
-  let sandbox;
+  let sandbox = sinon.createSandbox();
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
     sandbox.stub(console);
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
     sandbox.stub(OwnersBot.prototype, 'refreshTree').resolves();
@@ -178,25 +177,21 @@ describe('GitHub API', () => {
   });
 
   describe('repo', () => {
-    it(
-      'returns the repo and owner',
-      withContext((context, github) => {
-        const repoInfo = github.repo();
+    const github = new GitHub({}, 'test_owner', 'test_repo');
 
-        expect(repoInfo.owner).toEqual('test_owner');
-        expect(repoInfo.repo).toEqual('test_repo');
-      })
-    );
+    it('returns the repo and owner', () => {
+      const repoInfo = github.repo();
 
-    it(
-      'sets the repo and owner on an object',
-      withContext((context, github) => {
-        const repoInfo = github.repo({key: 'value', owner: 'old_owner'});
+      expect(repoInfo.owner).toEqual('test_owner');
+      expect(repoInfo.repo).toEqual('test_repo');
+    });
 
-        expect(repoInfo.key).toEqual('value');
-        expect(repoInfo.owner).toEqual('test_owner');
-      })
-    );
+    it('sets the repo and owner on an object', () => {
+      const repoInfo = github.repo({key: 'value', owner: 'old_owner'});
+
+      expect(repoInfo.key).toEqual('value');
+      expect(repoInfo.owner).toEqual('test_owner');
+    });
   });
 
   describe('customRequest', () => {
