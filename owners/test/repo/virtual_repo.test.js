@@ -17,7 +17,7 @@
 const {GitHub} = require('../../src/api/github');
 const VirtualRepository = require('../../src/repo/virtual_repo');
 const CompoundCache = require('../../src/cache/compound_cache');
-const {CloudStorage} = require('../../src/cloud_storage');
+const CloudStorage = require('../../src/api/cloud_storage');
 const sinon = require('sinon');
 
 describe('virtual repository', () => {
