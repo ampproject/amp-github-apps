@@ -62,4 +62,4 @@ module.exports = class MemoryCache extends AbstractFileCache {
     this.logger.debug(`Invalidating in-memory cache of "${filename}"`);
     this.files.delete(filename);
   }
-}
+};

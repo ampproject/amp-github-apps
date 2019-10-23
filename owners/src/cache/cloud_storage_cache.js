@@ -69,4 +69,4 @@ module.exports = class CloudStorageCache extends AbstractFileCache {
     this.logger.info(`Invalidating Cloud Storage cache of "${filename}"`);
     await this.storage.delete(filename);
   }
-}
+};

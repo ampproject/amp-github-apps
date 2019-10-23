@@ -133,10 +133,7 @@ describe('compound cache', () => {
 
     it('invalidates the memory cache', async done => {
       await cache.invalidate('foo/OWNERS');
-      sandbox.assert.calledWith(
-        MemoryCache.prototype.invalidate,
-        'foo/OWNERS'
-      );
+      sandbox.assert.calledWith(MemoryCache.prototype.invalidate, 'foo/OWNERS');
       done();
     });
 

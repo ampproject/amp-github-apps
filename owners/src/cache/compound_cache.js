@@ -63,4 +63,4 @@ module.exports = class CompoundCache extends AbstractFileCache {
     await this.memoryCache.invalidate(filename);
     await this.cloudStorageCache.invalidate(filename);
   }
-}
+};
