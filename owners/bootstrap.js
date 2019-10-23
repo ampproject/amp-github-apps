@@ -36,10 +36,16 @@ function bootstrap(logger) {
 
     const Octokit = require('@octokit/rest');
     const {GitHub} = require('./src/api/github');
-    const LocalRepository = require('./src/repo/local_repo');
+    const VirtualRepository = require('./src/repo/virtual_repo');
+    const CompoundCache = require('./src/cache/compound_cache');
     const {OwnersBot} = require('./src/owners_bot');
 
-    const {GITHUB_REPO, GITHUB_REPO_DIR, GITHUB_ACCESS_TOKEN} = process.env;
+    const {
+      GITHUB_REPO,
+      GITHUB_REPO_DIR,
+      GITHUB_ACCESS_TOKEN,
+      CLOUD_STORAGE_BUCKET,
+    } = process.env;
     const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 
     logger = logger || console;
@@ -51,7 +57,10 @@ function bootstrap(logger) {
       GITHUB_REPO_NAME,
       logger
     );
-    components.repo = new LocalRepository(GITHUB_REPO_DIR);
+    components.repo = new VirtualRepository(
+      components.github,
+      new CompoundCache(CLOUD_STORAGE_BUCKET),
+    );
     components.ownersBot = new OwnersBot(components.repo);
 
     const teamsInitialized = components.ownersBot.initTeams(components.github);
