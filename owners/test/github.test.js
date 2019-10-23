@@ -116,7 +116,7 @@ describe('team', () => {
 describe('GitHub API', () => {
   let probot;
   let app;
-  let sandbox = sinon.createSandbox();
+  const sandbox = sinon.createSandbox();
   let githubClient;
   let github;
 
@@ -445,7 +445,8 @@ describe('GitHub API', () => {
       await github.createReviewRequests(24574, ['reviewer']);
     });
 
-    it('skips the API call if no usernames are provided', async done => {      // This will fail if it attempts to make an un-nocked network request.
+    it('skips the API call if no usernames are provided', async done => {
+      // This will fail if it attempts to make an un-nocked network request.
       await github.createReviewRequests(24574, []);
 
       done();
