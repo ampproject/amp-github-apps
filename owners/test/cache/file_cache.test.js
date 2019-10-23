@@ -17,10 +17,8 @@
 const sinon = require('sinon');
 
 const {CloudStorage} = require('../../src/cloud_storage');
-const {
-  CloudStorageCache,
-  CompoundCache,
-} = require('../../src/cache/file_cache');
+const {CompoundCache} = require('../../src/cache/file_cache');
+const CloudStorageCache = require('../../src/cache/cloud_storage_cache');
 const MemoryCache = require('../../src/cache/memory_cache');
 
 describe('file caches', () => {
@@ -34,89 +32,6 @@ describe('file caches', () => {
 
   afterEach(() => {
     sandbox.restore();
-  });
-
-  describe('Cloud Storage-backed', () => {
-    let cache;
-
-    beforeEach(() => {
-      cache = new CloudStorageCache('my-storage-bucket');
-    });
-
-    describe('readFile', () => {
-      describe('when the file is in the cache', () => {
-        beforeEach(() => {
-          sandbox
-            .stub(CloudStorage.prototype, 'download')
-            .returns('OWNERS file contents');
-        });
-
-        it('downloads and returns the file contents', async () => {
-          const contents = await cache.readFile('foo/OWNERS', getContents);
-
-          expect(contents).toEqual('OWNERS file contents');
-          sandbox.assert.calledWith(cache.storage.download, 'foo/OWNERS');
-        });
-
-        it('does not get the contents from the provided method', async done => {
-          await cache.readFile('foo/OWNERS', getContents);
-          sandbox.assert.notCalled(getContents);
-          done();
-        });
-      });
-
-      describe('when the file is not in the cache', () => {
-        const getContents = sinon.spy(async () => 'OWNERS file contents');
-
-        beforeEach(() => {
-          sandbox
-            .stub(CloudStorage.prototype, 'download')
-            .returns(Promise.reject(new Error('Not found!')));
-        });
-
-        it('calls the provided method to get the file contents', async () => {
-          expect.assertions(1);
-          sandbox.stub(CloudStorage.prototype, 'upload').resolves();
-          const contents = await cache.readFile('foo/OWNERS', getContents);
-
-          expect(contents).toEqual('OWNERS file contents');
-          sandbox.assert.calledOnce(getContents);
-        });
-
-        it('saves the contents to the cache', async done => {
-          sandbox.stub(CloudStorage.prototype, 'upload').resolves();
-          await cache.readFile('foo/OWNERS', getContents);
-
-          sandbox.assert.calledWith(
-            cache.storage.upload,
-            'foo/OWNERS',
-            'OWNERS file contents'
-          );
-          done();
-        });
-
-        it('reports errors uploading to the cache', async done => {
-          sandbox.stub(cache.storage, 'upload').rejects(new Error('Not found'));
-          await cache.readFile('foo/OWNERS', getContents);
-
-          sandbox.assert.calledWith(
-            console.error,
-            'Error uploading "foo/OWNERS": Not found'
-          );
-          done();
-        });
-      });
-    });
-
-    describe('invalidate', () => {
-      it('deletes the invalidated file cache from storage', async done => {
-        sinon.stub(CloudStorage.prototype, 'delete');
-        await cache.invalidate('foo/OWNERS');
-
-        sandbox.assert.calledWith(cache.storage.delete, 'foo/OWNERS');
-        done();
-      });
-    });
   });
 
   describe('compound', () => {

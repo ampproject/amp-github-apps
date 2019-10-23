@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
+const {CloudStorage} = require('../cloud_storage');
 const AbstractFileCache = require('./abstract_file_cache');
-const MemoryCache = require('./memory_cache');
-const CloudStorageCache = require('./cloud_storage_cache');
 
 /**
- * A compound cache maintaining files in-memory and backed up by Cloud Storage.
- *
- * The memory cache allows the app to keep key owners files in memory for when
- * the ownership tree needs to be re-parsed (minimizing requests to Cloud
- * Storage APIs), while the Cloud Storage cache allows the app to bootstrap its
- * collection of OWNERS files on startup (preventing it from blasting the GitHub
- * API on startup).
+ * A Cloud Storage-backed file cache.
  */
-class CompoundCache extends AbstractFileCache {
+module.exports = class CloudStorageCache extends AbstractFileCache {
   /**
    * Constructor.
    *
@@ -37,8 +30,7 @@ class CompoundCache extends AbstractFileCache {
   constructor(bucketName, logger) {
     super();
     this.logger = logger || console;
-    this.cloudStorageCache = new CloudStorageCache(bucketName, this.logger);
-    this.memoryCache = new MemoryCache();
+    this.storage = new CloudStorage(bucketName, this.logger);
   }
 
   /**
@@ -49,9 +41,23 @@ class CompoundCache extends AbstractFileCache {
    * @return {string} file contents.
    */
   async readFile(filename, getContents) {
-    return await this.memoryCache.readFile(filename, async () => {
-      return await this.cloudStorageCache.readFile(filename, getContents);
-    });
+    try {
+      this.logger.info(`Fetching "${filename}" from Cloud Storage cache`);
+      return await this.storage.download(filename);
+    } catch (e) {
+      this.logger.info(`Cache miss on "${filename}"`);
+      const contents = await getContents();
+
+      this.logger.info(`Uploading "${filename}" to Cloud Storage cache`);
+      // Do not `await`` the upload; this can happen async in the background.
+      this.storage
+        .upload(filename, contents)
+        .catch(err =>
+          console.error(`Error uploading "${filename}": ${err.message}`)
+        );
+
+      return contents;
+    }
   }
 
   /**
@@ -60,9 +66,7 @@ class CompoundCache extends AbstractFileCache {
    * @param {string} filename file to drop from the cache.
    */
   async invalidate(filename) {
-    await this.memoryCache.invalidate(filename);
-    await this.cloudStorageCache.invalidate(filename);
+    this.logger.info(`Invalidating Cloud Storage cache of "${filename}"`);
+    await this.storage.delete(filename);
   }
 }
-
-module.exports = {CompoundCache};
