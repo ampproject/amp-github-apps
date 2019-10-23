@@ -646,24 +646,6 @@ describe('owners bot', () => {
         sandbox.assert.calledOnce(OwnersBot.prototype.refreshTree);
         done();
       });
-
-      it('provides a list of updated owners files', async done => {
-        nock('https://api.github.com')
-          .get('/repos/ampproject/amphtml/pulls/35/files')
-          .reply(200, [
-            {filename: 'index.js', sha: ''},
-            {filename: 'OWNERS', sha: ''},
-            {filename: 'foo/OWNERS', sha: ''},
-            {filename: 'foo/OWNERS.yaml', sha: ''},
-            {filename: 'foo/file-owners', sha: ''},
-            {filename: 'foo/bar/OWNERS', sha: ''},
-            {filename: 'foo/bar/style.css', sha: ''},
-          ]);
-        await probot.receive({name: 'pull_request.closed', payload});
-
-        sandbox.assert.calledWith(OwnersBot.prototype.refreshTree, app.log);
-        done();
-      });
     });
   });
 });
