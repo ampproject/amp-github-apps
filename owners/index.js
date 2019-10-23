@@ -44,7 +44,10 @@ module.exports = app => {
   const teamsInitialized = ownersBot.initTeams(sharedGithub);
   const appInitialized = teamsInitialized.then(() =>
     ownersBot.refreshTree(app.log)
-  );
+  ).catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
 
   /**
    * Listen for webhooks and provide handlers with a GitHub interface and the
