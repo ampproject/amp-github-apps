@@ -73,10 +73,9 @@ module.exports = class LocalRepository extends Repository {
   /**
    * Check out a branch locally.
    *
-   * @param {?string} [branch=master] git branch to checkout.
+   * @param {?string} branch git branch to checkout.
    */
-  async checkout(branch) {
-    branch = branch || 'master';
+  async checkout(branch = 'master') {
     await this._runCommands(
       `git fetch ${this.remote} ${branch}`,
       `git checkout -B ${branch} ${this.remote}/${branch}`

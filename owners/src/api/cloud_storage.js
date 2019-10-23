@@ -24,12 +24,12 @@ module.exports = class CloudStorage {
    * Constructor.
    *
    * @param {string} bucketName Cloud Storage bucket name.
-   * @param {Logger} [logger=console] logging interface.
+   * @param {Logger} logger logging interface.
    */
-  constructor(bucketName, logger) {
+  constructor(bucketName, logger = console) {
     this.storage = new Storage();
     this.bucketName = bucketName;
-    this.logger = logger || console;
+    this.logger = logger;
   }
 
   /**

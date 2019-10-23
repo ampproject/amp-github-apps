@@ -17,23 +17,9 @@
 const Repository = require('../../src/repo/repo');
 
 describe('abstract repository', () => {
-  const repo = new Repository();
-
-  describe('sync', () => {
+  describe('constructor', () => {
     it('throws an error', () => {
-      expect(repo.sync()).rejects.toThrow('Not implemented');
-    });
-  });
-
-  describe('readFile', () => {
-    it('throws an error', () => {
-      expect(repo.readFile('foo/file.txt')).rejects.toThrow('Not implemented');
-    });
-  });
-
-  describe('findOwnersFiles', () => {
-    it('throws an error', () => {
-      expect(repo.findOwnersFiles()).rejects.toThrow('Not implemented');
+      expect(() => new Repository()).toThrow('Cannot instantiate base class');
     });
   });
 });

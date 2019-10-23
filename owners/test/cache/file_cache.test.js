@@ -14,35 +14,12 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
 const FileCache = require('../../src/cache/file_cache');
 
 describe('abstract file cache', () => {
-  const sandbox = sinon.createSandbox();
-  let cache;
-  let getContents;
-
-  beforeEach(() => {
-    sandbox.stub(console);
-    cache = new FileCache();
-    getContents = sinon.spy(async () => 'OWNERS file contents');
-  });
-
-  afterEach(() => {
-    sandbox.restore();
-  });
-
-  describe('readFile', () => {
+  describe('constructor', () => {
     it('throws an error', () => {
-      expect(cache.readFile('foo/OWNERS', getContents)).rejects.toThrow(
-        'Not implemented'
-      );
-    });
-  });
-
-  describe('invalidate', () => {
-    it('throws an error', () => {
-      expect(cache.invalidate('foo/OWNERS')).rejects.toThrow('Not implemented');
+      expect(() => new FileCache()).toThrow('Cannot instantiate base class');
     });
   });
 });

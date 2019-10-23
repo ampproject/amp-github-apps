@@ -31,9 +31,9 @@ class Owner {
    * Constructor.
    *
    * @param {string} name readable name identifying the owner user/team.
-   * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
+   * @param {?OWNER_MODIFIER} modifier optional owner modifier.
    */
-  constructor(name, modifier) {
+  constructor(name, modifier = OWNER_MODIFIER.NONE) {
     this.name = name;
     this.modifier = modifier || OWNER_MODIFIER.NONE;
   }
@@ -93,9 +93,9 @@ class UserOwner extends Owner {
    * Constructor.
    *
    * @param {string} username owner's GitHub username.
-   * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
+   * @param {?OWNER_MODIFIER} modifier optional owner modifier.
    */
-  constructor(username, modifier) {
+  constructor(username, modifier = OWNER_MODIFIER.NONE) {
     super(username, modifier);
     Object.assign(this, {username});
   }
@@ -137,9 +137,9 @@ class TeamOwner extends Owner {
    * Constructor.
    *
    * @param {!Team} team the GitHub team.
-   * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
+   * @param {?OWNER_MODIFIER} modifier optional owner modifier.
    */
-  constructor(team, modifier) {
+  constructor(team, modifier = OWNER_MODIFIER.NONE) {
     super(team.toString(), modifier);
     Object.assign(this, {team});
   }
@@ -180,9 +180,9 @@ class WildcardOwner extends Owner {
   /**
    * Constructor.
    *
-   * @param {?OWNER_MODIFIER} [modifier=NONE] optional owner modifier.
+   * @param {?OWNER_MODIFIER} modifier optional owner modifier.
    */
-  constructor(modifier) {
+  constructor(modifier = OWNER_MODIFIER.NONE) {
     if (modifier && modifier != OWNER_MODIFIER.NONE) {
       throw new Error('Modifiers not supported on wildcard `*` owner');
     }

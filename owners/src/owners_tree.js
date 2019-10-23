@@ -24,12 +24,12 @@ class OwnersTree {
   /**
    * Constructor.
    *
-   * @param {?string} [dirPath='.'] relative directory containing owners file.
-   * @param {?OwnersTree} [parent=null] parent tree of the node.
+   * @param {?string} dirPath relative directory containing owners file.
+   * @param {?OwnersTree} parent parent tree of the node.
    */
-  constructor(dirPath, parent) {
-    this.parent = parent || null;
-    this.dirPath = dirPath || '.';
+  constructor(dirPath = '.', parent = null) {
+    this.parent = parent;
+    this.dirPath = dirPath;
 
     this.isRoot = !parent;
     this.depth = this.isRoot ? 0 : this.parent.depth + 1;

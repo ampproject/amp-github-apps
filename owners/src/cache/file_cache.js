@@ -20,22 +20,27 @@
  */
 module.exports = class FileCache {
   /**
+   * Constructor.
+   */
+  constructor() {
+    if (this.constructor === FileCache) {
+      throw new TypeError('Cannot instantiate base class');
+    }
+  }
+
+  /**
    * Fetch the contents of a file.
    *
    * @param {string} filename file to get contents of.
    * @param {string} getContents function to get contents if file not in cache.
    * @return {string} file contents.
    */
-  async readFile(filename, getContents) {
-    throw new Error('Not implemented');
-  }
+  async readFile(filename, getContents) {}
 
   /**
    * Invalidate the cache for a file.
    *
    * @param {string} filename file to drop from the cache.
    */
-  async invalidate(filename) {
-    throw new Error('Not implemented');
-  }
+  async invalidate(filename) {}
 };

@@ -20,11 +20,18 @@
  */
 module.exports = class Repository {
   /**
+   * Constructor.
+   */
+  constructor() {
+    if (this.constructor === Repository) {
+      throw new TypeError('Cannot instantiate base class');
+    }
+  }
+
+  /**
    * Perform any required syncing with the repository.
    */
-  async sync() {
-    throw new Error('Not implemented');
-  }
+  async sync() {}
 
   /**
    * Read the contents of a file from the repo.
@@ -32,9 +39,7 @@ module.exports = class Repository {
    * @param {string} relativePath file to read.
    * @return {string} file contents.
    */
-  async readFile(relativePath) {
-    throw new Error('Not implemented');
-  }
+  async readFile(relativePath) {}
 
   /**
    * Finds all OWNERS files in the checked out repository.
@@ -43,7 +48,5 @@ module.exports = class Repository {
    *
    * @return {!Array<string>} a list of relative OWNERS file paths.
    */
-  async findOwnersFiles() {
-    throw new Error('Not implemented');
-  }
+  async findOwnersFiles() {}
 };

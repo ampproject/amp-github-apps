@@ -32,11 +32,11 @@ module.exports = class CompoundCache extends FileCache {
    * Constructor.
    *
    * @param {string} bucketName Cloud Storage bucket name.
-   * @param {Logger} [logger=console] logging interface.
+   * @param {Logger} logger logging interface.
    */
-  constructor(bucketName, logger) {
+  constructor(bucketName, logger = console) {
     super();
-    this.logger = logger || console;
+    this.logger = logger;
     this.cloudStorageCache = new CloudStorageCache(bucketName, this.logger);
     this.memoryCache = new MemoryCache();
   }
