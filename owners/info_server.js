@@ -18,53 +18,123 @@ const express = require('express');
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 
-/**
- * Info server entrypoint.
- *
- * @param {!OwnersBot} ownersBot owners bot instance.
- * @parma {!express.App} express app.
- */
-module.exports = (ownersBot) => {
-  const app = express();
+class Server {
+  /**
+   * Constructor.
+   *
+   * @param {?express.App} app optional Express app to use.
+   * @param {Logger=} [logger=console] logging interface.
+   * @param {function} initRoutes function adding routes.
+   */
+  constructor(app, logger) {
+    this.app = app || express();
+    this.logger = logger || console;
+    this.initRoutes();
+  }
 
-  app.get('/status', (req, res) => {
-    res.send(
-      [
-        `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
-        '<a href="/tree">Owners Tree</a>',
-        '<a href="/teams">Organization Teams</a>',
-      ].join('<br>')
-    );
-  });
+  /**
+   * Initialize route handlers.
+   */
+  initRoutes() {}
 
-  app.get('/tree', (req, res) => {
-    const {result, errors} = ownersBot.treeParse;
-    const treeHeader = '<h3>OWNERS tree</h3>';
-    const treeDisplay = `<pre>${result.toString()}</pre>`;
-
-    let output = `${treeHeader}${treeDisplay}`;
-    if (errors.length) {
-      const errorHeader = '<h3>Parser Errors</h3>';
-      const errorDisplay = errors.join('<br>');
-      output += `${errorHeader}<code>${errorDisplay}</code>`;
+  /**
+   * Add a route to the server.
+   *
+   * @param {string} method HTTP method to accept.
+   * @param {string} path route URI.
+   * @param {function} handler function given a request returning a response.
+   */
+  route(method, uri, handler) {
+    method = method.toLowerCase()
+    if (method !== 'get' && method !== 'post') {
+      throw new Error(`Method "${method}" not allowed as route`)
     }
 
-    res.send(output);
-  });
+    this.app[method](uri, (req, res) => {
+      try {
+        res.send(handler(req));
+      } catch (error) {
+        res.statusCode = 500;
+        res.send(`Encountered an error: ${error.message}`);
+      }
+    });
+  }
 
-  app.get('/teams', (req, res) => {
-    const teamSections = [];
-    Object.entries(ownersBot.teams).forEach(([name, team]) => {
-      teamSections.push(
-        [
-          `Team "${name}" (ID: ${team.id}):`,
-          ...team.members.map(username => `- ${username}`),
-        ].join('<br>')
-      );
+  /**
+   * Convenience method for GET routes.
+   *
+   * @param {string} path route URI.
+   * @param {function} handler function given a request returning a response.
+   */
+  get(uri, handler) {
+    this.route('get', uri, handler);
+  }
+
+  /**
+   * Start the server listening on a port.
+   */
+  listen(port) {
+    return new Promise((resolve, reject) => {
+      this.app.listen(port, () => {
+        this.logger.info(`Starting server on port ${port}`);
+        resolve();
+      });
+    });
+  }
+}
+
+class InfoServer extends Server {
+  /**
+   * Constructor.
+   *
+   * @param {!OwnersBot} ownersBot owners bot instance.
+   * @param {?express.App} app optional Express app to use.
+   * @param {Logger=} [logger=console] logging interface.
+   */
+  constructor(ownersBot, app, logger) {
+    super(app, logger);
+    this.ownersBot = ownersBot;
+  }
+
+  /**
+   * Initialize route handlers.
+   */
+  initRoutes() {
+    this.get('/status', req => [
+      `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
+      '<a href="/tree">Owners Tree</a>',
+      '<a href="/teams">Organization Teams</a>',
+    ].join('<br>'));
+
+    this.get('/tree', req => {
+      const {result, errors} = this.ownersBot.treeParse;
+      const treeHeader = '<h3>OWNERS tree</h3>';
+      const treeDisplay = `<pre>${result.toString()}</pre>`;
+
+      let output = `${treeHeader}${treeDisplay}`;
+      if (errors.length) {
+        const errorHeader = '<h3>Parser Errors</h3>';
+        const errorDisplay = errors.join('<br>');
+        output += `${errorHeader}<code>${errorDisplay}</code>`;
+      }
+
+      return output;
     });
 
-    res.send(['<h2>Teams</h2>', ...teamSections].join('<br><br>'));
-  });
+    this.get('/teams', req => {
+      const teamSections = [];
+      Object.entries(this.ownersBot.teams).forEach(([name, team]) => {
+        teamSections.push(
+          [
+            `Team "${name}" (ID: ${team.id}):`,
+            ...team.members.map(username => `- ${username}`),
+          ].join('<br>')
+        );
+      });
 
-  return app;
-};
+      return ['<h2>Teams</h2>', ...teamSections].join('<br><br>');
+    });
+  }
+}
+
+module.exports = InfoServer;
