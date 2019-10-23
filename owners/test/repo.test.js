@@ -16,7 +16,7 @@
 
 const {GitHub} = require('../src/github');
 const {Repository, LocalRepository, VirtualRepository} = require('../src/repo');
-const {CompoundCache} = require('../src/file_cache');
+const CompoundCache = require('../src/cache/compound_cache');
 const {CloudStorage} = require('../src/cloud_storage');
 const childProcess = require('child_process');
 const sinon = require('sinon');

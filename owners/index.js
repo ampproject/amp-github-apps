@@ -100,7 +100,7 @@ module.exports = app => {
   });
 
   if (process.env.NODE_ENV !== 'test') {
-    const infoServer = new InfoServer(ownersBot, sharedGithub, null, app.log);
+    const infoServer = new InfoServer(ownersBot, github, null, app.log);
     infoServer.listen(INFO_SERVER_PORT);
   }
 
