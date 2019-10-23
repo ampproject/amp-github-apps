@@ -25,7 +25,7 @@ module.exports = class CloudStorageCache extends FileCache {
    * Constructor.
    *
    * @param {string} bucketName Cloud Storage bucket name.
-   * @param {Logger=} [logger=console] logging interface.
+   * @param {Logger} [logger=console] logging interface.
    */
   constructor(bucketName, logger) {
     super();

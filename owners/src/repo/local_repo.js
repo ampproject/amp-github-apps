@@ -73,7 +73,7 @@ module.exports = class LocalRepository extends Repository {
   /**
    * Check out a branch locally.
    *
-   * @param {?string=} [branch=master] git branch to checkout.
+   * @param {?string} [branch=master] git branch to checkout.
    */
   async checkout(branch) {
     branch = branch || 'master';

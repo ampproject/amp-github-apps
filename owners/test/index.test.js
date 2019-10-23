@@ -48,6 +48,7 @@ const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 nock.disableNetConnect();
 jest.setTimeout(30000);
 
+const GITHUB_REPO = 'erwinmombay/github-owners-bot-test-repo';
 const GITHUB_REPO_DIR = '/Users/erwinm/dev/github-owners-bot-test-repo';
 const ownersRules = [
   new OwnersRule('OWNERS', [new UserOwner('donttrustthisbot')]),
@@ -63,12 +64,17 @@ describe('owners bot', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'env').value({GITHUB_REPO_DIR, NODE_ENV: 'test'});
+    sandbox.stub(process, 'env').value({
+      GITHUB_REPO,
+      GITHUB_REPO_DIR,
+      NODE_ENV: 'test',
+    });
     // Disabled execution of `git pull` for testing.
     sandbox.stub(LocalRepository.prototype, 'checkout');
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
     sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
     sandbox.stub(GitHub.prototype, 'getReviewRequests').returns([]);
+    sandbox.stub(GitHub.prototype, 'createReviewRequests').returns([]);
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
@@ -629,7 +635,7 @@ describe('owners bot', () => {
 
       it('does nothing for a PR without owners files', async done => {
         nock('https://api.github.com')
-          .get('/repos/ampproject/amphtml/pulls/35/files')
+          .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
           .reply(200, [{filename: 'foo.txt', sha: ''}]);
         await probot.receive({name: 'pull_request.closed', payload});
 
@@ -639,29 +645,11 @@ describe('owners bot', () => {
 
       it('refreshes the owners tree for a PR with owners files', async done => {
         nock('https://api.github.com')
-          .get('/repos/ampproject/amphtml/pulls/35/files')
+          .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
           .reply(200, [{filename: 'OWNERS', sha: ''}]);
         await probot.receive({name: 'pull_request.closed', payload});
 
         sandbox.assert.calledOnce(OwnersBot.prototype.refreshTree);
-        done();
-      });
-
-      it('provides a list of updated owners files', async done => {
-        nock('https://api.github.com')
-          .get('/repos/ampproject/amphtml/pulls/35/files')
-          .reply(200, [
-            {filename: 'index.js', sha: ''},
-            {filename: 'OWNERS', sha: ''},
-            {filename: 'foo/OWNERS', sha: ''},
-            {filename: 'foo/OWNERS.yaml', sha: ''},
-            {filename: 'foo/file-owners', sha: ''},
-            {filename: 'foo/bar/OWNERS', sha: ''},
-            {filename: 'foo/bar/style.css', sha: ''},
-          ]);
-        await probot.receive({name: 'pull_request.closed', payload});
-
-        sandbox.assert.calledWith(OwnersBot.prototype.refreshTree, app.log);
         done();
       });
     });

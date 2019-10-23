@@ -27,7 +27,7 @@ class Server {
    * Constructor.
    *
    * @param {?express.App} app optional Express app to use.
-   * @param {Logger=} [logger=console] logging interface.
+   * @param {Logger} [logger=console] logging interface.
    * @param {function} initRoutes function adding routes.
    */
   constructor(app, logger) {
@@ -97,7 +97,7 @@ class InfoServer extends Server {
    * @param {!OwnersBot} ownersBot owners bot instance.
    * @param {!GitHub} github GitHub API interface.
    * @param {?express.App} app optional Express app to use.
-   * @param {Logger=} [logger=console] logging interface.
+   * @param {Logger} [logger=console] logging interface.
    */
   constructor(ownersBot, github, app, logger) {
     super(app, logger);

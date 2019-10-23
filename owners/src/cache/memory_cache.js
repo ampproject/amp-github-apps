@@ -23,7 +23,7 @@ module.exports = class MemoryCache extends FileCache {
   /**
    * Constructor.
    *
-   * @param {Logger=} [logger=console] logging interface.
+   * @param {Logger} [logger=console] logging interface.
    */
   constructor(logger) {
     super();
