@@ -17,7 +17,11 @@
 const express = require('express');
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
+const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 
+/**
+ * Generic server wrapping express routing.
+ */
 class Server {
   /**
    * Constructor.
@@ -41,29 +45,26 @@ class Server {
    * Add a route to the server.
    *
    * @param {string} method HTTP method to accept.
-   * @param {string} path route URI.
+   * @param {string} uri route URI.
    * @param {function} handler function given a request returning a response.
    */
   route(method, uri, handler) {
-    method = method.toLowerCase()
+    method = method.toLowerCase();
     if (method !== 'get' && method !== 'post') {
-      throw new Error(`Method "${method}" not allowed as route`)
+      throw new Error(`Method "${method}" not allowed as route`);
     }
 
-    this.app[method](uri, (req, res) => {
-      try {
-        res.send(handler(req));
-      } catch (error) {
-        res.statusCode = 500;
-        res.send(`Encountered an error: ${error.message}`);
-      }
+    this.app[method](uri, async (req, res, next) => {
+      handler(req)
+        .then(res.send.bind(res))
+        .catch(next);
     });
   }
 
   /**
    * Convenience method for GET routes.
    *
-   * @param {string} path route URI.
+   * @param {string} uri route URI.
    * @param {function} handler function given a request returning a response.
    */
   get(uri, handler) {
@@ -72,41 +73,70 @@ class Server {
 
   /**
    * Start the server listening on a port.
+   *
+   * @param {number} port port to listen on.
+   * @return {!Promise} a promise that resolves once the server is started.
    */
   listen(port) {
     return new Promise((resolve, reject) => {
       this.app.listen(port, () => {
-        this.logger.info(`Starting server on port ${port}`);
+        this.logger.info(`Info server listening on port ${port}`);
         resolve();
       });
     });
   }
 }
 
+/**
+ * Server providing status information and cron handlers..
+ */
 class InfoServer extends Server {
   /**
    * Constructor.
    *
    * @param {!OwnersBot} ownersBot owners bot instance.
+   * @param {!GitHub} github GitHub API interface.
    * @param {?express.App} app optional Express app to use.
    * @param {Logger=} [logger=console] logging interface.
    */
-  constructor(ownersBot, app, logger) {
+  constructor(ownersBot, github, app, logger) {
     super(app, logger);
+    this.github = github;
     this.ownersBot = ownersBot;
+  }
+
+  /**
+   * Adds a cron task request handler with error handling.
+   *
+   * @param {string} taskName cron task name.
+   * @param {function} handler async request handler function.
+   */
+  cron(taskName, handler) {
+    this.get(`/_cron/${taskName}`, async req => {
+      // This header is set by App Engine when running cron tasks, and is
+      // stripped out of external requests.
+      if (!req.header('X-Appengine-Cron')) {
+        throw new Error('Attempted external request to a cron endpoint');
+      }
+
+      await handler(req);
+      return 'Cron task completed successfully.';
+    });
   }
 
   /**
    * Initialize route handlers.
    */
   initRoutes() {
-    this.get('/status', req => [
-      `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
-      '<a href="/tree">Owners Tree</a>',
-      '<a href="/teams">Organization Teams</a>',
-    ].join('<br>'));
+    this.get('/status', async req =>
+      [
+        `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
+        '<a href="/tree">Owners Tree</a>',
+        '<a href="/teams">Organization Teams</a>',
+      ].join('<br>')
+    );
 
-    this.get('/tree', req => {
+    this.get('/tree', async req => {
       const {result, errors} = this.ownersBot.treeParse;
       const treeHeader = '<h3>OWNERS tree</h3>';
       const treeDisplay = `<pre>${result.toString()}</pre>`;
@@ -121,7 +151,7 @@ class InfoServer extends Server {
       return output;
     });
 
-    this.get('/teams', req => {
+    this.get('/teams', async req => {
       const teamSections = [];
       Object.entries(this.ownersBot.teams).forEach(([name, team]) => {
         teamSections.push(
@@ -134,27 +164,44 @@ class InfoServer extends Server {
 
       return ['<h2>Teams</h2>', ...teamSections].join('<br><br>');
     });
+
+    this.cron('refreshTree', async req => {
+      await this.ownersBot.refreshTree(this.logger);
+    });
+
+    this.cron('refreshTeams', async req => {
+      await this.ownersBot.initTeams(this.github);
+    });
   }
 }
 
 if (require.main === module) {
   require('dotenv').config();
 
+  const Octokit = require('@octokit/rest');
+  const {GitHub} = require('./src/github');
   const {LocalRepository} = require('./src/repo');
   const {OwnersBot} = require('./src/owners_bot');
 
+  const github = new GitHub(
+    new Octokit({auth: process.env.GITHUB_ACCESS_TOKEN}),
+    GITHUB_REPO_OWNER,
+    GITHUB_REPO_NAME,
+    console
+  );
+
   const repo = new LocalRepository(process.env.GITHUB_REPO_DIR);
   const ownersBot = new OwnersBot(repo);
-  const infoServer = new InfoServer(ownersBot);
+  const infoServer = new InfoServer(ownersBot, github);
   infoServer.listen(process.env.INFO_SERVER_PORT);
 
-  const teamsInitialized = Promise.resolve();//ownersBot.initTeams(sharedGithub);
-  const appInitialized = teamsInitialized.then(() =>
-    ownersBot.refreshTree()
-  ).catch(err => {
-    console.error(err);
-    process.exit(1);
-  });
+  const teamsInitialized = ownersBot.initTeams(github);
+  teamsInitialized
+    .then(() => ownersBot.refreshTree())
+    .catch(err => {
+      console.error(err);
+      process.exit(1);
+    });
 }
 
 module.exports = InfoServer;
