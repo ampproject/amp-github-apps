@@ -175,33 +175,12 @@ class InfoServer extends Server {
   }
 }
 
+
 if (require.main === module) {
-  require('dotenv').config();
+  const {github, ownersBot} = require('./bootstrap')(console);
 
-  const Octokit = require('@octokit/rest');
-  const {GitHub} = require('./src/api/github');
-  const {LocalRepository} = require('./src/repo');
-  const {OwnersBot} = require('./src/owners_bot');
-
-  const github = new GitHub(
-    new Octokit({auth: process.env.GITHUB_ACCESS_TOKEN}),
-    GITHUB_REPO_OWNER,
-    GITHUB_REPO_NAME,
-    console
-  );
-
-  const repo = new LocalRepository(process.env.GITHUB_REPO_DIR);
-  const ownersBot = new OwnersBot(repo);
   const infoServer = new InfoServer(ownersBot, github);
   infoServer.listen(process.env.INFO_SERVER_PORT);
-
-  const teamsInitialized = ownersBot.initTeams(github);
-  teamsInitialized
-    .then(() => ownersBot.refreshTree())
-    .catch(err => {
-      console.error(err);
-      process.exit(1);
-    });
 }
 
 module.exports = InfoServer;
