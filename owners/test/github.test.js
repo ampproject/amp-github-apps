@@ -17,9 +17,6 @@
 const nock = require('nock');
 const sinon = require('sinon');
 const Octokit = require('@octokit/rest');
-const {Probot} = require('probot');
-const owners = require('..');
-const {OwnersBot} = require('../src/owners_bot');
 const {CheckRun, CheckRunConclusion} = require('../src/owners_check');
 const {GitHub, PullRequest, Review, Team} = require('../src/github');
 
@@ -114,72 +111,38 @@ describe('team', () => {
 });
 
 describe('GitHub API', () => {
-  let probot;
-  let app;
   const sandbox = sinon.createSandbox();
   let githubClient;
   let github;
 
   beforeEach(() => {
     sandbox.stub(console);
-    sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
-    sandbox.stub(OwnersBot.prototype, 'refreshTree').resolves();
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
 
     githubClient = new Octokit({auth: '_TOKEN_'});
     github = new GitHub(githubClient, 'test_owner', 'test_repo');
-    probot = new Probot({});
-    app = probot.load(owners);
-
-    app.app = () => 'test';
   });
 
   afterEach(() => {
     sandbox.restore();
   });
 
-  /**
-   * A test function which uses a Probot context and/or its GitHub API.
-   *
-   * @callback contextFn
-   * @param {!Context} context Probot context.
-   * @param {!GitHub} github GitHub API interface.
-   */
-
-  /**
-   * Executes a function with a probot context and GitHub API interface.
-   *
-   * Wraps the function call in a fake Probot event handler and stubs out the
-   * context with the `test_owner/test_repo` repository.
-   *
-   * @param {contextFn} testFn test function.
-   * @return {function} the test function wrapped in a Probot context.
-   */
-  function withContext(testFn) {
-    return async () => {
-      app.on('test_event', async context => {
-        sandbox.stub(context, 'repo').returns({
-          repo: 'test_repo',
-          owner: 'test_owner',
-        });
-        await testFn(context, GitHub.fromContext(context));
-      });
-      await probot.receive({name: 'test_event', payload: {}});
-    };
-  }
-
   describe('fromContext', () => {
-    it(
-      'initializes a GitHub API interface',
-      withContext(context => {
-        const github = GitHub.fromContext(context);
+    it('initializes a GitHub API interface', () => {
+      const logStub = sandbox.stub();
+      const github = GitHub.fromContext({
+        repo: () => {
+          return {repo: 'test_repo', owner: 'test_owner'};
+        },
+        github: githubClient,
+        log: logStub,
+      });
 
-        expect(github.client).toBe(context.github);
-        expect(github.owner).toEqual('test_owner');
-        expect(github.repository).toEqual('test_repo');
-        expect(github.logger).toBe(context.log);
-      })
-    );
+      expect(github.client).toBe(githubClient);
+      expect(github.owner).toEqual('test_owner');
+      expect(github.repository).toEqual('test_repo');
+      expect(github.logger).toBe(logStub);
+    });
   });
 
   describe('repo', () => {
