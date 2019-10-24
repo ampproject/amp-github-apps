@@ -16,9 +16,6 @@
 
 const express = require('express');
 
-const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
-const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
-
 /**
  * Generic server wrapping express routing.
  */
@@ -130,7 +127,7 @@ class InfoServer extends Server {
   initRoutes() {
     this.get('/status', async req =>
       [
-        `The OWNERS bot is live and running on ${GITHUB_REPO}!`,
+        `The OWNERS bot is live and running on ${process.env.GITHUB_REPO}!`,
         '<a href="/tree">Owners Tree</a>',
         '<a href="/teams">Organization Teams</a>',
       ].join('<br>')
@@ -176,32 +173,8 @@ class InfoServer extends Server {
 }
 
 if (require.main === module) {
-  require('dotenv').config();
-
-  const Octokit = require('@octokit/rest');
-  const {GitHub} = require('./src/api/github');
-  const {LocalRepository} = require('./src/repo');
-  const {OwnersBot} = require('./src/owners_bot');
-
-  const github = new GitHub(
-    new Octokit({auth: process.env.GITHUB_ACCESS_TOKEN}),
-    GITHUB_REPO_OWNER,
-    GITHUB_REPO_NAME,
-    console
-  );
-
-  const repo = new LocalRepository(process.env.GITHUB_REPO_DIR);
-  const ownersBot = new OwnersBot(repo);
-  const infoServer = new InfoServer(ownersBot, github);
-  infoServer.listen(process.env.INFO_SERVER_PORT);
-
-  const teamsInitialized = ownersBot.initTeams(github);
-  teamsInitialized
-    .then(() => ownersBot.refreshTree())
-    .catch(err => {
-      console.error(err);
-      process.exit(1);
-    });
+  const {ownersBot, github} = require('bootstrap')(console);
+  new InfoServer(ownersBot, github).listen(process.env.INFO_SERVER_PORT);
 }
 
 module.exports = InfoServer;

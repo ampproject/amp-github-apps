@@ -43,6 +43,18 @@ module.exports = class VirtualRepository extends Repository {
   }
 
   /**
+   * Warms up the cache with all owners files.
+   *
+   * @param {?function} cacheMissCallback called when there is a cache miss.
+   */
+  async warmCache(cacheMissCallback) {
+    const ownersFiles = await this.findOwnersFiles();
+    return await Promise.all(
+      ownersFiles.map(filename => this.readFile(filename, cacheMissCallback))
+    );
+  }
+
+  /**
    * Read the contents of a file from the repo.
    *
    * @param {string} relativePath file to read.
