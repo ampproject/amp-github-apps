@@ -53,21 +53,10 @@ const cache = new CompoundCache(CLOUD_STORAGE_BUCKET);
 const repo = new VirtualRepository(github, cache);
 const parser = new OwnersParser(repo, {});
 
-/**
- * Warm up the cache by slowly fetching each owners file.
- */
-async function warmUp() {
-  const ownersFiles = await repo.findOwnersFiles();
-  let i = 1;
-  for (const file of ownersFiles) {
-    console.log(`File #${i++} of ${ownersFiles.length}`);
-    await repo.readFile(file);
-    await sleep(CACHE_HIT_INTERVAL);
-  }
-}
-
-warmUp().then(async () => {
-  const {result, errors} = await parser.parseOwnersTree();
-  errors.forEach(console.error);
-  console.log(result.toString());
-});
+repo
+  .warmCache(() => sleep(CACHE_HIT_INTERVAL))
+  .then(async () => {
+    const {result, errors} = await parser.parseOwnersTree();
+    errors.forEach(console.error);
+    console.log(result.toString());
+  });
