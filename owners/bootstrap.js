@@ -62,9 +62,11 @@ function bootstrap(logger) {
         logger.error(err);
         process.exit(1);
       });
+
+    components = {ownersBot, github, initialized};
   }
 
-  return {ownersBot, github, initialized};
+  return components;
 }
 
 module.exports = bootstrap;
