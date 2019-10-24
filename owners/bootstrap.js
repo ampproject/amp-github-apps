@@ -58,17 +58,16 @@ function bootstrap(logger) {
     const repo = new VirtualRepository(github, cache);
     const ownersBot = new OwnersBot(repo);
 
-    const teamsInitialized = ownersBot.initTeams(github);
-    const cacheWarmed = repo
-      .findOwnersFiles()
-      .then(ownersFiles => Promise.all(ownersFiles.map(repo.readFile, repo)))
-      .then(() => ownersBot.reparseTree(logger));
-    const initialized = Promise.all([teamsInitialized, cacheWarmed])
-      .then(() => ownersBot.reparseTree(logger))
-      .catch(err => {
+    const reparse = () => ownersBot.reparseTree(logger);
+    const initialized = Promise.all([
+      ownersBot.initTeams(github).then(reparse),
+      repo.warmCache().then(reparse),
+    ]).catch(
+      err => {
         logger.error(err);
         process.exit(1);
-      });
+      }
+    );
 
     components = {github, ownersBot, initialized};
   }
