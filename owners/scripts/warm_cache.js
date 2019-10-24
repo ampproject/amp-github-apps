@@ -32,9 +32,9 @@ require('dotenv').config();
 const sleep = require('sleep-promise');
 const Octokit = require('@octokit/rest');
 
-const {GitHub} = require('../src/github');
-const {VirtualRepository} = require('../src/repo');
-const {CompoundCache} = require('../src/file_cache');
+const {GitHub} = require('../src/api/github');
+const VirtualRepository = require('../src/repo/virtual_repo');
+const CompoundCache = require('../src//cache/compound_cache');
 const {OwnersParser} = require('../src/parser');
 
 const CLOUD_STORAGE_BUCKET = process.env.CLOUD_STORAGE_BUCKET;

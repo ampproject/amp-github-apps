@@ -58,9 +58,10 @@ module.exports = class VirtualRepository extends Repository {
    * Read the contents of a file from the repo.
    *
    * @param {string} relativePath file to read.
+   * @param {?function} cacheMissCallback called when there is a cache miss.
    * @return {string} file contents.
    */
-  async readFile(relativePath) {
+  async readFile(relativePath, cacheMissCallback) {
     const fileSha = this._fileRefs.get(relativePath);
     if (!fileSha) {
       throw new Error(
@@ -70,10 +71,16 @@ module.exports = class VirtualRepository extends Repository {
     }
 
     return await this.cache.readFile(relativePath, async () => {
-      return await this.github.getFileContents({
+      const contents = await this.github.getFileContents({
         filename: relativePath,
         sha: fileSha,
       });
+
+      if (cacheMissCallback) {
+        await cacheMissCallback();
+      }
+
+      return contents;
     });
   }
 

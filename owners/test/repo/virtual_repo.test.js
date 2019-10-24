@@ -118,6 +118,29 @@ describe('virtual repository', () => {
 
         expect(contents).toEqual('contents');
       });
+
+      it('executes the callback for cache misses', async () => {
+        expect.assertions(1);
+
+        const cacheMissCallback = sandbox.spy();
+        await repo.findOwnersFiles();
+        const contents = await repo.readFile('OWNERS', cacheMissCallback);
+
+        sandbox.assert.calledOnce(cacheMissCallback);
+        expect(contents).toEqual('contents');
+      });
+
+      it('ignores the callback for files in the cache', async () => {
+        expect.assertions(1);
+
+        const cacheMissCallback = sandbox.spy();
+        await repo.findOwnersFiles();
+        await repo.readFile('OWNERS');
+        const contents = await repo.readFile('OWNERS', cacheMissCallback);
+
+        sandbox.assert.notCalled(cacheMissCallback);
+        expect(contents).toEqual('contents');
+      });
     });
   });
 
