@@ -18,8 +18,8 @@ cron:
 
 - description: "Sync with the latest owners file and re-parse the owners tree"
   url: /_cron/refreshTree
-  schedule: every hour from 7:00 to 23:00
+  schedule: every 1 hours
 
 - description: "Update the internal list of teams and team members"
   url: /_cron/refreshTeams
-  schedule: every 4 hours from 8:00 to 19:00
+  schedule: every 4 hours
