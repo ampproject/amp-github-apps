@@ -1,0 +1,12 @@
+cron:
+# Note that both of these happen automatically in response to webhooks for new
+# or edited owners file and teams; this cron task ensures that the app stays in
+# sync even if webhooks are dropped or fail.
+
+- description: "Sync with the latest owners file and re-parse the owners tree"
+  url: /_cron/refreshTree
+  schedule: every hour from 7:00 to 23:00
+
+- description: "Update the internal list of teams and team members"
+  url: /_cron/refreshTeams
+  schedule: every 4 hours from 8:00 to 19:00
