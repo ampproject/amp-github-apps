@@ -62,12 +62,10 @@ function bootstrap(logger) {
     const initialized = Promise.all([
       ownersBot.initTeams(github).then(reparse),
       repo.warmCache().then(reparse),
-    ]).catch(
-      err => {
-        logger.error(err);
-        process.exit(1);
-      }
-    );
+    ]).catch(err => {
+      logger.error(err);
+      process.exit(1);
+    });
 
     components = {github, ownersBot, initialized};
   }
