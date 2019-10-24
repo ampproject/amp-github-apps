@@ -47,7 +47,7 @@ module.exports = class VirtualRepository extends Repository {
    */
   async warmCache() {
     const ownersFiles = await this.findOwnersFiles();
-    return await Promise.all(ownersFiles.map(this.readFile, this));
+    return await Promise.all(ownersFiles.map(file => this.readFile(file)));
   }
 
   /**
