@@ -46,7 +46,7 @@ module.exports = class VirtualRepository extends Repository {
    * Read the contents of a file from the repo.
    *
    * @param {string} relativePath file to read.
-   * @param {?function} cacheHitCallback called when there is a cache miss.
+   * @param {?function} cacheMissCallback called when there is a cache miss.
    * @return {string} file contents.
    */
   async readFile(relativePath, cacheMissCallback) {
