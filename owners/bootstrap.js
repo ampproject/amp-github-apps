@@ -15,7 +15,7 @@
  */
 
 // Keep the components in scope so that, if multiple files include this, the
-// bootstrapping is only done once and all files share the
+// bootstrapping is only done once and all files share the components.
 let components = null;
 
 /**
