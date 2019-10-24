@@ -61,8 +61,7 @@ async function warmUp() {
   let i = 1;
   for (const file of ownersFiles) {
     console.log(`File #${i++} of ${ownersFiles.length}`);
-    await repo.readFile(file);
-    await sleep(CACHE_HIT_INTERVAL);
+    await repo.readFile(file, () => sleep(CACHE_HIT_INTERVAL));
   }
 }
 
