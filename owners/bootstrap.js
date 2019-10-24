@@ -32,7 +32,9 @@ let components = null;
  */
 function bootstrap(logger) {
   if (components === null) {
-    require('dotenv').config();
+    if (process.env.NODE_ENV !== 'test') {
+      require('dotenv').config();
+    }
 
     const Octokit = require('@octokit/rest');
     const {GitHub} = require('./src/api/github');
