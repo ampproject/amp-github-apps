@@ -11,5 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-runtime: nodejs
-env: flex
+cron:
+# Note that both of these happen automatically in response to webhooks for new
+# or edited owners file and teams; this cron task ensures that the app stays in
+# sync even if webhooks are dropped or fail.
+
+- description: "Sync with the latest owners file and re-parse the owners tree"
+  url: /_cron/refreshTree
+  schedule: every 1 hours
+
+- description: "Update the internal list of teams and team members"
+  url: /_cron/refreshTeams
+  schedule: every 4 hours
