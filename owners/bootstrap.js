@@ -15,7 +15,7 @@
  */
 
 // Keep the components in scope so that, if multiple files include this, the
-// bootstrapping is only done once and all files share the components.
+// bootstrapping is only done once and all files share the
 let components = null;
 
 /**
@@ -45,27 +45,26 @@ function bootstrap(logger) {
     const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 
     logger = logger || console;
-    components = {};
 
-    components.github = new GitHub(
+    const github = new GitHub(
       new Octokit({auth: GITHUB_ACCESS_TOKEN}),
       GITHUB_REPO_OWNER,
       GITHUB_REPO_NAME,
       logger
     );
-    components.repo = new LocalRepository(GITHUB_REPO_DIR);
-    components.ownersBot = new OwnersBot(components.repo);
+    const repo = new LocalRepository(GITHUB_REPO_DIR);
+    const ownersBot = new OwnersBot(repo);
 
-    const teamsInitialized = components.ownersBot.initTeams(components.github);
-    components.initialized = teamsInitialized
-      .then(() => components.ownersBot.refreshTree(logger))
+    const teamsInitialized = ownersBot.initTeams(github);
+    const initialized = teamsInitialized
+      .then(() => ownersBot.refreshTree(logger))
       .catch(err => {
         logger.error(err);
         process.exit(1);
       });
   }
 
-  return components;
+  return {ownersBot, github, initialized};
 }
 
 module.exports = bootstrap;
