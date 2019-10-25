@@ -20,8 +20,6 @@ const InfoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/api/github');
 const {OwnersCheck} = require('./src/owners_check');
 
-const INFO_SERVER_PORT = Number(process.env.INFO_SERVER_PORT || 8081);
-
 module.exports = app => {
   const {github, ownersBot, initialized} = bootstrap(app.log);
 
@@ -100,8 +98,7 @@ module.exports = app => {
   });
 
   if (process.env.NODE_ENV !== 'test') {
-    const infoServer = new InfoServer(ownersBot, github, null, app.log);
-    infoServer.listen(INFO_SERVER_PORT);
+    new InfoServer(ownersBot, github, app.route(), app.log);
   }
 
   // Since this endpoint triggers a ton of GitHub API requests, there is a risk

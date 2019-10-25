@@ -28,9 +28,12 @@ class Server {
    * @param {function} initRoutes function adding routes.
    */
   constructor(app, logger = console) {
+    this.router = new express.Router();
     this.app = app || express();
     this.logger = logger;
+
     this.initRoutes();
+    this.app.use(this.router);
   }
 
   /**
@@ -51,7 +54,7 @@ class Server {
       throw new Error(`Method "${method}" not allowed as route`);
     }
 
-    this.app[method](uri, async (req, res, next) => {
+    this.router[method](uri, async (req, res, next) => {
       handler(req)
         .then(res.send.bind(res))
         .catch(next);
@@ -173,7 +176,7 @@ class InfoServer extends Server {
 }
 
 if (require.main === module) {
-  const {ownersBot, github} = require('bootstrap')(console);
+  const {ownersBot, github} = require('./bootstrap')(console);
   new InfoServer(ownersBot, github).listen(process.env.INFO_SERVER_PORT);
 }
 

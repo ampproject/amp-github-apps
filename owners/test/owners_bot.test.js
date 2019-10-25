@@ -131,6 +131,15 @@ describe('owners bot', () => {
     });
   });
 
+  describe('reparseTree', () => {
+    it('parses the owners tree', async () => {
+      expect.assertions(1);
+      ownersBot.treeParse = null;
+      await ownersBot.refreshTree(silentLogger);
+      expect(ownersBot.treeParse.result).toBeInstanceOf(OwnersTree);
+    });
+  });
+
   describe('initPr', () => {
     beforeEach(() => {
       const timestamp = new Date('2019-01-02T00:00:00Z');
