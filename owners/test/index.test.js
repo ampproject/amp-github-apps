@@ -20,7 +20,7 @@ const owners = require('..');
 const {Probot} = require('probot');
 const sinon = require('sinon');
 
-const LocalRepository = require('../src/repo/local_repo');
+const VirtualRepository = require('../src/repo/virtual_repo');
 const {GitHub, Team} = require('../src/api/github');
 const {OwnersParser} = require('../src/parser');
 const {UserOwner} = require('../src/owner');
@@ -71,7 +71,8 @@ describe('owners bot', () => {
       NODE_ENV: 'test',
     });
     // Disabled execution of `git pull` for testing.
-    sandbox.stub(LocalRepository.prototype, 'checkout');
+    sandbox.stub(VirtualRepository.prototype, 'sync');
+    sandbox.stub(VirtualRepository.prototype, 'warmCache').resolves();
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
     sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
     sandbox.stub(GitHub.prototype, 'getReviewRequests').returns([]);
