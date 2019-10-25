@@ -44,7 +44,7 @@ module.exports = class MemoryCache extends FileCache {
       return this.files.get(filename);
     }
 
-    this.logger.debug(`Cache miss on "${filename}"`);
+    this.logger.debug(`Memory cache miss on "${filename}"`);
     const contents = await getContents();
 
     this.logger.debug(`Storing "${filename}" to in-memory cache`);
