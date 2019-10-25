@@ -43,6 +43,16 @@ module.exports = class VirtualRepository extends Repository {
   }
 
   /**
+   * Prefix a file path with the repo to prevent cross-repo name collisions.
+   *
+   * @param {string} filename relative file path.
+   * @return {string} repository file path.
+   */
+  repoPath(filename) {
+    return `${this.github.repository}/${filename}`;
+  }
+
+  /**
    * Warms up the cache with all owners files.
    *
    * @param {?function} cacheMissCallback called when there is a cache miss.
@@ -50,7 +60,9 @@ module.exports = class VirtualRepository extends Repository {
   async warmCache(cacheMissCallback) {
     const ownersFiles = await this.findOwnersFiles();
     return await Promise.all(
-      ownersFiles.map(filename => this.readFile(filename, cacheMissCallback))
+      ownersFiles
+        .map(this.repoPath, this)
+        .map(filename => this.readFile(filename, cacheMissCallback))
     );
   }
 
@@ -62,15 +74,16 @@ module.exports = class VirtualRepository extends Repository {
    * @return {string} file contents.
    */
   async readFile(relativePath, cacheMissCallback) {
-    const fileSha = this._fileRefs.get(relativePath);
+    const repoPath = this.repoPath(relativePath);
+    const fileSha = this._fileRefs.get(repoPath);
     if (!fileSha) {
       throw new Error(
-        `File "${relativePath}" not found in virtual repository; ` +
+        `File "${repoPath}" not found in virtual repository; ` +
           'can only read files found through `findOwnersFiles`.'
       );
     }
 
-    return await this.cache.readFile(relativePath, async () => {
+    return await this.cache.readFile(repoPath, async () => {
       const contents = await this.github.getFileContents({
         filename: relativePath,
         sha: fileSha,
@@ -93,20 +106,21 @@ module.exports = class VirtualRepository extends Repository {
     const ownersFiles = await this.github.searchFilename('OWNERS');
 
     ownersFiles.forEach(({filename, sha}) => {
-      const fileSha = this._fileRefs.get(filename);
+      const repoPath = this.repoPath(filename);
+      const fileSha = this._fileRefs.get(repoPath);
       if (!fileSha) {
         // File has never been fetched and should be added to the cache.
-        this.logger.info(`Recording SHA for file "${filename}"`);
-        this._fileRefs.set(filename, sha);
+        this.logger.info(`Recording SHA for file "${repoPath}"`);
+        this._fileRefs.set(repoPath, sha);
       } else if (fileSha !== sha) {
         // File has been updated and needs to be re-fetched.
         this.logger.info(
-          `Updating SHA and clearing cache for file "${filename}"`
+          `Updating SHA and clearing cache for file "${repoPath}"`
         );
-        this._fileRefs.set(filename, sha);
-        this.cache.invalidate(filename);
+        this._fileRefs.set(repoPath, sha);
+        this.cache.invalidate(repoPath);
       } else {
-        this.logger.debug(`Ignoring unchanged file "${filename}"`);
+        this.logger.debug(`Ignoring unchanged file "${repoPath}"`);
       }
     });
 

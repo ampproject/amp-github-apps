@@ -22,7 +22,7 @@ const sinon = require('sinon');
 
 describe('virtual repository', () => {
   const sandbox = sinon.createSandbox();
-  const github = new GitHub({}, 'ampproject', 'amphtml', console);
+  const github = new GitHub({}, 'test_owner', 'test_repo', console);
   let repo;
 
   beforeEach(() => {
@@ -68,7 +68,7 @@ describe('virtual repository', () => {
   describe('readFile', () => {
     it('throws an error for unknown files', () => {
       expect(repo.readFile('OWNERS')).rejects.toThrowError(
-        'File "OWNERS" not found in virtual repository'
+        'File "test_repo/OWNERS" not found in virtual repository'
       );
     });
 
@@ -112,7 +112,7 @@ describe('virtual repository', () => {
           sha: 'sha_1',
         });
 
-        await repo.cache.invalidate('OWNERS');
+        await repo.cache.invalidate('test_repo/OWNERS');
         const contents = await repo.readFile('OWNERS');
         sandbox.assert.calledTwice(github.getFileContents);
 
@@ -155,8 +155,8 @@ describe('virtual repository', () => {
       expect.assertions(2);
       await repo.findOwnersFiles();
 
-      expect(repo._fileRefs.get('OWNERS')).toEqual('sha_1');
-      expect(repo._fileRefs.get('foo/OWNERS')).toEqual('sha_2');
+      expect(repo._fileRefs.get('test_repo/OWNERS')).toEqual('sha_1');
+      expect(repo._fileRefs.get('test_repo/foo/OWNERS')).toEqual('sha_2');
     });
 
     it('updates changed owners files', async () => {
@@ -164,12 +164,12 @@ describe('virtual repository', () => {
 
       await repo.findOwnersFiles();
       // Pretend the contents for the known files have been fetched
-      repo._fileRefs.get('OWNERS').contents = 'old root contents';
-      repo._fileRefs.get('foo/OWNERS').contents = 'old foo contents';
+      repo._fileRefs.get('test_repo/OWNERS').contents = 'old root contents';
+      repo._fileRefs.get('test_repo/foo/OWNERS').contents = 'old foo contents';
       await repo.findOwnersFiles();
 
-      expect(repo._fileRefs.get('OWNERS')).toEqual('sha_updated');
-      expect(repo._fileRefs.get('foo/OWNERS')).toEqual('sha_2');
+      expect(repo._fileRefs.get('test_repo/OWNERS')).toEqual('sha_updated');
+      expect(repo._fileRefs.get('test_repo/foo/OWNERS')).toEqual('sha_2');
     });
 
     it('invalidates the cache for changed owners files', async done => {
@@ -178,7 +178,7 @@ describe('virtual repository', () => {
       sandbox.assert.notCalled(repo.cache.invalidate);
 
       await repo.findOwnersFiles();
-      sandbox.assert.calledWith(repo.cache.invalidate, 'OWNERS');
+      sandbox.assert.calledWith(repo.cache.invalidate, 'test_repo/OWNERS');
       done();
     });
   });
