@@ -45,7 +45,6 @@ function bootstrap(logger = console) {
 
     const {
       GITHUB_REPO,
-      GITHUB_REPO_DIR,
       GITHUB_ACCESS_TOKEN,
       CLOUD_STORAGE_BUCKET,
     } = process.env;
@@ -59,14 +58,15 @@ function bootstrap(logger = console) {
     );
     const repo = new VirtualRepository(
       github,
-      new CompoundCache(CLOUD_STORAGE_BUCKET),
+      new CompoundCache(CLOUD_STORAGE_BUCKET)
     );
     const ownersBot = new OwnersBot(repo);
 
     const initialized = Promise.all([
       ownersBot.initTeams(github),
       repo.warmCache(() => sleep(CACHE_WARM_INTERVAL)),
-    ]).then(() => ownersBot.reparseTree(logger))
+    ])
+      .then(() => ownersBot.reparseTree(logger))
       .catch(err => {
         logger.error(err);
         process.exit(1);
