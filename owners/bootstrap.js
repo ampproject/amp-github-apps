@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+const CACHE_WARM_INTERVAL = 1000;
 // Keep the components in scope so that, if multiple files include this, the
 // bootstrapping is only done once and all files share the components.
 let components = null;
@@ -35,6 +36,7 @@ function bootstrap(logger = console) {
       require('dotenv').config();
     }
 
+    const sleep = require('sleep-promise');
     const Octokit = require('@octokit/rest');
     const {GitHub} = require('./src/api/github');
     const VirtualRepository = require('./src/repo/virtual_repo');
@@ -61,8 +63,10 @@ function bootstrap(logger = console) {
     );
     const ownersBot = new OwnersBot(repo);
 
-    const initialized = ownersBot.initTeams(github)
-      .then(() => ownersBot.refreshTree(logger))
+    const initialized = Promise.all([
+      ownersBot.initTeams(github),
+      repo.warmCache(() => sleep(CACHE_WARM_INTERVAL)),
+    ]).then(() => ownersBot.reparseTree(logger))
       .catch(err => {
         logger.error(err);
         process.exit(1);
