@@ -139,11 +139,7 @@ class InfoServer extends Server {
    */
   initRoutes() {
     this.get('/status', async req =>
-      [
-        `The OWNERS bot is live and running on ${process.env.GITHUB_REPO}!`,
-        '<a href="/tree">Owners Tree</a>',
-        '<a href="/teams">Organization Teams</a>',
-      ].join('<br>')
+      this.render('status', {repository: process.env.GITHUB_REPO})
     );
 
     this.get('/tree', async req => {
