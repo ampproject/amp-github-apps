@@ -21,17 +21,17 @@
   "dependencies": {
     "dotenv": "8.2.0",
     "express": "4.17.1",
-    "probot": "9.5.3",
+    "probot": "9.6.0",
     "typescript": "3.6.4"
   },
   "devDependencies": {
     "@types/bunyan": "1.8.6",
     "@types/express": "4.17.1",
-    "@types/jest": "24.0.19",
-    "@types/node": "12.11.1",
-    "@typescript-eslint/eslint-plugin": "2.4.0",
-    "@typescript-eslint/parser": "2.4.0",
-    "eslint": "6.5.1",
+    "@types/jest": "24.0.20",
+    "@types/node": "12.11.7",
+    "@typescript-eslint/eslint-plugin": "2.6.0",
+    "@typescript-eslint/parser": "2.6.0",
+    "eslint": "6.6.0",
     "jest": "24.9.0",
     "nodemon": "1.19.4",
     "smee-client": "1.1.0",
