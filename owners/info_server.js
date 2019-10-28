@@ -93,6 +93,13 @@ class Server {
     });
   }
 
+  /**
+   * Render a `lodash` template.
+   *
+   * @param {string} view name of view template.
+   * @param {?object} ctx template context.
+   * @return {strintg} template rendered with context variables.
+   */
   render(view, ctx = {}) {
     const template = fs.readFileSync(`./templates/${view}.template.html`);
     return _.template(template)(ctx);
@@ -142,9 +149,9 @@ class InfoServer extends Server {
   initRoutes() {
     const ownersFile = fs.readFileSync(EXAMPLE_OWNERS_PATH).toString('utf8');
 
-    this.get('/', async req => 
+    this.get('/', async req =>
       this.render('status', {
-        repository: `${GITHUB_OWNER}/${GITHUB_REPOSITORY}`
+        repository: `${GITHUB_OWNER}/${GITHUB_REPOSITORY}`,
       })
     );
 
