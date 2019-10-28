@@ -1,0 +1,28 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "google",
+    "prettier"
+  ],
+  "plugins": ["prettier"],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "modules": true,
+      "arrowFunctions": true,
+      "blockBindings": true,
+      "forOf": false,
+      "destructuring": true,
+      "spread": true
+    }
+  },
+  "env": {
+    "es6": true,
+    "browser": true
+  },
+  "globals": {
+    "d3": false
+  }
+}
