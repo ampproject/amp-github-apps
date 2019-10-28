@@ -44,16 +44,16 @@ function bootstrap(logger = console) {
     const {OwnersBot} = require('./src/owners_bot');
 
     const {
-      GITHUB_REPO,
+      GITHUB_OWNER,
+      GITHUB_REPOSITORY,
       GITHUB_ACCESS_TOKEN,
       CLOUD_STORAGE_BUCKET,
     } = process.env;
-    const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 
     const github = new GitHub(
       new Octokit({auth: GITHUB_ACCESS_TOKEN}),
-      GITHUB_REPO_OWNER,
-      GITHUB_REPO_NAME,
+      GITHUB_OWNER,
+      GITHUB_REPOSITORY,
       logger
     );
     const repo = new VirtualRepository(

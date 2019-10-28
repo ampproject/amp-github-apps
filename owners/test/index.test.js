@@ -49,8 +49,8 @@ const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 nock.disableNetConnect();
 jest.setTimeout(30000);
 
-const GITHUB_REPO = 'erwinmombay/github-owners-bot-test-repo';
-const GITHUB_REPO_DIR = '/Users/erwinm/dev/github-owners-bot-test-repo';
+const GITHUB_OWNER = 'erwinmombay';
+const GITHUB_REPOSITORY = 'github-owners-bot-test-repo';
 const ownersRules = [
   new OwnersRule('OWNERS', [new UserOwner('donttrustthisbot')]),
   new OwnersRule('dir1/OWNERS', [new UserOwner('donttrustthisbot')]),
@@ -66,8 +66,8 @@ describe('owners bot', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     sandbox.stub(process, 'env').value({
-      GITHUB_REPO,
-      GITHUB_REPO_DIR,
+      GITHUB_OWNER,
+      GITHUB_REPOSITORY,
       NODE_ENV: 'test',
     });
     // Disabled execution of `git pull` for testing.

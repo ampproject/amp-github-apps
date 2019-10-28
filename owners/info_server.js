@@ -19,6 +19,8 @@ const express = require('express');
 const _ = require('lodash');
 const hl = require('highlight').Highlight;
 
+const {GITHUB_OWNER, GITHUB_REPOSITORY, PORT} = process.env;
+
 const EXAMPLE_OWNERS_PATH = './OWNERS.example';
 
 /**
@@ -140,8 +142,10 @@ class InfoServer extends Server {
   initRoutes() {
     const ownersFile = fs.readFileSync(EXAMPLE_OWNERS_PATH).toString('utf8');
 
-    this.get('/', async req =>
-      this.render('status', {repository: process.env.GITHUB_REPO})
+    this.get('/', async req => 
+      this.render('status', {
+        repository: `${GITHUB_OWNER}/${GITHUB_REPOSITORY}`
+      })
     );
 
     this.get('/tree', async req => {
@@ -169,7 +173,7 @@ class InfoServer extends Server {
 
 if (require.main === module) {
   const {ownersBot, github} = require('./bootstrap')(console);
-  new InfoServer(ownersBot, github).listen(process.env.PORT);
+  new InfoServer(ownersBot, github).listen(PORT);
 }
 
 module.exports = InfoServer;
