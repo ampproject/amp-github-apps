@@ -138,7 +138,9 @@ class InfoServer extends Server {
    * Initialize route handlers.
    */
   initRoutes() {
-    this.get('/status', async req =>
+    const ownersFile = fs.readFileSync(EXAMPLE_OWNERS_PATH).toString('utf8');
+
+    this.get('/', async req =>
       this.render('status', {repository: process.env.GITHUB_REPO})
     );
 
@@ -149,6 +151,10 @@ class InfoServer extends Server {
 
     this.get('/teams', async req => {
       return this.render('teams', {teams: Object.values(this.ownersBot.teams)});
+    });
+
+    this.get('/example', async req => {
+      return this.render('example', {ownersFile: hl(ownersFile)});
     });
 
     this.cron('refreshTree', async req => {
