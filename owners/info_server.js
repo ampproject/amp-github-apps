@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
+const fs = require('fs');
 const express = require('express');
+const _ = require('lodash');
+const hl = require('highlight').Highlight;
+
+const EXAMPLE_OWNERS_PATH = './OWNERS.example';
 
 /**
  * Generic server wrapping express routing.
@@ -85,6 +90,11 @@ class Server {
       });
     });
   }
+
+  render(view, ctx = {}) {
+    const template = fs.readFileSync(`./templates/${view}.template.html`);
+    return _.template(template)(ctx);
+  }
 }
 
 /**
@@ -138,17 +148,7 @@ class InfoServer extends Server {
 
     this.get('/tree', async req => {
       const {result, errors} = this.ownersBot.treeParse;
-      const treeHeader = '<h3>OWNERS tree</h3>';
-      const treeDisplay = `<pre>${result.toString()}</pre>`;
-
-      let output = `${treeHeader}${treeDisplay}`;
-      if (errors.length) {
-        const errorHeader = '<h3>Parser Errors</h3>';
-        const errorDisplay = errors.join('<br>');
-        output += `${errorHeader}<code>${errorDisplay}</code>`;
-      }
-
-      return output;
+      return this.render('tree', {ownersTree: result, errors});
     });
 
     this.get('/teams', async req => {

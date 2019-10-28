@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Owners Tree</title>
+</head>
+<body>
+  <h3>Owners Tree</h3>
+  <pre><%= ownersTree.toString() %></pre>
+
+  <% if (errors.length) { %>
+  <h3>Parser Errors</h3>
+  <ul>
+    <% for (error of errors) { %>
+    <li><code><%= error.ownersPath %></code>: <%= error.message %></li>
+    <% } %>
+  </ul>  
+  <% } %>
+</body>
+</html>
