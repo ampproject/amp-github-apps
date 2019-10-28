@@ -443,9 +443,7 @@ describe('bundle-size', () => {
             .reply(200);
 
           await request(probot.server)
-            .post(
-              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
-            )
+            .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
             .send(jsonPayload)
             .set('Content-Type', 'application/json')
             .set('Accept', 'application/json')
@@ -506,9 +504,7 @@ describe('bundle-size', () => {
             .reply(200);
 
           await request(probot.server)
-            .post(
-              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
-            )
+            .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
             .send(jsonPayload)
             .set('Content-Type', 'application/json')
             .set('Accept', 'application/json')
@@ -569,9 +565,7 @@ describe('bundle-size', () => {
             .reply(200);
 
           await request(probot.server)
-            .post(
-              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
-            )
+            .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
             .send(jsonPayload)
             .set('Content-Type', 'application/json')
             .set('Accept', 'application/json')
@@ -624,9 +618,7 @@ describe('bundle-size', () => {
             .reply(200, reviews);
 
           await request(probot.server)
-            .post(
-              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
-            )
+            .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
             .send(jsonPayload)
             .set('Content-Type', 'application/json')
             .set('Accept', 'application/json')
@@ -679,9 +671,7 @@ describe('bundle-size', () => {
             .reply(200);
 
           await request(probot.server)
-            .post(
-              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
-            )
+            .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
             .send(jsonPayload)
             .set('Content-Type', 'application/json')
             .set('Accept', 'application/json')
@@ -748,9 +738,7 @@ describe('bundle-size', () => {
             .reply(200);
 
           await request(probot.server)
-            .post(
-              '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
-            )
+            .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
             .send(jsonPayload)
             .set('Content-Type', 'application/json')
             .set('Accept', 'application/json')
@@ -804,9 +792,7 @@ describe('bundle-size', () => {
           .reply(200);
 
         await request(probot.server)
-          .post(
-            '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
-          )
+          .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
@@ -816,9 +802,7 @@ describe('bundle-size', () => {
 
       test('ignore bundle-size report for a missing head SHA', async () => {
         await request(probot.server)
-          .post(
-            '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
-          )
+          .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
@@ -864,9 +848,7 @@ describe('bundle-size', () => {
         },
       ])('ignore bundle-size report with incorrect input: %p', async data => {
         await request(probot.server)
-          .post(
-            '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
-          )
+          .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
           .send(data)
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
