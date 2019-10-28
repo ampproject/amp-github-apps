@@ -18,8 +18,7 @@ const {OWNER_MODIFIER} = require('./owner');
 const {ReviewerSelection} = require('./reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
-const EXAMPLE_OWNERS_LINK =
-  'https://github.com/ampproject/amp-github-apps/blob/master/owners/OWNERS.example';
+const EXAMPLE_OWNERS_LINK = 'http://ampproject-owners-bot.appspot.com/example';
 
 const CheckRunConclusion = {
   SUCCESS: 'success',
