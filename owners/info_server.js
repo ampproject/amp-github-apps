@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
+const fs = require('fs');
 const express = require('express');
+const _ = require('lodash');
+const hl = require('highlight').Highlight;
+
+const EXAMPLE_OWNERS_PATH = './OWNERS.example';
 
 /**
  * Generic server wrapping express routing.
@@ -85,6 +90,18 @@ class Server {
       });
     });
   }
+
+  /**
+   * Render a `lodash` template.
+   *
+   * @param {string} view name of view template.
+   * @param {?object} ctx template context.
+   * @return {strintg} template rendered with context variables.
+   */
+  render(view, ctx = {}) {
+    const template = fs.readFileSync(`./templates/${view}.template.html`);
+    return _.template(template)(ctx);
+  }
 }
 
 /**
@@ -128,41 +145,25 @@ class InfoServer extends Server {
    * Initialize route handlers.
    */
   initRoutes() {
-    this.get('/status', async req =>
-      [
-        `The OWNERS bot is live and running on ${process.env.GITHUB_REPO}!`,
-        '<a href="/tree">Owners Tree</a>',
-        '<a href="/teams">Organization Teams</a>',
-      ].join('<br>')
+    const ownersFile = fs.readFileSync(EXAMPLE_OWNERS_PATH).toString('utf8');
+
+    this.get('/', async req =>
+      this.render('status', {
+        repository: `${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPOSITORY}`,
+      })
     );
 
     this.get('/tree', async req => {
       const {result, errors} = this.ownersBot.treeParse;
-      const treeHeader = '<h3>OWNERS tree</h3>';
-      const treeDisplay = `<pre>${result.toString()}</pre>`;
-
-      let output = `${treeHeader}${treeDisplay}`;
-      if (errors.length) {
-        const errorHeader = '<h3>Parser Errors</h3>';
-        const errorDisplay = errors.join('<br>');
-        output += `${errorHeader}<code>${errorDisplay}</code>`;
-      }
-
-      return output;
+      return this.render('tree', {ownersTree: result, errors});
     });
 
     this.get('/teams', async req => {
-      const teamSections = [];
-      Object.entries(this.ownersBot.teams).forEach(([name, team]) => {
-        teamSections.push(
-          [
-            `Team "${name}" (ID: ${team.id}):`,
-            ...team.members.map(username => `- ${username}`),
-          ].join('<br>')
-        );
-      });
+      return this.render('teams', {teams: Object.values(this.ownersBot.teams)});
+    });
 
-      return ['<h2>Teams</h2>', ...teamSections].join('<br><br>');
+    this.get('/example', async req => {
+      return this.render('example', {ownersFile: hl(ownersFile)});
     });
 
     this.cron('refreshTree', async req => {

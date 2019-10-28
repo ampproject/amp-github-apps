@@ -37,16 +37,18 @@ const VirtualRepository = require('../src/repo/virtual_repo');
 const CompoundCache = require('../src//cache/compound_cache');
 const {OwnersParser} = require('../src/parser');
 
-const CLOUD_STORAGE_BUCKET = process.env.CLOUD_STORAGE_BUCKET;
-const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
-const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
-const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
+const {
+  CLOUD_STORAGE_BUCKET,
+  GITHUB_ACCESS_TOKEN,
+  GITHUB_OWNER,
+  GITHUB_REPOSITORY,
+} = process.env.CLOUD_STORAGE_BUCKET;
 const CACHE_HIT_INTERVAL = 3000;
 
 const github = new GitHub(
   new Octokit({auth: GITHUB_ACCESS_TOKEN}),
-  GITHUB_REPO_OWNER,
-  GITHUB_REPO_NAME,
+  GITHUB_OWNER,
+  GITHUB_REPOSITORY,
   console
 );
 const cache = new CompoundCache(CLOUD_STORAGE_BUCKET);
