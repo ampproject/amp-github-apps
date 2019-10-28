@@ -177,7 +177,7 @@ class InfoServer extends Server {
 
 if (require.main === module) {
   const {ownersBot, github} = require('./bootstrap')(console);
-  new InfoServer(ownersBot, github).listen(process.env.INFO_SERVER_PORT);
+  new InfoServer(ownersBot, github).listen(process.env.PORT);
 }
 
 module.exports = InfoServer;
