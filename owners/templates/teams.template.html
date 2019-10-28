@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Organization Teams</title>
+</head>
+<body>
+  <h3>Teams</h3>
+
+  <% for (team of teams) { %>
+  <h4>Team <code>@<%= team %></code></h4>
+  <ul>
+    <% for (member of team.members) { %>
+    <li><code>@<%= member %></code></li>
+    <% } %>
+  </ul>  
+  <% } %>
+</body>
+</html>

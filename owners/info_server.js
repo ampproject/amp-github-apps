@@ -152,17 +152,7 @@ class InfoServer extends Server {
     });
 
     this.get('/teams', async req => {
-      const teamSections = [];
-      Object.entries(this.ownersBot.teams).forEach(([name, team]) => {
-        teamSections.push(
-          [
-            `Team "${name}" (ID: ${team.id}):`,
-            ...team.members.map(username => `- ${username}`),
-          ].join('<br>')
-        );
-      });
-
-      return ['<h2>Teams</h2>', ...teamSections].join('<br><br>');
+      return this.render('teams', {teams: Object.values(this.ownersBot.teams)});
     });
 
     this.cron('refreshTree', async req => {
