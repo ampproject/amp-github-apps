@@ -398,6 +398,8 @@ describe('bundle-size', () => {
           bundleSizes: {
             'dist/v0.js': 12.34,
             'dist/amp4ads-v0.js': 11.22,
+            'dist/v0/amp-accordion-0.1.js': 1.11,
+            'dist/v0/amp-ad-0.1.js': 4.56,
           },
         };
       });
@@ -453,6 +455,56 @@ describe('bundle-size', () => {
           await waitUntilNockScopeIsDone(nocks);
         }
       );
+
+      test('update a check with multiple files on bundle-size report', async () => {
+        await db('checks').insert({
+          head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          owner: 'ampproject',
+          repo: 'amphtml',
+          pull_request_id: 19603,
+          installation_id: 123456,
+          check_run_id: 555555,
+          delta: null,
+        });
+
+        const baseBundleSizeFixture = getFixture(
+          '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+        );
+        baseBundleSizeFixture.content = Buffer.from(
+          '{"dist/v0.js":12.34,"dist/v0/amp-accordion-0.1.js":1.11,"dist/v0/amp-ad-0.1.js":4.53,"dist/v0/amp-anim-0.1.js":5.65}'
+        ).toString('base64');
+        const nocks = nock('https://api.github.com')
+          .get(
+            '/repos/ampproject/amphtml-build-artifacts/contents/' +
+              'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+          )
+          .reply(200, baseBundleSizeFixture)
+          .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+            expect(body).toMatchObject({
+              conclusion: 'success',
+              output: {
+                title: 'Δ +0.00KB | no approval necessary',
+                summary: expect.stringContaining(
+                  '* dist/v0/amp-ad-0.1.js: Δ +0.03KB\n' +
+                    '* dist/v0/amp-anim-0.1.js: missing in pull request\n' +
+                    '* dist/amp4ads-v0.js: (11.22 KB) missing in `master`'
+                ),
+              },
+            });
+            return true;
+          })
+          .reply(200);
+
+        await request(probot.server)
+          .post(
+            '/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report.json'
+          )
+          .send(jsonPayload)
+          .set('Content-Type', 'application/json')
+          .set('Accept', 'application/json')
+          .expect(200);
+        await waitUntilNockScopeIsDone(nocks);
+      });
 
       test(
         'update a check on bundle-size report with no capable reviewers ' +

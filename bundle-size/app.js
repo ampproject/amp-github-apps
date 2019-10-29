@@ -123,7 +123,7 @@ async function getRandomReviewer(github) {
  *
  * Always fixed with 2 digits after the dot, preceded with a plus or minus sign.
  *
- * @param {number} delta the bundle size delta.
+ * @param {number} delta the bundle size delta in KB.
  * @return {string} formatted bundle size delta.
  */
 function formatBundleSizeDelta(delta) {
@@ -131,27 +131,87 @@ function formatBundleSizeDelta(delta) {
 }
 
 /**
+ * Returns an explanation on why the check failed when the bundle size is
+ * increased.
+ *
+ * @param {number} baseRuntimeDelta bundle size delta in KB.
+ * @param {!Array<string>} otherBundleSizeDeltas text description of other
+ *   bundle size changes.
+ * @param {!Array<string>} missingBundleSizes text description of missing bundle
+ *   sizes from other `master` or the pull request.
+ * @return {{title: string, summary: string}} check output.
+ */
+function failedCheckOutput(
+  baseRuntimeDelta,
+  otherBundleSizeDeltas,
+  missingBundleSizes
+) {
+  const baseRuntimeDeltaFormatted = formatBundleSizeDelta(baseRuntimeDelta);
+  return {
+    title: `${baseRuntimeDeltaFormatted} | approval required`,
+    summary:
+      'This pull request has increased the bundle size (brotli compressed ' +
+      `size of \`v0.js\`) by ${baseRuntimeDeltaFormatted}. As part of an ` +
+      'ongoing effort to reduce the bundle size, this change requires special' +
+      'approval.\n' +
+      'A member of the bundle-size group will be added automatically to ' +
+      'review this PR. Only once the member approves this PR, can it be ' +
+      'merged. If you do not receive a response from the group member, feel ' +
+      `free to tag another person in ${process.env.REVIEWER_TEAM_NAMES}` +
+      extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes),
+  };
+}
+
+/**
  * Returns an encouraging result summary when the bundle size is reduced.
  * Otherwise the summary is neutral, but not discouraging.
  *
- * @param {number} delta bundle size delta.
- * @param {string} deltaFormatted bundle size delta from `formatBundleSizeDelta`
- * @return {string} successful summary message.
+ * @param {number} baseRuntimeDelta bundle size delta in KB.
+ * @param {!Array<string>} otherBundleSizeDeltas text description of other
+ *   bundle size changes.
+ * @param {!Array<string>} missingBundleSizes text description of missing bundle
+ *   sizes from other `master` or the pull request.
+ * @return {{title: string, summary: string}} check output.
  */
-function successfulSummaryMessage(delta, deltaFormatted) {
-  if (delta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
-    return (
-      'This pull request *reduces* the bundle size ' +
-      '(brotli compressed size of `v0.js`), so no special approval is ' +
-      `necessary. The bundle size change is ${deltaFormatted}.`
-    );
+function successfulCheckOutput(
+  baseRuntimeDelta,
+  otherBundleSizeDeltas,
+  missingBundleSizes
+) {
+  const baseRuntimeDeltaFormatted = formatBundleSizeDelta(baseRuntimeDelta);
+  const title = `${baseRuntimeDeltaFormatted} | no approval necessary`;
+  let summary;
+  if (baseRuntimeDelta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
+    summary =
+      'This pull request *reduces* the bundle size (brotli compressed size ' +
+      'of `v0.js`), so no special approval is necessary. The bundle size ' +
+      `change is ${baseRuntimeDeltaFormatted}.`;
+  } else {
+    summary =
+      'This pull request does not change the bundle size (brotli compressed ' +
+      'size of `v0.js`) by any significant amount, so no special approval is ' +
+      `necessary. The bundle size change is ${baseRuntimeDeltaFormatted}.`;
   }
 
+  summary += extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes);
+
+  return {title, summary};
+}
+
+/**
+ * Return formatted extra changes to append to the check output summary.
+ *
+ * @param {!Array<string>} otherBundleSizeDeltas text description of other
+ *   bundle size changes.
+ * @param {!Array<string>} missingBundleSizes text description of missing bundle
+ *   sizes from other `master` or the pull request.
+ * @return {string} formatted extra changes;
+ */
+function extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes) {
   return (
-    'This pull request does not change the bundle size ' +
-    '(brotli compressed size of `v0.js`) by any significant amount, so no ' +
-    'special approval is necessary. ' +
-    `The bundle size change is ${deltaFormatted}.`
+    '\n\n' +
+    '** Other bundle sizes **\n' +
+    otherBundleSizeDeltas.concat(missingBundleSizes).join('\n')
   );
 }
 
@@ -190,11 +250,12 @@ module.exports = app => {
    *
    * @param {!object} check GitHub Check object.
    * @param {string} baseSha commit SHA of the base commit being compared to.
-   * @param {number} bundleSize the total bundle size in KB.
+   * @param {!Map<string, number>} prBundleSizes the bundle sizes of various
+   *   dist files in the pull request in KB.
    * @param {boolean} lastAttempt true if this is the last retry.
    * @return {boolean} true if succeeded; false otherwise.
    */
-  async function tryReport(check, baseSha, bundleSize, lastAttempt = false) {
+  async function tryReport(check, baseSha, prBundleSizes, lastAttempt = false) {
     const github = await app.auth(check.installation_id);
     const githubOptions = {
       owner: check.owner,
@@ -208,47 +269,79 @@ module.exports = app => {
     };
 
     try {
-      const bundleSizesJson = JSON.parse(
+      const masterBundleSizes = JSON.parse(
         await getBuildArtifactsFile(github, `${baseSha}.json`)
       );
-      const baseBundleSize = bundleSizesJson['dist/v0.js'];
 
-      const bundleSizeDelta = bundleSize - baseBundleSize;
-      const bundleSizeDeltaFormatted = formatBundleSizeDelta(bundleSizeDelta);
+      // Calculate and collect all (non-zero) bundle size deltas and list all
+      // dist files that are missing either from master or from this pull
+      // request.
+      const otherBundleSizeDeltas = [];
+      const missingBundleSizes = [];
+      for (const [file, baseBundleSize] of Object.entries(masterBundleSizes)) {
+        if (file === 'dist/v0.js') {
+          // For now, skip dist/v0.js because it gets special handling.
+          continue;
+        }
+
+        if (!(file in prBundleSizes)) {
+          missingBundleSizes.push(`* ${file}: missing in pull request`);
+          continue;
+        }
+
+        const bundleSizeDelta = prBundleSizes[file] - baseBundleSize;
+        if (bundleSizeDelta !== 0) {
+          otherBundleSizeDeltas.push(
+            `* ${file}: ${formatBundleSizeDelta(bundleSizeDelta)}`
+          );
+        }
+      }
+
+      for (const [file, prBundleSize] of Object.entries(prBundleSizes)) {
+        if (!(file in masterBundleSizes)) {
+          missingBundleSizes.push(
+            `* ${file}: (${prBundleSize} KB) missing in \`master\``
+          );
+        }
+      }
+
+      if (otherBundleSizeDeltas.length === 0) {
+        otherBundleSizeDeltas.push(
+          '* No other bundle sizes reported in this pull request'
+        );
+      }
+
+      // TODO(#271, danielrozenberg): this is a transitionary solution. This API
+      // endpoint accepts a JSON with multiple bundle sizes, but for now it only
+      // blocks on size changes in dist/v0.js. Later we determine how we want to
+      // report and block PRs based on bundle sizes of other dist files.
+      const baseRuntimeBundleSize = masterBundleSizes['dist/v0.js'];
+      const baseRuntimeBundleSizeDelta =
+        prBundleSizes['dist/v0.js'] - baseRuntimeBundleSize;
 
       await db('checks')
-        .update({delta: bundleSizeDelta})
+        .update({delta: baseRuntimeBundleSizeDelta})
         .where({head_sha: check.head_sha});
 
       const requiresApproval =
-        bundleSizeDelta > process.env['MAX_ALLOWED_INCREASE'];
+        baseRuntimeBundleSizeDelta > process.env['MAX_ALLOWED_INCREASE'];
       if (requiresApproval) {
         Object.assign(updatedCheckOptions, {
           conclusion: 'action_required',
-          output: {
-            title: `${bundleSizeDeltaFormatted} | approval required`,
-            summary:
-              'This pull request has increased the bundle size ' +
-              '(brotli compressed size of `v0.js`) by ' +
-              `${bundleSizeDeltaFormatted}. As part of an ongoing effort to ` +
-              'reduce the bundle size, this change requires special approval.' +
-              '\n' +
-              'A member of the bundle-size group will be added automatically ' +
-              'to review this PR. Only once the member approves this PR, ' +
-              'can it be merged. If you do not receive a response from the ' +
-              'group member, feel free to tag another person in ' +
-              process.env.REVIEWER_TEAM_NAMES,
-          },
+          output: failedCheckOutput(
+            baseRuntimeBundleSizeDelta,
+            otherBundleSizeDeltas,
+            missingBundleSizes
+          ),
         });
       } else {
-        const title = `${bundleSizeDeltaFormatted} | no approval necessary`;
-        const summary = successfulSummaryMessage(
-          bundleSizeDelta,
-          bundleSizeDeltaFormatted
-        );
         Object.assign(updatedCheckOptions, {
           conclusion: 'success',
-          output: {title, summary},
+          output: successfulCheckOutput(
+            baseRuntimeBundleSizeDelta,
+            otherBundleSizeDeltas,
+            missingBundleSizes
+          ),
         });
       }
       await github.checks.update(updatedCheckOptions);
@@ -549,12 +642,6 @@ module.exports = app => {
         );
     }
 
-    // TODO(#271, danielrozenberg): this is a transitionary solution. This API
-    // endpoint accepts a JSON with multiple bundle sizes, but for now it only
-    // processes the size of dist/v0.js. Once we determine how we want to report
-    // and block PRs based on other bundle sizes we can start processing them.
-    const bundleSize = bundleSizes['dist/v0.js'];
-
     const check = await getCheckFromDatabase(headSha);
     if (!check) {
       return response
@@ -565,7 +652,7 @@ module.exports = app => {
         );
     }
 
-    let reportSuccess = await tryReport(check, baseSha, bundleSize);
+    let reportSuccess = await tryReport(check, baseSha, bundleSizes);
     if (reportSuccess) {
       response.end();
     } else {
@@ -578,7 +665,7 @@ module.exports = app => {
         reportSuccess = await tryReport(
           check,
           baseSha,
-          bundleSize,
+          bundleSizes,
           /* lastAttempt */ retriesLeft == 0
         );
       } while (retriesLeft > 0 && !reportSuccess);
