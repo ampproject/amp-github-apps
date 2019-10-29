@@ -55,7 +55,7 @@ describe('compound cache', () => {
     });
 
     describe('when the file is not in the memory cache', () => {
-      describe('when the file is in the Cloud Storage cache', async () => {
+      describe('when the file is in the Cloud Storage cache', () => {
         beforeEach(() => {
           sandbox
             .stub(CloudStorage.prototype, 'download')
@@ -83,7 +83,7 @@ describe('compound cache', () => {
         });
       });
 
-      describe('when the file is not in the Cloud Storage cache', async () => {
+      describe('when the file is not in the Cloud Storage cache', () => {
         beforeEach(() => {
           sandbox.stub(CloudStorage.prototype, 'upload').resolves();
           sandbox
