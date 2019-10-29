@@ -18,7 +18,6 @@ const sinon = require('sinon');
 const {GitHub, PullRequest, Review, Team} = require('../src/api/github');
 const LocalRepository = require('../src/repo/local_repo');
 const {OwnersBot} = require('../src/owners_bot');
-const {OwnersParser} = require('../src/parser');
 const {OwnersNotifier} = require('../src/notifier');
 const {OwnersTree} = require('../src/owners_tree');
 const {
@@ -157,27 +156,6 @@ describe('owners bot', () => {
         .returns(['requested']);
     });
 
-    it('refreshes the owners tree', async done => {
-      sandbox.stub(OwnersBot.prototype, 'refreshTree');
-      await ownersBot.initPr(github, pr);
-
-      sandbox.assert.calledWith(ownersBot.refreshTree, github.logger);
-      done();
-    });
-
-    it('warns about parsing errors', async done => {
-      const error = new Error('Oops!');
-      sandbox.stub(silentLogger, 'warn');
-      sandbox.stub(OwnersParser.prototype, 'parseOwnersTree').returns({
-        tree: new OwnersTree(),
-        errors: [error],
-      });
-      await ownersBot.initPr(github, pr);
-
-      sandbox.assert.calledWith(silentLogger.warn, error);
-      done();
-    });
-
     it('finds the reviewers that approved', async () => {
       expect.assertions(2);
       const {reviewers} = await ownersBot.initPr(github, pr);
@@ -245,13 +223,6 @@ describe('owners bot', () => {
       await ownersBot.runOwnersCheck(github, pr);
 
       sandbox.assert.calledWith(github.getCheckRunIds, '_test_hash_');
-      done();
-    });
-
-    it('synchronizes the repository', async done => {
-      await ownersBot.runOwnersCheck(github, pr);
-
-      sandbox.assert.calledOnce(repo.sync);
       done();
     });
 

@@ -105,8 +105,6 @@ class OwnersBot {
    * }} key structures needed to check PR ownership.
    */
   async initPr(github, pr) {
-    await this.refreshTree(github.logger);
-
     const changedFiles = await github.listFiles(pr.number);
     const reviewers = await this._getCurrentReviewers(github, pr);
     const pendingReviewers = await github.getReviewRequests(pr.number);
