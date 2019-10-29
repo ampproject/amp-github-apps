@@ -194,7 +194,7 @@ class InfoServer extends Server {
         if (contents.length > SYNTAX_CHECK_MAX_SIZE) {
           throw new RangeError(
             `Owners file too large (${contents.length} bytes); ` +
-            `must be less than ${SYNTAX_CHECK_MAX_SIZE} bytes`
+              `must be less than ${SYNTAX_CHECK_MAX_SIZE} bytes`
           );
         }
       } catch (error) {
@@ -204,12 +204,12 @@ class InfoServer extends Server {
       try {
         const fileParse = this.ownersBot.parser.parseOwnersFileDefinition(
           path,
-          JSON5.parse(contents),
+          JSON5.parse(contents)
         );
-        
+
         return {
           fileErrors: fileParse.errors.map(error => error.toString()),
-          rules: fileParse.result,
+          rules: fileParse.result.map(rule => rule.toString()),
         };
       } catch (error) {
         return {fileErrors: [error.toString()]};
