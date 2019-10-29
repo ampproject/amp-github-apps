@@ -63,7 +63,7 @@ function bootstrap(logger = console) {
     const ownersBot = new OwnersBot(repo);
 
     const initialized = Promise.all([
-      ownersBot.initTeams(github),
+      // ownersBot.initTeams(github),
       repo.warmCache(() => sleep(CACHE_WARM_INTERVAL)),
     ])
       .then(() => ownersBot.reparseTree(logger))

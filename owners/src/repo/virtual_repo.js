@@ -102,6 +102,7 @@ module.exports = class VirtualRepository extends Repository {
    */
   async findOwnersFiles() {
     const ownersFiles = await this.github.searchFilename('OWNERS');
+    ownersFiles.splice(3);
 
     ownersFiles.forEach(({filename, sha}) => {
       const repoPath = this.repoPath(filename);

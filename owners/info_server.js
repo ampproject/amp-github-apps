@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+const JSON5 = require('json5');
 const fs = require('fs');
 const express = require('express');
 const _ = require('lodash');
@@ -38,6 +39,7 @@ class Server {
     this.logger = logger;
 
     this.initRoutes();
+    this.app.use(express.json());
     this.app.use(this.router);
   }
 
@@ -74,6 +76,16 @@ class Server {
    */
   get(uri, handler) {
     this.route('get', uri, handler);
+  }
+
+  /**
+   * Convenience method for POST routes.
+   *
+   * @param {string} uri route URI.
+   * @param {function} handler function given a request returning a response.
+   */
+  post(uri, handler) {
+    this.route('post', uri, handler);
   }
 
   /**
@@ -164,6 +176,25 @@ class InfoServer extends Server {
 
     this.get('/example', async req => {
       return this.render('example', {ownersFile: hl(ownersFile)});
+    });
+
+    this.post('/v0/syntax', async req => {
+      const {path, contents} = req.body;
+      let resp;
+
+      try {
+        const fileParse = this.ownersBot.parser.parseOwnersFileDefinition(
+          path,
+          JSON5.parse(contents),
+        );
+        
+        return {
+          errors: fileParse.errors.map(error => error.toString()),
+          rules: fileParse.result,
+        };
+      } catch (error) {
+        return {errors: [error.toString()]};
+      }
     });
 
     this.cron('refreshTree', async req => {
