@@ -38,8 +38,6 @@ const searchReadmeResponse = require('../fixtures/files/search.readme.json');
 const searchOwnersPage1Response = require('../fixtures/files/search.owners.page_1.json');
 const searchOwnersPage2Response = require('../fixtures/files/search.owners.page_2.json');
 
-nock.disableNetConnect();
-
 describe('pull request', () => {
   describe('isOpen', () => {
     it.each([['open', true], ['closed', false], ['merged', false]])(
@@ -115,6 +113,14 @@ describe('GitHub API', () => {
   const sandbox = sinon.createSandbox();
   let githubClient;
   let github;
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.enableNetConnect();
+  });
 
   beforeEach(() => {
     sandbox.stub(console);
