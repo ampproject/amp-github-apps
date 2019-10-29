@@ -348,7 +348,7 @@ describe('GitHub API', () => {
       const reviews = await github.getReviews(24686);
       const review = reviews[2];
 
-      expect(review.reviewer).toEqual('estherkim');
+      expect(review.reviewer).toEqual('fakename');
       expect(review.isComment).toBe(true);
     });
 
@@ -362,7 +362,7 @@ describe('GitHub API', () => {
       const reviews = await github.getReviews(24686);
       const review = reviews[3];
 
-      expect(review.reviewer).toEqual('estherkim');
+      expect(review.reviewer).toEqual('fakename');
       expect(review.isRejected).toBe(true);
     });
 
