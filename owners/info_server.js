@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
+const JSON5 = require('json5');
 const fs = require('fs');
 const express = require('express');
 const _ = require('lodash');
 const hl = require('highlight').Highlight;
 
 const EXAMPLE_OWNERS_PATH = './OWNERS.example';
+const SYNTAX_CHECK_MAX_SIZE = 5000;
 
 /**
  * Generic server wrapping express routing.
@@ -38,6 +40,7 @@ class Server {
     this.logger = logger;
 
     this.initRoutes();
+    this.app.use(express.json());
     this.app.use(this.router);
   }
 
@@ -74,6 +77,16 @@ class Server {
    */
   get(uri, handler) {
     this.route('get', uri, handler);
+  }
+
+  /**
+   * Convenience method for POST routes.
+   *
+   * @param {string} uri route URI.
+   * @param {function} handler function given a request returning a response.
+   */
+  post(uri, handler) {
+    this.route('post', uri, handler);
   }
 
   /**
@@ -164,6 +177,43 @@ class InfoServer extends Server {
 
     this.get('/example', async req => {
       return this.render('example', {ownersFile: hl(ownersFile)});
+    });
+
+    this.post('/v0/syntax', async req => {
+      const {path, contents} = req.body;
+
+      try {
+        if (path === undefined) {
+          throw new RangeError('Missing key "path" in POST body');
+        }
+
+        if (contents === undefined) {
+          throw new RangeError('Missing key "contents" in POST body');
+        }
+
+        if (contents.length > SYNTAX_CHECK_MAX_SIZE) {
+          throw new RangeError(
+            `Owners file too large (${contents.length} bytes); ` +
+              `must be less than ${SYNTAX_CHECK_MAX_SIZE} bytes`
+          );
+        }
+      } catch (error) {
+        return {requestErrors: [error.toString()]};
+      }
+
+      try {
+        const fileParse = this.ownersBot.parser.parseOwnersFileDefinition(
+          path,
+          JSON5.parse(contents)
+        );
+
+        return {
+          fileErrors: fileParse.errors.map(error => error.toString()),
+          rules: fileParse.result.map(rule => rule.toString()),
+        };
+      } catch (error) {
+        return {fileErrors: [error.toString()]};
+      }
     });
 
     this.cron('refreshTree', async req => {

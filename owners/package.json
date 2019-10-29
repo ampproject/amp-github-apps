@@ -31,7 +31,8 @@
     "nock": "11.6.0",
     "nodemon": "1.19.4",
     "sinon": "7.5.0",
-    "smee-client": "1.1.0"
+    "smee-client": "1.1.0",
+    "supertest": "4.0.2"
   },
   "standard": {
     "env": [

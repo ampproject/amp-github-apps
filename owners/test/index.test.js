@@ -46,7 +46,6 @@ const checkruns35Empty = require('./fixtures/check-runs/check-runs.get.35.empty'
 
 const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 
-nock.disableNetConnect();
 jest.setTimeout(30000);
 
 const GITHUB_OWNER = 'erwinmombay';
@@ -61,6 +60,14 @@ const ownersRules = [
 describe('owners bot', () => {
   let probot;
   let sandbox;
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.enableNetConnect();
+  });
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
