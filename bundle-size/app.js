@@ -123,7 +123,7 @@ async function getRandomReviewer(github) {
  *
  * Always fixed with 2 digits after the dot, preceded with a plus or minus sign.
  *
- * @param {number} delta the bundle size delta.
+ * @param {number} delta the bundle size delta in KB.
  * @return {string} formatted bundle size delta.
  */
 function formatBundleSizeDelta(delta) {
@@ -134,7 +134,7 @@ function formatBundleSizeDelta(delta) {
  * Returns an explanation on why the check failed when the bundle size is
  * increased.
  *
- * @param {number} baseRuntimeDelta bundle size delta.
+ * @param {number} baseRuntimeDelta bundle size delta in KB.
  * @param {Array<string>} otherBundleSizeDeltas text description of other bundle
  *   size changes.
  * @param {Array<string>} missingBundleSizes text description of missing bundle
@@ -166,7 +166,7 @@ function failedCheckOutput(
  * Returns an encouraging result summary when the bundle size is reduced.
  * Otherwise the summary is neutral, but not discouraging.
  *
- * @param {number} baseRuntimeDelta bundle size delta.
+ * @param {number} baseRuntimeDelta bundle size delta in KB.
  * @param {Array<string>} otherBundleSizeDeltas text description of other bundle
  *   size changes.
  * @param {Array<string>} missingBundleSizes text description of missing bundle
