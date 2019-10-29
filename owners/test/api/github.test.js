@@ -425,7 +425,7 @@ describe('GitHub API', () => {
         .reply(200, requestedReviewsResponse);
       const reviewers = await github.getReviewRequests(24574);
 
-      expect(reviewers).toEqual(['jridgewell', 'jpettitt', 'sparhami']);
+      expect(reviewers).toEqual(['scripter', 'someperson', 'sparhami']);
     });
   });
 
