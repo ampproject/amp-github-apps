@@ -599,7 +599,7 @@ describe('owners bot', () => {
     ])('updates the team members on event %p', async (name, done) => {
       nock('https://api.github.com')
         .get('/teams/42/members?page=1&per_page=100')
-        .reply(200, [{login: 'rcebulko'}]);
+        .reply(200, [{login: 'coder'}]);
 
       await probot.receive({
         name,

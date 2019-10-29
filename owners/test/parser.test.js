@@ -275,9 +275,9 @@ describe('owners parser', () => {
 
     it('creates an owners rule', () => {
       const {result} = parser._parseRuleDefinition('', {
-        owners: [{name: 'rcebulko'}],
+        owners: [{name: 'coder'}],
       });
-      expect(result).toEqual(new OwnersRule('', [new UserOwner('rcebulko')]));
+      expect(result).toEqual(new OwnersRule('', [new UserOwner('coder')]));
     });
 
     describe('when a pattern is specified', () => {
@@ -285,7 +285,7 @@ describe('owners parser', () => {
         it('reports an error', () => {
           const {errors} = parser._parseRuleDefinition('', {
             pattern: {},
-            owners: [{name: 'rcebulko'}],
+            owners: [{name: 'coder'}],
           });
           expect(errors[0].message).toEqual(
             'Expected "pattern" to be a string; got object'
@@ -295,7 +295,7 @@ describe('owners parser', () => {
         it('returns no result', () => {
           const {result} = parser._parseRuleDefinition('', {
             pattern: {},
-            owners: [{name: 'rcebulko'}],
+            owners: [{name: 'coder'}],
           });
           expect(result).toBeUndefined();
         });
@@ -305,7 +305,7 @@ describe('owners parser', () => {
         it('reports an error', () => {
           const {errors} = parser._parseRuleDefinition('', {
             pattern: 'foo-*/*.js',
-            owners: [{name: 'rcebulko'}],
+            owners: [{name: 'coder'}],
           });
           expect(errors[0].message).toContain(
             "directory patterns other than '**/' not supported"
@@ -315,7 +315,7 @@ describe('owners parser', () => {
         it('returns no result', () => {
           const {result} = parser._parseRuleDefinition('', {
             pattern: 'foo-*/*.js',
-            owners: [{name: 'rcebulko'}],
+            owners: [{name: 'coder'}],
           });
           expect(result).toBeUndefined();
         });
@@ -324,20 +324,20 @@ describe('owners parser', () => {
       it('creates a same-directory rule', () => {
         const {result} = parser._parseRuleDefinition('', {
           pattern: '*.js',
-          owners: [{name: 'rcebulko'}],
+          owners: [{name: 'coder'}],
         });
         expect(result).toEqual(
-          new SameDirPatternOwnersRule('', [new UserOwner('rcebulko')], '*.js')
+          new SameDirPatternOwnersRule('', [new UserOwner('coder')], '*.js')
         );
       });
 
       it('creates a recursive rule for a pattern starting with **/', () => {
         const {result} = parser._parseRuleDefinition('', {
           pattern: '**/*.js',
-          owners: [{name: 'rcebulko'}],
+          owners: [{name: 'coder'}],
         });
         expect(result).toEqual(
-          new PatternOwnersRule('', [new UserOwner('rcebulko')], '*.js')
+          new PatternOwnersRule('', [new UserOwner('coder')], '*.js')
         );
       });
     });
@@ -553,7 +553,7 @@ describe('owners parser', () => {
       expect.assertions(1);
       sandbox
         .stub(repo, 'readFile')
-        .returns('{rules: [{owners: [{name: "rcebulko"}]}]}');
+        .returns('{rules: [{owners: [{name: "coder"}]}]}');
       const fileParse = await parser.parseOwnersFile('foo/OWNERS');
       const rules = fileParse.result;
 

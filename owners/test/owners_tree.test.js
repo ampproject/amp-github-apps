@@ -96,7 +96,7 @@ describe('owners tree', () => {
 
     it('saves a reviewer set rule', () => {
       const reviewerSetRule = new ReviewerSetRule('OWNERS', [
-        new UserOwner('rcebulko'),
+        new UserOwner('coder'),
       ]);
       tree.addRule(reviewerSetRule);
 
