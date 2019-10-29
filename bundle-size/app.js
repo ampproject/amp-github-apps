@@ -158,7 +158,7 @@ function failedCheckOutput(
       'review this PR. Only once the member approves this PR, can it be ' +
       'merged. If you do not receive a response from the group member, feel ' +
       `free to tag another person in ${process.env.REVIEWER_TEAM_NAMES}` +
-      appendExtraBundleSizes(otherBundleSizeDeltas, missingBundleSizes),
+      extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes),
   };
 }
 
@@ -193,7 +193,7 @@ function successfulCheckOutput(
       `necessary. The bundle size change is ${baseRuntimeDeltaFormatted}.`;
   }
 
-  summary += appendExtraBundleSizes(otherBundleSizeDeltas, missingBundleSizes);
+  summary += extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes);
 
   return {title, summary};
 }
@@ -207,7 +207,7 @@ function successfulCheckOutput(
  *   sizes from other `master` or the pull request.
  * @return {string} formatted extra changes;
  */
-function appendExtraBundleSizes(otherBundleSizeDeltas, missingBundleSizes) {
+function extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes) {
   return (
     '\n\n' +
     '** Other bundle sizes **\n' +
