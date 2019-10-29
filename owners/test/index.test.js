@@ -81,27 +81,14 @@ describe('owners bot', () => {
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
       .returns({result: ownersRules, errors: []});
 
-    probot = new Probot({
-      // These are fake values (but a valid generated key) required for Probot
-      // to execute its auth flow.
-      id: 123,
-      cert: `-----BEGIN RSA PRIVATE KEY-----
-MIICXAIBAAKBgQCv62RBhL6nOnBCsTrXaxPnkmOlyYF9wkDiGC/gA6DS1hUmuZzv
-ntmlPLy7Xxf5NC+1//gZTBxesNoZE5a+UQDmI3nt9NNVzPmz69QGIVjwsIDOC/u/
-QmbHDMqBlWdNKgauVXIzP9bqkTGrQFUhyrRPBUia2a+xv7OzA4sMsF+huQIDAQAB
-AoGARnkYCp8w+TER88Wn+tAsgyJDxRB6TXTaJTjnROhvLscQZhkJY3zRV76DJNSt
-d+mOC2zlaMzyuIREerM8OjWdE+qapg/aLF173QHxs8GhZSBfa5AybSrxbC6MbON4
-3ufIqrK6THGSf7TVm/M5+E7F51fNGD8/DkHbulrbm/zx4fkCQQDazKzSXlb1XCnB
-XdKhM7kLMOoJl11oEQjNzna05ITOPFWRonG33H2K3CW7xpn4y76mVuPMwI3nrL8W
-iW2JEm9DAkEAzdRZWdb9ZweB9R4OVi+QwG8JH/71qcAOUhcizoNYModfdbx1EN8h
-YkCvnTA0dkl3m0JLxJHeJ7Euj9266y3FUwJAF+hPZfkq9UppwZg34KdfK8rfd8bT
-TQC3fo11yRRDMqnDC9O9K0LrcNXXRapQvq+8mD5cS84qc0sb4iGIF3ctMwJAJWIf
-BFku1wqfCOT3l6G1+a1xC9WjyrvuHezDzpw+ZZb+uISNAo50IsM64iLCNIWtao6E
-8mPH5I+itFCCRXqfrwJBAJG6yomvUabW5z6M/kpz4XN1fezwdqlXh6bpFE2P2tLg
-1TBbE6J/hywIrZ/IZ6ogFG0EJ2pBM1y3g5C/QFm6Aio=
------END RSA PRIVATE KEY-----`,
-    });
-    probot.load(owners);
+    probot = new Probot({});
+    const app = probot.load(owners);
+
+    // Return a test token.
+    app.app = {
+      getInstallationAccessToken: () => Promise.resolve('test'),
+      getSignedJsonWebToken: () => Promise.resolve('test'),
+    };
   });
 
   afterEach(() => {
