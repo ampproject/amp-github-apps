@@ -21,6 +21,7 @@ const _ = require('lodash');
 const hl = require('highlight').Highlight;
 
 const EXAMPLE_OWNERS_PATH = './OWNERS.example';
+const SYNTAX_CHECK_MAX_SIZE = 5000;
 
 /**
  * Generic server wrapping express routing.
@@ -183,6 +184,12 @@ class InfoServer extends Server {
       let resp;
 
       try {
+        if (contents.length > SYNTAX_CHECK_MAX_SIZE) {
+          throw new RangeError(
+            `Owners file too large (${contents.length} bytes); ` +
+            `must be less than ${SYNTAX_CHECK_MAX_SIZE} bytes`
+          );
+        }
         const fileParse = this.ownersBot.parser.parseOwnersFileDefinition(
           path,
           JSON5.parse(contents),
