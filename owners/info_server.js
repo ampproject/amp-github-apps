@@ -183,13 +183,22 @@ class InfoServer extends Server {
       const {path, contents} = req.body;
       let resp;
 
+      if (path === undefined) {
+        throw new RangeError('Missing key "path" in POST body');
+      }
+
+      if (contents === undefined) {
+        throw new RangeError('Missing key "contents" in POST body');
+      }
+
+      if (contents.length > SYNTAX_CHECK_MAX_SIZE) {
+        throw new RangeError(
+          `Owners file too large (${contents.length} bytes); ` +
+          `must be less than ${SYNTAX_CHECK_MAX_SIZE} bytes`
+        );
+      }
+
       try {
-        if (contents.length > SYNTAX_CHECK_MAX_SIZE) {
-          throw new RangeError(
-            `Owners file too large (${contents.length} bytes); ` +
-            `must be less than ${SYNTAX_CHECK_MAX_SIZE} bytes`
-          );
-        }
         const fileParse = this.ownersBot.parser.parseOwnersFileDefinition(
           path,
           JSON5.parse(contents),
