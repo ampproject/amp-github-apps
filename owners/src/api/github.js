@@ -259,9 +259,11 @@ class GitHub {
    * @return {!PullRequest} pull request instance.
    */
   async getPullRequest(number) {
-    const response = await this.client.pullRequests.get(this.repo({
-      pull_number: number,
-    }));
+    const response = await this.client.pullRequests.get(
+      this.repo({
+        pull_number: number,
+      })
+    );
     return PullRequest.fromGitHubResponse(response.data);
   }
 
