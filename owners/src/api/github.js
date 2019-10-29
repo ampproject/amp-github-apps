@@ -259,7 +259,11 @@ class GitHub {
    * @return {!PullRequest} pull request instance.
    */
   async getPullRequest(number) {
-    const response = await this.client.pullRequests.get(this.repo({number}));
+    const response = await this.client.pullRequests.get(
+      this.repo({
+        pull_number: number,
+      })
+    );
     return PullRequest.fromGitHubResponse(response.data);
   }
 
@@ -431,7 +435,7 @@ class GitHub {
     this.logger.info(`Fetching changed files for PR #${number}`);
 
     const response = await this.client.pullRequests.listFiles(
-      this.repo({number})
+      this.repo({pull_number: number})
     );
     this.logger.debug('[listFiles]', number, response.data);
 

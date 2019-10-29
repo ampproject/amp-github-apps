@@ -59,7 +59,6 @@ const ownersRules = [
 ];
 
 describe('owners bot', () => {
-  let app;
   let probot;
   let sandbox;
 
@@ -83,10 +82,13 @@ describe('owners bot', () => {
       .returns({result: ownersRules, errors: []});
 
     probot = new Probot({});
-    app = probot.load(owners);
+    const app = probot.load(owners);
 
-    // just return a test token
-    app.app = () => 'test';
+    // Return a test token.
+    app.app = {
+      getInstallationAccessToken: () => Promise.resolve('test'),
+      getSignedJsonWebToken: () => Promise.resolve('test'),
+    };
   });
 
   afterEach(() => {
