@@ -135,9 +135,9 @@ function formatBundleSizeDelta(delta) {
  * increased.
  *
  * @param {number} baseRuntimeDelta bundle size delta in KB.
- * @param {Array<string>} otherBundleSizeDeltas text description of other bundle
- *   size changes.
- * @param {Array<string>} missingBundleSizes text description of missing bundle
+ * @param {!Array<string>} otherBundleSizeDeltas text description of other
+ *   bundle size changes.
+ * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
  * @return {{title: string, summary: string}} check output.
  */
@@ -167,9 +167,9 @@ function failedCheckOutput(
  * Otherwise the summary is neutral, but not discouraging.
  *
  * @param {number} baseRuntimeDelta bundle size delta in KB.
- * @param {Array<string>} otherBundleSizeDeltas text description of other bundle
- *   size changes.
- * @param {Array<string>} missingBundleSizes text description of missing bundle
+ * @param {!Array<string>} otherBundleSizeDeltas text description of other
+ *   bundle size changes.
+ * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
  * @return {{title: string, summary: string}} check output.
  */
@@ -201,9 +201,9 @@ function successfulCheckOutput(
 /**
  * Return formatted extra changes to append to the check output summary.
  *
- * @param {Array<string>} otherBundleSizeDeltas text description of other bundle
- *   size changes.
- * @param {Array<string>} missingBundleSizes text description of missing bundle
+ * @param {!Array<string>} otherBundleSizeDeltas text description of other
+ *   bundle size changes.
+ * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
  * @return {string} formatted extra changes;
  */
@@ -250,8 +250,8 @@ module.exports = app => {
    *
    * @param {!object} check GitHub Check object.
    * @param {string} baseSha commit SHA of the base commit being compared to.
-   * @param {Map<string, number>} prBundleSizes the bundle sizes of various dist
-   *   files in the pull request in KB.
+   * @param {!Map<string, number>} prBundleSizes the bundle sizes of various
+   *   dist files in the pull request in KB.
    * @param {boolean} lastAttempt true if this is the last retry.
    * @return {boolean} true if succeeded; false otherwise.
    */
