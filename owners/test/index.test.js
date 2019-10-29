@@ -49,13 +49,13 @@ const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 nock.disableNetConnect();
 jest.setTimeout(30000);
 
-const GITHUB_OWNER = 'erwinmombay';
+const GITHUB_OWNER = 'githubuser';
 const GITHUB_REPOSITORY = 'github-owners-bot-test-repo';
 const ownersRules = [
   new OwnersRule('OWNERS', [new UserOwner('donttrustthisbot')]),
   new OwnersRule('dir1/OWNERS', [new UserOwner('donttrustthisbot')]),
-  new OwnersRule('dir2/OWNERS', [new UserOwner('erwinmombay')]),
-  new OwnersRule('dir2/dir1/dir1/OWNERS', [new UserOwner('erwinmombay')]),
+  new OwnersRule('dir2/OWNERS', [new UserOwner('githubuser')]),
+  new OwnersRule('dir2/dir1/dir1/OWNERS', [new UserOwner('githubuser')]),
 ];
 
 describe('owners bot', () => {
@@ -103,35 +103,35 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
         )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
+          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
         .reply(200, checkruns35Multiple);
 
       // Test that a check-run is created
       nock('https://api.github.com')
         .patch(
-          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472315',
+          '/repos/githubuser/github-owners-bot-test-repo/check-runs/53472315',
           body => {
             expect(body).toMatchObject({
               conclusion: 'action_required',
               output: {
                 title:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
                 summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
               },
             });
             expect(body.output.text).toContain(
@@ -140,7 +140,7 @@ describe('owners bot', () => {
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
-                'Reviewer: _erwinmombay_\n' +
+                'Reviewer: _githubuser_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
             expect(body.output.text).toContain('HELP TEXT');
@@ -164,28 +164,28 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
         )
         .reply(200, reviews35);
 
       // Get check runs for a specific commit
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
+          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
         .reply(200, checkruns35Empty);
 
       // Test that a check-run is created
       nock('https://api.github.com')
         .post(
-          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs',
+          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
@@ -194,9 +194,9 @@ describe('owners bot', () => {
               conclusion: 'action_required',
               output: {
                 title:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
                 summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
               },
             });
             expect(body.output.text).toContain(
@@ -205,7 +205,7 @@ describe('owners bot', () => {
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
-                'Reviewer: _erwinmombay_\n' +
+                'Reviewer: _githubuser_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
             expect(body.output.text).toContain('HELP TEXT');
@@ -229,35 +229,35 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
         )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
+          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
         .reply(200, checkruns35);
 
       // Test that a check-run is created
       nock('https://api.github.com')
         .patch(
-          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313',
+          '/repos/githubuser/github-owners-bot-test-repo/check-runs/53472313',
           body => {
             expect(body).toMatchObject({
               conclusion: 'action_required',
               output: {
                 title:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
                 summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
               },
             });
             expect(body.output.text).toContain(
@@ -266,7 +266,7 @@ describe('owners bot', () => {
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
-                'Reviewer: _erwinmombay_\n' +
+                'Reviewer: _githubuser_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
             expect(body.output.text).toContain('HELP TEXT');
@@ -288,35 +288,35 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35Multiple);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
         )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
+          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
         .reply(200, checkruns35);
 
       // Test that a check-run is created
       nock('https://api.github.com')
         .patch(
-          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313',
+          '/repos/githubuser/github-owners-bot-test-repo/check-runs/53472313',
           body => {
             expect(body).toMatchObject({
               conclusion: 'action_required',
               output: {
                 title:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
                 summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
               },
             });
             expect(body.output.text).toContain(
@@ -326,7 +326,7 @@ describe('owners bot', () => {
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
-                'Reviewer: _erwinmombay_\n' +
+                'Reviewer: _githubuser_\n' +
                 '- dir2/dir1/dir1/file.txt\n' +
                 '- dir2/dir1/dir1/file-2.txt'
             );
@@ -351,33 +351,33 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35')
         .reply(200, pullRequest35);
 
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
         )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
+          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
         .reply(200, checkruns35Empty);
 
       // Test that a check-run is created
       nock('https://api.github.com')
         .post(
-          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs',
+          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
@@ -386,9 +386,9 @@ describe('owners bot', () => {
               conclusion: 'action_required',
               output: {
                 title:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
                 summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: erwinmombay',
+                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
               },
             });
             expect(body.output.text).toContain(
@@ -397,7 +397,7 @@ describe('owners bot', () => {
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
-                'Reviewer: _erwinmombay_\n' +
+                'Reviewer: _githubuser_\n' +
                 '- dir2/dir1/dir1/file.txt'
             );
             expect(body.output.text).toContain('HELP TEXT');
@@ -421,20 +421,20 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
         )
         .reply(200, reviews35Approved);
 
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/commits/' +
+          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
             '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
         .reply(200, checkruns35Empty);
@@ -442,7 +442,7 @@ describe('owners bot', () => {
       // Test that a check-run is created
       nock('https://api.github.com')
         .post(
-          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs',
+          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
@@ -456,7 +456,7 @@ describe('owners bot', () => {
             });
             expect(body.output.text).toContain(
               '### Current Coverage\n\n' +
-                '- dir2/dir1/dir1/file.txt _(erwinmombay)_'
+                '- dir2/dir1/dir1/file.txt _(githubuser)_'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -477,20 +477,20 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/36/files')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/36/files')
         .reply(200, files36);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/36/reviews?page=1&per_page=100'
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/36/reviews?page=1&per_page=100'
         )
         .reply(200, reviews35);
 
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/commits/' +
+          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
             'c7fdbd7f947fca608b20006da8535af5384ab699/check-runs'
         )
         .reply(200, checkruns35Empty);
@@ -498,7 +498,7 @@ describe('owners bot', () => {
       // // Test that a check-run is created
       nock('https://api.github.com')
         .post(
-          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs',
+          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
@@ -511,7 +511,7 @@ describe('owners bot', () => {
               },
             });
             expect(body.output.text).toContain(
-              '### Current Coverage\n\n- dir2/new-file.txt _(erwinmombay)_'
+              '### Current Coverage\n\n- dir2/new-file.txt _(githubuser)_'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -532,25 +532,25 @@ describe('owners bot', () => {
         .reply(200, {token: 'test'});
 
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35')
         .reply(200, pullRequest35);
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files')
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
       // not.
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?page=1&per_page=100'
         )
         .reply(200, reviews35Approved);
 
       nock('https://api.github.com')
         .get(
-          '/repos/erwinmombay/github-owners-bot-test-repo/commits/' +
+          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
             '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
         .reply(200, checkruns35Empty);
@@ -558,7 +558,7 @@ describe('owners bot', () => {
       // Test that a check-run is created
       nock('https://api.github.com')
         .post(
-          '/repos/erwinmombay/github-owners-bot-test-repo/check-runs',
+          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
@@ -572,7 +572,7 @@ describe('owners bot', () => {
             });
             expect(body.output.text).toContain(
               '### Current Coverage\n\n' +
-                '- dir2/dir1/dir1/file.txt _(erwinmombay)_'
+                '- dir2/dir1/dir1/file.txt _(githubuser)_'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -637,7 +637,7 @@ describe('owners bot', () => {
 
       it('does nothing for a PR without owners files', async done => {
         nock('https://api.github.com')
-          .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+          .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files')
           .reply(200, [{filename: 'foo.txt', sha: ''}]);
         await probot.receive({name: 'pull_request.closed', payload});
 
@@ -647,7 +647,7 @@ describe('owners bot', () => {
 
       it('refreshes the owners tree for a PR with owners files', async done => {
         nock('https://api.github.com')
-          .get('/repos/erwinmombay/github-owners-bot-test-repo/pulls/35/files')
+          .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files')
           .reply(200, [{filename: 'OWNERS', sha: ''}]);
         await probot.receive({name: 'pull_request.closed', payload});
 

@@ -66,9 +66,9 @@ describe('owners rules', () => {
 
     describe('toString', () => {
       it('lists all owners', () => {
-        const rule = new OwnersRule('OWNERS', ['rcebulko', 'erwinmombay']);
+        const rule = new OwnersRule('OWNERS', ['rcebulko', 'githubuser']);
 
-        expect(rule.toString()).toEqual('**/*: rcebulko, erwinmombay');
+        expect(rule.toString()).toEqual('**/*: rcebulko, githubuser');
       });
     });
   });
@@ -146,11 +146,11 @@ describe('owners rules', () => {
       it('lists all owners for the pattern', () => {
         const rule = new PatternOwnersRule(
           'OWNERS',
-          ['rcebulko', 'erwinmombay'],
+          ['rcebulko', 'githubuser'],
           '*.css'
         );
 
-        expect(rule.toString()).toEqual('**/*.css: rcebulko, erwinmombay');
+        expect(rule.toString()).toEqual('**/*.css: rcebulko, githubuser');
       });
     });
 
@@ -220,9 +220,9 @@ describe('owners rules', () => {
 
     describe('toString', () => {
       it('lists all owners', () => {
-        const rule = new ReviewerSetRule('OWNERS', ['rcebulko', 'erwinmombay']);
+        const rule = new ReviewerSetRule('OWNERS', ['rcebulko', 'githubuser']);
 
-        expect(rule.toString()).toEqual('Reviewers: rcebulko, erwinmombay');
+        expect(rule.toString()).toEqual('Reviewers: rcebulko, githubuser');
       });
     });
   });

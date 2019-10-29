@@ -89,7 +89,7 @@ describe('team', () => {
   describe('getMembers', () => {
     let sandbox;
     let team;
-    const fakeGithub = {getTeamMembers: id => ['rcebulko', 'erwinmombay']};
+    const fakeGithub = {getTeamMembers: id => ['rcebulko', 'githubuser']};
 
     beforeEach(() => {
       sandbox = sinon.createSandbox();
@@ -106,7 +106,7 @@ describe('team', () => {
       await team.fetchMembers(fakeGithub);
 
       sandbox.assert.calledWith(fakeGithub.getTeamMembers, 1337);
-      expect(team.members).toEqual(['rcebulko', 'erwinmombay']);
+      expect(team.members).toEqual(['rcebulko', 'githubuser']);
     });
   });
 });
@@ -242,10 +242,10 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .get('/teams/1337/members?page=1&per_page=100')
-        .reply(200, [{login: 'rcebulko'}, {login: 'erwinmombay'}]);
+        .reply(200, [{login: 'rcebulko'}, {login: 'githubuser'}]);
       const members = await github.getTeamMembers(1337);
 
-      expect(members).toEqual(['rcebulko', 'erwinmombay']);
+      expect(members).toEqual(['rcebulko', 'githubuser']);
     });
 
     it('pages automatically', async () => {
@@ -286,7 +286,7 @@ describe('GitHub API', () => {
         .reply(200, reviewsApprovedResponse);
       const [review] = await github.getReviews(35);
 
-      expect(review.reviewer).toEqual('erwinmombay');
+      expect(review.reviewer).toEqual('githubuser');
       expect(review.isApproved).toBe(true);
       expect(review.submittedAt).toEqual(new Date('2019-02-26T20:39:13Z'));
     });
