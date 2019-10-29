@@ -181,21 +181,24 @@ class InfoServer extends Server {
 
     this.post('/v0/syntax', async req => {
       const {path, contents} = req.body;
-      let resp;
 
-      if (path === undefined) {
-        throw new RangeError('Missing key "path" in POST body');
-      }
+      try {
+        if (path === undefined) {
+          throw new RangeError('Missing key "path" in POST body');
+        }
 
-      if (contents === undefined) {
-        throw new RangeError('Missing key "contents" in POST body');
-      }
+        if (contents === undefined) {
+          throw new RangeError('Missing key "contents" in POST body');
+        }
 
-      if (contents.length > SYNTAX_CHECK_MAX_SIZE) {
-        throw new RangeError(
-          `Owners file too large (${contents.length} bytes); ` +
-          `must be less than ${SYNTAX_CHECK_MAX_SIZE} bytes`
-        );
+        if (contents.length > SYNTAX_CHECK_MAX_SIZE) {
+          throw new RangeError(
+            `Owners file too large (${contents.length} bytes); ` +
+            `must be less than ${SYNTAX_CHECK_MAX_SIZE} bytes`
+          );
+        }
+      } catch (error) {
+        return {requestErrors: [error.toString()]};
       }
 
       try {
@@ -205,11 +208,11 @@ class InfoServer extends Server {
         );
         
         return {
-          errors: fileParse.errors.map(error => error.toString()),
+          fileErrors: fileParse.errors.map(error => error.toString()),
           rules: fileParse.result,
         };
       } catch (error) {
-        return {errors: [error.toString()]};
+        return {fileErrors: [error.toString()]};
       }
     });
 
