@@ -489,7 +489,7 @@ describe('GitHub API', () => {
       });
 
       expect(contents).toEqual(
-        '- chenshay\n- chrisantaki\n- dparikh\n- dvoytenko\n- jpettitt\n'
+        '- otherperson\n- auser\n- otheruser\n- programmer\n- someperson\n'
       );
     });
   });
