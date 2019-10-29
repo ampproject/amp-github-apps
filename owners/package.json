@@ -27,7 +27,7 @@
     "sleep-promise": "8.0.1"
   },
   "devDependencies": {
-    "jest": "23.6.0",
+    "jest": "24.9.0",
     "nock": "11.6.0",
     "nodemon": "1.19.4",
     "sinon": "7.5.0",
