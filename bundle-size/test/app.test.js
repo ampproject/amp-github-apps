@@ -485,9 +485,9 @@ describe('bundle-size', () => {
               output: {
                 title: 'Δ +0.00KB | no approval necessary',
                 summary: expect.stringContaining(
-                  '* dist/v0/amp-ad-0.1.js: Δ +0.03KB\n' +
-                    '* dist/v0/amp-anim-0.1.js: missing in pull request\n' +
-                    '* dist/amp4ads-v0.js: (11.22 KB) missing in `master`'
+                  '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
+                    '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
+                    '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`'
                 ),
               },
             });

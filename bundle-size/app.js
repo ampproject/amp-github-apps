@@ -210,7 +210,7 @@ function successfulCheckOutput(
 function extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes) {
   return (
     '\n\n' +
-    '** Other bundle sizes **\n' +
+    '## Other bundle sizes\n' +
     otherBundleSizeDeltas.concat(missingBundleSizes).join('\n')
   );
 }
@@ -285,14 +285,14 @@ module.exports = app => {
         }
 
         if (!(file in prBundleSizes)) {
-          missingBundleSizes.push(`* ${file}: missing in pull request`);
+          missingBundleSizes.push(`* \`${file}\`: missing in pull request`);
           continue;
         }
 
         const bundleSizeDelta = prBundleSizes[file] - baseBundleSize;
         if (bundleSizeDelta !== 0) {
           otherBundleSizeDeltas.push(
-            `* ${file}: ${formatBundleSizeDelta(bundleSizeDelta)}`
+            `* \`${file}\`: ${formatBundleSizeDelta(bundleSizeDelta)}`
           );
         }
       }
@@ -300,7 +300,7 @@ module.exports = app => {
       for (const [file, prBundleSize] of Object.entries(prBundleSizes)) {
         if (!(file in masterBundleSizes)) {
           missingBundleSizes.push(
-            `* ${file}: (${prBundleSize} KB) missing in \`master\``
+            `* \`${file}\`: (${prBundleSize} KB) missing in \`master\``
           );
         }
       }
