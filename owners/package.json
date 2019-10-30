@@ -9,6 +9,7 @@
     "node": "^10.11"
   },
   "scripts": {
+    "init": "node scripts/warm_cache.js",
     "dev": "node info_server.js",
     "start": "probot run ./index.js",
     "test": "LOG_LEVEL=warn jest",

@@ -42,7 +42,7 @@ const {
   GITHUB_ACCESS_TOKEN,
   GITHUB_OWNER,
   GITHUB_REPOSITORY,
-} = process.env.CLOUD_STORAGE_BUCKET;
+} = process.env;
 const CACHE_HIT_INTERVAL = 3000;
 
 const github = new GitHub(
