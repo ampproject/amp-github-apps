@@ -131,7 +131,7 @@ class OwnersCheck {
 
         return {
           checkRun: new CheckRun(
-            CheckRunState.ACTION_REQUIRED,
+            CheckRunState.IN_PROGRESS,
             'Missing review from a member of the reviewer set',
             `${reviewerSetText}\n\n${coverageText}`
           ),

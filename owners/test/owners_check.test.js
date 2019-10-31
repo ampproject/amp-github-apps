@@ -184,9 +184,9 @@ describe('owners check', () => {
             ownersTree.addRule(reviewerSetRule);
           });
 
-          it('has an action-required conclusion', () => {
+          it('has an in-progress status', () => {
             const {checkRun} = ownersCheck.run();
-            expect(checkRun.json.conclusion).toEqual('action_required');
+            expect(checkRun.json.status).toEqual('in_progress');
           });
 
           it('has a failing summary', () => {
