@@ -164,7 +164,7 @@ class OwnersCheck {
       // If anything goes wrong, report a failing check.
       return {
         checkRun: new CheckRun(
-          CheckRunState.NEUTRAL,
+          CheckRunConclusion.FAILURE,
           'The check encountered an error!',
           'OWNERS check encountered an error:\n' + error
         ),
