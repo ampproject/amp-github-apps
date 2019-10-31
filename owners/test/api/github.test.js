@@ -442,7 +442,7 @@ describe('GitHub API', () => {
         GITHUB_BOT_USERNAME: 'amp-owners-bot',
       });
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/issues/24574/comments')
+        .get('/repos/test_owner/test_repo/issues/24574/comments?per_page=100')
         .reply(200, issueCommentsResponse);
       const comments = await github.getBotComments(24574);
 
@@ -452,6 +452,24 @@ describe('GitHub API', () => {
           body: 'Test comment by ampprojectbot',
         },
       ]);
+    });
+
+    it('pages automatically', async () => {
+      expect.assertions(1);
+      sandbox.stub(process, 'env').value({
+        GITHUB_BOT_USERNAME: 'amp-owners-bot',
+      });
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/issues/24574/comments?per_page=100')
+        .reply(200, issueCommentsResponse, {
+          link: '<https://api.github.com/repos/test_owner/test_repo/issues/24574/comments?page=2&per_page=100>; rel="next"',
+        });
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/issues/24574/comments?page=2&per_page=100')
+        .reply(200, issueCommentsResponse);
+      const comments = await github.getBotComments(24574);
+
+      expect(comments.length).toBe(2);
     });
   });
 

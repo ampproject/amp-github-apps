@@ -209,36 +209,6 @@ class GitHub {
   }
 
   /**
-   * Automatically fetch multiple pages from a GitHub endpoint
-   *
-   * @param {string} url API endpoint URL path (ie. `/teams/###/members`).
-   * @param {*} data optional request data.
-   * @return {!Array} list of results across all pages.
-   */
-  async _autoPage(url, data) {
-    const resultList = [];
-
-    let page = 1;
-    let isNextLink = true;
-    while (isNextLink) {
-      this.logger.info(`Fetching page ${page}`);
-      const response = await this._customRequest('GET', url, {
-        page,
-        per_page: MAX_PER_PAGE,
-        ...data,
-      });
-      const nextLink = response.headers.link || '';
-      isNextLink = nextLink.includes('rel="next"');
-
-      const resultPage = response.data;
-      resultList.push(...resultPage);
-      page++;
-    }
-
-    return resultList;
-  }
-
-  /**
    * Fetch all teams for the organization.
    *
    * @return {!Array<!Team>} list of teams.
@@ -372,8 +342,11 @@ class GitHub {
   async getBotComments(number) {
     this.logger.info(`Fetching bot comments for PR #${number}`);
 
-    const response = await this.client.issues.listComments(this.repo({number}));
-    this.logger.debug('[getBotComments]', number, response.data);
+    const comments = await this._paginate(
+      this.client.issues.listComments,
+      this.repo({number}),
+    );
+    this.logger.debug('[getBotComments]', number, comments);
 
     // GitHub appears to respond with the bot's username suffixed by `[bot]`,
     // though this doesn't appear to be documented anywhere. Since it's not
@@ -381,7 +354,7 @@ class GitHub {
     // for the presence of the username and ignore whatever extras GitHub tacks
     // on.
     const regex = new RegExp(`\\b${process.env.GITHUB_BOT_USERNAME}\\b`);
-    return response.data
+    return comments
       .filter(({user}) => regex.test(user.login))
       .map(({id, body}) => {
         return {id, body};
