@@ -9,7 +9,8 @@
     "node": "^10.11"
   },
   "scripts": {
-    "dev": "nodemon",
+    "init": "node scripts/warm_cache.js",
+    "dev": "node info_server.js",
     "start": "probot run ./index.js",
     "test": "LOG_LEVEL=warn jest",
     "test:watch": "jest --watch --notify --notifyMode=change"
@@ -29,7 +30,6 @@
   "devDependencies": {
     "jest": "24.9.0",
     "nock": "11.6.0",
-    "nodemon": "1.19.4",
     "sinon": "7.5.0",
     "smee-client": "1.1.0",
     "supertest": "4.0.2"
