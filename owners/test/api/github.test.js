@@ -30,7 +30,8 @@ const manyTeamsResponsePage1 = require('../fixtures/teams/many_members.page_1.js
 const manyTeamsResponsePage2 = require('../fixtures/teams/many_members.page_2.json');
 const pullRequestResponse = require('../fixtures/pulls/pull_request.35.json');
 const issueCommentsResponse = require('../fixtures/comments/issue_comments.438.json');
-const listFilesResponse = require('../fixtures/files/files.35.json');
+const listFilesResponsePage1 = require('../fixtures/files/files.35.json');
+const listFilesResponsePage2 = require('../fixtures/files/files.35.json');
 const checkRunsListResponse = require('../fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('../fixtures/check-runs/check-runs.get.35.empty');
 const getFileResponse = require('../fixtures/files/file_blob.24523.json');
@@ -218,7 +219,7 @@ describe('GitHub API', () => {
     it('returns a list of team objects', async () => {
       expect.assertions(3);
       nock('https://api.github.com')
-        .get('/orgs/test_owner/teams?page=1&per_page=100')
+        .get('/orgs/test_owner/teams?per_page=100')
         .reply(200, [{id: 1337, slug: 'my_team'}]);
       const teams = await github.getTeams();
 
@@ -230,9 +231,10 @@ describe('GitHub API', () => {
     it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/orgs/test_owner/teams?page=1&per_page=100')
+        .get('/orgs/test_owner/teams?per_page=100')
         .reply(200, Array(30).fill([{id: 1337, slug: 'my_team'}]), {
-          link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
+          link:
+            '<https://api.github.com/orgs/test_owner/teams?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?page=2&per_page=100')
@@ -247,7 +249,7 @@ describe('GitHub API', () => {
     it('returns a list of team objects', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/teams/1337/members?page=1&per_page=100')
+        .get('/teams/1337/members?per_page=100')
         .reply(200, [{login: 'coder'}, {login: 'githubuser'}]);
       const members = await github.getTeamMembers(1337);
 
@@ -257,9 +259,10 @@ describe('GitHub API', () => {
     it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/teams/1337/members?page=1&per_page=100')
+        .get('/teams/1337/members?per_page=100')
         .reply(200, manyTeamsResponsePage1, {
-          link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
+          link:
+            '<https://api.github.com/teams/1337/members?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get('/teams/1337/members?page=2&per_page=100')
@@ -288,7 +291,7 @@ describe('GitHub API', () => {
     it('fetches a list of reviews', async () => {
       expect.assertions(3);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/35/reviews?page=1&per_page=100')
+        .get('/repos/test_owner/test_repo/pulls/35/reviews?per_page=100')
         .reply(200, reviewsApprovedResponse);
       const [review] = await github.getReviews(35);
 
@@ -300,11 +303,10 @@ describe('GitHub API', () => {
     it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/pulls/23928/reviews?page=1&per_page=100'
-        )
+        .get('/repos/test_owner/test_repo/pulls/23928/reviews?per_page=100')
         .reply(200, manyReviewsPage1Response, {
-          link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
+          link:
+            '<https://api.github.com/repos/test_owner/test_repo/pulls/23928/reviews?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get(
@@ -319,9 +321,7 @@ describe('GitHub API', () => {
     it('returns approvals', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
-        )
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
         .reply(200, commentReviewsResponse);
       const reviews = await github.getReviews(24686);
       const review = reviews[0];
@@ -333,9 +333,7 @@ describe('GitHub API', () => {
     it('returns post-review comments', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
-        )
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
         .reply(200, commentReviewsResponse);
       const reviews = await github.getReviews(24686);
       const review = reviews[1];
@@ -347,9 +345,7 @@ describe('GitHub API', () => {
     it('returns pre-review comments', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
-        )
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
         .reply(200, commentReviewsResponse);
       const reviews = await github.getReviews(24686);
       const review = reviews[2];
@@ -361,9 +357,7 @@ describe('GitHub API', () => {
     it('returns rejections', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
-        )
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
         .reply(200, commentReviewsResponse);
       const reviews = await github.getReviews(24686);
       const review = reviews[3];
@@ -375,9 +369,7 @@ describe('GitHub API', () => {
     it('returns comment-only reviews', async () => {
       expect.assertions(2);
       nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
-        )
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
         .reply(200, commentReviewsResponse);
       const reviews = await github.getReviews(24686);
       const review = reviews[4];
@@ -389,9 +381,7 @@ describe('GitHub API', () => {
     it('ignores irrelevant review states', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/pulls/24686/reviews?page=1&per_page=100'
-        )
+        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
         .reply(200, commentReviewsResponse);
       const reviews = await github.getReviews(24686);
       const review = reviews[5];
@@ -442,7 +432,7 @@ describe('GitHub API', () => {
         GITHUB_BOT_USERNAME: 'amp-owners-bot',
       });
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/issues/24574/comments')
+        .get('/repos/test_owner/test_repo/issues/24574/comments?per_page=100')
         .reply(200, issueCommentsResponse);
       const comments = await github.getBotComments(24574);
 
@@ -452,6 +442,27 @@ describe('GitHub API', () => {
           body: 'Test comment by ampprojectbot',
         },
       ]);
+    });
+
+    it('pages automatically', async () => {
+      expect.assertions(1);
+      sandbox.stub(process, 'env').value({
+        GITHUB_BOT_USERNAME: 'amp-owners-bot',
+      });
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/issues/24574/comments?per_page=100')
+        .reply(200, issueCommentsResponse, {
+          link:
+            '<https://api.github.com/repos/test_owner/test_repo/issues/24574/comments?page=2&per_page=100>; rel="next"',
+        });
+      nock('https://api.github.com')
+        .get(
+          '/repos/test_owner/test_repo/issues/24574/comments?page=2&per_page=100'
+        )
+        .reply(200, issueCommentsResponse);
+      const comments = await github.getBotComments(24574);
+
+      expect(comments.length).toBe(2);
     });
   });
 
@@ -502,13 +513,30 @@ describe('GitHub API', () => {
 
   describe('listFiles', () => {
     it('fetches the list of changed files', async () => {
+      expect.assertions(2);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100')
+        .reply(200, listFilesResponsePage1);
+      const files = await github.listFiles(35);
+
+      expect(files.length).toBe(1);
+      expect(files[0]).toEqual('dir2/dir1/dir1/file.txt');
+    });
+
+    it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/35/files')
-        .reply(200, listFilesResponse);
-      const [file] = await github.listFiles(35);
+        .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100')
+        .reply(200, listFilesResponsePage1, {
+          link:
+            '<https://api.github.com/repos/test_owner/test_repo/pulls/35/files?per_page=100&page=2>; rel="next"',
+        });
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100&page=2')
+        .reply(200, listFilesResponsePage2);
+      const files = await github.listFiles(35);
 
-      expect(file).toEqual('dir2/dir1/dir1/file.txt');
+      expect(files.length).toBe(2);
     });
   });
 

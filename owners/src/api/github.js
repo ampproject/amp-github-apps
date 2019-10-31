@@ -196,31 +196,14 @@ class GitHub {
   /**
    * Automatically fetch multiple pages from a GitHub endpoint
    *
-   * @param {string} url API endpoint URL path (ie. `/teams/###/members`).
-   * @param {*} data optional request data.
-   * @return {!Array} list of results across all pages.
+   * @param {!object} target Octokit API target to call.
+   * @param {!object} options options to pass to Octokit's paginate function.
+   * @return {Array<*>} list of results.
    */
-  async _autoPage(url, data) {
-    const resultList = [];
-
-    let page = 1;
-    let isNextLink = true;
-    while (isNextLink) {
-      this.logger.info(`Fetching page ${page}`);
-      const response = await this._customRequest('GET', url, {
-        page,
-        per_page: MAX_PER_PAGE,
-        ...data,
-      });
-      const nextLink = response.headers.link || '';
-      isNextLink = nextLink.includes('rel="next"');
-
-      const resultPage = response.data;
-      resultList.push(...resultPage);
-      page++;
-    }
-
-    return resultList;
+  async _paginate(target, options) {
+    return await this.client.paginate(
+      target.endpoint.merge(Object.assign({per_page: MAX_PER_PAGE}, options))
+    );
   }
 
   /**
@@ -231,7 +214,9 @@ class GitHub {
   async getTeams() {
     this.logger.info(`Fetching teams for organization '${this.owner}'`);
 
-    const teamsList = await this._autoPage(`/orgs/${this.owner}/teams`);
+    const teamsList = await this._paginate(this.client.teams.list, {
+      org: this.owner,
+    });
     this.logger.debug('[getTeams]', teamsList);
 
     return teamsList.map(({id, slug}) => new Team(id, this.owner, slug));
@@ -246,7 +231,9 @@ class GitHub {
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
 
-    const memberList = await this._autoPage(`/teams/${teamId}/members`);
+    const memberList = await this._paginate(this.client.teams.listMembers, {
+      team_id: teamId,
+    });
     this.logger.debug('[getTeamMembers]', teamId, memberList);
 
     return memberList.map(({login}) => login.toLowerCase());
@@ -276,8 +263,9 @@ class GitHub {
   async getReviews(number) {
     this.logger.info(`Fetching reviews for PR #${number}`);
 
-    const reviewList = await this._autoPage(
-      `/repos/${this.owner}/${this.repository}/pulls/${number}/reviews`
+    const reviewList = await this._paginate(
+      this.client.pulls.listReviews,
+      this.repo({pull_number: number})
     );
     this.logger.debug('[getReviews]', number, reviewList);
 
@@ -350,8 +338,11 @@ class GitHub {
   async getBotComments(number) {
     this.logger.info(`Fetching bot comments for PR #${number}`);
 
-    const response = await this.client.issues.listComments(this.repo({number}));
-    this.logger.debug('[getBotComments]', number, response.data);
+    const comments = await this._paginate(
+      this.client.issues.listComments,
+      this.repo({number})
+    );
+    this.logger.debug('[getBotComments]', number, comments);
 
     // GitHub appears to respond with the bot's username suffixed by `[bot]`,
     // though this doesn't appear to be documented anywhere. Since it's not
@@ -359,7 +350,7 @@ class GitHub {
     // for the presence of the username and ignore whatever extras GitHub tacks
     // on.
     const regex = new RegExp(`\\b${process.env.GITHUB_BOT_USERNAME}\\b`);
-    return response.data
+    return comments
       .filter(({user}) => regex.test(user.login))
       .map(({id, body}) => {
         return {id, body};
@@ -434,12 +425,13 @@ class GitHub {
   async listFiles(number) {
     this.logger.info(`Fetching changed files for PR #${number}`);
 
-    const response = await this.client.pullRequests.listFiles(
+    const files = await this._paginate(
+      this.client.pullRequests.listFiles,
       this.repo({pull_number: number})
     );
-    this.logger.debug('[listFiles]', number, response.data);
+    this.logger.debug('[listFiles]', number, files);
 
-    return response.data.map(({filename}) => filename);
+    return files.map(({filename}) => filename);
   }
 
   /**
