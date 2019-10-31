@@ -22,6 +22,7 @@ const EXAMPLE_OWNERS_LINK = 'http://ampproject-owners-bot.appspot.com/example';
 
 const CheckRunState = {
   SUCCESS: 'success',
+  IN_PROGRESS: 'in_progress',
   FAILURE: 'failure',
   NEUTRAL: 'neutral',
   ACTION_REQUIRED: 'action_required',
@@ -48,17 +49,26 @@ class CheckRun {
    * @return {!object} JSON object describing check-run.
    */
   get json() {
-    return {
+    const checkRun = {
       name: GITHUB_CHECKRUN_NAME,
-      status: 'completed',
-      conclusion: this.state,
-      completed_at: new Date(),
       output: {
         title: this.summary,
         summary: this.summary,
         text: `${this.text}\n\n${this.helpText}`,
       },
     };
+
+    if (this.state === CheckRunState.IN_PROGRESS) {
+      checkRun.status = this.state;
+    } else {
+      Object.assign(checkRun, {
+        status: 'completed',
+        conclusion: this.state,
+        completed_at: new Date(),
+      });
+    }
+
+    return checkRun;
   }
 }
 CheckRun.prototype.helpText =

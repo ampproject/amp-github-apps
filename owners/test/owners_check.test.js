@@ -61,9 +61,19 @@ describe('check run', () => {
       const checkRun = new CheckRun(state, 'Test summary', 'Test text');
       const checkRunJson = checkRun.json;
       
+      expect(checkRunJson.status).toEqual('completed');
       expect(checkRunJson.conclusion).toEqual(conclusion);
       expect(checkRunJson.completed_at).not.toBeUndefined();
     });
+
+    it('with state "in_progress" has no conclusion or completed_at', () => {
+      const checkRun = new CheckRun(CheckRunState.IN_PROGRESS, 'Test summary', 'Test text');
+      const checkRunJson = checkRun.json;
+      
+      expect(checkRunJson.status).toEqual('in_progress');
+      expect(checkRunJson.conclusion).toBeUndefined();
+      expect(checkRunJson.completed_at).toBeUndefined();
+    })
   });
 });
 
