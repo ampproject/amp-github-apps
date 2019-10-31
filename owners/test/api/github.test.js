@@ -30,7 +30,8 @@ const manyTeamsResponsePage1 = require('../fixtures/teams/many_members.page_1.js
 const manyTeamsResponsePage2 = require('../fixtures/teams/many_members.page_2.json');
 const pullRequestResponse = require('../fixtures/pulls/pull_request.35.json');
 const issueCommentsResponse = require('../fixtures/comments/issue_comments.438.json');
-const listFilesResponse = require('../fixtures/files/files.35.json');
+const listFilesResponsePage1 = require('../fixtures/files/files.35.json');
+const listFilesResponsePage2 = require('../fixtures/files/files.35.json');
 const checkRunsListResponse = require('../fixtures/check-runs/check-runs.get.35.multiple');
 const checkRunsEmptyResponse = require('../fixtures/check-runs/check-runs.get.35.empty');
 const getFileResponse = require('../fixtures/files/file_blob.24523.json');
@@ -520,13 +521,29 @@ describe('GitHub API', () => {
 
   describe('listFiles', () => {
     it('fetches the list of changed files', async () => {
+      expect.assertions(2);
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100')
+        .reply(200, listFilesResponsePage1);
+      const files = await github.listFiles(35);
+
+      expect(files.length).toBe(1);
+      expect(files[0]).toEqual('dir2/dir1/dir1/file.txt');
+    });
+
+    it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/35/files')
-        .reply(200, listFilesResponse);
-      const [file] = await github.listFiles(35);
+        .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100')
+        .reply(200, listFilesResponsePage1, {
+          link: '<https://api.github.com/repos/test_owner/test_repo/pulls/35/files?per_page=100&page=2>; rel="next"',
+        });
+      nock('https://api.github.com')
+        .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100&page=2')
+        .reply(200, listFilesResponsePage2);
+      const files = await github.listFiles(35);
 
-      expect(file).toEqual('dir2/dir1/dir1/file.txt');
+      expect(files.length).toBe(2);
     });
   });
 

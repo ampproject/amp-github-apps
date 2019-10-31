@@ -429,12 +429,13 @@ class GitHub {
   async listFiles(number) {
     this.logger.info(`Fetching changed files for PR #${number}`);
 
-    const response = await this.client.pullRequests.listFiles(
-      this.repo({pull_number: number})
+    const files = await this._paginate(
+      this.client.pullRequests.listFiles,
+      this.repo({pull_number: number}),
     );
-    this.logger.debug('[listFiles]', number, response.data);
+    this.logger.debug('[listFiles]', number, files);
 
-    return response.data.map(({filename}) => filename);
+    return files.map(({filename}) => filename);
   }
 
   /**
