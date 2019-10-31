@@ -6,8 +6,8 @@
             "node_id": "MDg6Q2hlY2tSdW41MzQ3MjMxMw==",
             "head_sha": "9272f18514cbd3fa935b3ced62ae1c2bf6efa76d",
             "external_id": "",
-            "url": "https://api.github.com/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313",
-            "html_url": "https://github.com/erwinmombay/github-owners-bot-test-repo/runs/53472313",
+            "url": "https://api.github.com/repos/githubuser/github-owners-bot-test-repo/check-runs/53472313",
+            "html_url": "https://github.com/githubuser/github-owners-bot-test-repo/runs/53472313",
             "details_url": "https://www.ampproject.org",
             "status": "completed",
             "conclusion": "failure",
@@ -18,7 +18,7 @@
                 "summary": "The check has passed!",
                 "text": null,
                 "annotations_count": 0,
-                "annotations_url": "https://api.github.com/repos/erwinmombay/github-owners-bot-test-repo/check-runs/53472313/annotations"
+                "annotations_url": "https://api.github.com/repos/githubuser/github-owners-bot-test-repo/check-runs/53472313/annotations"
             },
             "name": "ampproject/owners-check",
             "check_suite": {
@@ -56,7 +56,7 @@
             },
             "pull_requests": [
                 {
-                    "url": "https://api.github.com/repos/erwinmombay/github-owners-bot-test-repo/pulls/35",
+                    "url": "https://api.github.com/repos/githubuser/github-owners-bot-test-repo/pulls/35",
                     "id": 246688458,
                     "number": 35,
                     "head": {
@@ -64,7 +64,7 @@
                         "sha": "9272f18514cbd3fa935b3ced62ae1c2bf6efa76d",
                         "repo": {
                             "id": 72889098,
-                            "url": "https://api.github.com/repos/erwinmombay/github-owners-bot-test-repo",
+                            "url": "https://api.github.com/repos/githubuser/github-owners-bot-test-repo",
                             "name": "github-owners-bot-test-repo"
                         }
                     },
@@ -73,7 +73,7 @@
                         "sha": "e896a1ed550e296573e46bcb7d0ab23afa3bbedf",
                         "repo": {
                             "id": 72889098,
-                            "url": "https://api.github.com/repos/erwinmombay/github-owners-bot-test-repo",
+                            "url": "https://api.github.com/repos/githubuser/github-owners-bot-test-repo",
                             "name": "github-owners-bot-test-repo"
                         }
                     }

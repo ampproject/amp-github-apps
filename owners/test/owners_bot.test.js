@@ -94,7 +94,7 @@ describe('owners bot', () => {
 
     beforeEach(() => {
       myTeam = new Team(1337, 'ampproject', 'my_team');
-      sandbox.stub(GitHub.prototype, 'getTeamMembers').returns(['rcebulko']);
+      sandbox.stub(GitHub.prototype, 'getTeamMembers').returns(['coder']);
     });
 
     it('fetches members for the team', async done => {
@@ -110,7 +110,7 @@ describe('owners bot', () => {
       await ownersBot.syncTeam(myTeam, github);
 
       expect(ownersBot.teams['ampproject/my_team']).toBe(myTeam);
-      expect(myTeam.members).toEqual(['rcebulko']);
+      expect(myTeam.members).toEqual(['coder']);
     });
   });
 

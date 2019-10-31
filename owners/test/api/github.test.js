@@ -87,7 +87,7 @@ describe('team', () => {
   describe('getMembers', () => {
     let sandbox;
     let team;
-    const fakeGithub = {getTeamMembers: id => ['rcebulko', 'erwinmombay']};
+    const fakeGithub = {getTeamMembers: id => ['coder', 'githubuser']};
 
     beforeEach(() => {
       sandbox = sinon.createSandbox();
@@ -104,7 +104,7 @@ describe('team', () => {
       await team.fetchMembers(fakeGithub);
 
       sandbox.assert.calledWith(fakeGithub.getTeamMembers, 1337);
-      expect(team.members).toEqual(['rcebulko', 'erwinmombay']);
+      expect(team.members).toEqual(['coder', 'githubuser']);
     });
   });
 });
@@ -248,10 +248,10 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .get('/teams/1337/members?page=1&per_page=100')
-        .reply(200, [{login: 'rcebulko'}, {login: 'erwinmombay'}]);
+        .reply(200, [{login: 'coder'}, {login: 'githubuser'}]);
       const members = await github.getTeamMembers(1337);
 
-      expect(members).toEqual(['rcebulko', 'erwinmombay']);
+      expect(members).toEqual(['coder', 'githubuser']);
     });
 
     it('pages automatically', async () => {
@@ -292,7 +292,7 @@ describe('GitHub API', () => {
         .reply(200, reviewsApprovedResponse);
       const [review] = await github.getReviews(35);
 
-      expect(review.reviewer).toEqual('erwinmombay');
+      expect(review.reviewer).toEqual('githubuser');
       expect(review.isApproved).toBe(true);
       expect(review.submittedAt).toEqual(new Date('2019-02-26T20:39:13Z'));
     });
@@ -354,7 +354,7 @@ describe('GitHub API', () => {
       const reviews = await github.getReviews(24686);
       const review = reviews[2];
 
-      expect(review.reviewer).toEqual('estherkim');
+      expect(review.reviewer).toEqual('fakename');
       expect(review.isComment).toBe(true);
     });
 
@@ -368,7 +368,7 @@ describe('GitHub API', () => {
       const reviews = await github.getReviews(24686);
       const review = reviews[3];
 
-      expect(review.reviewer).toEqual('estherkim');
+      expect(review.reviewer).toEqual('fakename');
       expect(review.isRejected).toBe(true);
     });
 
@@ -382,7 +382,7 @@ describe('GitHub API', () => {
       const reviews = await github.getReviews(24686);
       const review = reviews[4];
 
-      expect(review.reviewer).toEqual('rcebulko');
+      expect(review.reviewer).toEqual('coder');
       expect(review.isComment).toBe(true);
     });
 
@@ -431,7 +431,7 @@ describe('GitHub API', () => {
         .reply(200, requestedReviewsResponse);
       const reviewers = await github.getReviewRequests(24574);
 
-      expect(reviewers).toEqual(['jridgewell', 'jpettitt', 'sparhami']);
+      expect(reviewers).toEqual(['scripter', 'someperson', 'birdperson']);
     });
   });
 
@@ -495,7 +495,7 @@ describe('GitHub API', () => {
       });
 
       expect(contents).toEqual(
-        '- chenshay\n- chrisantaki\n- dparikh\n- dvoytenko\n- jpettitt\n'
+        '- otherperson\n- auser\n- otheruser\n- programmer\n- someperson\n'
       );
     });
   });
