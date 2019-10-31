@@ -20,11 +20,7 @@ const LocalRepository = require('../src/repo/local_repo');
 const {OwnersBot} = require('../src/owners_bot');
 const {OwnersNotifier} = require('../src/notifier');
 const {OwnersTree} = require('../src/owners_tree');
-const {
-  CheckRun,
-  CheckRunConclusion,
-  OwnersCheck,
-} = require('../src/owners_check');
+const {CheckRun, CheckRunState, OwnersCheck} = require('../src/owners_check');
 
 describe('owners bot', () => {
   const silentLogger = {
@@ -185,7 +181,7 @@ describe('owners bot', () => {
 
   describe('runOwnersCheck', () => {
     const checkRun = new CheckRun(
-      CheckRunConclusion.SUCCESS,
+      CheckRunState.SUCCESS,
       'Success!',
       'The owners check passed.'
     );

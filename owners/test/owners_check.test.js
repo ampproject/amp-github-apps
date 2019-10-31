@@ -15,11 +15,7 @@
  */
 
 const sinon = require('sinon');
-const {
-  CheckRun,
-  CheckRunConclusion,
-  OwnersCheck,
-} = require('../src/owners_check');
+const {CheckRun, CheckRunState, OwnersCheck} = require('../src/owners_check');
 const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
 const {Team} = require('../src/api/github');
 const {OwnersTree} = require('../src/owners_tree');
@@ -34,21 +30,52 @@ describe('check run', () => {
   });
 
   describe('json', () => {
-    it('produces a JSON object in the GitHub API format', () => {
+    beforeEach(() => {
       sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
+    });
+
+    it('produces a JSON object in the GitHub API format', () => {
       const checkRun = new CheckRun(
-        CheckRunConclusion.NEUTRAL,
+        CheckRunState.NEUTRAL,
         'Test summary',
         'Test text'
       );
       const checkRunJson = checkRun.json;
 
       expect(checkRunJson.name).toEqual('ampproject/owners-check');
-      expect(checkRunJson.status).toEqual('completed');
-      expect(checkRunJson.conclusion).toEqual('neutral');
       expect(checkRunJson.output.title).toEqual('Test summary');
       expect(checkRunJson.output.summary).toEqual('Test summary');
       expect(checkRunJson.output.text).toEqual('Test text\n\nHELP TEXT');
+    });
+
+    it.each([
+      [CheckRunState.SUCCESS, 'success'],
+      [CheckRunState.FAILURE, 'failure'],
+      [CheckRunState.NEUTRAL, 'neutral'],
+      [CheckRunState.ACTION_REQUIRED, 'action_required'],
+    ])(
+      'with state %p has conclusion %p and "completed_at"',
+      (state, conclusion) => {
+        const checkRun = new CheckRun(state, 'Test summary', 'Test text');
+        const checkRunJson = checkRun.json;
+
+        expect(checkRunJson.status).toEqual('completed');
+        expect(checkRunJson.conclusion).toEqual(conclusion);
+        expect(checkRunJson.completed_at).not.toBeUndefined();
+      }
+    );
+
+    it('with state "in_progress" has no conclusion or completed_at', () => {
+      const checkRun = new CheckRun(
+        CheckRunState.IN_PROGRESS,
+        'Test summary',
+        'Test text'
+      );
+      const checkRunJson = checkRun.json;
+
+      expect(checkRunJson.status).toEqual('in_progress');
+      expect(checkRunJson.conclusion).toBeUndefined();
+      expect(checkRunJson.completed_at).toBeUndefined();
     });
   });
 });
@@ -157,9 +184,9 @@ describe('owners check', () => {
             ownersTree.addRule(reviewerSetRule);
           });
 
-          it('has an action-required conclusion', () => {
+          it('has an in-progress status', () => {
             const {checkRun} = ownersCheck.run();
-            expect(checkRun.json.conclusion).toEqual('action_required');
+            expect(checkRun.json.status).toEqual('in_progress');
           });
 
           it('has a failing summary', () => {
