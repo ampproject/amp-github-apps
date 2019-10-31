@@ -34,8 +34,11 @@ describe('check run', () => {
   });
 
   describe('json', () => {
-    it('produces a JSON object in the GitHub API format', () => {
+    beforeEach(() => {
       sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
+    });
+
+    it('produces a JSON object in the GitHub API format', () => {
       const checkRun = new CheckRun(
         CheckRunState.NEUTRAL,
         'Test summary',
@@ -44,11 +47,22 @@ describe('check run', () => {
       const checkRunJson = checkRun.json;
 
       expect(checkRunJson.name).toEqual('ampproject/owners-check');
-      expect(checkRunJson.status).toEqual('completed');
-      expect(checkRunJson.conclusion).toEqual('neutral');
       expect(checkRunJson.output.title).toEqual('Test summary');
       expect(checkRunJson.output.summary).toEqual('Test summary');
       expect(checkRunJson.output.text).toEqual('Test text\n\nHELP TEXT');
+    });
+
+    it.each([
+      [CheckRunState.SUCCESS, 'success'],
+      [CheckRunState.FAILURE, 'failure'],
+      [CheckRunState.NEUTRAL, 'neutral'],
+      [CheckRunState.ACTION_REQUIRED, 'action_required'],
+    ])('with state %p has conclusion %p and "completed_at"', (state, conclusion) => {
+      const checkRun = new CheckRun(state, 'Test summary', 'Test text');
+      const checkRunJson = checkRun.json;
+      
+      expect(checkRunJson.conclusion).toEqual(conclusion);
+      expect(checkRunJson.completed_at).not.toBeUndefined();
     });
   });
 });
