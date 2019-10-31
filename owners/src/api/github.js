@@ -193,8 +193,6 @@ class GitHub {
     return await this.client.request(request);
   }
 
-  
-
   /**
    * Automatically fetch multiple pages from a GitHub endpoint
    *
@@ -216,10 +214,9 @@ class GitHub {
   async getTeams() {
     this.logger.info(`Fetching teams for organization '${this.owner}'`);
 
-    const teamsList = await this._paginate(
-      this.client.teams.list,
-      {org: this.owner}
-    );
+    const teamsList = await this._paginate(this.client.teams.list, {
+      org: this.owner,
+    });
     this.logger.debug('[getTeams]', teamsList);
 
     return teamsList.map(({id, slug}) => new Team(id, this.owner, slug));
@@ -234,10 +231,9 @@ class GitHub {
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
 
-    const memberList = await this._paginate(
-      this.client.teams.listMembers,
-      {team_id: teamId},
-    );
+    const memberList = await this._paginate(this.client.teams.listMembers, {
+      team_id: teamId,
+    });
     this.logger.debug('[getTeamMembers]', teamId, memberList);
 
     return memberList.map(({login}) => login.toLowerCase());
@@ -269,7 +265,7 @@ class GitHub {
 
     const reviewList = await this._paginate(
       this.client.pulls.listReviews,
-      this.repo({pull_number: number}),
+      this.repo({pull_number: number})
     );
     this.logger.debug('[getReviews]', number, reviewList);
 
@@ -344,7 +340,7 @@ class GitHub {
 
     const comments = await this._paginate(
       this.client.issues.listComments,
-      this.repo({number}),
+      this.repo({number})
     );
     this.logger.debug('[getBotComments]', number, comments);
 
@@ -431,7 +427,7 @@ class GitHub {
 
     const files = await this._paginate(
       this.client.pullRequests.listFiles,
-      this.repo({pull_number: number}),
+      this.repo({pull_number: number})
     );
     this.logger.debug('[listFiles]', number, files);
 
