@@ -21,7 +21,7 @@ const {OwnersTree} = require('./owners_tree');
 const {OwnersNotifier} = require('./notifier');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
-const GITHUB_GET_MEMBERS_DELAY = 3000;
+const GITHUB_GET_MEMBERS_DELAY = 1000;
 const OWNERS_CHECKRUN_NAME = 'owners-check';
 
 /**
