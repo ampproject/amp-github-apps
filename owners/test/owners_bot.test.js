@@ -22,7 +22,7 @@ const {OwnersNotifier} = require('../src/notifier');
 const {OwnersTree} = require('../src/owners_tree');
 const {
   CheckRun,
-  CheckRunConclusion,
+  CheckRunState,
   OwnersCheck,
 } = require('../src/owners_check');
 
@@ -185,7 +185,7 @@ describe('owners bot', () => {
 
   describe('runOwnersCheck', () => {
     const checkRun = new CheckRun(
-      CheckRunConclusion.SUCCESS,
+      CheckRunState.SUCCESS,
       'Success!',
       'The owners check passed.'
     );

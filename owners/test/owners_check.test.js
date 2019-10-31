@@ -17,7 +17,7 @@
 const sinon = require('sinon');
 const {
   CheckRun,
-  CheckRunConclusion,
+  CheckRunState,
   OwnersCheck,
 } = require('../src/owners_check');
 const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
@@ -37,7 +37,7 @@ describe('check run', () => {
     it('produces a JSON object in the GitHub API format', () => {
       sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
       const checkRun = new CheckRun(
-        CheckRunConclusion.NEUTRAL,
+        CheckRunState.NEUTRAL,
         'Test summary',
         'Test text'
       );

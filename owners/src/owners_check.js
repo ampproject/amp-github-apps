@@ -20,7 +20,7 @@ const {ReviewerSelection} = require('./reviewer_selection');
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
 const EXAMPLE_OWNERS_LINK = 'http://ampproject-owners-bot.appspot.com/example';
 
-const CheckRunConclusion = {
+const CheckRunState = {
   SUCCESS: 'success',
   FAILURE: 'failure',
   NEUTRAL: 'neutral',
@@ -34,7 +34,7 @@ class CheckRun {
   /**
    * Constructor.
    *
-   * @param {!CheckRunConclusion} conclusion result of the check-run.
+   * @param {!CheckRunState} conclusion result of the check-run.
    * @param {string} summary check-run summary text to show in PR.
    * @param {string} text description of check-run results.
    */
@@ -108,7 +108,7 @@ class OwnersCheck {
       if (prHasFullOwnersCoverage && prHasReviewerSetApproval) {
         return {
           checkRun: new CheckRun(
-            CheckRunConclusion.SUCCESS,
+            CheckRunState.SUCCESS,
             'All files in this PR have OWNERS approval',
             coverageText
           ),
@@ -121,7 +121,7 @@ class OwnersCheck {
 
         return {
           checkRun: new CheckRun(
-            CheckRunConclusion.ACTION_REQUIRED,
+            CheckRunState.ACTION_REQUIRED,
             'Missing review from a member of the reviewer set',
             `${reviewerSetText}\n\n${coverageText}`
           ),
@@ -143,7 +143,7 @@ class OwnersCheck {
       );
       return {
         checkRun: new CheckRun(
-          CheckRunConclusion.ACTION_REQUIRED,
+          CheckRunState.ACTION_REQUIRED,
           'Missing required OWNERS approvals! ' +
             `Suggested reviewers: ${reviewers.join(', ')}`,
           `${coverageText}\n\n${suggestionsText}`
@@ -154,7 +154,7 @@ class OwnersCheck {
       // If anything goes wrong, report a failing check.
       return {
         checkRun: new CheckRun(
-          CheckRunConclusion.NEUTRAL,
+          CheckRunState.NEUTRAL,
           'The check encountered an error!',
           'OWNERS check encountered an error:\n' + error
         ),
@@ -338,5 +338,5 @@ class OwnersCheck {
 module.exports = {
   OwnersCheck,
   CheckRun,
-  CheckRunConclusion,
+  CheckRunState,
 };
