@@ -112,7 +112,9 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+        )
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
@@ -173,7 +175,9 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+        )
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
@@ -238,7 +242,9 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+        )
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
@@ -297,7 +303,9 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+        )
         .reply(200, files35Multiple);
 
       // We need the reviews to check if a pull request has been approved or
@@ -366,7 +374,9 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+        )
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
@@ -430,7 +440,9 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+        )
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
@@ -486,7 +498,9 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/36/files?per_page=100')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/36/files?per_page=100'
+        )
         .reply(200, files36);
 
       // We need the reviews to check if a pull request has been approved or
@@ -546,7 +560,9 @@ describe('owners bot', () => {
       // We need the list of files on a pull request to evaluate the required
       // reviewers.
       nock('https://api.github.com')
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+        )
         .reply(200, files35);
 
       // We need the reviews to check if a pull request has been approved or
@@ -646,7 +662,9 @@ describe('owners bot', () => {
 
       it('does nothing for a PR without owners files', async done => {
         nock('https://api.github.com')
-          .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100')
+          .get(
+            '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+          )
           .reply(200, [{filename: 'foo.txt', sha: ''}]);
         await probot.receive({name: 'pull_request.closed', payload});
 
@@ -656,7 +674,9 @@ describe('owners bot', () => {
 
       it('refreshes the owners tree for a PR with owners files', async done => {
         nock('https://api.github.com')
-          .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100')
+          .get(
+            '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+          )
           .reply(200, [{filename: 'OWNERS', sha: ''}]);
         await probot.receive({name: 'pull_request.closed', payload});
 
