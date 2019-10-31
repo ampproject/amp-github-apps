@@ -445,10 +445,9 @@ class GitHub {
   async searchFilename(filename) {
     this.logger.info(`Searching repo for files named "${filename}"`);
 
-    const files = await this._paginate(
-      this.client.search.code,
-      {q: `filename:${filename} repo:${this.owner}/${this.repository}`},
-    );
+    const files = await this._paginate(this.client.search.code, {
+      q: `filename:${filename} repo:${this.owner}/${this.repository}`,
+    });
 
     const ownersFiles = files
       .filter(({name}) => name === filename)

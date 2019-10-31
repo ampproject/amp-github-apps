@@ -559,7 +559,8 @@ describe('GitHub API', () => {
           '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&per_page=100'
         )
         .reply(200, searchOwnersPage1Response, {
-          link: '</search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100>; rel="next"',
+          link:
+            '</search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get(
