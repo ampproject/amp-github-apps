@@ -255,10 +255,10 @@ describe('owners check', () => {
             .throws(new Error('Something is wrong'));
         });
 
-        it('has a neutral conclusion', () => {
+        it('has a failing conclusion', () => {
           const {checkRun} = ownersCheck.run();
 
-          expect(checkRun.json.conclusion).toEqual('neutral');
+          expect(checkRun.json.conclusion).toEqual('failure');
         });
 
         it('has an error summary', () => {
