@@ -131,8 +131,10 @@ class OwnersNotifier {
    * @return {!Array<string>} list of usernames.
    */
   getReviewersToRequest(suggestedReviewers) {
-    return Array.from(new Set(suggestedReviewers))
-      .filter(this._shouldRequestReview, this);
+    return Array.from(new Set(suggestedReviewers)).filter(
+      this._shouldRequestReview,
+      this
+    );
   }
 
   /**

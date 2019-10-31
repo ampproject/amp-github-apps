@@ -314,7 +314,7 @@ describe('notifier', () => {
         );
         notifier = new OwnersNotifier(pr, {}, tree, [
           'foo/script.js',
-          'foo/foobar/style.css'
+          'foo/foobar/style.css',
         ]);
 
         const reviewRequests = notifier.getReviewersToRequest([
@@ -335,9 +335,9 @@ describe('notifier', () => {
         );
         notifier = new OwnersNotifier(pr, {}, tree, [
           'foo/script.js',
-          'foo/foobar/style.css'
+          'foo/foobar/style.css',
         ]);
-   
+
         const reviewRequests = notifier.getReviewersToRequest([
           'busy_user',
           'busy_member',
@@ -358,11 +358,11 @@ describe('notifier', () => {
         );
         notifier = new OwnersNotifier(pr, {}, tree, [
           'foo/script.js',
-          'bar/style.css'
+          'bar/style.css',
         ]);
       });
 
-      it('includes non-silent owners in other branches\' OWNERS files', () => {
+      it("includes non-silent owners in other branches' OWNERS files", () => {
         const reviewRequests = notifier.getReviewersToRequest([
           'busy_user',
           'busy_member',
