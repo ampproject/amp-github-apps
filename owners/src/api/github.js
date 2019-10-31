@@ -193,6 +193,21 @@ class GitHub {
     return await this.client.request(request);
   }
 
+  
+
+  /**
+   * Automatically fetch multiple pages from a GitHub endpoint
+   *
+   * @param {!object} target Octokit API target to call.
+   * @param {!object} options options to pass to Octokit's paginate function.
+   * @return {Array<*>} list of results.
+   */
+  async _paginate(target, options) {
+    return await this.client.paginate(
+      target.endpoint.merge(Object.assign({per_page: MAX_PER_PAGE}, options))
+    );
+  }
+
   /**
    * Automatically fetch multiple pages from a GitHub endpoint
    *
@@ -231,7 +246,10 @@ class GitHub {
   async getTeams() {
     this.logger.info(`Fetching teams for organization '${this.owner}'`);
 
-    const teamsList = await this._autoPage(`/orgs/${this.owner}/teams`);
+    const teamsList = await this._paginate(
+      this.client.teams.list,
+      {org: this.owner}
+    );
     this.logger.debug('[getTeams]', teamsList);
 
     return teamsList.map(({id, slug}) => new Team(id, this.owner, slug));
