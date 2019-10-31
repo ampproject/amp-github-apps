@@ -34,12 +34,12 @@ class CheckRun {
   /**
    * Constructor.
    *
-   * @param {!CheckRunState} conclusion result of the check-run.
+   * @param {!CheckRunState} state result of the check-run.
    * @param {string} summary check-run summary text to show in PR.
    * @param {string} text description of check-run results.
    */
-  constructor(conclusion, summary, text) {
-    Object.assign(this, {conclusion, summary, text});
+  constructor(state, summary, text) {
+    Object.assign(this, {state, summary, text});
   }
 
   /**
@@ -51,7 +51,7 @@ class CheckRun {
     return {
       name: GITHUB_CHECKRUN_NAME,
       status: 'completed',
-      conclusion: this.conclusion,
+      conclusion: this.state,
       completed_at: new Date(),
       output: {
         title: this.summary,
