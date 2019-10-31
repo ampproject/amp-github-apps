@@ -247,7 +247,7 @@ describe('GitHub API', () => {
     it('returns a list of team objects', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/teams/1337/members?page=1&per_page=100')
+        .get('/teams/1337/members?per_page=100')
         .reply(200, [{login: 'coder'}, {login: 'githubuser'}]);
       const members = await github.getTeamMembers(1337);
 
@@ -257,9 +257,9 @@ describe('GitHub API', () => {
     it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/teams/1337/members?page=1&per_page=100')
+        .get('/teams/1337/members?per_page=100')
         .reply(200, manyTeamsResponsePage1, {
-          link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
+          link: '<https://api.github.com/teams/1337/members?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get('/teams/1337/members?page=2&per_page=100')

@@ -264,7 +264,10 @@ class GitHub {
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
 
-    const memberList = await this._autoPage(`/teams/${teamId}/members`);
+    const memberList = await this._paginate(
+      this.client.teams.listMembers,
+      {team_id: teamId},
+    );
     this.logger.debug('[getTeamMembers]', teamId, memberList);
 
     return memberList.map(({login}) => login.toLowerCase());
