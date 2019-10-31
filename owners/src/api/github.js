@@ -297,8 +297,9 @@ class GitHub {
   async getReviews(number) {
     this.logger.info(`Fetching reviews for PR #${number}`);
 
-    const reviewList = await this._autoPage(
-      `/repos/${this.owner}/${this.repository}/pulls/${number}/reviews`
+    const reviewList = await this._paginate(
+      this.client.pulls.listReviews,
+      this.repo({pull_number: number}),
     );
     this.logger.debug('[getReviews]', number, reviewList);
 
