@@ -30,7 +30,7 @@ module.exports = class VirtualRepository extends Repository {
     super();
     this.github = github;
     this.logger = github.logger;
-    /** @type {?Map<string, string>} */
+    /** @type {!Map<string, string>} */
     this._fileRefs = new Map();
     this.cache = cache;
   }
