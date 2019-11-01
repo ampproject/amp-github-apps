@@ -545,7 +545,7 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .get(
-          '/search/code?q=filename%3AREADME.md%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100'
+          '/search/code?q=filename%3AREADME.md%20repo%3Atest_owner%2Ftest_repo&per_page=100'
         )
         .reply(200, searchReadmeResponse);
       const files = await github.searchFilename('README.md');
@@ -556,10 +556,11 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .get(
-          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100'
+          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&per_page=100'
         )
         .reply(200, searchOwnersPage1Response, {
-          link: '<https://api.github.com/blah/blah?page=2>; rel="next"',
+          link:
+            '</search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get(
@@ -574,7 +575,7 @@ describe('GitHub API', () => {
       expect.assertions(3);
       nock('https://api.github.com')
         .get(
-          '/search/code?q=filename%3Aexact-match%20repo%3Atest_owner%2Ftest_repo&page=1&per_page=100'
+          '/search/code?q=filename%3Aexact-match%20repo%3Atest_owner%2Ftest_repo&per_page=100'
         )
         .reply(200, {
           total_count: 3,

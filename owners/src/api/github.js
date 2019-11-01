@@ -445,31 +445,17 @@ class GitHub {
   async searchFilename(filename) {
     this.logger.info(`Searching repo for files named "${filename}"`);
 
-    const files = [];
-    let page = 1;
-    let isLastPage = false;
-    while (!isLastPage) {
-      this.logger.info(`Fetching page ${page}`);
-      const response = await this.client.search.code({
-        q: `filename:${filename} repo:${this.owner}/${this.repository}`,
-        per_page: MAX_PER_PAGE,
-        page,
-      });
+    const files = await this._paginate(this.client.search.code, {
+      q: `filename:${filename} repo:${this.owner}/${this.repository}`,
+    });
 
-      const {items} = response.data;
-      const total = response.data.total_count;
-      this.logger.debug(`Received ${items.length} results out of ${total}`);
-      files.push(...items);
-
-      isLastPage = files.length >= total || !items.length;
-      page++;
-    }
-
-    return files
+    const ownersFiles = files
       .filter(({name}) => name === filename)
       .map(({path, sha}) => {
         return {filename: path, sha};
       });
+
+    return Array.from(new Set(ownersFiles));
   }
 
   /**
