@@ -48,6 +48,11 @@ describe('virtual repository', () => {
       .returns([
         {filename: 'OWNERS', sha: 'sha_updated'},
         {filename: 'foo/OWNERS', sha: 'sha_2'},
+      ])
+      .onThirdCall()
+      .returns([
+        {filename: 'OWNERS', sha: 'sha_updated'},
+        {filename: 'foo/OWNERS', sha: 'sha_2'},
       ]);
   });
 
@@ -80,10 +85,56 @@ describe('virtual repository', () => {
     it('invalidates the cache for changed owners files', async done => {
       sandbox.stub(CompoundCache.prototype, 'invalidate');
       await repo.sync();
-      sandbox.assert.notCalled(repo.cache.invalidate);
+      sandbox.assert.neverCalledWith(repo.cache.invalidate, 'test_repo/OWNERS');
 
       await repo.sync();
       sandbox.assert.calledWith(repo.cache.invalidate, 'test_repo/OWNERS');
+      done();
+    });
+
+    it('invalidates the file ref cache for new owners files', async done => {
+      sandbox.stub(CompoundCache.prototype, 'invalidate').resolves();
+      sandbox.stub(CompoundCache.prototype, 'readFile').resolves();
+      await repo.sync();
+
+      sandbox.assert.calledWith(
+        repo.cache.invalidate,
+        'test_repo/__fileRefs__',
+      );
+      sandbox.assert.calledWith(
+        repo.cache.readFile,
+        'test_repo/__fileRefs__',
+        sinon.match.any,
+      );
+      done();
+    });
+
+    it('invalidates the file ref cache for updated owners files', async done => {
+      sandbox.stub(CompoundCache.prototype, 'invalidate').resolves();
+      sandbox.stub(CompoundCache.prototype, 'readFile').resolves();
+      await repo.sync();
+
+      repo.cache.invalidate.resetHistory();
+      repo.cache.readFile.resetHistory();
+      await repo.sync();
+
+      sandbox.assert.calledWith(repo.cache.invalidate, 'test_repo/__fileRefs__');
+      sandbox.assert.calledWith(repo.cache.readFile, 'test_repo/__fileRefs__', sinon.match.any);
+      done();
+    });
+
+    it('does not touch the file ref cache for unchanged owners files', async done => {
+      sandbox.stub(CompoundCache.prototype, 'invalidate').resolves();
+      sandbox.stub(CompoundCache.prototype, 'readFile').resolves();
+      await repo.sync();
+      await repo.sync();
+
+      repo.cache.invalidate.resetHistory();
+      repo.cache.readFile.resetHistory();
+      await repo.sync();
+
+      sandbox.assert.neverCalledWith(repo.cache.invalidate, 'test_repo/__fileRefs__');
+      sandbox.assert.neverCalledWith(repo.cache.readFile, 'test_repo/__fileRefs__', sinon.match.any);
       done();
     });
   });
