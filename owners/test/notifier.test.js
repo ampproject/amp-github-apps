@@ -25,6 +25,7 @@ describe('notifier', () => {
   const sandbox = sinon.createSandbox();
   const loggerStub = sinon.stub();
   const github = new GitHub(sinon.stub(), 'ampproject', 'amphtml', loggerStub);
+  let tree;
   let pr;
 
   beforeEach(() => {
@@ -35,6 +36,9 @@ describe('notifier', () => {
       'description',
       'open'
     );
+
+    tree = new OwnersTree();
+    tree.addRule(new OwnersRule('OWNERS', [new UserOwner('auser')]));
   });
 
   afterEach(() => {
@@ -45,7 +49,7 @@ describe('notifier', () => {
     let notifier;
 
     beforeEach(() => {
-      notifier = new OwnersNotifier(pr, {}, new OwnersTree(), []);
+      notifier = new OwnersNotifier(pr, {}, tree, ['script.js']);
       sandbox.stub(GitHub.prototype, 'createReviewRequests');
       sandbox.stub(OwnersNotifier.prototype, 'createNotificationComment');
     });
@@ -265,7 +269,6 @@ describe('notifier', () => {
   });
 
   describe('getReviewersToRequest', () => {
-    let tree;
     const busyTeam = new Team(42, 'ampproject', 'busy_team');
     busyTeam.members = ['busy_member'];
     let notifier;
@@ -276,14 +279,9 @@ describe('notifier', () => {
         .withArgs(sinon.match.string, OWNER_MODIFIER.SILENT)
         .returns([new UserOwner('busy_user'), new TeamOwner(busyTeam)]);
 
-      tree = new OwnersTree();
       tree.addRule(
         new OwnersRule('foo/OWNERS', [
           new UserOwner('busy_user', OWNER_MODIFIER.SILENT),
-        ])
-      );
-      tree.addRule(
-        new OwnersRule('foo/OWNERS', [
           new TeamOwner(busyTeam, OWNER_MODIFIER.SILENT),
         ])
       );
@@ -305,23 +303,94 @@ describe('notifier', () => {
       const reviewRequests = notifier.getReviewersToRequest(['busy_member']);
       expect(reviewRequests).not.toContain('busy_member');
     });
+
+    describe('nested directory rules', () => {
+      it('includes non-silent owners in deeper OWNERS files', () => {
+        tree.addRule(
+          new OwnersRule('foo/foobar/OWNERS', [
+            new UserOwner('busy_user'),
+            new TeamOwner(busyTeam),
+          ])
+        );
+        notifier = new OwnersNotifier(pr, {}, tree, [
+          'foo/script.js',
+          'foo/foobar/style.css',
+        ]);
+
+        const reviewRequests = notifier.getReviewersToRequest([
+          'busy_user',
+          'busy_member',
+        ]);
+
+        expect(reviewRequests).toContain('busy_user');
+        expect(reviewRequests).toContain('busy_member');
+      });
+
+      it('excludes non-silent owners in higher OWNERS files', () => {
+        tree.addRule(
+          new OwnersRule('OWNERS', [
+            new UserOwner('busy_user'),
+            new TeamOwner(busyTeam),
+          ])
+        );
+        notifier = new OwnersNotifier(pr, {}, tree, [
+          'foo/script.js',
+          'foo/foobar/style.css',
+        ]);
+
+        const reviewRequests = notifier.getReviewersToRequest([
+          'busy_user',
+          'busy_member',
+        ]);
+
+        expect(reviewRequests).not.toContain('busy_user');
+        expect(reviewRequests).not.toContain('busy_member');
+      });
+    });
+
+    describe('adjacent directory rules', () => {
+      beforeEach(() => {
+        tree.addRule(
+          new OwnersRule('bar/OWNERS', [
+            new UserOwner('busy_user'),
+            new TeamOwner(busyTeam),
+          ])
+        );
+        notifier = new OwnersNotifier(pr, {}, tree, [
+          'foo/script.js',
+          'bar/style.css',
+        ]);
+      });
+
+      it("includes non-silent owners in other branches' OWNERS files", () => {
+        const reviewRequests = notifier.getReviewersToRequest([
+          'busy_user',
+          'busy_member',
+        ]);
+
+        expect(reviewRequests).toContain('busy_user');
+        expect(reviewRequests).toContain('busy_member');
+      });
+    });
   });
 
   describe('getOwnersToNotify', () => {
-    const tree = new OwnersTree();
     const relevantTeam = new Team(42, 'ampproject', 'relevant_team');
     relevantTeam.members = ['relevant_member'];
-    tree.addRule(
-      new OwnersRule('foo/OWNERS', [
-        new UserOwner('relevant_user', OWNER_MODIFIER.NOTIFY),
-      ])
-    );
-    tree.addRule(
-      new OwnersRule('bar/OWNERS', [
-        new TeamOwner(relevantTeam, OWNER_MODIFIER.NOTIFY),
-      ])
-    );
-    tree.addRule(new OwnersRule('baz/OWNERS', [new UserOwner('rando')]));
+
+    beforeEach(() => {
+      tree.addRule(
+        new OwnersRule('foo/OWNERS', [
+          new UserOwner('relevant_user', OWNER_MODIFIER.NOTIFY),
+        ])
+      );
+      tree.addRule(
+        new OwnersRule('bar/OWNERS', [
+          new TeamOwner(relevantTeam, OWNER_MODIFIER.NOTIFY),
+        ])
+      );
+      tree.addRule(new OwnersRule('baz/OWNERS', [new UserOwner('rando')]));
+    });
 
     it('includes user owners with the always-notify modifier', () => {
       const notifier = new OwnersNotifier(pr, {}, tree, [

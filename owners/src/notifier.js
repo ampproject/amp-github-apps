@@ -104,22 +104,37 @@ class OwnersNotifier {
   }
 
   /**
+   * Checks if a reviewer should be requested.
+   *
+   * If there is any file for which the reviewer is a non-silent owner, this
+   * should be true.
+   *
+   * @param {string} reviewer reviewer username.
+   * @return {boolean} if the reviewer is a non-silent owner of a changed file.
+   */
+  _shouldRequestReview(reviewer) {
+    return Object.entries(this.fileTreeMap)
+      .map(([filename, subtree]) => subtree.fileOwners(filename))
+      .some(fileOwners => {
+        for (const owner of fileOwners) {
+          if (owner.includes(reviewer)) {
+            return owner.modifier !== OWNER_MODIFIER.SILENT;
+          }
+        }
+      });
+  }
+
+  /**
    * Determine the set of users to request reviews from.
    *
    * @param {!Array<string>} suggestedReviewers list of suggested reviewer usernames.
    * @return {!Array<string>} list of usernames.
    */
   getReviewersToRequest(suggestedReviewers) {
-    const reviewers = new Set(suggestedReviewers);
-    Object.entries(this.fileTreeMap).forEach(([filename, subtree]) => {
-      subtree
-        .getModifiedFileOwners(filename, OWNER_MODIFIER.SILENT)
-        .map(owner => owner.allUsernames)
-        .reduce((left, right) => left.concat(right), [])
-        .forEach(reviewers.delete, reviewers);
-    });
-
-    return Array.from(reviewers);
+    return Array.from(new Set(suggestedReviewers)).filter(
+      this._shouldRequestReview,
+      this
+    );
   }
 
   /**
