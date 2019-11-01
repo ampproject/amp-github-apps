@@ -56,11 +56,34 @@ describe('virtual repository', () => {
   });
 
   describe('sync', () => {
-    it('fetches the list of owners files', async done => {
-      sandbox.stub(VirtualRepository.prototype, 'findOwnersFiles');
+    it('records new owners files', async () => {
+      expect.assertions(2);
       await repo.sync();
 
-      sandbox.assert.calledOnce(repo.findOwnersFiles);
+      expect(repo._fileRefs.get('test_repo/OWNERS')).toEqual('sha_1');
+      expect(repo._fileRefs.get('test_repo/foo/OWNERS')).toEqual('sha_2');
+    });
+
+    it('updates changed owners files', async () => {
+      expect.assertions(2);
+
+      await repo.sync();
+      // Pretend the contents for the known files have been fetched
+      repo._fileRefs.get('test_repo/OWNERS').contents = 'old root contents';
+      repo._fileRefs.get('test_repo/foo/OWNERS').contents = 'old foo contents';
+      await repo.sync();
+
+      expect(repo._fileRefs.get('test_repo/OWNERS')).toEqual('sha_updated');
+      expect(repo._fileRefs.get('test_repo/foo/OWNERS')).toEqual('sha_2');
+    });
+
+    it('invalidates the cache for changed owners files', async done => {
+      sandbox.stub(CompoundCache.prototype, 'invalidate');
+      await repo.sync();
+      sandbox.assert.notCalled(repo.cache.invalidate);
+
+      await repo.sync();
+      sandbox.assert.calledWith(repo.cache.invalidate, 'test_repo/OWNERS');
       done();
     });
   });
@@ -79,7 +102,7 @@ describe('virtual repository', () => {
 
       it('fetches the file contents from GitHub', async () => {
         expect.assertions(1);
-        await repo.findOwnersFiles();
+        await repo.sync();
         const contents = await repo.readFile('OWNERS');
 
         sandbox.assert.calledWith(github.getFileContents, {
@@ -91,7 +114,7 @@ describe('virtual repository', () => {
 
       it('returns the file from the cache when available', async () => {
         expect.assertions(1);
-        await repo.findOwnersFiles();
+        await repo.sync();
         await repo.readFile('OWNERS');
         await repo.readFile('OWNERS');
         await repo.readFile('OWNERS');
@@ -105,7 +128,7 @@ describe('virtual repository', () => {
       it('re-fetches the file when the cache is invalidated', async () => {
         expect.assertions(1);
 
-        await repo.findOwnersFiles();
+        await repo.sync();
         await repo.readFile('OWNERS');
         sandbox.assert.calledWith(github.getFileContents, {
           filename: 'OWNERS',
@@ -123,7 +146,7 @@ describe('virtual repository', () => {
         expect.assertions(1);
 
         const cacheMissCallback = sandbox.spy();
-        await repo.findOwnersFiles();
+        await repo.sync();
         const contents = await repo.readFile('OWNERS', cacheMissCallback);
 
         sandbox.assert.calledOnce(cacheMissCallback);
@@ -134,7 +157,7 @@ describe('virtual repository', () => {
         expect.assertions(1);
 
         const cacheMissCallback = sandbox.spy();
-        await repo.findOwnersFiles();
+        await repo.sync();
         await repo.readFile('OWNERS');
         const contents = await repo.readFile('OWNERS', cacheMissCallback);
 
@@ -147,39 +170,9 @@ describe('virtual repository', () => {
   describe('findOwnersFiles', () => {
     it('returns the owners file names', async () => {
       expect.assertions(1);
+      await repo.sync();
       const ownersFiles = await repo.findOwnersFiles();
       expect(ownersFiles).toEqual(['OWNERS', 'foo/OWNERS']);
-    });
-
-    it('records new owners files', async () => {
-      expect.assertions(2);
-      await repo.findOwnersFiles();
-
-      expect(repo._fileRefs.get('test_repo/OWNERS')).toEqual('sha_1');
-      expect(repo._fileRefs.get('test_repo/foo/OWNERS')).toEqual('sha_2');
-    });
-
-    it('updates changed owners files', async () => {
-      expect.assertions(2);
-
-      await repo.findOwnersFiles();
-      // Pretend the contents for the known files have been fetched
-      repo._fileRefs.get('test_repo/OWNERS').contents = 'old root contents';
-      repo._fileRefs.get('test_repo/foo/OWNERS').contents = 'old foo contents';
-      await repo.findOwnersFiles();
-
-      expect(repo._fileRefs.get('test_repo/OWNERS')).toEqual('sha_updated');
-      expect(repo._fileRefs.get('test_repo/foo/OWNERS')).toEqual('sha_2');
-    });
-
-    it('invalidates the cache for changed owners files', async done => {
-      sandbox.stub(CompoundCache.prototype, 'invalidate');
-      await repo.findOwnersFiles();
-      sandbox.assert.notCalled(repo.cache.invalidate);
-
-      await repo.findOwnersFiles();
-      sandbox.assert.calledWith(repo.cache.invalidate, 'test_repo/OWNERS');
-      done();
     });
   });
 });
