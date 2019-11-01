@@ -78,7 +78,7 @@ class OwnersBot {
    * @param {Logger} logger logging interface
    */
   async refreshTree(logger = console) {
-    logger.info(`Refreshing owners tree`);
+    logger.info('Refreshing owners tree');
 
     await this.repo.sync();
     await this.reparseTree(logger);
@@ -90,6 +90,8 @@ class OwnersBot {
    * @param {Logger} logger logging interface
    */
   async reparseTree(logger = console) {
+    logger.info('Re-parsing owners tree');
+
     this.treeParse = await this.parser.parseOwnersTree();
     this.treeParse.errors.forEach(logger.warn, logger);
   }

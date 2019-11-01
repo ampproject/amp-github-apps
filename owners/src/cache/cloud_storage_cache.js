@@ -45,7 +45,7 @@ module.exports = class CloudStorageCache extends FileCache {
       this.logger.info(`Fetching "${filename}" from Cloud Storage cache`);
       return await this.storage.download(filename);
     } catch (e) {
-      this.logger.info(`Memory cache miss on "${filename}"`);
+      this.logger.info(`Cloud Storage cache miss on "${filename}"`);
       const contents = await getContents();
 
       this.logger.info(`Uploading "${filename}" to Cloud Storage cache`);

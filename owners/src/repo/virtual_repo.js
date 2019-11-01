@@ -39,7 +39,40 @@ module.exports = class VirtualRepository extends Repository {
    * Fetch the latest versions of all OWNERS files.
    */
   async sync() {
-    await this.findOwnersFiles();
+    let fileChanged = false;
+    const ownersFiles = await this.github.searchFilename('OWNERS');
+
+    for (const {filename, sha} of ownersFiles) {
+      const repoPath = this.repoPath(filename);
+      const fileSha = this._fileRefs.get(repoPath);
+
+      if (!fileSha) {
+        // File has never been fetched and should be added to the cache.
+        this.logger.info(`Recording SHA for file "${repoPath}"`);
+        fileChanged = true;
+
+        this._fileRefs.set(repoPath, sha);
+      } else if (fileSha !== sha) {
+        // File has been updated and needs to be re-fetched.
+        this.logger.info(
+          `Updating SHA and clearing cache for file "${repoPath}"`
+        );
+        fileChanged = true;
+
+        this._fileRefs.set(repoPath, sha);
+        await this.cache.invalidate(repoPath);
+      } else {
+        this.logger.debug(`Ignoring unchanged file "${repoPath}"`);
+      }
+    }
+
+    if (fileChanged) {
+      const fileRefsPath = this.repoPath('__fileRefs__');
+      await this.cache.invalidate(fileRefsPath);
+      await this.cache.readFile(fileRefsPath, () =>
+        JSON.stringify(Array.from(this._fileRefs))
+      );
+    }
   }
 
   /**
@@ -58,8 +91,19 @@ module.exports = class VirtualRepository extends Repository {
    * @param {?function} cacheMissCallback called when there is a cache miss.
    */
   async warmCache(cacheMissCallback) {
+    const fileRefsContents = await this.cache.readFile(
+      this.repoPath('__fileRefs__'),
+      async () => {
+        const ownersFiles = await this.github.searchFilename('OWNERS');
+        return JSON.stringify(
+          ownersFiles.map(({filename, sha}) => [this.repoPath(filename), sha])
+        );
+      }
+    );
+    this._fileRefs = new Map(JSON.parse(fileRefsContents));
+
     const ownersFiles = await this.findOwnersFiles();
-    return await Promise.all(
+    await Promise.all(
       ownersFiles.map(filename => this.readFile(filename, cacheMissCallback))
     );
   }
@@ -101,27 +145,9 @@ module.exports = class VirtualRepository extends Repository {
    * @return {!Array<string>} a list of relative OWNERS file paths.
    */
   async findOwnersFiles() {
-    const ownersFiles = await this.github.searchFilename('OWNERS');
-
-    ownersFiles.forEach(({filename, sha}) => {
-      const repoPath = this.repoPath(filename);
-      const fileSha = this._fileRefs.get(repoPath);
-      if (!fileSha) {
-        // File has never been fetched and should be added to the cache.
-        this.logger.info(`Recording SHA for file "${repoPath}"`);
-        this._fileRefs.set(repoPath, sha);
-      } else if (fileSha !== sha) {
-        // File has been updated and needs to be re-fetched.
-        this.logger.info(
-          `Updating SHA and clearing cache for file "${repoPath}"`
-        );
-        this._fileRefs.set(repoPath, sha);
-        this.cache.invalidate(repoPath);
-      } else {
-        this.logger.debug(`Ignoring unchanged file "${repoPath}"`);
-      }
-    });
-
-    return ownersFiles.map(({filename}) => filename);
+    const repoPrefix = this.repoPath('');
+    return Array.from(this._fileRefs.keys())
+      .filter(filename => filename.startsWith(repoPrefix))
+      .map(filename => filename.substr(repoPrefix.length));
   }
 };
