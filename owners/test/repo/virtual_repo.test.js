@@ -158,14 +158,14 @@ describe('virtual repository', () => {
     it('fetches file refs from GitHub', async () => {
       await repo.warmCache();
 
-      sandbox.assert.calledWith(
-        github.getFileContents.getCall(0),
-        {filename: 'OWNERS', sha: 'sha_1'},
-      );
-      sandbox.assert.calledWith(
-        github.getFileContents.getCall(1),
-        {filename: 'foo/OWNERS', sha: 'sha_2'},
-      );
+      sandbox.assert.calledWith(github.getFileContents.getCall(0), {
+        filename: 'OWNERS',
+        sha: 'sha_1',
+      });
+      sandbox.assert.calledWith(github.getFileContents.getCall(1), {
+        filename: 'foo/OWNERS',
+        sha: 'sha_2',
+      });
     });
 
     describe('when file refs are in the cache', () => {
@@ -209,17 +209,17 @@ describe('virtual repository', () => {
         sandbox.assert.calledWith(
           repo.cache.readFile,
           'test_repo/__fileRefs__',
-          sinon.match.any,
+          sinon.match.any
         );
         sandbox.assert.calledWith(
           repo.cache.readFile,
           'test_repo/OWNERS',
-          sinon.match.any,
+          sinon.match.any
         );
         sandbox.assert.calledWith(
           repo.cache.readFile,
           'test_repo/foo/OWNERS',
-          sinon.match.any,
+          sinon.match.any
         );
         done();
       });
