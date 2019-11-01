@@ -36,6 +36,7 @@ describe('virtual repository', () => {
     sandbox.stub(CloudStorage.prototype, 'delete');
     sandbox.stub(console);
 
+    sandbox.stub(GitHub.prototype, 'getFileContents').resolves('contents');
     sandbox
       .stub(GitHub.prototype, 'searchFilename')
       .withArgs('OWNERS')
@@ -99,12 +100,12 @@ describe('virtual repository', () => {
 
       sandbox.assert.calledWith(
         repo.cache.invalidate,
-        'test_repo/__fileRefs__',
+        'test_repo/__fileRefs__'
       );
       sandbox.assert.calledWith(
         repo.cache.readFile,
         'test_repo/__fileRefs__',
-        sinon.match.any,
+        sinon.match.any
       );
       done();
     });
@@ -118,8 +119,15 @@ describe('virtual repository', () => {
       repo.cache.readFile.resetHistory();
       await repo.sync();
 
-      sandbox.assert.calledWith(repo.cache.invalidate, 'test_repo/__fileRefs__');
-      sandbox.assert.calledWith(repo.cache.readFile, 'test_repo/__fileRefs__', sinon.match.any);
+      sandbox.assert.calledWith(
+        repo.cache.invalidate,
+        'test_repo/__fileRefs__'
+      );
+      sandbox.assert.calledWith(
+        repo.cache.readFile,
+        'test_repo/__fileRefs__',
+        sinon.match.any
+      );
       done();
     });
 
@@ -133,9 +141,88 @@ describe('virtual repository', () => {
       repo.cache.readFile.resetHistory();
       await repo.sync();
 
-      sandbox.assert.neverCalledWith(repo.cache.invalidate, 'test_repo/__fileRefs__');
-      sandbox.assert.neverCalledWith(repo.cache.readFile, 'test_repo/__fileRefs__', sinon.match.any);
+      sandbox.assert.neverCalledWith(
+        repo.cache.invalidate,
+        'test_repo/__fileRefs__'
+      );
+      sandbox.assert.neverCalledWith(
+        repo.cache.readFile,
+        'test_repo/__fileRefs__',
+        sinon.match.any
+      );
       done();
+    });
+  });
+
+  describe('warmCache', () => {
+    it('fetches file refs from GitHub', async () => {
+      await repo.warmCache();
+
+      sandbox.assert.calledWith(
+        github.getFileContents.getCall(0),
+        {filename: 'OWNERS', sha: 'sha_1'},
+      );
+      sandbox.assert.calledWith(
+        github.getFileContents.getCall(1),
+        {filename: 'foo/OWNERS', sha: 'sha_2'},
+      );
+    });
+
+    describe('when file refs are in the cache', () => {
+      beforeEach(() => {
+        sandbox
+          .stub(CompoundCache.prototype, 'readFile')
+          .withArgs('test_repo/OWNERS', sinon.match.any)
+          .resolves('')
+          .withArgs('test_repo/foo/OWNERS', sinon.match.any)
+          .resolves('')
+          .withArgs('test_repo/__fileRefs__', sinon.match.any)
+          .resolves(
+            JSON.stringify([
+              ['test_repo/OWNERS', 'sha_1'],
+              ['test_repo/foo/OWNERS', 'sha_2'],
+            ])
+          );
+      });
+
+      it('reads file refs from the cache', async done => {
+        await repo.warmCache();
+        sandbox.assert.calledWith(
+          repo.cache.readFile,
+          'test_repo/__fileRefs__',
+          sinon.match.any
+        );
+        done();
+      });
+
+      it('builds a map of file refs', async () => {
+        expect.assertions(2);
+        await repo.warmCache();
+
+        expect(repo._fileRefs.get('test_repo/OWNERS')).toEqual('sha_1');
+        expect(repo._fileRefs.get('test_repo/foo/OWNERS')).toEqual('sha_2');
+      });
+
+      it('reads all owners files through the cache', async done => {
+        await repo.warmCache();
+
+        sandbox.assert.calledWith(
+          repo.cache.readFile,
+          'test_repo/__fileRefs__',
+          sinon.match.any,
+        );
+        sandbox.assert.calledWith(
+          repo.cache.readFile,
+          'test_repo/OWNERS',
+          sinon.match.any,
+        );
+        sandbox.assert.calledWith(
+          repo.cache.readFile,
+          'test_repo/foo/OWNERS',
+          sinon.match.any,
+        );
+        done();
+      });
     });
   });
 
@@ -147,10 +234,6 @@ describe('virtual repository', () => {
     });
 
     describe('for files found through findOwnersFiles', () => {
-      beforeEach(() => {
-        sandbox.stub(GitHub.prototype, 'getFileContents').returns('contents');
-      });
-
       it('fetches the file contents from GitHub', async () => {
         expect.assertions(1);
         await repo.sync();

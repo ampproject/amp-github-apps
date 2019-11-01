@@ -69,9 +69,8 @@ module.exports = class VirtualRepository extends Repository {
     if (fileChanged) {
       const fileRefsPath = this.repoPath('__fileRefs__');
       await this.cache.invalidate(fileRefsPath);
-      await this.cache.readFile(
-        fileRefsPath,
-        () => JSON.stringify(Array.from(this._fileRefs))
+      await this.cache.readFile(fileRefsPath, () =>
+        JSON.stringify(Array.from(this._fileRefs))
       );
     }
   }
