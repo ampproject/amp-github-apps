@@ -145,7 +145,7 @@ class InfoServer extends Server {
     this.get(`/_cron/${taskName}`, async req => {
       // This header is set by App Engine when running cron tasks, and is
       // stripped out of external requests.
-      if (!req.header('X-Appengine-Cron')) {
+      if (!req.header('X-Appengine-Cron') && process.env.NODE_ENV !== 'dev') {
         throw new Error('Attempted external request to a cron endpoint');
       }
 
