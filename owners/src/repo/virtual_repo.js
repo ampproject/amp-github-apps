@@ -30,7 +30,7 @@ module.exports = class VirtualRepository extends Repository {
     super();
     this.github = github;
     this.logger = github.logger;
-    /** @type {!Map<string, string>} */
+    /** @type {?Map<string, string>} */
     this._fileRefs = new Map();
     this.cache = cache;
   }
@@ -39,6 +39,7 @@ module.exports = class VirtualRepository extends Repository {
    * Fetch the latest versions of all OWNERS files.
    */
   async sync() {
+    let fileChanged = false;
     const ownersFiles = await this.github.searchFilename('OWNERS');
 
     for (const {filename, sha} of ownersFiles) {
@@ -48,6 +49,7 @@ module.exports = class VirtualRepository extends Repository {
       if (!fileSha) {
         // File has never been fetched and should be added to the cache.
         this.logger.info(`Recording SHA for file "${repoPath}"`);
+        fileChanged = true;
 
         this._fileRefs.set(repoPath, sha);
       } else if (fileSha !== sha) {
@@ -55,12 +57,22 @@ module.exports = class VirtualRepository extends Repository {
         this.logger.info(
           `Updating SHA and clearing cache for file "${repoPath}"`
         );
+        fileChanged = true;
 
         this._fileRefs.set(repoPath, sha);
         await this.cache.invalidate(repoPath);
       } else {
         this.logger.debug(`Ignoring unchanged file "${repoPath}"`);
       }
+    }
+
+    if (fileChanged) {
+      const fileRefsPath = this.repoPath('__fileRefs__');
+      await this.cache.invalidate(fileRefsPath);
+      await this.cache.readFile(
+        fileRefsPath,
+        () => JSON.stringify(Array.from(this._fileRefs))
+      );
     }
   }
 
@@ -80,7 +92,17 @@ module.exports = class VirtualRepository extends Repository {
    * @param {?function} cacheMissCallback called when there is a cache miss.
    */
   async warmCache(cacheMissCallback) {
-    await this.sync();
+    const fileRefsContents = await this.cache.readFile(
+      this.repoPath('__fileRefs__'),
+      async () => {
+        const ownersFiles = await this.github.searchFilename('OWNERS');
+        return JSON.stringify(
+          ownersFiles.map(({filename, sha}) => [this.repoPath(filename), sha])
+        );
+      }
+    );
+    this._fileRefs = new Map(JSON.parse(fileRefsContents));
+
     const ownersFiles = await this.findOwnersFiles();
     await Promise.all(
       ownersFiles.map(filename => this.readFile(filename, cacheMissCallback))
