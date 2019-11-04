@@ -25,7 +25,7 @@ The app runs on an instance of [Google AppEngine](https://ampproject-owners-bot.
 
 A GitHub App which deploys a PR branch to a static website when you ask it to. 
 
-Websites are served by a [Google Cloud Storage bucket](https://console.cloud.google.com/storage/browser/amp-test-website-1).
+Websites are served by a Google Cloud Storage bucket.
 
 The app runs on an instance of [Google AppEngine](https://amp-pr-deploy-bot.appspot.com) and is installed exclusively on the `[ampproject/amphtml](https://github.com/ampproject/amphtml)` repository.
 
