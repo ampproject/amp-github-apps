@@ -20,16 +20,16 @@
     "test": "jest"
   },
   "dependencies": {
-    "@octokit/rest": "16.34.0",
-    "knex": "0.20.0",
+    "@octokit/rest": "16.34.1",
+    "knex": "0.20.1",
     "pg": "7.12.1",
-    "probot": "9.6.0",
+    "probot": "9.6.3",
     "sleep-promise": "8.0.1"
   },
   "devDependencies": {
     "fancy-log": "1.3.3",
     "jest": "24.9.0",
-    "nock": "11.6.0",
+    "nock": "11.7.0",
     "nodemon": "1.19.4",
     "smee-client": "1.1.0",
     "sqlite3": "4.1.0",

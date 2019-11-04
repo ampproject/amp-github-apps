@@ -45,7 +45,7 @@ function initializeCheck(app: Application) {
  * so that the check run action to deploy site is enabled.
  */
 function initializeRouter(app: Application) {
-  const router: IRouter<void> = app.route('/v0/pr-deploy');
+  const router: IRouter = app.route('/v0/pr-deploy');
   router.use(express.json());
   router.post('/travisbuilds/:travisBuild/headshas/:headSha/:result',
     async(request, response) => {
