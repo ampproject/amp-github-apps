@@ -27,4 +27,20 @@ function isTravisBuild() {
   return !!process.env.TRAVIS;
 }
 
-module.exports = {isTravisBuild};
+/**
+ * Returns true if this is a Travis PR build.
+ * @return {boolean}
+ */
+function isTravisPullRequestBuild() {
+  return isTravisBuild() && process.env.TRAVIS_EVENT_TYPE === 'pull_request';
+}
+
+/**
+ * Returns true if this is a Travis Push build.
+ * @return {boolean}
+ */
+function isTravisPushBuild() {
+  return isTravisBuild() && process.env.TRAVIS_EVENT_TYPE === 'push';
+}
+
+module.exports = {isTravisBuild, isTravisPullRequestBuild, isTravisPushBuild};
