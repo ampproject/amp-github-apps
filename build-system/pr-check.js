@@ -40,8 +40,8 @@ function timedExecOrDie(cmd) {
 /**
  * Set up and execute tests for an app.
  *
- * TODO(rcebulko): Replace this with gulp tasks.
- * TODO(rcebulko): Adopt same logging standards as `amphtml`.
+ * TODO(#608): Replace this with gulp tasks.
+ * TODO(#607): Adopt same logging standards as `amphtml`.
  *
  * @param {string} appName
  */
