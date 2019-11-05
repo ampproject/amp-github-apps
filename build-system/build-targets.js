@@ -31,10 +31,6 @@ const ALL_TARGETS = ['bundle-size', 'owners', 'pr-deploy', 'test-status'];
  */
 const targetMatchers = [
   {
-    targets: ALL_TARGETS,
-    func: file => file.startsWith('build-system') || path.dirname(file) === '.',
-  },
-  {
     targets: ['bundle-size'],
     func: file => file.startsWith('bundle-size/'),
   },
@@ -68,6 +64,11 @@ function determineBuildTargets(fileName = 'build-targets.js') {
     .map(matcher => matcher.targets)
     .reduce((left, right) => left.concat(right), [])
     .forEach(buildTargets.add, buildTargets);
+  
+  if (buildTargets.size === 0) {
+    // Default to running all test targets if no other targets are matched.
+    ALL_TARGETS.forEach(buildTargets.add, buildTargets)
+  }
 
   const targetList = Array.from(buildTargets)
     .sort()
