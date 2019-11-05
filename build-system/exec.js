@@ -46,7 +46,7 @@ function spawnProcess(cmd, options) {
 function exec(cmd, options) {
   options = options || {'stdio': 'inherit'};
   return spawnProcess(cmd, options);
-};
+}
 
 /**
  * Executes the provided command, and terminates the program in case of failure.
@@ -59,7 +59,7 @@ function execOrDie(cmd, options) {
   if (p.status != 0) {
     process.exit(p.status);
   }
-};
+}
 
 /**
  * Executes the provided command, returning the process object.
