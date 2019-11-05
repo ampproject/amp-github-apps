@@ -21,12 +21,17 @@
  * determine which tasks are required to run for pull request builds.
  */
 const {bold, cyan, yellow} = require('ansi-colors');
-const minimatch = require('minimatch');
 const path = require('path');
 const {gitDiffNameOnlyMaster} = require('./git');
 
 const ALL_TARGETS = ['BUNDLE_SIZE', 'OWNERS', 'PR_DEPLOY', 'TEST_STATUS'];
 
+/**
+ * Determines if a file is a filetype containing code.
+ *
+ * @param {string} filePath
+ * @return {boolean}
+ */
 function isCode(filePath) {
   const fileName = path.basename(filePath);
   return !(
