@@ -43,7 +43,7 @@ function spawnProcess(cmd, options) {
  * @param {object} options
  * @return {object} Process info.
  */
-exec = function(cmd, options) {
+function exec(cmd, options) {
   options = options || {'stdio': 'inherit'};
   return spawnProcess(cmd, options);
 };
@@ -54,7 +54,7 @@ exec = function(cmd, options) {
  * @param {string} cmd Command line to execute.
  * @param {object} options Extra options to send to the process.
  */
-execOrDie = function(cmd, options) {
+function execOrDie(cmd, options) {
   const p = exec(cmd, options);
   if (p.status != 0) {
     process.exit(p.status);
