@@ -43,4 +43,8 @@ function isTravisPushBuild() {
   return isTravisBuild() && process.env.TRAVIS_EVENT_TYPE === 'push';
 }
 
-module.exports = {isTravisBuild, isTravisPullRequestBuild, isTravisPushBuild};
+module.exports = {
+  isTravisBuild,
+  isTravisPullRequestBuild,
+  isTravisPushBuild,
+};

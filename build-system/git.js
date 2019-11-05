@@ -74,4 +74,6 @@ function gitDiffNameOnlyMaster() {
     .split('\n');
 }
 
-module.exports = {gitDiffNameOnlyMaster};
+module.exports = {
+  gitDiffNameOnlyMaster,
+};
