@@ -60,23 +60,10 @@ function main() {
     ['bundle-size', 'owners', 'pr-deploy', 'test-status'].forEach(runAppTests);
   } else {
     const buildTargets = determineBuildTargets(FILENAME);
+    ['bundle-size', 'owners', 'pr-deploy', 'test-status']
+      .filter(buildTargets.has, buildTargets)
+      .forEach(runAppTests);
     log.info(`Detected build targets: ${Array.from(buildTargets).join(', ')}`);
-
-    if (buildTargets.has('BUNDLE_SIZE')) {
-      runAppTests('bundle-size');
-    }
-
-    if (buildTargets.has('OWNERS')) {
-      runAppTests('owners');
-    }
-
-    if (buildTargets.has('PR_DEPLOY')) {
-      runAppTests('pr-deploy');
-    }
-
-    if (buildTargets.has('TEST_STATUS')) {
-      runAppTests('test-status');
-    }
   }
 
   return 0;

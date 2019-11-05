@@ -24,22 +24,7 @@ const {bold, cyan, yellow} = require('ansi-colors');
 const path = require('path');
 const {gitDiffNameOnlyMaster} = require('./git');
 
-const ALL_TARGETS = ['BUNDLE_SIZE', 'OWNERS', 'PR_DEPLOY', 'TEST_STATUS'];
-
-/**
- * Determines if a file is a filetype containing code.
- *
- * @param {string} filePath
- * @return {boolean}
- */
-function isCode(filePath) {
-  const fileName = path.basename(filePath);
-  return !(
-    fileName.startsWith('.') ||
-    fileName.endsWith('.md') ||
-    fileName === 'LICENSE'
-  );
-}
+const ALL_TARGETS = ['bundle-size', 'owners', 'pr-deploy', 'test-status'];
 
 /**
  * A mapping of functions that match a given file to one or more build targets.
@@ -47,26 +32,23 @@ function isCode(filePath) {
 const targetMatchers = [
   {
     targets: ALL_TARGETS,
-    func: file =>
-      (isCode(file) && file.startsWith('build-system') ||
-      file === 'package.json' ||
-      file === 'package-lock.json'),
+    func: file => file.startsWith('build-system') || path.dirname(file) === '.',
   },
   {
-    targets: ['BUNDLE_SIZE'],
-    func: file => isCode(file) && file.startsWith('bundle-size/'),
+    targets: ['bundle-size'],
+    func: file => file.startsWith('bundle-size/'),
   },
   {
-    targets: ['OWNERS'],
-    func: file => isCode(file) && file.startsWith('owners/'),
+    targets: ['owners'],
+    func: file => file.startsWith('owners/'),
   },
   {
-    targets: ['PR_DEPLOY'],
-    func: file => isCode(file) && file.startsWith('pr-deploy/'),
+    targets: ['pr-deploy'],
+    func: file => file.startsWith('pr-deploy/'),
   },
   {
-    targets: ['TEST_STATUS'],
-    func: file => isCode(file) && file.startsWith('test-status/'),
+    targets: ['test-status'],
+    func: file => file.startsWith('test-status/'),
   },
 ];
 
