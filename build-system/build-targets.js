@@ -21,7 +21,6 @@
  * determine which tasks are required to run for pull request builds.
  */
 const {bold, cyan, yellow} = require('ansi-colors');
-const path = require('path');
 const {gitDiffNameOnlyMaster} = require('./git');
 
 const ALL_TARGETS = ['bundle-size', 'owners', 'pr-deploy', 'test-status'];
@@ -64,10 +63,10 @@ function determineBuildTargets(fileName = 'build-targets.js') {
     .map(matcher => matcher.targets)
     .reduce((left, right) => left.concat(right), [])
     .forEach(buildTargets.add, buildTargets);
-  
+
   if (buildTargets.size === 0) {
     // Default to running all test targets if no other targets are matched.
-    ALL_TARGETS.forEach(buildTargets.add, buildTargets)
+    ALL_TARGETS.forEach(buildTargets.add, buildTargets);
   }
 
   const targetList = Array.from(buildTargets)
