@@ -48,10 +48,9 @@ const targetMatchers = [
   {
     targets: ALL_TARGETS,
     func: file =>
-      isCode(file) &&
-      (file.startsWith('build-system') ||
-        file === 'package.json' ||
-        file === 'package-lock.json'),
+      (isCode(file) && file.startsWith('build-system') ||
+      file === 'package.json' ||
+      file === 'package-lock.json'),
   },
   {
     targets: ['BUNDLE_SIZE'],
