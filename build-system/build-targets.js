@@ -23,29 +23,24 @@
 const {bold, cyan, yellow} = require('ansi-colors');
 const {gitDiffNameOnlyMaster} = require('./git');
 
-const ALL_TARGETS = ['bundle-size', 'owners', 'pr-deploy', 'test-status'];
+const APP_TARGETS = {
+  'BUNDLE_SIZE': 'bundle-size',
+  'OWNERS': 'owners',
+  'PR_DEPLOY': 'pr-deploy',
+  'TEST_STATUS': 'test-status',
+};
+const ALL_TARGETS = [...Object.keys(APP_TARGETS)];
 
 /**
  * A mapping of functions that match a given file to one or more build targets.
  */
-const targetMatchers = [
-  {
-    targets: ['bundle-size'],
-    func: file => file.startsWith('bundle-size/'),
-  },
-  {
-    targets: ['owners'],
-    func: file => file.startsWith('owners/'),
-  },
-  {
-    targets: ['pr-deploy'],
-    func: file => file.startsWith('pr-deploy/'),
-  },
-  {
-    targets: ['test-status'],
-    func: file => file.startsWith('test-status/'),
-  },
-];
+const appTargetMatchers = Object.entries(APP_TARGETS).map((target, appName) => {
+  return {
+    targets: [target],
+    func: file => file.startsWith(appName),
+  };
+});
+const targetMatchers = [...appTargetMatchers];
 
 /**
  * Populates buildTargets with a set of build targets contained in a PR after
@@ -82,5 +77,7 @@ function determineBuildTargets(fileName = 'build-targets.js') {
 }
 
 module.exports = {
+  ALL_TARGETS,
+  APP_TARGETS,
   determineBuildTargets,
 };

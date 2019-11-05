@@ -17,7 +17,11 @@
 const colors = require('ansi-colors');
 const {execOrDie} = require('./exec');
 const {isTravisPushBuild} = require('./travis');
-const {determineBuildTargets} = require('./build-targets');
+const {
+  ALL_TARGETS,
+  APP_TARGETS,
+  determineBuildTargets,
+} = require('./build-targets');
 const log = require('fancy-log');
 
 const FILENAME = 'pr-check.js';
@@ -55,16 +59,19 @@ function runAppTests(appName) {
  */
 function main() {
   timedExecOrDie('eslint .');
+  let buildTargets = ALL_TARGETS;
 
   if (isTravisPushBuild()) {
     log.info('Travis push build; running all tests');
-    ['bundle-size', 'owners', 'pr-deploy', 'test-status'].forEach(runAppTests);
   } else {
-    const buildTargets = determineBuildTargets(FILENAME);
-    ['bundle-size', 'owners', 'pr-deploy', 'test-status']
-      .filter(buildTargets.has, buildTargets)
-      .forEach(runAppTests);
+    buildTargets = determineBuildTargets(FILENAME);
     log.info(`Detected build targets: ${Array.from(buildTargets).join(', ')}`);
+  }
+
+  for (const [target, appName] of Object.entries(APP_TARGETS)) {
+    if (buildTargets.has(target)) {
+      runAppTests(appName);
+    }
   }
 
   return 0;
