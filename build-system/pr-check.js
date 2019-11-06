@@ -55,7 +55,7 @@ function runAppTests(appName) {
  */
 function main() {
   timedExecOrDie('eslint .');
-  let buildTargets = ALL_TARGETS;
+  let buildTargets = new Set(ALL_TARGETS);
 
   if (isTravisPushBuild()) {
     log.info('Travis push build; running all tests');
