@@ -51,7 +51,10 @@ function bootstrap(logger = console) {
     } = process.env;
 
     const github = new GitHub(
-      new Octokit({auth: GITHUB_ACCESS_TOKEN}),
+      new Octokit({
+        auth: GITHUB_ACCESS_TOKEN,
+        previews: ['hellcat-preview'],
+      }),
       GITHUB_OWNER,
       GITHUB_REPOSITORY,
       logger
