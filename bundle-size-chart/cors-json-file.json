@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://amp-bundle-size-chart.appspot.com", "http://localhost:8080"],
+    "responseHeader": ["*"],
+    "method": ["GET", "HEAD"],
+    "maxAgeSeconds": 86400
+  }
+]
