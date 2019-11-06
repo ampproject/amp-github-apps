@@ -51,7 +51,11 @@ function bootstrap(logger = console) {
     } = process.env;
 
     const github = new GitHub(
-      new Octokit({auth: GITHUB_ACCESS_TOKEN}),
+      new Octokit({
+        auth: GITHUB_ACCESS_TOKEN,
+        // hellcat-preview allows team member listings to include nested teams.
+        previews: ['hellcat-preview'],
+      }),
       GITHUB_OWNER,
       GITHUB_REPOSITORY,
       logger
