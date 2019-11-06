@@ -16,7 +16,11 @@
 
 const colors = require('ansi-colors');
 const {execOrDie} = require('./exec');
+const {isTravisPushBuild} = require('./travis');
+const {ALL_TARGETS, determineBuildTargets} = require('./build-targets');
 const log = require('fancy-log');
+
+const FILENAME = 'pr-check.js';
 
 /**
  * Execute a command, surrounded by start/end time logs.
@@ -30,17 +34,48 @@ function timedExecOrDie(cmd) {
 }
 
 /**
+ * Set up and execute tests for an app.
+ *
+ * TODO(#608): Replace this with gulp tasks.
+ * TODO(#607): Adopt same logging standards as `amphtml`.
+ *
+ * @param {string} appName
+ */
+function runAppTests(appName) {
+  log.info(`Running tests for "${appName}" app`);
+  timedExecOrDie(`cd ${appName} && npm ci`);
+  timedExecOrDie(`cd ${appName} && npm test -u`);
+  log.info(`Done running "${appName}" tests`);
+}
+
+/**
  * Runs the checks.
  *
  * @return {number} process exit code.
  */
 function main() {
-  // TODO(danielrozenberg): conditional test running
   timedExecOrDie('eslint .');
-  ['bundle-size', 'test-status', 'pr-deploy', 'owners'].forEach(appName => {
-    timedExecOrDie(`cd ${appName} && npm ci`);
-    timedExecOrDie(`cd ${appName} && npm test -u`);
-  });
+  let buildTargets = ALL_TARGETS;
+
+  if (isTravisPushBuild()) {
+    log.info('Travis push build; running all tests');
+  } else {
+    buildTargets = determineBuildTargets(FILENAME);
+    log.info(`Detected build targets: ${Array.from(buildTargets).join(', ')}`);
+  }
+
+  if (buildTargets.has('BUNDLE_SIZE')) {
+    runAppTests('bundle-size');
+  }
+  if (buildTargets.has('OWNERS')) {
+    runAppTests('owners');
+  }
+  if (buildTargets.has('PR_DEPLOY')) {
+    runAppTests('pr-deploy');
+  }
+  if (buildTargets.has('TEST_STATUS')) {
+    runAppTests('test-status');
+  }
 
   return 0;
 }

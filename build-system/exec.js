@@ -43,10 +43,10 @@ function spawnProcess(cmd, options) {
  * @param {object} options
  * @return {object} Process info.
  */
-exports.exec = function(cmd, options) {
+function exec(cmd, options) {
   options = options || {'stdio': 'inherit'};
   return spawnProcess(cmd, options);
-};
+}
 
 /**
  * Executes the provided command, and terminates the program in case of failure.
@@ -54,9 +54,52 @@ exports.exec = function(cmd, options) {
  * @param {string} cmd Command line to execute.
  * @param {object} options Extra options to send to the process.
  */
-exports.execOrDie = function(cmd, options) {
-  const p = exports.exec(cmd, options);
+function execOrDie(cmd, options) {
+  const p = exec(cmd, options);
   if (p.status != 0) {
     process.exit(p.status);
   }
+}
+
+/**
+ * Executes the provided command, returning the process object.
+ * @param {string} cmd
+ * @param {?Object} options
+ * @return {!Object}
+ */
+function getOutput(cmd, options = {}) {
+  return spawnProcess(cmd, {
+    'cwd': options.cwd || process.cwd(),
+    'env': options.env || process.env,
+    'stdio': options.stdio || 'pipe',
+    'encoding': options.encoding || 'utf-8',
+  });
+}
+
+/**
+ * Executes the provided command, returning its stdout.
+ * @param {string} cmd
+ * @param {?Object} options
+ * @return {string}
+ */
+function getStdout(cmd, options) {
+  return getOutput(cmd, options).stdout;
+}
+
+/**
+ * Executes the provided command, returning its stderr.
+ * @param {string} cmd
+ * @param {?Object} options
+ * @return {string}
+ */
+function getStderr(cmd, options) {
+  return getOutput(cmd, options).stderr;
+}
+
+module.exports = {
+  exec,
+  execOrDie,
+  getOutput,
+  getStderr,
+  getStdout,
 };
