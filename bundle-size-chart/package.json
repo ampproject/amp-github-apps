@@ -21,10 +21,10 @@
     "start": "node dist/app.js"
   },
   "dependencies": {
-    "@google-cloud/storage": "4.1.0",
-    "@octokit/rest": "16.34.1",
+    "@google-cloud/storage": "4.1.1",
+    "@octokit/rest": "16.35.0",
     "@types/express": "4.17.2",
-    "@types/node": "12.12.6",
+    "@types/node": "12.12.7",
     "csv-writer": "1.5.0",
     "dotenv": "8.2.0",
     "express": "4.17.1",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "nodemon": "1.19.4",
-    "ts-node": "8.4.1"
+    "ts-node": "8.5.0"
   },
   "nodemonConfig": {
     "exec": "node --inspect -r ts-node/register ./src/app.ts",
