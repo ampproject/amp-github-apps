@@ -148,7 +148,10 @@ describe('test-status/api', () => {
     await waitUntilNockScopeIsDone(nocks);
   });
 
-  test.each([[0, 0, '0 tests passed'], [1, 0, '1 test passed']])(
+  test.each([
+    [0, 0, '0 tests passed'],
+    [1, 0, '1 test passed'],
+  ])(
     'Update a successful existing check with /report/%d/%d action',
     async (passed, failed, title) => {
       await db('pullRequestSnapshots').insert({

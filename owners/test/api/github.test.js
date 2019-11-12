@@ -41,13 +41,14 @@ const searchOwnersPage2Response = require('../fixtures/files/search.owners.page_
 
 describe('pull request', () => {
   describe('isOpen', () => {
-    it.each([['open', true], ['closed', false], ['merged', false]])(
-      'with status %p returns %p',
-      (state, result) => {
-        const pr = new PullRequest(0, '', '', '', state);
-        expect(pr.isOpen).toBe(result);
-      }
-    );
+    it.each([
+      ['open', true],
+      ['closed', false],
+      ['merged', false],
+    ])('with status %p returns %p', (state, result) => {
+      const pr = new PullRequest(0, '', '', '', state);
+      expect(pr.isOpen).toBe(result);
+    });
   });
 
   describe('fromGitHubResponse', () => {
