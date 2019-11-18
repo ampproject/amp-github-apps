@@ -25,11 +25,11 @@
     "express": "4.17.1",
     "express-session": "1.17.0",
     "express-validator": "6.2.0",
-    "knex": "0.20.1",
+    "knex": "0.20.2",
     "passport": "0.4.0",
     "passport-github2": "0.1.11",
     "pg": "7.12.1",
-    "probot": "9.6.4"
+    "probot": "9.6.5"
   },
   "devDependencies": {
     "deepcopy": "2.0.0",
