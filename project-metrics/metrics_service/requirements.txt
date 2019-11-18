@@ -12,9 +12,9 @@ Flask==1.1.1
 Flask-API==1.1
 gitdb2==2.0.6
 google-api-core==1.14.3
-google-auth==1.7.0
+google-auth==1.7.1
 google-cloud-core==1.0.3
-google-cloud-storage==1.22.0
+google-cloud-storage==1.23.0
 google-resumable-media==0.5.0
 googleapis-common-protos==1.6.0
 grpc-google-iam-v1==0.12.3
@@ -35,11 +35,11 @@ packaging==19.2
 pluggy==0.13.0
 protobuf==3.10.0
 py==1.8.0
-pyasn1==0.4.7
+pyasn1==0.4.8
 pyasn1-modules==0.2.7
 PyMySQL==0.9.3
 pyparsing==2.4.5
-pytest==5.2.2
+pytest==5.2.4
 pytest-rerunfailures==7.0
 python-dateutil==2.8.1
 pytz==2019.3
