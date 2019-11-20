@@ -16,9 +16,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const nockRetryTimeoutMs = 100;
-const nockMaxTimeoutMs = 10000;
-
 /**
  * Get a JSON test fixture object.
  *
@@ -29,17 +26,4 @@ exports.getFixture = name => {
   return JSON.parse(
     fs.readFileSync(path.join(__dirname, `fixtures/${name}.json`))
   );
-};
-
-/**
- * Wait until the supplied nock Scope has all its network requests are satified.
- *
- * @param {!nock.Scope} nocks a nock Scope object with network expectations.
- */
-exports.waitUntilNockScopeIsDone = async nocks => {
-  const start = Date.now();
-  while (Date.now() < start + nockMaxTimeoutMs && !nocks.isDone()) {
-    await new Promise(resolve => setTimeout(resolve, nockRetryTimeoutMs));
-  }
-  nocks.done();
 };

@@ -19,7 +19,6 @@ const nock = require('nock');
 const {Probot} = require('probot');
 const request = require('supertest');
 const {setupDb} = require('../setup-db');
-const {waitUntilNockScopeIsDone} = require('./_test_helper');
 
 const HEAD_SHA = '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa';
 
@@ -110,8 +109,7 @@ describe('test-status/api', () => {
         errored: null,
       },
     ]);
-
-    await waitUntilNockScopeIsDone(nocks);
+    nocks.done();
   });
 
   test('Update an existing check with /started action', async () => {
@@ -145,7 +143,7 @@ describe('test-status/api', () => {
     await request(probot.server)
       .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/started`)
       .expect(200);
-    await waitUntilNockScopeIsDone(nocks);
+    nocks.done();
   });
 
   test.each([
@@ -196,8 +194,7 @@ describe('test-status/api', () => {
           errored: 0,
         },
       ]);
-
-      await waitUntilNockScopeIsDone(nocks);
+      nocks.done();
     }
   );
 
@@ -263,8 +260,7 @@ describe('test-status/api', () => {
           errored: 0,
         },
       ]);
-
-      await waitUntilNockScopeIsDone(nocks);
+      nocks.done();
     }
   );
 
@@ -317,8 +313,7 @@ describe('test-status/api', () => {
         errored: 1,
       },
     ]);
-
-    await waitUntilNockScopeIsDone(nocks);
+    nocks.done();
   });
 
   test.each(['queued', 'started', 'skipped', 'report/5/0', 'report/errored'])(
