@@ -160,8 +160,9 @@ class OwnersCheck {
       const suggestionsText = reviewSuggestions.length
         ? this.buildReviewSuggestionsText(reviewSuggestions)
         : reviewerSelectionErrors;
-      const suggestedReviewersText = reviewers.length ?
-        ` Suggested reviewers: ${reviewers.join(', ')}` : '';
+      const suggestedReviewersText = reviewers.length
+        ? ` Suggested reviewers: ${reviewers.join(', ')}`
+        : '';
 
       return {
         checkRun: new CheckRun(

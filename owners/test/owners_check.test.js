@@ -329,8 +329,8 @@ describe('owners check', () => {
 
           expect(checkRun.text).toContain(
             'Encountered an error during reviewer selection: \n' +
-            'Error: Something is wrong\n' +
-            'Skipping reviewer assignment.'
+              'Error: Something is wrong\n' +
+              'Skipping reviewer assignment.'
           );
         });
       });

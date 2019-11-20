@@ -19,6 +19,7 @@ const fs = require('fs');
 const express = require('express');
 const _ = require('lodash');
 const hl = require('highlight').Highlight;
+const {OwnersCheck} = require('./src/owners_check');
 
 const EXAMPLE_OWNERS_PATH = './OWNERS.example';
 const SYNTAX_CHECK_MAX_SIZE = 5000;
@@ -222,6 +223,21 @@ class InfoServer extends Server {
 
     this.cron('refreshTeams', async req => {
       await this.ownersBot.initTeams(this.github);
+    });
+
+    this.get('/check/:prNumber', async req => {
+      const pr = await this.github.getPullRequest(req.params.prNumber);
+      const {changedFiles, reviewers} = await this.ownersBot.initPr(
+        this.github,
+        pr
+      );
+      const {checkRun} = new OwnersCheck(
+        this.ownersBot.treeParse.result,
+        changedFiles,
+        reviewers
+      ).run();
+
+      return checkRun.json;
     });
   }
 }
