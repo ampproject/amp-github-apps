@@ -454,7 +454,7 @@ describe('bundle-size api', () => {
                 resolve(nocks);
               }, 0);
             });
-        }).then(nocks => nocks.done());
+        });
 
         await request(probot.server)
           .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -462,7 +462,7 @@ describe('bundle-size api', () => {
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
           .expect(202);
-        await lastNetworkRequest;
+        await lastNetworkRequest.then(nocks => nocks.done());
       }
     );
 
@@ -527,7 +527,7 @@ describe('bundle-size api', () => {
                 resolve(nocks);
               }, 0);
             });
-        }).then(nocks => nocks.done());
+        });
 
         await request(probot.server)
           .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -535,7 +535,7 @@ describe('bundle-size api', () => {
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
           .expect(202);
-        await lastNetworkRequest;
+        await lastNetworkRequest.then(nocks => nocks.done());
       }
     );
 
@@ -587,7 +587,7 @@ describe('bundle-size api', () => {
               resolve(nocks);
             }, 0);
           });
-      }).then(nocks => nocks.done());
+      });
 
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -595,7 +595,7 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(202);
-      await lastNetworkRequest;
+      await lastNetworkRequest.then(nocks => nocks.done());
     });
 
     test('ignore bundle-size report for a missing head SHA', async () => {
