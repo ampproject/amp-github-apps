@@ -302,6 +302,38 @@ describe('owners check', () => {
           );
         });
       });
+
+      describe('if an error occurs in reviewer selection', () => {
+        beforeEach(() => {
+          sandbox
+            .stub(ReviewerSelection, 'pickReviews')
+            .throws(new Error('Something is wrong'));
+        });
+
+        it('has an action-required conclusion', () => {
+          const {checkRun} = ownersCheck.run();
+
+          expect(checkRun.json.conclusion).toEqual('action_required');
+        });
+
+        it('has a failing summary', () => {
+          const {checkRun} = ownersCheck.run();
+
+          expect(checkRun.summary).toContain(
+            'Missing required OWNERS approvals!'
+          );
+        });
+
+        it('contains error details in the output', () => {
+          const {checkRun} = ownersCheck.run();
+
+          expect(checkRun.text).toContain(
+            'Encountered an error during reviewer selection: \n' +
+              'Error: Something is wrong\n' +
+              'Skipping reviewer assignment.'
+          );
+        });
+      });
     });
   });
 

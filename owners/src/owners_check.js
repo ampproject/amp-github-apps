@@ -146,16 +146,28 @@ class OwnersCheck {
       });
 
       // TODO(#516): Include missing required reviewers.
-      const reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
+      let reviewSuggestions = [];
+      let reviewerSelectionErrors = '';
+      try {
+        reviewSuggestions = ReviewerSelection.pickReviews(fileTreeMap);
+      } catch (e) {
+        reviewerSelectionErrors =
+          'Encountered an error during reviewer ' +
+          `selection: \n${e}\nSkipping reviewer assignment.`;
+      }
+
       const reviewers = reviewSuggestions.map(([reviewer, files]) => reviewer);
-      const suggestionsText = this.buildReviewSuggestionsText(
-        reviewSuggestions
-      );
+      const suggestionsText = reviewSuggestions.length
+        ? this.buildReviewSuggestionsText(reviewSuggestions)
+        : reviewerSelectionErrors;
+      const suggestedReviewersText = reviewers.length
+        ? ` Suggested reviewers: ${reviewers.join(', ')}`
+        : '';
+
       return {
         checkRun: new CheckRun(
           CheckRunState.ACTION_REQUIRED,
-          'Missing required OWNERS approvals! ' +
-            `Suggested reviewers: ${reviewers.join(', ')}`,
+          `Missing required OWNERS approvals!${suggestedReviewersText}`,
           `${coverageText}\n\n${suggestionsText}`
         ),
         reviewers,
