@@ -462,7 +462,8 @@ describe('bundle-size api', () => {
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
           .expect(202);
-        await lastNetworkRequest.then(nocks => nocks.done());
+        const nocks = await lastNetworkRequest;
+        nocks.done();
       }
     );
 
@@ -535,7 +536,8 @@ describe('bundle-size api', () => {
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
           .expect(202);
-        await lastNetworkRequest.then(nocks => nocks.done());
+        const nocks = await lastNetworkRequest;
+        nocks.done();
       }
     );
 
@@ -595,7 +597,8 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(202);
-      await lastNetworkRequest.then(nocks => nocks.done());
+      const nocks = await lastNetworkRequest;
+      nocks.done();
     });
 
     test('ignore bundle-size report for a missing head SHA', async () => {
