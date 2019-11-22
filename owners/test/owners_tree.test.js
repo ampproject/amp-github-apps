@@ -356,8 +356,8 @@ describe('owners tree', () => {
     it('builds a map from filenames to subtrees', () => {
       const dirTrees = {
         '/': tree.addRule(rootDirRule),
-        '/foo': tree.addRule(rootDirRule),
-        '/biz': tree.addRule(rootDirRule),
+        '/foo': tree.addRule(childDirRule),
+        '/biz': tree.addRule(otherChildDirRule),
       };
       const fileTreeMap = tree.buildFileTreeMap([
         './main.js',
@@ -378,6 +378,20 @@ describe('owners tree', () => {
         'buzz/info.txt': dirTrees['/'],
         'buzz/code.js': dirTrees['/'],
       });
+    });
+
+    it('maps to the deepest subtree with a matching rule', () => {
+      tree.addRule(rootDirRule);
+      tree.addRule(
+        new PatternOwnersRule(
+          'foo/OWNERS',
+          [new UserOwner('person')],
+          'not_a_file_pattern'
+        )
+      );
+      const fileTreeMap = tree.buildFileTreeMap(['foo/file.js']);
+
+      expect(fileTreeMap).toEqual({'foo/file.js': tree});
     });
   });
 

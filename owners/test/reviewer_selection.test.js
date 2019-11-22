@@ -104,6 +104,20 @@ describe('reviewer selection', () => {
 
       expect(deepestRules).toEqual([dirRules['/foo']]);
     });
+
+    it('tries less-deep rules when the deepest rules do not apply', () => {
+      const deeperRule = new SameDirPatternOwnersRule(
+        'foo/bar/OWNERS',
+        [new UserOwner('person')],
+        'not_the_file.txt'
+      );
+      ownersTree.addRule(deeperRule);
+      const fileTreeMap = ownersTree.buildFileTreeMap(['foo/bar/file.js']);
+      const deepestRules = ReviewerSelection._deepestOwnersRules(fileTreeMap);
+
+      expect(deepestRules).not.toContain(deeperRule);
+      expect(deepestRules).toContain(dirRules['/foo']);
+    });
   });
 
   describe('reviewersForRules', () => {
