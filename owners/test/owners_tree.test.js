@@ -381,7 +381,7 @@ describe('owners tree', () => {
     });
 
     it('maps to the deepest subtree with a matching rule', () => {
-      tree.addRule(rootDirRule),
+      tree.addRule(rootDirRule);
       tree.addRule(
         new PatternOwnersRule(
           'foo/OWNERS',
