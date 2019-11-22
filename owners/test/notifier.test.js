@@ -196,7 +196,9 @@ describe('notifier', () => {
       getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
       getCommentsStub.returns([]);
 
-      notifier = new OwnersNotifier(pr, {}, new OwnersTree(), ['main.js']);
+      const tree = new OwnersTree();
+      tree.addRule(new OwnersRule('OWNERS', ['root_owner']));
+      notifier = new OwnersNotifier(pr, {}, tree, ['main.js']);
     });
 
     it('gets users and teams to notify', async done => {

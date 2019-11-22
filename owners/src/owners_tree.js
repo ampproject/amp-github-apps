@@ -198,9 +198,16 @@ class OwnersTree {
    */
   buildFileTreeMap(filenames) {
     const fileTreeMap = {};
+
     filenames.forEach(filename => {
-      fileTreeMap[filename] = this.atPath(filename);
+      let subtree = this.atPath(filename);
+      // Walk up the tree until reaching a node with at least one matching rule.
+      while (!subtree.rules.some(rule => rule.matchesFile(filename))) {
+        subtree = subtree.parent;
+      }
+      fileTreeMap[filename] = subtree;
     });
+
     return fileTreeMap;
   }
 
