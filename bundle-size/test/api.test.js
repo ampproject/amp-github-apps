@@ -70,7 +70,11 @@ describe('bundle-size api', () => {
       .get('/teams/123/members')
       .reply(200, getFixture('teams.123.members'))
       .get('/teams/234/members')
-      .reply(200, getFixture('teams.234.members'));
+      .reply(200, getFixture('teams.234.members'))
+      .get(
+        '/repos/ampproject/amphtml/contents/build-system/tasks/bundle-size/APPROVERS.json'
+      )
+      .reply(200, getFixture('APPROVERS.json'));
   });
 
   afterEach(async () => {
