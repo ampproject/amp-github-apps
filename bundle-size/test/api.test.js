@@ -558,7 +558,7 @@ describe('bundle-size api', () => {
             '/repos/ampproject/amphtml-build-artifacts/contents/' +
               'bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
           )
-          .times(2)
+          .times(60)
           .reply(404)
           .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
             expect(body).toMatchObject({
