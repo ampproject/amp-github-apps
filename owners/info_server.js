@@ -19,7 +19,7 @@ const fs = require('fs');
 const express = require('express');
 const _ = require('lodash');
 const hl = require('highlight').Highlight;
-const {OwnersCheck} = require('./src/owners_check');
+const {OwnersCheck} = require('./src/ownership/owners_check');
 
 const EXAMPLE_OWNERS_PATH = './OWNERS.example';
 const SYNTAX_CHECK_MAX_SIZE = 5000;

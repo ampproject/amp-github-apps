@@ -22,10 +22,10 @@ const sinon = require('sinon');
 
 const VirtualRepository = require('../src/repo/virtual_repo');
 const {GitHub, Team} = require('../src/api/github');
-const {OwnersParser} = require('../src/parser');
-const {UserOwner} = require('../src/owner');
-const {OwnersRule} = require('../src/rules');
-const {CheckRun} = require('../src/owners_check');
+const {OwnersParser} = require('../src/ownership/parser');
+const {UserOwner} = require('../src/ownership/owner');
+const {OwnersRule} = require('../src/ownership/rules');
+const {CheckRun} = require('../src/ownership/owners_check');
 const {OwnersBot} = require('../src/owners_bot');
 
 const opened35 = require('./fixtures/actions/opened.35');

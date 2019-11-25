@@ -18,23 +18,23 @@ const sinon = require('sinon');
 const path = require('path');
 const fs = require('fs');
 const JSON5 = require('json5');
-const {Team} = require('../src/api/github');
-const LocalRepository = require('../src/repo/local_repo');
-const {OwnersParser, OwnersParserError} = require('../src/parser');
+const {Team} = require('../../src/api/github');
+const LocalRepository = require('../../src/repo/local_repo');
+const {OwnersParser, OwnersParserError} = require('../../src/ownership/parser');
 const {
   UserOwner,
   TeamOwner,
   WildcardOwner,
   OWNER_MODIFIER,
-} = require('../src/owner');
+} = require('../../src/ownership/owner');
 const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
   ReviewerSetRule,
-} = require('../src/rules');
+} = require('../../src/ownership/rules');
 
-const EXAMPLE_FILE_PATH = path.resolve(__dirname, '../OWNERS.example');
+const EXAMPLE_FILE_PATH = path.resolve(__dirname, '../../OWNERS.example');
 
 describe('owners parser error', () => {
   describe('toString', () => {

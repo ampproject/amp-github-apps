@@ -21,7 +21,7 @@ const {
   SameDirPatternOwnersRule,
   ReviewerSetRule,
 } = require('./rules');
-const {OwnersTree} = require('./owners_tree');
+const OwnersTree = require('./tree');
 const {
   UserOwner,
   TeamOwner,

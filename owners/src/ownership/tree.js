@@ -20,7 +20,7 @@ const {ReviewerSetRule} = require('./rules');
 /**
  * A tree of ownership keyed by directory.
  */
-class OwnersTree {
+module.exports = class OwnersTree {
   /**
    * Constructor.
    *
@@ -244,5 +244,3 @@ class OwnersTree {
     return lines.join('\n');
   }
 }
-
-module.exports = {OwnersTree};

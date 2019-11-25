@@ -15,7 +15,7 @@
  */
 
 const {OWNER_MODIFIER} = require('./owner');
-const {ReviewerSelection} = require('./reviewer_selection');
+const {ReviewerSelection} = require('../reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
 const EXAMPLE_OWNERS_LINK = 'http://ampproject-owners-bot.appspot.com/example';

@@ -20,8 +20,8 @@ const {
   TeamOwner,
   WildcardOwner,
   OWNER_MODIFIER,
-} = require('../src/owner');
-const {Team} = require('../src/api/github');
+} = require('../../src/ownership/owner');
+const {Team} = require('../../src/api/github');
 
 describe('owner base class', () => {
   const owner = new Owner();

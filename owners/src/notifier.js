@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const {OWNER_MODIFIER} = require('./owner');
+const {OWNER_MODIFIER} = require('./ownership/owner');
 const ADD_REVIEWERS_TAG = /#add-?owners/i;
 const DONT_ADD_REVIEWERS_TAG = /#no-?add-?owners/i;
 

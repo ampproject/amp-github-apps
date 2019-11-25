@@ -18,7 +18,7 @@ const nock = require('nock');
 const sinon = require('sinon');
 const Octokit = require('@octokit/rest');
 
-const {CheckRun, CheckRunState} = require('../../src/owners_check');
+const {CheckRun, CheckRunState} = require('../../src/ownership/owners_check');
 const {GitHub, PullRequest, Review, Team} = require('../../src/api/github');
 
 const reviewsApprovedResponse = require('../fixtures/reviews/reviews.35.approved.json');

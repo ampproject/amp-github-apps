@@ -20,7 +20,7 @@ const {
   SameDirPatternOwnersRule,
   ReviewerSetRule,
   RULE_PRIORITY,
-} = require('../src/rules');
+} = require('../../src/ownership/rules');
 
 describe('owners rules', () => {
   expect.extend({
