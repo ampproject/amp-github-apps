@@ -14,7 +14,7 @@
  */
 
 const {dbConnect} = require('../db');
-const {getFixture, waitUntilNockScopeIsDone} = require('./_test_helper');
+const {getFixture} = require('./_test_helper');
 const {installGitHubWebhooks} = require('../webhooks');
 const nock = require('nock');
 const Octokit = require('@octokit/rest');
@@ -98,7 +98,7 @@ describe('bundle-size webhooks', () => {
         .reply(200, {id: 555555});
 
       await probot.receive({name: 'pull_request', payload});
-      await waitUntilNockScopeIsDone(nocks);
+      nocks.done();
 
       expect(await db('checks').select('*')).toMatchObject([
         {
@@ -140,7 +140,7 @@ describe('bundle-size webhooks', () => {
         .reply(200, {id: 555555});
 
       await probot.receive({name: 'pull_request', payload});
-      await waitUntilNockScopeIsDone(nocks);
+      nocks.done();
 
       expect(await db('checks').select('*')).toMatchObject([
         {
@@ -201,7 +201,7 @@ describe('bundle-size webhooks', () => {
 
       await probot.receive({name: 'check_run', payload: checkRunPayload});
       expect(await db('merges').select('*')).toMatchObject([]);
-      await waitUntilNockScopeIsDone(nocks);
+      nocks.done();
     });
 
     test('fail when a pull request is reported as merged twice', async () => {
@@ -253,7 +253,7 @@ describe('bundle-size webhooks', () => {
         .reply(200);
 
       await probot.receive({name: 'pull_request_review', payload});
-      await waitUntilNockScopeIsDone(nocks);
+      nocks.done();
     });
 
     test('mark a check as successful when a capable user approves the PR with missing size delta', async () => {
@@ -282,7 +282,7 @@ describe('bundle-size webhooks', () => {
         .reply(200);
 
       await probot.receive({name: 'pull_request_review', payload});
-      await waitUntilNockScopeIsDone(nocks);
+      nocks.done();
     });
 
     test('ignore an approved review by a non-capable reviewer', async () => {
