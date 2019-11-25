@@ -29,6 +29,7 @@ const {CheckRun} = require('../src/ownership/owners_check');
 const {OwnersBot} = require('../src/owners_bot');
 
 const opened35 = require('./fixtures/actions/opened.35');
+const openedDraft25408 = require('./fixtures/actions/opened.draft.25408');
 const opened36 = require('./fixtures/actions/opened.36.author-is-owner');
 const rerequest35 = require('./fixtures/actions/rerequested.35');
 const review35 = require('./fixtures/actions/pull_request_review.35.submitted');
@@ -57,6 +58,17 @@ const ownersRules = [
   new OwnersRule('dir2/dir1/dir1/OWNERS', [new UserOwner('githubuser')]),
 ];
 
+/**
+ * Require a fresh copy of a module, clearing the require cache.
+ *
+ * @param {string} path module path.
+ * @return {*} required module.
+ */
+function _rerequire(path) {
+  delete require.cache[require.resolve(path)];
+  return require(path);
+}
+
 describe('GitHub app', () => {
   let probot;
   let sandbox;
@@ -76,7 +88,7 @@ describe('GitHub app', () => {
       GITHUB_REPOSITORY,
       NODE_ENV: 'test',
     });
-    
+
     sandbox.stub(VirtualRepository.prototype, 'sync');
     sandbox.stub(VirtualRepository.prototype, 'warmCache').resolves();
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
@@ -88,8 +100,8 @@ describe('GitHub app', () => {
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
       .returns({result: ownersRules, errors: []});
     nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
+      .post('/app/installations/588033/access_tokens')
+      .reply(200, {token: 'test'});
 
     probot = new Probot({});
     const app = probot.load(owners);
@@ -554,6 +566,134 @@ describe('GitHub app', () => {
       });
       sandbox.assert.calledOnce(Team.prototype.fetchMembers);
       done();
+    });
+  });
+
+  describe('PRs that should not assign reviewers right away', () => {
+    beforeEach(() => {
+      sandbox.stub(OwnersBot.prototype, 'runOwnersCheck').callThrough();
+    });
+
+    it('does not assign reviewers for draft PRs', async () => {
+      expect.assertions(1);
+
+      nock('https://api.github.com')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/25408/files?per_page=100'
+        )
+        .reply(200, [])
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/25408/reviews?per_page=100'
+        )
+        .reply(200, [])
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
+            '85c9482fb0e92d0e7b0c4765308a6a1a37eeb708/check-runs'
+        )
+        .reply(200, checkruns35Empty)
+        .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
+        .reply(200);
+
+      await probot.receive({
+        name: 'pull_request.opened',
+        payload: openedDraft25408,
+      });
+
+      sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
+      expect(OwnersBot.prototype.runOwnersCheck.getCall(0).args[2]).toBe(false);
+    });
+
+    it('does assign reviewers for draft PRs once they are ready', async () => {
+      expect.assertions(1);
+
+      nock('https://api.github.com')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/25408/files?per_page=100'
+        )
+        .reply(200, [])
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/25408/reviews?per_page=100'
+        )
+        .reply(200, [])
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
+            '85c9482fb0e92d0e7b0c4765308a6a1a37eeb708/check-runs'
+        )
+        .reply(200, checkruns35Empty)
+        .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
+        .reply(200);
+
+      const payload = _rerequire('./fixtures/actions/ready_for_review.25408');
+      payload.pull_request.title = 'I am ready now!';
+      await probot.receive({
+        name: 'pull_request.ready_for_review',
+        payload,
+      });
+
+      sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
+      expect(OwnersBot.prototype.runOwnersCheck.getCall(0).args[2]).toBe(true);
+    });
+
+    it('does not assign reviewers when the title contains DO NOT SUBMIT', async () => {
+      expect.assertions(1);
+
+      nock('https://api.github.com')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+        )
+        .reply(200, [])
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
+        )
+        .reply(200, [])
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
+            '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
+        )
+        .reply(200, checkruns35Empty)
+        .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
+        .reply(200);
+
+      const payload = _rerequire('./fixtures/actions/opened.35');
+      payload.pull_request.title = 'DO NOT SUBMIT: test';
+      await probot.receive({
+        name: 'pull_request.opened',
+        payload: opened35,
+      });
+
+      sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
+      expect(OwnersBot.prototype.runOwnersCheck.getCall(0).args[2]).toBe(false);
+    });
+
+    it('does not assign reviewers when the title contains WIP', async () => {
+      expect.assertions(1);
+
+      nock('https://api.github.com')
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+        )
+        .reply(200, [])
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
+        )
+        .reply(200, [])
+        .get(
+          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
+            '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
+        )
+        .reply(200, checkruns35Empty)
+        .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
+        .reply(200);
+
+      const payload = _rerequire('./fixtures/actions/opened.35');
+      payload.pull_request.title = 'WIP: test';
+      await probot.receive({
+        name: 'pull_request.opened',
+        payload: opened35,
+      });
+
+      sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
+      expect(OwnersBot.prototype.runOwnersCheck.getCall(0).args[2]).toBe(false);
     });
   });
 
