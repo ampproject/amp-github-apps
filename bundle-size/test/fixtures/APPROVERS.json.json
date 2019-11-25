@@ -1,0 +1,18 @@
+{
+  "name": "APPROVERS.json",
+  "path": "build-system/tasks/bundle-size/APPROVERS.json",
+  "sha": "a533db2ed2dea345943998219b61e3ae9a2bac58",
+  "size": 416,
+  "url": "https://api.github.com/repos/ampproject/amphtml/contents/build-system/tasks/bundle-size/APPROVERS.json?ref=master",
+  "html_url": "https://github.com/ampproject/amphtml/blob/master/build-system/tasks/bundle-size/APPROVERS.json",
+  "git_url": "https://api.github.com/repos/ampproject/amphtml/git/blobs/a533db2ed2dea345943998219b61e3ae9a2bac58",
+  "download_url": "https://raw.githubusercontent.com/ampproject/amphtml/master/build-system/tasks/bundle-size/APPROVERS.json",
+  "type": "file",
+  "content": "ewogICJkaXN0L3YwLmpzIjogewogICAgImFwcHJvdmVycyI6IFsiYW1wcHJv\namVjdC93Zy1wZXJmb3JtYW5jZSIsICJhbXBwcm9qZWN0L3dnLXJ1bnRpbWUi\nXSwKICAgICJ0aHJlc2hvbGQiOiAwLjEKICB9LAogICJkaXN0L2FtcDRhZHMt\ndjAuanMiOiB7CiAgICAiYXBwcm92ZXJzIjogWyJhbXBwcm9qZWN0L3dnLWFk\ncyJdLAogICAgInRocmVzaG9sZCI6IDAuMQogIH0sCiAgImRpc3QvdjAvYW1w\nLXN0b3J5LTAuMS5qcyI6IHsKICAgICJhcHByb3ZlcnMiOiBbImFtcHByb2pl\nY3Qvd2ctc3RvcmllcyJdLAogICAgInRocmVzaG9sZCI6IDAuNQogIH0sCiAg\nImRpc3QvdjAvYW1wLXN0b3J5LTEuMC5qcyI6IHsKICAgICJhcHByb3ZlcnMi\nOiBbImFtcHByb2plY3Qvd2ctc3RvcmllcyJdLAogICAgInRocmVzaG9sZCI6\nIDAuNQogIH0KfQo=\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/ampproject/amphtml/contents/build-system/tasks/bundle-size/APPROVERS.json?ref=master",
+    "git": "https://api.github.com/repos/ampproject/amphtml/git/blobs/a533db2ed2dea345943998219b61e3ae9a2bac58",
+    "html": "https://github.com/ampproject/amphtml/blob/master/build-system/tasks/bundle-size/APPROVERS.json"
+  }
+}

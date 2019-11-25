@@ -19,6 +19,7 @@ const {
   getCheckFromDatabase,
   isBundleSizeApprover,
 } = require('./common');
+const NodeCache = require('node-cache');
 const path = require('path');
 const sleep = require('sleep-promise');
 
@@ -26,6 +27,15 @@ const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
 
 const HUMAN_ENCOURAGEMENT_MAX_DELTA = -0.03;
+
+const CACHE_TTL_SECONDS = 900;
+const CACHE_CHECK_SECONDS = 60;
+const CACHE_APPROVERS_KEY = 'approvers';
+
+const cache = new NodeCache({
+  'stdTTL': CACHE_TTL_SECONDS,
+  'checkperiod': CACHE_CHECK_SECONDS,
+});
 
 /**
  * Get GitHub API parameters for bundle-size file actions.
@@ -52,9 +62,7 @@ function getBuildArtifactsFileParams(filename) {
 async function getBuildArtifactsFile(github, filename) {
   return await github.repos
     .getContents(getBuildArtifactsFileParams(filename))
-    .then(result => {
-      return Buffer.from(result.data.content, 'base64').toString();
-    });
+    .then(result => Buffer.from(result.data.content, 'base64').toString());
 }
 
 /**
@@ -64,14 +72,43 @@ async function getBuildArtifactsFile(github, filename) {
  * @param {!github} github an authenticated GitHub API object.
  * @param {string} filename the name of the file to store into.
  * @param {string} contents text contents of the file.
- * @return {object} to ignore.
  */
 async function storeBuildArtifactsFile(github, filename, contents) {
-  return await github.repos.createOrUpdateFile({
+  await github.repos.createOrUpdateFile({
     ...getBuildArtifactsFileParams(filename),
     message: `bundle-size: ${filename}`,
     content: Buffer.from(contents).toString('base64'),
   });
+}
+
+/**
+ * Get the mapping of compiled files to their approvers and thresholds.
+ * @param {!github} github an authenticated GitHub API object.
+ * @param {Logger} log logging function/object.
+ * @return {!Map<string, {approvers: !Array<string>, threshold: number}>}
+ *   mapping of compiled files to the teams that can approve an increase, and
+ *   the threshold in KB that requires an approval.
+ */
+async function getFileApprovalsMapping(github, log) {
+  let approvers = cache.get(CACHE_APPROVERS_KEY);
+  if (!approvers) {
+    log(`Cache miss for ${CACHE_APPROVERS_KEY}. Fetching from GitHub...`);
+    approvers = await github.repos
+      .getContents({
+        owner: 'ampproject',
+        repo: 'amphtml',
+        path: 'build-system/tasks/bundle-size/APPROVERS.json',
+      })
+      .then(result => Buffer.from(result.data.content, 'base64').toString())
+      .then(JSON.parse);
+    log(
+      `Fetched ${CACHE_APPROVERS_KEY} from GitHub with ` +
+        `${Object.keys(approvers).length} entries. Caching for ` +
+        `${CACHE_TTL_SECONDS} seconds.`
+    );
+    cache.set(CACHE_APPROVERS_KEY, approvers);
+  }
+  return approvers;
 }
 
 /**
@@ -181,6 +218,54 @@ function extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes) {
   );
 }
 
+/**
+ * Choose the set of all the potential approver teams into a single team.
+ *
+ * Could end up choosing the fallback set defined in the `.env` file, even if
+ * the fallback set is not in the input.
+ *
+ * @param {!Array<!Array<string>>} allPotentialApproverTeams all the potential
+ *   teams that can approve this pull request.
+ * @param {!Logger} log logging function/object.
+ * @param {number} pullRequestId the pull request ID.
+ * @return {!Array<string>} the selected subset of all potential approver teams
+ *   that can approve this bundle-size change.
+ */
+function choosePotentialApproverTeams(
+  allPotentialApproverTeams,
+  log,
+  pullRequestId
+) {
+  let potentialApproverTeams;
+  switch (allPotentialApproverTeams.length) {
+    case 0:
+      potentialApproverTeams = [];
+      log(
+        `Pull request #${pullRequestId} does not require ` +
+          'bundle-size approval'
+      );
+      break;
+
+    case 1:
+      potentialApproverTeams = allPotentialApproverTeams[0];
+      log(
+        `Pull request #${pullRequestId} requires approval ` +
+          `from members of one of: ${potentialApproverTeams.join(', ')}`
+      );
+      break;
+
+    default:
+      potentialApproverTeams = process.env.FALLBACK_APPROVER_TEAMS.split(',');
+      log(
+        `Pull request #${pullRequestId} requires approval from ` +
+          'multiple sets of teams, so we fall back to the default set ' +
+          `of: ${potentialApproverTeams.join(', ')}`
+      );
+      break;
+  }
+  return potentialApproverTeams;
+}
+
 exports.installApiRouter = (app, db, userBasedGithub) => {
   /**
    * Try to report the bundle size of a pull request to the GitHub check.
@@ -206,21 +291,28 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
     };
 
     try {
+      app.log(
+        `Fetching master bundle-sizes on base commit ${baseSha} for pull ` +
+          `request #${check.pull_request_id}`
+      );
       const masterBundleSizes = JSON.parse(
         await getBuildArtifactsFile(github, `${baseSha}.json`)
       );
 
+      app.log(
+        'Fetching mapping of file approvers and thresholds for pull request ' +
+          `#${check.pull_request_id}`
+      );
+      const fileApprovers = await getFileApprovalsMapping(github, app.log);
+
       // Calculate and collect all (non-zero) bundle size deltas and list all
       // dist files that are missing either from master or from this pull
-      // request.
-      const otherBundleSizeDeltas = [];
+      // request, and all the potential teams that can approve above-threshold
+      // deltas.
+      const bundleSizeDeltas = [];
       const missingBundleSizes = [];
+      const allPotentialApproverTeams = new Set();
       for (const [file, baseBundleSize] of Object.entries(masterBundleSizes)) {
-        if (file === 'dist/v0.js') {
-          // For now, skip dist/v0.js because it gets special handling.
-          continue;
-        }
-
         if (!(file in prBundleSizes)) {
           missingBundleSizes.push(`* \`${file}\`: missing in pull request`);
           continue;
@@ -228,8 +320,19 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
 
         const bundleSizeDelta = prBundleSizes[file] - baseBundleSize;
         if (bundleSizeDelta !== 0) {
-          otherBundleSizeDeltas.push(
+          bundleSizeDeltas.push(
             `* \`${file}\`: ${formatBundleSizeDelta(bundleSizeDelta)}`
+          );
+        }
+
+        if (
+          file in fileApprovers &&
+          bundleSizeDelta >= fileApprovers[file].threshold
+        ) {
+          // Since `.approvers` is an array, it must be stringified to maintain
+          // the Set uniqueness property.
+          allPotentialApproverTeams.add(
+            JSON.stringify(fileApprovers[file].approvers)
           );
         }
       }
@@ -242,13 +345,29 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
         }
       }
 
-      if (otherBundleSizeDeltas.length === 0) {
-        otherBundleSizeDeltas.push(
-          '* No other bundle sizes reported in this pull request'
+      // TODO(#617, danielrozenberg): replace the legacy logic below with logic
+      // that uses the chosen approvers team list.
+      // eslint-disable-next-line no-unused-vars
+      const chosenApproverTeams = choosePotentialApproverTeams(
+        Array.from(allPotentialApproverTeams).map(JSON.parse),
+        app.log,
+        check.pull_request_id
+      );
+
+      if (bundleSizeDeltas.length === 0) {
+        bundleSizeDeltas.push(
+          '* No bundle size changes reported in this pull request'
         );
       }
 
-      // TODO(#271, danielrozenberg): this is a transitionary solution. This API
+      app.log(
+        'Done pre-processing bundle-size changes for pull request ' +
+          `#${check.pull_request_id}:`
+      );
+      app.log(`Deltas:\n${bundleSizeDeltas.join('\n')}`);
+      app.log(`Missing:\n${missingBundleSizes.join('\n')}`);
+
+      // TODO(#617, danielrozenberg): this is a transitionary solution. This API
       // endpoint accepts a JSON with multiple bundle sizes, but for now it only
       // blocks on size changes in dist/v0.js. Later we determine how we want to
       // report and block PRs based on bundle sizes of other dist files.
@@ -267,7 +386,7 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
           conclusion: 'action_required',
           output: failedCheckOutput(
             baseRuntimeBundleSizeDelta,
-            otherBundleSizeDeltas,
+            bundleSizeDeltas,
             missingBundleSizes
           ),
         });
@@ -276,7 +395,7 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
           conclusion: 'success',
           output: successfulCheckOutput(
             baseRuntimeBundleSizeDelta,
-            otherBundleSizeDeltas,
+            bundleSizeDeltas,
             missingBundleSizes
           ),
         });
@@ -297,7 +416,8 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
       app.log.error(
         'ERROR: Failed to retrieve the bundle size of ' +
           `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
-          `point ${partialBaseSha} from GitHub: ${error}`
+          `point ${partialBaseSha} from GitHub:\n`,
+        error
       );
       if (lastAttempt) {
         app.log.warn('No more retries left. Reporting failure');
@@ -372,7 +492,7 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
         'ERROR: Failed to add a reviewer to pull request ' +
           `${pullRequest.pull_number}. Skipping...`
       );
-      app.log.error(`Error message: ${error}`);
+      app.log.error(`Error message:\n`, error);
       throw error;
     }
   }
@@ -525,10 +645,9 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
     } catch (error) {
       const errorMessage =
         `ERROR: Failed to create the bundle-size/${jsonBundleSizeFile} file ` +
-        'in the build artifacts repository on GitHub!\n' +
-        `Error message was: ${error}`;
-      app.log.error(errorMessage);
-      return response.status(500).end(errorMessage);
+        'in the build artifacts repository on GitHub! Error message was:';
+      app.log.error(`${errorMessage}\n`, error);
+      return response.status(500).end(`${errorMessage}\n${error}`);
     }
 
     response.end();
