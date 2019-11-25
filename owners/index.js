@@ -20,6 +20,8 @@ const InfoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/api/github');
 const {OwnersCheck} = require('./src/ownership/owners_check');
 
+const NO_REQUEST_OWNERS_REGEX = /\b(WIP|work in progress|DO NOT (MERGE|SUBMIT))\b/i;
+
 module.exports = app => {
   const {github, ownersBot, initialized} = bootstrap(app.log);
 
@@ -46,11 +48,28 @@ module.exports = app => {
     });
   }
 
+  /**
+   * Identify if a PR is in a state that reviewers should be assigned.
+   *
+   * @param {!object} pr GitHub PR payload.
+   * @return {boolean} false if the PR is a draft or the title contains WIP/DNS.
+   */
+  function shouldAssignReviewers(pr) {
+    return !(pr.draft || NO_REQUEST_OWNERS_REGEX.test(pr.title));
+  }
+
   /** Probot request handlers **/
-  listen('pull_request.opened', async (github, payload) => {
-    const pr = PullRequest.fromGitHubResponse(payload.pull_request);
-    await ownersBot.runOwnersCheck(github, pr, /* requestOwners */ true);
-  });
+  listen(
+    ['pull_request.opened', 'pull_request.ready_for_review'],
+    async (github, payload) => {
+      const pr = PullRequest.fromGitHubResponse(payload.pull_request);
+      await ownersBot.runOwnersCheck(
+        github,
+        pr,
+        shouldAssignReviewers(payload.pull_request)
+      );
+    }
+  );
 
   listen('pull_request.synchronize', async (github, payload) => {
     const pr = PullRequest.fromGitHubResponse(payload.pull_request);
