@@ -276,11 +276,7 @@ describe('owners bot', () => {
       sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
       await ownersBot.runOwnersCheck(github, pr);
 
-      sandbox.assert.calledWith(
-        OwnersNotifier.prototype.requestReviews,
-        github,
-        []
-      );
+      sandbox.assert.notCalled(OwnersNotifier.prototype.requestReviews);
       done();
     });
 
