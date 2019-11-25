@@ -82,14 +82,14 @@ async function storeBuildArtifactsFile(github, filename, contents) {
 }
 
 /**
- * Get the dictionary of compiled files to their approvers and thresholds.
+ * Get the mapping of compiled files to their approvers and thresholds.
  * @param {!github} github an authenticated GitHub API object.
  * @param {Logger} log logging function/object.
  * @return {Map<string, {approvers: string[], thresholds: number}>} mapping of
  *   compiled files to the teams that can approve an increase, and the threshold
  *   in KB that requires an approval.
  */
-async function getFileApprovalsDictionary(github, log) {
+async function getFileApprovalsMapping(github, log) {
   let approvers = cache.get(CACHE_APPROVERS_KEY);
   if (!approvers) {
     log(`Cache miss for ${CACHE_APPROVERS_KEY}. Fetching from GitHub...`);
@@ -303,7 +303,7 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
         'Fetching mapping of file approvers and thresholds for pull request ' +
           `#${check.pull_request_id}`
       );
-      const fileApprovers = await getFileApprovalsDictionary(github, app.log);
+      const fileApprovers = await getFileApprovalsMapping(github, app.log);
 
       // Calculate and collect all (non-zero) bundle size deltas and list all
       // dist files that are missing either from master or from this pull
