@@ -15,9 +15,9 @@
  */
 
 const sleep = require('sleep-promise');
-const {OwnersCheck} = require('./owners_check');
-const {OwnersParser} = require('./parser');
-const {OwnersTree} = require('./owners_tree');
+const {OwnersCheck} = require('./ownership/owners_check');
+const {OwnersParser} = require('./ownership/parser');
+const OwnersTree = require('./ownership/tree');
 const {OwnersNotifier} = require('./notifier');
 
 const GITHUB_CHECKRUN_DELAY = 2000;

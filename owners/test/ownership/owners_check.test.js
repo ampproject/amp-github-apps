@@ -15,12 +15,20 @@
  */
 
 const sinon = require('sinon');
-const {CheckRun, CheckRunState, OwnersCheck} = require('../src/owners_check');
-const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/owner');
-const {Team} = require('../src/api/github');
-const {OwnersTree} = require('../src/owners_tree');
-const {OwnersRule, ReviewerSetRule} = require('../src/rules');
-const {ReviewerSelection} = require('../src/reviewer_selection');
+const {
+  CheckRun,
+  CheckRunState,
+  OwnersCheck,
+} = require('../../src/ownership/owners_check');
+const {
+  UserOwner,
+  TeamOwner,
+  OWNER_MODIFIER,
+} = require('../../src/ownership/owner');
+const {Team} = require('../../src/api/github');
+const OwnersTree = require('../../src/ownership/tree');
+const {OwnersRule, ReviewerSetRule} = require('../../src/ownership/rules');
+const {ReviewerSelection} = require('../../src/reviewer_selection');
 
 describe('check run', () => {
   const sandbox = sinon.createSandbox();

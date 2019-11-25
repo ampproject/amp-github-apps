@@ -17,13 +17,13 @@
 const sinon = require('sinon');
 const {ReviewerSelection} = require('../src/reviewer_selection');
 const {Team} = require('../src/api/github');
-const {UserOwner, TeamOwner, WildcardOwner} = require('../src/owner');
-const {OwnersTree} = require('../src/owners_tree');
+const {UserOwner, TeamOwner, WildcardOwner} = require('../src/ownership/owner');
+const OwnersTree = require('../src/ownership/tree');
 const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
-} = require('../src/rules');
+} = require('../src/ownership/rules');
 
 describe('reviewer selection', () => {
   const sandbox = sinon.createSandbox();

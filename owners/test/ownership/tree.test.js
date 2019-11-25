@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-const {OwnersTree} = require('../src/owners_tree');
-const {Team} = require('../src/api/github');
+const OwnersTree = require('../../src/ownership/tree');
+const {Team} = require('../../src/api/github');
 const {
   UserOwner,
   TeamOwner,
   WildcardOwner,
   OWNER_MODIFIER,
-} = require('../src/owner');
+} = require('../../src/ownership/owner');
 const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
   ReviewerSetRule,
-} = require('../src/rules');
+} = require('../../src/ownership/rules');
 
 describe('owners tree', () => {
   let tree;

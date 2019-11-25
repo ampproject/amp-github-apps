@@ -18,7 +18,7 @@ const path = require('path');
 const bootstrap = require('./bootstrap');
 const InfoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/api/github');
-const {OwnersCheck} = require('./src/owners_check');
+const {OwnersCheck} = require('./src/ownership/owners_check');
 
 module.exports = app => {
   const {github, ownersBot, initialized} = bootstrap(app.log);
