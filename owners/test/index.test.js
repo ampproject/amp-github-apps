@@ -19,6 +19,8 @@ const nock = require('nock');
 const owners = require('..');
 const {Probot} = require('probot');
 const sinon = require('sinon');
+const fs = require('fs');
+const path = require('path');
 
 const VirtualRepository = require('../src/repo/virtual_repo');
 const {GitHub, Team} = require('../src/api/github');
@@ -59,14 +61,15 @@ const ownersRules = [
 ];
 
 /**
- * Require a fresh copy of a module, clearing the require cache.
+ * Get a JSON test fixture object.
  *
- * @param {string} path module path.
- * @return {*} required module.
+ * @param {!string} name name of the JSON fixture file (without .json).
+ * @return {!object} the named JSON test fixture file.
  */
-function _rerequire(path) {
-  delete require.cache[require.resolve(path)];
-  return require(path);
+function getFixture(name) {
+  return JSON.parse(
+    fs.readFileSync(path.join(__dirname, `fixtures/${name}.json`))
+  );
 }
 
 describe('GitHub app', () => {
@@ -623,7 +626,7 @@ describe('GitHub app', () => {
         .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
         .reply(200);
 
-      const payload = _rerequire('./fixtures/actions/ready_for_review.25408');
+      const payload = getFixture('actions/ready_for_review.25408');
       payload.pull_request.title = 'I am ready now!';
       await probot.receive({
         name: 'pull_request.ready_for_review',
@@ -654,11 +657,11 @@ describe('GitHub app', () => {
         .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
         .reply(200);
 
-      const payload = _rerequire('./fixtures/actions/opened.35');
+      const payload = getFixture('actions/opened.35');
       payload.pull_request.title = 'DO NOT SUBMIT: test';
       await probot.receive({
         name: 'pull_request.opened',
-        payload: opened35,
+        payload,
       });
 
       sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
@@ -685,11 +688,11 @@ describe('GitHub app', () => {
         .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
         .reply(200);
 
-      const payload = _rerequire('./fixtures/actions/opened.35');
+      const payload = getFixture('actions/opened.35');
       payload.pull_request.title = 'WIP: test';
       await probot.receive({
         name: 'pull_request.opened',
-        payload: opened35,
+        payload,
       });
 
       sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
