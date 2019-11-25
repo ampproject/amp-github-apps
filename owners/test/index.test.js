@@ -57,7 +57,7 @@ const ownersRules = [
   new OwnersRule('dir2/dir1/dir1/OWNERS', [new UserOwner('githubuser')]),
 ];
 
-describe('owners bot', () => {
+describe('GitHub app', () => {
   let probot;
   let sandbox;
 
@@ -107,32 +107,24 @@ describe('owners bot', () => {
       expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
-
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
+        .reply(200, {token: 'test'})
+        // We need the list of files on a pull request to evaluate the required
+        // reviewers.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
         )
-        .reply(200, files35);
-
-      // We need the reviews to check if a pull request has been approved or
-      // not.
-      nock('https://api.github.com')
+        .reply(200, files35)
+        // We need the reviews to check if a pull request has been approved or
+        // not.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
         )
-        .reply(200, reviews35);
-
-      nock('https://api.github.com')
+        .reply(200, reviews35)
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
-        .reply(200, checkruns35Multiple);
-
-      // Test that a check-run is created
-      nock('https://api.github.com')
+        .reply(200, checkruns35Multiple)
+        // Test that a check-run is created
         .patch(
           '/repos/githubuser/github-owners-bot-test-repo/check-runs/53472315',
           body => {
@@ -170,33 +162,25 @@ describe('owners bot', () => {
       expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
-
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
+        .reply(200, {token: 'test'})
+        // We need the list of files on a pull request to evaluate the required
+        // reviewers.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
         )
-        .reply(200, files35);
-
-      // We need the reviews to check if a pull request has been approved or
-      // not.
-      nock('https://api.github.com')
+        .reply(200, files35)
+        // We need the reviews to check if a pull request has been approved or
+        // not.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
         )
-        .reply(200, reviews35);
-
-      // Get check runs for a specific commit
-      nock('https://api.github.com')
+        .reply(200, reviews35)
+        // Get check runs for a specific commit
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
-        .reply(200, checkruns35Empty);
-
-      // Test that a check-run is created
-      nock('https://api.github.com')
+        .reply(200, checkruns35Empty)
+        // Test that a check-run is created
         .post(
           '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {
@@ -237,32 +221,24 @@ describe('owners bot', () => {
       expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
-
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
+        .reply(200, {token: 'test'})
+        // We need the list of files on a pull request to evaluate the required
+        // reviewers.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
         )
-        .reply(200, files35);
-
-      // We need the reviews to check if a pull request has been approved or
-      // not.
-      nock('https://api.github.com')
+        .reply(200, files35)
+        // We need the reviews to check if a pull request has been approved or
+        // not.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
         )
-        .reply(200, reviews35);
-
-      nock('https://api.github.com')
+        .reply(200, reviews35)
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
-        .reply(200, checkruns35);
-
-      // Test that a check-run is created
-      nock('https://api.github.com')
+        .reply(200, checkruns35)
+        // Test that a check-run is created
         .patch(
           '/repos/githubuser/github-owners-bot-test-repo/check-runs/53472313',
           body => {
@@ -298,32 +274,24 @@ describe('owners bot', () => {
       expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
-
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
+        .reply(200, {token: 'test'})
+        // We need the list of files on a pull request to evaluate the required
+        // reviewers.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
         )
-        .reply(200, files35Multiple);
-
-      // We need the reviews to check if a pull request has been approved or
-      // not.
-      nock('https://api.github.com')
+        .reply(200, files35Multiple)
+        // We need the reviews to check if a pull request has been approved or
+        // not.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
         )
-        .reply(200, reviews35);
-
-      nock('https://api.github.com')
+        .reply(200, reviews35)
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
-        .reply(200, checkruns35);
-
-      // Test that a check-run is created
-      nock('https://api.github.com')
+        .reply(200, checkruns35)
+        // Test that a check-run is created
         .patch(
           '/repos/githubuser/github-owners-bot-test-repo/check-runs/53472313',
           body => {
@@ -363,38 +331,28 @@ describe('owners bot', () => {
       expect.assertions(4);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
-
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
+        .reply(200, {token: 'test'})
+        // We need the list of files on a pull request to evaluate the required
+        // reviewers.
         .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35')
-        .reply(200, pullRequest35);
-
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
+        .reply(200, pullRequest35)
+        // We need the list of files on a pull request to evaluate the required
+        // reviewers.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
         )
-        .reply(200, files35);
-
-      // We need the reviews to check if a pull request has been approved or
-      // not.
-      nock('https://api.github.com')
+        .reply(200, files35)
+        // We need the reviews to check if a pull request has been approved or
+        // not.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
         )
-        .reply(200, reviews35);
-
-      nock('https://api.github.com')
+        .reply(200, reviews35)
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
-        .reply(200, checkruns35Empty);
-
-      // Test that a check-run is created
-      nock('https://api.github.com')
+        .reply(200, checkruns35Empty)
+        // Test that a check-run is created
         .post(
           '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {
@@ -435,33 +393,25 @@ describe('owners bot', () => {
       expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
-
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
+        .reply(200, {token: 'test'})
+        // We need the list of files on a pull request to evaluate the required
+        // reviewers.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
         )
-        .reply(200, files35);
-
-      // We need the reviews to check if a pull request has been approved or
-      // not.
-      nock('https://api.github.com')
+        .reply(200, files35)
+        // We need the reviews to check if a pull request has been approved or
+        // not.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
         )
-        .reply(200, reviews35Approved);
-
-      nock('https://api.github.com')
+        .reply(200, reviews35Approved)
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/commits/' +
             '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
-        .reply(200, checkruns35Empty);
-
-      // Test that a check-run is created
-      nock('https://api.github.com')
+        .reply(200, checkruns35Empty)
+        // Test that a check-run is created
         .post(
           '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {
@@ -493,33 +443,25 @@ describe('owners bot', () => {
       expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
-
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
+        .reply(200, {token: 'test'})
+        // We need the list of files on a pull request to evaluate the required
+        // reviewers.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/36/files?per_page=100'
         )
-        .reply(200, files36);
-
-      // We need the reviews to check if a pull request has been approved or
-      // not.
-      nock('https://api.github.com')
+        .reply(200, files36)
+        // We need the reviews to check if a pull request has been approved or
+        // not.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/36/reviews?per_page=100'
         )
-        .reply(200, reviews35);
-
-      nock('https://api.github.com')
+        .reply(200, reviews35)
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/commits/' +
             'c7fdbd7f947fca608b20006da8535af5384ab699/check-runs'
         )
-        .reply(200, checkruns35Empty);
-
-      // // Test that a check-run is created
-      nock('https://api.github.com')
+        .reply(200, checkruns35Empty)
+        // Test that a check-run is created
         .post(
           '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {
@@ -552,36 +494,27 @@ describe('owners bot', () => {
       expect.assertions(3);
       nock('https://api.github.com')
         .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'});
-
-      nock('https://api.github.com')
+        .reply(200, {token: 'test'})
         .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35')
-        .reply(200, pullRequest35);
-      // We need the list of files on a pull request to evaluate the required
-      // reviewers.
-      nock('https://api.github.com')
+        .reply(200, pullRequest35)
+        // We need the list of files on a pull request to evaluate the required
+        // reviewers.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
         )
-        .reply(200, files35);
-
-      // We need the reviews to check if a pull request has been approved or
-      // not.
-      nock('https://api.github.com')
+        .reply(200, files35)
+        // We need the reviews to check if a pull request has been approved or
+        // not.
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
         )
-        .reply(200, reviews35Approved);
-
-      nock('https://api.github.com')
+        .reply(200, reviews35Approved)
         .get(
           '/repos/githubuser/github-owners-bot-test-repo/commits/' +
             '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
         )
-        .reply(200, checkruns35Empty);
-
-      // Test that a check-run is created
-      nock('https://api.github.com')
+        .reply(200, checkruns35Empty)
+        // Test that a check-run is created
         .post(
           '/repos/githubuser/github-owners-bot-test-repo/check-runs',
           body => {

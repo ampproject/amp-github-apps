@@ -287,10 +287,8 @@ class OwnersCheck {
   buildCurrentCoverageText(fileTreeMap) {
     const allFilesText = Object.entries(fileTreeMap)
       .map(([filename, subtree]) => {
-        const reviewers = Object.entries(
-          this.reviewers
-        ).filter(([username, approved]) =>
-          this.tree.fileHasOwner(filename, username)
+        const reviewers = Object.entries(this.reviewers).filter(
+          ([username, approved]) => this.tree.fileHasOwner(filename, username)
         );
 
         const approving = reviewers
