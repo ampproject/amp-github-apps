@@ -85,9 +85,9 @@ async function storeBuildArtifactsFile(github, filename, contents) {
  * Get the mapping of compiled files to their approvers and thresholds.
  * @param {!github} github an authenticated GitHub API object.
  * @param {Logger} log logging function/object.
- * @return {Map<string, {approvers: string[], thresholds: number}>} mapping of
- *   compiled files to the teams that can approve an increase, and the threshold
- *   in KB that requires an approval.
+ * @return {!Map<string, {approvers: !Array<string>, threshold: number}>}
+ *   mapping of compiled files to the teams that can approve an increase, and
+ *   the threshold in KB that requires an approval.
  */
 async function getFileApprovalsMapping(github, log) {
   let approvers = cache.get(CACHE_APPROVERS_KEY);
@@ -224,11 +224,11 @@ function extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes) {
  * Could end up choosing the fallback set defined in the `.env` file, even if
  * the fallback set is not in the input.
  *
- * @param {Array<Array<string>>} allPotentialApproverTeams all the potential
+ * @param {!Array<!Array<string>>} allPotentialApproverTeams all the potential
  *   teams that can approve this pull request.
- * @param {Logger} log logging function/object.
+ * @param {!Logger} log logging function/object.
  * @param {number} pullRequestId the pull request ID.
- * @return {Array<string>} the selected subset of all potential approver teams
+ * @return {!Array<string>} the selected subset of all potential approver teams
  *   that can approve this bundle-size change.
  */
 function choosePotentialApproverTeams(
