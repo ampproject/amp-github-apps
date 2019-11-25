@@ -20,7 +20,11 @@ const LocalRepository = require('../src/repo/local_repo');
 const {OwnersBot} = require('../src/owners_bot');
 const {OwnersNotifier} = require('../src/notifier');
 const OwnersTree = require('../src/ownership/tree');
-const {CheckRun, CheckRunState, OwnersCheck} = require('../src/ownership/owners_check');
+const {
+  CheckRun,
+  CheckRunState,
+  OwnersCheck,
+} = require('../src/ownership/owners_check');
 
 describe('owners bot', () => {
   const silentLogger = {

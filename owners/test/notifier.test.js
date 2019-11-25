@@ -18,7 +18,11 @@ const sinon = require('sinon');
 const {GitHub, PullRequest, Team} = require('../src/api/github');
 const OwnersTree = require('../src/ownership/tree');
 const {OwnersRule} = require('../src/ownership/rules');
-const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../src/ownership/owner');
+const {
+  UserOwner,
+  TeamOwner,
+  OWNER_MODIFIER,
+} = require('../src/ownership/owner');
 const {OwnersNotifier} = require('../src/notifier');
 
 describe('notifier', () => {

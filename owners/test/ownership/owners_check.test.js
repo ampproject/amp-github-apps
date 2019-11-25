@@ -15,8 +15,16 @@
  */
 
 const sinon = require('sinon');
-const {CheckRun, CheckRunState, OwnersCheck} = require('../../src/ownership/owners_check');
-const {UserOwner, TeamOwner, OWNER_MODIFIER} = require('../../src/ownership/owner');
+const {
+  CheckRun,
+  CheckRunState,
+  OwnersCheck,
+} = require('../../src/ownership/owners_check');
+const {
+  UserOwner,
+  TeamOwner,
+  OWNER_MODIFIER,
+} = require('../../src/ownership/owner');
 const {Team} = require('../../src/api/github');
 const OwnersTree = require('../../src/ownership/tree');
 const {OwnersRule, ReviewerSetRule} = require('../../src/ownership/rules');

@@ -243,4 +243,4 @@ module.exports = class OwnersTree {
 
     return lines.join('\n');
   }
-}
+};
