@@ -76,7 +76,7 @@ describe('GitHub app', () => {
       GITHUB_REPOSITORY,
       NODE_ENV: 'test',
     });
-    // Disabled execution of `git pull` for testing.
+    
     sandbox.stub(VirtualRepository.prototype, 'sync');
     sandbox.stub(VirtualRepository.prototype, 'warmCache').resolves();
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
@@ -87,6 +87,9 @@ describe('GitHub app', () => {
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
       .returns({result: ownersRules, errors: []});
+    nock('https://api.github.com')
+        .post('/app/installations/588033/access_tokens')
+        .reply(200, {token: 'test'});
 
     probot = new Probot({});
     const app = probot.load(owners);
@@ -106,8 +109,6 @@ describe('GitHub app', () => {
     test('it should update amp owners bot check when there is one', async () => {
       expect.assertions(4);
       nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'})
         // We need the list of files on a pull request to evaluate the required
         // reviewers.
         .get(
@@ -161,8 +162,6 @@ describe('GitHub app', () => {
     test('with failure check when there are 0 reviews on a pull request', async () => {
       expect.assertions(4);
       nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'})
         // We need the list of files on a pull request to evaluate the required
         // reviewers.
         .get(
@@ -220,8 +219,6 @@ describe('GitHub app', () => {
     test('with failure check when there are 0 reviews on a pull request', async () => {
       expect.assertions(4);
       nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'})
         // We need the list of files on a pull request to evaluate the required
         // reviewers.
         .get(
@@ -273,8 +270,6 @@ describe('GitHub app', () => {
     test('with failure check when there are 0 reviews on a pull request and multiple files', async () => {
       expect.assertions(4);
       nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'})
         // We need the list of files on a pull request to evaluate the required
         // reviewers.
         .get(
@@ -330,8 +325,6 @@ describe('GitHub app', () => {
     test('should re-evaluate pull request', async () => {
       expect.assertions(4);
       nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'})
         // We need the list of files on a pull request to evaluate the required
         // reviewers.
         .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35')
@@ -392,8 +385,6 @@ describe('GitHub app', () => {
     test('with passing check when there is 1 approver on a pull request', async () => {
       expect.assertions(3);
       nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'})
         // We need the list of files on a pull request to evaluate the required
         // reviewers.
         .get(
@@ -442,8 +433,6 @@ describe('GitHub app', () => {
     test('with passing check when author themselves are owners', async () => {
       expect.assertions(3);
       nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'})
         // We need the list of files on a pull request to evaluate the required
         // reviewers.
         .get(
@@ -493,8 +482,6 @@ describe('GitHub app', () => {
     test('triggers pull request re-evaluation', async () => {
       expect.assertions(3);
       nock('https://api.github.com')
-        .post('/app/installations/588033/access_tokens')
-        .reply(200, {token: 'test'})
         .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35')
         .reply(200, pullRequest35)
         // We need the list of files on a pull request to evaluate the required
