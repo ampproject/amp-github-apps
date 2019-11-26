@@ -20,7 +20,7 @@ const InfoServer = require('./info_server');
 const {GitHub, PullRequest, Team} = require('./src/api/github');
 const {OwnersCheck} = require('./src/ownership/owners_check');
 
-const NO_REQUEST_OWNERS_REGEX = /\b(WIP|work in progress|DO NOT (MERGE|SUBMIT))\b/i;
+const NO_REQUEST_OWNERS_REGEX = /\b(WIP|work in progress|DO NOT (MERGE|SUBMIT|REVIEW))\b/i;
 
 module.exports = app => {
   const {github, ownersBot, initialized} = bootstrap(app.log);
