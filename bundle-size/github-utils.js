@@ -122,7 +122,7 @@ class GitHubUtils {
    *
    * @return {string} a username of someone who can approve a bundle size change.
    */
-  async getRandomReviewer() {
+  async getRandomReviewerLegacy() {
     const reviewerTeamIds = process.env.REVIEWER_TEAMS.split('‚');
     const reviewerTeamId = parseInt(
       reviewerTeamIds[Math.floor(Math.random() * reviewerTeamIds.length)],
