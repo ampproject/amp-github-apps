@@ -32,7 +32,9 @@ function setupDb(db) {
       table.integer('pull_request_id');
       table.integer('installation_id');
       table.integer('check_run_id');
-      table.decimal('delta', 6, 2);
+      table
+        .decimal('delta', 6, 2)
+        .comment('Legacy column, should be removed with #617');
     })
     .createTable('merges', table => {
       table.string('merge_commit_sha', 40).primary();

@@ -99,7 +99,11 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
 
       let approvalMessagePrefix;
       if (check.delta === null) {
-        approvalMessagePrefix = 'Δ ±?.??KB';
+        context.log(
+          'Pull requests can no longer be preemptively approved for ' +
+            'bundle-size changes'
+        );
+        return;
       } else {
         const bundleSizeDelta = parseFloat(check.delta);
         if (bundleSizeDelta <= process.env['MAX_ALLOWED_INCREASE']) {

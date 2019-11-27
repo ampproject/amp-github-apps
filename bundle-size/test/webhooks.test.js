@@ -262,7 +262,7 @@ describe('bundle-size webhooks', () => {
       nocks.done();
     });
 
-    test('mark a check as successful when a capable user approves the PR with missing size delta', async () => {
+    test('ignore a preemptive approval', async () => {
       const payload = getFixture('pull_request_review.submitted');
 
       await db('checks').insert({
@@ -275,20 +275,7 @@ describe('bundle-size webhooks', () => {
         delta: null,
       });
 
-      const nocks = nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'success',
-            output: {
-              title: 'Δ ±?.??KB | approved by @aghassemi',
-            },
-          });
-          return true;
-        })
-        .reply(200);
-
       await probot.receive({name: 'pull_request_review', payload});
-      nocks.done();
     });
 
     test('ignore an approved review by a non-capable reviewer', async () => {
