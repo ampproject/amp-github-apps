@@ -156,7 +156,7 @@ class GitHubUtils {
       this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
       teamId = await this.github.teams
         .getByName({org, team_slug: teamSlug})
-        .then(result => result.id);
+        .then(result => result.data.id);
       this.log(
         `Fetched team id ${teamId} for team ${teamName} from GitHub. Caching ` +
           `for ${CACHE_TEAM_ID_TTL_SECONDS} seconds.`
@@ -179,9 +179,9 @@ class GitHubUtils {
       this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
       teamMembers = await this.github.teams
         .listMembers({team_id: teamId})
-        .then(result => result.map(user => user.login));
+        .then(result => result.data.map(user => user.login));
       this.log(
-        `Fetched team members [${teamMembers.join(', ')} for team id ` +
+        `Fetched team members [${teamMembers.join(', ')}] for team id ` +
           `${teamId}. Caching for ${CACHE_TEAM_MEMBERS_TTL_SECONDS} seconds.`
       );
       this.cache.set(cacheKey, teamMembers, CACHE_TEAM_MEMBERS_TTL_SECONDS);
