@@ -20,10 +20,6 @@ const path = require('path');
 const CACHE_CHECK_SECONDS = 60;
 const CACHE_APPROVERS_KEY = 'approvers';
 const CACHE_APPROVERS_TTL_SECONDS = 900;
-const CACHE_TEAM_ID_KEY = 'team_id';
-const CACHE_TEAM_ID_TTL_SECONDS = 86400;
-const CACHE_TEAM_MEMBERS_KEY = 'team_members';
-const CACHE_TEAM_MEMBERS_TTL_SECONDS = 3600;
 
 /**
  * Get GitHub API parameters for bundle-size file actions.
