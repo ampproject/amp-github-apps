@@ -15,6 +15,7 @@
 
 const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
+const {GitHubUtils} = require('../github-utils');
 const {installApiRouter} = require('../api');
 const nock = require('nock');
 const NodeCache = require('node-cache');
@@ -40,7 +41,9 @@ describe('bundle-size api', () => {
 
     probot = new Probot({});
     app = probot.load(app => {
-      installApiRouter(app, db, new Octokit(), nodeCache);
+      const github = new Octokit();
+      const githubUtils = new GitHubUtils(github, app.log, nodeCache);
+      installApiRouter(app, db, github, githubUtils);
     });
 
     // Return a test token.

@@ -19,7 +19,6 @@ const {
   getCheckFromDatabase,
   isBundleSizeApprover,
 } = require('./common');
-const {GitHubUtils} = require('./github-utils');
 const sleep = require('sleep-promise');
 
 const RETRY_MILLIS = 60000;
@@ -191,11 +190,9 @@ function choosePotentialApproverTeams(
  * @param {!Probot.Application} app Probot application.
  * @param {!Knex} db database connection.
  * @param {!Octokit} userBasedGithub a user-authenticated GitHub API object.
- * @param {NodeCache} nodeCache optional NodeCache instance.
+ * @param {!GitHubUtils} githubUtils GitHubUtils instance.
  */
-exports.installApiRouter = (app, db, userBasedGithub, nodeCache) => {
-  const githubUtils = new GitHubUtils(userBasedGithub, app.log, nodeCache);
-
+exports.installApiRouter = (app, db, userBasedGithub, githubUtils) => {
   /**
    * Try to report the bundle size of a pull request to the GitHub check.
    *

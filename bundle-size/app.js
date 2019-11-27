@@ -15,9 +15,10 @@
 'use strict';
 
 const {dbConnect} = require('./db');
-const Octokit = require('@octokit/rest');
+const {GitHubUtils} = require('./github-utils');
 const {installApiRouter} = require('./api');
 const {installGitHubWebhooks} = require('./webhooks');
+const Octokit = require('@octokit/rest');
 
 const db = dbConnect();
 
@@ -31,6 +32,8 @@ module.exports = app => {
     'auth': process.env.ACCESS_TOKEN,
   });
 
+  const githubUtils = new GitHubUtils(userBasedGithub, app.log);
+
   installGitHubWebhooks(app, db, userBasedGithub);
-  installApiRouter(app, db, userBasedGithub);
+  installApiRouter(app, db, userBasedGithub, githubUtils);
 };
