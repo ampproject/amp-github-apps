@@ -96,6 +96,31 @@ function successfulCheckOutput(
 }
 
 /**
+ * Returns a result summary to indicate that an error has occurred.
+ *
+ * @param {string} partialBaseSha the base sha this PR's commit is compared
+ *   against.
+ * @return {{title: string, summary: string}} check output.
+ */
+function erroredCheckOutput(partialBaseSha) {
+  return {
+    title: `Failed to retrieve the bundle size of branch point ${partialBaseSha}`,
+    summary:
+      'The bundle size (brotli compressed size of `v0.js`) of this pull ' +
+      'request could not be determined because the base size (that is, the ' +
+      'bundle size of the `master` commit that this pull request was ' +
+      'compared against) was not found in the ' +
+      '`https://github.com/ampproject/amphtml-build-artifacts` ' +
+      'repository. This can happen due to failed or delayed Travis builds on ' +
+      'said `master` commit.\n' +
+      'A member of the bundle-size group will be added automatically to ' +
+      'review this PR. Only once the member approves this PR, can it be ' +
+      'merged. If you do not receive a response from the group member, feel ' +
+      `free to tag another person in ${process.env.REVIEWER_TEAM_NAMES}`,
+  };
+}
+
+/**
  * Return formatted extra changes to append to the check output summary.
  *
  * @param {!Array<string>} otherBundleSizeDeltas text description of other
@@ -186,126 +211,15 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
       ...githubOptions,
     };
 
+    let masterBundleSizes;
     try {
       app.log(
         `Fetching master bundle-sizes on base commit ${baseSha} for pull ` +
           `request #${check.pull_request_id}`
       );
-      const masterBundleSizes = JSON.parse(
+      masterBundleSizes = JSON.parse(
         await githubUtils.getBuildArtifactsFile(`${baseSha}.json`)
       );
-
-      app.log(
-        'Fetching mapping of file approvers and thresholds for pull request ' +
-          `#${check.pull_request_id}`
-      );
-      const fileApprovers = await githubUtils.getFileApprovalsMapping();
-
-      // Calculate and collect all (non-zero) bundle size deltas and list all
-      // dist files that are missing either from master or from this pull
-      // request, and all the potential teams that can approve above-threshold
-      // deltas.
-      const bundleSizeDeltas = [];
-      const missingBundleSizes = [];
-      const allPotentialApproverTeams = new Set();
-      for (const [file, baseBundleSize] of Object.entries(masterBundleSizes)) {
-        if (!(file in prBundleSizes)) {
-          missingBundleSizes.push(`* \`${file}\`: missing in pull request`);
-          continue;
-        }
-
-        const bundleSizeDelta = prBundleSizes[file] - baseBundleSize;
-        if (bundleSizeDelta !== 0) {
-          bundleSizeDeltas.push(
-            `* \`${file}\`: ${formatBundleSizeDelta(bundleSizeDelta)}`
-          );
-        }
-
-        if (
-          file in fileApprovers &&
-          bundleSizeDelta >= fileApprovers[file].threshold
-        ) {
-          // Since `.approvers` is an array, it must be stringified to maintain
-          // the Set uniqueness property.
-          allPotentialApproverTeams.add(
-            JSON.stringify(fileApprovers[file].approvers)
-          );
-        }
-      }
-
-      for (const [file, prBundleSize] of Object.entries(prBundleSizes)) {
-        if (!(file in masterBundleSizes)) {
-          missingBundleSizes.push(
-            `* \`${file}\`: (${prBundleSize} KB) missing in \`master\``
-          );
-        }
-      }
-
-      // TODO(#617, danielrozenberg): replace the legacy logic below with logic
-      // that uses the chosen approvers team list.
-      // eslint-disable-next-line no-unused-vars
-      const chosenApproverTeams = choosePotentialApproverTeams(
-        Array.from(allPotentialApproverTeams).map(JSON.parse),
-        app.log,
-        check.pull_request_id
-      );
-
-      if (bundleSizeDeltas.length === 0) {
-        bundleSizeDeltas.push(
-          '* No bundle size changes reported in this pull request'
-        );
-      }
-
-      app.log(
-        'Done pre-processing bundle-size changes for pull request ' +
-          `#${check.pull_request_id}:`
-      );
-      app.log(`Deltas:\n${bundleSizeDeltas.join('\n')}`);
-      app.log(`Missing:\n${missingBundleSizes.join('\n')}`);
-
-      // TODO(#617, danielrozenberg): this is a transitionary solution. This API
-      // endpoint accepts a JSON with multiple bundle sizes, but for now it only
-      // blocks on size changes in dist/v0.js. Later we determine how we want to
-      // report and block PRs based on bundle sizes of other dist files.
-      const baseRuntimeBundleSize = masterBundleSizes['dist/v0.js'];
-      const baseRuntimeBundleSizeDelta =
-        prBundleSizes['dist/v0.js'] - baseRuntimeBundleSize;
-
-      await db('checks')
-        .update({delta: baseRuntimeBundleSizeDelta})
-        .where({head_sha: check.head_sha});
-
-      const requiresApproval =
-        baseRuntimeBundleSizeDelta > process.env['MAX_ALLOWED_INCREASE'];
-      if (requiresApproval) {
-        Object.assign(updatedCheckOptions, {
-          conclusion: 'action_required',
-          output: failedCheckOutput(
-            baseRuntimeBundleSizeDelta,
-            bundleSizeDeltas,
-            missingBundleSizes
-          ),
-        });
-      } else {
-        Object.assign(updatedCheckOptions, {
-          conclusion: 'success',
-          output: successfulCheckOutput(
-            baseRuntimeBundleSizeDelta,
-            bundleSizeDeltas,
-            missingBundleSizes
-          ),
-        });
-      }
-      await github.checks.update(updatedCheckOptions);
-
-      if (requiresApproval) {
-        await addBundleSizeReviewer(github, {
-          pull_number: check.pull_request_id,
-          ...githubOptions,
-        });
-      }
-
-      return true;
     } catch (error) {
       const partialHeadSha = check.head_sha.substr(0, 7);
       const partialBaseSha = baseSha.substr(0, 7);
@@ -319,24 +233,7 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
         app.log.warn('No more retries left. Reporting failure');
         Object.assign(updatedCheckOptions, {
           conclusion: 'action_required',
-          output: {
-            title:
-              'Failed to retrieve the bundle size of branch point ' +
-              partialBaseSha,
-            summary:
-              'The bundle size (brotli compressed size of `v0.js`) ' +
-              'of this pull request could not be determined because the base ' +
-              'size (that is, the bundle size of the `master` commit that ' +
-              'this pull request was compared against) was not found in the ' +
-              '`https://github.com/ampproject/amphtml-build-artifacts` ' +
-              'repository. This can happen due to failed or delayed Travis ' +
-              'builds on said `master` commit.\n' +
-              'A member of the bundle-size group will be added automatically ' +
-              'to review this PR. Only once the member approves this PR, ' +
-              'can it be merged. If you do not receive a response from the ' +
-              'group member, feel free to tag another person in ' +
-              process.env.REVIEWER_TEAM_NAMES,
-          },
+          output: erroredCheckOutput(partialBaseSha),
         });
         await github.checks.update(updatedCheckOptions);
         await addBundleSizeReviewer(github, {
@@ -346,6 +243,117 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
       }
       return false;
     }
+
+    app.log(
+      'Fetching mapping of file approvers and thresholds for pull request ' +
+        `#${check.pull_request_id}`
+    );
+    const fileApprovers = await githubUtils.getFileApprovalsMapping();
+
+    // Calculate and collect all (non-zero) bundle size deltas and list all dist
+    // files that are missing either from master or from this pull request, and
+    // all the potential teams that can approve above-threshold deltas.
+    const bundleSizeDeltas = [];
+    const missingBundleSizes = [];
+    const allPotentialApproverTeams = new Set();
+    for (const [file, baseBundleSize] of Object.entries(masterBundleSizes)) {
+      if (!(file in prBundleSizes)) {
+        missingBundleSizes.push(`* \`${file}\`: missing in pull request`);
+        continue;
+      }
+
+      const bundleSizeDelta = prBundleSizes[file] - baseBundleSize;
+      if (bundleSizeDelta !== 0) {
+        bundleSizeDeltas.push(
+          `* \`${file}\`: ${formatBundleSizeDelta(bundleSizeDelta)}`
+        );
+      }
+
+      if (
+        file in fileApprovers &&
+        bundleSizeDelta >= fileApprovers[file].threshold
+      ) {
+        // Since `.approvers` is an array, it must be stringified to maintain
+        // the Set uniqueness property.
+        allPotentialApproverTeams.add(
+          JSON.stringify(fileApprovers[file].approvers)
+        );
+      }
+    }
+
+    for (const [file, prBundleSize] of Object.entries(prBundleSizes)) {
+      if (!(file in masterBundleSizes)) {
+        missingBundleSizes.push(
+          `* \`${file}\`: (${prBundleSize} KB) missing in \`master\``
+        );
+      }
+    }
+
+    // TODO(#617, danielrozenberg): replace the legacy logic below with logic
+    // that uses the chosen approvers team list.
+    // eslint-disable-next-line no-unused-vars
+    const chosenApproverTeams = choosePotentialApproverTeams(
+      Array.from(allPotentialApproverTeams).map(JSON.parse),
+      app.log,
+      check.pull_request_id
+    );
+
+    if (bundleSizeDeltas.length === 0) {
+      bundleSizeDeltas.push(
+        '* No bundle size changes reported in this pull request'
+      );
+    }
+
+    app.log(
+      'Done pre-processing bundle-size changes for pull request ' +
+        `#${check.pull_request_id}:`
+    );
+    app.log(`Deltas:\n${bundleSizeDeltas.join('\n')}`);
+    app.log(`Missing:\n${missingBundleSizes.join('\n')}`);
+
+    // TODO(#617, danielrozenberg): this is a transitionary solution. This API
+    // endpoint accepts a JSON with multiple bundle sizes, but for now it only
+    // blocks on size changes in dist/v0.js. Everything from here down until the
+    // return statement is legacy code.
+    const baseRuntimeBundleSize = masterBundleSizes['dist/v0.js'];
+    const baseRuntimeBundleSizeDelta =
+      prBundleSizes['dist/v0.js'] - baseRuntimeBundleSize;
+
+    await db('checks')
+      .update({delta: baseRuntimeBundleSizeDelta})
+      .where({head_sha: check.head_sha});
+
+    const requiresApproval =
+      baseRuntimeBundleSizeDelta > process.env['MAX_ALLOWED_INCREASE'];
+    if (requiresApproval) {
+      Object.assign(updatedCheckOptions, {
+        conclusion: 'action_required',
+        output: failedCheckOutput(
+          baseRuntimeBundleSizeDelta,
+          bundleSizeDeltas,
+          missingBundleSizes
+        ),
+      });
+    } else {
+      Object.assign(updatedCheckOptions, {
+        conclusion: 'success',
+        output: successfulCheckOutput(
+          baseRuntimeBundleSizeDelta,
+          bundleSizeDeltas,
+          missingBundleSizes
+        ),
+      });
+    }
+    await github.checks.update(updatedCheckOptions);
+
+    if (requiresApproval) {
+      await addBundleSizeReviewer(github, {
+        pull_number: check.pull_request_id,
+        ...githubOptions,
+      });
+    }
+
+    return true;
   }
 
   /**
