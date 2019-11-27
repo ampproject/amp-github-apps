@@ -207,3 +207,34 @@ class Cherrypick(Base):
 
   def __repr__(self) -> Text:
     return '<Cherrypick(hash=%s, release_id=%s)>' % (self.hash, self.release_id)
+
+
+class CherrypickIssue(Base):
+  """A cherry-pick tracking issue."""
+
+  __tablename__ = 'cherrypick_issues'
+
+  number = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+  created_at = sqlalchemy.Column(sqlalchemy.DateTime)
+
+  @classmethod
+  def is_last_90_days(cls, base_time=None):
+    return _is_last_n_days(
+        timestamp_column=cls.created_at, days=90, base_time=base_time)
+
+  @classmethod
+  def scope(cls, session, base_time=None):
+    """Default scoped query.
+
+    Args:
+      session: SQL Alchemy database session.
+
+    Returns:
+      The last 90 days of cherry-pick issues from newest to oldest.
+    """
+    return session.query(cls).order_by(cls.created_at.desc()).filter(
+        cls.is_last_90_days(base_time))
+
+  def __repr__(self) -> Text:
+    return '<CherrypickIssue(number=%d, created_at=%s)>' % (self.number,
+                                                            self.created_at)
