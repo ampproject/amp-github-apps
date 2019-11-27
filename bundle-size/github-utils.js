@@ -167,26 +167,29 @@ class GitHubUtils {
   }
 
   /**
-   * Get the list of all team members by team id.
+   * Get a list of all unique team members by team ids.
    *
-   * @param {number} teamId the team id.
-   * @return {!Array<string>} the team id.
+   * @param {!Array<number>} teamIds the team ids.
+   * @return {!Array<string>} all members of the provided teams.
    */
-  async getTeamMembers_(teamId) {
-    const cacheKey = `${CACHE_TEAM_MEMBERS_KEY}/${teamId}`;
-    let teamMembers = this.cache.get(cacheKey);
-    if (!teamMembers) {
-      this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
-      teamMembers = await this.github.teams
-        .listMembers({team_id: teamId})
-        .then(result => result.data.map(user => user.login));
-      this.log(
-        `Fetched team members [${teamMembers.join(', ')}] for team id ` +
-          `${teamId}. Caching for ${CACHE_TEAM_MEMBERS_TTL_SECONDS} seconds.`
-      );
-      this.cache.set(cacheKey, teamMembers, CACHE_TEAM_MEMBERS_TTL_SECONDS);
-    }
-    return teamMembers;
+  async getTeamMembers_(teamIds) {
+    const allTeamMembersPromises = teamIds.map(async teamId => {
+      const cacheKey = `${CACHE_TEAM_MEMBERS_KEY}/${teamId}`;
+      let teamMembers = this.cache.get(cacheKey);
+      if (!teamMembers) {
+        this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
+        teamMembers = await this.github.teams
+          .listMembers({team_id: teamId})
+          .then(result => result.data.map(user => user.login));
+        this.log(
+          `Fetched team members [${teamMembers.join(', ')}] for team id ` +
+            `${teamId}. Caching for ${CACHE_TEAM_MEMBERS_TTL_SECONDS} seconds.`
+        );
+        this.cache.set(cacheKey, teamMembers, CACHE_TEAM_MEMBERS_TTL_SECONDS);
+      }
+      return teamMembers;
+    }, this);
+    return [...new Set((await Promise.all(allTeamMembersPromises)).flat())];
   }
 
   /**
@@ -198,20 +201,21 @@ class GitHubUtils {
    * @return {string} the chosen reviewer username.
    */
   async getRandomReviewer(potentialApproverTeams, pullRequestId) {
-    // First, randomly choose a team.
-    const reviewerTeamName =
-      potentialApproverTeams[
-        Math.floor(Math.random() * potentialApproverTeams.length)
-      ];
+    const teamIds = await Promise.all(
+      potentialApproverTeams.map(this.getTeamId_, this)
+    );
     this.log(
       `Reviewer for pull request ${pullRequestId} will be chosen from ` +
-        `${reviewerTeamName}`
+        `[${potentialApproverTeams.join(', ')}] (team ids are` +
+        `[${teamIds.join(', ')}])`
     );
-    const teamId = await this.getTeamId_(reviewerTeamName);
-    const allTeamMembers = await this.getTeamMembers_(teamId);
+    const potentialReviewers = await this.getTeamMembers_(teamIds);
     const reviewer =
-      allTeamMembers[Math.floor(Math.random() * allTeamMembers.length)];
-    this.log(`Chose reviewer ${reviewer} for pull request ${pullRequestId}`);
+      potentialReviewers[Math.floor(Math.random() * potentialReviewers.length)];
+    this.log(
+      `Chose reviewer ${reviewer} from all of ` +
+        `[${potentialReviewers.join(', ')}] for pull request ${pullRequestId}`
+    );
 
     return reviewer;
   }
