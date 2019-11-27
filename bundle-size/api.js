@@ -19,119 +19,13 @@ const {
   getCheckFromDatabase,
   isBundleSizeApprover,
 } = require('./common');
-const NodeCache = require('node-cache');
-const path = require('path');
+const {GitHubUtils} = require('./github-utils');
 const sleep = require('sleep-promise');
 
 const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
 
 const HUMAN_ENCOURAGEMENT_MAX_DELTA = -0.03;
-
-const CACHE_TTL_SECONDS = 900;
-const CACHE_CHECK_SECONDS = 60;
-const CACHE_APPROVERS_KEY = 'approvers';
-
-const cache = new NodeCache({
-  'stdTTL': CACHE_TTL_SECONDS,
-  'checkperiod': CACHE_CHECK_SECONDS,
-});
-
-/**
- * Get GitHub API parameters for bundle-size file actions.
- *
- * @param {string} filename the name of the file to act on.
- * @return {!object} GitHub API parameters to act on the file.
- */
-function getBuildArtifactsFileParams(filename) {
-  return {
-    owner: 'ampproject',
-    repo: 'amphtml-build-artifacts',
-    path: path.join('bundle-size', filename),
-  };
-}
-
-/**
- * Get a file from the bundle-size directory in the AMPHTML build artifacts
- * repository.
- *
- * @param {!github} github an authenticated GitHub API object.
- * @param {string} filename the name of the file to retrieve.
- * @return {string} the text contents of the file.
- */
-async function getBuildArtifactsFile(github, filename) {
-  return await github.repos
-    .getContents(getBuildArtifactsFileParams(filename))
-    .then(result => Buffer.from(result.data.content, 'base64').toString());
-}
-
-/**
- * Store a file in the bundle-size directory in the AMPHTML build artifacts
- * repository.
- *
- * @param {!github} github an authenticated GitHub API object.
- * @param {string} filename the name of the file to store into.
- * @param {string} contents text contents of the file.
- */
-async function storeBuildArtifactsFile(github, filename, contents) {
-  await github.repos.createOrUpdateFile({
-    ...getBuildArtifactsFileParams(filename),
-    message: `bundle-size: ${filename}`,
-    content: Buffer.from(contents).toString('base64'),
-  });
-}
-
-/**
- * Get the mapping of compiled files to their approvers and thresholds.
- * @param {!github} github an authenticated GitHub API object.
- * @param {Logger} log logging function/object.
- * @return {!Map<string, {approvers: !Array<string>, threshold: number}>}
- *   mapping of compiled files to the teams that can approve an increase, and
- *   the threshold in KB that requires an approval.
- */
-async function getFileApprovalsMapping(github, log) {
-  let approvers = cache.get(CACHE_APPROVERS_KEY);
-  if (!approvers) {
-    log(`Cache miss for ${CACHE_APPROVERS_KEY}. Fetching from GitHub...`);
-    approvers = await github.repos
-      .getContents({
-        owner: 'ampproject',
-        repo: 'amphtml',
-        path: 'build-system/tasks/bundle-size/APPROVERS.json',
-      })
-      .then(result => Buffer.from(result.data.content, 'base64').toString())
-      .then(JSON.parse);
-    log(
-      `Fetched ${CACHE_APPROVERS_KEY} from GitHub with ` +
-        `${Object.keys(approvers).length} entries. Caching for ` +
-        `${CACHE_TTL_SECONDS} seconds.`
-    );
-    cache.set(CACHE_APPROVERS_KEY, approvers);
-  }
-  return approvers;
-}
-
-/**
- * Get a random reviewer from the approved teams.
- *
- * @param {!github} github an authorized GitHub API object.
- * @return {string} a username of someone who can approve a bundle size change.
- */
-async function getRandomReviewer(github) {
-  const reviewerTeamIds = process.env.REVIEWER_TEAMS.split('‚');
-  const reviewerTeamId = parseInt(
-    reviewerTeamIds[Math.floor(Math.random() * reviewerTeamIds.length)],
-    10
-  );
-
-  const members = await github.teams
-    .listMembers({
-      team_id: reviewerTeamId,
-    })
-    .then(response => response.data);
-  const member = members[Math.floor(Math.random() * members.length)];
-  return member.login;
-}
 
 /**
  * Returns an explanation on why the check failed when the bundle size is
@@ -267,6 +161,8 @@ function choosePotentialApproverTeams(
 }
 
 exports.installApiRouter = (app, db, userBasedGithub) => {
+  const githubUtils = new GitHubUtils(userBasedGithub, app.log);
+
   /**
    * Try to report the bundle size of a pull request to the GitHub check.
    *
@@ -296,14 +192,14 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
           `request #${check.pull_request_id}`
       );
       const masterBundleSizes = JSON.parse(
-        await getBuildArtifactsFile(github, `${baseSha}.json`)
+        await githubUtils.getBuildArtifactsFile(`${baseSha}.json`)
       );
 
       app.log(
         'Fetching mapping of file approvers and thresholds for pull request ' +
           `#${check.pull_request_id}`
       );
-      const fileApprovers = await getFileApprovalsMapping(github, app.log);
+      const fileApprovers = await githubUtils.getFileApprovalsMapping();
 
       // Calculate and collect all (non-zero) bundle size deltas and list all
       // dist files that are missing either from master or from this pull
@@ -482,7 +378,7 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
     try {
       // Choose a random capable username and add them as a reviewer to the pull
       // request.
-      const newReviewer = await getRandomReviewer(userBasedGithub);
+      const newReviewer = await githubUtils.getRandomReviewer();
       return await github.pullRequests.createReviewRequest({
         reviewers: [newReviewer],
         ...pullRequest,
@@ -620,7 +516,7 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
 
     const jsonBundleSizeFile = `${headSha}.json`;
     try {
-      await getBuildArtifactsFile(userBasedGithub, jsonBundleSizeFile);
+      await githubUtils.getBuildArtifactsFile(jsonBundleSizeFile);
       app.log(
         `The file bundle-size/${jsonBundleSizeFile} already exists in the ` +
           'build artifacts repository on GitHub. Skipping...'
@@ -633,8 +529,7 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
 
     try {
       const jsonBundleSizeText = JSON.stringify(bundleSizes);
-      await storeBuildArtifactsFile(
-        userBasedGithub,
+      await githubUtils.storeBuildArtifactsFile(
         jsonBundleSizeFile,
         jsonBundleSizeText
       );
