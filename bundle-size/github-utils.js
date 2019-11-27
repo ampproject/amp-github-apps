@@ -189,7 +189,8 @@ class GitHubUtils {
       }
       return teamMembers;
     }, this);
-    return [...new Set((await Promise.all(allTeamMembersPromises)).flat())];
+    const allTeamMembers = (await Promise.all(allTeamMembersPromises)).flat();
+    return [...new Set(allTeamMembers)];
   }
 
   /**
