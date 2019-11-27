@@ -14,11 +14,7 @@
  */
 'use strict';
 
-const {
-  formatBundleSizeDelta,
-  getCheckFromDatabase,
-  isBundleSizeApprover,
-} = require('./common');
+const {formatBundleSizeDelta, getCheckFromDatabase} = require('./common');
 const sleep = require('sleep-promise');
 
 const RETRY_MILLIS = 60000;
@@ -189,10 +185,9 @@ function choosePotentialApproverTeams(
  *
  * @param {!Probot.Application} app Probot application.
  * @param {!Knex} db database connection.
- * @param {!Octokit} userBasedGithub a user-authenticated GitHub API object.
  * @param {!GitHubUtils} githubUtils GitHubUtils instance.
  */
-exports.installApiRouter = (app, db, userBasedGithub, githubUtils) => {
+exports.installApiRouter = (app, db, githubUtils) => {
   /**
    * Try to report the bundle size of a pull request to the GitHub check.
    *
@@ -396,7 +391,7 @@ exports.installApiRouter = (app, db, userBasedGithub, githubUtils) => {
       ...reviewsResponse.data.map(review => review.user.login),
     ]);
     for (const reviewer of reviewers) {
-      if (await isBundleSizeApprover(userBasedGithub, reviewer)) {
+      if (await githubUtils.isBundleSizeApprover(reviewer)) {
         app.log(
           `INFO: Pull request ${pullRequest.pull_number} already has ` +
             'a bundle-size capable reviewer. Skipping...'

@@ -41,9 +41,8 @@ describe('bundle-size api', () => {
 
     probot = new Probot({});
     app = probot.load(app => {
-      const github = new Octokit();
-      const githubUtils = new GitHubUtils(github, app.log, nodeCache);
-      installApiRouter(app, db, github, githubUtils);
+      const githubUtils = new GitHubUtils(new Octokit(), app.log, nodeCache);
+      installApiRouter(app, db, githubUtils);
     });
 
     // Return a test token.

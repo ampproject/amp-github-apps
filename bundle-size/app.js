@@ -34,6 +34,6 @@ module.exports = app => {
 
   const githubUtils = new GitHubUtils(userBasedGithub, app.log);
 
-  installGitHubWebhooks(app, db, userBasedGithub);
-  installApiRouter(app, db, userBasedGithub, githubUtils);
+  installGitHubWebhooks(app, db, githubUtils);
+  installApiRouter(app, db, githubUtils);
 };
