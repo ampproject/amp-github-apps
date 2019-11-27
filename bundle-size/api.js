@@ -19,7 +19,6 @@ const {
   getCheckFromDatabase,
   isBundleSizeApprover,
 } = require('./common');
-const {GitHubUtils} = require('./github-utils');
 const sleep = require('sleep-promise');
 
 const RETRY_MILLIS = 60000;
@@ -36,7 +35,7 @@ const HUMAN_ENCOURAGEMENT_MAX_DELTA = -0.03;
  *   bundle size changes.
  * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
- * @return {{title: string, summary: string}} check output.
+ * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
 function failedCheckOutput(
   baseRuntimeDelta,
@@ -68,7 +67,7 @@ function failedCheckOutput(
  *   bundle size changes.
  * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
- * @return {{title: string, summary: string}} check output.
+ * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
 function successfulCheckOutput(
   baseRuntimeDelta,
@@ -100,7 +99,7 @@ function successfulCheckOutput(
  *
  * @param {string} partialBaseSha the base sha this PR's commit is compared
  *   against.
- * @return {{title: string, summary: string}} check output.
+ * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
 function erroredCheckOutput(partialBaseSha) {
   return {
@@ -185,13 +184,19 @@ function choosePotentialApproverTeams(
   return potentialApproverTeams;
 }
 
-exports.installApiRouter = (app, db, userBasedGithub) => {
-  const githubUtils = new GitHubUtils(userBasedGithub, app.log);
-
+/**
+ * Install the API router on the Probot application.
+ *
+ * @param {!Probot.Application} app Probot application.
+ * @param {!Knex} db database connection.
+ * @param {!Octokit} userBasedGithub a user-authenticated GitHub API object.
+ * @param {!GitHubUtils} githubUtils GitHubUtils instance.
+ */
+exports.installApiRouter = (app, db, userBasedGithub, githubUtils) => {
   /**
    * Try to report the bundle size of a pull request to the GitHub check.
    *
-   * @param {!object} check GitHub Check object.
+   * @param {!object} check GitHub Check database object.
    * @param {string} baseSha commit SHA of the base commit being compared to.
    * @param {!Map<string, number>} prBundleSizes the bundle sizes of various
    *   dist files in the pull request in KB.
@@ -221,14 +226,27 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
         await githubUtils.getBuildArtifactsFile(`${baseSha}.json`)
       );
     } catch (error) {
+      const fileNotFound = 'status' in error && error.status === 404;
       const partialHeadSha = check.head_sha.substr(0, 7);
       const partialBaseSha = baseSha.substr(0, 7);
-      app.log.error(
-        'ERROR: Failed to retrieve the bundle size of ' +
-          `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
-          `point ${partialBaseSha} from GitHub:\n`,
-        error
-      );
+
+      if (fileNotFound) {
+        app.log.warn(
+          `Bundle size of ${partialHeadSha} (PR #${check.pull_request_id}) ` +
+            'does not exist yet'
+        );
+      } else {
+        // Any error other than 404 NOT FOUND is unexpected, and should be
+        // rethrown instead of attempting to re-retrieve the file.
+        app.log.error(
+          'Unexpected error when trying to retrieve the bundle size of ' +
+            `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
+            `point ${partialBaseSha} from GitHub:]n`,
+          error
+        );
+        throw error;
+      }
+
       if (lastAttempt) {
         app.log.warn('No more retries left. Reporting failure');
         Object.assign(updatedCheckOptions, {
@@ -291,12 +309,15 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
 
     // TODO(#617, danielrozenberg): replace the legacy logic below with logic
     // that uses the chosen approvers team list.
-    // eslint-disable-next-line no-unused-vars
     const chosenApproverTeams = choosePotentialApproverTeams(
       Array.from(allPotentialApproverTeams).map(JSON.parse),
       app.log,
       check.pull_request_id
     );
+    if (chosenApproverTeams.length) {
+      // eslint-disable-next-line no-unused-vars
+      githubUtils.getRandomReviewer(chosenApproverTeams, check.pull_request_id);
+    }
 
     if (bundleSizeDeltas.length === 0) {
       bundleSizeDeltas.push(
@@ -361,8 +382,9 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
    *
    * Ignore errors as this is a non-critical action.
    *
-   * @param {!github} github an authenticated GitHub API object.
-   * @param {!object} pullRequest GitHub Pull Request object.
+   * @param {!Octokit} github an authenticated GitHub API object.
+   * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
+   *   Request params.
    */
   async function addBundleSizeReviewer(github, pullRequest) {
     const requestedReviewersResponse = await github.pullRequests.listReviewRequests(
@@ -386,7 +408,7 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
     try {
       // Choose a random capable username and add them as a reviewer to the pull
       // request.
-      const newReviewer = await githubUtils.getRandomReviewer();
+      const newReviewer = await githubUtils.getRandomReviewerLegacy();
       return await github.pullRequests.createReviewRequest({
         reviewers: [newReviewer],
         ...pullRequest,

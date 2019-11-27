@@ -15,8 +15,10 @@
 
 const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
+const {GitHubUtils} = require('../github-utils');
 const {installApiRouter} = require('../api');
 const nock = require('nock');
+const NodeCache = require('node-cache');
 const Octokit = require('@octokit/rest');
 const {Probot} = require('probot');
 const request = require('supertest');
@@ -32,13 +34,16 @@ describe('bundle-size api', () => {
   let probot;
   let app;
   const db = dbConnect();
+  const nodeCache = new NodeCache();
 
   beforeAll(async () => {
     await setupDb(db);
 
     probot = new Probot({});
     app = probot.load(app => {
-      installApiRouter(app, db, new Octokit());
+      const github = new Octokit();
+      const githubUtils = new GitHubUtils(github, app.log, nodeCache);
+      installApiRouter(app, db, github, githubUtils);
     });
 
     // Return a test token.
@@ -48,6 +53,8 @@ describe('bundle-size api', () => {
   });
 
   beforeEach(async () => {
+    nodeCache.flushAll();
+
     process.env = {
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
       MAX_ALLOWED_INCREASE: '0.1',
@@ -74,7 +81,11 @@ describe('bundle-size api', () => {
       .get(
         '/repos/ampproject/amphtml/contents/build-system/tasks/bundle-size/APPROVERS.json'
       )
-      .reply(200, getFixture('APPROVERS.json'));
+      .reply(200, getFixture('APPROVERS.json'))
+      .get(/\/orgs\/ampproject\/teams\/wg-\w+/)
+      .reply(200, getFixture('teams.getByName.wg-runtime'))
+      .get('/teams/3065818/members')
+      .reply(200, getFixture('teams.listMembers.3065818'));
   });
 
   afterEach(async () => {

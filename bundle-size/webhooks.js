@@ -20,13 +20,14 @@ const {
   isBundleSizeApprover,
 } = require('./common');
 
+/**
+ * Installs GitHub Webhooks on the Probot application.
+ *
+ * @param {!Probot.Application} app Probot application.
+ * @param {!Knex} db database connection.
+ * @param {!Octokit} userBasedGithub a user-authenticated GitHub API object.
+ */
 exports.installGitHubWebhooks = (app, db, userBasedGithub) => {
-  /**
-   * Get the GitHub Check object from the database.
-   *
-   * @param {string} headSha commit SHA of the head commit of a pull request.
-   * @return {!object} GitHub Check object.
-   */
   app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
     context.log(`Pull request ${context.payload.number} created/updated`);
 

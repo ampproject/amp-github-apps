@@ -15,17 +15,25 @@
 'use strict';
 
 const {dbConnect} = require('./db');
-const Octokit = require('@octokit/rest');
+const {GitHubUtils} = require('./github-utils');
 const {installApiRouter} = require('./api');
 const {installGitHubWebhooks} = require('./webhooks');
+const Octokit = require('@octokit/rest');
 
 const db = dbConnect();
 
+/**
+ * Set up Probot application.
+ *
+ * @param {!Probot.Application} app base Probot Application.
+ */
 module.exports = app => {
   const userBasedGithub = new Octokit({
     'auth': process.env.ACCESS_TOKEN,
   });
 
+  const githubUtils = new GitHubUtils(userBasedGithub, app.log);
+
   installGitHubWebhooks(app, db, userBasedGithub);
-  installApiRouter(app, db, userBasedGithub);
+  installApiRouter(app, db, userBasedGithub, githubUtils);
 };

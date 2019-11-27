@@ -20,6 +20,10 @@ const path = require('path');
 const CACHE_CHECK_SECONDS = 60;
 const CACHE_APPROVERS_KEY = 'approvers';
 const CACHE_APPROVERS_TTL_SECONDS = 900;
+const CACHE_TEAM_ID_KEY = 'team_id';
+const CACHE_TEAM_ID_TTL_SECONDS = 86400;
+const CACHE_TEAM_MEMBERS_KEY = 'team_members';
+const CACHE_TEAM_MEMBERS_TTL_SECONDS = 3600;
 
 /**
  * Get GitHub API parameters for bundle-size file actions.
@@ -40,7 +44,7 @@ function getBuildArtifactsFileParams_(filename) {
  */
 class GitHubUtils {
   /**
-   * @param {!github} github an authenticated GitHub API object.
+   * @param {!Octokit} github an authenticated GitHub API object.
    * @param {!Logger} log logging function/object.
    * @param {NodeCache} cache an optional NodeCache instance.
    */
@@ -122,7 +126,7 @@ class GitHubUtils {
    *
    * @return {string} a username of someone who can approve a bundle size change.
    */
-  async getRandomReviewer() {
+  async getRandomReviewerLegacy() {
     const reviewerTeamIds = process.env.REVIEWER_TEAMS.split('‚');
     const reviewerTeamId = parseInt(
       reviewerTeamIds[Math.floor(Math.random() * reviewerTeamIds.length)],
@@ -136,6 +140,85 @@ class GitHubUtils {
       .then(response => response.data);
     const member = members[Math.floor(Math.random() * members.length)];
     return member.login;
+  }
+
+  /**
+   * Convert a team slug to a team id.
+   *
+   * @param {string} teamName the team slug (`organization/team`).
+   * @return {number} the team id.
+   */
+  async getTeamId_(teamName) {
+    const cacheKey = `${CACHE_TEAM_ID_KEY}/${teamName}`;
+    const [org, teamSlug] = teamName.split('/');
+    let teamId = this.cache.get(cacheKey);
+    if (!teamId) {
+      this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
+      teamId = await this.github.teams
+        .getByName({org, team_slug: teamSlug})
+        .then(result => result.data.id);
+      this.log(
+        `Fetched team id ${teamId} for team ${teamName} from GitHub. Caching ` +
+          `for ${CACHE_TEAM_ID_TTL_SECONDS} seconds.`
+      );
+      this.cache.set(cacheKey, teamId, CACHE_TEAM_ID_TTL_SECONDS);
+    }
+    return teamId;
+  }
+
+  /**
+   * Get a list of all unique team members by team ids.
+   *
+   * @param {!Array<number>} teamIds the team ids.
+   * @return {!Array<string>} all members of the provided teams.
+   */
+  async getTeamMembers_(teamIds) {
+    const allTeamMembersPromises = teamIds.map(async teamId => {
+      const cacheKey = `${CACHE_TEAM_MEMBERS_KEY}/${teamId}`;
+      let teamMembers = this.cache.get(cacheKey);
+      if (!teamMembers) {
+        this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
+        teamMembers = await this.github.teams
+          .listMembers({team_id: teamId})
+          .then(result => result.data.map(user => user.login));
+        this.log(
+          `Fetched team members [${teamMembers.join(', ')}] for team id ` +
+            `${teamId}. Caching for ${CACHE_TEAM_MEMBERS_TTL_SECONDS} seconds.`
+        );
+        this.cache.set(cacheKey, teamMembers, CACHE_TEAM_MEMBERS_TTL_SECONDS);
+      }
+      return teamMembers;
+    }, this);
+    const allTeamMembers = (await Promise.all(allTeamMembersPromises)).flat();
+    return [...new Set(allTeamMembers)];
+  }
+
+  /**
+   * Choose a random reviewer from list of potential approver teams.
+   *
+   * @param {!Array<string>} potentialApproverTeams potential teams that can
+   *   approve this pull request.
+   * @param {number} pullRequestId the pull request id.
+   * @return {string} the chosen reviewer username.
+   */
+  async getRandomReviewer(potentialApproverTeams, pullRequestId) {
+    const teamIds = await Promise.all(
+      potentialApproverTeams.map(this.getTeamId_, this)
+    );
+    this.log(
+      `Reviewer for pull request ${pullRequestId} will be chosen from ` +
+        `[${potentialApproverTeams.join(', ')}] (team ids are` +
+        `[${teamIds.join(', ')}])`
+    );
+    const potentialReviewers = await this.getTeamMembers_(teamIds);
+    const reviewer =
+      potentialReviewers[Math.floor(Math.random() * potentialReviewers.length)];
+    this.log(
+      `Chose reviewer ${reviewer} from all of ` +
+        `[${potentialReviewers.join(', ')}] for pull request ${pullRequestId}`
+    );
+
+    return reviewer;
   }
 }
 
