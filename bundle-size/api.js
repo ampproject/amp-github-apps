@@ -114,7 +114,7 @@ function erroredCheckOutput(partialBaseSha) {
       'repository. This can happen due to failed or delayed Travis builds on ' +
       'said `master` commit.\n' +
       'A member of the bundle-size group will be added automatically to ' +
-      'review this PR. Only once the member approves this PR, can it be' +
+      'review this PR. Only once the member approves this PR, can it be ' +
       'merged. If you do not receive a response from the group member, feel ' +
       `free to tag another person in ${process.env.REVIEWER_TEAM_NAMES}`,
   };
