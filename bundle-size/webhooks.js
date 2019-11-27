@@ -14,20 +14,16 @@
  */
 'use strict';
 
-const {
-  formatBundleSizeDelta,
-  getCheckFromDatabase,
-  isBundleSizeApprover,
-} = require('./common');
+const {formatBundleSizeDelta, getCheckFromDatabase} = require('./common');
 
 /**
  * Installs GitHub Webhooks on the Probot application.
  *
  * @param {!Probot.Application} app Probot application.
  * @param {!Knex} db database connection.
- * @param {!Octokit} userBasedGithub a user-authenticated GitHub API object.
+ * @param {!GitHubUtils} githubUtils GitHubUtils instance.
  */
-exports.installGitHubWebhooks = (app, db, userBasedGithub) => {
+exports.installGitHubWebhooks = (app, db, githubUtils) => {
   app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
     context.log(`Pull request ${context.payload.number} created/updated`);
 
@@ -86,7 +82,7 @@ exports.installGitHubWebhooks = (app, db, userBasedGithub) => {
 
     if (
       context.payload.review.state == 'approved' &&
-      (await isBundleSizeApprover(userBasedGithub, approver))
+      (await githubUtils.isBundleSizeApprover(approver))
     ) {
       context.log(
         `Pull request ${pullRequestId} approved by a bundle-size keeper`

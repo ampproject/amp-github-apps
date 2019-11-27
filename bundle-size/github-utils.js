@@ -143,6 +143,28 @@ class GitHubUtils {
   }
 
   /**
+   * Check whether the user is allowed to approve a bundle size change.
+   *
+   * @param {string} username the username to check.
+   * @return {boolean} true if the user is allowed to approve bundle size changes.
+   */
+  async isBundleSizeApprover(username) {
+    // TODO(danielrozenberg): replace this logic with Promise.any when it exists.
+    for (const teamId of process.env.APPROVER_TEAMS.split(',')) {
+      try {
+        await this.github.teams.getMembership({
+          team_id: parseInt(teamId, 10),
+          username,
+        });
+        return true;
+      } catch (error) {
+        // Ignore...
+      }
+    }
+    return false;
+  }
+
+  /**
    * Convert a team slug to a team id.
    *
    * @param {string} teamName the team slug (`organization/team`).

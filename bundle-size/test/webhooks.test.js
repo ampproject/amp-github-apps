@@ -15,8 +15,10 @@
 
 const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
+const {GitHubUtils} = require('../github-utils');
 const {installGitHubWebhooks} = require('../webhooks');
 const nock = require('nock');
+const NodeCache = require('node-cache');
 const Octokit = require('@octokit/rest');
 const {Probot} = require('probot');
 const {setupDb} = require('../setup-db');
@@ -30,13 +32,15 @@ describe('bundle-size webhooks', () => {
   let probot;
   let app;
   const db = dbConnect();
+  const nodeCache = new NodeCache();
 
   beforeAll(async () => {
     await setupDb(db);
 
     probot = new Probot({});
     app = probot.load(app => {
-      installGitHubWebhooks(app, db, new Octokit());
+      const githubUtils = new GitHubUtils(new Octokit(), app.log, nodeCache);
+      installGitHubWebhooks(app, db, githubUtils);
     });
 
     // Return a test token.
@@ -46,6 +50,8 @@ describe('bundle-size webhooks', () => {
   });
 
   beforeEach(async () => {
+    nodeCache.flushAll();
+
     process.env = {
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
       MAX_ALLOWED_INCREASE: '0.1',
