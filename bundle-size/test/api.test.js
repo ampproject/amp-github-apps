@@ -78,7 +78,11 @@ describe('bundle-size api', () => {
       .get(
         '/repos/ampproject/amphtml/contents/build-system/tasks/bundle-size/APPROVERS.json'
       )
-      .reply(200, getFixture('APPROVERS.json'));
+      .reply(200, getFixture('APPROVERS.json'))
+      .get(/\/orgs\/ampproject\/teams\/wg-\w+/)
+      .reply(200, getFixture('teams.getByName.wg-runtime'))
+      .get('/teams/3065818/members')
+      .reply(200, getFixture('teams.listMembers.3065818'));
   });
 
   afterEach(async () => {
