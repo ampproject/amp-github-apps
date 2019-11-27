@@ -291,12 +291,15 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
 
     // TODO(#617, danielrozenberg): replace the legacy logic below with logic
     // that uses the chosen approvers team list.
-    // eslint-disable-next-line no-unused-vars
     const chosenApproverTeams = choosePotentialApproverTeams(
       Array.from(allPotentialApproverTeams).map(JSON.parse),
       app.log,
       check.pull_request_id
     );
+    if (chosenApproverTeams.length) {
+      // eslint-disable-next-line no-unused-vars
+      githubUtils.getRandomReviewer(chosenApproverTeams, check.pull_request_id);
+    }
 
     if (bundleSizeDeltas.length === 0) {
       bundleSizeDeltas.push(

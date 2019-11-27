@@ -20,6 +20,10 @@ const path = require('path');
 const CACHE_CHECK_SECONDS = 60;
 const CACHE_APPROVERS_KEY = 'approvers';
 const CACHE_APPROVERS_TTL_SECONDS = 900;
+const CACHE_TEAM_ID_KEY = 'team_id';
+const CACHE_TEAM_ID_TTL_SECONDS = 86400;
+const CACHE_TEAM_MEMBERS_KEY = 'team_members';
+const CACHE_TEAM_MEMBERS_TTL_SECONDS = 3600;
 
 /**
  * Get GitHub API parameters for bundle-size file actions.
@@ -136,6 +140,80 @@ class GitHubUtils {
       .then(response => response.data);
     const member = members[Math.floor(Math.random() * members.length)];
     return member.login;
+  }
+
+  /**
+   * Convert a team slug to a team id.
+   *
+   * @param {string} teamName the team slug (`organization/team`).
+   * @return {number} the team id.
+   */
+  async getTeamId_(teamName) {
+    const cacheKey = `${CACHE_TEAM_ID_KEY}/${teamName}`;
+    const [org, teamSlug] = teamName.split('/');
+    let teamId = this.cache.get(cacheKey);
+    if (!teamId) {
+      this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
+      teamId = await this.github.teams
+        .getByName({org, team_slug: teamSlug})
+        .then(result => result.id);
+      this.log(
+        `Fetched team id ${teamId} for team ${teamName} from GitHub. Caching ` +
+          `for ${CACHE_TEAM_ID_TTL_SECONDS} seconds.`
+      );
+      this.cache.set(cacheKey, teamId, CACHE_TEAM_ID_TTL_SECONDS);
+    }
+    return teamId;
+  }
+
+  /**
+   * Get the list of all team members by team id.
+   *
+   * @param {number} teamId the team id.
+   * @return {!Array<string>} the team id.
+   */
+  async getTeamMembers_(teamId) {
+    const cacheKey = `${CACHE_TEAM_MEMBERS_KEY}/${teamId}`;
+    let teamMembers = this.cache.get(cacheKey);
+    if (!teamMembers) {
+      this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
+      teamMembers = await this.github.teams
+        .listMembers({team_id: teamId})
+        .then(result => result.map(user => user.login));
+      this.log(
+        `Fetched team members [${teamMembers.join(', ')} for team id ` +
+          `${teamId}. Caching for ${CACHE_TEAM_MEMBERS_TTL_SECONDS} seconds.`
+      );
+      this.cache.set(cacheKey, teamMembers, CACHE_TEAM_MEMBERS_TTL_SECONDS);
+    }
+    return teamMembers;
+  }
+
+  /**
+   * Choose a random reviewer from list of potential approver teams.
+   *
+   * @param {!Array<string>} potentialApproverTeams potential teams that can
+   *   approve this pull request.
+   * @param {number} pullRequestId the pull request id.
+   * @return {string} the chosen reviewer username.
+   */
+  async getRandomReviewer(potentialApproverTeams, pullRequestId) {
+    // First, randomly choose a team.
+    const reviewerTeamName =
+      potentialApproverTeams[
+        Math.floor(Math.random() * potentialApproverTeams.length)
+      ];
+    this.log(
+      `Reviewer for pull request ${pullRequestId} will be chosen from ` +
+        `${reviewerTeamName}`
+    );
+    const teamId = await this.getTeamId_(reviewerTeamName);
+    const allTeamMembers = await this.getTeamMembers_(teamId);
+    const reviewer =
+      allTeamMembers[Math.floor(Math.random() * allTeamMembers.length)];
+    this.log(`Chose reviewer ${reviewer} for pull request ${pullRequestId}`);
+
+    return reviewer;
   }
 }
 
