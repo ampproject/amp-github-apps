@@ -229,14 +229,27 @@ exports.installApiRouter = (app, db, userBasedGithub, nodeCache) => {
         await githubUtils.getBuildArtifactsFile(`${baseSha}.json`)
       );
     } catch (error) {
+      const fileNotFound = 'status' in error && error.status === 404;
       const partialHeadSha = check.head_sha.substr(0, 7);
       const partialBaseSha = baseSha.substr(0, 7);
-      app.log.error(
-        'ERROR: Failed to retrieve the bundle size of ' +
-          `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
-          `point ${partialBaseSha} from GitHub:\n`,
-        error
-      );
+
+      if (fileNotFound) {
+        app.log.warn(
+          `Bundle size of ${partialHeadSha} (PR #${check.pull_request_id}) ` +
+            'does not exist yet'
+        );
+      } else {
+        // Any error other than 404 NOT FOUND is unexpected, and should be
+        // rethrown instead of attempting to re-retrieve the file.
+        app.log.error(
+          'Unexpected error when trying to retrieve the bundle size of ' +
+            `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
+            `point ${partialBaseSha} from GitHub:]n`,
+          error
+        );
+        throw error;
+      }
+
       if (lastAttempt) {
         app.log.warn('No more retries left. Reporting failure');
         Object.assign(updatedCheckOptions, {
