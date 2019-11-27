@@ -95,5 +95,11 @@ def compute_all(metrics: Sequence[base_metric.MetricImplementation]):
 
 if __name__ == '__main__':
   logging.getLogger().setLevel(logging.INFO)
-  scrape_all(['commits', 'builds', 'releases', 'cherrypicks'])
+  scrape_all([
+      'commits',
+      'builds',
+      'releases',
+      'cherrypicks',
+      'cherrypick_issues',
+  ])
   compute_all(base_metric.Metric.get_active_metrics())
