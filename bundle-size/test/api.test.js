@@ -17,6 +17,7 @@ const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
 const {installApiRouter} = require('../api');
 const nock = require('nock');
+const NodeCache = require('node-cache');
 const Octokit = require('@octokit/rest');
 const {Probot} = require('probot');
 const request = require('supertest');
@@ -32,13 +33,14 @@ describe('bundle-size api', () => {
   let probot;
   let app;
   const db = dbConnect();
+  const nodeCache = new NodeCache();
 
   beforeAll(async () => {
     await setupDb(db);
 
     probot = new Probot({});
     app = probot.load(app => {
-      installApiRouter(app, db, new Octokit());
+      installApiRouter(app, db, new Octokit(), nodeCache);
     });
 
     // Return a test token.
@@ -48,6 +50,8 @@ describe('bundle-size api', () => {
   });
 
   beforeEach(async () => {
+    nodeCache.flushAll();
+
     process.env = {
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
       MAX_ALLOWED_INCREASE: '0.1',

@@ -44,7 +44,7 @@ function getBuildArtifactsFileParams_(filename) {
  */
 class GitHubUtils {
   /**
-   * @param {!github} github an authenticated GitHub API object.
+   * @param {!Octokit} github an authenticated GitHub API object.
    * @param {!Logger} log logging function/object.
    * @param {NodeCache} cache an optional NodeCache instance.
    */

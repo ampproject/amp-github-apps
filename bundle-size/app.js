@@ -21,6 +21,11 @@ const {installGitHubWebhooks} = require('./webhooks');
 
 const db = dbConnect();
 
+/**
+ * Set up Probot application.
+ *
+ * @param {!Probot.Application} app base Probot Application.
+ */
 module.exports = app => {
   const userBasedGithub = new Octokit({
     'auth': process.env.ACCESS_TOKEN,

@@ -36,7 +36,7 @@ const HUMAN_ENCOURAGEMENT_MAX_DELTA = -0.03;
  *   bundle size changes.
  * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
- * @return {{title: string, summary: string}} check output.
+ * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
 function failedCheckOutput(
   baseRuntimeDelta,
@@ -68,7 +68,7 @@ function failedCheckOutput(
  *   bundle size changes.
  * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
- * @return {{title: string, summary: string}} check output.
+ * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
 function successfulCheckOutput(
   baseRuntimeDelta,
@@ -100,7 +100,7 @@ function successfulCheckOutput(
  *
  * @param {string} partialBaseSha the base sha this PR's commit is compared
  *   against.
- * @return {{title: string, summary: string}} check output.
+ * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
 function erroredCheckOutput(partialBaseSha) {
   return {
@@ -185,13 +185,21 @@ function choosePotentialApproverTeams(
   return potentialApproverTeams;
 }
 
-exports.installApiRouter = (app, db, userBasedGithub) => {
-  const githubUtils = new GitHubUtils(userBasedGithub, app.log);
+/**
+ * Install the API router on the Probot application.
+ *
+ * @param {!Probot.Application} app Probot application.
+ * @param {!Knex} db database connection.
+ * @param {!Octokit} userBasedGithub a user-authenticated GitHub API object.
+ * @param {NodeCache} nodeCache optional NodeCache instance.
+ */
+exports.installApiRouter = (app, db, userBasedGithub, nodeCache) => {
+  const githubUtils = new GitHubUtils(userBasedGithub, app.log, nodeCache);
 
   /**
    * Try to report the bundle size of a pull request to the GitHub check.
    *
-   * @param {!object} check GitHub Check object.
+   * @param {!object} check GitHub Check database object.
    * @param {string} baseSha commit SHA of the base commit being compared to.
    * @param {!Map<string, number>} prBundleSizes the bundle sizes of various
    *   dist files in the pull request in KB.
@@ -364,8 +372,9 @@ exports.installApiRouter = (app, db, userBasedGithub) => {
    *
    * Ignore errors as this is a non-critical action.
    *
-   * @param {!github} github an authenticated GitHub API object.
-   * @param {!object} pullRequest GitHub Pull Request object.
+   * @param {!Octokit} github an authenticated GitHub API object.
+   * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
+   *   Request params.
    */
   async function addBundleSizeReviewer(github, pullRequest) {
     const requestedReviewersResponse = await github.pullRequests.listReviewRequests(

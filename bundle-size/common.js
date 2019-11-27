@@ -43,7 +43,7 @@ exports.getCheckFromDatabase = async (db, headSha) => {
 /**
  * Check whether the user is allowed to approve a bundle size change.
  *
- * @param {!github} github an authorized GitHub API object.
+ * @param {!Octokit} github an authorized GitHub API object.
  * @param {string} username the username to check.
  * @return {boolean} true if the user is allowed to approve bundle size changes.
  */
