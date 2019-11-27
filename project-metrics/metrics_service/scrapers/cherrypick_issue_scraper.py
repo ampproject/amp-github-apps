@@ -23,7 +23,6 @@ class CherrypickIssueScraper(object):
     self.github = github.GitHubGraphQL()
     self.session = db.Session()
     self.cursor = None
-    self.oldest_seen = datetime.datetime.now()
 
   def __del__(self):
     self.session.close()
