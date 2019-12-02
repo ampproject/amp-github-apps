@@ -10,7 +10,7 @@
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
   "engines": {
-    "node": "^10.14.1"
+    "node": "^12.13.1"
   },
   "scripts": {
     "start": "node build-system/pr-check.js",

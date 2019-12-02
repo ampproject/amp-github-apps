@@ -6,7 +6,7 @@
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "A web service that suggests approvers for a GitHub pull request based on OWNERS files and enforces reviews by OWNERS as a GitHub status check.",
   "engines": {
-    "node": "^10.11"
+    "node": "^12.13.1"
   },
   "scripts": {
     "init": "node scripts/warm_cache.js",
