@@ -12,12 +12,13 @@ from flask_api import status
 from google.cloud import storage
 from typing import Text
 
+logging.getLogger().setLevel(logging.INFO)
+
 from metrics import base
 import env
 import metric_plot
 import scrapers
 
-logging.getLogger().setLevel(logging.INFO)
 app = flask.Flask(__name__)
 
 BADGE_COLORS = [

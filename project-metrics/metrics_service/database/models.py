@@ -233,7 +233,7 @@ class CherrypickIssue(Base):
       The last 90 days of cherry-pick issues from newest to oldest.
     """
     return session.query(cls).order_by(cls.created_at.desc()).filter(
-        cls.is_last_90_days(base_time))
+        cls.is_last_90_days(base_time)).filter(cls.created_at <= base_time)
 
   def __repr__(self) -> Text:
     return '<CherrypickIssue(number=%d, created_at=%s)>' % (self.number,
