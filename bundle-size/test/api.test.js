@@ -106,6 +106,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         delta: null,
+        approving_teams: null,
       });
 
       const nocks = nock('https://api.github.com')
@@ -163,6 +164,7 @@ describe('bundle-size api', () => {
           installation_id: 123456,
           check_run_id: 555555,
           delta: null,
+          approving_teams: null,
         });
 
         const baseBundleSizeFixture = getFixture(
@@ -207,6 +209,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         delta: null,
+        approving_teams: null,
       });
 
       const baseBundleSizeFixture = getFixture(
@@ -258,6 +261,7 @@ describe('bundle-size api', () => {
           installation_id: 123456,
           check_run_id: 555555,
           delta: null,
+          approving_teams: null,
         });
 
         const baseBundleSizeFixture = getFixture(
@@ -319,6 +323,7 @@ describe('bundle-size api', () => {
           installation_id: 123456,
           check_run_id: 555555,
           delta: null,
+          approving_teams: null,
         });
 
         const baseBundleSizeFixture = getFixture(
@@ -380,6 +385,7 @@ describe('bundle-size api', () => {
           installation_id: 123456,
           check_run_id: 555555,
           delta: null,
+          approving_teams: null,
         });
 
         const baseBundleSizeFixture = getFixture(
@@ -433,6 +439,7 @@ describe('bundle-size api', () => {
           installation_id: 123456,
           check_run_id: 555555,
           delta: null,
+          approving_teams: null,
         });
 
         const baseBundleSizeFixture = getFixture(
@@ -493,6 +500,7 @@ describe('bundle-size api', () => {
           installation_id: 123456,
           check_run_id: 555555,
           delta: null,
+          approving_teams: null,
         });
 
         const baseBundleSizeFixture = getFixture(
@@ -564,6 +572,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         delta: null,
+        approving_teams: null,
       });
 
       const lastNetworkRequest = new Promise(resolve => {

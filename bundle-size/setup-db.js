@@ -35,6 +35,11 @@ function setupDb(db) {
       table
         .decimal('delta', 6, 2)
         .comment('Legacy column, should be removed with #617');
+      table
+        .string('approving_teams')
+        .comment(
+          'Comma separated list of teams to that can approve a bundle-size increase, in the format `ampproject/wg-runtime,ampproject/wg-performance`'
+        );
     })
     .createTable('merges', table => {
       table.string('merge_commit_sha', 40).primary();

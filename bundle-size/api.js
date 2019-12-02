@@ -336,7 +336,10 @@ exports.installApiRouter = (app, db, githubUtils) => {
       prBundleSizes['dist/v0.js'] - baseRuntimeBundleSize;
 
     await db('checks')
-      .update({delta: baseRuntimeBundleSizeDelta})
+      .update({
+        delta: baseRuntimeBundleSizeDelta,
+        approving_teams: chosenApproverTeams.join(','),
+      })
       .where({head_sha: check.head_sha});
 
     const requiresApproval =
