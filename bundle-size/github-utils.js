@@ -229,7 +229,7 @@ class GitHubUtils {
     );
     this.log(
       `Reviewer for pull request ${pullRequestId} will be chosen from ` +
-        `[${potentialApproverTeams.join(', ')}] (team ids are` +
+        `[${potentialApproverTeams.join(', ')}] (team ids are ` +
         `[${teamIds.join(', ')}])`
     );
     const potentialReviewers = await this.getTeamMembers_(teamIds);

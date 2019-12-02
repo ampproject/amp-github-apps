@@ -106,7 +106,7 @@ describe('bundle-size webhooks', () => {
       await probot.receive({name: 'pull_request', payload});
       nocks.done();
 
-      expect(await db('checks').select('*')).toMatchObject([
+      expect(await db('checks').select('*')).toEqual([
         {
           head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
           owner: 'ampproject',
@@ -115,6 +115,7 @@ describe('bundle-size webhooks', () => {
           installation_id: 123456,
           check_run_id: 555555,
           delta: null,
+          approving_teams: null,
         },
       ]);
     });
@@ -128,6 +129,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 444444,
         delta: null,
+        approving_teams: null,
       });
 
       const payload = getFixture('pull_request.opened');
@@ -148,7 +150,7 @@ describe('bundle-size webhooks', () => {
       await probot.receive({name: 'pull_request', payload});
       nocks.done();
 
-      expect(await db('checks').select('*')).toMatchObject([
+      expect(await db('checks').select('*')).toEqual([
         {
           head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
           owner: 'ampproject',
@@ -157,6 +159,7 @@ describe('bundle-size webhooks', () => {
           installation_id: 123456,
           check_run_id: 555555,
           delta: null,
+          approving_teams: null,
         },
       ]);
     });
@@ -169,7 +172,7 @@ describe('bundle-size webhooks', () => {
         name: 'pull_request',
         payload: pullRequestPayload,
       });
-      expect(await db('merges').select('*')).toMatchObject([]);
+      expect(await db('merges').select('*')).toEqual([]);
 
       const checkRunPayload = getFixture('check_run.created');
 
@@ -187,7 +190,7 @@ describe('bundle-size webhooks', () => {
         name: 'pull_request',
         payload: pullRequestPayload,
       });
-      expect(await db('merges').select('*')).toMatchObject([
+      expect(await db('merges').select('*')).toEqual([
         {merge_commit_sha: '4ba02c691d1a3014f70a7521c07d775dc6a1e355'},
       ]);
 
@@ -206,7 +209,7 @@ describe('bundle-size webhooks', () => {
         .reply(200);
 
       await probot.receive({name: 'check_run', payload: checkRunPayload});
-      expect(await db('merges').select('*')).toMatchObject([]);
+      expect(await db('merges').select('*')).toEqual([]);
       nocks.done();
     });
 
@@ -244,6 +247,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         delta: 0.2,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
       });
 
       const nocks = nock('https://api.github.com')
@@ -273,6 +277,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         delta: null,
+        approving_teams: null,
       });
 
       await probot.receive({name: 'pull_request_review', payload});
@@ -302,6 +307,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         delta: 0.05,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
       });
 
       await probot.receive({name: 'pull_request_review', payload});
