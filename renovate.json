@@ -2,6 +2,9 @@
   "extends": [
     "config:base"
   ],
+  "node": {
+    "supportPolicy": ["lts_latest"]
+  },
   "packageRules": [{
     "packagePatterns": [".*"],
     "groupName": "packages",
