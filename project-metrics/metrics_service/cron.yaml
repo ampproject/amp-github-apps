@@ -7,8 +7,8 @@ cron:
   url: /_cron/scrape/releases
   schedule: every 72 hours
 
-- description: "Scrape cherry-picks on recent releases"
-  url: /_cron/scrape/cherrypicks
+- description: "Scrape latest cherry-pick issues from GitHub"
+  url: /_cron/scrape/cherrypick_issues
   schedule: every 72 hours
   
 - description: "Scrape latest builds from Travis"
@@ -28,8 +28,8 @@ cron:
   url: /_cron/recompute/PresubmitLatencyMetric
   schedule: every 24 hours
 
-- description: "Update release-cherrypick-count metric."
-  url: /_cron/recompute/ReleaseCherrypickCountMetric
+- description: "Update cherrypick-issue-count metric."
+  url: /_cron/recompute/CherrypickIssueCountMetric
   schedule: every saturday 00:00
 
 - description: "Update release-granularity metric."
