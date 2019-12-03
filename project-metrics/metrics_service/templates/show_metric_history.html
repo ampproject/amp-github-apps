@@ -13,7 +13,7 @@
 <body>
   {% if metric_names %}
     {% for name in metric_names %}
-    <img src="{{ app_url }}/api/plot/{{ name }}.png">
+    <img src="/api/plot/{{ name }}.png">
     {% endfor %}
   {% else %}
   <strong>No metrics available to display.</strong>

@@ -28,7 +28,6 @@ BADGE_COLORS = [
     'green',
     'forestgreen',
 ]
-APP_URL = 'https://%s.appspot.com' % env.get('PROJECT_NAME')
 
 
 def _get_cloud_blob(filename: Text) -> storage.Blob:
@@ -168,8 +167,7 @@ def show_metric_history():
   return flask.render_template(
       'show_metric_history.html',
       github_repo=env.get('GITHUB_REPO'),
-      metric_names=metric_names,
-      app_url=APP_URL)
+      metric_names=metric_names)
 
 
 if __name__ == '__main__':
