@@ -162,5 +162,14 @@ def show_metrics():
       'show_metrics.html', github_repo=env.get('GITHUB_REPO'), metrics=metrics)
 
 
+@app.route('/history')
+def show_metric_history():
+  metric_names = [cls.__name__ for cls in base.Metric.get_active_metrics()]
+  return flask.render_template(
+      'show_metric_history.html',
+      github_repo=env.get('GITHUB_REPO'),
+      metric_names=metric_names)
+
+
 if __name__ == '__main__':
   app.run(port=os.environ.get('PORT', 8080), debug=True)

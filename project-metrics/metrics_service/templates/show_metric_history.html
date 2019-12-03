@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Metric History: {{ github_repo }}</title>
+
+  <style type="text/css">
+    img {
+      width: 33%;
+    }
+  </style>
+</head>
+
+<body>
+  {% if metric_names %}
+    {% for name in metric_names %}
+    <img src="/api/plot/{{ name }}.png">
+    {% endfor %}
+  {% else %}
+  <strong>No metrics available to display.</strong>
+  {% endif %}
+</body>
+</html>
