@@ -28,6 +28,7 @@ BADGE_COLORS = [
     'green',
     'forestgreen',
 ]
+APP_URL = 'https://%s.appspot.com' % env.get('PROJECT_NAME')
 
 
 def _get_cloud_blob(filename: Text) -> storage.Blob:
@@ -159,6 +160,16 @@ def show_metrics():
   metrics = base.Metric.get_latest().values()
   return flask.render_template(
       'show_metrics.html', github_repo=env.get('GITHUB_REPO'), metrics=metrics)
+
+
+@app.route('/history')
+def show_metric_history():
+  metric_names = [cls.__name__ for cls in base.Metric.get_active_metrics()]
+  return flask.render_template(
+      'show_metric_history.html',
+      github_repo=env.get('GITHUB_REPO'),
+      metric_names=metric_names,
+      app_url=APP_URL)
 
 
 if __name__ == '__main__':
