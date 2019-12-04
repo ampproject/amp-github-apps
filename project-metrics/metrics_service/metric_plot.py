@@ -10,8 +10,6 @@ from database import db
 from database import models
 from metrics import base as base_metric
 
-HISTORY_DAYS = 180
-
 
 class MetricHistoryPlotter(object):
   """Plots metric results over the last six months.
@@ -23,8 +21,10 @@ class MetricHistoryPlotter(object):
   drawing on each other.
   """
 
-  def __init__(self, metric: base_metric.MetricImplementation):
+  def __init__(self, metric: base_metric.MetricImplementation,
+               history_days: int):
     self.metric = metric
+    self.history_days = history_days
     self.history = self._get_metric_history()
 
   def __del__(self):
@@ -40,14 +40,15 @@ class MetricHistoryPlotter(object):
     Returns:
       A byte buffer containing the plot rendered as a PNG.
     """
-    logging.info('Plotting %d days of results for %s', HISTORY_DAYS,
+    logging.info('Plotting %d days of results for %s', self.history_days,
                  self.metric.name)
     self._make_plot()
     self._set_labels()
     return self._save_plot_to_buffer(width, height)
 
   def _get_metric_history(self) -> Sequence[models.MetricResult]:
-    start_date = datetime.datetime.now() - datetime.timedelta(days=HISTORY_DAYS)
+    start_date = datetime.datetime.now() - datetime.timedelta(
+        days=self.history_days)
 
     session = db.Session()
     history = session.query(models.MetricResult).order_by(
@@ -69,7 +70,7 @@ class MetricHistoryPlotter(object):
     plt.plot(result_dates, result_values, 'b-')
 
   def _set_labels(self):
-    plt.title('%s (Last %d Days)' % (self.metric.label, HISTORY_DAYS))
+    plt.title('%s (Last %d Days)' % (self.metric.label, self.history_days))
     plt.ylabel('Metric Value (%s)' % self.metric.UNIT)
     plt.xlabel('Date')
 

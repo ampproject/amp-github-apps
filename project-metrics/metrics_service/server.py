@@ -21,6 +21,7 @@ import scrapers
 
 app = flask.Flask(__name__)
 
+HISTORY_DAYS = 180
 BADGE_COLORS = [
     '#EEEEEE',
     'indianred',
@@ -89,20 +90,25 @@ def recompute(metric_cls_name: Text):
   return 'Successfully recomputed %s.' % metric_cls_name, status.HTTP_200_OK
 
 
-@app.route('/_cron/plot_metric_history')
-def render_metric_history_plot():
+@app.route(
+    '/_cron/plot_metric_history', defaults={'history_days': HISTORY_DAYS})
+@app.route('/_cron/plot_metric_history/<history_days>')
+def render_metric_history_plot(history_days: Text):
   # This header is added to cron requests by GAE, and stripped from any external
   # requests. See
   # https://cloud.google.com/appengine/docs/standard/python3/scheduling-jobs-with-cron-yaml#validating_cron_requests
   if not flask.request.headers.get('X-Appengine-Cron'):
     return 'Attempted to access internal endpoint.', status.HTTP_403_FORBIDDEN
 
-  logging.info('Rendering metric history plots')
+  history_days = int(history_days)
+  logging.info('Rendering metric history plots for last %d days', history_days)
   for metric_cls in base.Metric.get_active_metrics():
     metric = metric_cls()
-    plotter = metric_plot.MetricHistoryPlotter(metric)
+    plotter = metric_plot.MetricHistoryPlotter(
+        metric, history_days=history_days)
     plot_buffer = plotter.plot_metric_history()
-    _save_to_cloud(plot_buffer.read(), '%s-history.png' % metric.name,
+    _save_to_cloud(plot_buffer.read(),
+                   '%s-history-%dd.png' % (metric.name, history_days),
                    'image/png')
 
   return 'History plots updated.', status.HTTP_200_OK
@@ -119,8 +125,10 @@ def list_metrics():
                        }), status.HTTP_200_OK
 
 
-@app.route('/api/plot/<metric_cls_name>.png')
-def metric_history_plot(metric_cls_name: Text):
+@app.route(
+    '/api/plot/<metric_cls_name>.png', defaults={'history_days': HISTORY_DAYS})
+@app.route('/api/plot/<history_days>/<metric_cls_name>.png')
+def metric_history_plot(history_days: Text, metric_cls_name: Text):
   try:
     metric_cls = base.Metric.get_metric(metric_cls_name)
   except KeyError:
@@ -128,7 +136,9 @@ def metric_history_plot(metric_cls_name: Text):
     return ('No active metric found for %s.' %
             metric_cls_name), status.HTTP_404_NOT_FOUND
 
-  plot_bytes = _get_from_cloud('%s-history.png' % metric_cls_name)
+  history_days = int(history_days)
+  plot_bytes = _get_from_cloud('%s-history-%dd.png' %
+                               (metric_cls_name, history_days))
   return flask.send_file(io.BytesIO(plot_bytes), mimetype='image/png')
 
 
@@ -162,13 +172,16 @@ def show_metrics():
       'show_metrics.html', github_repo=env.get('GITHUB_REPO'), metrics=metrics)
 
 
-@app.route('/history')
-def show_metric_history():
+@app.route('/history', defaults={'history_days': HISTORY_DAYS})
+@app.route('/history/<history_days>')
+def show_metric_history(history_days: Text):
+  history_days = int(history_days)
   metric_names = [cls.__name__ for cls in base.Metric.get_active_metrics()]
   return flask.render_template(
       'show_metric_history.html',
       github_repo=env.get('GITHUB_REPO'),
-      metric_names=metric_names)
+      metric_names=metric_names,
+      history_days=history_days)
 
 
 if __name__ == '__main__':
