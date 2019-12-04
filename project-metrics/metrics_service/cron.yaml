@@ -15,9 +15,13 @@ cron:
   url: /_cron/scrape/builds
   schedule: every 4 hours from 8:00 to 19:00
   
-- description: "Render updated plots of metric result history"
+- description: "Render updated plots of 180 days of metric result history"
   url: /_cron/plot_metric_history
   schedule: every saturday 01:00
+  
+- description: "Render updated plots of a year of metric result history"
+  url: /_cron/plot_metric_history/365
+  schedule: 1st, 3rd saturday of month 01:30
 
 
 - description: "Update absolute-coverage metric."
