@@ -82,7 +82,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
 
     if (
       context.payload.review.state == 'approved' &&
-      (await githubUtils.isBundleSizeApprover(approver))
+      (await githubUtils.isBundleSizeApproverLegacy(approver))
     ) {
       context.log(
         `Pull request ${pullRequestId} approved by a bundle-size keeper`
