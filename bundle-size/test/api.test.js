@@ -28,7 +28,6 @@ nock.disableNetConnect();
 nock.enableNetConnect('127.0.0.1');
 jest.mock('../db');
 jest.mock('sleep-promise', () => () => Promise.resolve());
-jest.setTimeout(30000);
 
 describe('bundle-size api', () => {
   let probot;
