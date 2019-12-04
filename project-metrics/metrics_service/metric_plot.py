@@ -10,8 +10,6 @@ from database import db
 from database import models
 from metrics import base as base_metric
 
-HISTORY_DAYS = 180
-
 
 class MetricHistoryPlotter(object):
   """Plots metric results over the last six months.
@@ -23,9 +21,8 @@ class MetricHistoryPlotter(object):
   drawing on each other.
   """
 
-  def __init__(self,
-               metric: base_metric.MetricImplementation,
-               history_days: int = HISTORY_DAYS):
+  def __init__(self, metric: base_metric.MetricImplementation,
+               history_days: int):
     self.metric = metric
     self.history_days = history_days
     self.history = self._get_metric_history()
