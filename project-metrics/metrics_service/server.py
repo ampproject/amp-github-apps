@@ -172,13 +172,16 @@ def show_metrics():
       'show_metrics.html', github_repo=env.get('GITHUB_REPO'), metrics=metrics)
 
 
-@app.route('/history')
-def show_metric_history():
+@app.route('/history', defaults={'history_days': HISTORY_DAYS})
+@app.route('/history/<history_days>')
+def show_metric_history(history_days: Text):
+  history_days = int(history_days)
   metric_names = [cls.__name__ for cls in base.Metric.get_active_metrics()]
   return flask.render_template(
       'show_metric_history.html',
       github_repo=env.get('GITHUB_REPO'),
-      metric_names=metric_names)
+      metric_names=metric_names,
+      history_days=history_days)
 
 
 if __name__ == '__main__':
