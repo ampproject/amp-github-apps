@@ -242,6 +242,51 @@ class GitHubUtils {
 
     return reviewer;
   }
+
+  /**
+   * Add an bundle size reviewer to the pull request.
+   *
+   * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
+   *   Request params.
+   */
+  async addBundleSizeReviewer(pullRequest) {
+    const requestedReviewersResponse = await this.github.pullRequests.listReviewRequests(
+      pullRequest
+    );
+    const reviewsResponse = await this.github.pullRequests.listReviews(
+      pullRequest
+    );
+    const reviewers = new Set([
+      ...requestedReviewersResponse.data.users.map(user => user.login),
+      ...reviewsResponse.data.map(review => review.user.login),
+    ]);
+    for (const reviewer of reviewers) {
+      if (await this.isBundleSizeApprover(reviewer)) {
+        this.log(
+          `INFO: Pull request ${pullRequest.pull_number} already has ` +
+            'a bundle-size capable reviewer. Skipping...'
+        );
+        return;
+      }
+    }
+
+    try {
+      // Choose a random capable username and add them as a reviewer to the pull
+      // request.
+      const newReviewer = await this.getRandomReviewerLegacy();
+      return await this.github.pullRequests.createReviewRequest({
+        reviewers: [newReviewer],
+        ...pullRequest,
+      });
+    } catch (error) {
+      this.log.error(
+        'ERROR: Failed to add a reviewer to pull request ' +
+          `${pullRequest.pull_number}. Skipping...`
+      );
+      this.log.error(`Error message:\n`, error);
+      throw error;
+    }
+  }
 }
 
 module.exports = {GitHubUtils};

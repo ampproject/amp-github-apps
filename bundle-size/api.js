@@ -249,7 +249,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
           output: erroredCheckOutput(partialBaseSha),
         });
         await github.checks.update(updatedCheckOptions);
-        await addBundleSizeReviewer(github, {
+        await githubUtils.addBundleSizeReviewer({
           pull_number: check.pull_request_id,
           ...githubOptions,
         });
@@ -366,59 +366,13 @@ exports.installApiRouter = (app, db, githubUtils) => {
     await github.checks.update(updatedCheckOptions);
 
     if (requiresApproval) {
-      await addBundleSizeReviewer(github, {
+      await githubUtils.addBundleSizeReviewer({
         pull_number: check.pull_request_id,
         ...githubOptions,
       });
     }
 
     return true;
-  }
-
-  /**
-   * Add an bundle size reviewer to the pull request.
-   *
-   * Ignore errors as this is a non-critical action.
-   *
-   * @param {!Octokit} github an authenticated GitHub API object.
-   * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
-   *   Request params.
-   */
-  async function addBundleSizeReviewer(github, pullRequest) {
-    const requestedReviewersResponse = await github.pullRequests.listReviewRequests(
-      pullRequest
-    );
-    const reviewsResponse = await github.pullRequests.listReviews(pullRequest);
-    const reviewers = new Set([
-      ...requestedReviewersResponse.data.users.map(user => user.login),
-      ...reviewsResponse.data.map(review => review.user.login),
-    ]);
-    for (const reviewer of reviewers) {
-      if (await githubUtils.isBundleSizeApprover(reviewer)) {
-        app.log(
-          `INFO: Pull request ${pullRequest.pull_number} already has ` +
-            'a bundle-size capable reviewer. Skipping...'
-        );
-        return;
-      }
-    }
-
-    try {
-      // Choose a random capable username and add them as a reviewer to the pull
-      // request.
-      const newReviewer = await githubUtils.getRandomReviewerLegacy();
-      return await github.pullRequests.createReviewRequest({
-        reviewers: [newReviewer],
-        ...pullRequest,
-      });
-    } catch (error) {
-      app.log.error(
-        'ERROR: Failed to add a reviewer to pull request ' +
-          `${pullRequest.pull_number}. Skipping...`
-      );
-      app.log.error(`Error message:\n`, error);
-      throw error;
-    }
   }
 
   const v0 = app.route('/v0');
