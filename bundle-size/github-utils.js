@@ -191,11 +191,13 @@ class GitHubUtils {
   /**
    * Get a list of all unique team members by team ids.
    *
-   * @param {!Array<number>} teamIds the team ids.
+   * @param {!Array<string>} teamNames names of full team slug namesto get
+   *   members of.
    * @return {!Array<string>} all members of the provided teams.
    */
-  async getTeamMembers_(teamIds) {
-    const allTeamMembersPromises = teamIds.map(async teamId => {
+  async getTeamMembers_(teamNames) {
+    const allTeamMembersPromises = teamNames.map(async teamName => {
+      const teamId = await this.getTeamId_(teamName);
       const cacheKey = `${CACHE_TEAM_MEMBERS_KEY}/${teamId}`;
       let teamMembers = this.cache.get(cacheKey);
       if (!teamMembers) {
@@ -218,21 +220,13 @@ class GitHubUtils {
   /**
    * Choose a random reviewer from list of potential approver teams.
    *
-   * @param {!Array<string>} potentialApproverTeams potential teams that can
-   *   approve this pull request.
    * @param {number} pullRequestId the pull request id.
+   * @param {!Array<string>} potentialReviewers list of GitHub usernames of all
+   *   users who are members of the teams that can approve the bundle-size
+   *   change of this pull request.
    * @return {string} the chosen reviewer username.
    */
-  async getRandomReviewer(potentialApproverTeams, pullRequestId) {
-    const teamIds = await Promise.all(
-      potentialApproverTeams.map(this.getTeamId_, this)
-    );
-    this.log(
-      `Reviewer for pull request ${pullRequestId} will be chosen from ` +
-        `[${potentialApproverTeams.join(', ')}] (team ids are ` +
-        `[${teamIds.join(', ')}])`
-    );
-    const potentialReviewers = await this.getTeamMembers_(teamIds);
+  async getRandomReviewer_(pullRequestId, potentialReviewers) {
     const reviewer =
       potentialReviewers[Math.floor(Math.random() * potentialReviewers.length)];
     this.log(
@@ -248,20 +242,42 @@ class GitHubUtils {
    *
    * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
    *   Request params.
+   * @param {!Array<string>} approverTeams list of all the teams whose members
+   * can approve the bundle-size change of this pull request.
    */
-  async addBundleSizeReviewer(pullRequest) {
+  async addBundleSizeReviewer(pullRequest, approverTeams) {
     const requestedReviewersResponse = await this.github.pullRequests.listReviewRequests(
       pullRequest
     );
     const reviewsResponse = await this.github.pullRequests.listReviews(
       pullRequest
     );
-    const reviewers = new Set([
+    const existingReviewers = new Set([
       ...requestedReviewersResponse.data.users.map(user => user.login),
       ...reviewsResponse.data.map(review => review.user.login),
     ]);
-    for (const reviewer of reviewers) {
-      if (await this.isBundleSizeApprover(reviewer)) {
+
+    const potentialReviewers = await this.getTeamMembers_(approverTeams);
+    if (
+      potentialReviewers.length &&
+      potentialReviewers.every(
+        potentialReviewer => !existingReviewers.has(potentialReviewer)
+      )
+    ) {
+      // None of the potential reviewers are in the PR's requested reviewers
+      // list, so add a random reviewer here.
+      // eslint-disable-next-line no-unused-vars
+      const newReviewer = await this.getRandomReviewer_(
+        pullRequest.pull_number,
+        potentialReviewers
+      );
+      // TODO(#617, danielrozenberg): replace the legacy logic below and add the
+      // `newReviewer` as to this PR instead.
+    }
+
+    // TODO(#617, danielrozenberg): legacy logic
+    for (const existingReviewer of existingReviewers) {
+      if (await this.isBundleSizeApprover(existingReviewer)) {
         this.log(
           `INFO: Pull request ${pullRequest.pull_number} already has ` +
             'a bundle-size capable reviewer. Skipping...'

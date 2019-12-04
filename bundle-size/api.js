@@ -249,10 +249,13 @@ exports.installApiRouter = (app, db, githubUtils) => {
           output: erroredCheckOutput(partialBaseSha),
         });
         await github.checks.update(updatedCheckOptions);
-        await githubUtils.addBundleSizeReviewer({
-          pull_number: check.pull_request_id,
-          ...githubOptions,
-        });
+        await githubUtils.addBundleSizeReviewer(
+          {
+            pull_number: check.pull_request_id,
+            ...githubOptions,
+          },
+          process.env.SUPER_USER_TEAMS.split(',')
+        );
       }
       return false;
     }
@@ -309,10 +312,6 @@ exports.installApiRouter = (app, db, githubUtils) => {
       app.log,
       check.pull_request_id
     );
-    if (chosenApproverTeams.length) {
-      // eslint-disable-next-line no-unused-vars
-      githubUtils.getRandomReviewer(chosenApproverTeams, check.pull_request_id);
-    }
 
     if (bundleSizeDeltas.length === 0) {
       bundleSizeDeltas.push(
@@ -366,10 +365,13 @@ exports.installApiRouter = (app, db, githubUtils) => {
     await github.checks.update(updatedCheckOptions);
 
     if (requiresApproval) {
-      await githubUtils.addBundleSizeReviewer({
-        pull_number: check.pull_request_id,
-        ...githubOptions,
-      });
+      await githubUtils.addBundleSizeReviewer(
+        {
+          pull_number: check.pull_request_id,
+          ...githubOptions,
+        },
+        chosenApproverTeams
+      );
     }
 
     return true;
