@@ -57,6 +57,10 @@ describe('bundle-size api', () => {
     process.env = {
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
       MAX_ALLOWED_INCREASE: '0.1',
+      FALLBACK_APPROVER_TEAMS:
+        'ampproject/wg-runtime,ampproject/wg-performance',
+      SUPER_USER_TEAMS: 'ampproject/wg-infra',
+      // TODO(#617, danielrozenberg): legacy code.
       APPROVER_TEAMS: '123,234',
       REVIEWER_TEAMS: '123',
     };
