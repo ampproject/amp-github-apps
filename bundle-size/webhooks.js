@@ -99,7 +99,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
     if (approverTeams.length) {
       // TODO(#617, danielrozenberg): use the result of `isBundleSizeApprover`
       // instead of the legacy logic below.
-      const isBundleSizeApprover = githubUtils.isBundleSizeApprover(
+      const isBundleSizeApprover = await githubUtils.isBundleSizeApprover(
         approver,
         approverTeams
       );
