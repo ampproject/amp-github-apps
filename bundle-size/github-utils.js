@@ -165,6 +165,19 @@ class GitHubUtils {
   }
 
   /**
+   * Check whether the user is allowed to approve *all* bundle size change.
+   *
+   * @param {string} username the username to check.
+   * @return {boolean} true if the user is allowed to approve *all* bundle size
+   *   changes.
+   */
+  async isBundleSizeSuperApprover(username) {
+    return (
+      await this.getTeamMembers_(process.env.SUPER_USER_TEAMS.split(','))
+    ).includes(username);
+  }
+
+  /**
    * Check whether the user is allowed to approve a bundle size change.
    *
    * @param {string} username the username to check.
@@ -173,11 +186,7 @@ class GitHubUtils {
    * @return {boolean} true if the user is allowed to approve bundle size changes.
    */
   async isBundleSizeApprover(username, approverTeams) {
-    return (
-      await this.getTeamMembers_(
-        approverTeams.concat(process.env.SUPER_USER_TEAMS.split(','))
-      )
-    ).includes(username);
+    return (await this.getTeamMembers_(approverTeams)).includes(username);
   }
 
   /**
