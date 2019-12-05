@@ -220,21 +220,15 @@ class GitHubUtils {
   /**
    * Choose a random reviewer from list of potential approver teams.
    *
-   * @param {number} pullRequestId the pull request id.
    * @param {!Array<string>} potentialReviewers list of GitHub usernames of all
    *   users who are members of the teams that can approve the bundle-size
    *   change of this pull request.
    * @return {string} the chosen reviewer username.
    */
-  async getRandomReviewer_(pullRequestId, potentialReviewers) {
-    const reviewer =
-      potentialReviewers[Math.floor(Math.random() * potentialReviewers.length)];
-    this.log(
-      `Chose reviewer ${reviewer} from all of ` +
-        `[${potentialReviewers.join(', ')}] for pull request ${pullRequestId}`
-    );
-
-    return reviewer;
+  async getRandomReviewer_(potentialReviewers) {
+    return potentialReviewers[
+      Math.floor(Math.random() * potentialReviewers.length)
+    ];
   }
 
   /**
@@ -267,9 +261,11 @@ class GitHubUtils {
       // None of the potential reviewers are in the PR's requested reviewers
       // list, so add a random reviewer here.
       // eslint-disable-next-line no-unused-vars
-      const newReviewer = await this.getRandomReviewer_(
-        pullRequest.pull_number,
-        potentialReviewers
+      const newReviewer = await this.getRandomReviewer_(potentialReviewers);
+      this.log(
+        `Chose reviewer ${newReviewer} from all of ` +
+          `[${potentialReviewers.join(', ')}] for pull request ` +
+          `${pullRequest.pull_number}`
       );
       // TODO(#617, danielrozenberg): replace the legacy logic below and add the
       // `newReviewer` as to this PR instead.
