@@ -93,19 +93,30 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       return;
     }
 
+    const isSuperApprover = await githubUtils.isSuperApprover(approver);
+    if (
+      (check.delta === null || check.approval_teams === null) &&
+      !isSuperApprover
+    ) {
+      context.log(
+        'Pull requests can only be preemptively approved by members of',
+        process.env.SUPER_USER_TEAMS
+      );
+      return;
+    }
+
     const approverTeams = check.approving_teams
       ? check.approving_teams.split(',')
       : [];
     if (approverTeams.length) {
-      // TODO(#617, danielrozenberg): use the result of `isBundleSizeApprover`
-      // instead of the legacy logic below.
-      const isBundleSizeApprover = await githubUtils.isBundleSizeApprover(
-        approver,
-        approverTeams
-      );
+      // TODO(#617, danielrozenberg): use the result of `isApprover` and
+      // `isSuperApprover` instead of the legacy logic below.
+      const isApprover = (
+        await githubUtils.getTeamMembers(approverTeams)
+      ).includes(approver);
       context.log(
         `Approving user ${approver} of pull request ${pullRequestId}`,
-        isBundleSizeApprover ? 'is' : 'is NOT',
+        isApprover ? 'is' : 'is NOT',
         'a member of',
         approverTeams
       );
@@ -120,20 +131,11 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       `Pull request ${pullRequestId} approved by a bundle-size keeper`
     );
 
-    let approvalMessagePrefix;
-    if (check.delta === null) {
-      context.log(
-        'Pull requests can no longer be preemptively approved for ' +
-          'bundle-size changes'
-      );
+    const bundleSizeDelta = parseFloat(check.delta);
+    if (bundleSizeDelta <= process.env['MAX_ALLOWED_INCREASE']) {
       return;
-    } else {
-      const bundleSizeDelta = parseFloat(check.delta);
-      if (bundleSizeDelta <= process.env['MAX_ALLOWED_INCREASE']) {
-        return;
-      }
-      approvalMessagePrefix = formatBundleSizeDelta(bundleSizeDelta);
     }
+    const approvalMessagePrefix = formatBundleSizeDelta(bundleSizeDelta);
 
     await context.github.checks.update({
       owner: check.owner,

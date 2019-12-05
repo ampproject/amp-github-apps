@@ -165,15 +165,16 @@ class GitHubUtils {
   }
 
   /**
-   * Check whether the user is allowed to approve a bundle size change.
+   * Check whether the user is allowed to approve *all* bundle size changes.
    *
    * @param {string} username the username to check.
-   * @param {!Array<string>} approverTeams list of all the teams whose members
-   *   can approve the bundle-size change of this pull request.
-   * @return {boolean} true if the user is allowed to approve bundle size changes.
+   * @return {boolean} true if the user is allowed to approve *all* bundle size
+   *   changes.
    */
-  async isBundleSizeApprover(username, approverTeams) {
-    return (await this.getTeamMembers_(approverTeams)).includes(username);
+  async isSuperApprover(username) {
+    return (
+      await this.getTeamMembers(process.env.SUPER_USER_TEAMS.split(','))
+    ).includes(username);
   }
 
   /**
@@ -201,13 +202,13 @@ class GitHubUtils {
   }
 
   /**
-   * Get a list of all unique team members by team ids.
+   * Get a list of all unique team members by team names.
    *
    * @param {!Array<string>} teamNames names of full team slug namesto get
    *   members of.
    * @return {!Array<string>} all members of the provided teams.
    */
-  async getTeamMembers_(teamNames) {
+  async getTeamMembers(teamNames) {
     const allTeamMembersPromises = teamNames.map(async teamName => {
       const teamId = await this.getTeamId_(teamName);
       const cacheKey = `${CACHE_TEAM_MEMBERS_KEY}/${teamId}`;
@@ -263,7 +264,7 @@ class GitHubUtils {
       ...reviewsResponse.data.map(review => review.user.login),
     ]);
 
-    const potentialReviewers = await this.getTeamMembers_(approverTeams);
+    const potentialReviewers = await this.getTeamMembers(approverTeams);
     if (!potentialReviewers.some(existingReviewers.has, existingReviewers)) {
       // None of the potential reviewers are in the PR's requested reviewers
       // list, so add a random reviewer here.
