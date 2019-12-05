@@ -173,7 +173,11 @@ class GitHubUtils {
    * @return {boolean} true if the user is allowed to approve bundle size changes.
    */
   async isBundleSizeApprover(username, approverTeams) {
-    return (await this.getTeamMembers_(approverTeams)).includes(username);
+    return (
+      await this.getTeamMembers_(
+        approverTeams.concat(process.env.SUPER_USER_TEAMS.split(','))
+      )
+    ).includes(username);
   }
 
   /**
