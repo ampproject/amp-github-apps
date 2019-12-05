@@ -26,7 +26,6 @@ const {setupDb} = require('../setup-db');
 nock.disableNetConnect();
 nock.enableNetConnect('127.0.0.1');
 jest.mock('../db');
-jest.setTimeout(30000);
 
 describe('bundle-size webhooks', () => {
   let probot;
