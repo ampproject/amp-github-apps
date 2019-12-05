@@ -171,7 +171,7 @@ class GitHubUtils {
    * @return {boolean} true if the user is allowed to approve *all* bundle size
    *   changes.
    */
-  async isBundleSizeSuperApprover(username) {
+  async isSuperApprover(username) {
     return (
       await this.getTeamMembers(process.env.SUPER_USER_TEAMS.split(','))
     ).includes(username);

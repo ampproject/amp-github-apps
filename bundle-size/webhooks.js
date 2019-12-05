@@ -93,12 +93,10 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       return;
     }
 
-    const isBundleSizeSuperApprover = await githubUtils.isBundleSizeSuperApprover(
-      approver
-    );
+    const isSuperApprover = await githubUtils.isSuperApprover(approver);
     if (
       (check.delta === null || check.approval_teams === null) &&
-      !isBundleSizeSuperApprover
+      !isSuperApprover
     ) {
       context.log(
         'Pull requests can only be preemptively approved by members of',
@@ -111,14 +109,14 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       ? check.approving_teams.split(',')
       : [];
     if (approverTeams.length) {
-      // TODO(#617, danielrozenberg): use the result of `isBundleSizeApprover`
-      // and `isBundleSizeSuperApprover` instead of the legacy logic below.
-      const isBundleSizeApprover = (
+      // TODO(#617, danielrozenberg): use the result of `isApprover` and
+      // `isSuperApprover` instead of the legacy logic below.
+      const isApprover = (
         await githubUtils.getTeamMembers(approverTeams)
       ).includes(approver);
       context.log(
         `Approving user ${approver} of pull request ${pullRequestId}`,
-        isBundleSizeApprover ? 'is' : 'is NOT',
+        isApprover ? 'is' : 'is NOT',
         'a member of',
         approverTeams
       );
