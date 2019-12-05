@@ -80,52 +80,74 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
     const pullRequestId = context.payload.pull_request.number;
     const headSha = context.payload.pull_request.head.sha;
 
-    if (
-      context.payload.review.state == 'approved' &&
-      (await githubUtils.isBundleSizeApprover(approver))
-    ) {
-      context.log(
-        `Pull request ${pullRequestId} approved by a bundle-size keeper`
-      );
-
-      const check = await getCheckFromDatabase(db, headSha);
-      if (!check) {
-        context.log(
-          `Check ID for pull request ${pullRequestId} with head ` +
-            `SHA ${headSha} was not found in the database`
-        );
-        return;
-      }
-
-      let approvalMessagePrefix;
-      if (check.delta === null) {
-        context.log(
-          'Pull requests can no longer be preemptively approved for ' +
-            'bundle-size changes'
-        );
-        return;
-      } else {
-        const bundleSizeDelta = parseFloat(check.delta);
-        if (bundleSizeDelta <= process.env['MAX_ALLOWED_INCREASE']) {
-          return;
-        }
-        approvalMessagePrefix = formatBundleSizeDelta(bundleSizeDelta);
-      }
-
-      await context.github.checks.update({
-        owner: check.owner,
-        repo: check.repo,
-        check_run_id: check.check_run_id,
-        conclusion: 'success',
-        completed_at: new Date().toISOString(),
-        output: {
-          title: `${approvalMessagePrefix} | approved by @${approver}`,
-          summary:
-            'The bundle size (brotli compressed size of `v0.js`) ' +
-            `of this pull request was approved by ${approver}`,
-        },
-      });
+    if (context.payload.review.state !== 'approved') {
+      return;
     }
+
+    const check = await getCheckFromDatabase(db, headSha);
+    if (!check) {
+      context.log(
+        `Check ID for pull request ${pullRequestId} with head ` +
+          `SHA ${headSha} was not found in the database`
+      );
+      return;
+    }
+
+    const approverTeams = check.approving_teams
+      ? check.approving_teams.split(',')
+      : [];
+    if (approverTeams.length) {
+      // TODO(#617, danielrozenberg): use the result of `isBundleSizeApprover`
+      // instead of the legacy logic below.
+      const isBundleSizeApprover = githubUtils.isBundleSizeApprover(
+        approver,
+        approverTeams
+      );
+      context.log(
+        `Approving user ${approver} of pull request ${pullRequestId}`,
+        isBundleSizeApprover ? 'is' : 'is NOT',
+        'a member of',
+        approverTeams
+      );
+    }
+
+    // TODO(#617, danielrozenberg): remove the legacy logic below.
+    if (!(await githubUtils.isBundleSizeApproverLegacy(approver))) {
+      return;
+    }
+
+    context.log(
+      `Pull request ${pullRequestId} approved by a bundle-size keeper`
+    );
+
+    let approvalMessagePrefix;
+    if (check.delta === null) {
+      context.log(
+        'Pull requests can no longer be preemptively approved for ' +
+          'bundle-size changes'
+      );
+      return;
+    } else {
+      const bundleSizeDelta = parseFloat(check.delta);
+      if (bundleSizeDelta <= process.env['MAX_ALLOWED_INCREASE']) {
+        return;
+      }
+      approvalMessagePrefix = formatBundleSizeDelta(bundleSizeDelta);
+    }
+
+    await context.github.checks.update({
+      owner: check.owner,
+      repo: check.repo,
+      check_run_id: check.check_run_id,
+      conclusion: 'success',
+      completed_at: new Date().toISOString(),
+      output: {
+        title: `${approvalMessagePrefix} | approved by @${approver}`,
+        summary:
+          'The bundle size (brotli compressed size of `v0.js`) of this pull ' +
+          `request was approved by ${approver}`,
+      },
+    });
   });
 
   app.on('check_run.created', async context => {

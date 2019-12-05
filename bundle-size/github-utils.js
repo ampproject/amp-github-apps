@@ -148,7 +148,7 @@ class GitHubUtils {
    * @param {string} username the username to check.
    * @return {boolean} true if the user is allowed to approve bundle size changes.
    */
-  async isBundleSizeApprover(username) {
+  async isBundleSizeApproverLegacy(username) {
     // TODO(danielrozenberg): replace this logic with Promise.any when it exists.
     for (const teamId of process.env.APPROVER_TEAMS.split(',')) {
       try {
@@ -162,6 +162,18 @@ class GitHubUtils {
       }
     }
     return false;
+  }
+
+  /**
+   * Check whether the user is allowed to approve a bundle size change.
+   *
+   * @param {string} username the username to check.
+   * @param {!Array<string>} approverTeams list of all the teams whose members
+   *   can approve the bundle-size change of this pull request.
+   * @return {boolean} true if the user is allowed to approve bundle size changes.
+   */
+  async isBundleSizeApprover(username, approverTeams) {
+    return (await this.getTeamMembers_(approverTeams)).includes(username);
   }
 
   /**
@@ -237,7 +249,7 @@ class GitHubUtils {
    * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
    *   Request params.
    * @param {!Array<string>} approverTeams list of all the teams whose members
-   * can approve the bundle-size change of this pull request.
+   *   can approve the bundle-size change of this pull request.
    */
   async addBundleSizeReviewer(pullRequest, approverTeams) {
     const requestedReviewersResponse = await this.github.pullRequests.listReviewRequests(
@@ -268,7 +280,7 @@ class GitHubUtils {
 
     // TODO(#617, danielrozenberg): legacy logic
     for (const existingReviewer of existingReviewers) {
-      if (await this.isBundleSizeApprover(existingReviewer)) {
+      if (await this.isBundleSizeApproverLegacy(existingReviewer)) {
         this.log(
           `INFO: Pull request ${pullRequest.pull_number} already has ` +
             'a bundle-size capable reviewer. Skipping...'

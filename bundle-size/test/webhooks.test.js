@@ -54,6 +54,10 @@ describe('bundle-size webhooks', () => {
     process.env = {
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
       MAX_ALLOWED_INCREASE: '0.1',
+      FALLBACK_APPROVER_TEAMS:
+        'ampproject/wg-runtime,ampproject/wg-performance',
+      SUPER_USER_TEAMS: 'ampproject/wg-infra',
+      // TODO(#617, danielrozenberg): legacy code.
       APPROVER_TEAMS: '123,234',
       REVIEWER_TEAMS: '123',
     };
@@ -73,7 +77,11 @@ describe('bundle-size webhooks', () => {
       .get('/teams/123/members')
       .reply(200, getFixture('teams.123.members'))
       .get('/teams/234/members')
-      .reply(200, getFixture('teams.234.members'));
+      .reply(200, getFixture('teams.234.members'))
+      .get(/\/orgs\/ampproject\/teams\/wg-\w+/)
+      .reply(200, getFixture('teams.getByName.wg-runtime'))
+      .get('/teams/3065818/members')
+      .reply(200, getFixture('teams.listMembers.3065818'));
   });
 
   afterEach(async () => {
