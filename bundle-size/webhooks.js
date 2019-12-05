@@ -113,10 +113,9 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
     if (approverTeams.length) {
       // TODO(#617, danielrozenberg): use the result of `isBundleSizeApprover`
       // and `isBundleSizeSuperApprover` instead of the legacy logic below.
-      const isBundleSizeApprover = await githubUtils.isBundleSizeApprover(
-        approver,
-        approverTeams
-      );
+      const isBundleSizeApprover = (
+        await githubUtils.getTeamMembers(approverTeams)
+      ).includes(approver);
       context.log(
         `Approving user ${approver} of pull request ${pullRequestId}`,
         isBundleSizeApprover ? 'is' : 'is NOT',
