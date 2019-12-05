@@ -93,6 +93,25 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       return;
     }
 
+    const approverTeams = check.approving_teams
+      ? check.approving_teams.split(',')
+      : [];
+    if (approverTeams.length) {
+      // TODO(#617, danielrozenberg): use the result of `isBundleSizeApprover`
+      // instead of the legacy logic below.
+      const isBundleSizeApprover = githubUtils.isBundleSizeApprover(
+        approver,
+        approverTeams
+      );
+      context.log(
+        `Approving user ${approver} of pull request ${pullRequestId}`,
+        isBundleSizeApprover ? 'is' : 'is NOT',
+        'a member of',
+        approverTeams
+      );
+    }
+
+    // TODO(#617, danielrozenberg): remove the legacy logic below.
     if (!(await githubUtils.isBundleSizeApproverLegacy(approver))) {
       return;
     }

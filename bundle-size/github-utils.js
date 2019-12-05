@@ -165,6 +165,18 @@ class GitHubUtils {
   }
 
   /**
+   * Check whether the user is allowed to approve a bundle size change.
+   *
+   * @param {string} username the username to check.
+   * @param {!Array<string>} approverTeams list of all the teams whose members
+   *   can approve the bundle-size change of this pull request.
+   * @return {boolean} true if the user is allowed to approve bundle size changes.
+   */
+  async isBundleSizeApprover(username, approverTeams) {
+    return (await this.getTeamMembers_(approverTeams)).includes(username);
+  }
+
+  /**
    * Convert a team slug to a team id.
    *
    * @param {string} teamName the team slug (`organization/team`).
