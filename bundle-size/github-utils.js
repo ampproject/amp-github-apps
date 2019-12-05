@@ -165,7 +165,7 @@ class GitHubUtils {
   }
 
   /**
-   * Check whether the user is allowed to approve *all* bundle size change.
+   * Check whether the user is allowed to approve *all* bundle size changes.
    *
    * @param {string} username the username to check.
    * @return {boolean} true if the user is allowed to approve *all* bundle size
