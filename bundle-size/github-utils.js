@@ -252,12 +252,7 @@ class GitHubUtils {
     ]);
 
     const potentialReviewers = await this.getTeamMembers_(approverTeams);
-    if (
-      potentialReviewers.length &&
-      potentialReviewers.every(
-        potentialReviewer => !existingReviewers.has(potentialReviewer)
-      )
-    ) {
+    if (!potentialReviewers.some(existingReviewers.has, existingReviewers)) {
       // None of the potential reviewers are in the PR's requested reviewers
       // list, so add a random reviewer here.
       // eslint-disable-next-line no-unused-vars
