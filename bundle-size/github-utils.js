@@ -202,7 +202,7 @@ class GitHubUtils {
   }
 
   /**
-   * Get a list of all unique team members by team ids.
+   * Get a list of all unique team members by team names.
    *
    * @param {!Array<string>} teamNames names of full team slug namesto get
    *   members of.
