@@ -249,7 +249,7 @@ class GitHubUtils {
    * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
    *   Request params.
    * @param {!Array<string>} approverTeams list of all the teams whose members
-   * can approve the bundle-size change of this pull request.
+   *   can approve the bundle-size change of this pull request.
    */
   async addBundleSizeReviewer(pullRequest, approverTeams) {
     const requestedReviewersResponse = await this.github.pullRequests.listReviewRequests(
