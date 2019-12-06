@@ -53,13 +53,9 @@ describe('bundle-size webhooks', () => {
 
     process.env = {
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
-      MAX_ALLOWED_INCREASE: '0.1',
       FALLBACK_APPROVER_TEAMS:
         'ampproject/wg-runtime,ampproject/wg-performance',
       SUPER_USER_TEAMS: 'ampproject/wg-infra',
-      // TODO(#617, danielrozenberg): legacy code.
-      APPROVER_TEAMS: '123,234',
-      REVIEWER_TEAMS: '123',
     };
 
     nock('https://api.github.com')
@@ -67,21 +63,18 @@ describe('bundle-size webhooks', () => {
       .reply(200, {token: 'test'});
 
     nock('https://api.github.com')
-      .persist()
-      .get('/teams/123/memberships/aghassemi')
-      .reply(404)
-      .get('/teams/234/memberships/aghassemi')
-      .reply(200)
-      .get(/teams\/\d+\/memberships\/\w+$/)
-      .reply(404)
-      .get('/teams/123/members')
-      .reply(200, getFixture('teams.123.members'))
-      .get('/teams/234/members')
-      .reply(200, getFixture('teams.234.members'))
-      .get(/\/orgs\/ampproject\/teams\/wg-\w+/)
+      .get('/orgs/ampproject/teams/wg-runtime')
       .reply(200, getFixture('teams.getByName.wg-runtime'))
+      .get('/orgs/ampproject/teams/wg-performance')
+      .reply(200, getFixture('teams.getByName.wg-performance'))
+      .get('/orgs/ampproject/teams/wg-infra')
+      .reply(200, getFixture('teams.getByName.wg-infra'))
       .get('/teams/3065818/members')
-      .reply(200, getFixture('teams.listMembers.3065818'));
+      .reply(200, getFixture('teams.listMembers.3065818'))
+      .get('/teams/3188896/members')
+      .reply(200, getFixture('teams.listMembers.3188896'))
+      .get('/teams/3065813/members')
+      .reply(200, getFixture('teams.listMembers.3065813'));
   });
 
   afterEach(async () => {
@@ -121,7 +114,6 @@ describe('bundle-size webhooks', () => {
           pull_request_id: 19621,
           installation_id: 123456,
           check_run_id: 555555,
-          delta: null,
           approving_teams: null,
         },
       ]);
@@ -135,7 +127,6 @@ describe('bundle-size webhooks', () => {
         pull_request_id: 19621,
         installation_id: 123456,
         check_run_id: 444444,
-        delta: null,
         approving_teams: null,
       });
 
@@ -165,7 +156,6 @@ describe('bundle-size webhooks', () => {
           pull_request_id: 19621,
           installation_id: 123456,
           check_run_id: 555555,
-          delta: null,
           approving_teams: null,
         },
       ]);
@@ -253,7 +243,6 @@ describe('bundle-size webhooks', () => {
         pull_request_id: 19603,
         installation_id: 123456,
         check_run_id: 555555,
-        delta: 0.2,
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
       });
 
@@ -262,7 +251,37 @@ describe('bundle-size webhooks', () => {
           expect(body).toMatchObject({
             conclusion: 'success',
             output: {
-              title: 'Δ +0.20KB | approved by @aghassemi',
+              title: 'approved by @choumx',
+            },
+          });
+          return true;
+        })
+        .reply(200);
+
+      await probot.receive({name: 'pull_request_review', payload});
+      nocks.done();
+    });
+
+    test('mark a preemptive approval check as successful when a super user approves the PR', async () => {
+      const payload = getFixture('pull_request_review.submitted');
+      payload.review.user.login = 'rsimha';
+
+      await db('checks').insert({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: null,
+      });
+
+      const nocks = nock('https://api.github.com')
+        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+          expect(body).toMatchObject({
+            conclusion: 'success',
+            output: {
+              title: 'approved by @rsimha',
             },
           });
           return true;
@@ -283,7 +302,6 @@ describe('bundle-size webhooks', () => {
         pull_request_id: 19603,
         installation_id: 123456,
         check_run_id: 555555,
-        delta: null,
         approving_teams: null,
       });
 
@@ -313,8 +331,7 @@ describe('bundle-size webhooks', () => {
         pull_request_id: 19603,
         installation_id: 123456,
         check_run_id: 555555,
-        delta: 0.05,
-        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+        approving_teams: '',
       });
 
       await probot.receive({name: 'pull_request_review', payload});

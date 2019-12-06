@@ -122,49 +122,6 @@ class GitHubUtils {
   }
 
   /**
-   * Get a random reviewer from the approved teams.
-   *
-   * @return {string} a username of someone who can approve a bundle size change.
-   */
-  async getRandomReviewerLegacy() {
-    const reviewerTeamIds = process.env.REVIEWER_TEAMS.split('‚');
-    const reviewerTeamId = parseInt(
-      reviewerTeamIds[Math.floor(Math.random() * reviewerTeamIds.length)],
-      10
-    );
-
-    const members = await this.github.teams
-      .listMembers({
-        team_id: reviewerTeamId,
-      })
-      .then(response => response.data);
-    const member = members[Math.floor(Math.random() * members.length)];
-    return member.login;
-  }
-
-  /**
-   * Check whether the user is allowed to approve a bundle size change.
-   *
-   * @param {string} username the username to check.
-   * @return {boolean} true if the user is allowed to approve bundle size changes.
-   */
-  async isBundleSizeApproverLegacy(username) {
-    // TODO(danielrozenberg): replace this logic with Promise.any when it exists.
-    for (const teamId of process.env.APPROVER_TEAMS.split(',')) {
-      try {
-        await this.github.teams.getMembership({
-          team_id: parseInt(teamId, 10),
-          username,
-        });
-        return true;
-      } catch (error) {
-        // Ignore...
-      }
-    }
-    return false;
-  }
-
-  /**
    * Check whether the user is allowed to approve *all* bundle size changes.
    *
    * @param {string} username the username to check.
@@ -268,43 +225,27 @@ class GitHubUtils {
     if (!potentialReviewers.some(existingReviewers.has, existingReviewers)) {
       // None of the potential reviewers are in the PR's requested reviewers
       // list, so add a random reviewer here.
-      // eslint-disable-next-line no-unused-vars
       const newReviewer = await this.getRandomReviewer_(potentialReviewers);
       this.log(
         `Chose reviewer ${newReviewer} from all of ` +
           `[${potentialReviewers.join(', ')}] for pull request ` +
           `${pullRequest.pull_number}`
       );
-      // TODO(#617, danielrozenberg): replace the legacy logic below and add the
-      // `newReviewer` as to this PR instead.
-    }
-
-    // TODO(#617, danielrozenberg): legacy logic
-    for (const existingReviewer of existingReviewers) {
-      if (await this.isBundleSizeApproverLegacy(existingReviewer)) {
-        this.log(
-          `INFO: Pull request ${pullRequest.pull_number} already has ` +
-            'a bundle-size capable reviewer. Skipping...'
+      try {
+        // Choose a random capable username and add them as a reviewer to the pull
+        // request.
+        return await this.github.pullRequests.createReviewRequest({
+          reviewers: [newReviewer],
+          ...pullRequest,
+        });
+      } catch (error) {
+        this.log.error(
+          'ERROR: Failed to add a reviewer to pull request ' +
+            `${pullRequest.pull_number}. Skipping...`
         );
-        return;
+        this.log.error(`Error message:\n`, error);
+        throw error;
       }
-    }
-
-    try {
-      // Choose a random capable username and add them as a reviewer to the pull
-      // request.
-      const newReviewer = await this.getRandomReviewerLegacy();
-      return await this.github.pullRequests.createReviewRequest({
-        reviewers: [newReviewer],
-        ...pullRequest,
-      });
-    } catch (error) {
-      this.log.error(
-        'ERROR: Failed to add a reviewer to pull request ' +
-          `${pullRequest.pull_number}. Skipping...`
-      );
-      this.log.error(`Error message:\n`, error);
-      throw error;
     }
   }
 }

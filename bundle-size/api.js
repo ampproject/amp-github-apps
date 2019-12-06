@@ -20,13 +20,12 @@ const sleep = require('sleep-promise');
 const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
 
-const HUMAN_ENCOURAGEMENT_MAX_DELTA = -0.03;
-
 /**
  * Returns an explanation on why the check failed when the bundle size is
  * increased.
  *
- * @param {number} baseRuntimeDelta bundle size delta in KB.
+ * @param {!Array<string>} approverTeams all teams that can approve this
+ *   bundle size change.
  * @param {!Array<string>} otherBundleSizeDeltas text description of other
  *   bundle size changes.
  * @param {!Array<string>} missingBundleSizes text description of missing bundle
@@ -34,23 +33,22 @@ const HUMAN_ENCOURAGEMENT_MAX_DELTA = -0.03;
  * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
 function failedCheckOutput(
-  baseRuntimeDelta,
+  approverTeams,
   otherBundleSizeDeltas,
   missingBundleSizes
 ) {
-  const baseRuntimeDeltaFormatted = formatBundleSizeDelta(baseRuntimeDelta);
   return {
-    title: `${baseRuntimeDeltaFormatted} | approval required`,
+    title: `approval required from one of [@${approverTeams.join(', @')}]`,
     summary:
       'This pull request has increased the bundle size (brotli compressed ' +
-      `size of \`v0.js\`) by ${baseRuntimeDeltaFormatted}. As part of an ` +
-      'ongoing effort to reduce the bundle size, this change requires special' +
-      'approval.\n' +
-      'A member of the bundle-size group will be added automatically to ' +
-      'review this PR. Only once the member approves this PR, can it be ' +
-      'merged. If you do not receive a response from the group member, feel ' +
-      `free to tag another person in ${process.env.REVIEWER_TEAM_NAMES}` +
-      extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes),
+      'size) of the following files, and must be approved by a member of one ' +
+      `of the following teams: @${approverTeams.join(', @')}\n` +
+      extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes) +
+      '\n' +
+      'A randomly selected member from one of the above teams will be added ' +
+      'automatically to review this PR. Only once the member approves this ' +
+      'PR, can it be merged. If you do not receive a response feel free to ' +
+      'tag another team member.',
   };
 }
 
@@ -58,36 +56,20 @@ function failedCheckOutput(
  * Returns an encouraging result summary when the bundle size is reduced.
  * Otherwise the summary is neutral, but not discouraging.
  *
- * @param {number} baseRuntimeDelta bundle size delta in KB.
  * @param {!Array<string>} otherBundleSizeDeltas text description of other
  *   bundle size changes.
  * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
  * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
-function successfulCheckOutput(
-  baseRuntimeDelta,
-  otherBundleSizeDeltas,
-  missingBundleSizes
-) {
-  const baseRuntimeDeltaFormatted = formatBundleSizeDelta(baseRuntimeDelta);
-  const title = `${baseRuntimeDeltaFormatted} | no approval necessary`;
-  let summary;
-  if (baseRuntimeDelta <= HUMAN_ENCOURAGEMENT_MAX_DELTA) {
-    summary =
-      'This pull request *reduces* the bundle size (brotli compressed size ' +
-      'of `v0.js`), so no special approval is necessary. The bundle size ' +
-      `change is ${baseRuntimeDeltaFormatted}.`;
-  } else {
-    summary =
-      'This pull request does not change the bundle size (brotli compressed ' +
-      'size of `v0.js`) by any significant amount, so no special approval is ' +
-      `necessary. The bundle size change is ${baseRuntimeDeltaFormatted}.`;
-  }
-
-  summary += extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes);
-
-  return {title, summary};
+function successfulCheckOutput(otherBundleSizeDeltas, missingBundleSizes) {
+  return {
+    title: `no approval necessary`,
+    summary:
+      'This pull request does not change any bundle size (brotli compressed ' +
+      'size) by any significant amount, so no special approval is necessary.' +
+      extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes),
+  };
 }
 
 /**
@@ -98,20 +80,21 @@ function successfulCheckOutput(
  * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
 function erroredCheckOutput(partialBaseSha) {
+  const superUserTeams =
+    '@' + process.env.SUPER_USER_TEAMS.replace(/,/g, ', @');
   return {
     title: `Failed to retrieve the bundle size of branch point ${partialBaseSha}`,
     summary:
-      'The bundle size (brotli compressed size of `v0.js`) of this pull ' +
-      'request could not be determined because the base size (that is, the ' +
-      'bundle size of the `master` commit that this pull request was ' +
-      'compared against) was not found in the ' +
+      'The bundle size (brotli compressed size) of this pull request could ' +
+      'not be determined because the base size (that is, the bundle sizes of ' +
+      'the `master` commit that this pull request was compared against) was ' +
+      'not found in the ' +
       '`https://github.com/ampproject/amphtml-build-artifacts` ' +
       'repository. This can happen due to failed or delayed Travis builds on ' +
       'said `master` commit.\n' +
-      'A member of the bundle-size group will be added automatically to ' +
-      'review this PR. Only once the member approves this PR, can it be ' +
-      'merged. If you do not receive a response from the group member, feel ' +
-      `free to tag another person in ${process.env.REVIEWER_TEAM_NAMES}`,
+      `A member of [${superUserTeams}] will be added automatically to review ` +
+      'this PR. Only once the member approves this PR, can it be merged. If ' +
+      'you do not receive a response feel free to tag another team member.',
   };
 }
 
@@ -127,7 +110,7 @@ function erroredCheckOutput(partialBaseSha) {
 function extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes) {
   return (
     '\n\n' +
-    '## Other bundle sizes\n' +
+    '## Bundle size changes\n' +
     otherBundleSizeDeltas.concat(missingBundleSizes).join('\n')
   );
 }
@@ -305,13 +288,12 @@ exports.installApiRouter = (app, db, githubUtils) => {
       }
     }
 
-    // TODO(#617, danielrozenberg): replace the legacy logic below with logic
-    // that uses the chosen approvers team list.
     const chosenApproverTeams = choosePotentialApproverTeams(
       Array.from(allPotentialApproverTeams).map(JSON.parse),
       app.log,
       check.pull_request_id
     );
+    const requiresApproval = Boolean(chosenApproverTeams.length);
 
     if (bundleSizeDeltas.length === 0) {
       bundleSizeDeltas.push(
@@ -326,28 +308,11 @@ exports.installApiRouter = (app, db, githubUtils) => {
     app.log(`Deltas:\n${bundleSizeDeltas.join('\n')}`);
     app.log(`Missing:\n${missingBundleSizes.join('\n')}`);
 
-    // TODO(#617, danielrozenberg): this is a transitionary solution. This API
-    // endpoint accepts a JSON with multiple bundle sizes, but for now it only
-    // blocks on size changes in dist/v0.js. Everything from here down until the
-    // return statement is legacy code.
-    const baseRuntimeBundleSize = masterBundleSizes['dist/v0.js'];
-    const baseRuntimeBundleSizeDelta =
-      prBundleSizes['dist/v0.js'] - baseRuntimeBundleSize;
-
-    await db('checks')
-      .update({
-        delta: baseRuntimeBundleSizeDelta,
-        approving_teams: chosenApproverTeams.join(','),
-      })
-      .where({head_sha: check.head_sha});
-
-    const requiresApproval =
-      baseRuntimeBundleSizeDelta > process.env['MAX_ALLOWED_INCREASE'];
     if (requiresApproval) {
       Object.assign(updatedCheckOptions, {
         conclusion: 'action_required',
         output: failedCheckOutput(
-          baseRuntimeBundleSizeDelta,
+          chosenApproverTeams,
           bundleSizeDeltas,
           missingBundleSizes
         ),
@@ -355,11 +320,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
     } else {
       Object.assign(updatedCheckOptions, {
         conclusion: 'success',
-        output: successfulCheckOutput(
-          baseRuntimeBundleSizeDelta,
-          bundleSizeDeltas,
-          missingBundleSizes
-        ),
+        output: successfulCheckOutput(bundleSizeDeltas, missingBundleSizes),
       });
     }
     await github.checks.update(updatedCheckOptions);

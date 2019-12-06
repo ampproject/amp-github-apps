@@ -14,7 +14,7 @@
  */
 'use strict';
 
-const {formatBundleSizeDelta, getCheckFromDatabase} = require('./common');
+const {getCheckFromDatabase} = require('./common');
 
 /**
  * Installs GitHub Webhooks on the Probot application.
@@ -94,10 +94,12 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
     }
 
     const isSuperApprover = await githubUtils.isSuperApprover(approver);
-    if (
-      (check.delta === null || check.approval_teams === null) &&
-      !isSuperApprover
-    ) {
+    context.log(
+      `Approving user ${approver} of pull request ${pullRequestId}`,
+      isSuperApprover ? 'is' : 'is NOT',
+      'a super approver'
+    );
+    if (check.approval_teams === null && !isSuperApprover) {
       context.log(
         'Pull requests can only be preemptively approved by members of',
         process.env.SUPER_USER_TEAMS
@@ -108,48 +110,31 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
     const approverTeams = check.approving_teams
       ? check.approving_teams.split(',')
       : [];
-    if (approverTeams.length) {
-      // TODO(#617, danielrozenberg): use the result of `isApprover` and
-      // `isSuperApprover` instead of the legacy logic below.
-      const isApprover = (
-        await githubUtils.getTeamMembers(approverTeams)
-      ).includes(approver);
-      context.log(
-        `Approving user ${approver} of pull request ${pullRequestId}`,
-        isApprover ? 'is' : 'is NOT',
-        'a member of',
-        approverTeams
-      );
-    }
-
-    // TODO(#617, danielrozenberg): remove the legacy logic below.
-    if (!(await githubUtils.isBundleSizeApproverLegacy(approver))) {
-      return;
-    }
-
+    const isApprover =
+      isSuperApprover ||
+      (await githubUtils.getTeamMembers(approverTeams)).includes(approver);
     context.log(
-      `Pull request ${pullRequestId} approved by a bundle-size keeper`
+      `Approving user ${approver} of pull request ${pullRequestId}`,
+      isApprover && !isSuperApprover ? 'is' : 'is NOT',
+      'a member of',
+      approverTeams
     );
 
-    const bundleSizeDelta = parseFloat(check.delta);
-    if (bundleSizeDelta <= process.env['MAX_ALLOWED_INCREASE']) {
-      return;
+    if (isApprover) {
+      await context.github.checks.update({
+        owner: check.owner,
+        repo: check.repo,
+        check_run_id: check.check_run_id,
+        conclusion: 'success',
+        completed_at: new Date().toISOString(),
+        output: {
+          title: `approved by @${approver}`,
+          summary:
+            'The bundle size change(s) of this pull request were approved by ' +
+            `@${approver}`,
+        },
+      });
     }
-    const approvalMessagePrefix = formatBundleSizeDelta(bundleSizeDelta);
-
-    await context.github.checks.update({
-      owner: check.owner,
-      repo: check.repo,
-      check_run_id: check.check_run_id,
-      conclusion: 'success',
-      completed_at: new Date().toISOString(),
-      output: {
-        title: `${approvalMessagePrefix} | approved by @${approver}`,
-        summary:
-          'The bundle size (brotli compressed size of `v0.js`) of this pull ' +
-          `request was approved by ${approver}`,
-      },
-    });
   });
 
   app.on('check_run.created', async context => {
