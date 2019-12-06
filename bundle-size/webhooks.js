@@ -110,17 +110,17 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
     const approverTeams = check.approving_teams
       ? check.approving_teams.split(',')
       : [];
-    const isApprover = (
-      await githubUtils.getTeamMembers(approverTeams)
-    ).includes(approver);
+    const isApprover =
+      isSuperApprover ||
+      (await githubUtils.getTeamMembers(approverTeams)).includes(approver);
     context.log(
       `Approving user ${approver} of pull request ${pullRequestId}`,
-      isApprover ? 'is' : 'is NOT',
+      isApprover && !isSuperApprover ? 'is' : 'is NOT',
       'a member of',
       approverTeams
     );
 
-    if (isApprover || isSuperApprover) {
+    if (isApprover) {
       await context.github.checks.update({
         owner: check.owner,
         repo: check.repo,
