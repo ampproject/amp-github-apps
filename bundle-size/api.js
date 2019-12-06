@@ -80,7 +80,8 @@ function successfulCheckOutput(otherBundleSizeDeltas, missingBundleSizes) {
  * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
 function erroredCheckOutput(partialBaseSha) {
-  const superUserTeams = `@${process.env.SUPER_USER_TEAMS.replace(/,/, ', @')}`;
+  const superUserTeams =
+    '@' + process.env.SUPER_USER_TEAMS.replace(/,/g, ', @');
   return {
     title: `Failed to retrieve the bundle size of branch point ${partialBaseSha}`,
     summary:
