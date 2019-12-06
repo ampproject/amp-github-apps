@@ -390,7 +390,7 @@ describe('bundle-size api', () => {
           .reply(200, () => {
             setTimeout(() => {
               resolve(nocks);
-            }, 0);
+            });
           });
       });
 
@@ -463,7 +463,7 @@ describe('bundle-size api', () => {
           .reply(200, () => {
             setTimeout(() => {
               resolve(nocks);
-            }, 0);
+            });
           });
       });
 
@@ -526,7 +526,7 @@ describe('bundle-size api', () => {
           .reply(200, () => {
             setTimeout(() => {
               resolve(nocks);
-            }, 0);
+            });
           });
       });
 
