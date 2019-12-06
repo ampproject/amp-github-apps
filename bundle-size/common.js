@@ -30,7 +30,6 @@ exports.getCheckFromDatabase = async (db, headSha) => {
       'owner',
       'repo',
       'check_run_id',
-      'delta',
       'approving_teams'
     )
     .where('head_sha', headSha);
