@@ -210,7 +210,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
 
       if (fileNotFound) {
         app.log.warn(
-          `Bundle size of ${partialHeadSha} (PR #${check.pull_request_id}) ` +
+          `Bundle size of ${partialBaseSha} (PR #${check.pull_request_id}) ` +
             'does not exist yet'
         );
       } else {
