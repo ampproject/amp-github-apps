@@ -70,8 +70,8 @@ Follow these setup instructions to start developing for this App locally:
    * None of the other fields are required
 6. After creating the application, generate and download a private key. Also
    take note of the App ID
-7. Create a personal access token belonging to a GitHub _user_ with the
-   `public_repo` and `read:org` permissions and note its access token.
+7. Create a personal access token belonging to a GitHub _user_ with the `repo`
+   and `read:org` permissions and note its access token.
 8. Install the application on a GitHub repository that you want to use for
    testing. You might want to create a new repository for this purpose.
 9. Copy the `.env.example` file to `.env` and modify the fields based on the
