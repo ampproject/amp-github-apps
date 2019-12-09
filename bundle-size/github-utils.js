@@ -222,30 +222,35 @@ class GitHubUtils {
     ]);
 
     const potentialReviewers = await this.getTeamMembers(approverTeams);
-    if (!potentialReviewers.some(existingReviewers.has, existingReviewers)) {
-      // None of the potential reviewers are in the PR's requested reviewers
-      // list, so add a random reviewer here.
-      const newReviewer = await this.getRandomReviewer_(potentialReviewers);
+    if (potentialReviewers.some(existingReviewers.has, existingReviewers)) {
       this.log(
-        `Chose reviewer ${newReviewer} from all of ` +
-          `[${potentialReviewers.join(', ')}] for pull request ` +
-          `${pullRequest.pull_number}`
+        `Reviewers set [${Array.from(existingReviewers).join(', ')}] of pull ` +
+          `request ${pullRequest.pull_number} already contains an approver ` +
+          `from potential approvers set [${potentialReviewers.join(', ')}]`
       );
-      try {
-        // Choose a random capable username and add them as a reviewer to the pull
-        // request.
-        return await this.github.pullRequests.createReviewRequest({
-          reviewers: [newReviewer],
-          ...pullRequest,
-        });
-      } catch (error) {
-        this.log.error(
-          'ERROR: Failed to add a reviewer to pull request ' +
-            `${pullRequest.pull_number}. Skipping...`
-        );
-        this.log.error(`Error message:\n`, error);
-        throw error;
-      }
+      return;
+    }
+
+    const newReviewer = await this.getRandomReviewer_(potentialReviewers);
+    this.log(
+      `Chose reviewer ${newReviewer} from all of ` +
+        `[${potentialReviewers.join(', ')}] for pull request ` +
+        `${pullRequest.pull_number}`
+    );
+    try {
+      // Choose a random capable username and add them as a reviewer to the pull
+      // request.
+      return await this.github.pullRequests.createReviewRequest({
+        reviewers: [newReviewer],
+        ...pullRequest,
+      });
+    } catch (error) {
+      this.log.error(
+        'ERROR: Failed to add a reviewer to pull request ' +
+          `${pullRequest.pull_number}. Skipping...`
+      );
+      this.log.error(`Error message:\n`, error);
+      throw error;
     }
   }
 }
