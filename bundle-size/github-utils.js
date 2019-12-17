@@ -40,7 +40,7 @@ function getBuildArtifactsFileParams_(filename) {
 }
 
 /**
- * Utils for GitHub actions that are performed by the user based token.
+ * Utils for GitHub actions that are performed with a user-authenticated token.
  */
 class GitHubUtils {
   /**
