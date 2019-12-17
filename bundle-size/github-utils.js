@@ -40,7 +40,7 @@ function getBuildArtifactsFileParams_(filename) {
 }
 
 /**
- * Utils for GitHub actions.
+ * Utils for GitHub actions that are performed with a user-authenticated token.
  */
 class GitHubUtils {
   /**
@@ -51,12 +51,7 @@ class GitHubUtils {
   constructor(github, log, cache) {
     this.github = github;
     this.log = log;
-    this.cache =
-      cache ||
-      new NodeCache({
-        'stdTTL': CACHE_APPROVERS_TTL_SECONDS,
-        'checkperiod': CACHE_CHECK_SECONDS,
-      });
+    this.cache = cache || new NodeCache({'checkperiod': CACHE_CHECK_SECONDS});
   }
 
   /**
@@ -202,14 +197,16 @@ class GitHubUtils {
   }
 
   /**
-   * Add an bundle size reviewer to the pull request.
+   * Choose a bundle size reviewer to add to the pull request.
    *
    * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
    *   Request params.
    * @param {!Array<string>} approverTeams list of all the teams whose members
    *   can approve the bundle-size change of this pull request.
+   * @return {?string} a new reviewer to add to the pull request or null if
+   *   there is already a reviewer.
    */
-  async addBundleSizeReviewer(pullRequest, approverTeams) {
+  async chooseReviewer(pullRequest, approverTeams) {
     const requestedReviewersResponse = await this.github.pullRequests.listReviewRequests(
       pullRequest
     );
@@ -228,7 +225,7 @@ class GitHubUtils {
           `request ${pullRequest.pull_number} already contains an approver ` +
           `from potential approvers set [${potentialReviewers.join(', ')}]`
       );
-      return;
+      return null;
     }
 
     const newReviewer = await this.getRandomReviewer_(potentialReviewers);
@@ -237,21 +234,7 @@ class GitHubUtils {
         `[${potentialReviewers.join(', ')}] for pull request ` +
         `${pullRequest.pull_number}`
     );
-    try {
-      // Choose a random capable username and add them as a reviewer to the pull
-      // request.
-      return await this.github.pullRequests.createReviewRequest({
-        reviewers: [newReviewer],
-        ...pullRequest,
-      });
-    } catch (error) {
-      this.log.error(
-        'ERROR: Failed to add a reviewer to pull request ' +
-          `${pullRequest.pull_number}. Skipping...`
-      );
-      this.log.error(`Error message:\n`, error);
-      throw error;
-    }
+    return newReviewer;
   }
 }
 

@@ -172,6 +172,44 @@ function choosePotentialApproverTeams(
  */
 exports.installApiRouter = (app, db, githubUtils) => {
   /**
+   * Add a bundle size reviewer to add to the pull request.
+   *
+   * Does nothing if there is already a reviewer that can approve the bundle
+   * size change.
+   *
+   * @param {!Octokit} github an authenticated GitHub API object.
+   * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
+   *   Request params.
+   * @param {!Array<string>} approverTeams list of all the teams whose members
+   *   can approve the bundle-size change of this pull request.
+   * @return {!Octokit.Response<Octokit.PullsCreateReviewRequestResponse>}
+   *   response from GitHub API.
+   */
+  async function addReviewer_(github, pullRequest, approverTeams) {
+    const newReviewer = await githubUtils.chooseReviewer(
+      pullRequest,
+      approverTeams
+    );
+    if (newReviewer !== null) {
+      try {
+        // Choose a random capable username and add them as a reviewer to the pull
+        // request.
+        return await github.pullRequests.createReviewRequest({
+          reviewers: [newReviewer],
+          ...pullRequest,
+        });
+      } catch (error) {
+        app.log.error(
+          'ERROR: Failed to add a reviewer to pull request ' +
+            `${pullRequest.pull_number}. Skipping...`
+        );
+        app.log.error(`Error message:\n`, error);
+        throw error;
+      }
+    }
+  }
+
+  /**
    * Try to report the bundle size of a pull request to the GitHub check.
    *
    * @param {!object} check GitHub Check database object.
@@ -191,6 +229,10 @@ exports.installApiRouter = (app, db, githubUtils) => {
       check_run_id: check.check_run_id,
       name: 'ampproject/bundle-size',
       completed_at: new Date().toISOString(),
+      ...githubOptions,
+    };
+    const pullRequestOptions = {
+      pull_number: check.pull_request_id,
       ...githubOptions,
     };
 
@@ -232,11 +274,9 @@ exports.installApiRouter = (app, db, githubUtils) => {
           output: erroredCheckOutput(partialBaseSha),
         });
         await github.checks.update(updatedCheckOptions);
-        await githubUtils.addBundleSizeReviewer(
-          {
-            pull_number: check.pull_request_id,
-            ...githubOptions,
-          },
+        await addReviewer_(
+          github,
+          pullRequestOptions,
           process.env.SUPER_USER_TEAMS.split(',')
         );
       }
@@ -326,13 +366,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
     await github.checks.update(updatedCheckOptions);
 
     if (requiresApproval) {
-      await githubUtils.addBundleSizeReviewer(
-        {
-          pull_number: check.pull_request_id,
-          ...githubOptions,
-        },
-        chosenApproverTeams
-      );
+      await addReviewer_(github, pullRequestOptions, chosenApproverTeams);
     }
 
     return true;
