@@ -9,11 +9,17 @@ specifically for the AMP Project.
 
 ## Apps
 
-### [Bundle-size Bot](bundle-size/README.md)
+### [Bundle-Size Bot](bundle-size/README.md)
 
 This GitHub App performs checks on the size of the compiled AMP bundle, and blocks pull requests from being merged without specific approval from the team that maintains the bundle size.
 
 The app runs on an instance of Google AppEngine and is installed exclusively on the [`ampproject/amphtml`](https://github.com/ampproject/amphtml) repository.
+
+### [Bundle-Size Chart App](bundle-size-chart/README.md)
+
+This ExpressJS App generates and displays a chart of the bundle sizes history of compiled AMP files.
+
+The app runs on an instance of Google AppEngine and is deployed at https://amp-bundle-size-chart.appspot.com/.
 
 ### [Owners Bot](owners/README.md)
 
@@ -23,7 +29,7 @@ The app runs on an instance of [Google AppEngine](https://ampproject-owners-bot.
 
 ### [PR Deploy Bot](pr-deploy/README.md)
 
-A GitHub App which deploys a PR branch to a static website when you ask it to. 
+A GitHub App which deploys a PR branch to a static website when you ask it to.
 
 Websites are served by a Google Cloud Storage bucket.
 
