@@ -55,9 +55,12 @@ module.exports = app => {
 
   app.on('pull_request_review.submitted', async context => {
     const approver = context.payload.review.user.login;
+
+    // NOTE: this doesn't use `context.github`!
     const allowedApprovers = await userBasedGithub.teams
     .listMembers({team_id: 1234})
     .then(result => result.data.map(user => user.login));
+
     const isAllowedApprover = allowedApprovers.includes(approver);
     context.log(`Approving user ${approver} is allowed:`, isAllowedApprover);
   });
