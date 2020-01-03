@@ -21,7 +21,7 @@ ACCESS_TOKEN=0123456789abcdef0123456789abcdef01234567
 ```
 
 An experienced GitHub Apps developer would wonder why this is necessary, as GitHub Apps have their own way to
-authenticate themselves with the GitHub API, using the App ID and its private key, which we also use in as environment
+authenticate themselves with the GitHub API, using the App ID and its private key, which we also provide as environment
 variables:
 
 ###### [bundle-size/.env.example](https://github.com/ampproject/amp-github-apps/blob/33969c884f51a5fcfe342202b1935145b64efd1b/bundle-size/.env.example#L1-L11)
