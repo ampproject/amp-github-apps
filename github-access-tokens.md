@@ -40,8 +40,6 @@ calls with the permissions given to the app:
 ###### [bundle-size/webhooks.js](https://github.com/ampproject/amp-github-apps/blob/33969c884f51a5fcfe342202b1935145b64efd1b/bundle-size/webhooks.js#L42)
 
 ```javascript
-      },
-    });
     const check = await context.github.checks.create(params);
 
     const checkRunId = check.data.id;
@@ -51,8 +49,6 @@ Whereas in other contexts we use the `githubUtils` object that we authenticated 
 
 ###### [bundle-size/app.js](https://github.com/ampproject/amp-github-apps/blob/33969c884f51a5fcfe342202b1935145b64efd1b/bundle-size/webhooks.js#L96)
 ```javascript
-    }
-
     const isSuperApprover = await githubUtils.isSuperApprover(approver);
     context.log(
       `Approving user ${approver} of pull request ${pullRequestId}`,
