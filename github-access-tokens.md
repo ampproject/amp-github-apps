@@ -1,4 +1,4 @@
-# Nuance in the GitHub API with Probot
+# Explanation for how we use GitHub access tokens with Probot
 
 Many of the applications in this repository use the [Probot](https://probot.github.io/) framework to power GitHub apps.
 In the source code of some of these apps (e.g., `bundle-size`) you will notice that we define an environment variable
