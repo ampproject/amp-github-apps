@@ -37,10 +37,12 @@ app.get('/_cron', async (request, response) => {
   // This header is set by App Engine when running cron tasks, and is
   // stripped out of external requests.
   if (!request.header('X-Appengine-Cron')) {
+    console.log('Attempted external request to a cron endpoint');
     return response
       .status(403)
       .end('Attempted external request to a cron endpoint');
   } else {
+    console.log('Running cron task in the background');
     response.status(201).end('Running cron task in the background');
   }
 
