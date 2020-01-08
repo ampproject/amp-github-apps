@@ -1,16 +1,20 @@
 steps:
 - name: gcr.io/cloud-builders/npm
+  dir: bundle-size-chart
   args:
     - install
 - name: gcr.io/cloud-builders/npm
+  dir: bundle-size-chart
   args:
     - run
     - deploy
 - name: gcr.io/cloud-builders/npm
+  dir: bundle-size-chart
   args:
     - run
     - deploy-cron
 - name: gcr.io/cloud-builders/gcloud
+  dir: bundle-size-chart
   args:
   - kms
   - decrypt
