@@ -20,7 +20,7 @@ steps:
     - amp-bundle-size-chart-test
     - app
     - deploy
-- name: gcr.io/cloud-builders/npm
+- name: gcr.io/cloud-builders/gcloud
   dir: bundle-size-chart
   args:
     - --project
