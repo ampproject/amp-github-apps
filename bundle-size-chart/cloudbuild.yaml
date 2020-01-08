@@ -1,0 +1,21 @@
+steps:
+- name: gcr.io/cloud-builders/npm
+  args:
+    - install
+- name: gcr.io/cloud-builders/npm
+  args:
+    - run
+    - deploy
+- name: gcr.io/cloud-builders/npm
+  args:
+    - run
+    - deploy-cron
+- name: gcr.io/cloud-builders/gcloud
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=.env.enc
+  - --plaintext-file=.env
+  - --location=global
+  - --keyring=amp-bundle-size-chart-test-keyring
+  - --key=amp-bundle-size-chart-test-deploy-key
