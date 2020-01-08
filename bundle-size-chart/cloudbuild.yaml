@@ -3,16 +3,6 @@ steps:
   dir: bundle-size-chart
   args:
     - install
-- name: gcr.io/cloud-builders/npm
-  dir: bundle-size-chart
-  args:
-    - run
-    - deploy
-- name: gcr.io/cloud-builders/npm
-  dir: bundle-size-chart
-  args:
-    - run
-    - deploy-cron
 - name: gcr.io/cloud-builders/gcloud
   dir: bundle-size-chart
   args:
@@ -23,3 +13,17 @@ steps:
   - --location=global
   - --keyring=amp-bundle-size-chart-test-keyring
   - --key=amp-bundle-size-chart-test-deploy-key
+- name: gcr.io/cloud-builders/gcloud
+  dir: bundle-size-chart
+  args:
+    - --project
+    - amp-bundle-size-chart-test
+    - app
+    - deploy
+- name: gcr.io/cloud-builders/npm
+  dir: bundle-size-chart
+  args:
+    - --project
+    - amp-bundle-size-chart-test
+    - app
+    - deploy-cron
