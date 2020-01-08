@@ -23,7 +23,7 @@ import {Storage} from '@google-cloud/storage';
 
 const CRON_TIMEOUT_MS = 600000; // 10 minutes, the GAE cron timeout limit.
 const MAX_COMMIT_DAYS = 365;
-const GCLOUD_STORAGE_BUCKET = 'amp-bundle-size-chart';
+const GCLOUD_STORAGE_BUCKET = 'amp-bundle-size-chart-autodeploy-test-storage';
 
 dotenv.config();
 

@@ -1,7 +1,7 @@
 // Before this date only dist/v0.js was collected.
 const MIN_DATE = new Date('2019-10-23T18:00:00Z');
 const CSV_FILE_NAME =
-  'https://storage.googleapis.com/amp-bundle-size-chart/bundle-sizes.csv';
+  'https://storage.googleapis.com/amp-bundle-size-chart-autodeploy-test-storage/bundle-sizes.csv';
 const IGNORE_FILES = new Set(['dist/v0/amp-viz-vega-0.1.js']);
 
 const margin = {top: 30, right: 50, bottom: 30, left: 50};
