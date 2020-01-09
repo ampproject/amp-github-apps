@@ -1,0 +1,33 @@
+# Note that this file is named `cloud_build.yaml` instead of the canonical
+# `cloudbuild.yaml`. This is due to an issue where App Engine ignores the
+# presence of `app.yaml` when a file exists with the name matching
+# `cloudbuild.yaml`. Using this alternate name provides a workaround.
+steps:
+- name: gcr.io/cloud-builders/npm
+  dir: bundle-size-chart
+  args:
+    - install
+- name: gcr.io/cloud-builders/gcloud
+  dir: bundle-size-chart
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=.env.enc
+  - --plaintext-file=.env
+  - --location=global
+  - --keyring=amp-github-apps-keyring
+  - --key=bundle-size-chart-env-key
+- name: gcr.io/cloud-builders/gcloud
+  dir: bundle-size-chart
+  args:
+    - --project
+    - amp-bundle-size-chart-test
+    - app
+    - deploy
+- name: gcr.io/cloud-builders/gcloud
+  dir: bundle-size-chart
+  args:
+    - --project
+    - amp-bundle-size-chart-test
+    - app
+    - deploy-cron
