@@ -18,7 +18,8 @@
     "deploy": "gcloud --project amp-bundle-size-chart app deploy",
     "deploy-cron": "gcloud --project amp-bundle-size-chart app deploy cron.yaml",
     "prestart": "tsc",
-    "start": "node dist/app.js"
+    "start": "node dist/app.js",
+    "encrypt-env": "../encrypt-env.sh bundle-size-chart"
   },
   "dependencies": {
     "@google-cloud/storage": "4.1.3",
