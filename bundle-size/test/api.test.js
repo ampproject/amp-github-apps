@@ -33,10 +33,10 @@ describe('bundle-size api', () => {
   let probot;
   let app;
   const db = dbConnect();
-  const nodeCache = new NodeCache();
+  let nodeCache;
   let logWarnSpy;
 
-  beforeAll(async () => {
+  beforeAll(async done => {
     await setupDb(db);
 
     probot = new Probot({});
@@ -45,16 +45,17 @@ describe('bundle-size api', () => {
       installApiRouter(app, db, githubUtils);
     });
     // Stub app.log.warn to silence test log noise
-    let logWarnSpy = jest.spyOn(app.log, 'warn').mockImplementation();
+    logWarnSpy = jest.spyOn(app.log, 'warn').mockImplementation();
 
     // Return a test token.
     app.app = {
       getInstallationAccessToken: () => Promise.resolve('test'),
     };
+    done();
   });
 
-  beforeEach(async () => {
-    nodeCache.flushAll();
+  beforeEach(() => {
+    nodeCache = new NodeCache();
 
     process.env = {
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
@@ -86,14 +87,17 @@ describe('bundle-size api', () => {
       .reply(200, getFixture('teams.listMembers.3065813'));
   });
 
-  afterEach(async () => {
+  afterEach(async done => {
+    nodeCache.close();
     nock.cleanAll();
     await db('checks').truncate();
+    done();
   });
 
-  afterAll(async () => {
+  afterAll(async done => {
     logWarnSpy.mockRestore();
     await db.destroy();
+    done();
   });
 
   describe('/commit/:headSha/skip', () => {
