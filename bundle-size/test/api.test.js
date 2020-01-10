@@ -656,6 +656,9 @@ describe('bundle-size api', () => {
     });
 
     test('show error when failed to store bundle-size', async () => {
+      // Silence app.log.error messages during testing.
+      const logErrorSpy = jest.spyOn(app.log, 'error').mockImplementation();
+
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
@@ -680,6 +683,8 @@ describe('bundle-size api', () => {
         .set('Accept', 'application/json')
         .expect(500, /I am a tea pot/);
       nocks.done();
+
+      logErrorSpy.mockRestore();
     });
 
     test('fail on non-numeric values when called to store bundle-size', async () => {
