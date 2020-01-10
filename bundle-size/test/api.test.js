@@ -664,7 +664,6 @@ describe('bundle-size api', () => {
     });
 
     test('show error when failed to store bundle-size', async () => {
-
       const nocks = nock('https://api.github.com')
         .get(
           '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
