@@ -34,6 +34,7 @@ describe('bundle-size api', () => {
   let app;
   const db = dbConnect();
   const nodeCache = new NodeCache();
+  let logWarnSpy;
 
   beforeAll(async () => {
     await setupDb(db);
@@ -43,6 +44,8 @@ describe('bundle-size api', () => {
       const githubUtils = new GitHubUtils(new Octokit(), app.log, nodeCache);
       installApiRouter(app, db, githubUtils);
     });
+    // Stub app.log.warn to silence test log noise
+    let logWarnSpy = jest.spyOn(app.log, 'warn').mockImplementation();
 
     // Return a test token.
     app.app = {
@@ -89,6 +92,7 @@ describe('bundle-size api', () => {
   });
 
   afterAll(async () => {
+    logWarnSpy.mockRestore();
     await db.destroy();
   });
 
