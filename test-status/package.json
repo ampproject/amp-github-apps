@@ -17,7 +17,7 @@
     "deploy": "gcloud --project amp-test-status-bot app deploy",
     "setup-db": "node ./setup-db.js",
     "start": "probot run ./app.js",
-    "test": "jest"
+    "test": "LOG_LEVEL=warn jest"
   },
   "dependencies": {
     "body-parser": "1.19.0",
