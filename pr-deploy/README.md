@@ -1,10 +1,10 @@
 AMP PR Deploy Bot
 ===================
 
-A GitHub App which deploys a PR branch to a static website when you ask it to. 
+A GitHub App that deploys a PR branch to a static website when you ask it to. 
 
 Websites are served by a Google Cloud Storage bucket. <br>
-The app is hosted by [Google App Engine](https://amp-pr-deploy-bot.appspot.com) and is installed exclusively on the [ampproject/amphtml](https://github.com/ampproject/amphtml) repository.
+This app runs on an instance of Google AppEngine and is installed exclusively on [ampproject/amphtml](https://github.com/ampproject/amphtml).
 
 How the app works
 ----------------
@@ -53,3 +53,10 @@ Local development
 
 If there are no errors after running the last command then the app is running
 locally on your machine.
+
+
+Deployment
+----------
+
+This GitHub App is deployed on an AppEngine instance:
+https://amp-pr-deploy-bot.appspot.com

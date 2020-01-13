@@ -1,10 +1,10 @@
 AMP Owners Bot
 ==============
 
-A web service that suggests approvers for a GitHub pull request based on OWNERS
+A GitHub App that suggests approvers for a GitHub pull request based on OWNERS
 files and enforces reviews by OWNERS as a GitHub status check.
 
-The app is hosted by [Google App Engine](https://amp-pr-deploy-bot.appspot.com) and is installed exclusively on the `[ampproject/amphtml](https://github.com/ampproject/amphtml)` repository. It can be trivially deployed to other organizations and repositories.
+This app runs on an instance of Google AppEngine and is currently installed on [ampproject/amphtml](https://github.com/ampproject/amphtml). It can be deployed to other organizations and repositories.
 
 Status/Info Pages
 -----------------
@@ -115,6 +115,8 @@ After setting up the app locally, use `gcloud` to deploy the app and cron tasks:
 3. `gcloud app deploy cron.yaml`
 
 
+Deployment
+----------
 
 This GitHub App is deployed on an AppEngine instance:
 https://ampproject-owners-bot.appspot.com/

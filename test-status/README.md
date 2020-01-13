@@ -1,11 +1,11 @@
 AMP Test Status Bot
 ===================
 
-This GitHub App reports the status of different test types on the AMPHTML
+A GitHub App that reports the status of different test types on the AMPHTML
 repository, and allows the build cop to skip flaky tests.
 
-The app runs on an instance of Google AppEngine and is installed exclusively for
-the ampproject/amphtml repository.
+This app runs on an instance of Google AppEngine and is installed exclusively on [ampproject/amphtml](https://github.com/ampproject/amphtml).
+
 
 
 Interfaces

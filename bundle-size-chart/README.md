@@ -1,12 +1,12 @@
 AMP Bundle-Size Chart
 =====================
 
-This ExpressJS App generates and displays a chart of the bundle sizes history of
+An ExpressJS App that generates and displays a chart of the bundle sizes history of
 compiled AMP files. It is deployed at https://amp-bundle-size-chart.appspot.com/
 
 Unlike the other apps in this repository, this one was cobbled together quickly.
 If you would like to improve the code or documentation, please send us a pull
-requests!
+request!
 
 Deployment
 ----------
