@@ -1,12 +1,11 @@
 AMP Bundle-Size Bot
 ===================
 
-This GitHub App performs checks on the size of the compiled AMP bundle, and
+A GitHub App that performs checks on the size of the compiled AMP bundle, and
 blocks pull requests from being merged without specific approval from the team
 that maintains the bundle size.
 
-The app runs on an instance of Google AppEngine and is installed exclusively for
-the ampproject/amphtml repository.
+This app runs on an instance of Google AppEngine and is installed exclusively on [ampproject/amphtml](https://github.com/ampproject/amphtml).
 
 
 Webhooks and API

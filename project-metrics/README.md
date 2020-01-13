@@ -1,7 +1,7 @@
 AMP Project Metrics
 ===================
 
-This GitHub App reports metrics for the repository and scores each metric on a
+A GitHub App that reports metrics for the repository and scores each metric on a
 common scale.
 
 
