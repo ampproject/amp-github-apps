@@ -33,7 +33,8 @@ describe('bundle-size api', () => {
   let probot;
   let app;
   const db = dbConnect();
-  const nodeCache = new NodeCache();
+  let nodeCache;
+  let logWarnSpy;
 
   beforeAll(async () => {
     await setupDb(db);
@@ -43,6 +44,8 @@ describe('bundle-size api', () => {
       const githubUtils = new GitHubUtils(new Octokit(), app.log, nodeCache);
       installApiRouter(app, db, githubUtils);
     });
+    // Stub app.log.warn to silence test log noise
+    logWarnSpy = jest.spyOn(app.log, 'warn').mockImplementation();
 
     // Return a test token.
     app.app = {
@@ -50,8 +53,8 @@ describe('bundle-size api', () => {
     };
   });
 
-  beforeEach(async () => {
-    nodeCache.flushAll();
+  beforeEach(() => {
+    nodeCache = new NodeCache();
 
     process.env = {
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
@@ -84,12 +87,15 @@ describe('bundle-size api', () => {
   });
 
   afterEach(async () => {
+    nodeCache.close();
     nock.cleanAll();
     await db('checks').truncate();
   });
 
-  afterAll(async () => {
+  afterAll(async done => {
+    logWarnSpy.mockRestore();
     await db.destroy();
+    done();
   });
 
   describe('/commit/:headSha/skip', () => {
@@ -673,6 +679,9 @@ describe('bundle-size api', () => {
         )
         .reply(418, 'I am a tea pot');
 
+      // Stub app.log.error to silence test log noise for expected errors
+      const logErrorSpy = jest.spyOn(app.log, 'error').mockImplementation();
+
       await request(probot.server)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
@@ -680,6 +689,13 @@ describe('bundle-size api', () => {
         .set('Accept', 'application/json')
         .expect(500, /I am a tea pot/);
       nocks.done();
+
+      expect(logErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Failed to create the bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json file'
+        ),
+        expect.any(Error)
+      );
     });
 
     test('fail on non-numeric values when called to store bundle-size', async () => {

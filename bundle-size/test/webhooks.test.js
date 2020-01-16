@@ -221,6 +221,11 @@ describe('bundle-size webhooks', () => {
         name: 'pull_request',
         payload: pullRequestPayload,
       });
+
+      // Silence expected error messages during testing.
+      const logLevel = probot.logger.level();
+      probot.logger.level('fatal');
+
       try {
         await probot.receive({
           name: 'pull_request',
@@ -229,6 +234,8 @@ describe('bundle-size webhooks', () => {
       } catch (e) {
         expect(e.message).toContain('UNIQUE constraint failed');
       }
+
+      probot.logger.level(logLevel);
     });
   });
 

@@ -12,7 +12,7 @@
     "init": "node scripts/warm_cache.js",
     "dev": "node info_server.js",
     "start": "probot run ./index.js",
-    "test": "LOG_LEVEL=warn jest",
+    "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
   "license": "Apache-2.0",

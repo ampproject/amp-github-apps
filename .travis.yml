@@ -7,3 +7,5 @@ branches:
   only:
     - master
 cache: npm
+env:
+  - LOG_LEVEL=warn

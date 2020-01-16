@@ -27,6 +27,5 @@ exports.dbConfig = {
     user: 'postgres',
     password: 'HelloWorld!',
     database: 'postgres',
-
   },
-}
+};
