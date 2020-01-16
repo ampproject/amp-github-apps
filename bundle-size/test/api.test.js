@@ -679,9 +679,8 @@ describe('bundle-size api', () => {
         )
         .reply(418, 'I am a tea pot');
 
-      // Silence expected error messages during testing.
-      const logLevel = probot.logger.level();
-      probot.logger.level('fatal');
+      // Stub app.log.error to silence test log noise for expected errors
+      const logErrorSpy = jest.spyOn(app.log, 'error').mockImplementation();
 
       await request(probot.server)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
@@ -691,7 +690,10 @@ describe('bundle-size api', () => {
         .expect(500, /I am a tea pot/);
       nocks.done();
 
-      probot.logger.level(logLevel);
+      expect(logErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to create the bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json file'),
+        expect.any(Error),
+      );
     });
 
     test('fail on non-numeric values when called to store bundle-size', async () => {
