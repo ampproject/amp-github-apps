@@ -36,7 +36,7 @@ describe('bundle-size api', () => {
   let nodeCache;
   let logWarnSpy;
 
-  beforeAll(async done => {
+  beforeAll(async () => {
     await setupDb(db);
 
     probot = new Probot({});
@@ -51,7 +51,6 @@ describe('bundle-size api', () => {
     app.app = {
       getInstallationAccessToken: () => Promise.resolve('test'),
     };
-    done();
   });
 
   beforeEach(() => {
@@ -87,11 +86,10 @@ describe('bundle-size api', () => {
       .reply(200, getFixture('teams.listMembers.3065813'));
   });
 
-  afterEach(async done => {
+  afterEach(async () => {
     nodeCache.close();
     nock.cleanAll();
     await db('checks').truncate();
-    done();
   });
 
   afterAll(async done => {
