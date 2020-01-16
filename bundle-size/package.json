@@ -17,7 +17,7 @@
     "deploy": "gcloud --project amp-bundle-size-bot app deploy",
     "setup-db": "node ./setup-db.js",
     "start": "probot run ./app.js",
-    "test": "LOG_LEVEL=warn jest"
+    "test": "jest"
   },
   "dependencies": {
     "@octokit/rest": "16.35.2",
