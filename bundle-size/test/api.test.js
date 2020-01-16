@@ -691,8 +691,10 @@ describe('bundle-size api', () => {
       nocks.done();
 
       expect(logErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to create the bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json file'),
-        expect.any(Error),
+        expect.stringContaining(
+          'Failed to create the bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json file'
+        ),
+        expect.any(Error)
       );
     });
 
