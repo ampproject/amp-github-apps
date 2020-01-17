@@ -367,7 +367,7 @@ describe('bundle-size api', () => {
         pull_request_id: 19603,
         installation_id: 123456,
         check_run_id: 555555,
-        approving_teams: null,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
       });
     });
 
@@ -432,7 +432,7 @@ describe('bundle-size api', () => {
         pull_request_id: 19603,
         installation_id: 123456,
         check_run_id: 555555,
-        approving_teams: null,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
       });
     });
 
@@ -591,7 +591,7 @@ describe('bundle-size api', () => {
         pull_request_id: 19603,
         installation_id: 123456,
         check_run_id: 555555,
-        approving_teams: null,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
       });
     });
 
