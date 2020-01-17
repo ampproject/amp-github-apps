@@ -126,6 +126,22 @@ describe('bundle-size api', () => {
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
         .expect(200);
       nocks.done();
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: null,
+      });
     });
 
     test('ignore marking a check "skipped" for a missing head SHA', async () => {
@@ -196,6 +212,22 @@ describe('bundle-size api', () => {
           .set('Accept', 'application/json')
           .expect(200);
         nocks.done();
+
+        await expect(
+          db('checks')
+            .where({
+              head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+            })
+            .first()
+        ).resolves.toMatchObject({
+          head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          owner: 'ampproject',
+          repo: 'amphtml',
+          pull_request_id: 19603,
+          installation_id: 123456,
+          check_run_id: 555555,
+          approving_teams: null,
+        });
       }
     );
 
@@ -244,6 +276,22 @@ describe('bundle-size api', () => {
         .set('Accept', 'application/json')
         .expect(200);
       nocks.done();
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: null,
+      });
     });
 
     test('update a check on bundle-size report with no approvers (report/base = 12.34KB/12.00KB)', async () => {
@@ -305,6 +353,22 @@ describe('bundle-size api', () => {
         .set('Accept', 'application/json')
         .expect(200);
       nocks.done();
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+      });
     });
 
     test('update a check on bundle-size report with an existing approver (report/base = 12.34KB/12.00KB)', async () => {
@@ -354,6 +418,22 @@ describe('bundle-size api', () => {
         .set('Accept', 'application/json')
         .expect(200);
       nocks.done();
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+      });
     });
 
     test('update check on bundle-size report (report/_delayed_-base = 12.34KB/12.34KB)', async () => {
@@ -408,6 +488,22 @@ describe('bundle-size api', () => {
         .expect(202);
       const nocks = await lastNetworkRequest;
       nocks.done();
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: null,
+      });
     });
 
     test('update check on bundle-size report (report/_delayed_-base = 12.34KB/12.23KB)', async () => {
@@ -481,6 +577,22 @@ describe('bundle-size api', () => {
         .expect(202);
       const nocks = await lastNetworkRequest;
       nocks.done();
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+      });
     });
 
     test('update check on bundle-size report on missing base size', async () => {
@@ -544,6 +656,22 @@ describe('bundle-size api', () => {
         .expect(202);
       const nocks = await lastNetworkRequest;
       nocks.done();
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: null,
+      });
     });
 
     test('ignore bundle-size report for a missing head SHA', async () => {

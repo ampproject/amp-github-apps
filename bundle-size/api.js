@@ -349,6 +349,9 @@ exports.installApiRouter = (app, db, githubUtils) => {
     app.log(`Missing:\n${missingBundleSizes.join('\n')}`);
 
     if (requiresApproval) {
+      await db('checks')
+        .update({approving_teams: chosenApproverTeams.join(',')})
+        .where({head_sha: check.head_sha});
       Object.assign(updatedCheckOptions, {
         conclusion: 'action_required',
         output: failedCheckOutput(
