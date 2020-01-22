@@ -24,6 +24,6 @@ steps:
     - app
     - deploy-cron
 secrets:
-- kmsKeyName: projects/amp-bundle-size-chart-test/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+- kmsKeyName: projects/amp-bundle-size-chart-test/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/bundle-size-chart-env-key
   secretEnv:
     ACCESS_TOKEN: CiQA6qDuJ91Gu9MITgfX8zM550B+vNs6C5ojH810iTGwcWM9WpESUQB5Peyj8A/2maF7D7S65aP2Yp21IbQxVT3ouze/myjEUNSj52gSCq0xsvWaZcxXQKR+dbZw3IDsb7mWT9Asf889Mcx/MvOUyU2YbB3xP2UWtA==
