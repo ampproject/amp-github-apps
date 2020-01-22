@@ -24,12 +24,18 @@ const CLOUD_BUILD_FILE = 'cloud_build.yaml';
 
 function identifySecrets(appDir) {
   const yamlFile = path.join(appDir, CLOUD_BUILD_FILE);
-  const yamlContents = fs.readFileSync(yamlFile).toString('utf8');
-  const config = YAML.parse(yamlContents);
-  const secrets = Object.keys(config.secrets[0].secretEnv)
-  
-  console.log(`Identified the following secret env keys: ${secrets}`)
-  return secrets;
+  try {
+    const yamlContents = fs.readFileSync(yamlFile).toString('utf8');
+    const config = YAML.parse(yamlContents);
+    const secrets = Object.keys(config.secrets[0].secretEnv)
+    console.log(`Identified the following secret env keys: ${secrets}`)
+    return secrets;
+  } catch (e) {
+    // Handle the case where parsing secrets from the cloud build file fails.
+    console.warn('No secret keys were found in cloud_build.yaml.');
+  }
+
+  return [];
 }
 
 function replaceSecrets(appDir) {
@@ -37,7 +43,7 @@ function replaceSecrets(appDir) {
   const envFileContents = fs.readFileSync(envFile).toString('utf8');
 
   const replacedContents = envFileContents.split('\n').map(line => {
-    for (const secret of identifySecrets(appDir)) {
+    for (const secret of secrets) {
       if (line.startsWith(`${secret}=`)) {
         const secretVal = process.env[secret]
         console.log(
@@ -54,8 +60,7 @@ function replaceSecrets(appDir) {
 }
 
 if (require.main === module) {
-  const appDir = process.argv[2];
-  replaceSecrets(path.resolve(appDir));
+  replaceSecrets(path.resolve(process.argv[2]));
 }
 
-module.exports = replaceSecrets;
+module.exports = {identifySecrets, replaceSecrets};

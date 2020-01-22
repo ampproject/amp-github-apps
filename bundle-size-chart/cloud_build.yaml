@@ -1,13 +1,9 @@
 steps:
-  # Required to identify and inject un-redacted secrets.
+  # The first two steps are required to identify and inject un-redacted secrets.
 - name: gcr.io/cloud-builders/npm
   args:
     - install
     - yaml
-- name: gcr.io/cloud-builders/npm
-  dir: bundle-size-chart
-  args:
-    - install
 - name: gcr.io/cloud-builders/npm
   args:
     - run
@@ -15,6 +11,14 @@ steps:
     - --
     - bundle-size-chart
   secretEnv: ['ACCESS_TOKEN']
+
+  # Install app dependencies
+- name: gcr.io/cloud-builders/npm
+  dir: bundle-size-chart
+  args:
+    - install
+
+  # Deploy the app and its cron tasks
 - name: gcr.io/cloud-builders/gcloud
   dir: bundle-size-chart
   args:
@@ -28,7 +32,11 @@ steps:
     - --project
     - amp-bundle-size-chart-test
     - app
-    - deploy-cron
+    - deploy
+    - cron.yaml
+
+# These secrets are the base64-encoded form of encrypted secret values. They are
+# automatically decrypted and added to the `.env` environment at build time.
 secrets:
 - kmsKeyName: projects/amp-bundle-size-chart-test/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/bundle-size-chart-env-key
   secretEnv:
