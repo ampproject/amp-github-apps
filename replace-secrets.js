@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+/**
+ * @fileoverview Replaces redacted secret environment variables in an app
+ * directory's `redacted.env` and outputs `.env` with the decrypted values of
+ * the secrets.
+ */
+
 const fs = require('fs');
 const path = require('path');
 const YAML = require('yaml');
@@ -22,6 +28,12 @@ const OUTPUT_ENV_FILE = '.env';
 const REDACTED_ENV_FILE = 'redacted.env';
 const CLOUD_BUILD_FILE = 'cloud_build.yaml';
 
+/**
+ * Reads the Cloud Build config file to identify secrets in the environment.
+ *
+ * @param {string} appDir path to app directory.
+ * @return {Array<string>} list of environment variable names.
+ */
 function identifySecrets(appDir) {
   const yamlFile = path.join(appDir, CLOUD_BUILD_FILE);
   try {
@@ -38,6 +50,11 @@ function identifySecrets(appDir) {
   return [];
 }
 
+/**
+ * Reads the redacted env file and creates a `.env` file including secrets.
+ *
+ * @param {string} appDir path to app directory.
+ */
 function replaceSecrets(appDir) {
   const envFile = path.join(appDir, REDACTED_ENV_FILE);
   const envFileContents = fs.readFileSync(envFile).toString('utf8');
