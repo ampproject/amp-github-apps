@@ -77,7 +77,17 @@ function replaceSecrets(appDir) {
 }
 
 if (require.main === module) {
-  replaceSecrets(path.resolve(process.argv[2]));
+  const appName = process.argv[2];
+  if (!appName) {
+    throw new Error('Must specify app argument to replace-secrets');
+  }
+  const appDir = path.resolve(appName);
+
+  if (!fs.existsSync(appDir)) {
+    throw new Error(`Invalid app "${appName}"; directory does not exist`);
+  }
+
+  replaceSecrets();
 }
 
 module.exports = {identifySecrets, replaceSecrets};
