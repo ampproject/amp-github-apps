@@ -11,13 +11,13 @@
 
 3. Create the [Cloud KMS keyring](https://cloud.google.com/cloud-build/docs/securing-builds/use-encrypted-secrets-credentials#example_build_request_using_an_encrypted_variable)
     - `gcloud kms keyrings create amp-github-apps-keyring --location=global`
-    > Note: Because sharing a keyring across projects is complex, we use the same keyring name (`amp-github-apps-keyring`) for each project keyring; this uniformity makes it simpler to use shared encrypt/decrypt scripts. We will likewise use the standard `app-env-key` as the key name.
+    > Note: Because sharing a keyring across projects is complex, we use the same keyring name (`amp-github-apps-keyring`) for each project keyring; this uniformity make s it simpler to use shared encrypt/decrypt scripts. We will likewise use the standard `app-env-key` as the key name.
 
 4. Provide team access to the keyring
       ```
       gcloud kms keyrings add-iam-policy-binding amp-github-apps-keyring \
         --location=global \
-        --member amp-core-infra@google.com \
+        --member group:amp-core-infra@google.com \
         --role roles/cloudkms.cryptoKeyDecrypter
       ```
       > This will allow all members of the group to encrypt and decrypt secrets using this keyring.
