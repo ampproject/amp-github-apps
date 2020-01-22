@@ -7,7 +7,7 @@ steps:
   dir: bundle-size-chart
   args:
     - run
-    - replace_secrets
+    - replace-secrets
     - --
     - ACCESS_TOKEN
   secretEnv: ['ACCESS_TOKEN']
