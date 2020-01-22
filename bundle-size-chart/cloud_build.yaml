@@ -1,7 +1,6 @@
 steps:
   # Required to identify and inject un-redacted secrets.
 - name: gcr.io/cloud-builders/npm
-  dir: bundle-size-chart
   args:
     - install
     - yaml
