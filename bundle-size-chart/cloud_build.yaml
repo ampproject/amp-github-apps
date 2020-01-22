@@ -4,12 +4,11 @@ steps:
   args:
     - install
 - name: gcr.io/cloud-builders/npm
-  dir: bundle-size-chart
   args:
     - run
     - replace-secrets
     - --
-    - ACCESS_TOKEN
+    - bundle-size-chart
   secretEnv: ['ACCESS_TOKEN']
 - name: gcr.io/cloud-builders/gcloud
   dir: bundle-size-chart

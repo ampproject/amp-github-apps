@@ -15,7 +15,8 @@
   "scripts": {
     "start": "node build-system/pr-check.js",
     "lint": "eslint .",
-    "fix": "eslint . --fix"
+    "fix": "eslint . --fix",
+    "replace-secrets": "node replace_secrets.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "2.12.0",
@@ -28,6 +29,7 @@
     "eslint-plugin-prettier": "3.1.2",
     "fancy-log": "1.3.3",
     "prettier": "1.19.1",
-    "typescript": "3.7.3"
+    "typescript": "3.7.3",
+    "yaml": "1.7.2"
   }
 }

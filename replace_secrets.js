@@ -15,13 +15,29 @@
  */
 
 const fs = require('fs');
+const path = require('path');
+const YAML = require('yaml');
 
-const ENV_FILE = '.env';
+const OUTPUT_ENV_FILE = '.env';
+const REDACTED_ENV_FILE = 'redacted.env';
+const CLOUD_BUILD_FILE = 'cloud_build.yaml';
 
-function replaceSecrets(secrets) {
-  const envFileContents = fs.readFileSync(ENV_FILE).toString('utf8');
+function identifySecrets(appDir) {
+  const yamlFile = path.join(appDir, CLOUD_BUILD_FILE);
+  const yamlContents = fs.readFileSync(yamlFile).toString('utf8');
+  const config = YAML.parse(yamlContents);
+  const secrets = Object.keys(config.secrets[0].secretEnv)
+  
+  console.log(`Identified the following secret env keys: ${secrets}`)
+  return secrets;
+}
+
+function replaceSecrets(appDir) {
+  const envFile = path.join(appDir, REDACTED_ENV_FILE);
+  const envFileContents = fs.readFileSync(envFile).toString('utf8');
+
   const replacedContents = envFileContents.split('\n').map(line => {
-    for (const secret of secrets) {
+    for (const secret of identifySecrets(appDir)) {
       if (line.startsWith(`${secret}=`)) {
         const secretVal = process.env[secret]
         console.log(
@@ -33,12 +49,13 @@ function replaceSecrets(secrets) {
 
     return line;
   }).join('\n');
-  fs.writeFileSync(ENV_FILE, replacedContents);
+
+  fs.writeFileSync(path.join(appDir, OUTPUT_ENV_FILE), replacedContents);
 }
 
 if (require.main === module) {
-  const secrets = process.argv.slice(2);
-  replaceSecrets(secrets);
+  const appDir = process.argv[2];
+  replaceSecrets(path.resolve(appDir));
 }
 
 module.exports = replaceSecrets;

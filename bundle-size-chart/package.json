@@ -19,7 +19,6 @@
     "deploy-cron": "gcloud --project amp-bundle-size-chart-test app deploy cron.yaml",
     "prestart": "tsc",
     "start": "node dist/app.js",
-    "replace-secrets": "node replace_secrets.js"
   },
   "dependencies": {
     "@google-cloud/storage": "4.1.3",
