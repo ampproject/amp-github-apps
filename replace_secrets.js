@@ -43,7 +43,7 @@ function replaceSecrets(appDir) {
   const envFileContents = fs.readFileSync(envFile).toString('utf8');
 
   const replacedContents = envFileContents.split('\n').map(line => {
-    for (const secret of secrets) {
+    for (const secret of identifySecrets(appDir)) {
       if (line.startsWith(`${secret}=`)) {
         const secretVal = process.env[secret]
         console.log(
