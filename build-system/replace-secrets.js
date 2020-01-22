@@ -39,8 +39,8 @@ function identifySecrets(appDir) {
   try {
     const yamlContents = fs.readFileSync(yamlFile).toString('utf8');
     const config = YAML.parse(yamlContents);
-    const secrets = Object.keys(config.secrets[0].secretEnv)
-    console.log(`Identified the following secret env keys: ${secrets}`)
+    const secrets = Object.keys(config.secrets[0].secretEnv);
+    console.log(`Identified the following secret env keys: ${secrets}`);
     return secrets;
   } catch (e) {
     // Handle the case where parsing secrets from the cloud build file fails.
@@ -59,19 +59,22 @@ function replaceSecrets(appDir) {
   const envFile = path.join(appDir, REDACTED_ENV_FILE);
   const envFileContents = fs.readFileSync(envFile).toString('utf8');
 
-  const replacedContents = envFileContents.split('\n').map(line => {
-    for (const secret of identifySecrets(appDir)) {
-      if (line.startsWith(`${secret}=`)) {
-        const secretVal = process.env[secret]
-        console.log(
-          `Replacing value of ${secret} with "${secretVal.substr(0, 3)}..."`
-        );
-        return `${secret}=${secretVal}`;
+  const replacedContents = envFileContents
+    .split('\n')
+    .map(line => {
+      for (const secret of identifySecrets(appDir)) {
+        if (line.startsWith(`${secret}=`)) {
+          const secretVal = process.env[secret];
+          console.log(
+            `Replacing value of ${secret} with "${secretVal.substr(0, 3)}..."`
+          );
+          return `${secret}=${secretVal}`;
+        }
       }
-    }
 
-    return line;
-  }).join('\n');
+      return line;
+    })
+    .join('\n');
 
   fs.writeFileSync(path.join(appDir, OUTPUT_ENV_FILE), replacedContents);
 }
