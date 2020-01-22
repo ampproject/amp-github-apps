@@ -3,4 +3,3 @@
 pr-deploy/src/*.js
 release-tagging/src/*.js
 coverage/
-!bundle-size-chart/.env
