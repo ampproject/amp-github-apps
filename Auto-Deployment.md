@@ -2,10 +2,12 @@
 
 1. Create the actual App Engine project (or switch to an existing one) using `gcloud init`
 
-2. Enable _App Engine Admin_, _Cloud Build_, and _Cloud KMS_ APIs
-    - `https://pantheon.corp.google.com/apis/library/appengine.googleapis.com?project=[PROJECT_ID]`
-    - `https://console.developers.google.com/apis/library/cloudkms.googleapis.com/?project=[PROJECT_ID]`
-    - `https://console.developers.google.com/apis/library/cloudbuild.googleapis.com/?project=[PROJECT_ID]`
+2. Enable
+    [_App Engine Admin_](https://pantheon.corp.google.com/apis/library/appengine.googleapis.com),
+    [_Cloud Build_](https://console.developers.google.com/apis/library/cloudkms.googleapis.com),
+    and
+    [_Cloud KMS_](https://console.developers.google.com/apis/library/cloudbuild.googleapis.com)
+    APIs
 
 3. Create the [Cloud KMS keyring](https://cloud.google.com/cloud-build/docs/securing-builds/use-encrypted-secrets-credentials#example_build_request_using_an_encrypted_variable)
     - `gcloud kms keyrings create amp-github-apps-keyring --location=global`
