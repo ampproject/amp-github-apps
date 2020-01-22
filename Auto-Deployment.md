@@ -59,15 +59,7 @@
 
 1. Add the environment variable to `redacted.env`
     > Note: We commit `redacted.env` with all non-sensitive environment variables and create `.env` on the GCloud Build instance at deployment. This is to prevent accidentally committing a secret token.
-2. Encrypt the secret using the app's CryptoKey
-    ```
-    echo -n "$MY_SECRET_TOKEN" | gcloud kms encrypt \
-      --plaintext-file=- \  # - reads from stdin
-      --ciphertext-file=- \  # - writes to stdout
-      --location=global \
-      --keyring=amp-github-apps-keyring \
-      --key=app-env-key | base64
-    ```
+2. Encrypt and base64-encode the secret by running `build-system/encrypt-secrets.sh`
 3. Add the environment variable name and the base64-encoded value from above to the `secrets.secretEnv` dict in `cloud_build.yaml`
 4. Add the environment variable name to the `secretEnv` field of the `replace-secrets` step in `cloud_build.yaml`
     > This provides the decrypted secret to the environment so `replace-scripts` can construct the un-redacted `.env` file.
