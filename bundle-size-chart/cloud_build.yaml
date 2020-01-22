@@ -3,16 +3,11 @@ steps:
   dir: bundle-size-chart
   args:
     - install
-- name: gcr.io/cloud-builders/gcloud
+- name: gcr.io/cloud-builders/node
   dir: bundle-size-chart
   args:
-  - kms
-  - decrypt
-  - --ciphertext-file=.env.enc
-  - --plaintext-file=.env
-  - --location=global
-  - --keyring=amp-bundle-size-chart-test-keyring
-  - --key=amp-bundle-size-chart-test-deploy-key
+    - ../replace_secrets.js
+    - ACCESS_TOKEN
 - name: gcr.io/cloud-builders/gcloud
   dir: bundle-size-chart
   args:
@@ -27,3 +22,7 @@ steps:
     - amp-bundle-size-chart-test
     - app
     - deploy-cron
+secrets:
+- kmsKeyName: projects/amp-bundle-size-chart-test/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+  secretEnv:
+    ACCESS_TOKEN: CiQA6qDuJ91Gu9MITgfX8zM550B+vNs6C5ojH810iTGwcWM9WpESUQB5Peyj8A/2maF7D7S65aP2Yp21IbQxVT3ouze/myjEUNSj52gSCq0xsvWaZcxXQKR+dbZw3IDsb7mWT9Asf889Mcx/MvOUyU2YbB3xP2UWtA==
