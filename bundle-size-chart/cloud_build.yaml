@@ -8,6 +8,7 @@ steps:
   args:
     - ../replace_secrets.js
     - ACCESS_TOKEN
+  secretEnv: ['ACCESS_TOKEN']
 - name: gcr.io/cloud-builders/gcloud
   dir: bundle-size-chart
   args:

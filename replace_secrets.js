@@ -23,8 +23,11 @@ function replaceSecrets(secrets) {
   const replacedContents = envFileContents.split('\n').map(line => {
     for (const secret of secrets) {
       if (line.startsWith(`${secret}=`)) {
-        console.log(secret, process.env)
-        return `${secret}=${process.env[secret]}`;
+        const secretVal = process.env[secret]
+        console.log(
+          `Replacing value of ${secret} with "${secretVal.substr(0, 3)}..."`
+        );
+        return `${secret}=${secretVal}`;
       }
     }
 
