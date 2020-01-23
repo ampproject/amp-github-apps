@@ -10,6 +10,7 @@ steps:
     - replace-secrets
     - --
     - bundle-size-chart
+  env: ['NODE_ENV=cloud_build']
   secretEnv: ['ACCESS_TOKEN']
 
   # Install app dependencies
