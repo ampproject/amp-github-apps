@@ -17,7 +17,7 @@
       ```
       gcloud kms keyrings add-iam-policy-binding amp-github-apps-keyring \
         --location=global \
-        --member group:infra-team-group@google.com \
+        --member group:infra-team-group@myorganization.com \
         --role roles/cloudkms.cryptoKeyDecrypter
       ```
       > This will allow all members of the group to encrypt and decrypt secrets using this keyring.
