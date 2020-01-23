@@ -17,7 +17,7 @@
     "dev": "nodemon",
     "deploy": "gcloud --project amp-bundle-size-chart app deploy",
     "deploy-cron": "gcloud --project amp-bundle-size-chart app deploy cron.yaml",
-    "deploy-tag": "git tag 'deploy-bundle-size-chart-'`date '+%Y%m%d%H%M%S'`",
+    "deploy-tag": "git tag 'deploy-bundle-size-chart-'`date --utc '+%Y%m%d%H%M%S'`",
     "prestart": "tsc",
     "start": "node dist/app.js"
   },
