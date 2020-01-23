@@ -62,7 +62,7 @@
 2. Encrypt and base64-encode the secret by running `build-system/encrypt-secrets.sh`
 3. Add the environment variable name and the base64-encoded value from above to the `secrets.secretEnv` dict in `cloud_build.yaml`
 4. Add the environment variable name to the `secretEnv` field of the `replace-secrets` step in `cloud_build.yaml`
-    > This provides the decrypted secret to the environment so `replace-scripts` can construct the un-redacted `.env` file.
+    > Cloud Build will decode and decrypt the secrets listed here and provide them in the environment so `replace-scripts` can construct the un-redacted `.env` file.
 
 ## To deploy the app
 
