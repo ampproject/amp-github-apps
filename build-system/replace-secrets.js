@@ -23,6 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const YAML = require('yaml');
+const md5 = require('md5');
 
 const OUTPUT_ENV_FILE = '.env';
 const REDACTED_ENV_FILE = 'redacted.env';
@@ -65,8 +66,9 @@ function replaceSecrets(appDir) {
       for (const secret of identifySecrets(appDir)) {
         if (line.startsWith(`${secret}=`)) {
           const secretVal = process.env[secret];
+          const partialHash = md5(secretVal).substr(0, 6);
           console.log(
-            `Replacing value of ${secret} with "${secretVal.substr(0, 3)}..."`
+            `Replacing value of ${secret}; new value has MD5 ${partialHash}...`
           );
           return `${secret}=${secretVal}`;
         }
