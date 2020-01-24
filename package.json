@@ -16,7 +16,7 @@
     "start": "node build-system/pr-check.js",
     "lint": "eslint .",
     "fix": "eslint . --fix",
-    "replace-secrets": "node build-system/replace-secrets.js"
+    "replace-secrets": "node bin/replace-secrets.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "2.12.0",

@@ -85,8 +85,7 @@ function replaceSecrets(appDir) {
   fs.writeFileSync(path.join(appDir, OUTPUT_ENV_FILE), replacedContents);
 }
 
-if (process.env.NODE_ENV === 'cloud_build') {
-  const appName = process.argv[2];
+function main(appName) {
   if (!appName) {
     throw new Error('Must specify app argument to replace-secrets');
   }
@@ -99,4 +98,4 @@ if (process.env.NODE_ENV === 'cloud_build') {
   replaceSecrets();
 }
 
-module.exports = {identifySecrets, replaceSecrets};
+main(process.argv[2]);
