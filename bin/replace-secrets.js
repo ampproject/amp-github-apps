@@ -85,6 +85,11 @@ function replaceSecrets(appDir) {
   fs.writeFileSync(path.join(appDir, OUTPUT_ENV_FILE), replacedContents);
 }
 
+/**
+ * Inject secrets into an app's environment.
+ *
+ * @param {string} appName
+ */
 function main(appName) {
   if (!appName) {
     throw new Error('Must specify app argument to replace-secrets');
@@ -95,7 +100,7 @@ function main(appName) {
     throw new Error(`Invalid app "${appName}"; directory does not exist`);
   }
 
-  replaceSecrets();
+  replaceSecrets(appDir);
 }
 
 main(process.argv[2]);
