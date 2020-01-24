@@ -66,11 +66,11 @@ function replaceSecrets(appDir) {
       for (const secret of identifySecrets(appDir)) {
         if (line.startsWith(`${secret}=`)) {
           const secretVal = process.env[secret];
-          // The below use of MD5 is safe because it's not actually used to 
+          // The below use of MD5 is safe because it's not actually used to
           // encrypt the secret; only a substring of the MD5 is displayed as a
           // fingerprint for devs to verify that the build environment has the
           // correct values provided for secrets.
-          const partialHash = md5(secretVal).substr(0, 6);  // lgtm [js/weak-cryptographic-algorithm]
+          const partialHash = md5(secretVal).substr(0, 6); // lgtm [js/weak-cryptographic-algorithm]
           console.log(
             `Replacing value of ${secret}; new value has MD5 ${partialHash}...`
           );
