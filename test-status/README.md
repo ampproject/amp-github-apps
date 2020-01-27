@@ -22,7 +22,8 @@ The App subscribes to the following GitHub Webhooks:
 ### API for Travis
 
 The App has the following API points, which are to be triggered from Travis CI
-runs. The IP address of the request is validated against a list of known Travis IP addresses.
+runs. The IP address of the request is validated against a list of known
+Travis IP addresses.
 
 * `POST /v0/tests/:headSha/:type/:subType/:status(queued|started|skipped)`
   * Creates a new check on the supplied head commit (for `status` = `queued` or

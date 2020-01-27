@@ -377,7 +377,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
   v0.use((request, response, next) => {
     request.app.set('trust proxy', true);
     if (!isTravisIp(request.ip)) {
-      console.error(request.ip)
+      console.error(request.ip);
       app.log.warn(
         `Refused a request to ${request.originalUrl} from ${request.ip}`
       );

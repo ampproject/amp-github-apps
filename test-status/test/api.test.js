@@ -19,7 +19,7 @@ const nock = require('nock');
 const {Probot} = require('probot');
 const request = require('supertest');
 const {setupDb} = require('../setup-db');
-const travis_ips = require('travis-ips');
+const travisIps = require('travis-ips');
 
 const HEAD_SHA = '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa';
 
@@ -61,11 +61,11 @@ describe('test-status/api', () => {
       .reply(200, {token: 'test'});
 
     // For most tests, assume the request is always from a Travis IP.
-    jest.spyOn(travis_ips, 'isTravisIp').mockImplementation(() => true);
+    jest.spyOn(travisIps, 'isTravisIp').mockImplementation(() => true);
   });
 
   afterEach(async () => {
-    travis_ips.isTravisIp.mockRestore();
+    travisIps.isTravisIp.mockRestore();
     await db('pullRequestSnapshots').truncate();
     await db('checks').truncate();
   });
@@ -332,9 +332,9 @@ describe('test-status/api', () => {
   );
 
   test('reject non-Travis IP addresses', async () => {
-    travis_ips.isTravisIp.mockRestore();
-    travis_ips.runTravisIpLookup.mockImplementation(
-      () => Buffer.from('999.999.999.999\n123.456.789.012')
+    travisIps.isTravisIp.mockRestore();
+    travisIps.runTravisIpLookup.mockImplementation(() =>
+      Buffer.from('999.999.999.999\n123.456.789.012')
     );
     await request(probot.server)
       .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/queued`)

@@ -14,9 +14,9 @@
  */
 'use strict';
 
-const child_process = require('child_process');
+const childProcess = require('child_process');
 
-const MIN_LOOKUP_ITVL_MS = 5 * 60 * 1000  // 5 minutes
+const MIN_LOOKUP_ITVL_MS = 5 * 60 * 1000; // 5 minutes
 
 let travisIps = [];
 let lastLookup = null;
@@ -27,7 +27,7 @@ let lastLookup = null;
  * @return {Array<string>}
  */
 function runTravisIpLookup() {
-  child_process.execSync('dig +short nat.travisci.net | sort');
+  return childProcess.execSync('dig +short nat.travisci.net | sort');
 }
 
 /**
@@ -36,12 +36,14 @@ function runTravisIpLookup() {
 function refreshTravisIps() {
   // Don't refresh if we've tried to refresh very recently.
   if (new Date() - new Date(lastLookup) < MIN_LOOKUP_ITVL_MS) {
-    console.info('Travis IPs updated recently; skipping refresh')
+    console.info('Travis IPs updated recently; skipping refresh');
     return;
   }
 
   try {
-    travisIps = runTravisIpLookup().toString('utf8').split('\n');
+    travisIps = runTravisIpLookup()
+      .toString('utf8')
+      .split('\n');
     lastLookup = new Date();
     console.info(
       `Travis IPs successfully refreshed; found ${travisIps.length} IPs`
@@ -54,6 +56,7 @@ function refreshTravisIps() {
 /**
  * Tests if an IP is from Travis, possible refreshing the list if unsure.
  *
+ * @param {string} ip IP address to check.
  * @return {boolean}
  */
 function isTravisIp(ip) {
