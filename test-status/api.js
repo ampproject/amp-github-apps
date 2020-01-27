@@ -15,6 +15,7 @@
 'use strict';
 
 const {getBuildCop, getCheckRunId, getPullRequestSnapshot} = require('./db');
+const {isTravisIp} = require('travis-ips');
 
 /**
  * Create a parameters object for a new status check line.
@@ -207,10 +208,7 @@ exports.installApiRouter = (app, db) => {
   tests.use(require('express').json());
   tests.use((request, response, next) => {
     request.app.set('trust proxy', true);
-    if (
-      'TRAVIS_IP_ADDRESSES' in process.env &&
-      !process.env.TRAVIS_IP_ADDRESSES.includes(request.ip)
-    ) {
+    if (!isTravisIp(request.ip)) {
       app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
       response.status(403).end('You are not Travis!');
     } else {
