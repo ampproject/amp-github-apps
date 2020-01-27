@@ -46,6 +46,9 @@
 
 8. Grant App Engine access to Cloud Build service account on the [Service account permissions](https://console.cloud.google.com/cloud-build/settings) page
     - Set _App Engine Admin_ to _Enable_
+    - To add support for Cloud Build deploying Cron task updates:
+      - Visit [IAM page](https://pantheon.corp.google.com/iam-admin/iam) and find the `@cloudbuild.gserviceaccount.com` service account
+      - _Edit permissions_ > _Add Another Role_ > _Cloud Scheduler Admin_
 
 9. Create the [Cloud Build Trigger](https://pantheon.corp.google.com/cloud-build/triggers)
     - Click _Connect Repository_ and follow the steps to connect to `ampproject/amp-github-apps`
