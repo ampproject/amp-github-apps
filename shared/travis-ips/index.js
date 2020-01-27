@@ -16,7 +16,7 @@
 
 const childProcess = require('child_process');
 
-const MIN_LOOKUP_ITVL_MS = 5 * 60 * 1000; // 5 minutes
+const MIN_LOOKUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 let travisIps = [];
 let lastLookup = null;
@@ -35,7 +35,7 @@ function runTravisIpLookup() {
  */
 function refreshTravisIps() {
   // Don't refresh if we've tried to refresh very recently.
-  if (new Date() - new Date(lastLookup) < MIN_LOOKUP_ITVL_MS) {
+  if (new Date() - new Date(lastLookup) < MIN_LOOKUP_INTERVAL_MS) {
     console.info('Travis IPs updated recently; skipping refresh');
     return;
   }
