@@ -41,9 +41,7 @@ function refreshTravisIps() {
   }
 
   try {
-    travisIps = runTravisIpLookup()
-      .toString('utf8')
-      .split('\n');
+    travisIps = new Set(runTravisIpLookup().toString('utf8').split('\n'));
     lastLookup = new Date();
     console.info(
       `Travis IPs successfully refreshed; found ${travisIps.length} IPs`
@@ -61,11 +59,11 @@ function refreshTravisIps() {
  */
 function isTravisIp(ip) {
   // Allow a known IP.
-  if (travisIps.includes(ip)) return true;
+  if (travisIps.has(ip)) return true;
 
   // Otherwise, try to refresh and check again.
   refreshTravisIps();
-  return travisIps.includes(ip);
+  return travisIps.has(ip);
 }
 
 module.exports = {isTravisIp, refreshTravisIps, runTravisIpLookup};
