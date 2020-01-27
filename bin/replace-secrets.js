@@ -71,7 +71,7 @@ function replaceSecrets(appDir) {
           const partialHash = hash.digest('hex').substr(0, 6);
           console.log(
             `Replacing value of ${secret}; ` +
-            `new value has SHA256 ${partialHash}...`
+              `new value has SHA256 ${partialHash}...`
           );
           return `${secret}=${secretVal}`;
         }
