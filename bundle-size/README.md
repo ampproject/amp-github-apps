@@ -24,8 +24,7 @@ The App subscribes to the following GitHub Webhooks:
     Webhook will mark the above created check as approved
 
 The App also has the following API points, which are to be triggered from the
-Travis CI tests. If the `TRAVIS_IP_ADDRESSES` environment variable is set, only
-requests from this comma separated list of IP addresses will be processed.
+Travis CI tests. The IP address of the request is validated against a list of known Travis IP addresses.
 
 * `/v0/commit/:headSha/skip`
   * Marks the check on the supplied head commit as skipped, for when the pull
