@@ -65,8 +65,9 @@ function replaceSecrets(appDir) {
     .map(line => {
       for (const secret of identifySecrets(appDir)) {
         if (line.startsWith(`${secret}=`)) {
+          const secretVal = process.env[secret];
           const hash = crypto.createHash('sha1');
-          hash.update(process.env[secret]);
+          hash.update(secretVal);
           const partialHash = hash.digest('hex').substr(0, 6);
           console.log(
             `Replacing value of ${secret}; new value has SHA1 ${partialHash}...`
