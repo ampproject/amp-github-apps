@@ -14,6 +14,7 @@
  */
 'use strict';
 
+const {isTravisIp} = require('travis-ips');
 const {formatBundleSizeDelta, getCheckFromDatabase} = require('./common');
 const sleep = require('sleep-promise');
 
@@ -375,10 +376,8 @@ exports.installApiRouter = (app, db, githubUtils) => {
   const v0 = app.route('/v0');
   v0.use((request, response, next) => {
     request.app.set('trust proxy', true);
-    if (
-      'TRAVIS_IP_ADDRESSES' in process.env &&
-      !process.env['TRAVIS_IP_ADDRESSES'].includes(request.ip)
-    ) {
+    if (!isTravisIp(request.ip)) {
+      console.error(request.ip)
       app.log.warn(
         `Refused a request to ${request.originalUrl} from ${request.ip}`
       );

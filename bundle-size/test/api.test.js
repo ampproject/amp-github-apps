@@ -23,11 +23,14 @@ const Octokit = require('@octokit/rest');
 const {Probot} = require('probot');
 const request = require('supertest');
 const {setupDb} = require('../setup-db');
+const travis_ips = require('travis-ips');
+
 
 nock.disableNetConnect();
 nock.enableNetConnect('127.0.0.1');
 jest.mock('../db');
 jest.mock('sleep-promise', () => () => Promise.resolve());
+jest.mock('travis-ips');
 
 describe('bundle-size api', () => {
   let probot;
@@ -84,11 +87,15 @@ describe('bundle-size api', () => {
       .reply(200, getFixture('teams.listMembers.3188896'))
       .get('/teams/3065813/members')
       .reply(200, getFixture('teams.listMembers.3065813'));
+
+    // For most tests, assume the request is always from a Travis IP.
+    jest.spyOn(travis_ips, 'isTravisIp').mockImplementation(() => true);
   });
 
   afterEach(async () => {
     nodeCache.close();
     nock.cleanAll();
+    travis_ips.isTravisIp.mockRestore();
     await db('checks').truncate();
   });
 
@@ -739,7 +746,10 @@ describe('bundle-size api', () => {
   });
 
   test('reject non-Travis IP addresses', async () => {
-    process.env['TRAVIS_IP_ADDRESSES'] = '999.999.999.999,123.456.789.012';
+    travis_ips.isTravisIp.mockRestore();
+    travis_ips.runTravisIpLookup.mockImplementation(
+      () => Buffer.from('999.999.999.999\n123.456.789.012')
+    );
     await request(probot.server)
       .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
       .expect(403, 'You are not Travis!');
