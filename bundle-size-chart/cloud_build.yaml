@@ -40,4 +40,4 @@ steps:
 secrets:
 - kmsKeyName: projects/amp-bundle-size-chart/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
   secretEnv:
-    ACCESS_TOKEN: CiQAw7ztsgRWXIHVHCx0ax1tSP5fLbbmGMc2usLlozaFVAURQRgSUgC/du4odywwc1UmiF+FNDgulWYhkn+agyYWphwDRV5BjI+Uzq59474n8YSCwSW6JVXsZSxuRZrrd6NYMEISVfPoxkz/OENH4fZvbZ9+0lbbMQ0=
+    ACCESS_TOKEN: CiQAw7ztstTZZfpzAYjAq6q/L0yG6IstcaZDseFTnyu8yGwJf3gSUQC/du4ozr/sKQ5HQQrB2HJdrdkaGAliyzvR/OtRyplpmc5TAhfnDPvJ1208bcCOq1RnV8+F+x4/pex6hbJFhjIx5UfK0buc+9Cm3HvKYRDTSg==
