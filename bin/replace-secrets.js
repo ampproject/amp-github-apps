@@ -23,7 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const YAML = require('yaml');
-const md5 = require('md5');
+const sha1 = require('sha1');
 
 const OUTPUT_ENV_FILE = '.env';
 const REDACTED_ENV_FILE = 'redacted.env';
@@ -66,13 +66,9 @@ function replaceSecrets(appDir) {
       for (const secret of identifySecrets(appDir)) {
         if (line.startsWith(`${secret}=`)) {
           const secretVal = process.env[secret];
-          // The below use of MD5 is safe because it's not actually used to
-          // encrypt the secret; only a substring of the MD5 is displayed as a
-          // fingerprint for devs to verify that the build environment has the
-          // correct values provided for secrets.
-          const partialHash = md5(secretVal).substr(0, 6); // lgtm [js/weak-cryptographic-algorithm]
+          const partialHash = sha1(secretVal).substr(0, 6);
           console.log(
-            `Replacing value of ${secret}; new value has MD5 ${partialHash}...`
+            `Replacing value of ${secret}; new value has SHA1 ${partialHash}...`
           );
           return `${secret}=${secretVal}`;
         }

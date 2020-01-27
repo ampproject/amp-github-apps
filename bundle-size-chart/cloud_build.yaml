@@ -4,7 +4,7 @@ steps:
   args:
     - install
     - yaml
-    - md5
+    - sha1
 - name: gcr.io/cloud-builders/npm
   args:
     - run
