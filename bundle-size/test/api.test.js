@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
+const nock = require('nock');
+const NodeCache = require('node-cache');
+const Octokit = require('@octokit/rest');
+const request = require('supertest');
 const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
 const {GitHubUtils} = require('../github-utils');
 const {installApiRouter} = require('../api');
-const nock = require('nock');
-const NodeCache = require('node-cache');
-const Octokit = require('@octokit/rest');
 const {Probot} = require('probot');
-const request = require('supertest');
 const {setupDb} = require('../setup-db');
 
 nock.disableNetConnect();

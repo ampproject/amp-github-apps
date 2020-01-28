@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-const {dbConnect} = require('../db-connect');
 const deepcopy = require('deepcopy');
-const {installGitHubWebhooks} = require('../webhooks');
 const nock = require('nock');
+const {dbConnect} = require('../db-connect');
+const {installGitHubWebhooks} = require('../webhooks');
 const {Probot} = require('probot');
 const {setupDb} = require('../setup-db');
 

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
-const {GitHub, PullRequest, Team} = require('../src/api/github');
 const OwnersTree = require('../src/ownership/tree');
-const {OwnersRule} = require('../src/ownership/rules');
+const sinon = require('sinon');
 const {
   UserOwner,
   TeamOwner,
   OWNER_MODIFIER,
 } = require('../src/ownership/owner');
+const {GitHub, PullRequest, Team} = require('../src/api/github');
 const {OwnersNotifier} = require('../src/notifier');
+const {OwnersRule} = require('../src/ownership/rules');
 
 describe('notifier', () => {
   const sandbox = sinon.createSandbox();

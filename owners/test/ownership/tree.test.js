@@ -15,19 +15,19 @@
  */
 
 const OwnersTree = require('../../src/ownership/tree');
-const {Team} = require('../../src/api/github');
-const {
-  UserOwner,
-  TeamOwner,
-  WildcardOwner,
-  OWNER_MODIFIER,
-} = require('../../src/ownership/owner');
 const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
   ReviewerSetRule,
 } = require('../../src/ownership/rules');
+const {
+  UserOwner,
+  TeamOwner,
+  WildcardOwner,
+  OWNER_MODIFIER,
+} = require('../../src/ownership/owner');
+const {Team} = require('../../src/api/github');
 
 describe('owners tree', () => {
   let tree;

@@ -15,10 +15,10 @@
  */
 
 const childProcess = require('child_process');
-const sinon = require('sinon');
 const fs = require('fs');
-const path = require('path');
 const LocalRepository = require('../../src/repo/local_repo');
+const path = require('path');
+const sinon = require('sinon');
 
 describe('local repository', () => {
   const sandbox = sinon.createSandbox();

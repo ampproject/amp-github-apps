@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
-const {GitHub, PullRequest, Review, Team} = require('../src/api/github');
 const LocalRepository = require('../src/repo/local_repo');
-const {OwnersBot} = require('../src/owners_bot');
-const {OwnersNotifier} = require('../src/notifier');
 const OwnersTree = require('../src/ownership/tree');
+const sinon = require('sinon');
 const {
   CheckRun,
   CheckRunState,
   OwnersCheck,
 } = require('../src/ownership/owners_check');
+const {GitHub, PullRequest, Review, Team} = require('../src/api/github');
+const {OwnersBot} = require('../src/owners_bot');
+const {OwnersNotifier} = require('../src/notifier');
 
 describe('owners bot', () => {
   const silentLogger = {

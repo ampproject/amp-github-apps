@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
-const {ReviewerSelection} = require('../src/reviewer_selection');
-const {Team} = require('../src/api/github');
-const {UserOwner, TeamOwner, WildcardOwner} = require('../src/ownership/owner');
 const OwnersTree = require('../src/ownership/tree');
+const sinon = require('sinon');
 const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
 } = require('../src/ownership/rules');
+const {ReviewerSelection} = require('../src/reviewer_selection');
+const {Team} = require('../src/api/github');
+const {UserOwner, TeamOwner, WildcardOwner} = require('../src/ownership/owner');
 
 describe('reviewer selection', () => {
   const sandbox = sinon.createSandbox();
