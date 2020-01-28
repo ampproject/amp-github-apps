@@ -5,7 +5,7 @@
     "google",
     "prettier"
   ],
-  "plugins": ["prettier"],
+  "plugins": ["prettier", "sort-requires"],
   "parserOptions": {
     "ecmaVersion": 2018
   },
@@ -45,6 +45,7 @@
     "prefer-const": 2,
     "prettier/prettier": 2,
     "radix": 2,
-    "require-atomic-updates": 1
+    "require-atomic-updates": 1,
+    "sort-requires/sort-requires": 2
   }
 }
