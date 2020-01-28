@@ -22,8 +22,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const {execSync} = require('child_process')
 const YAML = require('yaml');
+const {execSync} = require('child_process');
 
 const OUTPUT_ENV_FILE = '.env';
 const REDACTED_ENV_FILE = 'redacted.env';
@@ -39,7 +39,7 @@ function getSecrets(appDir) {
   const yamlFile = path.join(appDir, CLOUD_BUILD_FILE);
   const yamlContents = fs.readFileSync(yamlFile).toString('utf8');
   const config = YAML.parse(yamlContents);
-  return config.secrets[0].secretEnv
+  return config.secrets[0].secretEnv;
 }
 
 /**
@@ -49,12 +49,14 @@ function getSecrets(appDir) {
  * @return {string} decrypted secret value.
  */
 function decryptSecret(encryptedVal) {
-  return execSync([
-    `echo -n "${encryptedVal}"`,
-    'base64 -d',
-    'gcloud kms decrypt --plaintext-file=- --ciphertext-file=- ' +
-      '--location=global --keyring=amp-github-apps-keyring --key=app-env-key'
-  ].join (' | '));
+  return execSync(
+    [
+      `echo -n "${encryptedVal}"`,
+      'base64 -d',
+      'gcloud kms decrypt --plaintext-file=- --ciphertext-file=- ' +
+        '--location=global --keyring=amp-github-apps-keyring --key=app-env-key',
+    ].join(' | ')
+  );
 }
 
 /**
