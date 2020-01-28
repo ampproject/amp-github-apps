@@ -16,7 +16,8 @@
     "start": "node build-system/pr-check.js",
     "lint": "eslint .",
     "fix": "eslint . --fix",
-    "replace-secrets": "node bin/replace-secrets.js"
+    "replace-secrets": "node bin/replace-secrets.js",
+    "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "2.18.0",
@@ -30,6 +31,7 @@
     "eslint-plugin-sort-requires": "2.1.0",
     "fancy-log": "1.3.3",
     "prettier": "1.19.1",
-    "typescript": "3.7.5"
+    "typescript": "3.7.5",
+    "yaml": "1.7.2"
   }
 }
