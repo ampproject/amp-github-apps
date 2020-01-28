@@ -17,7 +17,7 @@
     "lint": "eslint .",
     "fix": "eslint . --fix",
     "replace-secrets": "node bin/replace-secrets.js",
-    "unredact-env": "node bin/unredact-env.js"
+    "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "2.18.0",
