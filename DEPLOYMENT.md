@@ -17,8 +17,8 @@
       ```
       gcloud kms keyrings add-iam-policy-binding amp-github-apps-keyring \
         --location=global \
-        --member group:infra-team-group@myorganization.com \
-        --role roles/cloudkms.cryptoKeyDecrypter
+        --member=group:infra-team-group@myorganization.com \
+        --role=roles/cloudkms.cryptoKeyDecrypter
       ```
       > This will allow all members of the group to encrypt and decrypt secrets using this keyring.
 
@@ -41,18 +41,19 @@
 
 7. Create the Cloud Build configuration file `cloud_build.yaml`
     - Use an existing configuration as a template
-    - The first two steps must be installing `yarn` and replacing secrets
+    - The first two steps must be installing `yaml` and replacing secrets
     - The remaining steps will parallel the manual deployment process, such as `npm install`, `gcloud app deploy`, etc.
+    > Note that the name provided to `replace-secrets`, as well as the `dir` property in the build steps, should be the name of the app directory (ex. `bundle-size`); the `kmsKeyName`, in contrast, will reference the Google Cloud project name (ex. `amp-bundle-size-bot`)
 
 8. Grant App Engine access to Cloud Build service account on the [Service account permissions](https://console.cloud.google.com/cloud-build/settings) page
     - Set _App Engine Admin_ to _Enable_
-    - To add support for Cloud Build deploying Cron task updates:
+    - If you need support for Cloud Build deploying Cron task updates:
       - Visit [IAM page](https://pantheon.corp.google.com/iam-admin/iam) and find the `@cloudbuild.gserviceaccount.com` service account
       - _Edit permissions_ > _Add Another Role_ > _Cloud Scheduler Admin_
 
 9. Create the [Cloud Build Trigger](https://pantheon.corp.google.com/cloud-build/triggers)
-    - Click _Connect Repository_ and follow the steps to connect to `ampproject/amp-github-apps`
-    - Create a trigger named "on-deploy-tag", select `ampproject/amp-github-apps` as the _Source_, and set the _Event_ to _Push new tag_
+    - Click _Connect Repository_ and follow the steps to connect to `ampproject/amp-github-apps`; do not select _Create push trigger_ on the final step
+    - Click _Create Trigger_, name the trigger "on-deploy-tag" or something similar, select `ampproject/amp-github-apps` as the _Source_, and set the _Event_ to _Push new tag_
     - For the tag pattern, use `deploy-{your-app-name}-\d{14}` (ex. `deploy-bundle-size-20200122154000` would be the deploy tag for the `bundle-size` app, with a timestamp of 15:40:00 on 2020-01-22). For consistency, deploy using the timestamp in the UTC timezone.
     - Under _Build Configuration_, select _Cloud Build configuration file_ and provide the path to your Cloud Build file, ex. `bundle-size/cloud_build.yaml`
 10. Add the NPM script `deploy-tag`, which creates a git tag in the proper tag format for your app
