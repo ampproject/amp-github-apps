@@ -35,6 +35,8 @@ describe('test pr deploy app', () => {
   let server: express.Application;
 
   beforeEach(() => {
+    process.env.DISABLE_WEBHOOK_EVENT_CHECK = 'true';
+
     github = {
       checks: {
         create: jest.fn().mockReturnValue(Promise.resolve()),

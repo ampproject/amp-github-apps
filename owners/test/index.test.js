@@ -85,13 +85,14 @@ describe('GitHub app', () => {
   });
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'env').value({
+    process.env = {
+      DISABLE_WEBHOOK_EVENT_CHECK: 'true',
       GITHUB_OWNER,
       GITHUB_REPOSITORY,
       NODE_ENV: 'test',
-    });
+    };
 
+    sandbox = sinon.createSandbox();
     sandbox.stub(VirtualRepository.prototype, 'sync');
     sandbox.stub(VirtualRepository.prototype, 'warmCache').resolves();
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();

@@ -34,6 +34,14 @@ describe('bundle-size webhooks', () => {
   const nodeCache = new NodeCache();
 
   beforeAll(async () => {
+    process.env = {
+      DISABLE_WEBHOOK_EVENT_CHECK: 'true',
+      TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
+      FALLBACK_APPROVER_TEAMS:
+        'ampproject/wg-runtime,ampproject/wg-performance',
+      SUPER_USER_TEAMS: 'ampproject/wg-infra',
+    };
+
     await setupDb(db);
 
     probot = new Probot({});
@@ -50,13 +58,6 @@ describe('bundle-size webhooks', () => {
 
   beforeEach(async () => {
     nodeCache.flushAll();
-
-    process.env = {
-      TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
-      FALLBACK_APPROVER_TEAMS:
-        'ampproject/wg-runtime,ampproject/wg-performance',
-      SUPER_USER_TEAMS: 'ampproject/wg-infra',
-    };
 
     nock('https://api.github.com')
       .post('/app/installations/123456/access_tokens')

@@ -44,6 +44,7 @@ describe('test-status/webhooks', () => {
   const db = dbConnect();
 
   beforeAll(async () => {
+    process.env.DISABLE_WEBHOOK_EVENT_CHECK = 'true';
     await setupDb(db);
 
     probot = new Probot({});
