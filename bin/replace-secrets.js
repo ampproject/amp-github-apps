@@ -20,10 +20,10 @@
  * the secrets.
  */
 
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const YAML = require('yaml');
-const crypto = require('crypto');
 
 const OUTPUT_ENV_FILE = '.env';
 const REDACTED_ENV_FILE = 'redacted.env';
