@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-const path = require('path');
 const bootstrap = require('./bootstrap');
 const InfoServer = require('./info_server');
+const path = require('path');
 const {GitHub, PullRequest, Team} = require('./src/api/github');
 const {OwnersCheck} = require('./src/ownership/owners_check');
 

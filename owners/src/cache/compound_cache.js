@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+const CloudStorageCache = require('./cloud_storage_cache');
 const FileCache = require('./file_cache');
 const MemoryCache = require('./memory_cache');
-const CloudStorageCache = require('./cloud_storage_cache');
 
 /**
  * A compound cache maintaining files in-memory and backed up by Cloud Storage.

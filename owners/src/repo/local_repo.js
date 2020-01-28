@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-const path = require('path');
-const fs = require('fs');
 const childProcess = require('child_process');
+const fs = require('fs');
+const path = require('path');
 const util = require('util');
 const exec = util.promisify(childProcess.exec);
 const Repository = require('./repo');

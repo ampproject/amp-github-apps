@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
+const nock = require('nock');
+const request = require('supertest');
 const {dbConnect} = require('../db-connect');
 const {installApiRouter} = require('../api');
-const nock = require('nock');
 const {Probot} = require('probot');
-const request = require('supertest');
 const {setupDb} = require('../setup-db');
 
 const HEAD_SHA = '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa';

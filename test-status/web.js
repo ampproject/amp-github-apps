@@ -14,14 +14,14 @@
  */
 'use strict';
 
-const {body, validationResult} = require('express-validator');
 const bodyParser = require('body-parser');
 const express = require('express');
-const {getBuildCop, getCheckRunResults} = require('./db');
 const {
   installRootAuthentications,
   installRouteAuthentications,
 } = require('./auth');
+const {body, validationResult} = require('express-validator');
+const {getBuildCop, getCheckRunResults} = require('./db');
 
 let EXPRESS_SETTING_ARE_SET = false;
 

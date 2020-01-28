@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-const JSON5 = require('json5');
-const fs = require('fs');
-const express = require('express');
 const _ = require('lodash');
+const express = require('express');
+const fs = require('fs');
 const hl = require('highlight').Highlight;
+const JSON5 = require('json5');
 const {OwnersCheck} = require('./src/ownership/owners_check');
 
 const EXAMPLE_OWNERS_PATH = './OWNERS.example';

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-const path = require('path');
 const minimatch = require('minimatch');
+const path = require('path');
 const {WildcardOwner} = require('./owner');
 
 /**

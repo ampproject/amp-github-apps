@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
 const request = require('supertest');
+const sinon = require('sinon');
 
-const Repository = require('../src/repo/repo');
-const {OwnersBot} = require('../src/owners_bot');
-const {GitHub, Team} = require('../src/api/github');
 const InfoServer = require('../info_server');
+const Repository = require('../src/repo/repo');
+const {GitHub, Team} = require('../src/api/github');
+const {OwnersBot} = require('../src/owners_bot');
 
 /* eslint-disable require-jsdoc */
 class FakeRepository extends Repository {

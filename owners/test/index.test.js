@@ -15,24 +15,24 @@
  */
 
 /* eslint max-len: 0 */
+const fs = require('fs');
 const nock = require('nock');
 const owners = require('..');
-const {Probot} = require('probot');
-const sinon = require('sinon');
-const fs = require('fs');
 const path = require('path');
+const sinon = require('sinon');
+const {Probot} = require('probot');
 
 const VirtualRepository = require('../src/repo/virtual_repo');
-const {GitHub, Team} = require('../src/api/github');
-const {OwnersParser} = require('../src/ownership/parser');
-const {UserOwner} = require('../src/ownership/owner');
-const {OwnersRule} = require('../src/ownership/rules');
 const {CheckRun} = require('../src/ownership/owners_check');
+const {GitHub, Team} = require('../src/api/github');
 const {OwnersBot} = require('../src/owners_bot');
+const {OwnersParser} = require('../src/ownership/parser');
+const {OwnersRule} = require('../src/ownership/rules');
+const {UserOwner} = require('../src/ownership/owner');
 
 const opened35 = require('./fixtures/actions/opened.35');
-const openedDraft25408 = require('./fixtures/actions/opened.draft.25408');
 const opened36 = require('./fixtures/actions/opened.36.author-is-owner');
+const openedDraft25408 = require('./fixtures/actions/opened.draft.25408');
 const rerequest35 = require('./fixtures/actions/rerequested.35');
 const review35 = require('./fixtures/actions/pull_request_review.35.submitted');
 
@@ -44,8 +44,8 @@ const reviews35 = require('./fixtures/reviews/reviews.35');
 const reviews35Approved = require('./fixtures/reviews/reviews.35.approved');
 
 const checkruns35 = require('./fixtures/check-runs/check-runs.get.35');
-const checkruns35Multiple = require('./fixtures/check-runs/check-runs.get.35.multiple');
 const checkruns35Empty = require('./fixtures/check-runs/check-runs.get.35.empty');
+const checkruns35Multiple = require('./fixtures/check-runs/check-runs.get.35.multiple');
 
 const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 

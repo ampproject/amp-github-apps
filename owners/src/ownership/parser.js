@@ -15,13 +15,13 @@
  */
 
 const JSON5 = require('json5');
+const OwnersTree = require('./tree');
 const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
   ReviewerSetRule,
 } = require('./rules');
-const OwnersTree = require('./tree');
 const {
   UserOwner,
   TeamOwner,

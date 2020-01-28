@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+const OwnersTree = require('./ownership/tree');
 const sleep = require('sleep-promise');
 const {OwnersCheck} = require('./ownership/owners_check');
-const {OwnersParser} = require('./ownership/parser');
-const OwnersTree = require('./ownership/tree');
 const {OwnersNotifier} = require('./notifier');
+const {OwnersParser} = require('./ownership/parser');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
 const GITHUB_GET_MEMBERS_DELAY = 1000;

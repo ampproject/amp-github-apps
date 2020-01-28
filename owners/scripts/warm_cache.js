@@ -29,12 +29,12 @@
 
 require('dotenv').config();
 
-const sleep = require('sleep-promise');
 const Octokit = require('@octokit/rest');
+const sleep = require('sleep-promise');
 
-const {GitHub} = require('../src/api/github');
-const VirtualRepository = require('../src/repo/virtual_repo');
 const CompoundCache = require('../src//cache/compound_cache');
+const VirtualRepository = require('../src/repo/virtual_repo');
+const {GitHub} = require('../src/api/github');
 const {OwnersParser} = require('../src/parser');
 
 const {

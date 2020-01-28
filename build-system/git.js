@@ -19,8 +19,8 @@
  * @fileoverview Provides functions for executing various git commands.
  */
 
-const {isTravisBuild} = require('./travis');
 const {getStdout} = require('./exec');
+const {isTravisBuild} = require('./travis');
 
 /**
  * Returns the merge base of HEAD off of a given ref.

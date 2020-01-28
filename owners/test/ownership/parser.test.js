@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
-const path = require('path');
 const fs = require('fs');
 const JSON5 = require('json5');
-const {Team} = require('../../src/api/github');
 const LocalRepository = require('../../src/repo/local_repo');
-const {OwnersParser, OwnersParserError} = require('../../src/ownership/parser');
-const {
-  UserOwner,
-  TeamOwner,
-  WildcardOwner,
-  OWNER_MODIFIER,
-} = require('../../src/ownership/owner');
+const path = require('path');
+const sinon = require('sinon');
 const {
   OwnersRule,
   PatternOwnersRule,
   SameDirPatternOwnersRule,
   ReviewerSetRule,
 } = require('../../src/ownership/rules');
+const {
+  UserOwner,
+  TeamOwner,
+  WildcardOwner,
+  OWNER_MODIFIER,
+} = require('../../src/ownership/owner');
+const {OwnersParser, OwnersParserError} = require('../../src/ownership/parser');
+const {Team} = require('../../src/api/github');
 
 const EXAMPLE_FILE_PATH = path.resolve(__dirname, '../../OWNERS.example');
 

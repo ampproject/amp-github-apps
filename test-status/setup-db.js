@@ -14,8 +14,8 @@
  */
 'use strict';
 
-const {dbConnect} = require('./db-connect');
 const log = require('fancy-log');
+const {dbConnect} = require('./db-connect');
 
 /**
  * Setup up the database schema.

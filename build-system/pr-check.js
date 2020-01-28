@@ -15,10 +15,10 @@
 'use strict';
 
 const colors = require('ansi-colors');
+const log = require('fancy-log');
+const {ALL_TARGETS, determineBuildTargets} = require('./build-targets');
 const {execOrDie} = require('./exec');
 const {isTravisPushBuild} = require('./travis');
-const {ALL_TARGETS, determineBuildTargets} = require('./build-targets');
-const log = require('fancy-log');
 
 const FILENAME = 'pr-check.js';
 

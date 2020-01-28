@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+const OwnersTree = require('../../src/ownership/tree');
 const sinon = require('sinon');
 const {
   CheckRun,
@@ -25,10 +26,9 @@ const {
   TeamOwner,
   OWNER_MODIFIER,
 } = require('../../src/ownership/owner');
-const {Team} = require('../../src/api/github');
-const OwnersTree = require('../../src/ownership/tree');
 const {OwnersRule, ReviewerSetRule} = require('../../src/ownership/rules');
 const {ReviewerSelection} = require('../../src/reviewer_selection');
+const {Team} = require('../../src/api/github');
 
 describe('check run', () => {
   const sandbox = sinon.createSandbox();

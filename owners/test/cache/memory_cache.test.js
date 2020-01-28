@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-const sinon = require('sinon');
 const MemoryCache = require('../../src/cache/memory_cache');
+const sinon = require('sinon');
 
 describe('in-memory file cache', () => {
   const sandbox = sinon.createSandbox();

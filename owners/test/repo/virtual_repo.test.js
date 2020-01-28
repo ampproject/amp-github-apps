@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-const {GitHub} = require('../../src/api/github');
-const VirtualRepository = require('../../src/repo/virtual_repo');
-const CompoundCache = require('../../src/cache/compound_cache');
 const CloudStorage = require('../../src/api/cloud_storage');
+const CompoundCache = require('../../src/cache/compound_cache');
 const sinon = require('sinon');
+const VirtualRepository = require('../../src/repo/virtual_repo');
+const {GitHub} = require('../../src/api/github');
 
 describe('virtual repository', () => {
   const sandbox = sinon.createSandbox();

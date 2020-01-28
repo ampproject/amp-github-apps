@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
+const nock = require('nock');
+const NodeCache = require('node-cache');
+const Octokit = require('@octokit/rest');
 const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
 const {GitHubUtils} = require('../github-utils');
 const {installGitHubWebhooks} = require('../webhooks');
-const nock = require('nock');
-const NodeCache = require('node-cache');
-const Octokit = require('@octokit/rest');
 const {Probot} = require('probot');
 const {setupDb} = require('../setup-db');
 
