@@ -43,7 +43,7 @@
     - Use an existing configuration as a template
     - The first two steps must be installing `yaml` and replacing secrets
     - The remaining steps will parallel the manual deployment process, such as `npm install`, `gcloud app deploy`, etc.
-    > Note that the name provided to `replace-secrets`, as well as the `dir` property in the build steps, should be the name of the app directory (ex. `bundle-size`); the `kmsKeyName`, in contrast, will reference the GAE project name (ex. `amp-bundle-size-bot`)
+    > Note that the name provided to `replace-secrets`, as well as the `dir` property in the build steps, should be the name of the app directory (ex. `bundle-size`); the `kmsKeyName`, in contrast, will reference the Google Cloud project name (ex. `amp-bundle-size-bot`)
 
 8. Grant App Engine access to Cloud Build service account on the [Service account permissions](https://console.cloud.google.com/cloud-build/settings) page
     - Set _App Engine Admin_ to _Enable_
