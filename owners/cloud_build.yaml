@@ -1,0 +1,44 @@
+steps:
+  # The first two steps are required to identify and inject un-redacted secrets.
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - install
+      - yaml
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - run
+      - replace-secrets
+      - --
+      - owners
+    secretEnv:
+      - WEBHOOK_SECRET
+      - PRIVATE_KEY
+      - GITHUB_ACCESS_TOKEN
+
+  # Install app dependencies
+  - name: gcr.io/cloud-builders/npm
+    dir: owners
+    args:
+      - install
+
+  # Deploy the app and its cron tasks
+  - name: gcr.io/cloud-builders/gcloud
+    dir: owners
+    args:
+      - app
+      - deploy
+  - name: gcr.io/cloud-builders/gcloud
+    dir: owners
+    args:
+      - app
+      - deploy
+      - cron.yaml
+
+# These secrets are the base64-encoded form of encrypted secret values. They are
+# automatically decrypted and added to the `.env` environment at build time.
+secrets:
+  - kmsKeyName: projects/ampproject-owners-bot/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+    secretEnv:
+      WEBHOOK_SECRET: CiQAw7ztsosITYSacj1Y7cCM33GiFjliMWbCT5KKqkfggHI09zESOQC/du4ovnrkCTSIfXXgmVh9l7JmTvvXXnAOSTHokYwkf0FfJLgaGishIDinhAIzxvmIXAL/XE16wQ==
+      PRIVATE_KEY: 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
+      GITHUB_ACCESS_TOKEN: CiQAw7ztspIG26jwJqUE+K8nRc/SG3lF5WITqXOQKg3IP40q/M0SUQC/du4omVdGnrGXOu6LcSvRKVOT52XCAzC3kc6gzAaVBh26ppVGqpPmj8Y6gtHUqMq/8zhUAHortLF3o1hXF5SiLyZZt2EFEX6jnm68L1SnMA==
