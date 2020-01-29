@@ -10,7 +10,8 @@ steps:
       - replace-secrets
       - --
       - bundle-size-chart
-    secretEnv: ['ACCESS_TOKEN']
+    secretEnv:
+      - ACCESS_TOKEN
 
   # Install app dependencies
   - name: gcr.io/cloud-builders/npm
