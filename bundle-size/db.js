@@ -15,8 +15,12 @@
 'use strict';
 
 const knex = require('knex');
-const {dbConfig} = require('./db-config.js');
 
 exports.dbConnect = () => {
-  return knex(dbConfig);
+  return knex({
+    client: 'pg',
+    // TODO(danielrozenberg): replace this with a database connection URL when
+    // https://github.com/iceddev/pg-connection-string/pull/34 is merged.
+    connection: JSON.parse(process.env.DATABASE_CONNECTION_JSON),
+  });
 };
