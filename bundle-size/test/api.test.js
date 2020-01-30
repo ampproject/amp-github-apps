@@ -17,6 +17,7 @@ const nock = require('nock');
 const NodeCache = require('node-cache');
 const Octokit = require('@octokit/rest');
 const request = require('supertest');
+const {createTokenAuth} = require('@octokit/auth');
 const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
 const {GitHubUtils} = require('../github-utils');
@@ -41,7 +42,11 @@ describe('bundle-size api', () => {
 
     probot = new Probot({});
     app = probot.load(app => {
-      const githubUtils = new GitHubUtils(new Octokit(), app.log, nodeCache);
+      const githubUtils = new GitHubUtils(
+        new Octokit({authStrategy: createTokenAuth, auth: '_TOKEN_'}),
+        app.log,
+        nodeCache
+      );
       installApiRouter(app, db, githubUtils);
     });
     // Stub app.log.warn to silence test log noise

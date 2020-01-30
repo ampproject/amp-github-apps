@@ -15,6 +15,7 @@
  */
 
 import {createObjectCsvStringifier} from 'csv-writer';
+import {createTokenAuth} from '@octokit/auth';
 import dotenv from 'dotenv';
 import express from 'express';
 import process from 'process';
@@ -56,7 +57,8 @@ app.get('/_cron', async (request, response) => {
   console.log(`Finding bundle sizes until ${earliestCommitDateString}`);
 
   const github = new Octokit({
-    'auth': process.env.ACCESS_TOKEN,
+    authStrategy: createTokenAuth,
+    auth: process.env.ACCESS_TOKEN,
   });
 
   const masterCommits: Array<{sha: string, message: string, date: string}> = [];

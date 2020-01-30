@@ -48,7 +48,8 @@ Whereas in other contexts we construct an `Octokit` instance using the personal 
 
 module.exports = app => {
   const userBasedGithub = new Octokit({
-    'auth': process.env.ACCESS_TOKEN,
+    authStrategy: createTokenAuth,
+    auth: process.env.ACCESS_TOKEN,
   });
 
   app.on('pull_request.opened', /* ... */);
