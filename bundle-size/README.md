@@ -87,9 +87,7 @@ Follow these setup instructions to start developing for this App locally:
      builds and not from pull requests. On Travis, set this as an push-build
      only environment variable and treat this like you would any other access
      token.
-10. Copy the `db-config.example.js` file to `db-config.js` and modify the fields
-    based on the connection information to your database
-11. `npm run dev`
+10. `npm run dev`
    * This will reload the App on every file change. Quit the server with
      `<Ctrl> + C` or `<Cmd> + C`
 

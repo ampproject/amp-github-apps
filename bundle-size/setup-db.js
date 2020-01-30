@@ -49,7 +49,8 @@ module.exports = {setupDb};
  * This file creates the database tables that will be used by the GitHub App.
  *
  * Execute this file by running `npm run setup-db`. Make sure you set up the
- * database connection first. See db-config.example.js for details.
+ * database connection first in your .env file. See the .env.example file for
+ * details.
  */
 if (require.main === module) {
   const db = dbConnect();
