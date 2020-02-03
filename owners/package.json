@@ -19,7 +19,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@google-cloud/storage": "4.3.0",
-    "@octokit/rest": "16.40.0",
+    "@octokit/rest": "16.43.1",
     "express": "4.17.1",
     "highlight": "0.2.4",
     "json5": "2.1.1",

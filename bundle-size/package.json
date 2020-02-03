@@ -20,10 +20,10 @@
     "test": "jest"
   },
   "dependencies": {
-    "@octokit/rest": "16.40.0",
+    "@octokit/rest": "16.43.1",
     "knex": "0.20.8",
     "node-cache": "5.1.0",
-    "pg": "7.17.1",
+    "pg": "7.18.1",
     "probot": "9.9.1",
     "sleep-promise": "8.0.1"
   },
