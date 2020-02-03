@@ -4,3 +4,4 @@
 # for the production environment) by naming them <something>.<config-file-name>.
 /*.app.yaml
 /*.env
+!/redacted.env
