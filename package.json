@@ -20,8 +20,8 @@
     "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "2.18.0",
-    "@typescript-eslint/parser": "2.18.0",
+    "@typescript-eslint/eslint-plugin": "2.19.0",
+    "@typescript-eslint/parser": "2.19.0",
     "ansi-colors": "4.1.1",
     "babel-eslint": "10.0.3",
     "eslint": "6.8.0",
