@@ -130,8 +130,8 @@ class GitHubUtils {
   /**
    * Get a list of all unique team members by team names.
    *
-   * @param {!Array<string>} teamNames names of full team slug names
-   *   ("org/team_slug") format to get members of.
+   * @param {!Array<string>} teamNames list of GitHub team (full) slugs,
+   *   e.g., ["ampproject/wg-coffee", "ampproject/wg-tea"].
    * @return {!Array<string>} all members of the provided teams.
    */
   async getTeamMembers(teamNames) {
