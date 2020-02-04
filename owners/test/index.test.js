@@ -89,6 +89,7 @@ describe('GitHub app', () => {
       DISABLE_WEBHOOK_EVENT_CHECK: 'true',
       GITHUB_OWNER,
       GITHUB_REPOSITORY,
+      GITHUB_ACCESS_TOKEN: '_TOKEN_',
       NODE_ENV: 'test',
     };
 
