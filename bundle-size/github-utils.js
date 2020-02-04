@@ -207,12 +207,10 @@ class GitHubUtils {
    *   there is already a reviewer.
    */
   async chooseReviewer(pullRequest, approverTeams) {
-    const requestedReviewersResponse = await this.github.pullRequests.listReviewRequests(
+    const requestedReviewersResponse = await this.github.pulls.listReviewRequests(
       pullRequest
     );
-    const reviewsResponse = await this.github.pullRequests.listReviews(
-      pullRequest
-    );
+    const reviewsResponse = await this.github.pulls.listReviews(pullRequest);
     const existingReviewers = new Set([
       ...requestedReviewersResponse.data.users.map(user => user.login),
       ...reviewsResponse.data.map(review => review.user.login),
