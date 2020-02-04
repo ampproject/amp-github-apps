@@ -19,6 +19,7 @@ const {ReviewerSelection} = require('../reviewer_selection');
 
 const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
 const EXAMPLE_OWNERS_LINK = 'http://ampproject-owners-bot.appspot.com/example';
+const OWNERS_TREE_LINK = 'http://ampproject-owners-bot.appspot.com/tree';
 
 const CheckRunState = {
   SUCCESS: 'success',
@@ -73,7 +74,9 @@ class CheckRun {
 }
 CheckRun.prototype.helpText =
   'For a description of the OWNERS file syntax, see ' +
-  `[this example file](${EXAMPLE_OWNERS_LINK}).`;
+  `[this example file](${EXAMPLE_OWNERS_LINK}).\n` +
+  'To see the current ownership hierarchy and groups, see ' +
+  `[the full OWNERS tree](${OWNERS_TREE_LINK}).`;
 
 /**
  * Manages checking if a PR has the necessary approvals.
