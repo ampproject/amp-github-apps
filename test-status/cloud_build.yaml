@@ -11,14 +11,12 @@ steps:
       - --
       - test-status
     secretEnv:
-      [
-        'WEBHOOK_SECRET',
-        'GITHUB_CLIENT_SECRET',
-        'PRIVATE_KEY',
-        'DATABASE_CONNECTION_JSON',
-        'APPROVING_USERS',
-        'BUILD_COP_UPDATE_TOKEN',
-      ]
+      - WEBHOOK_SECRET
+      - GITHUB_CLIENT_SECRET
+      - PRIVATE_KEY
+      - DATABASE_CONNECTION_JSON
+      - APPROVING_USERS
+      - BUILD_COP_UPDATE_TOKEN
 
   # Install app dependencies
   - name: gcr.io/cloud-builders/npm
@@ -30,8 +28,6 @@ steps:
   - name: gcr.io/cloud-builders/gcloud
     dir: test-status
     args:
-      - --project
-      - amp-test-status-bot
       - app
       - deploy
 
