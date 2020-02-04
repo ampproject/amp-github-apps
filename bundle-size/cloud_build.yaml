@@ -11,13 +11,11 @@ steps:
       - --
       - bundle-size
     secretEnv:
-      [
-        'WEBHOOK_SECRET',
-        'PRIVATE_KEY',
-        'DATABASE_CONNECTION_JSON',
-        'TRAVIS_PUSH_BUILD_TOKEN',
-        'ACCESS_TOKEN',
-      ]
+      - WEBHOOK_SECRET
+      - PRIVATE_KEY
+      - DATABASE_CONNECTION_JSON
+      - TRAVIS_PUSH_BUILD_TOKEN
+      - ACCESS_TOKEN
 
   # Install app dependencies
   - name: gcr.io/cloud-builders/npm
@@ -29,8 +27,6 @@ steps:
   - name: gcr.io/cloud-builders/gcloud
     dir: bundle-size
     args:
-      - --project
-      - amp-bundle-size-bot
       - app
       - deploy
 
