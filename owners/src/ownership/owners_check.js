@@ -76,7 +76,7 @@ CheckRun.prototype.helpText =
   'For a description of the OWNERS file syntax, see ' +
   `[this example file](${EXAMPLE_OWNERS_LINK}).\n` +
   'To see the current ownership hierarchy and groups, see ' +
-  `[the full OWNERS tree].`
+  `[the full OWNERS tree](${OWNERS_TREE_LINK}).`
   ;
 
 /**
