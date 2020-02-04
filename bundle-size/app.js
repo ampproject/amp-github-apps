@@ -14,11 +14,12 @@
  */
 'use strict';
 
-const Octokit = require('@octokit/rest');
+const {createTokenAuth} = require('@octokit/auth');
 const {dbConnect} = require('./db');
 const {GitHubUtils} = require('./github-utils');
 const {installApiRouter} = require('./api');
 const {installGitHubWebhooks} = require('./webhooks');
+const {Octokit} = require('@octokit/rest');
 
 const db = dbConnect();
 
@@ -29,7 +30,8 @@ const db = dbConnect();
  */
 module.exports = app => {
   const userBasedGithub = new Octokit({
-    'auth': process.env.ACCESS_TOKEN,
+    authStrategy: createTokenAuth,
+    auth: process.env.ACCESS_TOKEN,
   });
 
   const githubUtils = new GitHubUtils(userBasedGithub, app.log);

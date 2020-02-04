@@ -194,7 +194,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
       try {
         // Choose a random capable username and add them as a reviewer to the pull
         // request.
-        return await github.pullRequests.createReviewRequest({
+        return await github.pulls.createReviewRequest({
           reviewers: [newReviewer],
           ...pullRequest,
         });

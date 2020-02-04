@@ -15,12 +15,13 @@
 
 const nock = require('nock');
 const NodeCache = require('node-cache');
-const Octokit = require('@octokit/rest');
 const request = require('supertest');
+const {createTokenAuth} = require('@octokit/auth');
 const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
 const {GitHubUtils} = require('../github-utils');
 const {installApiRouter} = require('../api');
+const {Octokit} = require('@octokit/rest');
 const {Probot} = require('probot');
 const {setupDb} = require('../setup-db');
 
@@ -41,7 +42,11 @@ describe('bundle-size api', () => {
 
     probot = new Probot({});
     app = probot.load(app => {
-      const githubUtils = new GitHubUtils(new Octokit(), app.log, nodeCache);
+      const githubUtils = new GitHubUtils(
+        new Octokit({authStrategy: createTokenAuth, auth: '_TOKEN_'}),
+        app.log,
+        nodeCache
+      );
       installApiRouter(app, db, githubUtils);
     });
     // Stub app.log.warn to silence test log noise
@@ -72,18 +77,12 @@ describe('bundle-size api', () => {
         '/repos/ampproject/amphtml/contents/build-system/tasks/bundle-size/APPROVERS.json'
       )
       .reply(200, getFixture('APPROVERS.json'))
-      .get('/orgs/ampproject/teams/wg-runtime')
-      .reply(200, getFixture('teams.getByName.wg-runtime'))
-      .get('/orgs/ampproject/teams/wg-performance')
-      .reply(200, getFixture('teams.getByName.wg-performance'))
-      .get('/orgs/ampproject/teams/wg-infra')
-      .reply(200, getFixture('teams.getByName.wg-infra'))
-      .get('/teams/3065818/members')
-      .reply(200, getFixture('teams.listMembers.3065818'))
-      .get('/teams/3188896/members')
-      .reply(200, getFixture('teams.listMembers.3188896'))
-      .get('/teams/3065813/members')
-      .reply(200, getFixture('teams.listMembers.3065813'));
+      .get('/orgs/ampproject/teams/wg-infra/members')
+      .reply(200, getFixture('teams.listMembersInOrg.wg-infra'))
+      .get('/orgs/ampproject/teams/wg-performance/members')
+      .reply(200, getFixture('teams.listMembersInOrg.wg-performance'))
+      .get('/orgs/ampproject/teams/wg-runtime/members')
+      .reply(200, getFixture('teams.listMembersInOrg.wg-runtime'));
   });
 
   afterEach(async () => {

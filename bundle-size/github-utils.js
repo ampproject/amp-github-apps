@@ -20,8 +20,6 @@ const path = require('path');
 const CACHE_CHECK_SECONDS = 60;
 const CACHE_APPROVERS_KEY = 'approvers';
 const CACHE_APPROVERS_TTL_SECONDS = 900;
-const CACHE_TEAM_ID_KEY = 'team_id';
-const CACHE_TEAM_ID_TTL_SECONDS = 86400;
 const CACHE_TEAM_MEMBERS_KEY = 'team_members';
 const CACHE_TEAM_MEMBERS_TTL_SECONDS = 3600;
 
@@ -130,49 +128,26 @@ class GitHubUtils {
   }
 
   /**
-   * Convert a team slug to a team id.
-   *
-   * @param {string} teamName the team slug (`organization/team`).
-   * @return {number} the team id.
-   */
-  async getTeamId_(teamName) {
-    const cacheKey = `${CACHE_TEAM_ID_KEY}/${teamName}`;
-    const [org, teamSlug] = teamName.split('/');
-    let teamId = this.cache.get(cacheKey);
-    if (!teamId) {
-      this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
-      teamId = await this.github.teams
-        .getByName({org, team_slug: teamSlug})
-        .then(result => result.data.id);
-      this.log(
-        `Fetched team id ${teamId} for team ${teamName} from GitHub. Caching ` +
-          `for ${CACHE_TEAM_ID_TTL_SECONDS} seconds.`
-      );
-      this.cache.set(cacheKey, teamId, CACHE_TEAM_ID_TTL_SECONDS);
-    }
-    return teamId;
-  }
-
-  /**
    * Get a list of all unique team members by team names.
    *
-   * @param {!Array<string>} teamNames names of full team slug namesto get
-   *   members of.
+   * @param {!Array<string>} teamNames list of GitHub team slugs. e.g.,
+   *   ["ampproject/wg-coffee", "ampproject/wg-tea"].
    * @return {!Array<string>} all members of the provided teams.
    */
   async getTeamMembers(teamNames) {
     const allTeamMembersPromises = teamNames.map(async teamName => {
-      const teamId = await this.getTeamId_(teamName);
-      const cacheKey = `${CACHE_TEAM_MEMBERS_KEY}/${teamId}`;
+      const cacheKey = `${CACHE_TEAM_MEMBERS_KEY}/${teamName}`;
       let teamMembers = this.cache.get(cacheKey);
       if (!teamMembers) {
         this.log(`Cache miss for ${cacheKey}. Fetching from GitHub...`);
+        const [org, teamSlug] = teamName.split('/', 2);
         teamMembers = await this.github.teams
-          .listMembers({team_id: teamId})
+          .listMembersInOrg({org, team_slug: teamSlug})
           .then(result => result.data.map(user => user.login));
         this.log(
-          `Fetched team members [${teamMembers.join(', ')}] for team id ` +
-            `${teamId}. Caching for ${CACHE_TEAM_MEMBERS_TTL_SECONDS} seconds.`
+          `Fetched team members [${teamMembers.join(', ')}] for team ` +
+            `${teamName}. Caching for ${CACHE_TEAM_MEMBERS_TTL_SECONDS} ` +
+            'seconds.'
         );
         this.cache.set(cacheKey, teamMembers, CACHE_TEAM_MEMBERS_TTL_SECONDS);
       }
@@ -207,12 +182,10 @@ class GitHubUtils {
    *   there is already a reviewer.
    */
   async chooseReviewer(pullRequest, approverTeams) {
-    const requestedReviewersResponse = await this.github.pullRequests.listReviewRequests(
+    const requestedReviewersResponse = await this.github.pulls.listReviewRequests(
       pullRequest
     );
-    const reviewsResponse = await this.github.pullRequests.listReviews(
-      pullRequest
-    );
+    const reviewsResponse = await this.github.pulls.listReviews(pullRequest);
     const existingReviewers = new Set([
       ...requestedReviewersResponse.data.users.map(user => user.login),
       ...reviewsResponse.data.map(review => review.user.login),

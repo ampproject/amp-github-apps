@@ -231,6 +231,11 @@ class GitHub {
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
 
+    // TODO(#685): teams.listMembers is deprecated, replace this with
+    // teams.listMembersInOrg, which takes as argument an object with two
+    // fields: `org` (e.g., "ampproject") and team_name (e.g, "wg-infra").
+    // This means you can drop any logic that requires looking up the numeric
+    // team id.
     const memberList = await this._paginate(this.client.teams.listMembers, {
       team_id: teamId,
     });
@@ -246,7 +251,7 @@ class GitHub {
    * @return {!PullRequest} pull request instance.
    */
   async getPullRequest(number) {
-    const response = await this.client.pullRequests.get(
+    const response = await this.client.pulls.get(
       this.repo({
         pull_number: number,
       })
@@ -304,9 +309,7 @@ class GitHub {
       `Requesting review for PR #${number} from: ${reviewers.join(', ')}`
     );
 
-    await this.client.pullRequests.createReviewRequest(
-      this.repo({number, reviewers})
-    );
+    await this.client.pulls.createReviewRequest(this.repo({number, reviewers}));
   }
 
   /**
@@ -318,7 +321,7 @@ class GitHub {
   async getReviewRequests(number) {
     this.logger.info(`Fetching review requests for PR #${number}`);
 
-    const response = await this.client.pullRequests.listReviewRequests(
+    const response = await this.client.pulls.listReviewRequests(
       this.repo({number})
     );
     this.logger.debug('[getReviewRequests]', number, response.data);
@@ -426,7 +429,7 @@ class GitHub {
     this.logger.info(`Fetching changed files for PR #${number}`);
 
     const files = await this._paginate(
-      this.client.pullRequests.listFiles,
+      this.client.pulls.listFiles,
       this.repo({pull_number: number})
     );
     this.logger.debug('[listFiles]', number, files);
