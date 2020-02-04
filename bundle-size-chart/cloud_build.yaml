@@ -23,15 +23,11 @@ steps:
   - name: gcr.io/cloud-builders/gcloud
     dir: bundle-size-chart
     args:
-      - --project
-      - amp-bundle-size-chart
       - app
       - deploy
   - name: gcr.io/cloud-builders/gcloud
     dir: bundle-size-chart
     args:
-      - --project
-      - amp-bundle-size-chart
       - app
       - deploy
       - cron.yaml
