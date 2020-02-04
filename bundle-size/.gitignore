@@ -1,6 +1,4 @@
-app.yaml
-
 # You can maintain multiple configuration files (for your local development and
 # for the production environment) by naming them <something>.<config-file-name>.
-*.app.yaml
-*.env
+/*.env
+!/redacted.env

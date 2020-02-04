@@ -1,0 +1,42 @@
+steps:
+  # The first two steps are required to identify and inject un-redacted secrets.
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - install
+      - yaml
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - run
+      - replace-secrets
+      - --
+      - bundle-size
+    secretEnv:
+      - WEBHOOK_SECRET
+      - PRIVATE_KEY
+      - DATABASE_CONNECTION_JSON
+      - TRAVIS_PUSH_BUILD_TOKEN
+      - ACCESS_TOKEN
+
+  # Install app dependencies
+  - name: gcr.io/cloud-builders/npm
+    dir: bundle-size
+    args:
+      - install
+
+  # Deploy the app and its cron tasks
+  - name: gcr.io/cloud-builders/gcloud
+    dir: bundle-size
+    args:
+      - app
+      - deploy
+
+# These secrets are the base64-encoded form of encrypted secret values. They are
+# automatically decrypted and added to the `.env` environment at build time.
+secrets:
+  - kmsKeyName: projects/amp-bundle-size-bot/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+    secretEnv:
+      WEBHOOK_SECRET: CiQACk+Z5liXn36gO9hfrFiW9308QI40AeFIkCsAGN5KIF2+dyESUQD71Pbb9uAeG/MCuInFTgfSzijmO3emP3FCWoLXd5jYCBOLQMNk91qyMtV9uff/iOKjo5md5gPglHTAY3g5R8TFodiaSRj9tVQR0f3WDbpj+A==
+      PRIVATE_KEY: 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
+      DATABASE_CONNECTION_JSON: CiQACk+Z5l9Ac/FkQRKBZ2lBY+v4izf5OlyoaDakLRUUUYJJXv0SuAEA+9T22wTzyhiXFOVAWGuJBaKPmvj6HPBRp77N45KM6BA1HNhL5URGqIRXpKIQgHeTeCkTNoP5O1+2UHr1RalowPMDnQGfgYNtsWIRfj2mDPrZdGJ03NbcPRbOgZID/E4oj03SEN9/qwi8M2mr8IrV/e6DS48PO7ityGwB4h8xp49Z4VqK7ssJEYmZgtmDtI696Ci3xDtBjkNOKRn5f6kQHJtjD86IP+YDKTbEuae+pQwatCtW5k2s
+      TRAVIS_PUSH_BUILD_TOKEN: CiQACk+Z5iAM1lpf2bq34klKka3C4lgUX6jDiC+ZfjIKpbwetUcSUQD71PbbQMAngw4BcPrcmObkZUNty+UkMDqixa0KCoh0ntpgv0w4DH//MbkaMJpbdFvy6q3uyuJGJ1NFTcmjOwVug21M6wbpJ96hsKaU7HLI7g==
+      ACCESS_TOKEN: CiQACk+Z5nlIejacRPzT21H3b7Hl/LTWi9KZZpK6fDjtfAZoS1USUQD71PbbOzsfy+3wlNZ2AZff34vNaSc9tIn7rdmS1w2UmrwIUj9qFrUAqAoc2ZcH0HOfb/PLYIokX5Bv+yO/eiMX7obdTCH4ve1/Hbte3yzYAQ==
