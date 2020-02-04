@@ -231,6 +231,11 @@ class GitHub {
   async getTeamMembers(teamId) {
     this.logger.info(`Fetching team members for team with ID ${teamId}`);
 
+    // TODO(rcebulko): teams.listMembers is deprecated, replace this with
+    // teams.listMembersInOrg, which takes as argument an object with two
+    // fields: `org` (e.g., "ampproject") and team_name (e.g, "wg-infra").
+    // This means you can drop any logic that requires looking up the numeric
+    // team id.
     const memberList = await this._paginate(this.client.teams.listMembers, {
       team_id: teamId,
     });
