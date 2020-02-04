@@ -19,7 +19,7 @@ import {createTokenAuth} from '@octokit/auth';
 import dotenv from 'dotenv';
 import express from 'express';
 import process from 'process';
-import Octokit from '@octokit/rest';
+import {Octokit} from '@octokit/rest';
 import {Storage} from '@google-cloud/storage';
 
 const CRON_TIMEOUT_MS = 600000; // 10 minutes, the GAE cron timeout limit.

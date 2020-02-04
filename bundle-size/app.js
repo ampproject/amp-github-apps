@@ -14,12 +14,12 @@
  */
 'use strict';
 
-const Octokit = require('@octokit/rest');
 const {createTokenAuth} = require('@octokit/auth');
 const {dbConnect} = require('./db');
 const {GitHubUtils} = require('./github-utils');
 const {installApiRouter} = require('./api');
 const {installGitHubWebhooks} = require('./webhooks');
+const {Octokit} = require('@octokit/rest');
 
 const db = dbConnect();
 

@@ -29,9 +29,9 @@
 
 require('dotenv').config();
 
-const Octokit = require('@octokit/rest');
 const sleep = require('sleep-promise');
 const {createTokenAuth} = require('@octokit/auth');
+const {Octokit} = require('@octokit/rest');
 
 const CompoundCache = require('../src//cache/compound_cache');
 const VirtualRepository = require('../src/repo/virtual_repo');
