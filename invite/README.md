@@ -24,11 +24,20 @@ Webhooks
 
 The app subscribes to the following GitHub Webhooks:
 
+> Note: This app does not attempt to catch comments which are edited to add an invite macro; this allows simpler stateless processing without potentially re-issuing invitations if comments are edited
+
 * [`IssueCommentEvent`](https://developer.github.com/v3/activity/events/types/#issuecommentevent)
-  * `created`: check the comment for any known trigger macros
-  > Note: This app does not attempt to catch comments which are edited to add an invite macro; this allows simpler stateless processing without potentially re-issuing invitations if comments are edited
-* [`MemberEvent`](https://developer.github.com/v3/activity/events/types/#memberevent)
-  * `added`: comment on the original invite comment, and possibly assign a corresponding issue, to a member who accepts her invitation
+  * `created`: check the comment for trigger macros
+* [`IssueEvent`](https://developer.github.com/v3/activity/events/types/#issueevent)
+  * `opened`: check the issue body for trigger macros
+* [`PullRequestEvent`](https://developer.github.com/v3/activity/events/types/#pullrequestevent)
+  * `created`: check the PR description for trigger macros
+* [`PullRequestReviewEvent`](https://developer.github.com/v3/activity/events/types/#pullrequestreviewevent)
+  * `submitted`: check the review body for trigger macros
+* [`PullRequestReviewCommentEvent`](https://developer.github.com/v3/activity/events/types/#pullrequestreviewcommentevent)
+  * `created`: check the review comment for trigger macros
+* [`OrganizationEvent`](https://developer.github.com/v3/activity/events/types/#organizationevent)
+  * `member_added`: comment on the original invite comment, and possibly assign a corresponding issue, to a member who accepts her invitation
 
 Setup
 -----
