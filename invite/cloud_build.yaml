@@ -1,0 +1,36 @@
+steps:
+  # The first two steps are required to identify and inject un-redacted secrets.
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - install
+      - yaml
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - run
+      - replace-secrets
+      - --
+      - invite
+    secretEnv:
+      - PRIVATE_KEY
+      - WEBHOOK_SECRET
+      - GITHUB_ACCESS_TOKEN
+
+  # Deploy the app and its cron tasks
+  - name: gcr.io/cloud-builders/gcloud
+    dir: invite
+    args:
+      - functions
+      - deploy
+      - invite-bot
+      - --entry-point
+      - probot
+
+# These secrets are the base64-encoded form of encrypted secret values. They are
+# automatically decrypted and added to the `.env` environment at build time.
+secrets:
+  - kmsKeyName: projects/[PROJECT_NAME]/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+    secretEnv:
+      PRIVATE_KEY:
+      WEBHOOK_SECRET:
+      GITHUB_ACCESS_TOKEN:
+
