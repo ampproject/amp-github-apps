@@ -4,9 +4,7 @@ AMP Invite Bot
 A GitHub App that invites GitHub users to the an organization based
 on GitHub comment macros (ie. `/invite` and `/tryassign`).
 
-This app runs as a Google Cloud Functions deployment and is currently installed
-on the [ampproject orginazition](https://github.com/ampproject). It can be
-configured for deployment to other organizations.
+This app runs as a Google Cloud Functions deployment. It can be configured for deployment to any organization.
 
 Interface
 ---------
