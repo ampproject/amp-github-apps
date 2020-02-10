@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-module.exports = app => {
+import {Application, Context} from 'probot';
+
+module.exports = (app: Application) => {
   if (process.env.NODE_ENV !== 'test') {
     require('dotenv').config();
   }
@@ -27,13 +29,13 @@ module.exports = app => {
       'pull_request_review.submitted',
       'pull_request_review_comment.created',
     ],
-    async context => {
+    async (context: Context) => {
       context.log.info(`Received ${context.event}.${context.payload.action}`);
       context.log.info('TODO: Process the comment');
     }
   );
 
-  app.on('organization.member_added', async context => {
+  app.on('organization.member_added', async (context: Context) => {
     context.log.info(`Received ${context.event}.${context.payload.action}`);
     context.log.info('TODO: Process the accepted invite');
   });
