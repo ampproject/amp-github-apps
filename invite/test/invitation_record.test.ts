@@ -17,7 +17,7 @@
 import {Invite, InviteAction} from '../src/types';
 import {InvitationRecord} from '../src/invitation_record';
 
-describe('invitation record', () => {
+describe.skip('invitation record', () => {
   let record: InvitationRecord;
   const invite: Invite = {
     username: 'someone',
