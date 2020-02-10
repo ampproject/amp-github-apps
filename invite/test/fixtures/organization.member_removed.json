@@ -1,0 +1,70 @@
+{
+  "event": "organization",
+  "payload": {
+    "action": "member_removed",
+    "membership": {
+      "url": "https://api.github.com/orgs/test_org/memberships/someone_else",
+      "state": "inactive",
+      "role": "unaffiliated",
+      "organization_url": "https://api.github.com/orgs/test_org",
+      "user": {
+        "login": "someone_else",
+        "id": 24681012,
+        "node_id": "MDQ6VXNlcjIzMjY5MDc4",
+        "avatar_url": "https://avatars3.githubusercontent.com/u/24681012?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/someone_else",
+        "html_url": "https://github.com/someone_else",
+        "followers_url": "https://api.github.com/users/someone_else/followers",
+        "following_url": "https://api.github.com/users/someone_else/following{/other_user}",
+        "gists_url": "https://api.github.com/users/someone_else/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/someone_else/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/someone_else/subscriptions",
+        "organizations_url": "https://api.github.com/users/someone_else/orgs",
+        "repos_url": "https://api.github.com/users/someone_else/repos",
+        "events_url": "https://api.github.com/users/someone_else/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/someone_else/received_events",
+        "type": "User",
+        "site_admin": false
+      }
+    },
+    "organization": {
+      "login": "test_org",
+      "id": 12345678,
+      "node_id": "MDEyOk9yZ2FuaXphdGlvbjYwODg5NTM5",
+      "url": "https://api.github.com/orgs/test_org",
+      "repos_url": "https://api.github.com/orgs/test_org/repos",
+      "events_url": "https://api.github.com/orgs/test_org/events",
+      "hooks_url": "https://api.github.com/orgs/test_org/hooks",
+      "issues_url": "https://api.github.com/orgs/test_org/issues",
+      "members_url": "https://api.github.com/orgs/test_org/members{/member}",
+      "public_members_url": "https://api.github.com/orgs/test_org/public_members{/member}",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/12345678?v=4",
+      "description": null
+    },
+    "sender": {
+      "login": "someone",
+      "id": 1357911,
+      "node_id": "MDQ6VXNlcjY2OTQ1MTI=",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1357911?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/someone",
+      "html_url": "https://github.com/someone",
+      "followers_url": "https://api.github.com/users/someone/followers",
+      "following_url": "https://api.github.com/users/someone/following{/other_user}",
+      "gists_url": "https://api.github.com/users/someone/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/someone/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/someone/subscriptions",
+      "organizations_url": "https://api.github.com/users/someone/orgs",
+      "repos_url": "https://api.github.com/users/someone/repos",
+      "events_url": "https://api.github.com/users/someone/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/someone/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "installation": {
+      "id": 6709063,
+      "node_id": "MDIzOkludGVncmF0aW9uSW5zdGFsbGF0aW9uNjcwOTA2Mw=="
+    }
+  }
+}
