@@ -13,17 +13,14 @@
  * limitations under the License.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Get a JSON test fixture object.
- *
- * @param {!string} name name of the JSON fixture file (without .json).
- * @return {!object} the named JSON test fixture file.
  */
-exports.getFixture = name => {
+export function getFixture(name: string): Object {
   return JSON.parse(
-    fs.readFileSync(path.join(__dirname, `${name}.json`))
+    fs.readFileSync(path.join(__dirname, `${name}.json`)).toString('utf8')
   );
 };
