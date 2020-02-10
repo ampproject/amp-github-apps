@@ -23,7 +23,7 @@ export class InvitationRecord {
   /**
    * Constructor.
    */
-  constructor(logger: ILogger = console) {}
+  constructor(private logger: ILogger = console) {}
 
   /**
    * Records an invite created by the bot.

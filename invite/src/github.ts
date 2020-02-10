@@ -25,16 +25,14 @@ import {ILogger} from './types';
  * Interface for working with the GitHub API.
  */
 export class GitHub {
-  private client: Octokit;
-  private org: string;
-  private logger: ILogger;
-
   /**
    * Constructor.
    */
-  constructor(client: Octokit, org: string, logger: ILogger = console) {
-    Object.assign(this, {client, org, logger});
-  }
+  constructor(
+    private client: Octokit,
+    private org: string,
+    private logger: ILogger = console
+  ) {}
 
   /**
    * Checks whether a user is a member of the organization.
