@@ -1,0 +1,53 @@
+{
+  "name": "amp-invite-bot",
+  "author": "The AMP HTML Authors",
+  "version": "0.0.1",
+  "private": true,
+  "repository": "http://github.com/ampproject/amp-github-apps",
+  "description": "A GitHub app which invites users to an organization in response to comment macros.",
+  "engines": {
+    "node": "^12.13.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "probot run ./app.js",
+    "dev": "nodemon",
+    "deploy-tag": "git tag 'deploy-invite-'`date --utc '+%Y%m%d%H%M%S'`",
+    "test": "jest",
+    "test:watch": "jest --watch --notify --notifyMode=change"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@octokit/auth": "1.1.1",
+    "@octokit/rest": "16.43.1",
+    "@probot/serverless-gcf": "0.2.0",
+    "dotenv": "8.2.0",
+    "probot": "9.9.1",
+    "typescript": "3.7.5"
+  },
+  "devDependencies": {
+    "@types/jest": "25.1.2",
+    "@types/node": "13.7.0",
+    "jest": "24.9.0",
+    "nock": "11.7.2",
+    "nodemon": "2.0.2",
+    "ts-jest": "25.2.0",
+    "ts-node": "8.6.2"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
+  "nodemonConfig": {
+    "exec": "npm start",
+    "watch": [
+      ".env",
+      "."
+    ]
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  }
+}
