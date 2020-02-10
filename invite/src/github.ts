@@ -15,7 +15,6 @@
  */
 
 import {Octokit} from '@octokit/rest';
-import {GitHubAPI} from 'probot/lib/github';
 
 import {ILogger} from './types';
 
