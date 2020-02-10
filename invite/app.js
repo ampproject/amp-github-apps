@@ -19,19 +19,22 @@ module.exports = app => {
     require('dotenv').config();
   }
 
-  app.on([
-    'issue_comment.created'
-    'issue.opened'
-    'pull_request.opened'
-    'pull_request_review.submitted'
-    'pull_request_review_comment.created'
-  ], async context => {
-    context.log.info(`Received ${context.event}.${context.payload.action}`);
-    context.log.info('TODO: Process the comment')
-  });
+  app.on(
+    [
+      'issue_comment.created',
+      'issue.opened',
+      'pull_request.opened',
+      'pull_request_review.submitted',
+      'pull_request_review_comment.created',
+    ],
+    async context => {
+      context.log.info(`Received ${context.event}.${context.payload.action}`);
+      context.log.info('TODO: Process the comment');
+    }
+  );
 
   app.on('organization.member_added', async context => {
     context.log.info(`Received ${context.event}.${context.payload.action}`);
-    context.log.info('TODO: Process the accepted invite')
+    context.log.info('TODO: Process the accepted invite');
   });
-}
+};
