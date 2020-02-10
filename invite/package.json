@@ -9,6 +9,7 @@
     "node": "^12.13.1"
   },
   "scripts": {
+    "build": "tsc ./*.ts",
     "start": "probot run ./app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-invite-'`date --utc '+%Y%m%d%H%M%S'`",
@@ -21,12 +22,17 @@
     "@octokit/rest": "16.43.1",
     "@probot/serverless-gcf": "0.2.0",
     "dotenv": "8.2.0",
-    "probot": "9.9.1"
+    "probot": "9.9.1",
+    "typescript": "3.7.5"
   },
   "devDependencies": {
+    "@types/jest": "25.1.2",
+    "@types/node": "13.7.0",
     "jest": "24.9.0",
     "nock": "11.7.2",
-    "nodemon": "2.0.2"
+    "nodemon": "2.0.2",
+    "ts-jest": "25.2.0",
+    "ts-node": "8.6.2"
   },
   "standard": {
     "env": [
@@ -41,6 +47,7 @@
     ]
   },
   "jest": {
+    "preset": "ts-jest",
     "testEnvironment": "node"
   }
 }
