@@ -21,7 +21,7 @@ import {Octokit} from '@octokit/rest';
 import {getFixture} from './fixtures';
 import {GitHub} from '../src/github';
 
-describe('GitHub interface', () => {
+describe.skip('GitHub interface', () => {
   const githubClient: Octokit = new Octokit({
     authStrategy: createTokenAuth,
     auth: '_TOKEN_',
