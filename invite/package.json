@@ -9,7 +9,7 @@
     "node": "^12.13.1"
   },
   "scripts": {
-    "build": "tsc ./*.ts",
+    "build": "tsc",
     "start": "probot run ./app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-invite-'`date --utc '+%Y%m%d%H%M%S'`",
