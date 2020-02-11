@@ -14,9 +14,31 @@
  * limitations under the License.
  */
 
+/**
+ * A standard logging interface.
+ */
 export interface ILogger {
   debug(message: string, ...extraInfo: any[]): void;
   warn(message: string, ...extraInfo: any[]): void;
   error(message: string, ...extraInfo: any[]): void;
   info(message: string, ...extraInfo: any[]): void;
+}
+
+/**
+ * Possible invite action types.
+ */
+export enum InviteAction {
+  INVITE = 'invite',
+  INVITE_AND_ASSIGN = 'invite_and_assign',
+}
+
+/**
+ * An invite triggered by the bot.
+ */
+export interface Invite {
+  username: string;
+  repo: string;
+  issue_number: number;
+  action: InviteAction;
+  archived?: boolean;
 }

@@ -13,6 +13,7 @@
     "fix": "eslint **/*.ts --fix",
     "lint-conflicts": "eslint --print-config app.ts | eslint-config-prettier-check",
     "build": "tsc",
+    "build:watch": "tsc -w --p tsconfig.json",
     "start": "probot run ./app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-invite-'`date --utc '+%Y%m%d%H%M%S'`",
