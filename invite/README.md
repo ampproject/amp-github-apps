@@ -60,7 +60,7 @@ Setup
    take note of the App ID and app Client Secret.
 6. Install the application on a GitHub repository that you want to use for
    testing. You might want to fork the [ampproject/amphtml](https://github.com/ampproject/amphtml) repository or create a new repository for this purpose.
-7. Run a local instance of PostgreSQL, or use the [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy) to connect to a[Cloud SQL instance](https://pantheon.corp.google.com/sql/choose-instance-engine?project=ampproject-invite-bot)
+7. Run a local instance of PostgreSQL, or use the [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy) to connect to a [Cloud SQL instance](https://pantheon.corp.google.com/sql/choose-instance-engine?project=ampproject-invite-bot)
    * While other database engines might work, we have only tested this on `pg`
    * Take note of the instance ID and default user password.
 8. Enable the [Cloud SQL Admin API](https://pantheon.corp.google.com/flows/enableapi?apiid=sqladmin)
