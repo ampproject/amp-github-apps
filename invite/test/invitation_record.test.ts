@@ -32,15 +32,8 @@ describe.skip('invitation record', () => {
   });
 
   describe('recordInvite', () => {
-    // TODO: Update once the storage interface is determined.
-    it('records an invite', async done => {
-      throw new Error('Not implemented!');
-      done();
-    });
-    it('sets `archived = false`', async done => {
-      throw new Error('Not implemented!');
-      done();
-    });
+    it.todo('records an invite');
+    it.todo('sets `archived = false`');
   });
 
   describe('getInvites', () => {
