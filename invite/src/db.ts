@@ -22,7 +22,12 @@ export type Database = Knex;
 export function dbConnect(): Database {
   return Knex({
     client: 'pg',
-    connection: process.env.DB_CONNECTION_STRING,
+    connection: {
+      host: process.env.DB_UNIX_SOCKET,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    },
     useNullAsDefault: true,
   } as Knex.Config);
 };
