@@ -70,8 +70,12 @@ export class GitHub {
     issue_number: number,
     assignee: string
   ): Promise<void> {
-    // https://octokit.github.io/rest.js/#octokit-routes-issues-add-assignee
-    // octokit.issues.addAssignees({owner, repo, issue_number, assignees})
+    await this.client.issues.addAssignees({
+      owner: this.org,
+      repo,
+      issue_number,
+      assignees: [assignee],
+    });
   }
 }
 
