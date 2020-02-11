@@ -49,20 +49,16 @@ describe('invitation record', () => {
     it('records an invite', async done => {
       record.recordInvite(invite);
 
-      expect(
-        await db('invites')
-          .select()
-          .first()
-      ).toEqual(invite);
+      const recordedInvite = await db('invites').first()
+      expect(recordedInvite).toMatchObject(invite);
       done();
     });
 
     it('sets `archived = false`', async done => {
-      expect(
-        await db('invites')
-          .pluck('archived')
-          .first()
-      ).toEqual(false);
+      record.recordInvite(invite);
+
+      const recordedInvite = await db('invites').first();
+      expect(recordedInvite.archived).toBeFalsy();
       done();
     });
   });

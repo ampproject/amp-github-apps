@@ -32,7 +32,9 @@ export class InvitationRecord {
   /**
    * Records an invite created by the bot.
    */
-  async recordInvite(invite: Invite): Promise<void> {}
+  async recordInvite(invite: Invite): Promise<void> {
+    await this.db('invites').insert(invite);
+  }
 
   /**
    * Looks up the invites for a user.
