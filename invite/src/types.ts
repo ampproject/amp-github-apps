@@ -40,5 +40,5 @@ export interface Invite {
   repo: string;
   issue_number: number;
   action: InviteAction;
-  archived?: boolean;
+  archived?: boolean|number;  // stored as a TINYINT in PostgresQL
 }
