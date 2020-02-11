@@ -40,7 +40,9 @@ export class InvitationRecord {
    * Looks up the invites for a user.
    */
   async getInvites(username: string): Promise<Array<Invite>> {
-    return [];
+    return await this.db('invites')
+      .select()
+      .where({username, archived: false});
   }
 
   /**

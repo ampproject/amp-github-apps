@@ -34,6 +34,12 @@ describe('invitation record', () => {
     issue_number: 1337,
     action: InviteAction.INVITE,
   };
+  const otherInvite: Invite = {
+    username: 'someone',
+    repo: 'test_repo',
+    issue_number: 42,
+    action: InviteAction.INVITE,
+  }
   const archivedInvite: Invite = Object.assign({archived: true}, invite);
 
   beforeAll(async () => setupDb(db));
@@ -49,7 +55,7 @@ describe('invitation record', () => {
     it('records an invite', async done => {
       record.recordInvite(invite);
 
-      const recordedInvite = await db('invites').first()
+      const recordedInvite: Invite = await db('invites').first()
       expect(recordedInvite).toMatchObject(invite);
       done();
     });
@@ -57,7 +63,7 @@ describe('invitation record', () => {
     it('sets `archived = false`', async done => {
       record.recordInvite(invite);
 
-      const recordedInvite = await db('invites').first();
+      const recordedInvite: Invite = await db('invites').first();
       expect(recordedInvite.archived).toBeFalsy();
       done();
     });
@@ -74,10 +80,14 @@ describe('invitation record', () => {
     describe('if records exists of invites to the user', () => {
       beforeEach(async () => {
         await record.recordInvite(invite);
+        await record.recordInvite(otherInvite);
       });
 
       it('returns the invites', async done => {
-        expect(await record.getInvites('someone')).toEqual([invite]);
+        const recordedInvites: Array<Invite> = await record.getInvites('someone');
+
+        expect(recordedInvites[0]).toMatchObject(invite);
+        expect(recordedInvites[1]).toMatchObject(otherInvite);
         done();
       });
     });
@@ -98,12 +108,7 @@ describe('invitation record', () => {
     describe('if records exists of any invites to the user', () => {
       beforeEach(async () => {
         await record.recordInvite(invite);
-        await record.recordInvite({
-          username: 'someone',
-          repo: 'test_repo',
-          issue_number: 42,
-          action: InviteAction.INVITE,
-        });
+        await record.recordInvite(otherInvite);
       });
 
       it('updates the invite records', async done => {
