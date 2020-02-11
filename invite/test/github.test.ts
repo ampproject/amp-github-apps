@@ -21,7 +21,7 @@ import {Octokit} from '@octokit/rest';
 import {getFixture} from './fixtures';
 import {GitHub} from '../src/github';
 
-describe.skip('GitHub interface', () => {
+describe('GitHub interface', () => {
   const githubClient: Octokit = new Octokit({
     authStrategy: createTokenAuth,
     auth: '_TOKEN_',
@@ -46,35 +46,6 @@ describe.skip('GitHub interface', () => {
       throw new Error('Not all nock interceptors were used!');
       nock.cleanAll();
     }
-  });
-
-  describe('userIsMember', () => {
-    it('GETs /orgs/:org/members/:username', async done => {
-      nock('https://api.github.com')
-        .get('/orgs/test_org/members/someone')
-        .reply(204);
-
-      await github.userIsMember('someone');
-      done();
-    });
-
-    it('returns true for 204: No Content', async done => {
-      nock('https://api.github.com')
-        .get('/orgs/test_org/members/someone')
-        .reply(204);
-
-      expect(await github.userIsMember('someone')).toBe(true);
-      done();
-    });
-
-    it('returns false for 404: Not Found', async done => {
-      nock('https://api.github.com')
-        .get('/orgs/test_org/members/someone')
-        .reply(404);
-
-      expect(await github.userIsMember('someone')).toBe(false);
-      done();
-    });
   });
 
   describe('inviteUser', () => {
