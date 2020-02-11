@@ -51,7 +51,7 @@ export class InviteBot {
   /**
    * Process an accepted invite by adding comments and assigning issues.
    */
-  async processAcceptedInvite(repo: string, username: string): Promise<void> {}
+  async processAcceptedInvite(username: string): Promise<void> {}
 
   /**
    * Parses a comment for invitation macros.

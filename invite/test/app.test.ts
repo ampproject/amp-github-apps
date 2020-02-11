@@ -104,14 +104,13 @@ describe('Probot webhooks', () => {
     });
   });
 
-  describe.skip('on organization.member_added event', () => {
+  describe('on organization.member_added event', () => {
     it('processes the accepted invite with follow-up actions', async done => {
       await triggerWebhook(probot, 'organization.member_added');
 
-      expect(InviteBot.prototype.processComment).toBeCalledWith(
-        'test_repo',
-        'someone'
-      );
+      expect(
+        InviteBot.prototype.processAcceptedInvite
+      ).toBeCalledWith('someone_else');
       done();
     });
   });
@@ -120,7 +119,7 @@ describe('Probot webhooks', () => {
     it('does not process the new membership', async done => {
       await triggerWebhook(probot, 'organization.member_invited');
 
-      expect(InviteBot.prototype.processComment).not.toBeCalledWith();
+      expect(InviteBot.prototype.processAcceptedInvite).not.toBeCalledWith();
       done();
     });
   });
@@ -129,7 +128,7 @@ describe('Probot webhooks', () => {
     it('does not process the new membership', async done => {
       await triggerWebhook(probot, 'organization.member_removed');
 
-      expect(InviteBot.prototype.processComment).not.toBeCalledWith();
+      expect(InviteBot.prototype.processAcceptedInvite).not.toBeCalledWith();
       done();
     });
   });

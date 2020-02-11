@@ -113,14 +113,11 @@ export default (app: Application) => {
     }
   );
 
-  listen(
-    'organization.member_added',
-    async (
-      inviteBot: InviteBot,
-      payload: Webhooks.WebhookPayloadOrganization
-    ) => {
-      // context.log.info(`Received ${context.event}.${context.payload.action}`);
-      // context.log.info('TODO: Process the accepted invite');
-    }
+  listen('organization.member_added', async (
+    inviteBot: InviteBot,
+    payload: Webhooks.WebhookPayloadOrganization,
+  ) => {
+    await inviteBot.processAcceptedInvite(payload.membership.user.login);
+  }
   );
 };
