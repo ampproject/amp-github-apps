@@ -45,10 +45,6 @@
     "no-sequences": 2,
     "no-throw-literal": 2,
     "no-unused-expressions": 0,
-    "no-unused-vars": [2, {
-      "argsIgnorePattern": "^var_|opt_|unused",
-      "varsIgnorePattern": "AmpElement|Def|Interface$"
-    }],
     "no-var": 2,
     "no-useless-call": 2,
     "no-useless-concat": 2,
