@@ -25,33 +25,26 @@ import {ILogger} from './types';
  * Interface for working with the GitHub API.
  */
 export class GitHub {
-  private client: Octokit;
-  private org: string;
-  private logger: ILogger;
-
   /**
    * Constructor.
    */
-  constructor(client: Octokit, org: string, logger: ILogger = console) {
-    Object.assign(this, {client, org, logger});
-  }
+  constructor(
+    private client: Octokit,
+    private org: string,
+    private logger: ILogger = console
+  ) {}
 
   /**
-   * Checks whether a user is a member of the organization.
-   */
-  async userIsMember(username: string): Promise<boolean> {
-    // https://octokit.github.io/rest.js/#octokit-routes-orgs-check-membership
-    // octokit.orgs.checkMembership({org, username});
-    return false;
-  }
-
-  /**
-   * Attempts to invite a user to the organization.
+   * Attempts to invite a user to the organization. Returns true if an invite
+   * was sent; false if the user was already a member.
    */
   async inviteUser(username: string): Promise<boolean> {
-    // https://octokit.github.io/rest.js/#octokit-routes-orgs-create-invitation
-    // octokit.orgs.addOrUpdateMembership({org, username})
-    return false;
+    const response = await this.client.orgs.addOrUpdateMembership({
+      org: this.org,
+      username,
+    });
+
+    return response.data.state === 'pending';
   }
 
   /**
@@ -62,8 +55,12 @@ export class GitHub {
     issue_number: number,
     comment: string
   ): Promise<void> {
-    // https://octokit.github.io/rest.js/#octokit-routes-issues-create-comment
-    // octokit.issues.createComment({owner, repo, issue_number, body})
+    await this.client.issues.createComment({
+      owner: this.org,
+      repo,
+      issue_number,
+      body: comment,
+    });
   }
 
   /**
@@ -74,8 +71,12 @@ export class GitHub {
     issue_number: number,
     assignee: string
   ): Promise<void> {
-    // https://octokit.github.io/rest.js/#octokit-routes-issues-add-assignee
-    // octokit.issues.addAssignees({owner, repo, issue_number, assignees})
+    await this.client.issues.addAssignees({
+      owner: this.org,
+      repo,
+      issue_number,
+      assignees: [assignee],
+    });
   }
 }
 

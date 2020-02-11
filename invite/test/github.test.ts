@@ -21,7 +21,7 @@ import {Octokit} from '@octokit/rest';
 import {getFixture} from './fixtures';
 import {GitHub} from '../src/github';
 
-describe.skip('GitHub interface', () => {
+describe('GitHub interface', () => {
   const githubClient: Octokit = new Octokit({
     authStrategy: createTokenAuth,
     auth: '_TOKEN_',
@@ -46,35 +46,6 @@ describe.skip('GitHub interface', () => {
       throw new Error('Not all nock interceptors were used!');
       nock.cleanAll();
     }
-  });
-
-  describe('userIsMember', () => {
-    it('GETs /orgs/:org/members/:username', async done => {
-      nock('https://api.github.com')
-        .get('/orgs/test_org/members/someone')
-        .reply(204);
-
-      await github.userIsMember('someone');
-      done();
-    });
-
-    it('returns true for 204: No Content', async done => {
-      nock('https://api.github.com')
-        .get('/orgs/test_org/members/someone')
-        .reply(204);
-
-      expect(await github.userIsMember('someone')).toBe(true);
-      done();
-    });
-
-    it('returns false for 404: Not Found', async done => {
-      nock('https://api.github.com')
-        .get('/orgs/test_org/members/someone')
-        .reply(404);
-
-      expect(await github.userIsMember('someone')).toBe(false);
-      done();
-    });
   });
 
   describe('inviteUser', () => {
@@ -107,9 +78,9 @@ describe.skip('GitHub interface', () => {
   });
 
   describe('addComment', () => {
-    it('POSTs comment to /repos/:owner/:repo/:issue_number/comment', async done => {
+    it('POSTs comment to /repos/:owner/:repo/issues/:issue_number/comments', async done => {
       nock('https://api.github.com')
-        .post('/repos/test_org/test_repo/1337/comment', body => {
+        .post('/repos/test_org/test_repo/issues/1337/comments', body => {
           expect(body).toEqual({body: 'Test comment'});
           return true;
         })

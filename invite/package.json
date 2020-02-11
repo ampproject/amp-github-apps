@@ -12,12 +12,10 @@
     "lint": "eslint **/*.ts",
     "fix": "eslint **/*.ts --fix",
     "lint-conflicts": "eslint --print-config app.ts | eslint-config-prettier-check",
-
     "build": "tsc",
     "start": "probot run ./app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-invite-'`date --utc '+%Y%m%d%H%M%S'`",
-
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
