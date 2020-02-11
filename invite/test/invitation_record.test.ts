@@ -32,25 +32,33 @@ describe.skip('invitation record', () => {
   };
   const archivedInvite: Invite = Object.assign({archived: true}, invite);
 
-  beforeAll(() => setupDb(db))
-  afterAll(() => db.destroy())
+  beforeAll(async () => setupDb(db));
+  afterAll(async () => db.destroy());
 
   beforeEach(() => {
     record = new InvitationRecord(db);
   });
 
-  afterEach(() => db('invites').truncate());
+  afterEach(async () => db('invites').truncate());
 
   describe('recordInvite', () => {
     it('records an invite', async done => {
       record.recordInvite(invite);
 
-      expect(await db('invites').select().first()).toEqual(invite);
+      expect(
+        await db('invites')
+          .select()
+          .first()
+      ).toEqual(invite);
       done();
     });
 
     it('sets `archived = false`', async done => {
-      expect(await db('invites').pluck('archived').first()).toEqual(false);
+      expect(
+        await db('invites')
+          .pluck('archived')
+          .first()
+      ).toEqual(false);
       done();
     });
   });

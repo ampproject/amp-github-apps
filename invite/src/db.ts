@@ -30,4 +30,4 @@ export function dbConnect(): Database {
     },
     useNullAsDefault: true,
   } as Knex.Config);
-};
+}

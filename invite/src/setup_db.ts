@@ -37,11 +37,14 @@ export function setupDb(db: Database) {
 if (require.main === module) {
   const db = dbConnect();
 
-  setupDb(db).then(() => {
-    console.info('Database tables created');
-  }).catch(error => {
-    console.error(error.message);
-  }).then(() => {
-    db.destroy();
-  });
+  setupDb(db)
+    .then(() => {
+      console.info('Database tables created');
+    })
+    .catch(error => {
+      console.error(error.message);
+    })
+    .then(() => {
+      db.destroy();
+    });
 }
