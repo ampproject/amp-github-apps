@@ -60,18 +60,27 @@ Setup
    take note of the App ID and app Client Secret.
 6. Install the application on a GitHub repository that you want to use for
    testing. You might want to fork the [ampproject/amphtml](https://github.com/ampproject/amphtml) repository or create a new repository for this purpose.
-7. Copy the `redacted.env` file to `.env` and modify the fields based the values from the GitHub App page:
+7. Run a local instance of PostgreSQL, or use the [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy) to connect to a [Cloud SQL instance](https://pantheon.corp.google.com/sql/choose-instance-engine?project=ampproject-invite-bot)
+   * While other database engines might work, we have only tested this on `pg`
+   * Take note of the instance ID and default user password.
+8. Enable the [Cloud SQL Admin API](https://pantheon.corp.google.com/flows/enableapi?apiid=sqladmin)
+9. Copy the `redacted.env` file to `.env` and modify the fields based the values from the GitHub App page:
    * The value for the `APP_ID` field is the App ID from Step 5.
    * The value for `WEBHOOK_SECRET` is the secret you set when creating the GitHub app.
    * The value for the `PRIVATE_KEY` field is a base64 representation of the
      `.pem` file you downloaded from the GitHub App page in Step 5. On Linux/Mac you can convert that file by running `cat private-key-file.pem | base64` in a command line.
    * The value for `GITHUB_ACCESS_TOKEN` is the Client Secret obtained in Step 5.
-   * Set `GITHUB_ORG` to the name of the GitHub organization the bot will be inviting users to.
+   * The value for `GITHUB_ORG` to the name of the GitHub organization the bot will be inviting users to.
+   * The values for `DB_USER`, `DB_PASSWORD`, and `DB_NAME` will be the values used or created during step 7.
+   * The value for `DB_UNIX_SOCKET` will be `/cloudsql/[CLOUD_SQL_INSTANCE_NAME]`; the instance name can be found on the [Instances page](https://pantheon.corp.google.com/sql/instances) and is of the form `project-name:region:database-instance-name`
+10. Create the database tables by running `npm run setup-db`
 
 Local Development
 -----------------
 
 If you need to receive webhooks locally, make sure the app in GitHub is configured to use the Smee channel as the webhook URL. Set the env variable `WEBHOOK_PROXY_URL` to the Smee channel URL.
+
+You will also need to either set up a local PostgresQL instance or a Cloud SQL instance and a Cloud SQL Unix Proxy.
 
 To run the app locally, run `npm run start`.
 
@@ -84,7 +93,7 @@ After setting up the app locally, use `gcloud` to deploy the app and cron tasks:
 2. Deploy the function for the first time:
     ```
     gcloud functions deploy [FUNCTION_NAME] \
-      --entrypoint probot \
+      --entry-point probot \
       --runtime nodejs10 \
       --trigger-http
     ```

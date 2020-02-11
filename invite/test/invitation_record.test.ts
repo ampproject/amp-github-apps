@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
+import Knex from 'knex';
+
+import {Database} from '../src/db';
+import {setupDb} from '../src/setup_db';
 import {Invite, InviteAction} from '../src/types';
 import {InvitationRecord} from '../src/invitation_record';
 
-describe.skip('invitation record', () => {
+describe('invitation record', () => {
+  const db: Database = Knex({
+    client: 'sqlite3',
+    connection: ':memory:',
+    useNullAsDefault: true,
+  });
   let record: InvitationRecord;
   const invite: Invite = {
     username: 'someone',
@@ -27,13 +36,35 @@ describe.skip('invitation record', () => {
   };
   const archivedInvite: Invite = Object.assign({archived: true}, invite);
 
+  beforeAll(async () => setupDb(db));
+  afterAll(async () => db.destroy());
+
   beforeEach(() => {
-    record = new InvitationRecord();
+    record = new InvitationRecord(db);
   });
 
+  afterEach(async () => db('invites').truncate());
+
   describe('recordInvite', () => {
-    it.todo('records an invite');
-    it.todo('sets `archived = false`');
+    it('records an invite', async done => {
+      record.recordInvite(invite);
+
+      expect(
+        await db('invites')
+          .select()
+          .first()
+      ).toEqual(invite);
+      done();
+    });
+
+    it('sets `archived = false`', async done => {
+      expect(
+        await db('invites')
+          .pluck('archived')
+          .first()
+      ).toEqual(false);
+      done();
+    });
   });
 
   describe('getInvites', () => {

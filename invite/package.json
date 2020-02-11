@@ -12,11 +12,15 @@
     "lint": "eslint **/*.ts",
     "fix": "eslint **/*.ts --fix",
     "lint-conflicts": "eslint --print-config app.ts | eslint-config-prettier-check",
+
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
-    "start": "probot run ./app.js",
+    "setup-db": "node dist/src/setup_db.js",
+
+    "start": "probot run dist/app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-invite-'`date --utc '+%Y%m%d%H%M%S'`",
+
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
@@ -26,6 +30,8 @@
     "@octokit/rest": "16.43.1",
     "@probot/serverless-gcf": "0.2.0",
     "dotenv": "8.2.0",
+    "knex": "0.20.9",
+    "pg": "7.18.1",
     "probot": "9.9.1",
     "typescript": "3.7.5"
   },
