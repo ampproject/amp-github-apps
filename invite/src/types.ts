@@ -28,8 +28,8 @@ export interface ILogger {
  * Possible invite action types.
  */
 export enum InviteAction {
-  INVITE = 1,
-  INVITE_AND_ASSIGN,
+  INVITE = 'invite',
+  INVITE_AND_ASSIGN = 'invite_and_assign',
 }
 
 /**
