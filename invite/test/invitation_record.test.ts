@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
+import Knex from 'knex';
+
 import {dbConnect, Database} from '../src/db';
 import {setupDb} from '../src/setup_db';
 import {Invite, InviteAction} from '../src/types';
 import {InvitationRecord} from '../src/invitation_record';
 
-jest.mock('../src/db', () => require('./__mocks__/db'));
-
-describe.skip('invitation record', () => {
-  const db: Database = dbConnect();
+describe('invitation record', () => {
+  const db: Database = Knex({
+    client: 'sqlite3',
+    connection: ':memory:',
+    useNullAsDefault: true,
+  });;
   let record: InvitationRecord;
   const invite: Invite = {
     username: 'someone',
