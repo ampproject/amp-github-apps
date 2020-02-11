@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-const {Probot} = require('probot');
-const nock = require('nock');
+import {Probot} from 'probot';
+import nock from 'nock';
 
-const {InviteBot} = require('../src/invite_bot');
-const {triggerWebhook} = require('_test_helper');
-
-function fail() {
-  throw new Error('Not implemented!');
-}
+import {InviteBot} from '../src/invite_bot';
+import {triggerWebhook} from './fixtures';
 
 describe('Probot webhooks', () => {
-  let probot: typeof Probot;
+  let probot: Probot;
 
   beforeAll(() => {
     nock.disableNetConnect();
@@ -40,7 +36,7 @@ describe('Probot webhooks', () => {
     // Return a test token for fake authentication flow.
     app.app = {
       getInstallationAccessToken: async () => 'test_token',
-      getSignedJsonWebToken: async () => 'test_token',
+      getSignedJsonWebToken: () => 'test_token',
     };
   });
 
