@@ -17,9 +17,6 @@
 import {Database} from './db';
 import {ILogger, Invite} from './types';
 
-// TODO: Enable after filling in implementations.
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /**
  * A record of invites sent by the bot that may require follow-up actions.
  */

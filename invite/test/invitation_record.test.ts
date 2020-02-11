@@ -39,7 +39,7 @@ describe('invitation record', () => {
     repo: 'test_repo',
     issue_number: 42,
     action: InviteAction.INVITE,
-  }
+  };
   const archivedInvite: Invite = Object.assign({archived: true}, invite);
 
   beforeAll(async () => setupDb(db));
@@ -55,7 +55,7 @@ describe('invitation record', () => {
     it('records an invite', async done => {
       record.recordInvite(invite);
 
-      const recordedInvite: Invite = await db('invites').first()
+      const recordedInvite: Invite = await db('invites').first();
       expect(recordedInvite).toMatchObject(invite);
       done();
     });

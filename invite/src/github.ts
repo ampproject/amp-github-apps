@@ -18,9 +18,6 @@ import {Octokit} from '@octokit/rest';
 
 import {ILogger} from './types';
 
-// TODO: Enable after filling in implementations.
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /**
  * Interface for working with the GitHub API.
  */
