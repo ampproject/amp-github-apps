@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-import knex, {Knex} from 'knex';
+import Knex from 'knex';
 
-export type Database = typeof knex;
+export type Database = Knex;
 /** Connect to a database instance. */
 export function dbConnect(): Database {
-  return knex({
+  return Knex({
     client: 'sqlite3',
     connection: ':memory:',
     useNullAsDefault: true,
