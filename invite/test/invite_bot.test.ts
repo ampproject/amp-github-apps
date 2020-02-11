@@ -96,6 +96,11 @@ describe('Invite Bot', () => {
         },
       ]);
     });
+
+    it('ignores `whatever/invite` and `something/tryassign` non-macros', () => {
+      const comment = 'greet/invite @someone and ask/tryAssign @someone_else';
+      expect(inviteBot.parseMacros(comment)).toEqual([]);
+    });
   });
 
   describe('tryInvite', () => {
