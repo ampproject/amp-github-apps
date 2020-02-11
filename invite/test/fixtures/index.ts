@@ -15,6 +15,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import {Probot} from 'probot';
 
 /**
  * Get a JSON test fixture object.
@@ -24,3 +25,18 @@ export function getFixture(name: string): Object {
     fs.readFileSync(path.join(__dirname, `${name}.json`)).toString('utf8')
   );
 };
+
+/**
+ * Triggers a Probot webhook event using a payload from `fixtures/`.
+ */
+export async function triggerWebhook(
+  probot: Probot,
+  eventName: string
+): Promise<void> {
+  const [name] = eventName.split('.');
+  await probot.receive({
+    name,
+    id: '',  // required by type definition.
+    payload: getFixture(eventName),
+  });
+}
