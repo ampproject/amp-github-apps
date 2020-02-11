@@ -18,6 +18,9 @@ import {Octokit} from '@octokit/rest';
 
 import {ILogger} from './types';
 
+// TODO: Enable after filling in implementations.
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 /**
  * Interface for working with the GitHub API.
  */
@@ -54,7 +57,11 @@ export class GitHub {
   /**
    * Adds a comment to an issue.
    */
-  async addComment(repo: string, issue_number: number, comment: string): Promise<void> {
+  async addComment(
+    repo: string,
+    issue_number: number,
+    comment: string
+  ): Promise<void> {
     // https://octokit.github.io/rest.js/#octokit-routes-issues-create-comment
     // octokit.issues.createComment({owner, repo, issue_number, body})
   }
@@ -62,7 +69,11 @@ export class GitHub {
   /**
    * Assigns an issue to a user.
    */
-  async assignIssue(repo: string, issue_number: number, assignee: string): Promise<void> {
+  async assignIssue(
+    repo: string,
+    issue_number: number,
+    assignee: string
+  ): Promise<void> {
     // https://octokit.github.io/rest.js/#octokit-routes-issues-add-assignee
     // octokit.issues.addAssignees({owner, repo, issue_number, assignees})
   }
