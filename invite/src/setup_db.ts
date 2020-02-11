@@ -19,7 +19,7 @@ import {Database, dbConnect} from './db';
 /** Set up the database table. */
 export function setupDb(db: Database) {
   return db.schema.createTable('invites', table => {
-    table.uuid('id').primary();
+    table.increments('id').primary();
     table.string('username', 40);
     table.string('repo', 100);
     table.integer('issue_number');
