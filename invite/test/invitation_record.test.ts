@@ -84,10 +84,10 @@ describe('invitation record', () => {
       });
 
       it('returns the invites', async done => {
-        const recordedInvites: Array<Invite> = await record.getInvites('someone');
+        const invites: Array<Invite> = await record.getInvites('someone');
 
-        expect(recordedInvites[0]).toMatchObject(invite);
-        expect(recordedInvites[1]).toMatchObject(otherInvite);
+        expect(invites[0]).toMatchObject(invite);
+        expect(invites[1]).toMatchObject(otherInvite);
         done();
       });
     });
@@ -114,9 +114,10 @@ describe('invitation record', () => {
       it('updates the invite records', async done => {
         await record.archiveInvites('someone');
 
-        const invites: Array<Invite> = await record.getInvites('someone');
-        expect(invites[0].archived).toBe(true);
-        expect(invites[1].archived).toBe(true);
+        expect(await record.getInvites('someone')).toEqual([]);
+        const invites = await db('invites').select();
+        expect(invites[0].archived).toBeTruthy();
+        expect(invites[1].archived).toBeTruthy();
 
         done();
       });

@@ -49,5 +49,9 @@ export class InvitationRecord {
    * Marks a user's invites as archived, indicating all necessary follow-up
    * actions have been completed.
    */
-  async archiveInvites(username: string): Promise<void> {}
+  async archiveInvites(username: string): Promise<void> {
+    await this.db('invites')
+      .where({username})
+      .update({archived: true});
+  }
 }
