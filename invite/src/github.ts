@@ -54,8 +54,12 @@ export class GitHub {
     issue_number: number,
     comment: string
   ): Promise<void> {
-    // https://octokit.github.io/rest.js/#octokit-routes-issues-create-comment
-    // octokit.issues.createComment({owner, repo, issue_number, body})
+    await this.client.issues.createComment({
+      owner: this.org,
+      repo,
+      issue_number,
+      body: comment,
+    });
   }
 
   /**

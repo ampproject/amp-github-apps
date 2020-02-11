@@ -78,9 +78,9 @@ describe('GitHub interface', () => {
   });
 
   describe('addComment', () => {
-    it('POSTs comment to /repos/:owner/:repo/:issue_number/comment', async done => {
+    it('POSTs comment to /repos/:owner/:repo/issues/:issue_number/comments', async done => {
       nock('https://api.github.com')
-        .post('/repos/test_org/test_repo/1337/comment', body => {
+        .post('/repos/test_org/test_repo/issues/1337/comments', body => {
           expect(body).toEqual({body: 'Test comment'});
           return true;
         })
