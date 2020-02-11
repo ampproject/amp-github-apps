@@ -23,7 +23,7 @@ export function setupDb(db: Database) {
     table.string('username', 40);
     table.string('repo', 100);
     table.integer('issue_number');
-    table.enum('action', Object.values(InviteAction));
+    table.string('action');
     table.boolean('archived').defaultTo(false);
   });
 }
