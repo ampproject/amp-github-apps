@@ -31,7 +31,8 @@ export class GitHub {
   constructor(
     private client: Octokit,
     private org: string,
-    private logger: ILogger = console) {}
+    private logger: ILogger = console
+  ) {}
 
   /**
    * Attempts to invite a user to the organization. Returns true if an invite
