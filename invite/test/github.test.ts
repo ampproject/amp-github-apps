@@ -42,7 +42,7 @@ describe.skip('GitHub interface', () => {
 
   afterEach(() => {
     // Fail the test if there were unused nocks.
-    if(!nock.isDone()) {
+    if (!nock.isDone()) {
       throw new Error('Not all nock interceptors were used!');
       nock.cleanAll();
     }
@@ -81,28 +81,28 @@ describe.skip('GitHub interface', () => {
     it('PUTs to /orgs/:org/memberships/:username', async done => {
       nock('https://api.github.com')
         .put('/orgs/test_org/memberships/someone')
-        .reply(200, getFixture('add_member.exists'))
+        .reply(200, getFixture('add_member.exists'));
 
-        await github.inviteUser('someone');
-        done();
+      await github.inviteUser('someone');
+      done();
     });
 
     it('returns true when the user is invited', async done => {
       nock('https://api.github.com')
         .put('/orgs/test_org/memberships/someone')
-        .reply(200, getFixture('add_member.invited'))
+        .reply(200, getFixture('add_member.invited'));
 
-        expect(await github.inviteUser('someone')).toBe(true);
-        done();
+      expect(await github.inviteUser('someone')).toBe(true);
+      done();
     });
 
     it('returns false when the user is already a member', async done => {
       nock('https://api.github.com')
         .put('/orgs/test_org/memberships/someone')
-        .reply(200, getFixture('add_member.exists'))
+        .reply(200, getFixture('add_member.exists'));
 
-        expect(await github.inviteUser('someone')).toBe(false);
-        done();
+      expect(await github.inviteUser('someone')).toBe(false);
+      done();
     });
   });
 
@@ -110,7 +110,7 @@ describe.skip('GitHub interface', () => {
     it('POSTs comment to /repos/:owner/:repo/:issue_number/comment', async done => {
       nock('https://api.github.com')
         .post('/repos/test_org/test_repo/1337/comment', body => {
-          expect(body).toEqual({ body: 'Test comment' });
+          expect(body).toEqual({body: 'Test comment'});
           return true;
         })
         .reply(200);
@@ -121,11 +121,10 @@ describe.skip('GitHub interface', () => {
   });
 
   describe('assignIssue', () => {
-    it('POSTs assignee to /repos/:owner/:repo/issues/:issue_number/assignees',
-        async done => {
+    it('POSTs assignee to /repos/:owner/:repo/issues/:issue_number/assignees', async done => {
       nock('https://api.github.com')
         .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
-          expect(body).toEqual({ assignees: ['someone'] });
+          expect(body).toEqual({assignees: ['someone']});
           return true;
         })
         .reply(200);
