@@ -16,11 +16,14 @@
 import fs from 'fs';
 import path from 'path';
 import {Probot} from 'probot';
+import {WebhookEvent} from '@octokit/webhooks';
+
+type SampleWebhookEvent = {event: string, payload: WebhookEvent<any>}
 
 /**
  * Get a JSON test fixture object.
  */
-export function getFixture(name: string): Object {
+export function getFixture(name: string): SampleWebhookEvent {
   return JSON.parse(
     fs.readFileSync(path.join(__dirname, `${name}.json`)).toString('utf8')
   );
@@ -33,10 +36,10 @@ export async function triggerWebhook(
   probot: Probot,
   eventName: string
 ): Promise<void> {
-  const [name] = eventName.split('.');
+  const {event, payload} = getFixture(eventName);
   await probot.receive({
-    name,
+    name: event,
     id: '',  // required by type definition.
-    payload: getFixture(eventName),
+    payload,
   });
 }
