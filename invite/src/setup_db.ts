@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-import {InviteAction} from './types';
 import {Database, dbConnect} from './db';
 
 /** Set up the database table. */
