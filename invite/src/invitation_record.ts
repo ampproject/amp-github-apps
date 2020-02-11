@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import {Database} from './db';
 import {ILogger, Invite} from './types';
 
 // TODO: Enable after filling in implementations.
@@ -26,7 +27,7 @@ export class InvitationRecord {
   /**
    * Constructor.
    */
-  constructor(private logger: ILogger = console) {}
+  constructor(private db: Database, private logger: ILogger = console) {}
 
   /**
    * Records an invite created by the bot.

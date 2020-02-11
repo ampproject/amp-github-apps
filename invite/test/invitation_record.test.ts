@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
+import {dbConnect, Database} from '../src/db';
+import {setupDb} from '../src/setup_db';
 import {Invite, InviteAction} from '../src/types';
 import {InvitationRecord} from '../src/invitation_record';
 
+jest.mock('../src/db', () => require('./__mocks__/db'));
+
 describe.skip('invitation record', () => {
+  const db: Database = dbConnect();
   let record: InvitationRecord;
   const invite: Invite = {
     username: 'someone',
@@ -27,13 +32,27 @@ describe.skip('invitation record', () => {
   };
   const archivedInvite: Invite = Object.assign({archived: true}, invite);
 
+  beforeAll(() => setupDb(db))
+  afterAll(() => db.destroy())
+
   beforeEach(() => {
-    record = new InvitationRecord();
+    record = new InvitationRecord(db);
   });
 
+  afterEach(() => db('invites').truncate());
+
   describe('recordInvite', () => {
-    it.todo('records an invite');
-    it.todo('sets `archived = false`');
+    it('records an invite', async done => {
+      record.recordInvite(invite);
+
+      expect(await db('invites').select().first()).toEqual(invite);
+      done();
+    });
+
+    it('sets `archived = false`', async done => {
+      expect(await db('invites').pluck('archived').first()).toEqual(false);
+      done();
+    });
   });
 
   describe('getInvites', () => {
