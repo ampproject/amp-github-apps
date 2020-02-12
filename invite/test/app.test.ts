@@ -65,46 +65,42 @@ describe('Probot webhooks', () => {
     }
   });
 
-  [
-    'issue_comment.created',
-    'issues.opened',
-    'pull_request.opened',
-    'pull_request_review.submitted',
-    'pull_request_review_comment.created',
-  ].forEach(eventName => {
-    describe(`on ${eventName} event`, () => {
-      it('processes the comment for macros', async done => {
-        await triggerWebhook(probot, eventName);
+  describe.each([
+    ['issue_comment.created'],
+    ['issues.opened'],
+    ['pull_request.opened'],
+    ['pull_request_review.submitted'],
+    ['pull_request_review_comment.created'],
+  ])(`on %p event`, eventName => {
+    it('processes the comment for macros', async done => {
+      await triggerWebhook(probot, eventName);
 
-        expect(InviteBot.prototype.processComment).toBeCalledWith(
-          'test_repo',
-          1337,
-          'Test comment'
-        );
-        done();
-      });
+      expect(InviteBot.prototype.processComment).toBeCalledWith(
+        'test_repo',
+        1337,
+        'Test comment'
+      );
+      done();
     });
   });
 
-  [
-    'issue_comment.edited',
-    'issue_comment.deleted',
-    'pull_request_review.edited',
-    'pull_request_review.dismissed',
-    'pull_request_review_comment.edited',
-    'pull_request_review_comment.deleted',
-  ].forEach(eventName => {
-    describe(`on ${eventName} event`, () => {
-      it('does not processes the comment', async done => {
-        await triggerWebhook(probot, eventName);
+  describe.each([
+    ['issue_comment.edited'],
+    ['issue_comment.deleted'],
+    ['pull_request_review.edited'],
+    ['pull_request_review.dismissed'],
+    ['pull_request_review_comment.edited'],
+    ['pull_request_review_comment.deleted'],
+  ])(`on %p event`, eventName => {
+    it('does not processes the comment', async done => {
+      await triggerWebhook(probot, eventName);
 
-        expect(InviteBot.prototype.processComment).not.toBeCalled();
-        done();
-      });
+      expect(InviteBot.prototype.processComment).not.toBeCalled();
+      done();
     });
   });
 
-  describe('on organization.member_added event', () => {
+  describe('on "organization.member_added" event', () => {
     it('processes the accepted invite with follow-up actions', async done => {
       await triggerWebhook(probot, 'organization.member_added');
 
@@ -115,7 +111,7 @@ describe('Probot webhooks', () => {
     });
   });
 
-  describe('on organization.member_invited event', () => {
+  describe('on "organization.member_invited" event', () => {
     it('does not process the new membership', async done => {
       await triggerWebhook(probot, 'organization.member_invited');
 
@@ -124,7 +120,7 @@ describe('Probot webhooks', () => {
     });
   });
 
-  describe('on organization.member_removed event', () => {
+  describe('on "organization.member_removed" event', () => {
     it('does not process the new membership', async done => {
       await triggerWebhook(probot, 'organization.member_removed');
 
