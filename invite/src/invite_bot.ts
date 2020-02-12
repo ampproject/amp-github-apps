@@ -161,7 +161,7 @@ export class InviteBot {
       `You asked me to send an invite to \`@${invite.username}\`, but I ` +
         'ran into an error when I tried. Try sending the invite manually.'
     );
-    
+
     throw error;
   }
 
@@ -172,5 +172,20 @@ export class InviteBot {
    * Should be called in response to accepted invitations in order to update the
    * thread(s) from which the user was invited.
    */
-  async tryAssign(invite: Invite, accepted: boolean): Promise<void> {}
+  async tryAssign(invite: Invite, accepted: boolean): Promise<void> {
+    const commentStart = accepted ?
+      `The invitation to \`@${invite.username}\` was accepted!` :
+      `It looks like \`@${invite.username}\` is already a member of ` +
+        `\`${this.org}\`!`
+    await this.github.assignIssue(
+      invite.repo,
+      invite.issue_number,
+      invite.username
+    );
+    await this.github.addComment(
+      invite.repo,
+      invite.issue_number,
+      `${commentStart} I've assigned them to this issue.`
+    );
+  }
 }

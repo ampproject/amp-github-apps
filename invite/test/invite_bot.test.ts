@@ -30,6 +30,8 @@ describe('Invite Bot', () => {
     jest.spyOn(GitHub.prototype, 'inviteUser');
     jest.spyOn(GitHub.prototype, 'addComment')
       .mockImplementation(async () => {});
+    jest.spyOn(GitHub.prototype, 'assignIssue')
+      .mockImplementation(async () => {});
     jest.spyOn(InvitationRecord.prototype, 'recordInvite');
   });
 
@@ -246,7 +248,7 @@ describe('Invite Bot', () => {
     });
   });
 
-  describe.skip('tryAssign', () => {
+  describe('tryAssign', () => {
     const newInvite: Invite = {
       username: 'someone',
       repo: 'test_repo',
