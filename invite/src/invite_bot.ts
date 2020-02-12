@@ -21,8 +21,19 @@ import {GitHub} from './github';
 import {ILogger, Invite, InviteAction} from './types';
 import {InvitationRecord} from './invitation_record';
 
-// TODO: Enable after filling in implementations.
-/* eslint-disable @typescript-eslint/no-unused-vars */
+const INVITE_MACROS: Record<string, InviteAction> = {
+  invite: InviteAction.INVITE,
+  tryassign: InviteAction.INVITE_AND_ASSIGN,
+};
+
+// Regex source: https://github.com/shinnn/github-username-regex
+const USERNAME_PATTERN: string = '[a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38}';
+const MACRO_PATTERN: string = `/(${Object.keys(INVITE_MACROS).join('|')})`;
+const FULL_MACRO_REGEX: RegExp = new RegExp(
+  // (?<!\\s) ensures the macro is not preceded by a non-space character.
+  `(?<!\\S)${MACRO_PATTERN} @${USERNAME_PATTERN}`,
+  'ig'
+);
 
 /**
  * GitHub bot which can invite users to an organization and assign issues in
@@ -58,7 +69,17 @@ export class InviteBot {
    * Parses a comment for invitation macros.
    */
   parseMacros(comment: string): Record<string, InviteAction> {
-    return {};
+    const macros: Record<string, InviteAction> = {};
+    const matches = comment.match(FULL_MACRO_REGEX);
+
+    if (matches) {
+      matches.forEach((macro: string) => {
+        const [macroString, username] = macro.substr(1).split(' @');
+        macros[username] = INVITE_MACROS[macroString.toLowerCase()];
+      });
+    }
+    
+    return macros;
   }
 
   /**
