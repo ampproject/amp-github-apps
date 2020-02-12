@@ -98,7 +98,7 @@ export class InviteBot {
     const pendingInvite = !!existingInvites.length;
 
     if (pendingInvite) {
-      return this.handlePendingInvite(invite);
+      return await this.handlePendingInvite(invite);
     }
 
     // The user has not been invited by the bot yet, so try and send an invite.
