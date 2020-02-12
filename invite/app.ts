@@ -21,15 +21,6 @@ import {Octokit} from '@octokit/rest';
 
 import {InviteBot} from './src/invite_bot';
 
-type WebhookHandler<T> = (inviteBot: InviteBot, payload: T ) => Promise<void>;
-
-type CommentWebhookPayload =
-  | Webhooks.WebhookPayloadIssues
-  | Webhooks.WebhookPayloadIssueComment
-  | Webhooks.WebhookPayloadPullRequest
-  | Webhooks.WebhookPayloadPullRequestReview
-  | Webhooks.WebhookPayloadPullRequestReviewComment;
-
 export default (app: Application) => {
   if (process.env.NODE_ENV !== 'test') {
     require('dotenv').config();
@@ -40,84 +31,85 @@ export default (app: Application) => {
     auth: process.env.GITHUB_ACCESS_TOKEN,
   });
 
-  /** Listens for webhooks and provides a bot instance to the handler. */
-  function listen(
-    events: string | Array<string>,
-    handler: WebhookHandler<any>
-  ) {
-    app.on(events, async ({event, payload, log}: Context) => {
-      await handler(
-        new InviteBot(github, payload.organization.login, log),
-        payload
-      );
-    });
-  }
-
-  listen('issue_comment.created', async (
-    inviteBot: InviteBot,
-    payload: Webhooks.WebhookPayloadIssueComment,
+  app.on('issue_comment.created', async (
+    {event, payload, log}: Context<Webhooks.WebhookPayloadIssueComment>
   ) => {
-      await inviteBot.processComment(
-        payload.repository.name,
-        payload.issue.number,
-        payload.comment.body,
-      );
-    }
-  );
+    const inviteBot = new InviteBot(
+      github,
+      payload.repository.owner.login,
+      log,
+    );
+    await inviteBot.processComment(
+      payload.repository.name,
+      payload.issue.number,
+      payload.comment.body,
+    );
+  });
 
-  listen('issues.opened', async (
-    inviteBot: InviteBot,
-    payload: Webhooks.WebhookPayloadIssues,
+  app.on('issues.opened', async (
+    {event, payload, log}: Context<Webhooks.WebhookPayloadIssues>
   ) => {
-      await inviteBot.processComment(
-        payload.repository.name,
-        payload.issue.number,
-        payload.issue.body,
-      );
-    }
-  );
+    const inviteBot = new InviteBot(
+      github,
+      payload.repository.owner.login,
+      log,
+    );
+    await inviteBot.processComment(
+      payload.repository.name,
+      payload.issue.number,
+      payload.issue.body,
+    );
+  });
 
-  listen('pull_request.opened', async (
-    inviteBot: InviteBot,
-    payload: Webhooks.WebhookPayloadPullRequest,
+  app.on('pull_request.opened', async (
+    {event, payload, log}: Context<Webhooks.WebhookPayloadPullRequest>
   ) => {
-      await inviteBot.processComment(
-        payload.repository.name,
-        payload.pull_request.number,
-        payload.pull_request.body,
-      );
-    }
-  );
+    const inviteBot = new InviteBot(
+      github,
+      payload.repository.owner.login,
+      log,
+    );
+    await inviteBot.processComment(
+      payload.repository.name,
+      payload.pull_request.number,
+      payload.pull_request.body,
+    );
+  });
 
-  listen('pull_request_review.submitted', async (
-    inviteBot: InviteBot,
-    payload: Webhooks.WebhookPayloadPullRequestReview,
+  app.on('pull_request_review.submitted', async (
+    {event, payload, log}: Context<Webhooks.WebhookPayloadPullRequestReview>
   ) => {
-      await inviteBot.processComment(
-        payload.repository.name,
-        payload.pull_request.number,
-        payload.review.body,
-      );
-    }
-  );
+    const inviteBot = new InviteBot(
+      github,
+      payload.repository.owner.login,
+      log,
+    );
+    await inviteBot.processComment(
+      payload.repository.name,
+      payload.pull_request.number,
+      payload.review.body,
+    );
+  });
 
-  listen('pull_request_review_comment.created', async (
-    inviteBot: InviteBot,
-    payload: Webhooks.WebhookPayloadPullRequestReviewComment,
+  app.on('pull_request_review_comment.created', async (
+    {event, payload, log}: Context<Webhooks.WebhookPayloadPullRequestReviewComment>
   ) => {
-      await inviteBot.processComment(
-        payload.repository.name,
-        payload.pull_request.number,
-        payload.comment.body,
-      );
-    }
-  );
+    const inviteBot = new InviteBot(
+      github,
+      payload.repository.owner.login,
+      log,
+    );
+    await inviteBot.processComment(
+      payload.repository.name,
+      payload.pull_request.number,
+      payload.comment.body,
+    );
+  });
 
-  listen('organization.member_added', async (
-    inviteBot: InviteBot,
-    payload: Webhooks.WebhookPayloadOrganization,
+  app.on('organization.member_added', async (
+    {event, payload, log}: Context<Webhooks.WebhookPayloadOrganization>
   ) => {
+    const inviteBot = new InviteBot(github, payload.organization.login, log);
     await inviteBot.processAcceptedInvite(payload.membership.user.login);
-  }
-  );
+  });
 };
