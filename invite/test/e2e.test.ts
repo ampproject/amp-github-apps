@@ -14,16 +14,30 @@
  * limitations under the License.
  */
 
+import Knex from 'knex';
+import {mocked} from 'ts-jest/utils';
 import nock from 'nock';
 import {Probot} from 'probot';
 
 import app from '../app';
+import {Database, dbConnect} from '../src/db';
+import {InviteAction} from '../src/types';
+import {setupDb} from '../src/setup_db';
 import {triggerWebhook, getFixture} from './fixtures';
+
+jest.mock('../src/db', () => ({
+  dbConnect: () => Knex({
+    client: 'sqlite3',
+    connection: ':memory:',
+    useNullAsDefault: true,
+  })
+}));
 
 describe('end-to-end', () => {
   let probot: Probot;
+  let db: Database;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     nock.disableNetConnect();
     process.env = {
       DISABLE_WEBHOOK_EVENT_CHECK: 'true',
@@ -31,6 +45,9 @@ describe('end-to-end', () => {
       GITHUB_ACCESS_TOKEN: '_TOKEN_',
       NODE_ENV: 'test',
     };
+
+    db = dbConnect();
+    await setupDb(db);
 
     probot = new Probot({});
     const probotApp = probot.load(app);
@@ -43,10 +60,12 @@ describe('end-to-end', () => {
 
   afterAll(() => {
     nock.enableNetConnect();
+    db.destroy();
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    db('invites').truncate();
 
     // Fail the test if there were unused nocks.
     if (!nock.isDone()) {
@@ -57,11 +76,48 @@ describe('end-to-end', () => {
 
   describe('when a comment includes "/invite @someone"', () => {
     describe('when @someone is a member of the org', () => {
-      it.todo('comments');
+      it('comments', async done => {
+        nock('https://api.github.com')
+          .put('/orgs/test_org/memberships/someone')
+          .reply(200, getFixture('add_member.exists'))
+          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
+            expect(body).toEqual({
+              body: 'You asked me to invite `@someone`, but they are already' +
+                ' a member of `test_org`!'
+            });
+            return true;
+          })
+          .reply(200);
+
+        await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
+        done();
+      });
     });
     
     describe('when @someone is not a member of the org', () => {
-      it.todo('invites, records, comments');
+      it('invites, records, comments', async done => {
+        nock('https://api.github.com')
+          .put('/orgs/test_org/memberships/someone')
+          .reply(200, getFixture('add_member.invited'))
+          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
+            expect(body).toEqual({
+              body: 'You asked me to invite `@someone`, but they are already' +
+                ' a member of `test_org`!'
+            });
+            return true;
+          })
+          .reply(200);
+
+        await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
+        expect(await db('invites').select().first()).toEqual({
+          username: 'someone',
+          repo: 'test_repo',
+          issue_number: 1337,
+          action: InviteAction.INVITE,
+          archived: false,
+        });
+        done();
+      });
 
       describe('once the invite is accepted', () => {
         it.todo('comments, archives');
