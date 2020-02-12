@@ -77,7 +77,7 @@ describe('invitation record', () => {
       });
     });
 
-    describe('if records exists of invites to the user', () => {
+    describe('if records exist of invites to the user', () => {
       beforeEach(async () => {
         await record.recordInvite(invite);
         await record.recordInvite(otherInvite);
@@ -105,7 +105,7 @@ describe('invitation record', () => {
   });
 
   describe('archiveInvites', () => {
-    describe('if records exists of any invites to the user', () => {
+    describe('if records exist of any invites to the user', () => {
       beforeEach(async () => {
         await record.recordInvite(invite);
         await record.recordInvite(otherInvite);
