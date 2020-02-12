@@ -52,7 +52,7 @@ describe('end-to-end', () => {
     probot = new Probot({});
     const probotApp = probot.load(app);
     probotApp.app = {
-      getInstallationAccessToken: () => Promise.resolve('test'),
+      getInstallationAccessToken: async () =>'test',
       getSignedJsonWebToken: () => 'test',
     };
 
@@ -76,7 +76,7 @@ describe('end-to-end', () => {
 
   describe('when a comment includes "/invite @someone"', () => {
     describe('when @someone is a member of the org', () => {
-      it('comments', async done => {
+      it('comments, doesn\'t record', async done => {
         nock('https://api.github.com')
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.exists'))
@@ -90,32 +90,36 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
+        expect(await db('invites').select().first()).toBeUndefined();
         done();
       });
     });
     
     describe('when @someone is not a member of the org', () => {
+      const recordedInvite = {
+        username: 'someone',
+        repo: 'test_repo',
+        issue_number: 1337,
+        action: InviteAction.INVITE,
+        archived: false,
+      };
+
       it('invites, records, comments', async done => {
         nock('https://api.github.com')
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.invited'))
           .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
-              body: 'You asked me to invite `@someone`, but they are already' +
-                ' a member of `test_org`!'
+              body: 'An invitation to join `test_org` has been sent to ' +
+                '`@someone`. I will update this thread when the invitation ' +
+                'accepted'
             });
             return true;
           })
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
-        expect(await db('invites').select().first()).toEqual({
-          username: 'someone',
-          repo: 'test_repo',
-          issue_number: 1337,
-          action: InviteAction.INVITE,
-          archived: false,
-        });
+        expect(await db('invites').select().first()).toEqual(recordedInvite);
         done();
       });
 
@@ -127,11 +131,57 @@ describe('end-to-end', () => {
 
   describe('when a comment includes "/tryassign @someone"', () => {
     describe('when @someone is a member of the org', () => {
-      it.todo('assigns, comments')
+      it('assigns, comments, doesn\'t record', async done => {
+        nock('https://api.github.com')
+          .put('/orgs/test_org/memberships/someone')
+          .reply(200, getFixture('add_member.exists'))
+          .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
+            expect(body).toEqual({assignees: ['someone']});
+            return true;
+          })
+          .reply(200)
+          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
+            expect(body).toEqual({
+              body: 'It looks like `@someone` is already a member of ' +
+                '`test_org`! I\'ve assigned them to this issue.'
+            });
+            return true;
+          })
+          .reply(200);
+
+        await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
+        expect(await db('invites').select().first()).toBeUndefined();
+        done();
+      });
     });
 
     describe('when @someone is not a member of the org', () => {
-      it.todo('invites, records, comments');
+      const recordedInvite = {
+        username: 'someone',
+        repo: 'test_repo',
+        issue_number: 1337,
+        action: InviteAction.INVITE_AND_ASSIGN,
+        archived: false,
+      };
+
+      it('invites, records, comments', async done => {
+        nock('https://api.github.com')
+          .put('/orgs/test_org/memberships/someone')
+          .reply(200, getFixture('add_member.invited'))
+          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
+            expect(body).toEqual({
+              body: 'An invitation to join `test_org` has been sent to ' +
+                '`@someone`. I will update this thread when the invitation ' +
+                'accepted'
+            });
+            return true;
+          })
+          .reply(200);
+
+        await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
+        expect(await db('invites').select().first()).toEqual(recordedInvite);
+        done();
+      });
 
       describe('once the invite is accepted', () => {
         it.todo('assigns, comments, archives');
@@ -140,10 +190,18 @@ describe('end-to-end', () => {
   });
 
   describe('when a comment includes no macros', () => {
-    it.todo('ignores it');
+    it('ignores it', async done => {
+      await triggerWebhook(probot, 'issue_comment.created');
+      expect(await db('invites').select().first()).toBeUndefined();
+      done();
+    });
   });
 
   describe('when someone joins without a recorded invitation', () => {
-    it.todo('ignores it');
+    it('ignores it', async done => {
+      await triggerWebhook(probot, 'organization.member_added');
+      expect(await db('invites').select().first()).toBeUndefined();
+      done();
+    });
   })
 });
