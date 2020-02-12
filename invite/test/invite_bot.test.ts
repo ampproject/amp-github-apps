@@ -28,7 +28,7 @@ describe('Invite Bot', () => {
     inviteBot = new InviteBot(
       /*client=*/ null,
       'test_org',
-      /*helpUserToTag=*/'test_org/wg-example',
+      /*helpUsernameToTag=*/'test_org/wg-example',
     );
 
     jest.spyOn(GitHub.prototype, 'inviteUser');
@@ -41,6 +41,22 @@ describe('Invite Bot', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  describe('constructor', () => {
+    it('defaults helpUserTag to "someone"', () => {
+      inviteBot = new InviteBot(/*client=*/ null, 'test_org');
+      expect(inviteBot.helpUserTag).toEqual('someone');
+    });
+
+    it('prepends the help username with @ if set', () => {
+      inviteBot = new InviteBot(
+        /*client=*/ null,
+        'test_org',
+        /*helpUsernameToTag=*/'test_org/wg-example',
+      );
+      expect(inviteBot.helpUserTag).toEqual('@test_org/wg-example');
+    });
   });
 
   describe('parseMacros', () => {
