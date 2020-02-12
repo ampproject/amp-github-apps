@@ -285,8 +285,7 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          "It looks like `@someone` is already a member of `test_org`! I've " +
-            'assigned them to this issue.'
+          'I\'ve assigned this issue to `@someone`.',
         );
         done();
       });

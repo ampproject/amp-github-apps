@@ -173,10 +173,6 @@ export class InviteBot {
    * thread(s) from which the user was invited.
    */
   async tryAssign(invite: Invite, accepted: boolean): Promise<void> {
-    const commentStart = accepted ?
-      `The invitation to \`@${invite.username}\` was accepted!` :
-      `It looks like \`@${invite.username}\` is already a member of ` +
-        `\`${this.org}\`!`
     await this.github.assignIssue(
       invite.repo,
       invite.issue_number,
@@ -185,7 +181,10 @@ export class InviteBot {
     await this.github.addComment(
       invite.repo,
       invite.issue_number,
-      `${commentStart} I've assigned them to this issue.`
+      accepted ?
+        `The invitation to \`@${invite.username}\` was accepted! I've ` +
+        'assigned them to this issue.' :
+        `I've assigned this issue to \`@${invite.username}\`.`
     );
   }
 }
