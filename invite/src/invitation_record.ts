@@ -37,9 +37,14 @@ export class InvitationRecord {
    * Looks up the invites for a user.
    */
   async getInvites(username: string): Promise<Array<Invite>> {
-    return await this.db('invites')
+    return (await this.db('invites')
       .select()
-      .where({username, archived: false});
+      .where({username, archived: false}))
+      .map(invite => {
+        // PostgresQL stores booleans as TINYINT, so we cast it to boolean.
+        invite.archived = !!invite.archived;
+        return invite;
+      });
   }
 
   /**
