@@ -25,31 +25,31 @@
         "type": "User",
         "site_admin": false
       },
-      "body": "Test PR review comment",
+      "body": "Test comment",
       "commit_id": "fd8e720de95dff55debd79be6b8010545b7f8143",
       "submitted_at": "2020-02-10T16:40:32Z",
       "state": "commented",
-      "html_url": "https://github.com/test_org/test_repo/pull/3#pullrequestreview-356088683",
-      "pull_request_url": "https://api.github.com/repos/test_org/test_repo/pulls/3",
+      "html_url": "https://github.com/test_org/test_repo/pull/1337#pullrequestreview-356088683",
+      "pull_request_url": "https://api.github.com/repos/test_org/test_repo/pulls/1337",
       "author_association": "NONE",
       "_links": {
         "html": {
-          "href": "https://github.com/test_org/test_repo/pull/3#pullrequestreview-356088683"
+          "href": "https://github.com/test_org/test_repo/pull/1337#pullrequestreview-356088683"
         },
         "pull_request": {
-          "href": "https://api.github.com/repos/test_org/test_repo/pulls/3"
+          "href": "https://api.github.com/repos/test_org/test_repo/pulls/1337"
         }
       }
     },
     "pull_request": {
-      "url": "https://api.github.com/repos/test_org/test_repo/pulls/3",
+      "url": "https://api.github.com/repos/test_org/test_repo/pulls/1337",
       "id": 373232694,
       "node_id": "MDExOlB1bGxSZXF1ZXN0MzczMjMyNjk0",
-      "html_url": "https://github.com/test_org/test_repo/pull/3",
-      "diff_url": "https://github.com/test_org/test_repo/pull/3.diff",
-      "patch_url": "https://github.com/test_org/test_repo/pull/3.patch",
-      "issue_url": "https://api.github.com/repos/test_org/test_repo/issues/3",
-      "number": 3,
+      "html_url": "https://github.com/test_org/test_repo/pull/1337",
+      "diff_url": "https://github.com/test_org/test_repo/pull/1337.diff",
+      "patch_url": "https://github.com/test_org/test_repo/pull/1337.patch",
+      "issue_url": "https://api.github.com/repos/test_org/test_repo/issues/1337",
+      "number": 1337,
       "state": "open",
       "locked": false,
       "title": "Test edit to README",
@@ -85,10 +85,10 @@
       "requested_teams": [],
       "labels": [],
       "milestone": null,
-      "commits_url": "https://api.github.com/repos/test_org/test_repo/pulls/3/commits",
-      "review_comments_url": "https://api.github.com/repos/test_org/test_repo/pulls/3/comments",
+      "commits_url": "https://api.github.com/repos/test_org/test_repo/pulls/1337/commits",
+      "review_comments_url": "https://api.github.com/repos/test_org/test_repo/pulls/1337/comments",
       "review_comment_url": "https://api.github.com/repos/test_org/test_repo/pulls/comments{/number}",
-      "comments_url": "https://api.github.com/repos/test_org/test_repo/issues/3/comments",
+      "comments_url": "https://api.github.com/repos/test_org/test_repo/issues/1337/comments",
       "statuses_url": "https://api.github.com/repos/test_org/test_repo/statuses/fd8e720de95dff55debd79be6b8010545b7f8143",
       "head": {
         "label": "test_org:test-change",
@@ -342,25 +342,25 @@
       },
       "_links": {
         "self": {
-          "href": "https://api.github.com/repos/test_org/test_repo/pulls/3"
+          "href": "https://api.github.com/repos/test_org/test_repo/pulls/1337"
         },
         "html": {
-          "href": "https://github.com/test_org/test_repo/pull/3"
+          "href": "https://github.com/test_org/test_repo/pull/1337"
         },
         "issue": {
-          "href": "https://api.github.com/repos/test_org/test_repo/issues/3"
+          "href": "https://api.github.com/repos/test_org/test_repo/issues/1337"
         },
         "comments": {
-          "href": "https://api.github.com/repos/test_org/test_repo/issues/3/comments"
+          "href": "https://api.github.com/repos/test_org/test_repo/issues/1337/comments"
         },
         "review_comments": {
-          "href": "https://api.github.com/repos/test_org/test_repo/pulls/3/comments"
+          "href": "https://api.github.com/repos/test_org/test_repo/pulls/1337/comments"
         },
         "review_comment": {
           "href": "https://api.github.com/repos/test_org/test_repo/pulls/comments{/number}"
         },
         "commits": {
-          "href": "https://api.github.com/repos/test_org/test_repo/pulls/3/commits"
+          "href": "https://api.github.com/repos/test_org/test_repo/pulls/1337/commits"
         },
         "statuses": {
           "href": "https://api.github.com/repos/test_org/test_repo/statuses/fd8e720de95dff55debd79be6b8010545b7f8143"

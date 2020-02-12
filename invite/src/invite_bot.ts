@@ -16,6 +16,7 @@
 
 import {Octokit} from '@octokit/rest';
 
+import {dbConnect} from './db';
 import {GitHub} from './github';
 import {ILogger, Invite, InviteAction} from './types';
 import {InvitationRecord} from './invitation_record';
@@ -36,7 +37,7 @@ export class InviteBot {
    */
   constructor(client: Octokit, org: string, private logger: ILogger = console) {
     this.github = new GitHub(client, org, logger);
-    this.record = new InvitationRecord(logger);
+    this.record = new InvitationRecord(dbConnect(), logger);
   }
 
   /**
@@ -51,7 +52,7 @@ export class InviteBot {
   /**
    * Process an accepted invite by adding comments and assigning issues.
    */
-  async processAcceptedInvite(repo: string, username: string): Promise<void> {}
+  async processAcceptedInvite(username: string): Promise<void> {}
 
   /**
    * Parses a comment for invitation macros.

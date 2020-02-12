@@ -3,15 +3,15 @@
   "payload": {
     "action": "opened",
     "issue": {
-      "url": "https://api.github.com/repos/test_org/test_repo/issues/2",
+      "url": "https://api.github.com/repos/test_org/test_repo/issues/1337",
       "repository_url": "https://api.github.com/repos/test_org/test_repo",
-      "labels_url": "https://api.github.com/repos/test_org/test_repo/issues/2/labels{/name}",
-      "comments_url": "https://api.github.com/repos/test_org/test_repo/issues/2/comments",
-      "events_url": "https://api.github.com/repos/test_org/test_repo/issues/2/events",
-      "html_url": "https://github.com/test_org/test_repo/issues/2",
+      "labels_url": "https://api.github.com/repos/test_org/test_repo/issues/1337/labels{/name}",
+      "comments_url": "https://api.github.com/repos/test_org/test_repo/issues/1337/comments",
+      "events_url": "https://api.github.com/repos/test_org/test_repo/issues/1337/events",
+      "html_url": "https://github.com/test_org/test_repo/issues/1337",
       "id": 562663665,
       "node_id": "MDU6SXNzdWU1NjI2NjM2NjU=",
-      "number": 2,
+      "number": 1337,
       "title": "Test issue created",
       "user": {
         "login": "someone",
@@ -44,7 +44,7 @@
       "updated_at": "2020-02-10T16:07:36Z",
       "closed_at": null,
       "author_association": "NONE",
-      "body": "Test issue body"
+      "body": "Test comment"
     },
     "repository": {
       "id": 239549697,

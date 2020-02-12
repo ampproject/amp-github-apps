@@ -19,6 +19,7 @@ import nock from 'nock';
 
 import {InviteBot} from '../src/invite_bot';
 import {triggerWebhook} from './fixtures';
+import app from '../app';
 
 describe('Probot webhooks', () => {
   let probot: Probot;
@@ -26,17 +27,17 @@ describe('Probot webhooks', () => {
   beforeAll(() => {
     nock.disableNetConnect();
     process.env = {
-      GITHUB_ARG: 'test_org',
+      DISABLE_WEBHOOK_EVENT_CHECK: 'true',
+      GITHUB_ORG: 'test_org',
       GITHUB_ACCESS_TOKEN: '_TOKEN_',
+      NODE_ENV: 'test',
     };
 
     probot = new Probot({});
-    const app = probot.load(require('../app'));
-
-    // Return a test token for fake authentication flow.
-    app.app = {
-      getInstallationAccessToken: async () => 'test_token',
-      getSignedJsonWebToken: () => 'test_token',
+    const probotApp = probot.load(app);
+    probotApp.app = {
+      getInstallationAccessToken: async () => 'test',
+      getSignedJsonWebToken: () => 'test',
     };
   });
 
@@ -51,10 +52,6 @@ describe('Probot webhooks', () => {
     jest
       .spyOn(InviteBot.prototype, 'processAcceptedInvite')
       .mockImplementation(async () => {});
-
-    nock('https://api.github.com')
-      .post('/app/installations/588033/access_tokens')
-      .reply(200, {token: 'test'});
   });
 
   afterEach(() => {
@@ -67,73 +64,66 @@ describe('Probot webhooks', () => {
     }
   });
 
-  [
-    'issue_comment.created',
-    'pull_request_review.submitted',
-    'pull_request_review_comment.created',
-  ].forEach(eventName => {
-    describe(`on ${eventName} event`, () => {
-      it('processes the comment for macros', async done => {
-        expect(InviteBot.prototype.processComment).toBeCalledWith(
-          'test_repo',
-          1337,
-          'Test comment'
-        );
+  describe.each([
+    ['issue_comment.created'],
+    ['issues.opened'],
+    ['pull_request.opened'],
+    ['pull_request_review.submitted'],
+    ['pull_request_review_comment.created'],
+  ])(`on %p event`, eventName => {
+    it('processes the comment for macros', async done => {
+      await triggerWebhook(probot, eventName);
 
-        await triggerWebhook(probot, eventName);
-        done();
-      });
-    });
-  });
-
-  [
-    'issue_comment.edited',
-    'issue_comment.deleted',
-    'pull_request_review.edited',
-    'pull_request_review.dismissed',
-    'pull_request_review_comment.edited',
-    'pull_request_review_comment.deleted',
-  ].forEach(eventName => {
-    describe(`on ${eventName} event`, () => {
-      it('does not processes the comment', async done => {
-        expect(InviteBot.prototype.processComment).toBeCalledWith(
-          'test_repo',
-          1337,
-          'Test comment'
-        );
-
-        await triggerWebhook(probot, eventName);
-        done();
-      });
-    });
-  });
-
-  describe('on organization.member_added event', () => {
-    it('processes the accepted invite with follow-up actions', async done => {
       expect(InviteBot.prototype.processComment).toBeCalledWith(
         'test_repo',
-        'someone'
+        1337,
+        'Test comment'
       );
+      done();
+    });
+  });
 
+  describe.each([
+    ['issue_comment.edited'],
+    ['issue_comment.deleted'],
+    ['pull_request_review.edited'],
+    ['pull_request_review.dismissed'],
+    ['pull_request_review_comment.edited'],
+    ['pull_request_review_comment.deleted'],
+  ])(`on %p event`, eventName => {
+    it('does not processes the comment', async done => {
+      await triggerWebhook(probot, eventName);
+
+      expect(InviteBot.prototype.processComment).not.toBeCalled();
+      done();
+    });
+  });
+
+  describe('on "organization.member_added" event', () => {
+    it('processes the accepted invite with follow-up actions', async done => {
       await triggerWebhook(probot, 'organization.member_added');
+
+      expect(InviteBot.prototype.processAcceptedInvite).toBeCalledWith(
+        'someone_else'
+      );
       done();
     });
   });
 
-  describe('on organization.member_invited event', () => {
+  describe('on "organization.member_invited" event', () => {
     it('does not process the new membership', async done => {
-      expect(InviteBot.prototype.processComment).not.toBeCalledWith();
-
       await triggerWebhook(probot, 'organization.member_invited');
+
+      expect(InviteBot.prototype.processAcceptedInvite).not.toBeCalledWith();
       done();
     });
   });
 
-  describe('on organization.member_removed event', () => {
+  describe('on "organization.member_removed" event', () => {
     it('does not process the new membership', async done => {
-      expect(InviteBot.prototype.processComment).not.toBeCalledWith();
-
       await triggerWebhook(probot, 'organization.member_removed');
+
+      expect(InviteBot.prototype.processAcceptedInvite).not.toBeCalledWith();
       done();
     });
   });
