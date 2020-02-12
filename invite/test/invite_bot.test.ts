@@ -25,10 +25,17 @@ describe('Invite Bot', () => {
   let inviteBot: InviteBot;
 
   beforeEach(() => {
-    inviteBot = new InviteBot(/*client=*/ null, 'test_repo');
+    inviteBot = new InviteBot(
+      /*client=*/ null,
+      'test_org',
+      /*helpUsernameToTag=*/'test_org/wg-example',
+    );
 
     jest.spyOn(GitHub.prototype, 'inviteUser');
-    jest.spyOn(GitHub.prototype, 'addComment');
+    jest.spyOn(GitHub.prototype, 'addComment')
+      .mockImplementation(async () => {});
+    jest.spyOn(GitHub.prototype, 'assignIssue')
+      .mockImplementation(async () => {});
     jest.spyOn(InvitationRecord.prototype, 'recordInvite');
   });
 
@@ -36,9 +43,25 @@ describe('Invite Bot', () => {
     jest.restoreAllMocks();
   });
 
+  describe('constructor', () => {
+    it('defaults helpUserTag to "someone"', () => {
+      inviteBot = new InviteBot(/*client=*/ null, 'test_org');
+      expect(inviteBot.helpUserTag).toEqual('someone in your organization');
+    });
+
+    it('prepends the help username with @ if set', () => {
+      inviteBot = new InviteBot(
+        /*client=*/ null,
+        'test_org',
+        /*helpUsernameToTag=*/'test_org/wg-example',
+      );
+      expect(inviteBot.helpUserTag).toEqual('@test_org/wg-example');
+    });
+  });
+
   describe('parseMacros', () => {
     describe('comments without macros', () => {
-      it('returns an empty list', () => {
+      it('returns no matches', () => {
         const comment = 'random comment';
         expect(inviteBot.parseMacros(comment)).toEqual({});
       });
@@ -58,10 +81,10 @@ describe('Invite Bot', () => {
       });
 
       it('handles multiple `/invite` macros', () => {
-        const comment = '/invite @someone and /invite @someone_else';
+        const comment = '/invite @someone and /invite @someoneelse';
         expect(inviteBot.parseMacros(comment)).toEqual({
           someone: InviteAction.INVITE,
-          someone_else: InviteAction.INVITE,
+          someoneelse: InviteAction.INVITE,
         });
       });
     });
@@ -69,37 +92,31 @@ describe('Invite Bot', () => {
     describe('comments with `/tryassign @user`', () => {
       it('returns list including InviteAndAssign action for @user', () => {
         const comment = '/tryassign @someone';
-        expect(inviteBot.parseMacros(comment)).toEqual([
-          {
-            someone: InviteAction.INVITE_AND_ASSIGN,
-          },
-        ]);
+        expect(inviteBot.parseMacros(comment)).toEqual({
+          someone: InviteAction.INVITE_AND_ASSIGN,
+        });
       });
 
       it('handles multiple `/tryassign` macros', () => {
-        const comment = '/tryassign @someone and /tryAssign @someone_else';
-        expect(inviteBot.parseMacros(comment)).toEqual([
-          {
-            someone: InviteAction.INVITE_AND_ASSIGN,
-            someone_else: InviteAction.INVITE_AND_ASSIGN,
-          },
-        ]);
+        const comment = '/tryassign @someone and /tryAssign @someoneelse';
+        expect(inviteBot.parseMacros(comment)).toEqual({
+          someone: InviteAction.INVITE_AND_ASSIGN,
+          someoneelse: InviteAction.INVITE_AND_ASSIGN,
+        });
       });
     });
 
     it('handles mix of `/invite` and `/tryassign` macros', () => {
-      const comment = '/invite @someone and /tryAssign @someone_else';
-      expect(inviteBot.parseMacros(comment)).toEqual([
-        {
-          someone: InviteAction.INVITE,
-          someone_else: InviteAction.INVITE_AND_ASSIGN,
-        },
-      ]);
+      const comment = '/invite @someone and /tryAssign @someoneelse';
+      expect(inviteBot.parseMacros(comment)).toEqual({
+        someone: InviteAction.INVITE,
+        someoneelse: InviteAction.INVITE_AND_ASSIGN,
+      });
     });
 
     it('ignores `whatever/invite` and `something/tryassign` non-macros', () => {
-      const comment = 'greet/invite @someone and ask/tryAssign @someone_else';
-      expect(inviteBot.parseMacros(comment)).toEqual([]);
+      const comment = 'greet/invite @someone and ask/tryAssign @someoneelse';
+      expect(inviteBot.parseMacros(comment)).toEqual({});
     });
   });
 
@@ -113,12 +130,13 @@ describe('Invite Bot', () => {
 
     describe('when the user has a pending invite from the bot', () => {
       beforeEach(() => {
-        inviteBot.record.recordInvite({
-          username: 'someone',
-          repo: 'test_repo',
-          issue_number: 42,
-          action: InviteAction.INVITE,
-        });
+        jest.spyOn(InvitationRecord.prototype, 'getInvites')
+          .mockImplementation(async () => [{
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 42,
+            action: InviteAction.INVITE,
+          }]);
       });
 
       it('it does not attempt to send an invite', async done => {
@@ -138,7 +156,7 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'I attempted to invite @someone to `test_org`, but they already ' +
+          'You asked me to invite `@someone` to `test_org`, but they already ' +
             'have an invitation pending! I will update this thread when the ' +
             'invitation is accepted.'
         );
@@ -148,7 +166,7 @@ describe('Invite Bot', () => {
 
     describe('when the user is a member', () => {
       beforeEach(() => {
-        mocked(inviteBot.github.inviteUser).mockImplementation(
+        mocked(GitHub.prototype.inviteUser).mockImplementation(
           async () => false
         );
       });
@@ -170,21 +188,16 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'You asked me to invite @someone, but they are already a member of ' +
-            '`test_org/test_repo`!'
+          'You asked me to invite `@someone`, but they are already a member ' +
+            'of `test_org`!'
         );
-        done();
-      });
-
-      it('returns false', async done => {
-        expect(await inviteBot.tryInvite(newInvite)).toBe(false);
         done();
       });
     });
 
     describe('when the user is not a member', () => {
       beforeEach(() => {
-        mocked(inviteBot.github.inviteUser).mockImplementation(
+        mocked(GitHub.prototype.inviteUser).mockImplementation(
           async () => true
         );
       });
@@ -206,24 +219,19 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'An invitation to join `test_org` has been sent to @someone. I ' +
+          'An invitation to join `test_org` has been sent to `@someone`. I ' +
             'will update this thread when the invitation is accepted.'
         );
-        done();
-      });
-
-      it('returns true', async done => {
-        expect(await inviteBot.tryInvite(newInvite)).toBe(true);
         done();
       });
     });
 
     describe('when the invite fails', () => {
       beforeEach(() => {
-        mocked(inviteBot.github.inviteUser).mockImplementation(async () => {
+        mocked(GitHub.prototype.inviteUser).mockImplementation(async () => {
           throw new Error('Uh-oh!');
         });
-        jest.spyOn(console, 'error');
+        jest.spyOn(console, 'error').mockImplementation(() => {});
       });
 
       it('logs an error', async done => {
@@ -232,7 +240,7 @@ describe('Invite Bot', () => {
         } catch (e) {}
 
         expect(console.error).toBeCalledWith(
-          'Failed to send an invite to @someone: Error: Uh-oh!'
+          'Failed to send an invite to `@someone`: Error: Uh-oh!'
         );
         done();
       });
@@ -245,16 +253,17 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'You asked me to send an invite to @someone, but I ran into an ' +
-            'error when I tried. Try sending the invite manually.'
+          'You asked me to send an invite to `@someone`, but I ran into an ' +
+            'error when I tried. You can try sending the invite manually, or ' +
+            'ask @test_org/wg-example for help.'
         );
         done();
       });
 
       it('re-throws the error', async done => {
-        expect(async () => {
-          await inviteBot.tryInvite(newInvite);
-        }).toThrow(new Error('Uh-oh!'));
+        expect(inviteBot.tryInvite(newInvite)).rejects.toThrow(
+          new Error('Uh-oh!')
+        );
         done();
       });
     });
@@ -284,7 +293,7 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          "The invitation to @someone was accepted! I've assigned them to " +
+          "The invitation to `@someone` was accepted! I've assigned them to " +
             'this issue.'
         );
         done();
@@ -297,8 +306,7 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          "It looks like @someone is already a member of `test_org`! I've " +
-            'assigned them to this issue.'
+          'I\'ve assigned this issue to `@someone`.',
         );
         done();
       });
