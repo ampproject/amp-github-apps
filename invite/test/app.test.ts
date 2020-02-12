@@ -36,10 +36,9 @@ describe('Probot webhooks', () => {
     probot = new Probot({});
     const probotApp = probot.load(app);
     probotApp.app = {
-      getInstallationAccessToken: () => Promise.resolve('test'),
+      getInstallationAccessToken: async () => 'test',
       getSignedJsonWebToken: () => 'test',
     };
-
   });
 
   afterAll(() => {
@@ -104,9 +103,9 @@ describe('Probot webhooks', () => {
     it('processes the accepted invite with follow-up actions', async done => {
       await triggerWebhook(probot, 'organization.member_added');
 
-      expect(
-        InviteBot.prototype.processAcceptedInvite
-      ).toBeCalledWith('someone_else');
+      expect(InviteBot.prototype.processAcceptedInvite).toBeCalledWith(
+        'someone_else'
+      );
       done();
     });
   });
