@@ -46,7 +46,7 @@ describe('Invite Bot', () => {
   describe('constructor', () => {
     it('defaults helpUserTag to "someone"', () => {
       inviteBot = new InviteBot(/*client=*/ null, 'test_org');
-      expect(inviteBot.helpUserTag).toEqual('someone');
+      expect(inviteBot.helpUserTag).toEqual('someone in your organization');
     });
 
     it('prepends the help username with @ if set', () => {

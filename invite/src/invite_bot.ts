@@ -40,19 +40,30 @@ const FULL_MACRO_REGEX: RegExp = new RegExp(
  * response to macro comments.
  */
 export class InviteBot {
+  readonly helpUserTag: string;
   readonly github: GitHub;
   readonly record: InvitationRecord;
 
   /**
    * Constructor.
+   *
+   * Optional helpUsernameToTag parameter allows specifying someone to tag in the
+   * event that the invite fails to send for some reason. If left as null, the
+   * comment will just say "ask someone for help".
+   * Example: 'ampproject/wg-infra'
    */
   constructor(
     client: Octokit,
     private org: string,
+    helpUsernameToTag: string | null = null,
     private logger: ILogger = console,
+
   ) {
     this.github = new GitHub(client, org, logger);
     this.record = new InvitationRecord(dbConnect(), logger);
+    this.helpUserTag = helpUsernameToTag === null ?
+      'someone in your organization' :
+      `@${helpUsernameToTag}`;
   }
 
   /**
@@ -159,7 +170,8 @@ export class InviteBot {
       invite.repo,
       invite.issue_number,
       `You asked me to send an invite to \`@${invite.username}\`, but I ` +
-        'ran into an error when I tried. Try sending the invite manually.'
+        'ran into an error when I tried. You can try sending the invite ' +
+        `manually, or ask ${this.helpUserTag} for help.`
     );
 
     throw error;
