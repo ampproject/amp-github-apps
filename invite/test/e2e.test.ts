@@ -124,7 +124,25 @@ describe('end-to-end', () => {
       });
 
       describe('once the invite is accepted', () => {
-        it.todo('comments, archives');
+        beforeEach(async done => {
+          await db('invites').insert(recordedInvite);
+          done();
+        });
+
+        it('comments, archives', async done => {
+          nock('https://api.github.com')
+            .post('/repos/test_org/test_repo/issues/1337/comments', body => {
+              expect(body).toEqual({
+                body: 'The invitation to `@someone` was accepted!'
+              });
+              return true;
+            })
+            .reply(200);
+
+          await triggerWebhook(probot, 'organization.member_added');
+          expect(await db('invites').pluck('archived').first()).toEqual(true);
+          done();
+        });
       });
     });
   });
@@ -184,7 +202,30 @@ describe('end-to-end', () => {
       });
 
       describe('once the invite is accepted', () => {
-        it.todo('assigns, comments, archives');
+        beforeEach(async done => {
+          await db('invites').insert(recordedInvite);
+          done();
+        });
+
+        it('assigns, comments, archives', async done => {
+          nock('https://api.github.com')
+            .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
+              expect(body).toEqual({assignees: ['someone']});
+              return true;
+            })
+            .reply(200)
+            .post('/repos/test_org/test_repo/issues/1337/comments', body => {
+              expect(body).toEqual({
+                body: 'The invitation to `@someone` was accepted!'
+              });
+              return true;
+            })
+            .reply(200);
+
+          await triggerWebhook(probot, 'organization.member_added');
+          expect(await db('invites').pluck('archived').first()).toEqual(true);
+          done();
+        });
       });
     });
   });
