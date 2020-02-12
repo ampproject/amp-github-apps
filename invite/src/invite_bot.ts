@@ -30,7 +30,7 @@ const INVITE_MACROS: Record<string, InviteAction> = {
 const USERNAME_PATTERN: string = '[a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38}';
 const MACRO_PATTERN: string = `/(${Object.keys(INVITE_MACROS).join('|')})`;
 const FULL_MACRO_REGEX: RegExp = new RegExp(
-  // (?<!\\s) ensures the macro is not preceded by a non-space character.
+  // (?<!\\S) ensures the macro is not preceded by a non-space character.
   `(?<!\\S)${MACRO_PATTERN} @${USERNAME_PATTERN}`,
   'ig'
 );
@@ -112,7 +112,7 @@ export class InviteBot {
     if (!invited) {
       return await this.handleUserAlreadyMember(invite);
     }
-   
+
     await this.handleNewInviteSent(invite);
   }
 

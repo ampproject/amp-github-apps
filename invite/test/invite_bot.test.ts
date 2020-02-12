@@ -25,6 +25,7 @@ describe('Invite Bot', () => {
   let inviteBot: InviteBot;
 
   beforeEach(() => {
+    process.env = {HELP_TAG_USER: 'test_org/wg-example'};
     inviteBot = new InviteBot(/*client=*/ null, 'test_org');
 
     jest.spyOn(GitHub.prototype, 'inviteUser');
@@ -233,8 +234,9 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'You asked me to send an invite to `@someone`, but I ran into an ' +
-            'error when I tried. Try sending the invite manually.'
+          'You asked me to send an invite to @someone, but I ran into an ' +
+            'error when I tried. You can try sending the invite manually, or ' +
+            'ask @test_org/wg-example for help.'
         );
         done();
       });
