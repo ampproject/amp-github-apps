@@ -34,6 +34,12 @@ describe('invitation record', () => {
     issue_number: 1337,
     action: InviteAction.INVITE,
   };
+  const otherInvite: Invite = {
+    username: 'someone',
+    repo: 'test_repo',
+    issue_number: 42,
+    action: InviteAction.INVITE,
+  };
   const archivedInvite: Invite = Object.assign({archived: true}, invite);
 
   beforeAll(async () => setupDb(db));
@@ -49,20 +55,16 @@ describe('invitation record', () => {
     it('records an invite', async done => {
       record.recordInvite(invite);
 
-      expect(
-        await db('invites')
-          .select()
-          .first()
-      ).toEqual(invite);
+      const recordedInvite: Invite = await db('invites').first();
+      expect(recordedInvite).toMatchObject(invite);
       done();
     });
 
     it('sets `archived = false`', async done => {
-      expect(
-        await db('invites')
-          .pluck('archived')
-          .first()
-      ).toEqual(false);
+      record.recordInvite(invite);
+
+      const recordedInvite: Invite = await db('invites').first();
+      expect(recordedInvite.archived).toBeFalsy();
       done();
     });
   });
@@ -75,13 +77,17 @@ describe('invitation record', () => {
       });
     });
 
-    describe('if records exists of invites to the user', () => {
+    describe('if records exist of invites to the user', () => {
       beforeEach(async () => {
         await record.recordInvite(invite);
+        await record.recordInvite(otherInvite);
       });
 
       it('returns the invites', async done => {
-        expect(await record.getInvites('someone')).toEqual([invite]);
+        const invites: Array<Invite> = await record.getInvites('someone');
+
+        expect(invites[0]).toMatchObject(invite);
+        expect(invites[1]).toMatchObject(otherInvite);
         done();
       });
     });
@@ -99,23 +105,19 @@ describe('invitation record', () => {
   });
 
   describe('archiveInvites', () => {
-    describe('if records exists of any invites to the user', () => {
+    describe('if records exist of any invites to the user', () => {
       beforeEach(async () => {
         await record.recordInvite(invite);
-        await record.recordInvite({
-          username: 'someone',
-          repo: 'test_repo',
-          issue_number: 42,
-          action: InviteAction.INVITE,
-        });
+        await record.recordInvite(otherInvite);
       });
 
       it('updates the invite records', async done => {
         await record.archiveInvites('someone');
 
-        const invites: Array<Invite> = await record.getInvites('someone');
-        expect(invites[0].archived).toBe(true);
-        expect(invites[1].archived).toBe(true);
+        expect(await record.getInvites('someone')).toEqual([]);
+        const invites = await db('invites').select();
+        expect(invites[0].archived).toBeTruthy();
+        expect(invites[1].archived).toBeTruthy();
 
         done();
       });

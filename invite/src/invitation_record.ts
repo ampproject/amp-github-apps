@@ -17,9 +17,6 @@
 import {Database} from './db';
 import {ILogger, Invite} from './types';
 
-// TODO: Enable after filling in implementations.
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /**
  * A record of invites sent by the bot that may require follow-up actions.
  */
@@ -32,18 +29,31 @@ export class InvitationRecord {
   /**
    * Records an invite created by the bot.
    */
-  async recordInvite(invite: Invite): Promise<void> {}
+  async recordInvite(invite: Invite): Promise<void> {
+    await this.db('invites').insert(invite);
+  }
 
   /**
    * Looks up the invites for a user.
    */
   async getInvites(username: string): Promise<Array<Invite>> {
-    return [];
+    return (await this.db('invites')
+      .select()
+      .where({username, archived: false}))
+      .map(invite => {
+        // PostgresQL stores booleans as TINYINT, so we cast it to boolean.
+        invite.archived = !!invite.archived;
+        return invite;
+      });
   }
 
   /**
    * Marks a user's invites as archived, indicating all necessary follow-up
    * actions have been completed.
    */
-  async archiveInvites(username: string): Promise<void> {}
+  async archiveInvites(username: string): Promise<void> {
+    await this.db('invites')
+      .where({username})
+      .update({archived: true});
+  }
 }
