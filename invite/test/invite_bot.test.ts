@@ -25,10 +25,11 @@ describe('Invite Bot', () => {
   let inviteBot: InviteBot;
 
   beforeEach(() => {
-    inviteBot = new InviteBot(/*client=*/ null, 'test_repo');
+    inviteBot = new InviteBot(/*client=*/ null, 'test_org');
 
     jest.spyOn(GitHub.prototype, 'inviteUser');
-    jest.spyOn(GitHub.prototype, 'addComment');
+    jest.spyOn(GitHub.prototype, 'addComment')
+      .mockImplementation(async () => {});
     jest.spyOn(InvitationRecord.prototype, 'recordInvite');
   });
 
@@ -97,7 +98,7 @@ describe('Invite Bot', () => {
     });
   });
 
-  describe.skip('tryInvite', () => {
+  describe('tryInvite', () => {
     const newInvite: Invite = {
       username: 'someone',
       repo: 'test_repo',
@@ -107,12 +108,13 @@ describe('Invite Bot', () => {
 
     describe('when the user has a pending invite from the bot', () => {
       beforeEach(() => {
-        inviteBot.record.recordInvite({
-          username: 'someone',
-          repo: 'test_repo',
-          issue_number: 42,
-          action: InviteAction.INVITE,
-        });
+        jest.spyOn(InvitationRecord.prototype, 'getInvites')
+          .mockImplementation(async () => [{
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 42,
+            action: InviteAction.INVITE,
+          }]);
       });
 
       it('it does not attempt to send an invite', async done => {
@@ -132,7 +134,7 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'I attempted to invite @someone to `test_org`, but they already ' +
+          'You asked me to invite `@someone` to `test_org`, but they already ' +
             'have an invitation pending! I will update this thread when the ' +
             'invitation is accepted.'
         );
@@ -142,7 +144,7 @@ describe('Invite Bot', () => {
 
     describe('when the user is a member', () => {
       beforeEach(() => {
-        mocked(inviteBot.github.inviteUser).mockImplementation(
+        mocked(GitHub.prototype.inviteUser).mockImplementation(
           async () => false
         );
       });
@@ -164,21 +166,16 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'You asked me to invite @someone, but they are already a member of ' +
-            '`test_org/test_repo`!'
+          'You asked me to invite `@someone`, but they are already a member ' +
+            'of `test_org`!'
         );
-        done();
-      });
-
-      it('returns false', async done => {
-        expect(await inviteBot.tryInvite(newInvite)).toBe(false);
         done();
       });
     });
 
     describe('when the user is not a member', () => {
       beforeEach(() => {
-        mocked(inviteBot.github.inviteUser).mockImplementation(
+        mocked(GitHub.prototype.inviteUser).mockImplementation(
           async () => true
         );
       });
@@ -200,24 +197,19 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'An invitation to join `test_org` has been sent to @someone. I ' +
+          'An invitation to join `test_org` has been sent to `@someone`. I ' +
             'will update this thread when the invitation is accepted.'
         );
-        done();
-      });
-
-      it('returns true', async done => {
-        expect(await inviteBot.tryInvite(newInvite)).toBe(true);
         done();
       });
     });
 
     describe('when the invite fails', () => {
       beforeEach(() => {
-        mocked(inviteBot.github.inviteUser).mockImplementation(async () => {
+        mocked(GitHub.prototype.inviteUser).mockImplementation(async () => {
           throw new Error('Uh-oh!');
         });
-        jest.spyOn(console, 'error');
+        jest.spyOn(console, 'error').mockImplementation(() => {});
       });
 
       it('logs an error', async done => {
@@ -226,7 +218,7 @@ describe('Invite Bot', () => {
         } catch (e) {}
 
         expect(console.error).toBeCalledWith(
-          'Failed to send an invite to @someone: Error: Uh-oh!'
+          'Failed to send an invite to `@someone`: Error: Uh-oh!'
         );
         done();
       });
@@ -239,16 +231,16 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'You asked me to send an invite to @someone, but I ran into an ' +
+          'You asked me to send an invite to `@someone`, but I ran into an ' +
             'error when I tried. Try sending the invite manually.'
         );
         done();
       });
 
       it('re-throws the error', async done => {
-        expect(async () => {
-          await inviteBot.tryInvite(newInvite);
-        }).toThrow(new Error('Uh-oh!'));
+        expect(inviteBot.tryInvite(newInvite)).rejects.toThrow(
+          new Error('Uh-oh!')
+        );
         done();
       });
     });
@@ -278,7 +270,7 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          "The invitation to @someone was accepted! I've assigned them to " +
+          "The invitation to `@someone` was accepted! I've assigned them to " +
             'this issue.'
         );
         done();
@@ -291,7 +283,7 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          "It looks like @someone is already a member of `test_org`! I've " +
+          "It looks like `@someone` is already a member of `test_org`! I've " +
             'assigned them to this issue.'
         );
         done();

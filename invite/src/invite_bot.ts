@@ -46,7 +46,11 @@ export class InviteBot {
   /**
    * Constructor.
    */
-  constructor(client: Octokit, org: string, private logger: ILogger = console) {
+  constructor(
+    client: Octokit,
+    private org: string,
+    private logger: ILogger = console,
+  ) {
     this.github = new GitHub(client, org, logger);
     this.record = new InvitationRecord(dbConnect(), logger);
   }
@@ -78,7 +82,7 @@ export class InviteBot {
         macros[username] = INVITE_MACROS[macroString.toLowerCase()];
       });
     }
-    
+
     return macros;
   }
 
@@ -89,8 +93,76 @@ export class InviteBot {
    * Should be called in response to new comments with the /invite or /tryassign
    * macros.
    */
-  async tryInvite(invite: Invite): Promise<boolean> {
-    return false;
+  async tryInvite(invite: Invite): Promise<void> {
+    const existingInvites = await this.record.getInvites(invite.username);
+    const pendingInvite = !!existingInvites.length;
+
+    if (pendingInvite) {
+      return this.handlePendingInvite(invite);
+    }
+
+    // The user has not been invited by the bot yet, so try and send an invite.
+    let invited = false;
+    try {
+      invited = await this.github.inviteUser(invite.username);
+    } catch (error) {
+      return await this.handleErrorSendingInvite(invite, error);
+    }
+
+    if (!invited) {
+      return await this.handleUserAlreadyMember(invite);
+    }
+   
+    await this.handleNewInviteSent(invite);
+  }
+
+  /** Handle case where there's at least one pending invite already recorded. */
+  private async handlePendingInvite(invite: Invite): Promise<void> {
+    await this.record.recordInvite(invite);
+    await this.github.addComment(
+      invite.repo,
+      invite.issue_number,
+      `You asked me to invite \`@${invite.username}\` to \`${this.org}\`, ` +
+        'but they already have an invitation pending! I will update this ' +
+        'thread when the invitation is accepted.'
+    );
+  }
+
+  /** Handle case where the user is already a member. */
+  private async handleUserAlreadyMember(invite: Invite): Promise<void> {
+    await this.github.addComment(
+      invite.repo,
+      invite.issue_number,
+      `You asked me to invite \`@${invite.username}\`, but they are ` +
+        `already a member of \`${this.org}\`!`
+    );
+  }
+
+  /** Handle case where the invite was actually sent. */
+  private async handleNewInviteSent(invite: Invite): Promise<void> {
+    await this.record.recordInvite(invite);
+    await this.github.addComment(
+      invite.repo,
+      invite.issue_number,
+      `An invitation to join \`${this.org}\` has been sent to ` +
+        `\`@${invite.username}\`. I will update this thread when the ` +
+        'invitation is accepted.'
+    );
+  }
+
+  /** Handle case where the there was an error sending the invite. */
+  private async handleErrorSendingInvite(invite: Invite, error: Error): Promise<void> {
+    this.logger.error(
+      `Failed to send an invite to \`@${invite.username}\`: ${error}`
+    );
+    await this.github.addComment(
+      invite.repo,
+      invite.issue_number,
+      `You asked me to send an invite to \`@${invite.username}\`, but I ` +
+        'ran into an error when I tried. Try sending the invite manually.'
+    );
+    
+    throw error;
   }
 
   /**
