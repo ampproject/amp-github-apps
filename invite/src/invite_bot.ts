@@ -75,17 +75,19 @@ export class InviteBot {
     comment: string,
     author: string,
   ): Promise<void> {
-    // TODO(rcebulko): Add author once `allow` branch is merged.
     this.logger.info(
-      `processComment: Processing comment on ${repo}#${issue_number}`
+      `processComment: Processing comment by @${author} on ` +
+      `${repo}#${issue_number}`
     );
-    const macros = this.parseMacros(comment);
+    const macroList = Object.entries(this.parseMacros(comment));
 
     this.logger.debug(
-      `processComment: Found ${Object.keys(macros).length} macros`
+      `processComment: Found ${macroList.length} macros`
     );
-    for (const [username, action] of Object.entries(macros)) {
-      await this.tryInvite({username, repo, issue_number, action});
+    if (macroList.length && await this.userCanTrigger(author)) {
+      for (const [username, action] of macroList) {
+        await this.tryInvite({username, repo, issue_number, action});
+      }
     }
   }
 
@@ -118,7 +120,7 @@ export class InviteBot {
 
   /** Checks if a user is allowed to trigger an invite macro. */
   async userCanTrigger(username: string): Promise<boolean> {
-    return false;
+    return true;
   }
 
   /** Parses a comment for invitation macros. */
