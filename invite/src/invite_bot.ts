@@ -73,12 +73,39 @@ export class InviteBot {
     repo: string,
     issue_number: number,
     comment: string
-  ): Promise<void> {}
+  ): Promise<void> {
+    const macros = this.parseMacros(comment);
+
+    for (const [username, action] of Object.entries(macros)) {
+      await this.tryInvite({username, repo, issue_number, action});
+    }
+  }
 
   /**
    * Process an accepted invite by adding comments and assigning issues.
    */
-  async processAcceptedInvite(username: string): Promise<void> {}
+  async processAcceptedInvite(username: string): Promise<void> {
+    const recordedInvites = await this.record.getInvites(username);
+
+    for (const invite of recordedInvites) {
+      switch (invite.action) {
+        case InviteAction.INVITE:
+          await this.github.addComment(
+            invite.repo,
+            invite.issue_number,
+            `The invitation to \`@${invite.username}\` was accepted!`,
+          );
+          break;
+        case InviteAction.INVITE_AND_ASSIGN:
+          await this.tryAssign(invite, /*accepted=*/true);
+          break;
+        default:
+          throw new RangeError('Unimplemented action');
+      }
+    }
+
+    await this.record.archiveInvites(username);
+  }
 
   /**
    * Parses a comment for invitation macros.
@@ -117,14 +144,19 @@ export class InviteBot {
     try {
       invited = await this.github.inviteUser(invite.username);
     } catch (error) {
-      return await this.handleErrorSendingInvite(invite, error);
+      await this.handleErrorSendingInvite(invite, error);
+      throw error;
     }
 
-    if (!invited) {
-      return await this.handleUserAlreadyMember(invite);
+    if (invited) {
+      return await this.handleNewInviteSent(invite);
     }
 
-    await this.handleNewInviteSent(invite);
+    if (invite.action === InviteAction.INVITE_AND_ASSIGN) {
+      await this.tryAssign(invite, /*accepted=*/false);
+    } else {
+      await this.handleUserAlreadyMember(invite);
+    }
   }
 
   /** Handle case where there's at least one pending invite already recorded. */
@@ -173,8 +205,6 @@ export class InviteBot {
         'ran into an error when I tried. You can try sending the invite ' +
         `manually, or ask ${this.helpUserTag} for help.`
     );
-
-    throw error;
   }
 
   /**

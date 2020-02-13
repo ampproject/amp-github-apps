@@ -37,6 +37,7 @@ describe('GitHub interface', () => {
   });
 
   beforeEach(() => {
+    nock.cleanAll();
     github = new GitHub(githubClient, 'test_org');
   });
 
@@ -44,8 +45,8 @@ describe('GitHub interface', () => {
     // Fail the test if there were unused nocks.
     if (!nock.isDone()) {
       throw new Error('Not all nock interceptors were used!');
-      nock.cleanAll();
     }
+    nock.cleanAll();
   });
 
   describe('inviteUser', () => {
@@ -63,7 +64,7 @@ describe('GitHub interface', () => {
         .put('/orgs/test_org/memberships/someone')
         .reply(200, getFixture('add_member.invited'));
 
-      expect(await github.inviteUser('someone')).toBe(true);
+      expect(github.inviteUser('someone')).resolves.toBe(true);
       done();
     });
 
@@ -72,7 +73,7 @@ describe('GitHub interface', () => {
         .put('/orgs/test_org/memberships/someone')
         .reply(200, getFixture('add_member.exists'));
 
-      expect(await github.inviteUser('someone')).toBe(false);
+      expect(github.inviteUser('someone')).resolves.toBe(false);
       done();
     });
   });

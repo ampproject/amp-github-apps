@@ -104,7 +104,7 @@ describe('Probot webhooks', () => {
       await triggerWebhook(probot, 'organization.member_added');
 
       expect(InviteBot.prototype.processAcceptedInvite).toBeCalledWith(
-        'someone_else'
+        'someone'
       );
       done();
     });

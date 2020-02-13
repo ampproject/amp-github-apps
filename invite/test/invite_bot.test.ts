@@ -14,33 +14,54 @@
  * limitations under the License.
  */
 
+import Knex from 'knex';
 import {mocked} from 'ts-jest/utils';
 
+import {setupDb} from '../src/setup_db';
+import {dbConnect} from '../src/db';
 import {Invite, InviteAction} from '../src/types';
 import {InvitationRecord} from '../src/invitation_record';
 import {InviteBot} from '../src/invite_bot';
 import {GitHub} from '../src/github';
 
+jest.mock('../src/db', () => {
+  const testDb = Knex({
+    client: 'sqlite3',
+    connection: ':memory:',
+    useNullAsDefault: true,
+  });
+
+  return {
+    Database: Knex,
+    dbConnect: () => testDb,
+  };
+});
+
 describe('Invite Bot', () => {
   let inviteBot: InviteBot;
+  const db = dbConnect();
+
+  beforeAll(async () => setupDb(db));
+  afterAll(async () => db.destroy());
 
   beforeEach(() => {
-    inviteBot = new InviteBot(
-      /*client=*/ null,
-      'test_org',
-      /*helpUsernameToTag=*/'test_org/wg-example',
-    );
-
-    jest.spyOn(GitHub.prototype, 'inviteUser');
+    jest.spyOn(GitHub.prototype, 'inviteUser')
     jest.spyOn(GitHub.prototype, 'addComment')
       .mockImplementation(async () => {});
     jest.spyOn(GitHub.prototype, 'assignIssue')
       .mockImplementation(async () => {});
     jest.spyOn(InvitationRecord.prototype, 'recordInvite');
+
+    inviteBot = new InviteBot(
+      /*client=*/ null,
+      'test_org',
+      /*helpUsernameToTag=*/'test_org/wg-example',
+    );
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.restoreAllMocks();
+    await db('invites').truncate();
   });
 
   describe('constructor', () => {
@@ -56,6 +77,198 @@ describe('Invite Bot', () => {
         /*helpUsernameToTag=*/'test_org/wg-example',
       );
       expect(inviteBot.helpUserTag).toEqual('@test_org/wg-example');
+    });
+  });
+
+  describe('processComment', () => {
+    beforeEach(() => {
+      jest.spyOn(inviteBot, 'parseMacros');
+      jest.spyOn(inviteBot, 'tryInvite')
+      jest.spyOn(inviteBot, 'tryAssign')
+        .mockImplementation(async () => {});
+    });
+
+    it('parses the comment for macros', async done => {
+      await inviteBot.processComment('test_repo', 1337, 'My test comment')
+
+      expect(inviteBot.parseMacros).toBeCalledWith('My test comment');
+      done();
+    });
+
+    describe('when macros are present', () => {
+      const comment = '/invite @someone and /tryassign @someoneelse';
+
+      beforeEach(() => {
+        mocked(inviteBot.tryInvite).mockClear();
+        mocked(GitHub.prototype.inviteUser).mockImplementation(
+          async () => false
+        );
+      });
+
+      it('tries to send invites', async done => {
+        await inviteBot.processComment('test_repo', 1337, comment);
+
+        expect(inviteBot.tryInvite).toBeCalledWith({
+          username: 'someone',
+          repo: 'test_repo',
+          issue_number: 1337,
+          action: InviteAction.INVITE,
+        });
+        expect(inviteBot.tryInvite).toBeCalledWith({
+          username: 'someoneelse',
+          repo: 'test_repo',
+          issue_number: 1337,
+          action: InviteAction.INVITE_AND_ASSIGN,
+        });
+        done();
+      });
+
+      describe('for /tryassign macros', () => {
+        it('tries to assign the issue', async done => {
+          await inviteBot.processComment('test_repo', 1337, comment);
+
+          expect(inviteBot.tryAssign).toBeCalledWith({
+            username: 'someoneelse',
+            repo: 'test_repo',
+            issue_number: 1337,
+            action: InviteAction.INVITE_AND_ASSIGN,
+          }, /*accepted=*/false);
+
+          done();
+        });
+      });
+    });
+
+    describe('when no macros are found', () => {
+      const comment = 'say hello/invite @someone and do not /tryassign anyone';
+
+      it('does not try to send any invites', async done => {
+        await inviteBot.processComment('test_repo', 1337, comment);
+
+        expect(inviteBot.tryInvite).not.toBeCalled();
+        done();
+      });
+    });
+  });
+
+  describe('processAcceptedInvite', () => {
+    beforeEach(() => {
+      jest.spyOn(GitHub.prototype, 'addComment')
+        .mockImplementation(async () => {});
+      jest.spyOn(inviteBot, 'tryAssign')
+        .mockImplementation(async () => {});
+    });
+
+    it('checks the record for invites to the user', async done => {
+      jest.spyOn(inviteBot.record, 'getInvites');
+      await inviteBot.processAcceptedInvite('someone');
+
+      expect(inviteBot.record.getInvites).toBeCalledWith('someone');
+      done();
+    });
+
+    describe('when there are recorded invites', () => {
+      describe('with Invite action', () => {
+        beforeEach(async done => {
+          await inviteBot.record.recordInvite({
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 1337,
+            action: InviteAction.INVITE,
+          });
+          await inviteBot.record.recordInvite({
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 42,
+            action: InviteAction.INVITE,
+          });
+
+          done();
+        });
+
+        it('does not try to assign any issues', async done => {
+          await inviteBot.processAcceptedInvite('someone');
+
+          expect(inviteBot.tryAssign).not.toBeCalled();
+          done();
+        });
+
+        it('comments on the issues that the invite was accepted', async done => {
+          await inviteBot.processAcceptedInvite('someone');
+
+          expect(inviteBot.github.addComment).toBeCalledWith(
+            'test_repo',
+            1337,
+            `The invitation to \`@someone\` was accepted!`,
+          );
+
+          expect(inviteBot.github.addComment).toBeCalledWith(
+            'test_repo',
+            42,
+            `The invitation to \`@someone\` was accepted!`,
+          );
+          done();
+        });
+      });
+
+      describe('with InviteAndAssign action', () => {
+        beforeEach(async done => {
+          await inviteBot.record.recordInvite({
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 1337,
+            action: InviteAction.INVITE_AND_ASSIGN,
+          });
+          await inviteBot.record.recordInvite({
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 42,
+            action: InviteAction.INVITE_AND_ASSIGN,
+          });
+
+          done();
+        });
+
+        it('tries to assign the issues', async done => {
+          await inviteBot.processAcceptedInvite('someone');
+
+          expect(inviteBot.tryAssign).toBeCalledWith(
+            expect.objectContaining({
+              username: 'someone',
+              repo: 'test_repo',
+              issue_number: 1337,
+              action: InviteAction.INVITE_AND_ASSIGN,
+            }),
+            /*accepted=*/true,
+          );
+          expect(inviteBot.tryAssign).toBeCalledWith(
+            expect.objectContaining({
+              username: 'someone',
+              repo: 'test_repo',
+              issue_number: 42,
+              action: InviteAction.INVITE_AND_ASSIGN,
+            }),
+            /*accepted=*/true,
+          );
+
+          done();
+        });
+      });
+    });
+
+    describe('when there are no recorded invites to the user', () => {
+      it('does not try to assign any issues', async done => {
+        await inviteBot.processAcceptedInvite('someone');
+
+        expect(inviteBot.tryAssign).not.toBeCalled();
+        done();
+      });
+      it('does not comment on any issues', async done => {
+        inviteBot.processAcceptedInvite('someone');
+
+        expect(inviteBot.github.addComment).not.toBeCalled();
+        done();
+      });
     });
   });
 
@@ -228,9 +441,9 @@ describe('Invite Bot', () => {
 
     describe('when the invite fails', () => {
       beforeEach(() => {
-        mocked(GitHub.prototype.inviteUser).mockImplementation(async () => {
-          throw new Error('Uh-oh!');
-        });
+        mocked(GitHub.prototype.inviteUser).mockRejectedValue(
+          new Error('Uh-oh!')
+        );
         jest.spyOn(console, 'error').mockImplementation(() => {});
       });
 
@@ -261,9 +474,12 @@ describe('Invite Bot', () => {
       });
 
       it('re-throws the error', async done => {
-        expect(inviteBot.tryInvite(newInvite)).rejects.toThrow(
-          new Error('Uh-oh!')
-        );
+        expect.assertions(1);
+        try {
+          await inviteBot.tryInvite(newInvite);
+        } catch (e) {
+          expect(e).toEqual(new Error('Uh-oh!'));
+        }
         done();
       });
     });

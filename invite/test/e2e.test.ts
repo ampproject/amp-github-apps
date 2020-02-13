@@ -22,20 +22,28 @@ import {Probot} from 'probot';
 import app from '../app';
 import {Database, dbConnect} from '../src/db';
 import {InviteAction} from '../src/types';
+import {InvitationRecord} from '../src/invitation_record';
+import {InviteBot} from '../src/invite_bot';
 import {setupDb} from '../src/setup_db';
 import {triggerWebhook, getFixture} from './fixtures';
 
-jest.mock('../src/db', () => ({
-  dbConnect: () => Knex({
+jest.mock('../src/db', () => {
+  const testDb = Knex({
     client: 'sqlite3',
     connection: ':memory:',
     useNullAsDefault: true,
-  })
-}));
+  });
+
+  return {
+    Database: Knex,
+    dbConnect: () => testDb,
+  };
+});
 
 describe('end-to-end', () => {
   let probot: Probot;
   let db: Database;
+  let record: InvitationRecord;
 
   beforeAll(async () => {
     nock.disableNetConnect();
@@ -48,6 +56,7 @@ describe('end-to-end', () => {
 
     db = dbConnect();
     await setupDb(db);
+    record = new InvitationRecord(db);
 
     probot = new Probot({});
     const probotApp = probot.load(app);
@@ -58,19 +67,20 @@ describe('end-to-end', () => {
 
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.enableNetConnect();
-    db.destroy();
+    await db.destroy();
   });
 
-  afterEach(() => {
+  beforeEach(() => nock.cleanAll());
+
+  afterEach(async () => {
     jest.restoreAllMocks();
-    db('invites').truncate();
+    await db('invites').truncate();
 
     // Fail the test if there were unused nocks.
     if (!nock.isDone()) {
       throw new Error('Not all nock interceptors were used!');
-      nock.cleanAll();
     }
   });
 
@@ -90,11 +100,11 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
-        expect(await db('invites').select().first()).toBeUndefined();
+        expect(record.getInvites('someone')).resolves.toEqual([]);
         done();
       });
     });
-    
+
     describe('when @someone is not a member of the org', () => {
       const recordedInvite = {
         username: 'someone',
@@ -112,22 +122,21 @@ describe('end-to-end', () => {
             expect(body).toEqual({
               body: 'An invitation to join `test_org` has been sent to ' +
                 '`@someone`. I will update this thread when the invitation ' +
-                'accepted'
+                'is accepted.'
             });
             return true;
           })
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
-        expect(await db('invites').select().first()).toEqual(recordedInvite);
+        expect(record.getInvites('someone')).resolves.toEqual([
+          expect.objectContaining(recordedInvite)
+        ]);
         done();
       });
 
       describe('once the invite is accepted', () => {
-        beforeEach(async done => {
-          await db('invites').insert(recordedInvite);
-          done();
-        });
+        beforeEach(async () => record.recordInvite(recordedInvite));
 
         it('comments, archives', async done => {
           nock('https://api.github.com')
@@ -140,7 +149,7 @@ describe('end-to-end', () => {
             .reply(200);
 
           await triggerWebhook(probot, 'organization.member_added');
-          expect(await db('invites').pluck('archived').first()).toEqual(true);
+          expect(record.getInvites('someone')).resolves.toEqual([]);
           done();
         });
       });
@@ -160,15 +169,14 @@ describe('end-to-end', () => {
           .reply(200)
           .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
-              body: 'It looks like `@someone` is already a member of ' +
-                '`test_org`! I\'ve assigned them to this issue.'
+              body: 'I\'ve assigned this issue to `@someone`.'
             });
             return true;
           })
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
-        expect(await db('invites').select().first()).toBeUndefined();
+        expect(record.getInvites('someone')).resolves.toEqual([]);
         done();
       });
     });
@@ -190,14 +198,16 @@ describe('end-to-end', () => {
             expect(body).toEqual({
               body: 'An invitation to join `test_org` has been sent to ' +
                 '`@someone`. I will update this thread when the invitation ' +
-                'accepted'
+                'is accepted.'
             });
             return true;
           })
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
-        expect(await db('invites').select().first()).toEqual(recordedInvite);
+        expect(record.getInvites('someone')).resolves.toEqual([
+          expect.objectContaining(recordedInvite)
+        ]);
         done();
       });
 
@@ -216,14 +226,15 @@ describe('end-to-end', () => {
             .reply(200)
             .post('/repos/test_org/test_repo/issues/1337/comments', body => {
               expect(body).toEqual({
-                body: 'The invitation to `@someone` was accepted!'
+                body: 'The invitation to `@someone` was accepted! I\'ve ' +
+                  'assigned them to this issue.'
               });
               return true;
             })
             .reply(200);
 
           await triggerWebhook(probot, 'organization.member_added');
-          expect(await db('invites').pluck('archived').first()).toEqual(true);
+          expect(record.getInvites('someone')).resolves.toEqual([]);
           done();
         });
       });
@@ -232,8 +243,11 @@ describe('end-to-end', () => {
 
   describe('when a comment includes no macros', () => {
     it('ignores it', async done => {
+      jest.spyOn(InviteBot.prototype, 'tryInvite');
       await triggerWebhook(probot, 'issue_comment.created');
-      expect(await db('invites').select().first()).toBeUndefined();
+      expect(InviteBot.prototype.tryInvite).not.toBeCalled();
+
+      // The test will fail if any unexpected network requests occur.
       done();
     });
   });
@@ -241,8 +255,9 @@ describe('end-to-end', () => {
   describe('when someone joins without a recorded invitation', () => {
     it('ignores it', async done => {
       await triggerWebhook(probot, 'organization.member_added');
-      expect(await db('invites').select().first()).toBeUndefined();
+
+      // The test will fail if any unexpected network requests occur.
       done();
     });
-  })
+  });
 });

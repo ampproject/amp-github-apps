@@ -72,7 +72,7 @@ describe('invitation record', () => {
   describe('getInvites', () => {
     describe('if no invite record exists for the user', () => {
       it('returns an empty list', async done => {
-        expect(await record.getInvites('someone')).toEqual([]);
+        expect(record.getInvites('someone')).resolves.toEqual([]);
         done();
       });
     });
@@ -98,7 +98,7 @@ describe('invitation record', () => {
       });
 
       it('returns an empty list', async done => {
-        expect(await record.getInvites('someone')).toEqual([]);
+        expect(record.getInvites('someone')).resolves.toEqual([]);
         done();
       });
     });
@@ -114,7 +114,7 @@ describe('invitation record', () => {
       it('updates the invite records', async done => {
         await record.archiveInvites('someone');
 
-        expect(await record.getInvites('someone')).toEqual([]);
+        expect(record.getInvites('someone')).resolves.toEqual([]);
         const invites = await db('invites').select();
         expect(invites[0].archived).toBeTruthy();
         expect(invites[1].archived).toBeTruthy();
