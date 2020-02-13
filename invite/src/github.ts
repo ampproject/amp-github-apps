@@ -18,13 +18,9 @@ import {Octokit} from '@octokit/rest';
 
 import {ILogger} from './types';
 
-/**
- * Interface for working with the GitHub API.
- */
+/** Interface for working with the GitHub API. */
 export class GitHub {
-  /**
-   * Constructor.
-   */
+  /** Constructor. */
   constructor(
     private client: Octokit,
     private org: string,
@@ -44,9 +40,7 @@ export class GitHub {
     return response.data.state === 'pending';
   }
 
-  /**
-   * Adds a comment to an issue.
-   */
+  /** Adds a comment to an issue. */
   async addComment(
     repo: string,
     issue_number: number,
@@ -60,9 +54,7 @@ export class GitHub {
     });
   }
 
-  /**
-   * Assigns an issue to a user.
-   */
+  /** Assigns an issue to a user. */
   async assignIssue(
     repo: string,
     issue_number: number,
@@ -74,6 +66,13 @@ export class GitHub {
       issue_number,
       assignees: [assignee],
     });
+  }
+
+  /* Checks whether a user is a member of the organization. */
+  async userIsMember(username: string): Promise<boolean> {  
+    // https://octokit.github.io/rest.js/#octokit-routes-orgs-check-membership  
+    // octokit.orgs.checkMembership({org, username}); 
+    return false; 
   }
 }
 

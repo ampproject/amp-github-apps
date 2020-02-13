@@ -104,4 +104,33 @@ describe('GitHub interface', () => {
       done();
     });
   });
+
+  describe('userIsMember', () => {  
+    it('GETs /orgs/:org/members/:username', async done => { 
+      nock('https://api.github.com')  
+        .get('/orgs/test_org/members/someone')  
+        .reply(204);  
+
+      await github.userIsMember('someone'); 
+      done(); 
+    }); 
+
+    it('returns true for 204: No Content', async done => {  
+      nock('https://api.github.com')  
+        .get('/orgs/test_org/members/someone')  
+        .reply(204);  
+
+      expect(await github.userIsMember('someone')).toBe(true);  
+      done(); 
+    }); 
+
+    it('returns false for 404: Not Found', async done => {  
+      nock('https://api.github.com')  
+        .get('/orgs/test_org/members/someone')  
+        .reply(404);  
+
+      expect(await github.userIsMember('someone')).toBe(false); 
+      done(); 
+    }); 
+  });
 });
