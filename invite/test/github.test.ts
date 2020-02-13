@@ -104,4 +104,42 @@ describe('GitHub interface', () => {
       done();
     });
   });
+
+  describe('userIsTeamMember', () => {  
+    it('GETs /orgs/:org/teams/:team_slug/memberships/:username', async done => { 
+      nock('https://api.github.com')  
+        .get('/orgs/test_org/teams/test-team/memberships/someone')  
+        .reply(200, getFixture('team_membership.active'));  
+
+      await github.userIsTeamMember('someone', 'test-team'); 
+      done(); 
+    });
+
+    it('returns true for "active" membership state', async done => {  
+      nock('https://api.github.com')  
+        .get('/orgs/test_org/teams/test-team/memberships/someone')  
+        .reply(200, getFixture('team_membership.active'));
+
+      expect(await github.userIsTeamMember('someone', 'test-team')).toBe(true);  
+      done(); 
+    });
+
+    it('returns false for "pending" membership state', async done => {  
+      nock('https://api.github.com')  
+        .get('/orgs/test_org/teams/test-team/memberships/someone')  
+        .reply(200, getFixture('team_membership.pending'));
+
+      expect(await github.userIsTeamMember('someone', 'test-team')).toBe(false);  
+      done(); 
+    }); 
+
+    it('returns false for 404: Not Found', async done => {  
+      nock('https://api.github.com')  
+        .get('/orgs/test_org/teams/test-team/memberships/someone')  
+        .reply(404, getFixture('team_membership.not_found'));  
+
+      expect(await github.userIsTeamMember('someone', 'test-team')).toBe(false); 
+      done(); 
+    }); 
+  });
 });

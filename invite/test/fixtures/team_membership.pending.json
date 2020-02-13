@@ -1,0 +1,5 @@
+{
+  "state": "pending",
+  "role": "member",
+  "url": "https://api.github.com/organizations/12345/team/67890/memberships/someone"
+}

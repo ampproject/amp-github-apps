@@ -26,6 +26,7 @@ export default (app: Application) => {
     require('dotenv').config();
   }
 
+  const helpUserToTag = process.env.HELP_USER_TO_TAG || null;
   const github = new Octokit({
     authStrategy: createTokenAuth,
     auth: process.env.GITHUB_ACCESS_TOKEN,
@@ -37,6 +38,7 @@ export default (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      helpUserToTag,
       log,
     );
     await inviteBot.processComment(
@@ -52,6 +54,7 @@ export default (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      helpUserToTag,
       log,
     );
     await inviteBot.processComment(
@@ -67,6 +70,7 @@ export default (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      helpUserToTag,
       log,
     );
     await inviteBot.processComment(
@@ -82,6 +86,7 @@ export default (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      helpUserToTag,
       log,
     );
     await inviteBot.processComment(
@@ -97,6 +102,7 @@ export default (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      helpUserToTag,
       log,
     );
     await inviteBot.processComment(
@@ -109,7 +115,12 @@ export default (app: Application) => {
   app.on('organization.member_added', async (
     {event, payload, log}: Context<Webhooks.WebhookPayloadOrganization>
   ) => {
-    const inviteBot = new InviteBot(github, payload.organization.login, log);
+    const inviteBot = new InviteBot(
+      github,
+      payload.organization.login,
+      helpUserToTag,
+      log,
+    );
     await inviteBot.processAcceptedInvite(payload.membership.user.login);
   });
 };
