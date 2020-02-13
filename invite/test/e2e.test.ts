@@ -254,16 +254,25 @@ describe('end-to-end', () => {
     it('ignores it', async done => {
       jest.spyOn(InviteBot.prototype, 'tryInvite');
       await triggerWebhook(probot, 'issue_comment.created');
-      expect(InviteBot.prototype.tryInvite).not.toBeCalled();
 
+      expect(InviteBot.prototype.tryInvite).not.toBeCalled();
       // The test will fail if any unexpected network requests occur.
       done();
     });
   });
 
   describe('when the author is not a member of the allow team', () => {
-    // TODO(rcebulko): Implement once the membership check is implemented.
-    it.todo('ignores it');
+    it('ignores it', async done => {
+      jest.spyOn(InviteBot.prototype, 'tryInvite');
+      nock('https://api.github.com')
+        .get('/orgs/test_org/teams/wg-inviters/memberships/author')
+        .reply(404, getFixture('team_membership.not_found'))
+      await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
+
+      expect(InviteBot.prototype.tryInvite).not.toBeCalled();
+      // The test will fail if any unexpected network requests occur.
+      done();
+    });
   });
 
   describe('when someone joins without a recorded invitation', () => {

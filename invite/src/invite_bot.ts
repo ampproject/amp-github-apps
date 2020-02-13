@@ -126,7 +126,7 @@ export class InviteBot {
 
   /** Checks if a user is allowed to trigger an invite macro. */
   async userCanTrigger(username: string): Promise<boolean> {
-    return true;
+    return await this.github.userIsTeamMember(username, this.allowTeamSlug);
   }
 
   /** Parses a comment for invitation macros. */
