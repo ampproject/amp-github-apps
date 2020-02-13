@@ -100,7 +100,7 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
-        expect(await record.getInvites('someone')).toEqual([]);
+        expect(record.getInvites('someone')).resolves.toEqual([]);
         done();
       });
     });
@@ -148,7 +148,7 @@ describe('end-to-end', () => {
             .reply(200);
 
           await triggerWebhook(probot, 'organization.member_added');
-          expect(await record.getInvites('someone')).toEqual([]);
+          expect(record.getInvites('someone')).resolves.toEqual([]);
           done();
         });
       });
@@ -175,7 +175,7 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
-        expect(await record.getInvites('someone')).toEqual([]);
+        expect(record.getInvites('someone')).resolves.toEqual([]);
         done();
       });
     });
@@ -232,7 +232,7 @@ describe('end-to-end', () => {
             .reply(200);
 
           await triggerWebhook(probot, 'organization.member_added');
-          expect(await record.getInvites('someone')).toEqual([]);
+          expect(record.getInvites('someone')).resolves.toEqual([]);
           done();
         });
       });

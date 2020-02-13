@@ -64,7 +64,7 @@ describe('GitHub interface', () => {
         .put('/orgs/test_org/memberships/someone')
         .reply(200, getFixture('add_member.invited'));
 
-      expect(await github.inviteUser('someone')).toBe(true);
+      expect(github.inviteUser('someone')).resolves.toBe(true);
       done();
     });
 
@@ -73,7 +73,7 @@ describe('GitHub interface', () => {
         .put('/orgs/test_org/memberships/someone')
         .reply(200, getFixture('add_member.exists'));
 
-      expect(await github.inviteUser('someone')).toBe(false);
+      expect(github.inviteUser('someone')).resolves.toBe(false);
       done();
     });
   });
