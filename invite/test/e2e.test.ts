@@ -63,6 +63,8 @@ describe('end-to-end', () => {
     db.destroy();
   });
 
+  beforeEach(() => nock.cleanAll());
+
   afterEach(() => {
     jest.restoreAllMocks();
     db('invites').truncate();
@@ -70,7 +72,6 @@ describe('end-to-end', () => {
     // Fail the test if there were unused nocks.
     if (!nock.isDone()) {
       throw new Error('Not all nock interceptors were used!');
-      nock.cleanAll();
     }
   });
 
@@ -94,7 +95,7 @@ describe('end-to-end', () => {
         done();
       });
     });
-    
+
     describe('when @someone is not a member of the org', () => {
       const recordedInvite = {
         username: 'someone',

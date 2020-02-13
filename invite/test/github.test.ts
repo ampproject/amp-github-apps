@@ -37,6 +37,7 @@ describe('GitHub interface', () => {
   });
 
   beforeEach(() => {
+    nock.cleanAll();
     github = new GitHub(githubClient, 'test_org');
   });
 
@@ -44,8 +45,8 @@ describe('GitHub interface', () => {
     // Fail the test if there were unused nocks.
     if (!nock.isDone()) {
       throw new Error('Not all nock interceptors were used!');
-      nock.cleanAll();
     }
+    nock.cleanAll();
   });
 
   describe('inviteUser', () => {
