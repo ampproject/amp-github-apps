@@ -88,14 +88,19 @@ export class InviteBot {
     const recordedInvites = await this.record.getInvites(username);
 
     for (const invite of recordedInvites) {
-      if (invite.action === InviteAction.INVITE) {
-        await this.github.addComment(
-          invite.repo,
-          invite.issue_number,
-          `The invitation to \`@${invite.username}\` was accepted!`,
-        );
-      } else {
-        await this.tryAssign(invite, /*accepted=*/true);
+      switch (invite.action) {
+        case InviteAction.INVITE:
+          await this.github.addComment(
+            invite.repo,
+            invite.issue_number,
+            `The invitation to \`@${invite.username}\` was accepted!`,
+          );
+          break;
+        case InviteAction.INVITE_AND_ASSIGN:
+          await this.tryAssign(invite, /*accepted=*/true);
+          break;
+        default:
+          throw new RangeError('Unimplemented action');
       }
     }
 
