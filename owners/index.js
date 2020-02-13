@@ -63,11 +63,13 @@ module.exports = app => {
     ['pull_request.opened', 'pull_request.ready_for_review'],
     async (github, payload) => {
       const pr = PullRequest.fromGitHubResponse(payload.pull_request);
-      await ownersBot.runOwnersCheck(
-        github,
-        pr,
-        shouldAssignReviewers(payload.pull_request)
-      );
+      if (!payload.pull_request.draft) {
+        await ownersBot.runOwnersCheck(
+          github,
+          pr,
+          shouldAssignReviewers(payload.pull_request)
+        );
+      }
     }
   );
 

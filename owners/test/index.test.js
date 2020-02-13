@@ -579,33 +579,14 @@ describe('GitHub app', () => {
       sandbox.stub(OwnersBot.prototype, 'runOwnersCheck').callThrough();
     });
 
-    it('does not assign reviewers for draft PRs', async () => {
-      expect.assertions(1);
-
-      nock('https://api.github.com')
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/25408/files?per_page=100'
-        )
-        .reply(200, [])
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/25408/reviews?per_page=100'
-        )
-        .reply(200, [])
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
-            '85c9482fb0e92d0e7b0c4765308a6a1a37eeb708/check-runs'
-        )
-        .reply(200, checkruns35Empty)
-        .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
-        .reply(200);
-
+    it('does not run the check on for draft PRs', async done => {
       await probot.receive({
         name: 'pull_request.opened',
         payload: openedDraft25408,
       });
 
-      sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
-      expect(OwnersBot.prototype.runOwnersCheck.getCall(0).args[2]).toBe(false);
+      sandbox.assert.notCalled(OwnersBot.prototype.runOwnersCheck);
+      done();
     });
 
     it('does assign reviewers for draft PRs once they are ready', async () => {
