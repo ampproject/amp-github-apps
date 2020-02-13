@@ -55,7 +55,8 @@ describe('Invite Bot', () => {
     inviteBot = new InviteBot(
       /*client=*/ null,
       'test_org',
-      /*helpUsernameToTag=*/'test_org/wg-example',
+      'wg-example',
+      /*helpUsernameToTag=*/'test_org/wg-helpme',
     );
   });
 
@@ -66,7 +67,7 @@ describe('Invite Bot', () => {
 
   describe('constructor', () => {
     it('defaults helpUserTag to "someone"', () => {
-      inviteBot = new InviteBot(/*client=*/ null, 'test_org');
+      inviteBot = new InviteBot(/*client=*/ null, 'test_org', 'wg-example');
       expect(inviteBot.helpUserTag).toEqual('someone in your organization');
     });
 
@@ -74,9 +75,10 @@ describe('Invite Bot', () => {
       inviteBot = new InviteBot(
         /*client=*/ null,
         'test_org',
-        /*helpUsernameToTag=*/'test_org/wg-example',
+        'wg-example',
+        /*helpUsernameToTag=*/'test_org/wg-helpme',
       );
-      expect(inviteBot.helpUserTag).toEqual('@test_org/wg-example');
+      expect(inviteBot.helpUserTag).toEqual('@test_org/wg-helpme');
     });
   });
 
@@ -298,8 +300,8 @@ describe('Invite Bot', () => {
   });
 
   describe('userCanTrigger', () => {
-    it.todo('returns true if the user is a member of the org');
-    it.todo('returns false if the user is not a member of the org');
+    it.todo('returns true if the user is a member of the allow team');
+    it.todo('returns false if the user is not a member of the allow team');
   });
 
   describe('parseMacros', () => {
@@ -498,7 +500,7 @@ describe('Invite Bot', () => {
           1337,
           'You asked me to send an invite to `@someone`, but I ran into an ' +
             'error when I tried. You can try sending the invite manually, or ' +
-            'ask @test_org/wg-example for help.'
+            'ask @test_org/wg-helpme for help.'
         );
         done();
       });

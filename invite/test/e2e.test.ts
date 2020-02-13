@@ -252,7 +252,7 @@ describe('end-to-end', () => {
     });
   });
 
-  describe('when a comment with macros is authored by a non-member', () => {
+  describe('when the author is not a member of the allow team', () => {
     // TODO(rcebulko): Implement once the membership check is implemented.
     it.todo('ignores it');
   });

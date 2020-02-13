@@ -38,6 +38,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -55,6 +56,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -72,6 +74,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -89,6 +92,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -106,6 +110,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -123,6 +128,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.organization.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
