@@ -137,9 +137,7 @@ export class InviteBot {
     // The user has not been invited by the bot yet, so try and send an invite.
     let invited = false;
     try {
-      invited = await this.github.inviteUser(invite.username).catch(error => {
-        throw error;
-      });
+      invited = await this.github.inviteUser(invite.username);
     } catch (error) {
       await this.handleErrorSendingInvite(invite, error);
       throw error;
