@@ -129,8 +129,9 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
-        const invites = await record.getInvites('someone');
-        expect(invites[0]).toMatchObject(recordedInvite);
+        expect(record.getInvites('someone')).resolves.toEqual([
+          expect.objectContaining(recordedInvite)
+        ]);
         done();
       });
 
@@ -204,8 +205,9 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
-        const invites = await record.getInvites('someone');
-        expect(invites[0]).toMatchObject(recordedInvite);
+        expect(record.getInvites('someone')).resolves.toEqual([
+          expect.objectContaining(recordedInvite)
+        ]);
         done();
       });
 
