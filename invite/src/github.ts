@@ -70,9 +70,12 @@ export class GitHub {
 
   /* Checks whether a user is a member of the organization. */
   async userIsMember(username: string): Promise<boolean> {  
-    // https://octokit.github.io/rest.js/#octokit-routes-orgs-check-membership  
-    // octokit.orgs.checkMembership({org, username}); 
-    return false; 
+    const response = await this.client.orgs.checkMembership({
+      org: this.org,
+      username,
+    }).catch(errorResponse => errorResponse); 
+
+    return response.status === 204; 
   }
 }
 
