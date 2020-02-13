@@ -70,6 +70,10 @@ export class GitHub {
 
   /* Checks whether a user is a member of the organization. */
   async userIsMember(username: string): Promise<boolean> {  
+    // The membership API returns status 404 when the user is not a member of
+    // the organization, but Octokit handles this by rejecting the promise. We
+    // only need the status code to make a determination, so the `catch` handler
+    // just forwards along the response.
     const response = await this.client.orgs.checkMembership({
       org: this.org,
       username,
