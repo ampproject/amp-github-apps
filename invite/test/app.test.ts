@@ -77,7 +77,8 @@ describe('Probot webhooks', () => {
       expect(InviteBot.prototype.processComment).toBeCalledWith(
         'test_repo',
         1337,
-        'Test comment'
+        'Test comment',
+        'author',
       );
       done();
     });

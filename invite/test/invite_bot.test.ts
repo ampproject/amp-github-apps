@@ -89,9 +89,9 @@ describe('Invite Bot', () => {
     });
 
     it('parses the comment for macros', async done => {
-      await inviteBot.processComment('test_repo', 1337, 'My test comment')
+      await inviteBot.processComment('test_repo', 1337, 'My comment', 'author');
 
-      expect(inviteBot.parseMacros).toBeCalledWith('My test comment');
+      expect(inviteBot.parseMacros).toBeCalledWith('My comment');
       done();
     });
 
@@ -101,12 +101,12 @@ describe('Invite Bot', () => {
       beforeEach(() => {
         mocked(inviteBot.tryInvite).mockClear();
         mocked(GitHub.prototype.inviteUser).mockImplementation(
-          async () => false
+          async (author: string) => author === 'author'
         );
       });
 
       it('tries to send invites', async done => {
-        await inviteBot.processComment('test_repo', 1337, comment);
+        await inviteBot.processComment('test_repo', 1337, comment, 'author');
 
         expect(inviteBot.tryInvite).toBeCalledWith({
           username: 'someone',
@@ -125,7 +125,7 @@ describe('Invite Bot', () => {
 
       describe('for /tryassign macros', () => {
         it('tries to assign the issue', async done => {
-          await inviteBot.processComment('test_repo', 1337, comment);
+          await inviteBot.processComment('test_repo', 1337, comment, 'author');
 
           expect(inviteBot.tryAssign).toBeCalledWith({
             username: 'someoneelse',
@@ -143,7 +143,7 @@ describe('Invite Bot', () => {
       const comment = 'say hello/invite @someone and do not /tryassign anyone';
 
       it('does not try to send any invites', async done => {
-        await inviteBot.processComment('test_repo', 1337, comment);
+        await inviteBot.processComment('test_repo', 1337, comment, 'author');
 
         expect(inviteBot.tryInvite).not.toBeCalled();
         done();

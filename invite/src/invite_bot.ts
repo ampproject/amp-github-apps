@@ -72,7 +72,8 @@ export class InviteBot {
   async processComment(
     repo: string,
     issue_number: number,
-    comment: string
+    comment: string,
+    author: string,
   ): Promise<void> {
     // TODO(rcebulko): Add author once `allow` branch is merged.
     this.logger.info(
