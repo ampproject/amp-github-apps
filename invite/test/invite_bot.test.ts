@@ -272,6 +272,11 @@ describe('Invite Bot', () => {
     });
   });
 
+  describe('userCanTrigger', () => {
+    it.todo('returns true if the user is a member of the org');
+    it.todo('returns false if the user is not a member of the org');
+  });
+
   describe('parseMacros', () => {
     describe('comments without macros', () => {
       it('returns no matches', () => {

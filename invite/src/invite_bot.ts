@@ -68,9 +68,7 @@ export class InviteBot {
     this.logger.info(`InviteBot initialized for ${this.org}`);
   }
 
-  /**
-   * Process a comment by identifying and acting on any macros present.
-   */
+  /** Process a comment by identifying and acting on any macros present. */
   async processComment(
     repo: string,
     issue_number: number,
@@ -90,9 +88,7 @@ export class InviteBot {
     }
   }
 
-  /**
-   * Process an accepted invite by adding comments and assigning issues.
-   */
+  /** Process an accepted invite by adding comments and assigning issues. */
   async processAcceptedInvite(username: string): Promise<void> {
     this.logger.info(
       `processAcceptedInvite: Processing invite accepted by @${username}`
@@ -119,9 +115,12 @@ export class InviteBot {
     await this.record.archiveInvites(username);
   }
 
-  /**
-   * Parses a comment for invitation macros.
-   */
+  /** Checks if a user is allowed to trigger an invite macro. */
+  async userCanTrigger(username: string): Promise<boolean> {
+    return false;
+  }
+
+  /** Parses a comment for invitation macros. */
   parseMacros(comment: string): Record<string, InviteAction> {
     const macros: Record<string, InviteAction> = {};
     const matches = comment.match(FULL_MACRO_REGEX);
