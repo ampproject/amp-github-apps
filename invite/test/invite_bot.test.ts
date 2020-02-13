@@ -88,7 +88,12 @@ describe('Invite Bot', () => {
         .mockImplementation(async () => {});
     });
 
-    it.todo('parses the comment for macros');
+    it('parses the comment for macros', async done => {
+      await inviteBot.processComment('test_repo', 1337, 'My test comment')
+
+      expect(inviteBot.parseMacros).toBeCalledWith('My test comment');
+      done();
+    });
 
     describe('when macros are present', () => {
       const comment = '/invite @someone and /tryassign @someoneelse';
@@ -100,17 +105,49 @@ describe('Invite Bot', () => {
         );
       });
 
-      it.todo('tries to send invites');
+      it('tries to send invites', async done => {
+        await inviteBot.processComment('test_repo', 1337, comment);
+
+        expect(inviteBot.tryInvite).toBeCalledWith({
+          username: 'someone',
+          repo: 'test_repo',
+          issue_number: 1337,
+          action: InviteAction.INVITE,
+        });
+        expect(inviteBot.tryInvite).toBeCalledWith({
+          username: 'someoneelse',
+          repo: 'test_repo',
+          issue_number: 1337,
+          action: InviteAction.INVITE_AND_ASSIGN,
+        });
+        done();
+      });
 
       describe('for /tryassign macros', () => {
-        it.todo('tries to assign the issue');
+        it('tries to assign the issue', async done => {
+          await inviteBot.processComment('test_repo', 1337, comment);
+
+          expect(inviteBot.tryAssign).toBeCalledWith({
+            username: 'someoneelse',
+            repo: 'test_repo',
+            issue_number: 1337,
+            action: InviteAction.INVITE_AND_ASSIGN,
+          }, /*accepted=*/false);
+
+          done();
+        });
       });
     });
 
     describe('when no macros are found', () => {
       const comment = 'say hello/invite @someone and do not /tryassign anyone';
 
-      it.todo('does not try to send any invites');
+      it('does not try to send any invites', async done => {
+        await inviteBot.processComment('test_repo', 1337, comment);
+
+        expect(inviteBot.tryInvite).not.toBeCalled();
+        done();
+      });
     });
   });
 
@@ -122,7 +159,13 @@ describe('Invite Bot', () => {
         .mockImplementation(async () => {});
     });
 
-    it.todo('checks the record for invites to the user');
+    it('checks the record for invites to the user', async done => {
+      jest.spyOn(inviteBot.record, 'getInvites');
+      await inviteBot.processAcceptedInvite('someone');
+
+      expect(inviteBot.record.getInvites).toBeCalledWith('someone');
+      done();
+    });
 
     describe('when there are recorded invites', () => {
       describe('with Invite action', () => {
@@ -143,8 +186,29 @@ describe('Invite Bot', () => {
           done();
         });
 
-        it.todo('does not try to assign any issues');
-        it.todo('comments on the issues that the invite was accepted');
+        it('does not try to assign any issues', async done => {
+          await inviteBot.processAcceptedInvite('someone');
+
+          expect(inviteBot.tryAssign).not.toBeCalled();
+          done();
+        });
+
+        it('comments on the issues that the invite was accepted', async done => {
+          await inviteBot.processAcceptedInvite('someone');
+
+          expect(inviteBot.github.addComment).toBeCalledWith(
+            'test_repo',
+            1337,
+            `The invitation to \`@someone\` was accepted!`,
+          );
+
+          expect(inviteBot.github.addComment).toBeCalledWith(
+            'test_repo',
+            42,
+            `The invitation to \`@someone\` was accepted!`,
+          );
+          done();
+        });
       });
 
       describe('with InviteAndAssign action', () => {
@@ -165,13 +229,46 @@ describe('Invite Bot', () => {
           done();
         });
 
-        it.todo('tries to assign the issues');
+        it('tries to assign the issues', async done => {
+          await inviteBot.processAcceptedInvite('someone');
+
+          expect(inviteBot.tryAssign).toBeCalledWith(
+            expect.objectContaining({
+              username: 'someone',
+              repo: 'test_repo',
+              issue_number: 1337,
+              action: InviteAction.INVITE_AND_ASSIGN,
+            }),
+            /*accepted=*/true,
+          );
+          expect(inviteBot.tryAssign).toBeCalledWith(
+            expect.objectContaining({
+              username: 'someone',
+              repo: 'test_repo',
+              issue_number: 42,
+              action: InviteAction.INVITE_AND_ASSIGN,
+            }),
+            /*accepted=*/true,
+          );
+
+          done();
+        });
       });
     });
 
     describe('when there are no recorded invites to the user', () => {
-      it.todo('does not try to assign any issues');
-      it.todo('does not comment on any issues');
+      it('does not try to assign any issues', async done => {
+        await inviteBot.processAcceptedInvite('someone');
+
+        expect(inviteBot.tryAssign).not.toBeCalled();
+        done();
+      });
+      it('does not comment on any issues', async done => {
+        inviteBot.processAcceptedInvite('someone');
+
+        expect(inviteBot.github.addComment).not.toBeCalled();
+        done();
+      });
     });
   });
 
