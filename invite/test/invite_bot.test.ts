@@ -82,10 +82,10 @@ describe('Invite Bot', () => {
 
   describe('processComment', () => {
     beforeEach(() => {
+      jest.spyOn(inviteBot, 'userCanTrigger');
       jest.spyOn(inviteBot, 'parseMacros');
-      jest.spyOn(inviteBot, 'tryInvite')
-      jest.spyOn(inviteBot, 'tryAssign')
-        .mockImplementation(async () => {});
+      jest.spyOn(inviteBot, 'tryInvite');
+      jest.spyOn(inviteBot, 'tryAssign').mockImplementation(async () => {});
     });
 
     it('parses the comment for macros', async done => {
@@ -101,46 +101,71 @@ describe('Invite Bot', () => {
       beforeEach(() => {
         mocked(inviteBot.tryInvite).mockClear();
         mocked(GitHub.prototype.inviteUser).mockImplementation(
-          async (author: string) => author === 'author'
+          async () => false
+        );
+        mocked(inviteBot.userCanTrigger).mockImplementation(
+          async (author: string) => author === 'member-author'
         );
       });
 
-      it('tries to send invites', async done => {
-        await inviteBot.processComment('test_repo', 1337, comment, 'author');
+      describe('if the comment author is not allowed to trigger', () => {
+        const author = 'nonmember-author';
 
-        expect(inviteBot.tryInvite).toBeCalledWith({
-          username: 'someone',
-          repo: 'test_repo',
-          issue_number: 1337,
-          action: InviteAction.INVITE,
+        it('does not try to send invites', async done => {
+          await inviteBot.processComment('test_repo', 1337, comment, author);
+
+          expect(inviteBot.tryInvite).not.toBeCalled();
+          done();
         });
-        expect(inviteBot.tryInvite).toBeCalledWith({
-          username: 'someoneelse',
-          repo: 'test_repo',
-          issue_number: 1337,
-          action: InviteAction.INVITE_AND_ASSIGN,
-        });
-        done();
       });
 
-      describe('for /tryassign macros', () => {
-        it('tries to assign the issue', async done => {
-          await inviteBot.processComment('test_repo', 1337, comment, 'author');
+      describe('if the comment author is allowed to trigger', () => {
+        const author = 'member-author';
 
-          expect(inviteBot.tryAssign).toBeCalledWith({
+        it('tries to send invites', async done => {
+          await inviteBot.processComment('test_repo', 1337, comment, author);
+
+          expect(inviteBot.tryInvite).toBeCalledWith({
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 1337,
+            action: InviteAction.INVITE,
+          });
+          expect(inviteBot.tryInvite).toBeCalledWith({
             username: 'someoneelse',
             repo: 'test_repo',
             issue_number: 1337,
             action: InviteAction.INVITE_AND_ASSIGN,
-          }, /*accepted=*/false);
-
+          });
           done();
+        });
+
+        describe('for /tryassign macros', () => {
+          it('tries to assign the issue', async done => {
+            await inviteBot.processComment('test_repo', 1337, comment, author);
+
+            expect(inviteBot.tryAssign).toBeCalledWith({
+              username: 'someoneelse',
+              repo: 'test_repo',
+              issue_number: 1337,
+              action: InviteAction.INVITE_AND_ASSIGN,
+            }, /*accepted=*/false);
+
+            done();
+          });
         });
       });
     });
 
     describe('when no macros are found', () => {
       const comment = 'say hello/invite @someone and do not /tryassign anyone';
+
+      it('does not try to check if the user can trigger', async done => {
+        await inviteBot.processComment('test_repo', 1337, comment, 'author');
+
+        expect(inviteBot.userCanTrigger).not.toBeCalled();
+        done();
+      });
 
       it('does not try to send any invites', async done => {
         await inviteBot.processComment('test_repo', 1337, comment, 'author');

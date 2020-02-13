@@ -252,6 +252,11 @@ describe('end-to-end', () => {
     });
   });
 
+  describe('when a comment with macros is authored by a non-member', () => {
+    // TODO(rcebulko): Implement once the membership check is implemented.
+    it.todo('ignores it');
+  });
+
   describe('when someone joins without a recorded invitation', () => {
     it('ignores it', async done => {
       await triggerWebhook(probot, 'organization.member_added');
