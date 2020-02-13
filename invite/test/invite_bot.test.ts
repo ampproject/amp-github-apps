@@ -14,33 +14,54 @@
  * limitations under the License.
  */
 
+import Knex from 'knex';
 import {mocked} from 'ts-jest/utils';
 
+import {setupDb} from '../src/setup_db';
+import {dbConnect} from '../src/db';
 import {Invite, InviteAction} from '../src/types';
 import {InvitationRecord} from '../src/invitation_record';
 import {InviteBot} from '../src/invite_bot';
 import {GitHub} from '../src/github';
 
+jest.mock('../src/db', () => {
+  const testDb = Knex({
+    client: 'sqlite3',
+    connection: ':memory:',
+    useNullAsDefault: true,
+  });
+
+  return {
+    Database: Knex,
+    dbConnect: () => testDb,
+  };
+});
+
 describe('Invite Bot', () => {
   let inviteBot: InviteBot;
+  const db = dbConnect();
+
+  beforeAll(async () => setupDb(db));
+  afterAll(async () => db.destroy());
 
   beforeEach(() => {
-    inviteBot = new InviteBot(
-      /*client=*/ null,
-      'test_org',
-      /*helpUsernameToTag=*/'test_org/wg-example',
-    );
-
-    jest.spyOn(GitHub.prototype, 'inviteUser');
+    jest.spyOn(GitHub.prototype, 'inviteUser')
     jest.spyOn(GitHub.prototype, 'addComment')
       .mockImplementation(async () => {});
     jest.spyOn(GitHub.prototype, 'assignIssue')
       .mockImplementation(async () => {});
     jest.spyOn(InvitationRecord.prototype, 'recordInvite');
+
+    inviteBot = new InviteBot(
+      /*client=*/ null,
+      'test_org',
+      /*helpUsernameToTag=*/'test_org/wg-example',
+    );
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.restoreAllMocks();
+    await db('invites').truncate();
   });
 
   describe('constructor', () => {
@@ -56,6 +77,101 @@ describe('Invite Bot', () => {
         /*helpUsernameToTag=*/'test_org/wg-example',
       );
       expect(inviteBot.helpUserTag).toEqual('@test_org/wg-example');
+    });
+  });
+
+  describe('processComment', () => {
+    beforeEach(() => {
+      jest.spyOn(inviteBot, 'parseMacros');
+      jest.spyOn(inviteBot, 'tryInvite')
+      jest.spyOn(inviteBot, 'tryAssign')
+        .mockImplementation(async () => {});
+    });
+
+    it.todo('parses the comment for macros');
+
+    describe('when macros are present', () => {
+      const comment = '/invite @someone and /tryassign @someoneelse';
+
+      beforeEach(() => {
+        mocked(inviteBot.tryInvite).mockClear();
+        mocked(GitHub.prototype.inviteUser).mockImplementation(
+          async () => false
+        );
+      });
+
+      it.todo('tries to send invites');
+
+      describe('for /tryassign macros', () => {
+        it.todo('tries to assign the issue');
+      });
+    });
+
+    describe('when no macros are found', () => {
+      const comment = 'say hello/invite @someone and do not /tryassign anyone';
+
+      it.todo('does not try to send any invites');
+    });
+  });
+
+  describe('processAcceptedInvite', () => {
+    beforeEach(() => {
+      jest.spyOn(GitHub.prototype, 'addComment')
+        .mockImplementation(async () => {});
+      jest.spyOn(inviteBot, 'tryAssign')
+        .mockImplementation(async () => {});
+    });
+
+    it.todo('checks the record for invites to the user');
+
+    describe('when there are recorded invites', () => {
+      describe('with Invite action', () => {
+        beforeEach(async done => {
+          await inviteBot.record.recordInvite({
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 1337,
+            action: InviteAction.INVITE,
+          });
+          await inviteBot.record.recordInvite({
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 42,
+            action: InviteAction.INVITE,
+          });
+
+          done();
+        });
+
+        it.todo('does not try to assign any issues');
+        it.todo('comments on the issues that the invite was accepted');
+      });
+
+      describe('with InviteAndAssign action', () => {
+        beforeEach(async done => {
+          await inviteBot.record.recordInvite({
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 1337,
+            action: InviteAction.INVITE_AND_ASSIGN,
+          });
+          await inviteBot.record.recordInvite({
+            username: 'someone',
+            repo: 'test_repo',
+            issue_number: 42,
+            action: InviteAction.INVITE_AND_ASSIGN,
+          });
+
+          done();
+        });
+
+        it.todo('tries to assign the issues');
+      });
+    });
+
+    describe('when there are no recorded invites to the user', () => {
+      it.todo('does not try to assign any issues');
+      it.todo('does not comment on any issues');
     });
   });
 
@@ -228,9 +344,9 @@ describe('Invite Bot', () => {
 
     describe('when the invite fails', () => {
       beforeEach(() => {
-        mocked(GitHub.prototype.inviteUser).mockImplementation(async () => {
-          throw new Error('Uh-oh!');
-        });
+        mocked(GitHub.prototype.inviteUser).mockRejectedValue(
+          new Error('Uh-oh!')
+        );
         jest.spyOn(console, 'error').mockImplementation(() => {});
       });
 
@@ -261,9 +377,12 @@ describe('Invite Bot', () => {
       });
 
       it('re-throws the error', async done => {
-        expect(inviteBot.tryInvite(newInvite)).rejects.toThrow(
-          new Error('Uh-oh!')
-        );
+        expect.assertions(1);
+        try {
+          await inviteBot.tryInvite(newInvite);
+        } catch (e) {
+          expect(e).toEqual(new Error('Uh-oh!'));
+        }
         done();
       });
     });

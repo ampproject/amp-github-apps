@@ -115,16 +115,23 @@ export class InviteBot {
     // The user has not been invited by the bot yet, so try and send an invite.
     let invited = false;
     try {
-      invited = await this.github.inviteUser(invite.username);
+      invited = await this.github.inviteUser(invite.username).catch(error => {
+        throw error;
+      });
     } catch (error) {
-      return await this.handleErrorSendingInvite(invite, error);
+      await this.handleErrorSendingInvite(invite, error);
+      throw error;
     }
 
-    if (!invited) {
-      return await this.handleUserAlreadyMember(invite);
+    if (invited) {
+      return await this.handleNewInviteSent(invite);
     }
 
-    await this.handleNewInviteSent(invite);
+    if (invite.action === InviteAction.INVITE_AND_ASSIGN) {
+      await this.tryAssign(invite, /*accepted=*/false);
+    } else {
+      await this.handleUserAlreadyMember(invite);
+    }
   }
 
   /** Handle case where there's at least one pending invite already recorded. */
@@ -173,8 +180,6 @@ export class InviteBot {
         'ran into an error when I tried. You can try sending the invite ' +
         `manually, or ask ${this.helpUserTag} for help.`
     );
-
-    throw error;
   }
 
   /**
