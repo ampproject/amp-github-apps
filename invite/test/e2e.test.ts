@@ -50,6 +50,7 @@ describe('end-to-end', () => {
     process.env = {
       DISABLE_WEBHOOK_EVENT_CHECK: 'true',
       GITHUB_ORG: 'test_org',
+      ALLOW_TEAM_SLUG: 'wg-inviters',
       GITHUB_ACCESS_TOKEN: '_TOKEN_',
       NODE_ENV: 'test',
     };
@@ -88,6 +89,8 @@ describe('end-to-end', () => {
     describe('when @someone is a member of the org', () => {
       it('comments, doesn\'t record', async done => {
         nock('https://api.github.com')
+          .get('/orgs/test_org/teams/wg-inviters/memberships/author')
+          .reply(200, getFixture('team_membership.active'))
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.exists'))
           .post('/repos/test_org/test_repo/issues/1337/comments', body => {
@@ -116,6 +119,8 @@ describe('end-to-end', () => {
 
       it('invites, records, comments', async done => {
         nock('https://api.github.com')
+          .get('/orgs/test_org/teams/wg-inviters/memberships/author')
+          .reply(200, getFixture('team_membership.active'))
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.invited'))
           .post('/repos/test_org/test_repo/issues/1337/comments', body => {
@@ -160,6 +165,8 @@ describe('end-to-end', () => {
     describe('when @someone is a member of the org', () => {
       it('assigns, comments, doesn\'t record', async done => {
         nock('https://api.github.com')
+          .get('/orgs/test_org/teams/wg-inviters/memberships/author')
+          .reply(200, getFixture('team_membership.active'))
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.exists'))
           .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
@@ -192,6 +199,8 @@ describe('end-to-end', () => {
 
       it('invites, records, comments', async done => {
         nock('https://api.github.com')
+          .get('/orgs/test_org/teams/wg-inviters/memberships/author')
+          .reply(200, getFixture('team_membership.active'))
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.invited'))
           .post('/repos/test_org/test_repo/issues/1337/comments', body => {

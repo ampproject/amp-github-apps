@@ -300,8 +300,22 @@ describe('Invite Bot', () => {
   });
 
   describe('userCanTrigger', () => {
-    it.todo('returns true if the user is a member of the allow team');
-    it.todo('returns false if the user is not a member of the allow team');
+    beforeEach(() => {
+      const members = ['a-member'];
+      jest.spyOn(GitHub.prototype, 'userIsTeamMember').mockImplementation(
+        async (username: string, teamSlug: string) => members.includes(username)
+      );
+    });
+
+    it('returns true if user is a member of allow team', async done => {
+      expect(inviteBot.userCanTrigger('a-member')).resolves.toBe(true);
+      done();
+    });
+
+    it('returns false if user is not a member of allow team', async done => {
+      expect(inviteBot.userCanTrigger('not-a-member')).resolves.toBe(false);
+      done();
+    });
   });
 
   describe('parseMacros', () => {
