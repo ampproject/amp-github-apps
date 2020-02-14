@@ -13,6 +13,8 @@ steps:
     secretEnv:
       - PRIVATE_KEY
       - WEBHOOK_SECRET
+      - DB_PASSWORD
+      - DB_USER
 
   # Compile the app from Typescript into dist/.
   - name: gcr.io/cloud-builders/npm
