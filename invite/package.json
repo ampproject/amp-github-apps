@@ -45,6 +45,7 @@
     "prettier": "1.19.1",
     "ts-jest": "25.2.0",
     "ts-node": "8.6.2",
+    "tsc": "1.20150623.0",
     "typescript": "3.7.5"
   },
   "standard": {
