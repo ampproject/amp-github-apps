@@ -30,6 +30,10 @@ export class InvitationRecord {
    * Records an invite created by the bot.
    */
   async recordInvite(invite: Invite): Promise<void> {
+    this.logger.info(
+      `recordInvite: Recording ${invite.action} to @${invite.username} from ` +
+      `${invite.repo}#{invite.issue_number} (archived = ${invite.archived}).`
+    );
     await this.db('invites').insert(invite);
   }
 
@@ -37,6 +41,7 @@ export class InvitationRecord {
    * Looks up the invites for a user.
    */
   async getInvites(username: string): Promise<Array<Invite>> {
+    this.logger.info(`getInvites: Looking up recorded invites to @${username}`);
     return (await this.db('invites')
       .select()
       .where({username, archived: false}))
@@ -52,6 +57,7 @@ export class InvitationRecord {
    * actions have been completed.
    */
   async archiveInvites(username: string): Promise<void> {
+    this.logger.info(`archiveInvites: Archiving invites to @${username}`);
     await this.db('invites')
       .where({username})
       .update({archived: true});
