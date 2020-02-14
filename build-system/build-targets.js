@@ -34,6 +34,10 @@ const targetMatchers = [
     func: file => file.startsWith('bundle-size/'),
   },
   {
+    targets: ['INVITE'],
+    func: file => file.startsWith('invite/'),
+  },
+  {
     targets: ['OWNERS'],
     func: file => file.startsWith('owners/'),
   },
