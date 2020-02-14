@@ -19,7 +19,7 @@ import nock from 'nock';
 
 import {InviteBot} from '../src/invite_bot';
 import {triggerWebhook} from './fixtures';
-import app from '../app';
+const app = require('../app');
 
 describe('Probot webhooks', () => {
   let probot: Probot;
