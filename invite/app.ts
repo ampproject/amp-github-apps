@@ -15,7 +15,6 @@
  */
 
 import {Application, Context} from 'probot';
-import {createTokenAuth} from '@octokit/auth';
 import Webhooks from '@octokit/webhooks';
 import {Octokit} from '@octokit/rest';
 
@@ -27,16 +26,12 @@ module.exports = (app: Application) => {
   }
 
   const helpUserToTag = process.env.HELP_USER_TO_TAG || null;
-  const github = new Octokit({
-    authStrategy: createTokenAuth,
-    auth: process.env.GITHUB_ACCESS_TOKEN,
-  });
 
   app.on('issue_comment.created', async (
-    {event, payload, log}: Context<Webhooks.WebhookPayloadIssueComment>
+    {github, event, payload, log}: Context<Webhooks.WebhookPayloadIssueComment>
   ) => {
     const inviteBot = new InviteBot(
-      github,
+      (github as unknown) as Octokit,
       payload.repository.owner.login,
       process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
@@ -51,10 +46,10 @@ module.exports = (app: Application) => {
   });
 
   app.on('issues.opened', async (
-    {event, payload, log}: Context<Webhooks.WebhookPayloadIssues>
+    {github, event, payload, log}: Context<Webhooks.WebhookPayloadIssues>
   ) => {
     const inviteBot = new InviteBot(
-      github,
+      (github as unknown) as Octokit,
       payload.repository.owner.login,
       process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
@@ -69,10 +64,10 @@ module.exports = (app: Application) => {
   });
 
   app.on('pull_request.opened', async (
-    {event, payload, log}: Context<Webhooks.WebhookPayloadPullRequest>
+    {github, event, payload, log}: Context<Webhooks.WebhookPayloadPullRequest>
   ) => {
     const inviteBot = new InviteBot(
-      github,
+      (github as unknown) as Octokit,
       payload.repository.owner.login,
       process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
@@ -87,10 +82,10 @@ module.exports = (app: Application) => {
   });
 
   app.on('pull_request_review.submitted', async (
-    {event, payload, log}: Context<Webhooks.WebhookPayloadPullRequestReview>
+    {github, event, payload, log}: Context<Webhooks.WebhookPayloadPullRequestReview>
   ) => {
     const inviteBot = new InviteBot(
-      github,
+      (github as unknown) as Octokit,
       payload.repository.owner.login,
       process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
@@ -105,10 +100,10 @@ module.exports = (app: Application) => {
   });
 
   app.on('pull_request_review_comment.created', async (
-    {event, payload, log}: Context<Webhooks.WebhookPayloadPullRequestReviewComment>
+    {github, event, payload, log}: Context<Webhooks.WebhookPayloadPullRequestReviewComment>
   ) => {
     const inviteBot = new InviteBot(
-      github,
+      (github as unknown) as Octokit,
       payload.repository.owner.login,
       process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
@@ -123,10 +118,10 @@ module.exports = (app: Application) => {
   });
 
   app.on('organization.member_added', async (
-    {event, payload, log}: Context<Webhooks.WebhookPayloadOrganization>
+    {github, event, payload, log}: Context<Webhooks.WebhookPayloadOrganization>
   ) => {
     const inviteBot = new InviteBot(
-      github,
+      (github as unknown) as Octokit,
       payload.organization.login,
       process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,

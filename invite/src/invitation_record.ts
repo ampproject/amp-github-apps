@@ -32,7 +32,7 @@ export class InvitationRecord {
   async recordInvite(invite: Invite): Promise<void> {
     this.logger.info(
       `recordInvite: Recording ${invite.action} to @${invite.username} from ` +
-      `${invite.repo}#{invite.issue_number} (archived = ${invite.archived}).`
+        `${invite.repo}#{invite.issue_number} (archived = ${invite.archived}).`
     );
     await this.db('invites').insert(invite);
   }
@@ -42,14 +42,15 @@ export class InvitationRecord {
    */
   async getInvites(username: string): Promise<Array<Invite>> {
     this.logger.info(`getInvites: Looking up recorded invites to @${username}`);
-    return (await this.db('invites')
-      .select()
-      .where({username, archived: false}))
-      .map(invite => {
-        // PostgresQL stores booleans as TINYINT, so we cast it to boolean.
-        invite.archived = !!invite.archived;
-        return invite;
-      });
+    return (
+      await this.db('invites')
+        .select()
+        .where({username, archived: false})
+    ).map(invite => {
+      // PostgresQL stores booleans as TINYINT, so we cast it to boolean.
+      invite.archived = !!invite.archived;
+      return invite;
+    });
   }
 
   /**

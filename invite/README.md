@@ -63,7 +63,7 @@ Setup
 7. Run a local instance of PostgreSQL, or use the [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy) to connect to a [Cloud SQL instance](https://pantheon.corp.google.com/sql/choose-instance-engine?project=ampproject-invite-bot)
    * While other database engines might work, we have only tested this on `pg`
    * Take note of the instance ID and default user password.
-8. Enable the [Cloud SQL Admin API](https://pantheon.corp.google.com/flows/enableapi?apiid=sqladmin)
+8. Enable the [Cloud SQL Admin](https://pantheon.corp.google.com/flows/enableapi?apiid=sqladmin) and [Cloud Functions](https://pantheon.corp.google.com/flows/enableapi?apiid=cloudfunctions) APIs
 9. Copy the `redacted.env` file to `.env` and modify the fields based the values from the GitHub App page:
    * The value for the `APP_ID` field is the App ID from Step 5.
    * The value for `WEBHOOK_SECRET` is the secret you set when creating the GitHub app.

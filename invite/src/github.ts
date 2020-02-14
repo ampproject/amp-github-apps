@@ -74,7 +74,7 @@ export class GitHub {
   }
 
   /* Checks whether a user is a member of the organization. */
-  async userIsTeamMember(username: string, teamSlug: string): Promise<boolean> {  
+  async userIsTeamMember(username: string, teamSlug: string): Promise<boolean> {
     this.logger.info(
       `userIsTeamMember: Checking if @${username} is a member of ${teamSlug}`
     );
@@ -83,13 +83,15 @@ export class GitHub {
     // only need the status code to make a determination, so the `catch` handler
     // just forwards along the response.
     const [org, teamName] = teamSlug.split('/');
-    const response = await this.client.teams.getMembershipInOrg({
-      org,
-      team_slug: teamName,
-      username,
-    }).catch(errorResponse => errorResponse); 
+    const response = await this.client.teams
+      .getMembershipInOrg({
+        org,
+        team_slug: teamName,
+        username,
+      })
+      .catch(errorResponse => errorResponse);
 
-    return response.status === 200 && response.data.state === 'active'; 
+    return response.status === 200 && response.data.state === 'active';
   }
 }
 
