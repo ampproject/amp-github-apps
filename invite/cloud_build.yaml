@@ -20,6 +20,7 @@ steps:
   - name: gcr.io/cloud-builders/npm
     dir: invite
     args:
+      - run
       - build
 
   # Copy over the environment and package file.
