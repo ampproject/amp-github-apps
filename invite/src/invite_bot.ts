@@ -47,14 +47,17 @@ export class InviteBot {
   /**
    * Constructor.
    *
+   * The allowTeamSlug parameter restricts the set of users who can trigger an
+   * invite to members of a GitHub team. Example: 'ampproject/inviters'
+   *
    * Optional helpUsernameToTag parameter allows specifying someone to tag in the
    * event that the invite fails to send for some reason. If left as null, the
-   * comment will just say "ask someone for help".
-   * Example: 'ampproject/wg-infra'
+   * comment will say "ask someone for help". Example: 'ampproject/wg-infra'
    */
   constructor(
     client: Octokit,
     private org: string,
+    private allowTeamSlug: string,
     helpUsernameToTag: string | null = null,
     private logger: ILogger = console,
 
@@ -68,31 +71,30 @@ export class InviteBot {
     this.logger.info(`InviteBot initialized for ${this.org}`);
   }
 
-  /**
-   * Process a comment by identifying and acting on any macros present.
-   */
+  /** Process a comment by identifying and acting on any macros present. */
   async processComment(
     repo: string,
     issue_number: number,
-    comment: string
+    comment: string,
+    author: string,
   ): Promise<void> {
-    // TODO(rcebulko): Add author once `allow` branch is merged.
     this.logger.info(
-      `processComment: Processing comment on ${repo}#${issue_number}`
+      `processComment: Processing comment by @${author} on ` +
+      `${repo}#${issue_number}`
     );
-    const macros = this.parseMacros(comment);
+    const macroList = Object.entries(this.parseMacros(comment));
 
     this.logger.debug(
-      `processComment: Found ${Object.keys(macros).length} macros`
+      `processComment: Found ${macroList.length} macros`
     );
-    for (const [username, action] of Object.entries(macros)) {
-      await this.tryInvite({username, repo, issue_number, action});
+    if (macroList.length && await this.userCanTrigger(author)) {
+      for (const [username, action] of macroList) {
+        await this.tryInvite({username, repo, issue_number, action});
+      }
     }
   }
 
-  /**
-   * Process an accepted invite by adding comments and assigning issues.
-   */
+  /** Process an accepted invite by adding comments and assigning issues. */
   async processAcceptedInvite(username: string): Promise<void> {
     this.logger.info(
       `processAcceptedInvite: Processing invite accepted by @${username}`
@@ -119,9 +121,12 @@ export class InviteBot {
     await this.record.archiveInvites(username);
   }
 
-  /**
-   * Parses a comment for invitation macros.
-   */
+  /** Checks if a user is allowed to trigger an invite macro. */
+  async userCanTrigger(username: string): Promise<boolean> {
+    return await this.github.userIsTeamMember(username, this.allowTeamSlug);
+  }
+
+  /** Parses a comment for invitation macros. */
   parseMacros(comment: string): Record<string, InviteAction> {
     const macros: Record<string, InviteAction> = {};
     const matches = comment.match(FULL_MACRO_REGEX);

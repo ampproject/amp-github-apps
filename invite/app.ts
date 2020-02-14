@@ -38,6 +38,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -45,6 +46,7 @@ module.exports = (app: Application) => {
       payload.repository.name,
       payload.issue.number,
       payload.comment.body,
+      payload.comment.user.login,
     );
   });
 
@@ -54,6 +56,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -61,6 +64,7 @@ module.exports = (app: Application) => {
       payload.repository.name,
       payload.issue.number,
       payload.issue.body,
+      payload.issue.user.login,
     );
   });
 
@@ -70,6 +74,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -77,6 +82,7 @@ module.exports = (app: Application) => {
       payload.repository.name,
       payload.pull_request.number,
       payload.pull_request.body,
+      payload.pull_request.user.login,
     );
   });
 
@@ -86,6 +92,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -93,6 +100,7 @@ module.exports = (app: Application) => {
       payload.repository.name,
       payload.pull_request.number,
       payload.review.body,
+      payload.review.user.login,
     );
   });
 
@@ -102,6 +110,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.repository.owner.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
@@ -109,6 +118,7 @@ module.exports = (app: Application) => {
       payload.repository.name,
       payload.pull_request.number,
       payload.comment.body,
+      payload.comment.user.login,
     );
   });
 
@@ -118,6 +128,7 @@ module.exports = (app: Application) => {
     const inviteBot = new InviteBot(
       github,
       payload.organization.login,
+      process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
