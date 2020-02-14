@@ -59,14 +59,14 @@ export class InviteBot {
     private org: string,
     private allowTeamSlug: string,
     helpUsernameToTag: string | null = null,
-    private logger: ILogger = console,
-
+    private logger: ILogger = console
   ) {
     this.github = new GitHub(client, org, logger);
     this.record = new InvitationRecord(dbConnect(), logger);
-    this.helpUserTag = helpUsernameToTag === null ?
-      'someone in your organization' :
-      `@${helpUsernameToTag}`;
+    this.helpUserTag =
+      helpUsernameToTag === null
+        ? 'someone in your organization'
+        : `@${helpUsernameToTag}`;
 
     this.logger.info(`InviteBot initialized for ${this.org}`);
   }
@@ -76,18 +76,16 @@ export class InviteBot {
     repo: string,
     issue_number: number,
     comment: string,
-    author: string,
+    author: string
   ): Promise<void> {
     this.logger.info(
       `processComment: Processing comment by @${author} on ` +
-      `${repo}#${issue_number}`
+        `${repo}#${issue_number}`
     );
     const macroList = Object.entries(this.parseMacros(comment));
 
-    this.logger.debug(
-      `processComment: Found ${macroList.length} macros`
-    );
-    if (macroList.length && await this.userCanTrigger(author)) {
+    this.logger.debug(`processComment: Found ${macroList.length} macros`);
+    if (macroList.length && (await this.userCanTrigger(author))) {
       for (const [username, action] of macroList) {
         await this.tryInvite({username, repo, issue_number, action});
       }
@@ -107,11 +105,11 @@ export class InviteBot {
           await this.github.addComment(
             invite.repo,
             invite.issue_number,
-            `The invitation to \`@${invite.username}\` was accepted!`,
+            `The invitation to \`@${invite.username}\` was accepted!`
           );
           break;
         case InviteAction.INVITE_AND_ASSIGN:
-          await this.tryAssign(invite, /*accepted=*/true);
+          await this.tryAssign(invite, /*accepted=*/ true);
           break;
         default:
           throw new RangeError('Unimplemented action');
@@ -171,7 +169,7 @@ export class InviteBot {
     }
 
     if (invite.action === InviteAction.INVITE_AND_ASSIGN) {
-      await this.tryAssign(invite, /*accepted=*/false);
+      await this.tryAssign(invite, /*accepted=*/ false);
     } else {
       await this.handleUserAlreadyMember(invite);
     }
@@ -212,7 +210,10 @@ export class InviteBot {
   }
 
   /** Handle case where the there was an error sending the invite. */
-  private async handleErrorSendingInvite(invite: Invite, error: Error): Promise<void> {
+  private async handleErrorSendingInvite(
+    invite: Invite,
+    error: Error
+  ): Promise<void> {
     this.logger.error(
       `Failed to send an invite to \`@${invite.username}\`: ${error}`
     );
@@ -235,7 +236,7 @@ export class InviteBot {
   async tryAssign(invite: Invite, accepted: boolean): Promise<void> {
     this.logger.debug(
       `tryAssign: Trying to assign (accepted = ${accepted}`,
-      invite,
+      invite
     );
     await this.github.assignIssue(
       invite.repo,
@@ -245,10 +246,10 @@ export class InviteBot {
     await this.github.addComment(
       invite.repo,
       invite.issue_number,
-      accepted ?
-        `The invitation to \`@${invite.username}\` was accepted! I've ` +
-        'assigned them to this issue.' :
-        `I've assigned this issue to \`@${invite.username}\`.`
+      accepted
+        ? `The invitation to \`@${invite.username}\` was accepted! I've ` +
+            'assigned them to this issue.'
+        : `I've assigned this issue to \`@${invite.username}\`.`
     );
   }
 }

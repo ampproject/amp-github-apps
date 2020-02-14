@@ -45,10 +45,12 @@ describe('Invite Bot', () => {
   afterAll(async () => db.destroy());
 
   beforeEach(() => {
-    jest.spyOn(GitHub.prototype, 'inviteUser')
-    jest.spyOn(GitHub.prototype, 'addComment')
+    jest.spyOn(GitHub.prototype, 'inviteUser');
+    jest
+      .spyOn(GitHub.prototype, 'addComment')
       .mockImplementation(async () => {});
-    jest.spyOn(GitHub.prototype, 'assignIssue')
+    jest
+      .spyOn(GitHub.prototype, 'assignIssue')
       .mockImplementation(async () => {});
     jest.spyOn(InvitationRecord.prototype, 'recordInvite');
 
@@ -56,7 +58,7 @@ describe('Invite Bot', () => {
       /*client=*/ null,
       'test_org',
       'test_org/wg-example',
-      /*helpUsernameToTag=*/'test_org/wg-helpme',
+      /*helpUsernameToTag=*/ 'test_org/wg-helpme'
     );
   });
 
@@ -76,7 +78,7 @@ describe('Invite Bot', () => {
         /*client=*/ null,
         'test_org',
         'wg-example',
-        /*helpUsernameToTag=*/'test_org/wg-helpme',
+        /*helpUsernameToTag=*/ 'test_org/wg-helpme'
       );
       expect(inviteBot.helpUserTag).toEqual('@test_org/wg-helpme');
     });
@@ -147,12 +149,15 @@ describe('Invite Bot', () => {
           it('tries to assign the issue', async done => {
             await inviteBot.processComment('test_repo', 1337, comment, author);
 
-            expect(inviteBot.tryAssign).toBeCalledWith({
-              username: 'someoneelse',
-              repo: 'test_repo',
-              issue_number: 1337,
-              action: InviteAction.INVITE_AND_ASSIGN,
-            }, /*accepted=*/false);
+            expect(inviteBot.tryAssign).toBeCalledWith(
+              {
+                username: 'someoneelse',
+                repo: 'test_repo',
+                issue_number: 1337,
+                action: InviteAction.INVITE_AND_ASSIGN,
+              },
+              /*accepted=*/ false
+            );
 
             done();
           });
@@ -181,10 +186,10 @@ describe('Invite Bot', () => {
 
   describe('processAcceptedInvite', () => {
     beforeEach(() => {
-      jest.spyOn(GitHub.prototype, 'addComment')
+      jest
+        .spyOn(GitHub.prototype, 'addComment')
         .mockImplementation(async () => {});
-      jest.spyOn(inviteBot, 'tryAssign')
-        .mockImplementation(async () => {});
+      jest.spyOn(inviteBot, 'tryAssign').mockImplementation(async () => {});
     });
 
     it('checks the record for invites to the user', async done => {
@@ -227,13 +232,13 @@ describe('Invite Bot', () => {
           expect(inviteBot.github.addComment).toBeCalledWith(
             'test_repo',
             1337,
-            `The invitation to \`@someone\` was accepted!`,
+            `The invitation to \`@someone\` was accepted!`
           );
 
           expect(inviteBot.github.addComment).toBeCalledWith(
             'test_repo',
             42,
-            `The invitation to \`@someone\` was accepted!`,
+            `The invitation to \`@someone\` was accepted!`
           );
           done();
         });
@@ -267,7 +272,7 @@ describe('Invite Bot', () => {
               issue_number: 1337,
               action: InviteAction.INVITE_AND_ASSIGN,
             }),
-            /*accepted=*/true,
+            /*accepted=*/ true
           );
           expect(inviteBot.tryAssign).toBeCalledWith(
             expect.objectContaining({
@@ -276,7 +281,7 @@ describe('Invite Bot', () => {
               issue_number: 42,
               action: InviteAction.INVITE_AND_ASSIGN,
             }),
-            /*accepted=*/true,
+            /*accepted=*/ true
           );
 
           done();
@@ -303,9 +308,11 @@ describe('Invite Bot', () => {
   describe('userCanTrigger', () => {
     beforeEach(() => {
       const members = ['a-member'];
-      jest.spyOn(GitHub.prototype, 'userIsTeamMember').mockImplementation(
-        async (username: string, teamSlug: string) => members.includes(username)
-      );
+      jest
+        .spyOn(GitHub.prototype, 'userIsTeamMember')
+        .mockImplementation(async (username: string) =>
+          members.includes(username)
+        );
     });
 
     it('returns true if user is a member of allow team', async done => {
@@ -390,13 +397,16 @@ describe('Invite Bot', () => {
 
     describe('when the user has a pending invite from the bot', () => {
       beforeEach(() => {
-        jest.spyOn(InvitationRecord.prototype, 'getInvites')
-          .mockImplementation(async () => [{
-            username: 'someone',
-            repo: 'test_repo',
-            issue_number: 42,
-            action: InviteAction.INVITE,
-          }]);
+        jest
+          .spyOn(InvitationRecord.prototype, 'getInvites')
+          .mockImplementation(async () => [
+            {
+              username: 'someone',
+              repo: 'test_repo',
+              issue_number: 42,
+              action: InviteAction.INVITE,
+            },
+          ]);
       });
 
       it('it does not attempt to send an invite', async done => {
@@ -569,7 +579,7 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'I\'ve assigned this issue to `@someone`.',
+          "I've assigned this issue to `@someone`."
         );
         done();
       });

@@ -78,7 +78,7 @@ describe('Probot webhooks', () => {
         'test_repo',
         1337,
         'Test comment',
-        'author',
+        'author'
       );
       done();
     });

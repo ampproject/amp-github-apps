@@ -15,7 +15,6 @@
  */
 
 import Knex from 'knex';
-import {mocked} from 'ts-jest/utils';
 import nock from 'nock';
 import {Probot} from 'probot';
 
@@ -62,10 +61,9 @@ describe('end-to-end', () => {
     probot = new Probot({});
     const probotApp = probot.load(app);
     probotApp.app = {
-      getInstallationAccessToken: async () =>'test',
+      getInstallationAccessToken: async () => 'test',
       getSignedJsonWebToken: () => 'test',
     };
-
   });
 
   afterAll(async () => {
@@ -87,7 +85,7 @@ describe('end-to-end', () => {
 
   describe('when a comment includes "/invite @someone"', () => {
     describe('when @someone is a member of the org', () => {
-      it('comments, doesn\'t record', async done => {
+      it("comments, doesn't record", async done => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
@@ -95,8 +93,9 @@ describe('end-to-end', () => {
           .reply(200, getFixture('add_member.exists'))
           .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
-              body: 'You asked me to invite `@someone`, but they are already' +
-                ' a member of `test_org`!'
+              body:
+                'You asked me to invite `@someone`, but they are already' +
+                ' a member of `test_org`!',
             });
             return true;
           })
@@ -125,9 +124,10 @@ describe('end-to-end', () => {
           .reply(200, getFixture('add_member.invited'))
           .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
-              body: 'An invitation to join `test_org` has been sent to ' +
+              body:
+                'An invitation to join `test_org` has been sent to ' +
                 '`@someone`. I will update this thread when the invitation ' +
-                'is accepted.'
+                'is accepted.',
             });
             return true;
           })
@@ -135,7 +135,7 @@ describe('end-to-end', () => {
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
         expect(record.getInvites('someone')).resolves.toEqual([
-          expect.objectContaining(recordedInvite)
+          expect.objectContaining(recordedInvite),
         ]);
         done();
       });
@@ -147,7 +147,7 @@ describe('end-to-end', () => {
           nock('https://api.github.com')
             .post('/repos/test_org/test_repo/issues/1337/comments', body => {
               expect(body).toEqual({
-                body: 'The invitation to `@someone` was accepted!'
+                body: 'The invitation to `@someone` was accepted!',
               });
               return true;
             })
@@ -163,7 +163,7 @@ describe('end-to-end', () => {
 
   describe('when a comment includes "/tryassign @someone"', () => {
     describe('when @someone is a member of the org', () => {
-      it('assigns, comments, doesn\'t record', async done => {
+      it("assigns, comments, doesn't record", async done => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
@@ -176,7 +176,7 @@ describe('end-to-end', () => {
           .reply(200)
           .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
-              body: 'I\'ve assigned this issue to `@someone`.'
+              body: "I've assigned this issue to `@someone`.",
             });
             return true;
           })
@@ -205,9 +205,10 @@ describe('end-to-end', () => {
           .reply(200, getFixture('add_member.invited'))
           .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
-              body: 'An invitation to join `test_org` has been sent to ' +
+              body:
+                'An invitation to join `test_org` has been sent to ' +
                 '`@someone`. I will update this thread when the invitation ' +
-                'is accepted.'
+                'is accepted.',
             });
             return true;
           })
@@ -215,7 +216,7 @@ describe('end-to-end', () => {
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
         expect(record.getInvites('someone')).resolves.toEqual([
-          expect.objectContaining(recordedInvite)
+          expect.objectContaining(recordedInvite),
         ]);
         done();
       });
@@ -235,8 +236,9 @@ describe('end-to-end', () => {
             .reply(200)
             .post('/repos/test_org/test_repo/issues/1337/comments', body => {
               expect(body).toEqual({
-                body: 'The invitation to `@someone` was accepted! I\'ve ' +
-                  'assigned them to this issue.'
+                body:
+                  "The invitation to `@someone` was accepted! I've " +
+                  'assigned them to this issue.',
               });
               return true;
             })
@@ -266,7 +268,7 @@ describe('end-to-end', () => {
       jest.spyOn(InviteBot.prototype, 'tryInvite');
       nock('https://api.github.com')
         .get('/orgs/test_org/teams/wg-inviters/memberships/author')
-        .reply(404, getFixture('team_membership.not_found'))
+        .reply(404, getFixture('team_membership.not_found'));
       await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
 
       expect(InviteBot.prototype.tryInvite).not.toBeCalled();
