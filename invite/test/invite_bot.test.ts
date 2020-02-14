@@ -55,7 +55,7 @@ describe('Invite Bot', () => {
     inviteBot = new InviteBot(
       /*client=*/ null,
       'test_org',
-      'wg-example',
+      'test_org/wg-example',
       /*helpUsernameToTag=*/'test_org/wg-helpme',
     );
   });

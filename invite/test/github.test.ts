@@ -112,7 +112,7 @@ describe('GitHub interface', () => {
         .get('/orgs/test_org/teams/test-team/memberships/someone')  
         .reply(200, getFixture('team_membership.active'));  
 
-      await github.userIsTeamMember('someone', 'test-team'); 
+      await github.userIsTeamMember('someone', 'test_org/test-team'); 
       done(); 
     });
 
@@ -121,7 +121,8 @@ describe('GitHub interface', () => {
         .get('/orgs/test_org/teams/test-team/memberships/someone')  
         .reply(200, getFixture('team_membership.active'));
 
-      expect(await github.userIsTeamMember('someone', 'test-team')).toBe(true);  
+      expect(github.userIsTeamMember('someone', 'test_org/test-team'))
+        .resolves.toBe(true);  
       done(); 
     });
 
@@ -130,7 +131,8 @@ describe('GitHub interface', () => {
         .get('/orgs/test_org/teams/test-team/memberships/someone')  
         .reply(200, getFixture('team_membership.pending'));
 
-      expect(await github.userIsTeamMember('someone', 'test-team')).toBe(false);  
+      expect(github.userIsTeamMember('someone', 'test_org/test-team'))
+        .resolves.toBe(false);  
       done(); 
     }); 
 
@@ -139,7 +141,8 @@ describe('GitHub interface', () => {
         .get('/orgs/test_org/teams/test-team/memberships/someone')  
         .reply(404, getFixture('team_membership.not_found'));  
 
-      expect(await github.userIsTeamMember('someone', 'test-team')).toBe(false); 
+      expect(github.userIsTeamMember('someone', 'test_org/test-team'))
+        .resolves.toBe(false); 
       done(); 
     }); 
   });

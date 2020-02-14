@@ -50,7 +50,7 @@ describe('end-to-end', () => {
     process.env = {
       DISABLE_WEBHOOK_EVENT_CHECK: 'true',
       GITHUB_ORG: 'test_org',
-      ALLOW_TEAM_SLUG: 'wg-inviters',
+      ALLOW_TEAM_SLUG: 'test_org/wg-inviters',
       GITHUB_ACCESS_TOKEN: '_TOKEN_',
       NODE_ENV: 'test',
     };

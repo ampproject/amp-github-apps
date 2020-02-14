@@ -47,15 +47,12 @@ export class InviteBot {
   /**
    * Constructor.
    *
+   * The allowTeamSlug parameter restricts the set of users who can trigger an
+   * invite to members of a GitHub team. Example: 'ampproject/inviters'
+   *
    * Optional helpUsernameToTag parameter allows specifying someone to tag in the
    * event that the invite fails to send for some reason. If left as null, the
-   * comment will just say "ask someone for help".
-   * Example: 'ampproject/wg-infra'
-   *
-   * The allowTeamSlug parameter restricts the set of users who can trigger an
-   * invite to members of a GitHub team. The value should be the name of the 
-   * team, but should not include the org.
-   * Example: 'wg-infra'
+   * comment will say "ask someone for help". Example: 'ampproject/wg-infra'
    */
   constructor(
     client: Octokit,
