@@ -84,6 +84,7 @@ describe('Invite Bot', () => {
 
   describe('processComment', () => {
     beforeEach(() => {
+      jest.spyOn(GitHub.prototype, 'userIsTeamMember');
       jest.spyOn(inviteBot, 'userCanTrigger');
       jest.spyOn(inviteBot, 'parseMacros');
       jest.spyOn(inviteBot, 'tryInvite');
@@ -105,8 +106,8 @@ describe('Invite Bot', () => {
         mocked(GitHub.prototype.inviteUser).mockImplementation(
           async () => false
         );
-        mocked(inviteBot.userCanTrigger).mockImplementation(
-          async (author: string) => author === 'member-author'
+        mocked(GitHub.prototype.userIsTeamMember).mockImplementation(
+          async (username: string) => username === 'member-author'
         );
       });
 
