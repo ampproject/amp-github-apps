@@ -59,11 +59,12 @@ function identifySecrets(appDir) {
 function replaceSecrets(appDir) {
   const envFile = path.join(appDir, REDACTED_ENV_FILE);
   const envFileContents = fs.readFileSync(envFile).toString('utf8');
+  const secretsList = identifySecrets(appDir);
 
   const replacedContents = envFileContents
     .split('\n')
     .map(line => {
-      for (const secret of identifySecrets(appDir)) {
+      for (const secret of secretsList) {
         if (line.startsWith(`${secret}=`)) {
           const secretVal = process.env[secret];
           const hash = crypto.createHash('sha256');
