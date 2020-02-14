@@ -47,6 +47,8 @@ steps:
     args:
       - functions
       - deploy
+      - --source
+      - dist/
       - invite-bot
       - --entry-point
       - probot
