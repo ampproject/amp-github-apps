@@ -50,12 +50,22 @@
     - If you need support for Cloud Build deploying Cron task updates:
       - Visit [IAM page](https://pantheon.corp.google.com/iam-admin/iam) and find the `@cloudbuild.gserviceaccount.com` service account
       - _Edit permissions_ > _Add Another Role_ > _Cloud Scheduler Admin_
-
+    - If you need support for Cloud Build deploying Cloud Functions:
+      Visit [IAM page](https://pantheon.corp.google.com/iam-admin/iam) and find the `@cloudbuild.gserviceaccount.com` service account
+      - _Edit permissions_ > _Add Another Role_ > _Cloud Functions Developer_
+      ```
+      gcloud iam service-accounts add-iam-policy-binding \
+        [PROJECT_ID]@appspot.gserviceaccount.com \
+        --member \
+        serviceAccount:[PROJECT_NUMBER]@cloudbuild.gserviceaccount.com \
+        --role=roles/iam.serviceAccountUser
+      ```
 9. Create the [Cloud Build Trigger](https://pantheon.corp.google.com/cloud-build/triggers)
     - Click _Connect Repository_ and follow the steps to connect to `ampproject/amp-github-apps`; do not select _Create push trigger_ on the final step
     - Click _Create Trigger_, name the trigger "on-deploy-tag" or something similar, select `ampproject/amp-github-apps` as the _Source_, and set the _Event_ to _Push new tag_
     - For the tag pattern, use `deploy-{your-app-name}-\d{14}` (ex. `deploy-bundle-size-20200122154000` would be the deploy tag for the `bundle-size` app, with a timestamp of 15:40:00 on 2020-01-22). For consistency, deploy using the timestamp in the UTC timezone.
     - Under _Build Configuration_, select _Cloud Build configuration file_ and provide the path to your Cloud Build file, ex. `bundle-size/cloud_build.yaml`
+
 10. Add the NPM script `deploy-tag`, which creates a git tag in the proper tag format for your app
     - Ex. ``git tag 'deploy-your-app-name-'`date --utc '+%Y%m%d%H%M%S'` ``
 
