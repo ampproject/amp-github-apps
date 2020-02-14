@@ -20,6 +20,10 @@ steps:
   - name: gcr.io/cloud-builders/npm
     dir: invite
     args:
+      - install
+  - name: gcr.io/cloud-builders/npm
+    dir: invite
+    args:
       - run
       - build
 
