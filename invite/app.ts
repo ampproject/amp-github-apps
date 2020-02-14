@@ -15,7 +15,6 @@
  */
 
 import {Application, Context} from 'probot';
-import {createTokenAuth} from '@octokit/auth';
 import Webhooks from '@octokit/webhooks';
 import {Octokit} from '@octokit/rest';
 
