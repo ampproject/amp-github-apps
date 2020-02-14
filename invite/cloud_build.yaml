@@ -15,7 +15,27 @@ steps:
       - WEBHOOK_SECRET
       - GITHUB_ACCESS_TOKEN
 
-  # Deploy the app and its cron tasks
+  # Compile the app from Typescript into dist/.
+  - name: gcr.io/cloud-builders/npm
+    dir: invite
+    args:
+      - build
+
+  # Copy over the environment and package file.
+  - name: 'ubuntu'
+    dir: invite
+    args:
+      - cp
+      - .env
+      - dist/
+  - name: 'ubuntu'
+    dir: invite
+    args:
+      - cp
+      - package.json
+      - dist/
+
+  # Deploy the app.
   - name: gcr.io/cloud-builders/gcloud
     dir: invite
     args:
