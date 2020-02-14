@@ -67,6 +67,9 @@ function main() {
   if (buildTargets.has('BUNDLE_SIZE')) {
     runAppTests('bundle-size');
   }
+  if (buildTargets.has('INVITE')) {
+    runAppTests('invite');
+  }
   if (buildTargets.has('OWNERS')) {
     runAppTests('owners');
   }

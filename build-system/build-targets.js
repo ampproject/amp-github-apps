@@ -23,7 +23,13 @@
 const {bold, cyan, yellow} = require('ansi-colors');
 const {gitDiffNameOnlyMaster} = require('./git');
 
-const ALL_TARGETS = ['BUNDLE_SIZE', 'OWNERS', 'PR_DEPLOY', 'TEST_STATUS'];
+const ALL_TARGETS = [
+  'BUNDLE_SIZE',
+  'INVITE',
+  'OWNERS',
+  'PR_DEPLOY',
+  'TEST_STATUS',
+];
 
 /**
  * A mapping of functions that match a given file to one or more build targets.
@@ -32,6 +38,10 @@ const targetMatchers = [
   {
     targets: ['BUNDLE_SIZE'],
     func: file => file.startsWith('bundle-size/'),
+  },
+  {
+    targets: ['INVITE'],
+    func: file => file.startsWith('invite/'),
   },
   {
     targets: ['OWNERS'],
