@@ -12,15 +12,12 @@
     "lint": "eslint **/*.ts",
     "fix": "eslint **/*.ts --fix",
     "lint-conflicts": "eslint --print-config app.ts | eslint-config-prettier-check",
-
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
     "setup-db": "node dist/src/setup_db.js",
-
     "start": "probot run dist/app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-invite-'`date --utc '+%Y%m%d%H%M%S'`",
-
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
@@ -64,6 +61,7 @@
   },
   "jest": {
     "preset": "ts-jest",
+    "setupTestFrameworkScriptFile": "<rootDir>/test/jest-preload.ts",
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "<rootDir>/node_modules/",

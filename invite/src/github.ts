@@ -32,6 +32,7 @@ export class GitHub {
    * was sent; false if the user was already a member.
    */
   async inviteUser(username: string): Promise<boolean> {
+    this.logger.info(`inviteUser: Sending an invite to @${username}`);
     const response = await this.client.orgs.addOrUpdateMembership({
       org: this.org,
       username,
@@ -46,6 +47,7 @@ export class GitHub {
     issue_number: number,
     comment: string
   ): Promise<void> {
+    this.logger.info(`addComment: Commenting on ${repo}#${issue_number}`);
     await this.client.issues.createComment({
       owner: this.org,
       repo,
@@ -60,6 +62,9 @@ export class GitHub {
     issue_number: number,
     assignee: string
   ): Promise<void> {
+    this.logger.info(
+      `assignIssue: Assigning @${assignee} to ${repo}#${issue_number}`
+    );
     await this.client.issues.addAssignees({
       owner: this.org,
       repo,
@@ -70,6 +75,9 @@ export class GitHub {
 
   /* Checks whether a user is a member of the organization. */
   async userIsTeamMember(username: string, teamSlug: string): Promise<boolean> {  
+    this.logger.info(
+      `userIsTeamMember: Checking if @${username} is a member of ${teamSlug}`
+    );
     // The membership API returns status 404 when the user is not a member of
     // the organization, but Octokit handles this by rejecting the promise. We
     // only need the status code to make a determination, so the `catch` handler

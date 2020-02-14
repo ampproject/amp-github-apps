@@ -64,6 +64,8 @@ export class InviteBot {
     this.helpUserTag = helpUsernameToTag === null ?
       'someone in your organization' :
       `@${helpUsernameToTag}`;
+
+    this.logger.info(`InviteBot initialized for ${this.org}`);
   }
 
   /**
@@ -74,8 +76,15 @@ export class InviteBot {
     issue_number: number,
     comment: string
   ): Promise<void> {
+    // TODO(rcebulko): Add author once `allow` branch is merged.
+    this.logger.info(
+      `processComment: Processing comment on ${repo}#${issue_number}`
+    );
     const macros = this.parseMacros(comment);
 
+    this.logger.debug(
+      `processComment: Found ${Object.keys(macros).length} macros`
+    );
     for (const [username, action] of Object.entries(macros)) {
       await this.tryInvite({username, repo, issue_number, action});
     }
@@ -85,6 +94,9 @@ export class InviteBot {
    * Process an accepted invite by adding comments and assigning issues.
    */
   async processAcceptedInvite(username: string): Promise<void> {
+    this.logger.info(
+      `processAcceptedInvite: Processing invite accepted by @${username}`
+    );
     const recordedInvites = await this.record.getInvites(username);
 
     for (const invite of recordedInvites) {
@@ -132,6 +144,7 @@ export class InviteBot {
    * macros.
    */
   async tryInvite(invite: Invite): Promise<void> {
+    this.logger.debug(`tryInvite: Trying to invite`, invite);
     const existingInvites = await this.record.getInvites(invite.username);
     const pendingInvite = !!existingInvites.length;
 
@@ -215,6 +228,10 @@ export class InviteBot {
    * thread(s) from which the user was invited.
    */
   async tryAssign(invite: Invite, accepted: boolean): Promise<void> {
+    this.logger.debug(
+      `tryAssign: Trying to assign (accepted = ${accepted}`,
+      invite,
+    );
     await this.github.assignIssue(
       invite.repo,
       invite.issue_number,

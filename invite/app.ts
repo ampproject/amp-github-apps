@@ -21,7 +21,7 @@ import {Octokit} from '@octokit/rest';
 
 import {InviteBot} from './src/invite_bot';
 
-export default (app: Application) => {
+module.exports = (app: Application) => {
   if (process.env.NODE_ENV !== 'test') {
     require('dotenv').config();
   }
