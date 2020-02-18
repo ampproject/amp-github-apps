@@ -16,13 +16,12 @@
 
 import Knex from 'knex';
 
-import {Database} from '../src/db';
 import {setupDb} from '../src/setup_db';
 import {Invite, InviteAction} from '../src/types';
 import {InvitationRecord} from '../src/invitation_record';
 
 describe('invitation record', () => {
-  const db: Database = Knex({
+  const db: Knex = Knex({
     client: 'sqlite3',
     connection: ':memory:',
     useNullAsDefault: true,

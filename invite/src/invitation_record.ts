@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import {Database} from './db';
+import Knex from 'knex';
+
 import {ILogger, Invite} from './types';
 
 /**
@@ -24,7 +25,7 @@ export class InvitationRecord {
   /**
    * Constructor.
    */
-  constructor(private db: Database, private logger: ILogger = console) {}
+  constructor(private db: Knex, private logger: ILogger = console) {}
 
   /**
    * Records an invite created by the bot.

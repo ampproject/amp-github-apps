@@ -17,9 +17,8 @@ require('dotenv').config();
 
 import Knex from 'knex';
 
-export type Database = Knex;
 /** Connect to a database instance. */
-export function dbConnect(): Database {
+export function dbConnect(): Knex {
   return Knex({
     client: 'pg',
     connection: {

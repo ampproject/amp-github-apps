@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
-import {Database, dbConnect} from './db';
+import Knex from 'knex';
+
+import {dbConnect} from './db';
 
 /** Set up the database table. */
-export function setupDb(db: Database) {
+export function setupDb(db: Knex) {
   return db.schema.createTable('invites', table => {
     table.increments('id').primary();
     table.string('username', 40);

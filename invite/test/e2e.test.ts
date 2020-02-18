@@ -18,7 +18,7 @@ import Knex from 'knex';
 import nock from 'nock';
 import {Probot} from 'probot';
 
-import {Database, dbConnect} from '../src/db';
+import {dbConnect} from '../src/db';
 import {InviteAction} from '../src/types';
 import {InvitationRecord} from '../src/invitation_record';
 import {InviteBot} from '../src/invite_bot';
@@ -34,14 +34,13 @@ jest.mock('../src/db', () => {
   });
 
   return {
-    Database: Knex,
     dbConnect: () => testDb,
   };
 });
 
 describe('end-to-end', () => {
   let probot: Probot;
-  let db: Database;
+  let db: Knex;
   let record: InvitationRecord;
 
   beforeAll(async () => {
