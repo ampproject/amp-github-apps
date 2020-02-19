@@ -196,7 +196,7 @@ class Release(Base):
 
 
 class Cherrypick(Base):
-  """A cherry-picked commit."""
+  """[DEPRECATED] A cherry-picked commit."""
 
   __tablename__ = 'cherrypicks'
 
