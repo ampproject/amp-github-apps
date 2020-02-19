@@ -196,7 +196,11 @@ class Release(Base):
 
 
 class Cherrypick(Base):
-  """[DEPRECATED] A cherry-picked commit."""
+  """A cherry-picked commit.
+  
+  DEPRECATED: There is a better way to count cherry-picks now using issues. Use
+  CherrypickIssue instead. Leave this here so historical data can be handled.
+  """
 
   __tablename__ = 'cherrypicks'
 
