@@ -27,7 +27,7 @@ def _is_last_n_days(
   if base_time is None:
     base_time = datetime.datetime.now()
   n_days_ago = base_time - datetime.timedelta(days=days)
-  return timestamp_column >= n_days_ago
+  return (timestamp_column >= n_days_ago) & (timestamp_column <= base_time)
 
 
 class MetricScore(enum.Enum):
@@ -196,7 +196,11 @@ class Release(Base):
 
 
 class Cherrypick(Base):
-  """A cherry-picked commit."""
+  """A cherry-picked commit.
+  
+  DEPRECATED: There is a better way to count cherry-picks now using issues. Use
+  CherrypickIssue instead. Leave this here so historical data can be handled.
+  """
 
   __tablename__ = 'cherrypicks'
 
@@ -233,7 +237,7 @@ class CherrypickIssue(Base):
       The last 90 days of cherry-pick issues from newest to oldest.
     """
     return session.query(cls).order_by(cls.created_at.desc()).filter(
-        cls.is_last_90_days(base_time)).filter(cls.created_at <= base_time)
+        cls.is_last_90_days(base_time))
 
   def __repr__(self) -> Text:
     return '<CherrypickIssue(number=%d, created_at=%s)>' % (self.number,
