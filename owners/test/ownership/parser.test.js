@@ -301,6 +301,26 @@ describe('owners parser', () => {
         });
       });
 
+      describe('for a singleton pattern in braces', () => {
+        it('reports an error', () => {
+          const {errors} = parser._parseRuleDefinition('', {
+            pattern: '{amp-story-*}.js',
+            owners: [{name: 'coder'}],
+          });
+          expect(errors[0].message).toContain(
+            'braces only contain one pattern'
+          );
+        });
+
+        it('returns no result', () => {
+          const {result} = parser._parseRuleDefinition('', {
+            pattern: '{amp-story-*}.js',
+            owners: [{name: 'coder'}],
+          });
+          expect(result).toBeUndefined();
+        });
+      });
+
       describe('for a directory glob pattern', () => {
         it('reports an error', () => {
           const {errors} = parser._parseRuleDefinition('', {
