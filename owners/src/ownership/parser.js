@@ -272,7 +272,7 @@ class OwnersParser {
         new OwnersParserError(
           ownersPath,
           `Brace expansion attempted in pattern '${ruleDef.pattern}', but ` +
-          'braces only contain one pattern! Please remove the extra braces.'
+            'braces only contain one pattern! Please remove the extra braces.'
         )
       );
       return {errors};
