@@ -261,6 +261,23 @@ class OwnersParser {
       }
     }
 
+    // Check that there are no singleton patterns in brace-expansion format. The
+    // minimatch glob parsing library performs brace-expansion, but only if the
+    // braces contain comma-separated patterns. This is not obvious behavior,
+    // and has resulted in broken owners rules.
+    // Ex. `{a,b}.js` becomes /(a|b)\.js/
+    // Ex. `{a}.js` becomes /\{a\}\.js/
+    if (/\{[^,]+\}/.test(pattern)) {
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Brace expansion attempted in pattern '${ruleDef.pattern}', but ` +
+            'braces only contain one pattern! Please remove the extra braces.'
+        )
+      );
+      return {errors};
+    }
+
     // Create rule based on pattern and owners list.
     let rule;
     if (pattern && isRecursive) {
