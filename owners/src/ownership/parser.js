@@ -262,7 +262,7 @@ class OwnersParser {
     }
 
     // Check that there are no singleton patterns in brace-expansion format. The
-    // minimatch glob parsing library performs brace-exparnsion, but only if the
+    // minimatch glob parsing library performs brace-expansion, but only if the
     // braces contain comma-separated patterns. This is not obvious behavior,
     // and has resulted in broken owners rules.
     // Ex. `{a,b}.js` becomes /(a|b)\.js/
