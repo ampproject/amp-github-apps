@@ -266,7 +266,7 @@ class OwnersParser {
     // braces contain comma-separated patterns. This is not obvious behavior,
     // and has resulted in broken owners rules.
     // Ex. `{a,b}.js` becomes /(a|b)\.js/
-    // Ex. `{a}.js` matches /\{a\}\.js/
+    // Ex. `{a}.js` becomes /\{a\}\.js/
     if (/\{[^,]+\}/.test(pattern)) {
       errors.push(
         new OwnersParserError(
