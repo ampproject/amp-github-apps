@@ -62,30 +62,37 @@ module.exports = app => {
   listen(
     ['pull_request.opened', 'pull_request.ready_for_review'],
     async (github, payload) => {
-      const pr = PullRequest.fromGitHubResponse(payload.pull_request);
-      if (!payload.pull_request.draft) {
-        await ownersBot.runOwnersCheck(
-          github,
-          pr,
-          shouldAssignReviewers(payload.pull_request)
-        );
-      }
+      const prPayload = payload.pull_request;
+      if (prPayload.draft) return;
+
+      await ownersBot.runOwnersCheck(
+        github,
+        PullRequest.fromGitHubResponse(prPayload),
+        shouldAssignReviewers(prPayload)
+      );
     }
   );
 
   listen('pull_request.synchronize', async (github, payload) => {
-    const pr = PullRequest.fromGitHubResponse(payload.pull_request);
+    const prPayload = payload.pull_request;
+    if (prPayload.draft) return;
+
+    const pr = PullRequest.fromGitHubResponse(prPayload);
     await ownersBot.runOwnersCheck(github, pr);
   });
 
   listen('check_run.rerequested', async (github, payload) => {
-    const prNumber = payload.check_run.check_suite.pull_requests[0].number;
-    await ownersBot.runOwnersCheckOnPrNumber(github, prNumber);
+    const prPayload = payload.check_run.check_suite.pull_requests[0];
+    if (prPayload.draft) return;
+
+    await ownersBot.runOwnersCheckOnPrNumber(github, prPayload.number);
   });
 
   listen('pull_request_review.submitted', async (github, payload) => {
-    const prNumber = payload.pull_request.number;
-    await ownersBot.runOwnersCheckOnPrNumber(github, prNumber);
+    const prPayload = payload.pull_request;
+    if (prPayload.draft) return;
+
+    await ownersBot.runOwnersCheckOnPrNumber(github, prPayload.number);
   });
 
   listen(
