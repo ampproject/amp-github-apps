@@ -63,30 +63,35 @@ module.exports = app => {
     ['pull_request.opened', 'pull_request.ready_for_review'],
     async (github, payload) => {
       const prPayload = payload.pull_request;
-      const pr = PullRequest.fromGitHubResponse(prPayload);
-      if (!prPayload.draft) {
-        await ownersBot.runOwnersCheck(
-          github,
-          pr,
-          shouldAssignReviewers(prPayload)
-        );
-      }
+      if (prPayload.draft) return;
+
+      await ownersBot.runOwnersCheck(
+        github,
+        PullRequest.fromGitHubResponse(prPayload),
+        shouldAssignReviewers(prPayload)
+      );
     }
   );
 
   listen('pull_request.synchronize', async (github, payload) => {
     const prPayload = payload.pull_request;
+    if (prPayload.draft) return;
+
     const pr = PullRequest.fromGitHubResponse(prPayload);
     await ownersBot.runOwnersCheck(github, pr);
   });
 
   listen('check_run.rerequested', async (github, payload) => {
     const prPayload = payload.check_run.check_suite.pull_requests[0];
+    if (prPayload.draft) return;
+
     await ownersBot.runOwnersCheckOnPrNumber(github, prPayload.number);
   });
 
   listen('pull_request_review.submitted', async (github, payload) => {
     const prPayload = payload.pull_request;
+    if (prPayload.draft) return;
+
     await ownersBot.runOwnersCheckOnPrNumber(github, prPayload.number);
   });
 
