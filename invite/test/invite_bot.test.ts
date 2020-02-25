@@ -93,6 +93,13 @@ describe('Invite Bot', () => {
       jest.spyOn(inviteBot, 'tryAssign').mockImplementation(async () => {});
     });
 
+    it('ignores empty comments', async done => {
+      await inviteBot.processComment('test_repo', 1337, null, 'author');
+
+      expect(inviteBot.parseMacros).not.toBeCalled();
+      done();
+    });
+
     it('parses the comment for macros', async done => {
       await inviteBot.processComment('test_repo', 1337, 'My comment', 'author');
 
