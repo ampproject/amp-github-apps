@@ -82,8 +82,13 @@ export class InviteBot {
       `processComment: Processing comment by @${author} on ` +
         `${repo}#${issue_number}`
     );
-    const macroList = Object.entries(this.parseMacros(comment));
 
+    if (!comment) {
+      this.logger.info('processComment: Comment is empty; skipping');
+      return;
+    }
+
+    const macroList = Object.entries(this.parseMacros(comment));
     this.logger.debug(`processComment: Found ${macroList.length} macros`);
     if (macroList.length && (await this.userCanTrigger(author))) {
       for (const [username, action] of macroList) {
