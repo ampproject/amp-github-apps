@@ -1,0 +1,37 @@
+{
+  "name": "amp-release-calendar",
+  "description": "",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "The AMP HTML Authors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ampproject/amp-github-apps.git"
+  },
+  "engines": {
+    "node": "^12.13.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "npm run build && eslint **/*.ts --quiet --fix",
+    "start": "npm run build && node ./dist/app.js",
+    "test": "jest --verbose=false"
+  },
+  "dependencies": {
+    "typescript": "3.7.5"
+  },
+  "devDependencies": {
+    "@types/jest": "24.9.1",
+    "@types/node": "12.12.26",
+    "@typescript-eslint/eslint-plugin": "2.19.0",
+    "@typescript-eslint/parser": "2.19.0",
+    "eslint": "6.8.0",
+    "jest": "24.9.0",
+    "ts-jest": "24.3.0",
+    "ts-node": "8.6.2"
+  },
+  "jest": {
+    "preset": "ts-jest"
+  }
+}
