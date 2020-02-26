@@ -89,7 +89,7 @@ class OwnersNotifier {
       ([name, filenames]) => {
         const header = `Hey @${name}, these files were changed:`;
         const files = filenames.map(filename => `- ${filename}`);
-        return [header, ...files].join('\n');
+        return [header, '```', ...files, '```'].join('\n');
       }
     );
 
