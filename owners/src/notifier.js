@@ -88,8 +88,7 @@ class OwnersNotifier {
     const fileNotifyComments = Object.entries(notifies).map(
       ([name, filenames]) => {
         const header = `Hey @${name}, these files were changed:`;
-        const files = filenames.map(filename => `- ${filename}`);
-        return [header, '```', ...files, '```'].join('\n');
+        return [header, '```', ...filenames, '```'].join('\n');
       }
     );
 
