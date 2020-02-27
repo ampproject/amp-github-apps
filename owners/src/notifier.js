@@ -85,8 +85,10 @@ class OwnersNotifier {
     const notifies = this.getOwnersToNotify();
     delete notifies[this.pr.author];
 
-    const fileNotifyComments = Object.entries(notifies).map(
-      ([name, filenames]) => [
+    const fileNotifyComments = Object.entries(
+      notifies
+    ).map(([name, filenames]) =>
+      [
         `Hey @${name}, these files were changed:`,
         '```',
         ...filenames,
