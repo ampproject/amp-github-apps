@@ -29,7 +29,7 @@
     "dotenv": "8.2.0",
     "knex": "0.20.9",
     "pg": "7.18.1",
-    "probot": "9.9.1"
+    "probot": "9.9.6"
   },
   "devDependencies": {
     "@types/jest": "25.1.2",
@@ -39,7 +39,7 @@
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-prettier": "3.1.2",
-    "jest": "24.9.0",
+    "jest": "25.1.0",
     "nock": "11.7.2",
     "nodemon": "2.0.2",
     "prettier": "1.19.1",
@@ -61,8 +61,13 @@
     ]
   },
   "jest": {
+    "modulePathIgnorePatterns": [
+      "<rootDir>/build/"
+    ],
     "preset": "ts-jest",
-    "setupTestFrameworkScriptFile": "<rootDir>/test/jest-preload.ts",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/jest-preload.ts"
+    ],
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "<rootDir>/node_modules/",
