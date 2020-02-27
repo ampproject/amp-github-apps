@@ -29,7 +29,7 @@
     "dotenv": "8.2.0",
     "knex": "0.20.9",
     "pg": "7.18.1",
-    "probot": "9.9.1"
+    "probot": "9.9.6"
   },
   "devDependencies": {
     "@types/jest": "25.1.2",
