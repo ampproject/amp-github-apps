@@ -61,9 +61,13 @@
     ]
   },
   "jest": {
-    "modulePathIgnorePatterns": ["<rootDir>/build/"],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/build/"
+    ],
     "preset": "ts-jest",
-    "setupTestFrameworkScriptFile": "<rootDir>/test/jest-preload.ts",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/jest-preload.ts"
+    ],
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "<rootDir>/node_modules/",
