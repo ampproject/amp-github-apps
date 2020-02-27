@@ -20,6 +20,13 @@ import {Octokit} from '@octokit/rest';
 
 import {InviteBot} from './src/invite_bot';
 
+type CommentWebhookPayload =
+  | Webhooks.WebhookPayloadIssueComment
+  | Webhooks.WebhookPayloadIssues
+  | Webhooks.WebhookPayloadPullRequest
+  | Webhooks.WebhookPayloadPullRequestReview
+  | Webhooks.WebhookPayloadPullRequestReviewComment;
+
 module.exports = (app: Application) => {
   if (process.env.NODE_ENV !== 'test') {
     require('dotenv').config();
@@ -27,93 +34,72 @@ module.exports = (app: Application) => {
 
   const helpUserToTag = process.env.HELP_USER_TO_TAG || null;
 
-  app.on('issue_comment.created', async (
-    {github, event, payload, log}: Context<Webhooks.WebhookPayloadIssueComment>
-  ) => {
-    const inviteBot = new InviteBot(
+  function botFromContext(
+    {github, payload, log}: Context<CommentWebhookPayload>
+  ) {
+    return new InviteBot(
+      // This type-cast is required because Probot exports a separate GitHubAPI
+      // class, even though it's in Octokit instance.
       (github as unknown) as Octokit,
       payload.repository.owner.login,
       process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
       log,
     );
-    await inviteBot.processComment(
-      payload.repository.name,
-      payload.issue.number,
-      payload.comment.body,
-      payload.comment.user.login,
+  }
+
+  app.on('issue_comment.created', async (
+    context: Context<Webhooks.WebhookPayloadIssueComment>
+  ) => {
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.issue.number,
+      context.payload.comment.body,
+      context.payload.comment.user.login,
     );
   });
 
   app.on('issues.opened', async (
-    {github, event, payload, log}: Context<Webhooks.WebhookPayloadIssues>
+    context: Context<Webhooks.WebhookPayloadIssues>
   ) => {
-    const inviteBot = new InviteBot(
-      (github as unknown) as Octokit,
-      payload.repository.owner.login,
-      process.env.ALLOW_TEAM_SLUG,
-      helpUserToTag,
-      log,
-    );
-    await inviteBot.processComment(
-      payload.repository.name,
-      payload.issue.number,
-      payload.issue.body,
-      payload.issue.user.login,
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.issue.number,
+      context.payload.issue.body,
+      context.payload.issue.user.login,
     );
   });
 
   app.on('pull_request.opened', async (
-    {github, event, payload, log}: Context<Webhooks.WebhookPayloadPullRequest>
+    context: Context<Webhooks.WebhookPayloadPullRequest>
   ) => {
-    const inviteBot = new InviteBot(
-      (github as unknown) as Octokit,
-      payload.repository.owner.login,
-      process.env.ALLOW_TEAM_SLUG,
-      helpUserToTag,
-      log,
-    );
-    await inviteBot.processComment(
-      payload.repository.name,
-      payload.pull_request.number,
-      payload.pull_request.body,
-      payload.pull_request.user.login,
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.pull_request.number,
+      context.payload.pull_request.body,
+      context.payload.pull_request.user.login,
     );
   });
 
   app.on('pull_request_review.submitted', async (
-    {github, event, payload, log}: Context<Webhooks.WebhookPayloadPullRequestReview>
+    context: Context<Webhooks.WebhookPayloadPullRequestReview>
   ) => {
-    const inviteBot = new InviteBot(
-      (github as unknown) as Octokit,
-      payload.repository.owner.login,
-      process.env.ALLOW_TEAM_SLUG,
-      helpUserToTag,
-      log,
-    );
-    await inviteBot.processComment(
-      payload.repository.name,
-      payload.pull_request.number,
-      payload.review.body,
-      payload.review.user.login,
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.pull_request.number,
+      context.payload.review.body,
+      context.payload.review.user.login,
     );
   });
 
   app.on('pull_request_review_comment.created', async (
-    {github, event, payload, log}: Context<Webhooks.WebhookPayloadPullRequestReviewComment>
+    context: Context<Webhooks.WebhookPayloadPullRequestReviewComment>
   ) => {
-    const inviteBot = new InviteBot(
-      (github as unknown) as Octokit,
-      payload.repository.owner.login,
-      process.env.ALLOW_TEAM_SLUG,
-      helpUserToTag,
-      log,
-    );
-    await inviteBot.processComment(
-      payload.repository.name,
-      payload.pull_request.number,
-      payload.comment.body,
-      payload.comment.user.login,
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.pull_request.number,
+      context.payload.comment.body,
+      context.payload.comment.user.login,
     );
   });
 
