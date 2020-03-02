@@ -14,4 +14,31 @@
  * limitations under the License.
  */
 
-console.log('hi');
+import {createConnection, Connection} from 'typeorm';
+import {Release} from './entities/release';
+
+async function main() {
+  const connection = await createConnection({
+    type: 'mysql',
+    host: process.env.HOST,
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    entities: [Release],
+    synchronize: true, //
+    logging: false,
+  }).catch(error => {
+    throw error;
+  }) as Connection;
+
+
+  const releaseRepo = connection.getRepository(Release);
+
+  const release = new Release('1234567891234');
+  await releaseRepo.save(release);
+
+  const savedReleases = await releaseRepo.find();
+  console.log(savedReleases);
+}
+
+main();

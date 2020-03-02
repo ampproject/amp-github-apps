@@ -14,11 +14,15 @@
   },
   "scripts": {
     "build": "tsc",
+    "dotenv": "node -r dotenv/config",
     "lint": "npm run build && eslint **/*.ts --quiet --fix",
-    "start": "npm run build && node ./dist/app.js",
+    "start": "npm run build && node -r dotenv/config ./dist/app.js",
     "test": "jest --verbose=false"
   },
   "dependencies": {
+    "dotenv": "8.2.0",
+    "mysql": "2.18.1",
+    "typeorm": "0.2.24",
     "typescript": "3.7.5"
   },
   "devDependencies": {
