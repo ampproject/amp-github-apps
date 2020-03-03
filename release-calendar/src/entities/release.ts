@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-import {createConnection, Connection} from 'typeorm';
-import {Release} from './entities/release';
+import {Entity, PrimaryColumn} from 'typeorm';
 
-async function main() {
-  await createConnection({
-    type: 'mysql',
-    host: process.env.HOST,
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    entities: [Release],
-    synchronize: !JSON.parse(process.env.PRODUCTION), //recreate database schema on connect
-    logging: false,
-  }).catch(error => {
-    throw error;
-  }) as Connection;
+@Entity()
+export class Release {
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  @PrimaryColumn('varchar', {length: 13})
+  name: string;
+
+  //TODO(ajwhatson): fill out table here. See https://typeorm.io/#/undefined/column-data-types
 }
-
-main();
