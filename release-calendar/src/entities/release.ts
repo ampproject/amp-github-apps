@@ -14,17 +14,42 @@
  * limitations under the License.
  */
 
-import {Entity, PrimaryColumn} from 'typeorm';
+import {Entity, PrimaryColumn, Column} from 'typeorm';
+
+export enum Channel {
+  LTS = 'lts',
+  STABLE = 'stable',
+  BETAONE = 'betaOne',
+  EXPERIMENTALONE = 'experimentalOne',
+  BETAOPTIN = 'betaOptin',
+  EXPERIMENTALOPTIN = 'experimentalOptin',
+  NIGHTLY = 'nightly',
+  ERROR = 'error',
+}
 
 @Entity()
 export class Release {
-
-  constructor(name: string) {
+  constructor(name: string, channel: Channel, isRollback: boolean, date: Date) {
     this.name = name;
+    this.channel = channel;
+    this.isRollback = isRollback;
+    this.date = date;
   }
 
   @PrimaryColumn('varchar', {length: 13})
   name: string;
 
-  //TODO(ajwhatson): fill out table here. See https://typeorm.io/#/undefined/column-data-types
+  @Column({
+    type: 'enum',
+    enum: Channel,
+    default: Channel.ERROR,
+  })
+  channel: Channel;
+
+  @Column()
+  isRollback: boolean;
+
+  @Column('timestamp')
+  date: Date;
+
 }
