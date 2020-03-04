@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 import 'reflect-metadata';
-import {createConnection} from 'typeorm';
+import {createConnection, Connection} from 'typeorm';
 import {Release} from './entities/release';
-import {Channel} from './types/channel';
+import {addingTestData} from './development/developmentData';
 
 async function main() {
-  await createConnection({
+  const devConnection = (await createConnection({
     type: 'mysql',
     host: process.env.HOST,
     username: process.env.DB_USERNAME,
@@ -28,53 +28,14 @@ async function main() {
     entities: [Release],
     synchronize: !JSON.parse(process.env.PRODUCTION), //recreate database schema on connect
     logging: false,
-  })
-    .then(async connection => {
-      const releaseRepo = connection.getRepository(Release);
+  }).catch(error => {
+    throw error;
+  })) as Connection;
 
-      const release1 = new Release(
-        '1234567890123',
-        Channel.LTS,
-        false,
-        new Date('2020-03-17T08:44:29+0100')
-      );
-      await releaseRepo.save(release1);
-      const release2 = new Release(
-        '2234567890123',
-        Channel.STABLE,
-        false,
-        new Date('2020-03-12T08:44:29+0100')
-      );
-      await releaseRepo.save(release2);
-      const release3 = new Release(
-        '3234567890123',
-        Channel.LTS,
-        true,
-        new Date('2020-03-10T08:44:29+0100')
-      );
-      await releaseRepo.save(release3);
-      const release4 = new Release(
-        '4234567890123',
-        Channel.BETA_ONE_PERCENT,
-        false,
-        new Date('2020-03-16T08:44:29+0100')
-      );
-      await releaseRepo.save(release4);
-      const release5 = new Release(
-        '5234567890123',
-        Channel.NIGHTLY,
-        false,
-        new Date('2020-03-14T08:44:29+0100')
-      );
-      await releaseRepo.save(release5);
-
-      const savedReleases = await releaseRepo.find();
-      console.log(savedReleases);
-    })
-    .catch(error => {
-      throw error;
-    });
-
+  try {
+    addingTestData(devConnection);
+  } catch (e) {
+    console.log(e);
+  }
 }
-
 main();

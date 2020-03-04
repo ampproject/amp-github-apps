@@ -5,6 +5,5 @@ export enum Channel {
   EXPERIMENTAL_ONE_PERCENT = 'experimentalOnePercent',
   BETA_OPTIN = 'betaOptin',
   EXPERIMENTAL_OPTIN = 'experimentalOptin',
-  NIGHTLY = 'nightly',
-  ERROR = 'error',
+  NIGHTLY = 'nightly'
 }

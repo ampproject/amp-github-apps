@@ -32,7 +32,6 @@ export class Release {
   @Column({
     type: 'enum',
     enum: Channel,
-    default: Channel.ERROR,
   })
   channel: Channel;
 
