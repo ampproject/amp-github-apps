@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import {createConnection, Connection} from 'typeorm';
-import {Release} from './entities/release';
+import 'reflect-metadata';
+import {createConnection} from 'typeorm';
+import {Release, Channel} from './entities/release';
 
 async function main() {
   await createConnection({
@@ -27,9 +27,53 @@ async function main() {
     entities: [Release],
     synchronize: !JSON.parse(process.env.PRODUCTION), //recreate database schema on connect
     logging: false,
-  }).catch(error => {
-    throw error;
-  }) as Connection;
+  })
+    .then(async connection => {
+      const releaseRepo = connection.getRepository(Release);
+
+      const release1 = new Release(
+        '1234567890123',
+        Channel.LTS,
+        false,
+        new Date('2020-03-17T08:44:29+0100')
+      );
+      await releaseRepo.save(release1);
+      const release2 = new Release(
+        '2234567890123',
+        Channel.STABLE,
+        false,
+        new Date('2020-03-12T08:44:29+0100')
+      );
+      await releaseRepo.save(release2);
+      const release3 = new Release(
+        '3234567890123',
+        Channel.LTS,
+        true,
+        new Date('2020-03-10T08:44:29+0100')
+      );
+      await releaseRepo.save(release3);
+      const release4 = new Release(
+        '4234567890123',
+        Channel.BETAONE,
+        false,
+        new Date('2020-03-16T08:44:29+0100')
+      );
+      await releaseRepo.save(release4);
+      const release5 = new Release(
+        '5234567890123',
+        Channel.NIGHTLY,
+        false,
+        new Date('2020-03-14T08:44:29+0100')
+      );
+      await releaseRepo.save(release5);
+
+      const savedReleases = await releaseRepo.find();
+      console.log(savedReleases);
+    })
+    .catch(error => {
+      throw error;
+    });
+
 }
 
 main();
