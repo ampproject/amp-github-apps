@@ -55,7 +55,7 @@ async function main() {
       await releaseRepo.save(release3);
       const release4 = new Release(
         '4234567890123',
-        Channel.BETAONE,
+        Channel.BETA_ONE_PERCENT,
         false,
         new Date('2020-03-16T08:44:29+0100')
       );
