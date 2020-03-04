@@ -15,7 +15,8 @@
  */
 import 'reflect-metadata';
 import {createConnection} from 'typeorm';
-import {Release, Channel} from './entities/release';
+import {Release} from './entities/release';
+import {Channel} from './types/channel';
 
 async function main() {
   await createConnection({

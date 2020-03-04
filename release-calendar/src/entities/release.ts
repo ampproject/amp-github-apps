@@ -15,17 +15,7 @@
  */
 
 import {Entity, PrimaryColumn, Column} from 'typeorm';
-
-export enum Channel {
-  LTS = 'lts',
-  STABLE = 'stable',
-  BETAONE = 'betaOne',
-  EXPERIMENTALONE = 'experimentalOne',
-  BETAOPTIN = 'betaOptin',
-  EXPERIMENTALOPTIN = 'experimentalOptin',
-  NIGHTLY = 'nightly',
-  ERROR = 'error',
-}
+import {Channel} from '../types/channel';
 
 @Entity()
 export class Release {
@@ -46,10 +36,9 @@ export class Release {
   })
   channel: Channel;
 
-  @Column()
+  @Column('boolean')
   isRollback: boolean;
 
   @Column('timestamp')
   date: Date;
-
 }
