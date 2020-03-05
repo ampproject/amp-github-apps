@@ -16,7 +16,7 @@
     "build": "tsc",
     "dotenv": "node -r dotenv/config",
     "lint": "npm run build && eslint **/*.ts --quiet --fix",
-    "start": "npm run build && node -r dotenv/config ./dist/app.js",
+    "start": "npm run build && node -r dotenv/config ./dist/src/app.js",
     "test": "jest --verbose=false"
   },
   "dependencies": {

@@ -16,7 +16,7 @@
 import 'reflect-metadata';
 import {createConnection, Connection} from 'typeorm';
 import {Release} from './entities/release';
-import {addingTestData} from './development/developmentData';
+import {addingTestData} from '../test/developmentData';
 
 async function main() {
   const devConnection = (await createConnection({
