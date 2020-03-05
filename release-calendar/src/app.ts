@@ -16,10 +16,11 @@
 import 'reflect-metadata';
 import {createConnection, Connection} from 'typeorm';
 import {Release} from './entities/release';
-import {addingTestData} from '../test/developmentData';
+import {addTestData} from '../test/development-data';
+
 
 async function main() {
-  const devConnection = (await createConnection({
+  const connection = await createConnection({
     type: 'mysql',
     host: process.env.HOST,
     username: process.env.DB_USERNAME,
@@ -30,9 +31,9 @@ async function main() {
     logging: false,
   }).catch(error => {
     throw error;
-  })) as Connection;
+  }) as Connection;
 
-  const savedReleases = await addingTestData(devConnection);
+  const savedReleases = await addTestData(connection);
   console.log(savedReleases);
 }
 main();

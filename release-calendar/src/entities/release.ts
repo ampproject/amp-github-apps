@@ -15,7 +15,7 @@
  */
 
 import {Entity, PrimaryColumn, Column} from 'typeorm';
-import {Channel} from '../types/channel';
+import {Channel} from '../types';
 
 @Entity()
 export class Release {
@@ -34,6 +34,9 @@ export class Release {
     enum: Channel,
   })
   channel: Channel;
+
+  // @Column('varchar')
+  // channel: string;
 
   @Column('boolean')
   isRollback: boolean;
