@@ -32,10 +32,7 @@ async function main() {
     throw error;
   })) as Connection;
 
-  try {
-    addingTestData(devConnection);
-  } catch (e) {
-    console.log(e);
-  }
+  const savedReleases = await addingTestData(devConnection);
+  console.log(savedReleases);
 }
 main();
