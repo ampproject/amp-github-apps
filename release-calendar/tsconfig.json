@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "module": "commonjs",
+    "module": "es6",
     "esModuleInterop": true,
     "target": "es6",
     "noImplicitAny": true,
+    "jsx": "react",
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
@@ -16,6 +17,6 @@
     }
   },  
   "include": [
-    "src/**/*",
+    "src",
   ]
 }
