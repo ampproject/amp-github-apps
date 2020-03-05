@@ -1,9 +1,9 @@
 export enum Channel {
   LTS = 'lts',
   STABLE = 'stable',
-  BETA_ONE_PERCENT = 'betaOnePercent',
-  EXPERIMENTAL_ONE_PERCENT = 'experimentalOnePercent',
-  BETA_OPTIN = 'betaOptin',
-  EXPERIMENTAL_OPTIN = 'experimentalOptin',
+  PERCENT_BETA = 'perc-beta',
+  PERCENT_EXPERIMENTAL = 'perc-experimental',
+  OPT_IN_BETA = 'opt-in-beta',
+  OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
   NIGHTLY = 'nightly'
 }
