@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 import 'reflect-metadata';
+import express from 'express';
 import {createConnection, Connection} from 'typeorm';
+import {addTestData} from '../../test/development-data';
+import {ApiService} from './api-service';
 import {Release} from './entities/release';
-import {addTestData} from '../test/development-data';
 
-
-async function main() {
+async function main(): Promise<void> {
   const connection = await createConnection({
     type: 'mysql',
     host: process.env.HOST,
@@ -31,7 +32,26 @@ async function main() {
     logging: false,
   }).catch(error => {
     throw error;
-  }) as Connection;
+  }) as Connection; 
+
+  const apiService = new ApiService(connection);
+  const app = express();
+  const port = process.env.API_PORT;
+
+  app.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', `http://localhost:${process.env.WEB_PORT}`);
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+
+  app.listen(port, () => {
+    console.log(`Express server is listening on port: ${port}`);
+  });
+  
+  app.get('/', async (req, res) => {
+    const releases = await apiService.getReleases();
+    res.json({items: releases });    
+  });
 
   if (!JSON.parse(process.env.PRODUCTION)) {
     const savedReleases = await addTestData(connection);

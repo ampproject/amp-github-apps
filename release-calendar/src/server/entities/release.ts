@@ -15,7 +15,7 @@
  */
 
 import {Entity, PrimaryColumn, Column} from 'typeorm';
-import {Channel} from '../types';
+import {Channel} from '../../types';
 
 @Entity()
 export class Release {
@@ -23,7 +23,7 @@ export class Release {
     name: string,
     channel: Channel,
     date: Date,
-    isRollback: boolean = false
+    isRollback = false
   ) {
     this.name = name;
     this.channel = channel;

@@ -16,21 +16,17 @@
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
-const HtmlWebPackPlugin = require('html-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   mode: "production",
-  target: "web",
-  devtool: "source-map",
-  devServer: {
-    port: 9000
-  },
-  entry: './src/client/index.tsx',
+  target: "node",
+  entry: './src/server/app.ts',
   resolve: {
-    extensions: [".wasm", ".mjs", ".js", ".jsx", ".ts", ".tsx", ".json"],
+    extensions: [".ts"],
   },
   output: {
-    filename: 'bundle-client.js',
+    filename: 'bundle-server.js',
     path: path.resolve(__dirname, 'dist')
   },
   module: {
@@ -51,14 +47,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new HtmlWebPackPlugin({
-      template: "./src/client/index.html",
-      "filename": "./index.html"
-    })
-  ],
-  externals: {
-    "react": "React",
-    "react-dom": "ReactDOM",
-  }
+  externals: [nodeExternals()]
 }

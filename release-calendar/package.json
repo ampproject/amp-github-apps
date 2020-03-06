@@ -12,16 +12,18 @@
   "engines": {
     "node": "12.13.1"
   },
-  "scripts": {
-    "build": "tsc",
-    "lint": "eslint --quiet --fix src/* test/* --ext .ts,.tsx ",
-    "start": "npm run build && node -r dotenv/config ./dist/app.js",
-    "test": "jest --verbose=false",
+  "scripts": {    
+    "lint": "eslint --quiet --fix src/* test/* --ext .ts,.tsx ",    
     "client": "npm run client-build && npm run client-serve",
     "client-build": "webpack --config ./webpack.client.config.js",
     "client-serve": "webpack-dev-server --mode development --open --hot --config ./webpack.client.config.js",
+    "server": "npm run server-build && npm run server-serve",
+    "server-build": "webpack --config ./webpack.server.config.js",
+    "server-serve": "node -r dotenv/config ./dist/bundle-server.js",
+    "test": "jest --verbose=false"
   },
   "dependencies": {
+    "express": "4.17.1",
     "mysql": "2.18.1",
     "react": "16.13.0",
     "react-dom": "16.13.0",
@@ -38,7 +40,7 @@
     "dotenv": "8.2.0",
     "eslint": "6.8.0",
     "eslint-plugin-react": "7.18.3",
-    "html-webpack-plugin": "^3.2.0",
+    "html-webpack-plugin": "3.2.0",
     "jest": "24.9.0",
     "source-map-loader": "0.2.4",
     "ts-jest": "24.3.0",
@@ -47,7 +49,8 @@
     "typescript": "3.7.5",
     "webpack": "4.42.0",
     "webpack-cli": "3.3.11",
-    "webpack-dev-server": "3.10.3"
+    "webpack-dev-server": "3.10.3",
+    "webpack-node-externals": "1.7.2"
   },
   "jest": {
     "preset": "ts-jest"
