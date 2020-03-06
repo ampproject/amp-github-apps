@@ -23,37 +23,34 @@ export async function addTestData(connection: Connection) {
     new Release(
       '1234567890123',
       Channel.NIGHTLY,
-      false,
-      new Date('2020-03-17T08:44:29+0100')
+      new Date('2020-03-17T08:44:29+0100'),
+      true
     ),
     new Release(
       '2234567890123',
       Channel.STABLE,
-      false,
       new Date('2020-03-12T08:44:29+0100')
     ),
     new Release(
       '3234567890123',
       Channel.LTS,
-      true,
       new Date('2020-03-10T08:44:29+0100')
     ),
     new Release(
       '4234567890123',
       Channel.OPT_IN_EXPERIMENTAL,
-      false,
-      new Date('2020-03-16T08:44:29+0100')
+      new Date('2020-03-16T08:44:29+0100'),
+      false
     ),
     new Release(
       '5234567890123',
       Channel.LTS,
-      true,
-      new Date('2020-03-14T08:44:29+0100')
+      new Date('2020-03-14T08:44:29+0100'),
+      true
     ),
     new Release(
       '6234567890123',
       Channel.LTS,
-      true,
       new Date('2020-03-14T08:44:29+0100')
     ),
   ];

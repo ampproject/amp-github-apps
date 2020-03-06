@@ -33,7 +33,9 @@ async function main() {
     throw error;
   }) as Connection;
 
-  const savedReleases = await addTestData(connection);
-  console.log(savedReleases);
+  if (!JSON.parse(process.env.PRODUCTION)) {
+    const savedReleases = await addTestData(connection);
+    console.log(savedReleases);
+  }
 }
 main();

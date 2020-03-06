@@ -19,11 +19,16 @@ import {Channel} from '../types';
 
 @Entity()
 export class Release {
-  constructor(name: string, channel: Channel, isRollback: boolean, date: Date) {
+  constructor(
+    name: string,
+    channel: Channel,
+    date: Date,
+    isRollback: boolean = false
+  ) {
     this.name = name;
     this.channel = channel;
-    this.isRollback = isRollback;
     this.date = date;
+    this.isRollback = isRollback;
   }
 
   @PrimaryColumn('varchar', {length: 13})
@@ -35,12 +40,9 @@ export class Release {
   })
   channel: Channel;
 
-  // @Column('varchar')
-  // channel: string;
+  @Column('timestamp')
+  date: Date;
 
   @Column('boolean')
   isRollback: boolean;
-
-  @Column('timestamp')
-  date: Date;
 }
