@@ -24,7 +24,8 @@ If the pull request includes a new directory in `extensions/`, the bot will:
 The app subscribes to the following GitHub Webhooks:
 
 - [`PullRequestEvent`](https://developer.github.com/v3/activity/events/types/#pullrequestevent)
-  - `opened`: check the PR content and its comments to post checklist
+  - `opened`: check the PR content and its comments to post checklist, unless it's a draft
+  - `ready_for_review`: check the PR content and its comments to post checklist
 
 ## Setup
 
@@ -73,4 +74,4 @@ After setting up the app locally, use `gcloud` to deploy the app and cron tasks:
    - When deploying after the first time, the `--runtime` and `--trigger-http` flags may be omitted
 3. To configure Cloud Build auto-deployment, follow [this guide](https://github.com/ampproject/amp-github-apps/blob/master/DEPLOYMENT.md)
 
-This GitHub App is deployed as a [Google Cloud Function](https://cloud.google.com/functions/docs/) at the endpoint: https://ampproject-invite-bot.cloudfunctions.net/
+This GitHub App is deployed as a [Google Cloud Function](https://cloud.google.com/functions/docs/) at the endpoint: https://ampproject-checklist-bot.cloudfunctions.net/
