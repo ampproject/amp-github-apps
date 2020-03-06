@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import 'reflect-metadata';
 import {createConnection, Connection} from 'typeorm';
 import {Release} from './entities/release';
+import {addTestData} from '../test/development-data';
+
 
 async function main() {
-  await createConnection({
+  const connection = await createConnection({
     type: 'mysql',
     host: process.env.HOST,
     username: process.env.DB_USERNAME,
@@ -30,6 +32,10 @@ async function main() {
   }).catch(error => {
     throw error;
   }) as Connection;
-}
 
+  if (!JSON.parse(process.env.PRODUCTION)) {
+    const savedReleases = await addTestData(connection);
+    console.log(savedReleases);
+  }
+}
 main();

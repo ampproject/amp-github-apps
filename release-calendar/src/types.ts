@@ -13,36 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import {Entity, PrimaryColumn, Column} from 'typeorm';
-import {Channel} from '../types';
-
-@Entity()
-export class Release {
-  constructor(
-    name: string,
-    channel: Channel,
-    date: Date,
-    isRollback: boolean = false
-  ) {
-    this.name = name;
-    this.channel = channel;
-    this.date = date;
-    this.isRollback = isRollback;
-  }
-
-  @PrimaryColumn('varchar', {length: 13})
-  name: string;
-
-  @Column({
-    type: 'enum',
-    enum: Channel,
-  })
-  channel: Channel;
-
-  @Column('timestamp')
-  date: Date;
-
-  @Column('boolean')
-  isRollback: boolean;
+export enum Channel {
+  LTS = 'lts',
+  STABLE = 'stable',
+  PERCENT_BETA = 'perc-beta',
+  PERCENT_EXPERIMENTAL = 'perc-experimental',
+  OPT_IN_BETA = 'opt-in-beta',
+  OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
+  NIGHTLY = 'nightly',
 }
