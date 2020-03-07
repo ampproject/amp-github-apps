@@ -24,8 +24,8 @@ If the pull request includes a new directory in `extensions/`, the bot will:
 The app subscribes to the following GitHub Webhooks:
 
 - [`PullRequestEvent`](https://developer.github.com/v3/activity/events/types/#pullrequestevent)
-  - `opened`: skips drafts, may append checklist to the description of a pull request
-  - `ready_for_review`: may append checklist to the description of a pull request
+  - `opened`: skips drafts, may add checklist to pull request
+  - `ready_for_review`: may add checklist to pull request
 
 ## Setup
 
