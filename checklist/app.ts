@@ -16,8 +16,4 @@
 
 import {Application} from 'probot';
 
-module.exports = (app: Application) => {
-  if (process.env.NODE_ENV !== 'test') {
-    require('dotenv').config();
-  }
-};
+module.exports = (app: Application) => {};
