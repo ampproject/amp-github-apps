@@ -16,8 +16,8 @@ The AMP Contribution Checklist Bot watches for all newly opened pull requests.
 
 If the pull request includes a new directory in `extensions/`, the bot will:
 
-1. Append a checklist to the pull request's description
-2. Post a comment on the pull request
+1. Append a checklist to the pull request's description.
+2. Post a comment on the pull request.
 
 ## Webhooks
 
