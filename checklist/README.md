@@ -1,10 +1,10 @@
 # AMP Contribution Checklist Bot
 
-A GitHub app which posts checklists for contribution process on pull requests:
+A GitHub app which posts checklists for [contribution process](https://go.amp.dev/contribute/code) on pull requests:
 
 ```markdown
-- [ ] My pull request has an I2I issue.
-- [ ] My I2I issue was approved during design review.
+- [ ] My pull request has an intent-to-implement issue (I2I).
+- [ ] My I2I was approved during design review.
 - [ ] ...
 ```
 
