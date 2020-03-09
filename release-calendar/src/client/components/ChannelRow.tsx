@@ -13,31 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export enum Channel {
-  LTS = 'lts',
-  STABLE = 'stable',
-  PERCENT_BETA = 'perc-beta',
-  PERCENT_EXPERIMENTAL = 'perc-experimental',
-  OPT_IN_BETA = 'opt-in-beta',
-  OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
-  NIGHTLY = 'nightly',
-}
 
-export class CurrentRelease {
+import * as React from 'react';
+
+export interface ChannelRowProps {
   channel: string;
   RTV: string;
   isDisplayed: boolean;
-  constructor(channel: string, RTV: string, isDisplayed = false) {
-    this.channel = channel;
-    this.RTV = RTV;
-    this.isDisplayed = isDisplayed;
-  }
 }
-export class RTVRowObject {
-  RTV: string;
-  link: string;
-  constructor(RTV: string, link: string) {
-    this.RTV = RTV;
-    this.link = link;
+
+export class ChannelRow extends React.Component<ChannelRowProps, {}> {
+  render(): JSX.Element {
+    const channel = this.props.channel;
+    const RTV = this.props.RTV;
+    const enlarge = this.props.isDisplayed;
+    if (enlarge) {
+      return (
+        <tr>
+          <td> {'clicked on'}</td>
+          <td>{channel}</td>
+          <td>{RTV}</td>
+        </tr>
+      );
+    } else {
+      return (
+        <tr>
+          <td>{channel}</td>
+          <td>{RTV}</td>
+        </tr>
+      );
+    }
   }
 }

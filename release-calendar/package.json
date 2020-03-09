@@ -12,8 +12,8 @@
   "engines": {
     "node": "12.13.1"
   },
-  "scripts": {    
-    "lint": "eslint --quiet --fix src/* test/* --ext .ts,.tsx ",    
+  "scripts": {
+    "lint": "eslint --quiet --fix src/* test/* --ext .ts,.tsx ",
     "client": "npm run client-build && npm run client-serve",
     "client-build": "webpack --config ./webpack.client.config.js",
     "client-serve": "webpack-dev-server --mode development --open --hot --config ./webpack.client.config.js",
@@ -23,7 +23,11 @@
     "test": "jest --verbose=false"
   },
   "dependencies": {
+    "@fullcalendar/core": "^4.4.0",
+    "@fullcalendar/daygrid": "^4.4.0",
+    "@fullcalendar/react": "^4.4.0",
     "express": "4.17.1",
+    "material-design-icons": "^3.0.1",
     "mysql": "2.18.1",
     "react": "16.13.0",
     "react-dom": "16.13.0",

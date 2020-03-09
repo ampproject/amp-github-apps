@@ -15,10 +15,42 @@
  */
 
 import * as React from 'react';
-import { Header } from './Header';
+import {Header} from './Header';
+import {Channel, CurrentRelease, RTVRowObject} from '../../types';
+import {ChannelTable} from './ChannelTable';
+import {RTVTable} from './RTVTable';
 
+const MODE = true;
+const SELECTEDRTV = 'A single selected RTV';
+const SELECTEDCHANEL = Channel.STABLE;
+const FAKERTVANDGITHUBLINKS = [
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example')
+]
+const CURRENTRELEASES = [
+  new CurrentRelease(Channel.LTS, 'RTVexample'),
+  new CurrentRelease(Channel.STABLE, 'RTVexample'),
+  new CurrentRelease(Channel.OPT_IN_BETA, 'RTVexample'),
+  new CurrentRelease(Channel.OPT_IN_EXPERIMENTAL, 'RTVexample'),
+  new CurrentRelease(Channel.PERCENT_BETA, 'RTVexample'),
+  new CurrentRelease(Channel.PERCENT_EXPERIMENTAL, 'RTVexample'),
+  new CurrentRelease(Channel.NIGHTLY, 'RTVexample'),
+];
 export const App = (): JSX.Element => {
   return (
-    <Header title='AMP Release Calendar' />
-  )
-}
+    <div>
+      <Header title="AMP Release Calendar" />
+      <RTVTable
+        mode={MODE}
+        singleRTV={SELECTEDRTV}
+        singleChannel={SELECTEDCHANEL}
+        fakeData={FAKERTVANDGITHUBLINKS}
+      />
+      <ChannelTable currentReleases={CURRENTRELEASES} />
+    </div>
+  );
+};
