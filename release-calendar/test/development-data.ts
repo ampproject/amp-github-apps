@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import {Connection} from 'typeorm';
-import {Release} from '../src/entities/release';
+import {Release} from '../src/server/entities/release';
 import {Channel} from '../src/types';
 
-export async function addTestData(connection: Connection) {
+export async function addTestData(connection: Connection): Promise<Release[]> {
   const releaseRepo = connection.getRepository(Release);
   const manyReleases = [
     new Release(
