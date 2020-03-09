@@ -4,9 +4,9 @@
 
 2. Enable
     [_App Engine Admin_](https://pantheon.corp.google.com/apis/library/appengine.googleapis.com),
-    [_Cloud Build_](https://console.developers.google.com/apis/library/cloudkms.googleapis.com),
+    [_Cloud Build_](https://console.developers.google.com/apis/library/cloudbuild.googleapis.com),
     and
-    [_Cloud KMS_](https://console.developers.google.com/apis/library/cloudbuild.googleapis.com)
+    [_Cloud KMS_](https://console.developers.google.com/apis/library/cloudkms.googleapis.com)
     APIs
 
 3. Create the [Cloud KMS keyring](https://cloud.google.com/cloud-build/docs/securing-builds/use-encrypted-secrets-credentials#example_build_request_using_an_encrypted_variable)
