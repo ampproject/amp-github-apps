@@ -67,9 +67,6 @@ function main() {
   if (buildTargets.has('BUNDLE_SIZE')) {
     runAppTests('bundle-size');
   }
-  if (buildTargets.has('CHECKLIST')) {
-    runAppTests('checklist');
-  }
   if (buildTargets.has('INVITE')) {
     runAppTests('invite');
   }
