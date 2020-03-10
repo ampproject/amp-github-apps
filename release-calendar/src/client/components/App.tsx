@@ -19,8 +19,10 @@ import {Header} from './Header';
 import {Channel, CurrentRelease, RTVRowObject} from '../../types';
 import {ChannelTable} from './ChannelTable';
 import {RTVTable} from './RTVTable';
+import { FullCalendarCom } from './FullCalendarCom';
 
-const MODE = true;
+
+const MODE = false;
 const SELECTEDRTV = 'A single selected RTV';
 const SELECTEDCHANEL = Channel.STABLE;
 const FAKERTVANDGITHUBLINKS = [
@@ -29,8 +31,8 @@ const FAKERTVANDGITHUBLINKS = [
   new RTVRowObject('RTVexample', 'githublink example'),
   new RTVRowObject('RTVexample', 'githublink example'),
   new RTVRowObject('RTVexample', 'githublink example'),
-  new RTVRowObject('RTVexample', 'githublink example')
-]
+  new RTVRowObject('RTVexample', 'githublink example'),
+];
 const CURRENTRELEASES = [
   new CurrentRelease(Channel.LTS, 'RTVexample'),
   new CurrentRelease(Channel.STABLE, 'RTVexample'),
@@ -42,15 +44,22 @@ const CURRENTRELEASES = [
 ];
 export const App = (): JSX.Element => {
   return (
-    <div>
-      <Header title="AMP Release Calendar" />
-      <RTVTable
-        mode={MODE}
-        singleRTV={SELECTEDRTV}
-        singleChannel={SELECTEDCHANEL}
-        fakeData={FAKERTVANDGITHUBLINKS}
-      />
-      <ChannelTable currentReleases={CURRENTRELEASES} />
+    <div className="AMP-Release-Calendar">
+      <div className="AMP-Release-Calendar-Header">
+        <Header title="AMP Release Calendar" />
+      </div>
+      <div className="AMP-Release-Calendar-Side-Panel">
+        <RTVTable
+          mode={MODE}
+          singleRTV={SELECTEDRTV}
+          singleChannel={SELECTEDCHANEL}
+          fakeData={FAKERTVANDGITHUBLINKS}
+        />
+        <ChannelTable currentReleases={CURRENTRELEASES} />
+      </div>
+      <div className='AMP-Release-Calendar-Full-Calendar'>
+        <FullCalendarCom/>
+      </div>
     </div>
   );
 };

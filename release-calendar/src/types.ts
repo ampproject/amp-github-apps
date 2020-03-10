@@ -24,10 +24,10 @@ export enum Channel {
 }
 
 export class CurrentRelease {
-  channel: string;
+  channel: Channel;
   RTV: string;
   isDisplayed: boolean;
-  constructor(channel: string, RTV: string, isDisplayed = false) {
+  constructor(channel: Channel, RTV: string, isDisplayed = false) {
     this.channel = channel;
     this.RTV = RTV;
     this.isDisplayed = isDisplayed;
