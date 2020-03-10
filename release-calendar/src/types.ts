@@ -41,3 +41,15 @@ export class RTVRowObject {
     this.link = link;
   }
 }
+export class Event {
+  RTV: string;
+  channel: Channel;
+  date: Date;
+  isRollback: boolean;
+  constructor(RTV: string, channel: Channel, date: Date, isRollback: boolean) {
+    this.RTV = RTV;
+    this.channel = channel;
+    this.date = date;
+    this.isRollback = isRollback;
+  }
+}
