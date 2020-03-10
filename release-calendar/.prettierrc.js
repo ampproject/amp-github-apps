@@ -14,37 +14,14 @@
  * limitations under the License.
  */
 
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-
 module.exports = {
-  mode: "production",
-  target: "node",
-  entry: './src/server/app.ts',
-  resolve: {
-    extensions: [".ts"],
-  },
-  output: {
-    filename: 'bundle-server.js',
-    path: path.resolve(__dirname, 'dist')
-  },
-  module: {
-    rules: [
-      {
-        test: /\.ts(x?)$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "ts-loader"
-          }
-        ]
-      },
-      {
-        enforce: "pre",
-        test: /\.js$/,
-        loader: "source-map-loader"
-      }
-    ]
-  },
-  externals: [nodeExternals()]
+  bracketSpacing: false,
+  jsxBracketSameLine: true,
+  jsxSingleQuote: true,
+  parser: 'typescript',
+  printWidth: 80,
+  quoteProps: 'preserve',
+  singleQuote: true,
+  semi: true,
+  trailingComma: 'all',
 }
