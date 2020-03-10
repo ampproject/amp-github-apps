@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  mode: "production",
-  target: "web",
-  devtool: "source-map",
+  mode: 'production',
+  target: 'web',
+  devtool: 'source-map',
   devServer: {
-    port: 9000
+    port: 9000,
   },
   entry: './src/client/index.tsx',
   resolve: {
-    extensions: [".wasm", ".mjs", ".js", ".jsx", ".ts", ".tsx", ".json"],
+    extensions: ['.wasm', '.mjs', '.js', '.jsx', '.ts', '.tsx', '.json'],
   },
   output: {
     filename: 'bundle-client.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
   },
   module: {
     rules: [
@@ -40,25 +39,25 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: "ts-loader"
-          }
-        ]
+            loader: 'ts-loader',
+          },
+        ],
       },
       {
-        enforce: "pre",
+        enforce: 'pre',
         test: /\.js$/,
-        loader: "source-map-loader"
-      }
-    ]
+        loader: 'source-map-loader',
+      },
+    ],
   },
   plugins: [
     new HtmlWebPackPlugin({
-      template: "./src/client/index.html",
-      "filename": "./index.html"
-    })
+      template: './src/client/index.html',
+      'filename': './index.html',
+    }),
   ],
   externals: {
-    "react": "React",
-    "react-dom": "ReactDOM",
-  }
-}
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+  },
+};
