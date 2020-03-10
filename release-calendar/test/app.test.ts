@@ -16,6 +16,6 @@
 
 describe('test release calendar app', () => {
   test('hello world', () => {
-    expect(true).toBeTruthy;
+    expect(true).toBe(true);
   });
 });

@@ -15,10 +15,8 @@
  */
 
 import * as React from 'react';
-import { Header } from './Header';
+import {Header} from './Header';
 
 export const App = (): JSX.Element => {
-  return (
-    <Header title='AMP Release Calendar' />
-  )
-}
+  return <Header title='AMP Release Calendar' />;
+};
