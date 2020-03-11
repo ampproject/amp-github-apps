@@ -20,7 +20,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction'; // needed for dayClick
 
-import '../../main.scss';
+import '../stylesheets/fullCalendar.scss';
 
 export interface FullCalendarProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

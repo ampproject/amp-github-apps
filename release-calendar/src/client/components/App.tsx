@@ -81,6 +81,14 @@ const FAKEEVENTS = [
   },
 ];
 export class App extends React.Component {
+  // constructor(props) {
+  //   super(props)
+  //   this.state= {
+  //     mode: false,
+  //     calendarWeekends: true,
+  //     mostRecentRTV: 
+  //   };
+  // }
   calendarComponentRef = React.createRef();
 
   state = {
