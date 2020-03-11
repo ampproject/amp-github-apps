@@ -29,13 +29,14 @@ export interface FullCalendarProps {
 
 export class FullCalendarCom extends React.Component<FullCalendarProps, {}> {
   calendarComponentRef = React.createRef();
-
+  
   state = {
     calendarWeekends: true,
   };
-
+  
   render(): JSX.Element {
     const allCalenderEvents = this.props.events;
+    console.log(this.props.events);
     return (
       <div className="demo-app">
         <div className="demo-app-top">
