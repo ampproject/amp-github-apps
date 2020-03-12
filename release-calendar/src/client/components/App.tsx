@@ -88,7 +88,7 @@ export class App extends React.Component<{},AppState > {
   constructor(props: unknown) {
     super(props)
     this.state= {
-      mode: false,
+      mode: true,
       today: new Date(),
       mostRecentRTV: '1234567890123'  //updateRTV(this.state.date) output: RTVObject[]
     };
@@ -121,7 +121,7 @@ export class App extends React.Component<{},AppState > {
         <div className="AMP-Release-Calendar-Side-Panel">
           <RTVTable
             mode={this.state.mode}
-            singleRTV={SELECTEDRTV} //RTVObject[]
+            singleRTV={this.state.mostRecentRTV} //RTVObject[]
             singleChannel={SELECTEDCHANEL} //RTVObject[]
             fakeData={FAKERTVANDGITHUBLINKS}
           />
