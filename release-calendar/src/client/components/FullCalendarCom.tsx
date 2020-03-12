@@ -20,7 +20,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction'; // needed for dayClick
 
-import '../../main.scss';
+import '../stylesheets/fullCalendar.scss';
 
 export interface FullCalendarProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,13 +29,14 @@ export interface FullCalendarProps {
 
 export class FullCalendarCom extends React.Component<FullCalendarProps, {}> {
   calendarComponentRef = React.createRef();
-
+  
   state = {
     calendarWeekends: true,
   };
-
+  
   render(): JSX.Element {
     const allCalenderEvents = this.props.events;
+    console.log(this.props.events);
     return (
       <div className="demo-app">
         <div className="demo-app-top">

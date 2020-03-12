@@ -21,7 +21,7 @@ import {Channel, CurrentRelease, RTVRowObject} from '../../types';
 import {ChannelTable} from './ChannelTable';
 import {RTVTable} from './RTVTable';
 import {FullCalendarCom} from './FullCalendarCom';
-
+//import FullCalendar from '@fullcalendar/react';
 const MODE = false;
 const SELECTEDRTV = 'A single selected RTV';
 const SELECTEDCHANEL = Channel.STABLE;
@@ -42,64 +42,77 @@ const CURRENTRELEASES = [
   new CurrentRelease(Channel.PERCENT_EXPERIMENTAL, 'RTVexample'),
   new CurrentRelease(Channel.NIGHTLY, 'RTVexample'),
 ];
-const FAKEEVENTS = {
-  eventSources: [
-    {
-      events: [
-        {
-          title: 'event1',
-          start: '2020-03-14',
-        },
-        {
-          title: 'event2',
-          start: '2020-03-10',
-        },
-        {
-          title: 'event3',
-          start: '2020-03-09T12:30:00',
-        },
-      ],
-      color: 'black', 
-      textColor: 'yellow', 
-    },
-    {
-      events: [
-        {
-          title: 'event1',
-          start: '2020-03-08',
-        },
-        {
-          title: 'event2',
-          start: '2020-03-07',
-        },
-        {
-          title: 'event3',
-          start: '2020-03-04T12:30:00',
-        },
-      ],
-      color: 'blue',
-      textColor: 'brown', 
-    },
-  ],
-};
-export const App = (): JSX.Element => {
-  return (
-    <div className="AMP-Release-Calendar">
-      <div className="AMP-Release-Calendar-Header">
-        <Header title="AMP Release Calendar" />
+const FAKEEVENTS = [
+  {
+    events: [
+      {
+        title: 'event1',
+        start: '2020-03-14',
+      },
+      {
+        title: 'event2',
+        start: '2020-03-10',
+      },
+      {
+        title: 'event3',
+        start: '2020-03-09T12:30:00',
+      },
+    ],
+    color: 'black',
+    textColor: 'yellow',
+  },
+  {
+    events: [
+      {
+        title: 'event1',
+        start: '2020-03-08',
+      },
+      {
+        title: 'event2',
+        start: '2020-03-07',
+      },
+      {
+        title: 'event3',
+        start: '2020-03-04T12:30:00',
+      },
+    ],
+    color: 'blue',
+    textColor: 'brown',
+  },
+];
+export class App extends React.Component {
+  // constructor(props) {
+  //   super(props)
+  //   this.state= {
+  //     mode: false,
+  //     calendarWeekends: true,
+  //     mostRecentRTV: 
+  //   };
+  // }
+  calendarComponentRef = React.createRef();
+
+  state = {
+    calendarWeekends: true,
+  };
+  render(): JSX.Element {
+    return (
+      <div className="AMP-Release-Calendar">
+        <div className="AMP-Release-Calendar-Header">
+          <Header title="AMP Release Calendar" />
+        </div>
+        <div className="AMP-Release-Calendar-Side-Panel">
+          <RTVTable
+            mode={MODE}
+            singleRTV={SELECTEDRTV}
+            singleChannel={SELECTEDCHANEL}
+            fakeData={FAKERTVANDGITHUBLINKS}
+          />
+          <ChannelTable currentReleases={CURRENTRELEASES} />
+        </div>
+        <div className="AMP-Release-Calendar-Full-Calendar">
+          <FullCalendarCom events={FAKEEVENTS} />
+        </div>
       </div>
-      <div className="AMP-Release-Calendar-Side-Panel">
-        <RTVTable
-          mode={MODE}
-          singleRTV={SELECTEDRTV}
-          singleChannel={SELECTEDCHANEL}
-          fakeData={FAKERTVANDGITHUBLINKS}
-        />
-        <ChannelTable currentReleases={CURRENTRELEASES} />
-      </div>
-      <div className="AMP-Release-Calendar-Full-Calendar">
-        <FullCalendarCom events={FAKEEVENTS} />
-      </div>
-    </div>
-  );
-};
+    );
+  }
+}
