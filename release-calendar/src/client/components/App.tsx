@@ -22,7 +22,6 @@ import {ChannelTable} from './ChannelTable';
 import {RTVTable} from './RTVTable';
 import {FullCalendarCom} from './FullCalendarCom';
 //import FullCalendar from '@fullcalendar/react';
-const MODE = false;
 const SELECTEDRTV = 'A single selected RTV';
 const SELECTEDCHANEL = Channel.STABLE;
 const FAKERTVANDGITHUBLINKS = [
@@ -80,20 +79,39 @@ const FAKEEVENTS = [
     textColor: 'brown',
   },
 ];
-export class App extends React.Component {
-  // constructor(props) {
-  //   super(props)
-  //   this.state= {
-  //     mode: false,
-  //     calendarWeekends: true,
-  //     mostRecentRTV: 
-  //   };
-  // }
-  calendarComponentRef = React.createRef();
+export interface AppState {
+  mode: boolean;
+  today: Date;
+  mostRecentRTV: string; //change to RTVObject[]
+}
+export class App extends React.Component<{},AppState > {
+  constructor(props: unknown) {
+    super(props)
+    this.state= {
+      mode: false,
+      today: new Date(),
+      mostRecentRTV: '1234567890123'  //updateRTV(this.state.date) output: RTVObject[]
+    };
+  }
+  
 
-  state = {
-    calendarWeekends: true,
-  };
+  //uses date to get the most Recent RTV object and 
+  //all of the RTV objects assocaiated with that RTV 
+  //as it goes through the channels
+  //TODO: create function updateRTV(this.state.date)
+  // to pull from the datebase the most recent RTV
+  componentDidMount(): void {
+    setInterval( () => this.refresh(),
+    60000 * 30
+    );
+  }
+  refresh(): void {
+    this.setState({
+      today: new Date(),
+      mostRecentRTV: '222222222222' //updateRTV(this.state.date) output RTVObject[]
+    });
+  }
+
   render(): JSX.Element {
     return (
       <div className="AMP-Release-Calendar">
@@ -102,9 +120,9 @@ export class App extends React.Component {
         </div>
         <div className="AMP-Release-Calendar-Side-Panel">
           <RTVTable
-            mode={MODE}
-            singleRTV={SELECTEDRTV}
-            singleChannel={SELECTEDCHANEL}
+            mode={this.state.mode}
+            singleRTV={SELECTEDRTV} //RTVObject[]
+            singleChannel={SELECTEDCHANEL} //RTVObject[]
             fakeData={FAKERTVANDGITHUBLINKS}
           />
           <ChannelTable currentReleases={CURRENTRELEASES} />

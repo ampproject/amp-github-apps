@@ -21,19 +21,27 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction'; // needed for dayClick
 
 import '../stylesheets/fullCalendar.scss';
+import { EventSourceInput } from '@fullcalendar/core/structs/event-source';
 
 export interface FullCalendarProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  events: any;
+  events: EventSourceInput[];
+}
+export interface FullCalendarState {
+  calendarWeekends: boolean;
 }
 
-export class FullCalendarCom extends React.Component<FullCalendarProps, {}> {
-  calendarComponentRef = React.createRef();
+export class FullCalendarCom extends React.Component<FullCalendarProps, FullCalendarState> {
+  // calendarComponentRef = React.createRef();
   
-  state = {
-    calendarWeekends: true,
-  };
-  
+  // state = {
+  //   calendarWeekends: true,
+  // };
+  constructor(props: Readonly<FullCalendarProps>) {
+    super(props)
+    this.state= {
+      calendarWeekends: true
+    };
+  }
   render(): JSX.Element {
     const allCalenderEvents = this.props.events;
     console.log(this.props.events);
@@ -51,7 +59,6 @@ export class FullCalendarCom extends React.Component<FullCalendarProps, {}> {
               right: 'dayGridMonth,timeGridWeek,listWeek',
             }}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            //ref={ this.calendarComponentRef }
             weekends={this.state.calendarWeekends}
             eventSources={allCalenderEvents}
           />
