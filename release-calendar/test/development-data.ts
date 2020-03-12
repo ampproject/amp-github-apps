@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {Channel} from '../src/types';
 import {Connection} from 'typeorm';
 import {Release} from '../src/server/entities/release';
-import {Channel} from '../src/types';
 
 export async function addTestData(connection: Connection): Promise<Release[]> {
   const releaseRepo = connection.getRepository(Release);
@@ -24,34 +24,34 @@ export async function addTestData(connection: Connection): Promise<Release[]> {
       '1234567890123',
       Channel.NIGHTLY,
       new Date('2020-03-17T08:44:29+0100'),
-      true
+      true,
     ),
     new Release(
       '2234567890123',
       Channel.STABLE,
-      new Date('2020-03-12T08:44:29+0100')
+      new Date('2020-03-12T08:44:29+0100'),
     ),
     new Release(
       '3234567890123',
       Channel.LTS,
-      new Date('2020-03-10T08:44:29+0100')
+      new Date('2020-03-10T08:44:29+0100'),
     ),
     new Release(
       '4234567890123',
       Channel.OPT_IN_EXPERIMENTAL,
       new Date('2020-03-16T08:44:29+0100'),
-      false
+      false,
     ),
     new Release(
       '5234567890123',
       Channel.LTS,
       new Date('2020-03-14T08:44:29+0100'),
-      true
+      true,
     ),
     new Release(
       '6234567890123',
       Channel.LTS,
-      new Date('2020-03-14T08:44:29+0100')
+      new Date('2020-03-14T08:44:29+0100'),
     ),
   ];
   await Promise.all(manyReleases.map(release => releaseRepo.save(release)));
