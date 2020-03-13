@@ -16,73 +16,18 @@
 
 import * as React from 'react';
 import {Header} from './Header';
-import {Channel, CurrentRelease, RTVRowObject} from '../../types';
-// import {event} from '@fullcalendar/core/structs/event';
 import {ChannelTable} from './ChannelTable';
 import {RTVTable} from './RTVTable';
-import {FullCalendarCom} from './FullCalendarCom';
-//import FullCalendar from '@fullcalendar/react';
-const SELECTEDRTV = 'A single selected RTV';
-const SELECTEDCHANEL = Channel.STABLE;
-const FAKERTVANDGITHUBLINKS = [
-  new RTVRowObject('RTVexample', 'githublink example'),
-  new RTVRowObject('RTVexample', 'githublink example'),
-  new RTVRowObject('RTVexample', 'githublink example'),
-  new RTVRowObject('RTVexample', 'githublink example'),
-  new RTVRowObject('RTVexample', 'githublink example'),
-  new RTVRowObject('RTVexample', 'githublink example'),
-];
-const CURRENTRELEASES = [
-  new CurrentRelease(Channel.LTS, 'RTVexample'),
-  new CurrentRelease(Channel.STABLE, 'RTVexample'),
-  new CurrentRelease(Channel.OPT_IN_BETA, 'RTVexample'),
-  new CurrentRelease(Channel.OPT_IN_EXPERIMENTAL, 'RTVexample'),
-  new CurrentRelease(Channel.PERCENT_BETA, 'RTVexample'),
-  new CurrentRelease(Channel.PERCENT_EXPERIMENTAL, 'RTVexample'),
-  new CurrentRelease(Channel.NIGHTLY, 'RTVexample'),
-];
-const FAKEEVENTS = [
-  {
-    events: [
-      {
-        title: 'event1',
-        start: '2020-03-14',
-      },
-      {
-        title: 'event2',
-        start: '2020-03-10',
-      },
-      {
-        title: 'event3',
-        start: '2020-03-09T12:30:00',
-      },
-    ],
-    color: 'black',
-    textColor: 'yellow',
-  },
-  {
-    events: [
-      {
-        title: 'event1',
-        start: '2020-03-08',
-      },
-      {
-        title: 'event2',
-        start: '2020-03-07',
-      },
-      {
-        title: 'event3',
-        start: '2020-03-04T12:30:00',
-      },
-    ],
-    color: 'blue',
-    textColor: 'brown',
-  },
-];
+import {Calendar} from './Calendar';
+//TODO: remove all fake data imported below and add TODOs that pull from MySQL APIs that will be created
+import {SELECTEDCHANEL, FAKEEVENTS, FAKERTVANDGITHUBLINKS, CURRENTRELEASES} from '../../../test/development-data';
+
+
 export interface AppState {
   mode: boolean;
   today: Date;
   mostRecentRTV: string; //change to RTVObject[]
+  searchedValue: string;
 }
 export class App extends React.Component<{},AppState > {
   constructor(props: unknown) {
@@ -90,11 +35,10 @@ export class App extends React.Component<{},AppState > {
     this.state= {
       mode: true,
       today: new Date(),
-      mostRecentRTV: '1234567890123'  //updateRTV(this.state.date) output: RTVObject[]
+      mostRecentRTV: '1234567890123',  //updateRTV(this.state.date) output: RTVObject[]
+      searchedValue: 'Before'
     };
   }
-  
-
   //uses date to get the most Recent RTV object and 
   //all of the RTV objects assocaiated with that RTV 
   //as it goes through the channels
@@ -102,7 +46,7 @@ export class App extends React.Component<{},AppState > {
   // to pull from the datebase the most recent RTV
   componentDidMount(): void {
     setInterval( () => this.refresh(),
-    60000 * 30
+    60000
     );
   }
   refresh(): void {
@@ -111,13 +55,18 @@ export class App extends React.Component<{},AppState > {
       mostRecentRTV: '222222222222' //updateRTV(this.state.date) output RTVObject[]
     });
   }
+  handleSearch = (searchValue: string): void => {
+    this.setState({searchedValue: searchValue});
+}
 
   render(): JSX.Element {
+    console.log(this.state.searchedValue);
     return (
       <div className="AMP-Release-Calendar">
         <div className="AMP-Release-Calendar-Header">
-          <Header title="AMP Release Calendar" />
+          <Header title="AMP Release Calendar" handleSearch={this.handleSearch} />
         </div>
+        <h4>{'this is what was searched: ' + this.state.searchedValue}</h4>
         <div className="AMP-Release-Calendar-Side-Panel">
           <RTVTable
             mode={this.state.mode}
@@ -128,7 +77,10 @@ export class App extends React.Component<{},AppState > {
           <ChannelTable currentReleases={CURRENTRELEASES} />
         </div>
         <div className="AMP-Release-Calendar-Full-Calendar">
-          <FullCalendarCom events={FAKEEVENTS} />
+          
+          <Calendar events={FAKEEVENTS} />
+          <h5>{'last updated at ' + this.state.today}</h5>
+          //TODO: add button to refresh manually
         </div>
       </div>
     );

@@ -15,7 +15,65 @@
  */
 import {Connection} from 'typeorm';
 import {Release} from '../src/server/entities/release';
-import {Channel} from '../src/types';
+import {Channel, CurrentRelease, RTVRowObject} from '../src/types';
+
+
+export const SELECTEDCHANEL = Channel.STABLE;
+export const FAKERTVANDGITHUBLINKS = [
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example'),
+  new RTVRowObject('RTVexample', 'githublink example'),
+];
+export const CURRENTRELEASES = [
+  new CurrentRelease(Channel.LTS, 'RTVexample'),
+  new CurrentRelease(Channel.STABLE, 'RTVexample'),
+  new CurrentRelease(Channel.OPT_IN_BETA, 'RTVexample'),
+  new CurrentRelease(Channel.OPT_IN_EXPERIMENTAL, 'RTVexample'),
+  new CurrentRelease(Channel.PERCENT_BETA, 'RTVexample'),
+  new CurrentRelease(Channel.PERCENT_EXPERIMENTAL, 'RTVexample'),
+  new CurrentRelease(Channel.NIGHTLY, 'RTVexample'),
+];
+export const FAKEEVENTS = [
+  {
+    events: [
+      {
+        title: 'event1',
+        start: '2020-03-14',
+      },
+      {
+        title: 'event2',
+        start: '2020-03-10',
+      },
+      {
+        title: 'event3',
+        start: '2020-03-09T12:30:00',
+      },
+    ],
+    color: 'black',
+    textColor: 'white',
+  },
+  {
+    events: [
+      {
+        title: 'event1',
+        start: '2020-03-08',
+      },
+      {
+        title: 'event2',
+        start: '2020-03-07',
+      },
+      {
+        title: 'event3',
+        start: '2020-03-04T12:30:00',
+      },
+    ],
+    color: 'blue',
+    textColor: 'white',
+  },
+];
 
 export async function addTestData(connection: Connection): Promise<Release[]> {
   const releaseRepo = connection.getRepository(Release);

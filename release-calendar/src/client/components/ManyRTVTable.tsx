@@ -36,7 +36,8 @@ export class ManyRTVTable extends React.Component<ManyRTVTableProps, {}> {
            <RTVRow Rtv={fakeData[i]}
             ></RTVRow>
          );
-              }      return (
+              }
+     return (
         <table>
           <thead>Related RTVs</thead>
       <tbody>{rows}</tbody>

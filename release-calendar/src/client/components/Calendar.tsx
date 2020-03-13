@@ -23,20 +23,15 @@ import interactionPlugin from '@fullcalendar/interaction'; // needed for dayClic
 import '../stylesheets/fullCalendar.scss';
 import { EventSourceInput } from '@fullcalendar/core/structs/event-source';
 
-export interface FullCalendarProps {
+export interface CalendarProps {
   events: EventSourceInput[];
 }
-export interface FullCalendarState {
+export interface CalendarState {
   calendarWeekends: boolean;
 }
 
-export class FullCalendarCom extends React.Component<FullCalendarProps, FullCalendarState> {
-  // calendarComponentRef = React.createRef();
-  
-  // state = {
-  //   calendarWeekends: true,
-  // };
-  constructor(props: Readonly<FullCalendarProps>) {
+export class Calendar extends React.Component<CalendarProps, CalendarState> {
+  constructor(props: Readonly<CalendarProps>) {
     super(props)
     this.state= {
       calendarWeekends: true
@@ -69,7 +64,6 @@ export class FullCalendarCom extends React.Component<FullCalendarProps, FullCale
 
   toggleWeekends = (): void => {
     this.setState({
-      // update a property
       calendarWeekends: !this.state.calendarWeekends,
     });
   };

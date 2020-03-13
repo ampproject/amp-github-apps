@@ -18,10 +18,36 @@ import * as React from 'react';
 
 export interface HeaderProps {
   title: string;
+  handleSearch: (searchValue: string) => void;
 }
-
-export class Header extends React.Component<HeaderProps, {}> {
+export interface HeaderState {
+  otherPlace: string;
+  searchedValue: string;
+}
+export class Header extends React.Component<HeaderProps, HeaderState> {
+  constructor(props: Readonly<HeaderProps>) {
+    super(props)
+    this.state= {
+      otherPlace: 'searched',
+      searchedValue: ''
+    };
+  }
+  handleSearchValueChange = (): void => {
+    this.props.handleSearch(this.state.otherPlace);            
+}
   render(): JSX.Element {
-    return <h1>{this.props.title}</h1>;
+    return ( 
+            <div>
+            <h1>{this.props.title}</h1>
+            <form>
+              <label>
+             Search for RTV:
+           <input type="text" name={this.state.otherPlace} />
+                </label>
+                <input type="submit" value="Submit" />
+              </form>
+          </div>        
+    );
+
   }
 }
