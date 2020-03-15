@@ -13,18 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
-import {Calendar} from './Calendar';
-import {FAKEEVENTS} from './fakeData';
-import {Header} from './Header';
 
-export const App = (): JSX.Element => {
-  return (
-    <div>
-      <Header title='AMP Release Calendar' />
-      <div className='AMP-Release-Calendar-Full-Calendar'>
-        <Calendar events={FAKEEVENTS} />
-      </div>
-    </div>
-  );
-};
+export const FAKEEVENTS = [
+  {
+    events: [
+      {
+        title: 'event1',
+        start: '2020-03-14',
+      },
+      {
+        title: 'event2',
+        start: '2020-03-10',
+      },
+      {
+        title: 'event3',
+        start: '2020-03-09T12:30:00',
+      },
+    ],
+    color: 'black',
+    textColor: 'white',
+  },
+  {
+    events: [
+      {
+        title: 'event1',
+        start: '2020-03-08',
+      },
+      {
+        title: 'event2',
+        start: '2020-03-07',
+      },
+      {
+        title: 'event3',
+        start: '2020-03-04T12:30:00',
+      },
+    ],
+    color: 'blue',
+    textColor: 'white',
+  },
+];
