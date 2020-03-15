@@ -21,18 +21,14 @@ import {RTVTable} from './RTVTable';
 
 export interface AppState {
   mode: boolean;
-  //today: Date;
   mostRecentRTV: string; //change to RTVObject[]
-  searchedValue: string;
 }
 export class App extends React.Component<{}, AppState> {
   constructor(props: unknown) {
     super(props);
     this.state = {
       mode: true,
-      //today: new Date(),
       mostRecentRTV: '1234567890123', //updateRTV(this.state.date) output: RTVObject[]
-      searchedValue: 'Before',
     };
   }
   render(): JSX.Element {
