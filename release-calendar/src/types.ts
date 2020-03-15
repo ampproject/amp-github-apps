@@ -23,3 +23,33 @@ export enum Channel {
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
   NIGHTLY = 'nightly',
 }
+export class CurrentRelease {
+  channel: Channel;
+  RTV: string;
+  isDisplayed: boolean;
+  constructor(channel: Channel, RTV: string, isDisplayed = false) {
+    this.channel = channel;
+    this.RTV = RTV;
+    this.isDisplayed = isDisplayed;
+  }
+}
+export class RTVRowObject {
+  RTV: string;
+  link: string;
+  constructor(RTV: string, link: string) {
+    this.RTV = RTV;
+    this.link = link;
+  }
+}
+export class Event {
+  RTV: string;
+  channel: Channel;
+  date: Date;
+  isRollback: boolean;
+  constructor(RTV: string, channel: Channel, date: Date, isRollback: boolean) {
+    this.RTV = RTV;
+    this.channel = channel;
+    this.date = date;
+    this.isRollback = isRollback;
+  }
+}

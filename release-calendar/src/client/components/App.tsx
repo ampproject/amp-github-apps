@@ -15,8 +15,41 @@
  */
 
 import * as React from 'react';
+import {FAKERTVANDGITHUBLINKS, SELECTEDCHANEL} from './fakeRTVdata';
 import {Header} from './Header';
+import {RTVTable} from './RTVTable';
 
-export const App = (): JSX.Element => {
-  return <Header title='AMP Release Calendar' />;
-};
+export interface AppState {
+  mode: boolean;
+  //today: Date;
+  mostRecentRTV: string; //change to RTVObject[]
+  searchedValue: string;
+}
+export class App extends React.Component<{}, AppState> {
+  constructor(props: unknown) {
+    super(props);
+    this.state = {
+      mode: true,
+      //today: new Date(),
+      mostRecentRTV: '1234567890123', //updateRTV(this.state.date) output: RTVObject[]
+      searchedValue: 'Before',
+    };
+  }
+  render(): JSX.Element {
+    return (
+      <div>
+        <Header title='AMP Release Calendar' />
+        <div className='AMP-Release-Clanedar-Side-Panel'>
+          <div className='AMP-Release-Calendar-RTV-Table'>
+            <RTVTable
+              mode={this.state.mode}
+              singleRTV={this.state.mostRecentRTV} //RTVObject[]
+              singleChannel={SELECTEDCHANEL} //RTVObject[]
+              fakeData={FAKERTVANDGITHUBLINKS}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
