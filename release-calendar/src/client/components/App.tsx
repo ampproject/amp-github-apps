@@ -56,6 +56,7 @@ export class App extends React.Component<{},AppState > {
     });
   }
   handleSearch = (searchValue: string): void => {
+    console.log(searchValue);
     this.setState({searchedValue: searchValue});
 }
 
@@ -64,7 +65,7 @@ export class App extends React.Component<{},AppState > {
     return (
       <div className="AMP-Release-Calendar">
         <div className="AMP-Release-Calendar-Header">
-          <Header title="AMP Release Calendar" handleSearch={this.handleSearch} />
+          <Header title="AMP Release Calendar" handleSearch={this.handleSearch} searchedValue={this.state.searchedValue}/>
         </div>
         <h4>{'this is what was searched: ' + this.state.searchedValue}</h4>
         <div className="AMP-Release-Calendar-Side-Panel">

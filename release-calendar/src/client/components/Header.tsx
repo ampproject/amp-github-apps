@@ -15,38 +15,20 @@
  */
 
 import * as React from 'react';
+import {SearchBar} from './SearchBar';
 
 export interface HeaderProps {
   title: string;
   handleSearch: (searchValue: string) => void;
-}
-export interface HeaderState {
-  otherPlace: string;
   searchedValue: string;
 }
-export class Header extends React.Component<HeaderProps, HeaderState> {
-  constructor(props: Readonly<HeaderProps>) {
-    super(props)
-    this.state= {
-      otherPlace: 'searched',
-      searchedValue: ''
-    };
-  }
-  handleSearchValueChange = (): void => {
-    this.props.handleSearch(this.state.otherPlace);            
-}
+export class Header extends React.Component<HeaderProps, {}> {
   render(): JSX.Element {
     return ( 
             <div>
             <h1>{this.props.title}</h1>
-            <form>
-              <label>
-             Search for RTV:
-           <input type="text" name={this.state.otherPlace} />
-                </label>
-                <input type="submit" value="Submit" />
-              </form>
-          </div>        
+            <SearchBar handleSearch={this.props.handleSearch} searchedValue={this.props.searchedValue}/>
+            </div>        
     );
 
   }
