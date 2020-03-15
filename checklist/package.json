@@ -1,0 +1,73 @@
+{
+  "name": "amp-checklist-bot",
+  "author": "The AMP HTML Authors",
+  "version": "0.0.1",
+  "private": true,
+  "repository": "http://github.com/ampproject/amp-github-apps",
+  "description": "A GitHub app which posts checklists on pull requests.",
+  "engines": {
+    "node": "^12.13.1"
+  },
+  "scripts": {
+    "lint": "eslint **/*.ts",
+    "fix": "eslint **/*.ts --fix",
+    "lint-conflicts": "eslint --print-config app.ts | eslint-config-prettier-check",
+    "build": "tsc",
+    "build:watch": "tsc -w --p tsconfig.json",
+    "start": "probot run ./dist/app.js",
+    "dev": "nodemon",
+    "deploy-tag": "git tag 'deploy-checklist-'`date --utc '+%Y%m%d%H%M%S'`",
+    "test": "jest",
+    "test:watch": "jest --watch --notify --notifyMode=change"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@octokit/auth": "1.1.1",
+    "@octokit/rest": "16.43.1",
+    "@probot/serverless-gcf": "0.2.0",
+    "dotenv": "8.2.0",
+    "probot": "9.9.6"
+  },
+  "devDependencies": {
+    "@types/jest": "25.1.2",
+    "@types/node": "13.7.0",
+    "@typescript-eslint/eslint-plugin": "2.19.2",
+    "@typescript-eslint/parser": "2.19.2",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.0",
+    "eslint-plugin-prettier": "3.1.2",
+    "jest": "25.1.0",
+    "nock": "11.7.2",
+    "nodemon": "2.0.2",
+    "prettier": "1.19.1",
+    "ts-jest": "25.2.0",
+    "ts-node": "8.6.2",
+    "typescript": "3.7.5"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
+  "nodemonConfig": {
+    "exec": "npm start",
+    "watch": [
+      ".env",
+      "."
+    ]
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "<rootDir>/build/"
+    ],
+    "preset": "ts-jest",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/jest-preload.ts"
+    ],
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/dist/"
+    ]
+  }
+}

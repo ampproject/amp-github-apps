@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 The AMP HTML Authors. All Rights Reserved.
+ * Copyright 2020 The AMP HTML Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-describe('test release calendar app', () => {
-  test('hello world', () => {
-    expect(true).toBe(true);
-  });
-});
+const appFn = require('./app');
+const {serverless} = require('@probot/serverless-gcf');
+module.exports.probot = serverless(appFn);

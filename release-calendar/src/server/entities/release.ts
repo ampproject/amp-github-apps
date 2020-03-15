@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-import {Entity, PrimaryColumn, Column} from 'typeorm';
 import {Channel} from '../../types';
+import {Column, Entity, PrimaryColumn} from 'typeorm';
 
 @Entity()
 export class Release {
-  constructor(
-    name: string,
-    channel: Channel,
-    date: Date,
-    isRollback = false
-  ) {
+  constructor(name: string, channel: Channel, date: Date, isRollback = false) {
     this.name = name;
     this.channel = channel;
     this.date = date;

@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-describe('test release calendar app', () => {
-  test('hello world', () => {
-    expect(true).toBe(true);
-  });
-});
+module.exports = {
+  bracketSpacing: false,
+  jsxBracketSameLine: true,
+  jsxSingleQuote: true,
+  parser: 'typescript',
+  printWidth: 80,
+  quoteProps: 'preserve',
+  singleQuote: true,
+  semi: true,
+  trailingComma: 'all',
+}

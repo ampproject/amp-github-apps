@@ -15,7 +15,7 @@
  */
 
 import {Connection, Repository} from 'typeorm';
-import { Release } from './entities/release';
+import {Release} from './entities/release';
 
 export class ApiService {
   private releaseRepository: Repository<Release>;

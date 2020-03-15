@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-  mode: "production",
-  target: "node",
+  mode: 'production',
+  target: 'node',
   entry: './src/server/app.ts',
   resolve: {
-    extensions: [".ts"],
+    extensions: ['.ts'],
   },
   output: {
     filename: 'bundle-server.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
   },
   module: {
     rules: [
@@ -36,16 +35,16 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: "ts-loader"
-          }
-        ]
+            loader: 'ts-loader',
+          },
+        ],
       },
       {
-        enforce: "pre",
+        enforce: 'pre',
         test: /\.js$/,
-        loader: "source-map-loader"
-      }
-    ]
+        loader: 'source-map-loader',
+      },
+    ],
   },
-  externals: [nodeExternals()]
-}
+  externals: [nodeExternals()],
+};

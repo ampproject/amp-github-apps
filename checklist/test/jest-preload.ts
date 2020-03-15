@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-describe('test release calendar app', () => {
-  test('hello world', () => {
-    expect(true).toBe(true);
-  });
-});
+global.console.log = jest.fn();
+global.console.info = jest.fn();
+global.console.debug = jest.fn();
+// Allow the environment to override if desired.
+process.env.LOG_LEVEL = process.env.LOG_LEVEL || 'warn';
