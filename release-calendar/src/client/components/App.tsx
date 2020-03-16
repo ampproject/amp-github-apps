@@ -16,7 +16,35 @@
 
 import * as React from 'react';
 import {Header} from './Header';
+import {SearchBar} from './SearchBar';
 
-export const App = (): JSX.Element => {
-  return <Header title='AMP Release Calendar' />;
-};
+interface AppState {
+  searchedValue: string;
+}
+
+export class App extends React.Component<{}, AppState> {
+  constructor(props: unknown) {
+    super(props);
+    this.state = {
+      searchedValue: '',
+    };
+  }
+
+  handleSearch = (searchValue: string): void => {
+    console.log(this.state.searchedValue);
+    this.setState({searchedValue: searchValue});
+    console.log(this.state.searchedValue);
+  };
+
+  render(): JSX.Element {
+    return (
+      <div className='AMP-Release-Calender'>
+        <div className='AMP-Release-Calendar-Header'>
+          <Header title='AMP Release Calendar' />
+          <SearchBar handleSearch={this.handleSearch} />
+          <h4>{'this is what was searched: ' + this.state.searchedValue}</h4>
+        </div>
+      </div>
+    );
+  }
+}
