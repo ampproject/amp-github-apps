@@ -15,15 +15,33 @@
  */
 
 import * as React from 'react';
-import {CURRENTRELEASES} from './fakeChannelData';
-import {ChannelTable} from './ChannelTable';
-import {Header} from './Header';
 
-export const App = (): JSX.Element => {
-  return (
-    <div>
-      <Header title='AMP Release Calendar' />
-      <ChannelTable currentReleases={CURRENTRELEASES} />
-    </div>
-  );
-};
+export interface ChannelRowProps {
+  channel: string;
+  RTV: string;
+  isDisplayed: boolean;
+}
+
+export class ChannelRow extends React.Component<ChannelRowProps, {}> {
+  render(): JSX.Element {
+    const channel = this.props.channel;
+    const RTV = this.props.RTV;
+    const enlarge = this.props.isDisplayed;
+    if (enlarge) {
+      return (
+        <tr>
+          <td> {'clicked on'}</td>
+          <td>{channel}</td>
+          <td>{RTV}</td>
+        </tr>
+      );
+    } else {
+      return (
+        <tr>
+          <td>{channel}</td>
+          <td>{RTV}</td>
+        </tr>
+      );
+    }
+  }
+}

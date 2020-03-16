@@ -23,3 +23,13 @@ export enum Channel {
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
   NIGHTLY = 'nightly',
 }
+export class CurrentRelease {
+  channel: Channel;
+  RTV: string;
+  isDisplayed: boolean;
+  constructor(channel: Channel, RTV: string, isDisplayed = false) {
+    this.channel = channel;
+    this.RTV = RTV;
+    this.isDisplayed = isDisplayed;
+  }
+}

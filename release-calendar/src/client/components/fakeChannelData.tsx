@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {Channel, CurrentRelease} from './../../types';
 
-import * as React from 'react';
-import {CURRENTRELEASES} from './fakeChannelData';
-import {ChannelTable} from './ChannelTable';
-import {Header} from './Header';
-
-export const App = (): JSX.Element => {
-  return (
-    <div>
-      <Header title='AMP Release Calendar' />
-      <ChannelTable currentReleases={CURRENTRELEASES} />
-    </div>
-  );
-};
+export const CURRENTRELEASES = [
+  new CurrentRelease(Channel.LTS, 'RTVexample'),
+  new CurrentRelease(Channel.STABLE, 'RTVexample'),
+  new CurrentRelease(Channel.OPT_IN_BETA, 'RTVexample'),
+  new CurrentRelease(Channel.OPT_IN_EXPERIMENTAL, 'RTVexample'),
+  new CurrentRelease(Channel.PERCENT_BETA, 'RTVexample'),
+  new CurrentRelease(Channel.PERCENT_EXPERIMENTAL, 'RTVexample'),
+  new CurrentRelease(Channel.NIGHTLY, 'RTVexample'),
+];
