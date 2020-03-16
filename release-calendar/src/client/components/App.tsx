@@ -31,9 +31,7 @@ export class App extends React.Component<{}, AppState> {
   }
 
   handleSearch = (searchValue: string): void => {
-    console.log(this.state.searchedValue);
     this.setState({searchedValue: searchValue});
-    console.log(this.state.searchedValue);
   };
 
   render(): JSX.Element {
@@ -42,7 +40,8 @@ export class App extends React.Component<{}, AppState> {
         <div className='AMP-Release-Calendar-Header'>
           <Header title='AMP Release Calendar' />
           <SearchBar handleSearch={this.handleSearch} />
-          <h4>{'this is what was searched: ' + this.state.searchedValue}</h4>
+          {/* TODO: remove the line below later */}
+          <h4>this is what was searched: + {this.state.searchedValue}</h4>
         </div>
       </div>
     );

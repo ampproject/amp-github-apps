@@ -20,21 +20,25 @@ import {ChangeEvent, FormEvent} from 'react';
 export interface SearchBarProps {
   handleSearch: (searchValue: string) => void;
 }
+
 export class SearchBar extends React.Component<SearchBarProps, {}> {
   constructor(props: Readonly<SearchBarProps>) {
     super(props);
     this.handleSearchValueChange = this.handleSearchValueChange.bind(this); //if I'm beinng honest, I'm not really
-    this.mySubmitHandler = this.mySubmitHandler.bind(this); //sure what the bindings actually accomplishes
+    this.submitHandler = this.submitHandler.bind(this); //sure what the bindings actually accomplishes
   }
-  mySubmitHandler = (event: FormEvent<HTMLFormElement>): void => {
+
+  submitHandler = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
   };
+
   handleSearchValueChange = (event: ChangeEvent<HTMLInputElement>): void => {
     this.props.handleSearch(event.target.value);
   };
+
   render(): JSX.Element {
     return (
-      <form onSubmit={this.mySubmitHandler}>
+      <form onSubmit={this.submitHandler}>
         <label>
           Search for RTV:
           <input type='text' onChange={this.handleSearchValueChange} />
