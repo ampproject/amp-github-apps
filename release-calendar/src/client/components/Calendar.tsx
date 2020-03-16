@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
+import '../stylesheets/calendar.scss';
 import * as React from 'react';
+import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
-//import interactionPlugin from '@fullcalendar/interaction';
-
-import '../stylesheets/calendarStyle.scss';
-import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 
 export interface CalendarProps {
   events: EventSourceInput[];
 }
+
 export interface CalendarState {
   calendarWeekends: boolean;
 }
@@ -39,13 +38,12 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   }
   render(): JSX.Element {
     const allCalenderEvents = this.props.events;
-    console.log(this.props.events);
     return (
-      <div className='demo-app'>
-        <div className='demo-app-top'>
+      <div className='Full-Calendar'>
+        <div className='Calendar-Top'>
           <button onClick={this.toggleWeekends}>toggle weekends</button>&nbsp;
         </div>
-        <div className='demo-app-calendar'>
+        <div className='Calendar-Content'>
           <FullCalendar
             defaultView='dayGridMonth'
             header={{

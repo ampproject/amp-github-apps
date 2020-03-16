@@ -1,19 +1,17 @@
 @import '~@fullcalendar/core/main.css';
 @import '~@fullcalendar/daygrid/main.css';
 @import '~@fullcalendar/timegrid/main.css';
-.style {
-  font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-}
-.demo-app {
+
+.Full-Calendar {
   font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 14px;
 }
 
-.demo-app-top {
+.Calendar-Top {
   margin: 0 0 3em;
 }
 
-.demo-app-calendar {
+.Calendar-Content {
   margin: 0 auto;
-  max-width: 900px;
+  max-width: 90%;
 }

@@ -15,12 +15,13 @@
  */
 import * as React from 'react';
 import {Calendar} from './Calendar';
-import {FAKEEVENTS} from './fakeData';
+//TODO: remove fakeData and instead populate with data from ./test/development-data.ts and then from real data
+import {FAKEEVENTS} from '../fakeData/fakeEvents';
 import {Header} from './Header';
 
 export const App = (): JSX.Element => {
   return (
-    <div>
+    <div className='AMP-Release-Calendar'>
       <Header title='AMP Release Calendar' />
       <div className='AMP-Release-Calendar-Full-Calendar'>
         <Calendar events={FAKEEVENTS} />
