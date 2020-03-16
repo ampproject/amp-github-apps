@@ -25,6 +25,10 @@ export class SingleRTVBlock extends React.Component<SingleRTVBlockProps, {}> {
     const RTV = this.props.RTV;
     return (
       <tr>
+        {/*TODO(ajwhatson): links to issue #765,
+         replace with information that
+         links RTV to github and the PRs
+         associated with it*/}
         <ul> {'Selected RTV: ' + RTV} </ul>
         <ul>{'Release Inforamtion... blah blah'}</ul>
         <ul>{'blah blah blah'}</ul>

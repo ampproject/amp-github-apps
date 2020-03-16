@@ -29,7 +29,6 @@ export class ManyRTVTable extends React.Component<ManyRTVTableProps, {}> {
     const fakeData = this.props.fakeData;
 
     for (let i = 0; i < fakeData.length; i++) {
-      console.log(fakeData[i]);
       rows.push(<RTVRow Rtv={fakeData[i]}></RTVRow>);
     }
     return (

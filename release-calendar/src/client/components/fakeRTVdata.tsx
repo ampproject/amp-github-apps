@@ -16,6 +16,7 @@
 import {Channel, CurrentRelease, RTVRowObject} from '../../types';
 
 export const SELECTEDCHANEL = Channel.STABLE;
+
 export const FAKERTVANDGITHUBLINKS = [
   new RTVRowObject('RTVexample', 'githublink example'),
   new RTVRowObject('RTVexample', 'githublink example'),
@@ -24,6 +25,7 @@ export const FAKERTVANDGITHUBLINKS = [
   new RTVRowObject('RTVexample', 'githublink example'),
   new RTVRowObject('RTVexample', 'githublink example'),
 ];
+
 export const CURRENTRELEASES = [
   new CurrentRelease(Channel.LTS, 'RTVexample'),
   new CurrentRelease(Channel.STABLE, 'RTVexample'),

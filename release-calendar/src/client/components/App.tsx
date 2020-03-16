@@ -23,6 +23,7 @@ export interface AppState {
   mode: boolean;
   mostRecentRTV: string; //change to RTVObject[]
 }
+
 export class App extends React.Component<{}, AppState> {
   constructor(props: unknown) {
     super(props);
