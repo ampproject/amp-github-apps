@@ -24,23 +24,26 @@ export interface ChannelRowProps {
 
 export class ChannelRow extends React.Component<ChannelRowProps, {}> {
   render(): JSX.Element {
-    const channel = this.props.channel;
-    const RTV = this.props.RTV;
-    const enlarge = this.props.isDisplayed;
-    if (enlarge) {
+    if (this.props.isDisplayed) {
       return (
-        <tr>
-          <td> {'clicked on'}</td>
-          <td>{channel}</td>
-          <td>{RTV}</td>
-        </tr>
+        //TODO(ajwhatson): change the format of the RTVTable and ColumnTable
+        //to be similar once Material Design is added
+        <thead>
+          <tr>
+            <th colSpan={3}>{'clicked on'}</th>
+            <th colSpan={3}>{this.props.channel}</th>
+            <th colSpan={3}>{this.props.RTV}</th>
+          </tr>
+        </thead>
       );
     } else {
       return (
-        <tr>
-          <td>{channel}</td>
-          <td>{RTV}</td>
-        </tr>
+        <thead>
+          <tr>
+            <th colSpan={3}>{this.props.channel}</th>
+            <th colSpan={3}>{this.props.RTV}</th>
+          </tr>
+        </thead>
       );
     }
   }

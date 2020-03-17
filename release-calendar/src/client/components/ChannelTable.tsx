@@ -25,16 +25,14 @@ export interface ChannelTableProps {
 export class ChannelTable extends React.Component<ChannelTableProps, {}> {
   render(): JSX.Element {
     const rows = [];
-    const currentReleases = this.props.currentReleases;
 
     //change this for loop
-    for (let i = 0; i < currentReleases.length; i++) {
-      console.log(currentReleases[i]);
+    for (let i = 0; i < this.props.currentReleases.length; i++) {
       rows.push(
         <ChannelRow
-          channel={currentReleases[i].channel}
-          RTV={currentReleases[i].RTV}
-          isDisplayed={currentReleases[i].isDisplayed}
+          channel={this.props.currentReleases[i].channel}
+          RTV={this.props.currentReleases[i].RTV}
+          isDisplayed={this.props.currentReleases[i].isDisplayed}
           key={i}></ChannelRow>,
       );
     }
