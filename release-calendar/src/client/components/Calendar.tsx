@@ -37,7 +37,6 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     };
   }
   render(): JSX.Element {
-    const allCalenderEvents = this.props.events;
     return (
       <div className='Full-Calendar'>
         <div className='Calendar-Top'>
@@ -53,7 +52,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
             }}
             plugins={[dayGridPlugin, timeGridPlugin]}
             weekends={this.state.calendarWeekends}
-            eventSources={allCalenderEvents}
+            eventSources={this.props.events}
           />
         </div>
       </div>

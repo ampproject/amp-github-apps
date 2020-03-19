@@ -15,17 +15,37 @@
  */
 import * as React from 'react';
 import {Calendar} from './Calendar';
-//TODO: remove fakeData and instead populate with data from ./test/development-data.ts and then from real data
-import {FAKEEVENTS} from '../fakeData/fakeEvents';
+//TODO: remove DATA and instead populate with data from ./test/development-data.ts
+import {DATA} from '../models (TODO: rename folder)/data';
+import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
+import {getEvents} from '../models (TODO: rename folder)/fakeEvents';
 
-export const App = (): JSX.Element => {
-  return (
-    <div className='AMP-Release-Calendar'>
-      <Header title='AMP Release Calendar' />
-      <div className='AMP-Release-Calendar-Full-Calendar'>
-        <Calendar events={FAKEEVENTS} />
+interface AppState {
+  events: EventSourceInput[];
+}
+
+export class App extends React.Component<{}, AppState> {
+  constructor(props: unknown) {
+    super(props);
+    this.state = {
+      events: [],
+    };
+  }
+  //TODO: change fetch API call to service
+  componentDidMount(): void {
+    fetch('https://jsonplaceholder.typicode.com/todos')
+      .then(e => getEvents(DATA, e))
+      .then(result => this.setState({events: result}));
+  }
+  render(): JSX.Element {
+    return (
+      <div className='AMP-Release-Calendar'>
+        <Header title='AMP Release Calendar' />
+        <div className='AMP-Release-Calendar-Full-Calendar'>
+          <Calendar events={this.state.events} />
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
