@@ -16,10 +16,10 @@
 import * as React from 'react';
 import {Calendar} from './Calendar';
 //TODO: remove DATA and instead populate with data from ./test/development-data.ts
-import {DATA} from '../models (TODO: rename folder)/data';
+import {DATA} from '../models/data';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
-import {getEvents} from '../models (TODO: rename folder)/fakeEvents';
+import {getEvents} from '../models/release-event';
 
 interface AppState {
   events: EventSourceInput[];
@@ -32,12 +32,14 @@ export class App extends React.Component<{}, AppState> {
       events: [],
     };
   }
+
   //TODO: change fetch API call to service
   componentDidMount(): void {
-    fetch('https://jsonplaceholder.typicode.com/todos')
-      .then(e => getEvents(DATA, e))
-      .then(result => this.setState({events: result}));
+    Promise.resolve(getEvents(DATA)).then(result =>
+      this.setState({events: result}),
+    );
   }
+
   render(): JSX.Element {
     return (
       <div className='AMP-Release-Calendar'>

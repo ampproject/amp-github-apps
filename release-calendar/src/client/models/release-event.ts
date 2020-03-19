@@ -15,17 +15,15 @@
  */
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {Release} from '../../server/entities/release';
+import {Release} from '../../types';
 
-async function conventReleaseToEvent(Release: Release): Promise<EventInput> {
-  return new Promise(resolve => {
-    resolve({
-      title: Release.name,
-      start: Release.date,
-      className: Release.channel,
-      extendedProps: {isRollback: Release.isRollback},
-    });
-  });
+function convertReleaseToEvent(release: Release): EventInput {
+  return {
+    title: release.name,
+    start: release.date,
+    className: release.channel,
+    extendedProps: {isRollback: release.isRollback},
+  };
 }
 
 function groupIntoChannels(events: EventInput[]): EventSourceInput[] {
@@ -65,7 +63,7 @@ function groupIntoChannels(events: EventInput[]): EventSourceInput[] {
         break;
     }
   });
-  const calendarReady: EventSourceInput[] = [
+  return [
     {events: ltsEvents, color: 'black', textColor: 'white'},
     {events: stableEvents, color: 'gray', textColor: 'white'},
     {events: percBetaEvents, color: 'blue', textColor: 'white'},
@@ -74,15 +72,10 @@ function groupIntoChannels(events: EventInput[]): EventSourceInput[] {
     {events: optInExperimentalEvents, color: 'silver', textColor: 'white'},
     {events: nightlyEvents, color: 'red', textColor: 'white'},
   ];
-  return calendarReady;
 }
 
-export async function getEvents(
-  releases: Release[],
-  e: unknown,
-): Promise<EventSourceInput[]> {
-  console.log(e);
-  return Promise.all(
-    releases.map(release => conventReleaseToEvent(release)),
-  ).then(result => groupIntoChannels(result));
+export function getEvents(releases: Release[]): EventSourceInput[] {
+  return groupIntoChannels(
+    releases.map(release => convertReleaseToEvent(release)),
+  );
 }

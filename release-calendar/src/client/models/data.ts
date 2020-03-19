@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import {Channel} from '../../types';
-import {Release} from '../../server/entities/release';
+import {Channel, Release} from '../../types';
 
 export const DATA = [
   new Release(

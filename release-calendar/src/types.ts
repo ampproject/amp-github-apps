@@ -23,3 +23,23 @@ export enum Channel {
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
   NIGHTLY = 'nightly',
 }
+
+// export interface Release {
+//   name: string;
+//   channel: Channel;
+//   date: Date;
+//   isRollback: boolean;
+// }
+
+export class Release {
+  name: string;
+  channel: Channel;
+  date: Date;
+  isRollback: boolean;
+  constructor(name: string, channel: Channel, date: Date, isRollback = false) {
+    this.name = name;
+    this.channel = channel;
+    this.date = date;
+    this.isRollback = isRollback;
+  }
+}

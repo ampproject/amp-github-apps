@@ -67,6 +67,8 @@ module.exports = {
   externals: {
     'react': 'React',
     'react-dom': 'ReactDOM',
-    'react-native-sqlite-storage': 'react-native-sqlite-storage',
+    'express': 'express',
+    'mysql': 'mysql',
+    'typeorm': 'typeorm',
   },
 };

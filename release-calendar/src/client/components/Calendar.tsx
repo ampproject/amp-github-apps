@@ -25,23 +25,10 @@ export interface CalendarProps {
   events: EventSourceInput[];
 }
 
-export interface CalendarState {
-  calendarWeekends: boolean;
-}
-
-export class Calendar extends React.Component<CalendarProps, CalendarState> {
-  constructor(props: Readonly<CalendarProps>) {
-    super(props);
-    this.state = {
-      calendarWeekends: true,
-    };
-  }
+export class Calendar extends React.Component<CalendarProps, {}> {
   render(): JSX.Element {
     return (
       <div className='Full-Calendar'>
-        <div className='Calendar-Top'>
-          <button onClick={this.toggleWeekends}>toggle weekends</button>&nbsp;
-        </div>
         <div className='Calendar-Content'>
           <FullCalendar
             defaultView='dayGridMonth'
@@ -51,17 +38,10 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
               right: 'dayGridMonth,timeGridWeek,listWeek',
             }}
             plugins={[dayGridPlugin, timeGridPlugin]}
-            weekends={this.state.calendarWeekends}
             eventSources={this.props.events}
           />
         </div>
       </div>
     );
   }
-
-  toggleWeekends = (): void => {
-    this.setState({
-      calendarWeekends: !this.state.calendarWeekends,
-    });
-  };
 }
