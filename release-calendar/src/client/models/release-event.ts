@@ -13,69 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {Release} from '../../types';
+import {EventTuple, Release} from '../../types';
 
-function convertReleaseToEvent(release: Release): EventInput {
-  return {
-    title: release.name,
-    start: release.date,
-    className: release.channel,
-    extendedProps: {isRollback: release.isRollback},
-  };
-}
-
-function groupIntoChannels(events: EventInput[]): EventSourceInput[] {
-  const ltsEvents: EventInput[] = [],
-    stableEvents: EventInput[] = [],
-    percBetaEvents: EventInput[] = [],
-    percExperimentalEvents: EventInput[] = [],
-    optInBetaEvents: EventInput[] = [],
-    optInExperimentalEvents: EventInput[] = [],
-    nightlyEvents: EventInput[] = [];
-
-  events.forEach((event: EventInput) => {
-    switch (event.className) {
-      case 'lts':
-        ltsEvents.push(event);
-        break;
-      case 'stable':
-        stableEvents.push(event);
-        break;
-      case 'perc-beta':
-        percBetaEvents.push(event);
-        break;
-      case 'perc-experimental':
-        percExperimentalEvents.push(event);
-        break;
-      case 'opt-in-beta':
-        optInBetaEvents.push(event);
-        break;
-      case 'opt-in-experimental':
-        optInExperimentalEvents.push(event);
-        break;
-      case 'nightly':
-        nightlyEvents.push(event);
-        break;
-      default:
-        console.log('not logged');
-        break;
-    }
-  });
+function convertReleaseToEvent(release: Release): EventTuple {
   return [
-    {events: ltsEvents, color: 'black', textColor: 'white'},
-    {events: stableEvents, color: 'gray', textColor: 'white'},
-    {events: percBetaEvents, color: 'blue', textColor: 'white'},
-    {events: percExperimentalEvents, color: 'green', textColor: 'white'},
-    {events: optInBetaEvents, color: 'purple', textColor: 'white'},
-    {events: optInExperimentalEvents, color: 'silver', textColor: 'white'},
-    {events: nightlyEvents, color: 'red', textColor: 'white'},
+    release.channel,
+    {
+      title: release.name,
+      start: release.date,
+      className: release.channel,
+      extendedProps: {isRollback: release.isRollback},
+    },
   ];
 }
 
 export function getEvents(releases: Release[]): EventSourceInput[] {
-  return groupIntoChannels(
-    releases.map(release => convertReleaseToEvent(release)),
+  const dict: {[channel: string]: EventInput[]} = {};
+  dict['lts'] = [];
+  dict['stable'] = [];
+  dict['perc-beta'] = [];
+  dict['perc-experimental'] = [];
+  dict['opt-in-beta'] = [];
+  dict['opt-in-experimental'] = [];
+  dict['nightly'] = [];
+
+  const channelEventPairs: EventTuple[] = releases.map(release =>
+    convertReleaseToEvent(release),
   );
+
+  channelEventPairs.forEach(pair => dict[pair[0]].push(pair[1]));
+
+  return [
+    {events: dict['lts'], color: 'black', textColor: 'white'},
+    {events: dict['stable'], color: 'gray', textColor: 'white'},
+    {events: dict['perc-beta'], color: 'blue', textColor: 'white'},
+    {events: dict['perc-experimental'], color: 'green', textColor: 'white'},
+    {events: dict['opt-in-beta'], color: 'purple', textColor: 'white'},
+    {events: dict['opt-in-experimental'], color: 'silver', textColor: 'white'},
+    {events: dict['nightly'], color: 'red', textColor: 'white'},
+  ];
 }

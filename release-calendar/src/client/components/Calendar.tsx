@@ -28,19 +28,17 @@ export interface CalendarProps {
 export class Calendar extends React.Component<CalendarProps, {}> {
   render(): JSX.Element {
     return (
-      <div className='Full-Calendar'>
-        <div className='Calendar-Content'>
-          <FullCalendar
-            defaultView='dayGridMonth'
-            header={{
-              left: 'prev,next',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,listWeek',
-            }}
-            plugins={[dayGridPlugin, timeGridPlugin]}
-            eventSources={this.props.events}
-          />
-        </div>
+      <div className='calendar'>
+        <FullCalendar
+          defaultView='dayGridMonth'
+          header={{
+            left: 'prev,next',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek',
+          }}
+          plugins={[dayGridPlugin, timeGridPlugin]}
+          eventSources={this.props.events}
+        />
       </div>
     );
   }

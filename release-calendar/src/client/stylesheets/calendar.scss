@@ -2,16 +2,10 @@
 @import '~@fullcalendar/daygrid/main.css';
 @import '~@fullcalendar/timegrid/main.css';
 
-.Full-Calendar {
+.calendar {
   font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 14px;
-}
-
-.Calendar-Top {
-  margin: 0 0 3em;
-}
-
-.Calendar-Content {
   margin: 0 auto;
   max-width: 90%;
 }
+

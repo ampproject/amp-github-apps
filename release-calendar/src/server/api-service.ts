@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import {Channel} from '../types';
 import {Connection, Repository} from 'typeorm';
 import {Release} from './entities/release';
 
@@ -27,9 +26,5 @@ export class ApiService {
 
   async getReleases(): Promise<Release[]> {
     return this.releaseRepository.find();
-  }
-
-  async getChannel(desiredChannel: Channel): Promise<Release[]> {
-    return this.releaseRepository.find({channel: desiredChannel});
   }
 }

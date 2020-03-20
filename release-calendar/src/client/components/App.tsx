@@ -42,9 +42,9 @@ export class App extends React.Component<{}, AppState> {
 
   render(): JSX.Element {
     return (
-      <div className='AMP-Release-Calendar'>
+      <div>
         <Header title='AMP Release Calendar' />
-        <div className='AMP-Release-Calendar-Full-Calendar'>
+        <div>
           <Calendar events={this.state.events} />
         </div>
       </div>
