@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import {EventInput} from '@fullcalendar/core/structs/event';
-
 export enum Channel {
   LTS = 'lts',
   STABLE = 'stable',
@@ -25,8 +23,6 @@ export enum Channel {
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
   NIGHTLY = 'nightly',
 }
-
-export type EventTuple = [string, EventInput];
 
 //TODO: switch from class to interface once data is coming from server
 //for now, it must be a class because of data.ts

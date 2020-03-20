@@ -16,42 +16,40 @@
 
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {EventTuple, Release} from '../../types';
+import {Release} from '../../types';
 
-function convertReleaseToEvent(release: Release): EventTuple {
-  return [
-    release.channel,
-    {
-      title: release.name,
-      start: release.date,
-      extendedProps: {isRollback: release.isRollback},
-    },
-  ];
+function convertReleaseToEvent(release: Release): EventInput {
+  return {
+    title: release.name,
+    start: release.date,
+    className: release.channel,
+    extendedProps: {isRollback: release.isRollback},
+  };
 }
 
 export function getEvents(releases: Release[]): EventSourceInput[] {
-  const dict: {[channel: string]: EventInput[]} = {};
-  dict['lts'] = [];
-  dict['stable'] = [];
-  dict['perc-beta'] = [];
-  dict['perc-experimental'] = [];
-  dict['opt-in-beta'] = [];
-  dict['opt-in-experimental'] = [];
-  dict['nightly'] = [];
-
-  const channelEventPairs: EventTuple[] = releases.map(release =>
-    convertReleaseToEvent(release),
-  );
-
-  channelEventPairs.forEach(pair => dict[pair[0]].push(pair[1]));
-
+  const map = new Map();
+  releases.forEach(release => {
+    const event = convertReleaseToEvent(release);
+    const channelEvents = map.get(event.className);
+    if (!channelEvents) {
+      map.set(event.className, [event]);
+    } else {
+      channelEvents.push(event);
+      map.set(event.className, channelEvents);
+    }
+  });
   return [
-    {events: dict['lts'], color: 'black', textColor: 'white'},
-    {events: dict['stable'], color: 'gray', textColor: 'white'},
-    {events: dict['perc-beta'], color: 'blue', textColor: 'white'},
-    {events: dict['perc-experimental'], color: 'green', textColor: 'white'},
-    {events: dict['opt-in-beta'], color: 'purple', textColor: 'white'},
-    {events: dict['opt-in-experimental'], color: 'silver', textColor: 'white'},
-    {events: dict['nightly'], color: 'red', textColor: 'white'},
+    {events: map.get('lts'), color: 'black', textColor: 'white'},
+    {events: map.get('stable'), color: 'gray', textColor: 'white'},
+    {events: map.get('perc-beta'), color: 'blue', textColor: 'white'},
+    {events: map.get('perc-experimental'), color: 'green', textColor: 'white'},
+    {events: map.get('opt-in-beta'), color: 'purple', textColor: 'white'},
+    {
+      events: map.get('opt-in-experimental'),
+      color: 'silver',
+      textColor: 'white',
+    },
+    {events: map.get('nightly'), color: 'red', textColor: 'white'},
   ];
 }
