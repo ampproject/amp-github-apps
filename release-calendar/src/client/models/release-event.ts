@@ -24,7 +24,6 @@ function convertReleaseToEvent(release: Release): EventTuple {
     {
       title: release.name,
       start: release.date,
-      className: release.channel,
       extendedProps: {isRollback: release.isRollback},
     },
   ];
