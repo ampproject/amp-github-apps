@@ -23,3 +23,25 @@ export enum Channel {
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
   NIGHTLY = 'nightly',
 }
+
+//TODO: switch from class to interface once data is coming from server
+//for now, it must be a class because of data.ts
+// export interface Release {
+//   name: string;
+//   channel: Channel;
+//   date: Date;
+//   isRollback: boolean;
+// }
+
+export class Release {
+  name: string;
+  channel: Channel;
+  date: Date;
+  isRollback: boolean;
+  constructor(name: string, channel: Channel, date: Date, isRollback = false) {
+    this.name = name;
+    this.channel = channel;
+    this.date = date;
+    this.isRollback = isRollback;
+  }
+}

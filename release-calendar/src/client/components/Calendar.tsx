@@ -13,40 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
-import {Calendar} from './Calendar';
-//TODO: remove DATA and instead populate with data from ./test/development-data.ts
-import {DATA} from '../models/data';
-import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {Header} from './Header';
-import {getEvents} from '../models/release-event';
 
-interface AppState {
+import '../stylesheets/calendar.scss';
+import * as React from 'react';
+import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+
+export interface CalendarProps {
   events: EventSourceInput[];
 }
 
-export class App extends React.Component<{}, AppState> {
-  constructor(props: unknown) {
-    super(props);
-    this.state = {
-      events: [],
-    };
-  }
-
-  //TODO: change fetch API call to service
-  componentDidMount(): void {
-    Promise.resolve(getEvents(DATA)).then(result =>
-      this.setState({events: result}),
-    );
-  }
-
+export class Calendar extends React.Component<CalendarProps, {}> {
   render(): JSX.Element {
     return (
-      <div>
-        <Header title='AMP Release Calendar' />
-        <div>
-          <Calendar events={this.state.events} />
-        </div>
+      <div className='calendar'>
+        <FullCalendar
+          defaultView='dayGridMonth'
+          header={{
+            left: 'prev,next',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek',
+          }}
+          plugins={[dayGridPlugin, timeGridPlugin]}
+          eventSources={this.props.events}
+        />
       </div>
     );
   }
