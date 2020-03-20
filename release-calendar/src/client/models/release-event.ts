@@ -35,8 +35,7 @@ export function getEvents(releases: Release[]): EventSourceInput[] {
     if (!channelEvents) {
       map.set(event.className, [event]);
     } else {
-      channelEvents.push(event);
-      map.set(event.className, channelEvents);
+      map.set(event.className, [...channelEvents, event]);
     }
   });
   return [
