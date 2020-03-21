@@ -13,17 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import * as React from 'react';
+import {Calendar} from './Calendar';
+//TODO: remove DATA and instead populate with data from ./test/development-data.ts
 import {CURRENTRELEASES} from './fakeChannelData';
 import {ChannelTable} from './ChannelTable';
+import {DATA} from '../models/data';
+import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
+import {getEvents} from '../models/release-event';
 
-export const App = (): JSX.Element => {
-  return (
-    <div>
-      <Header title='AMP Release Calendar' />
-      <ChannelTable currentReleases={CURRENTRELEASES} />
-    </div>
-  );
-};
+interface AppState {
+  events: EventSourceInput[];
+}
+
+export class App extends React.Component<{}, AppState> {
+  constructor(props: unknown) {
+    super(props);
+    this.state = {
+      events: [],
+    };
+  }
+
+  //TODO: change fetch API call to service
+  componentDidMount(): void {
+    Promise.resolve(getEvents(DATA)).then(result =>
+      this.setState({events: result}),
+    );
+  }
+
+  render(): JSX.Element {
+    return (
+      <div>
+        <Header title='AMP Release Calendar' />
+        <ChannelTable currentReleases={CURRENTRELEASES} />
+        <div>
+          <Calendar events={this.state.events} />
+        </div>
+      </div>
+    );
+  }
+}
