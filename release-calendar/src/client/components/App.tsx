@@ -15,16 +15,17 @@
  */
 import * as React from 'react';
 import {Calendar} from './Calendar';
-//TODO: remove DATA and instead populate with data from ./test/development-data.ts
-import {CURRENTRELEASES} from './fakeChannelData';
 import {ChannelTable} from './ChannelTable';
+//TODO: remove DATA and instead populate with data from ./test/development-data.ts
 import {DATA} from '../models/data';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
+import {getChannelRTVs} from '../models/release-channel';
 import {getEvents} from '../models/release-event';
 
 interface AppState {
   events: EventSourceInput[];
+  currentRTVs: string[];
 }
 
 export class App extends React.Component<{}, AppState> {
@@ -32,6 +33,7 @@ export class App extends React.Component<{}, AppState> {
     super(props);
     this.state = {
       events: [],
+      currentRTVs: [],
     };
   }
 
@@ -40,16 +42,17 @@ export class App extends React.Component<{}, AppState> {
     Promise.resolve(getEvents(DATA)).then(result =>
       this.setState({events: result}),
     );
+    Promise.resolve(getChannelRTVs(DATA)).then(result =>
+      this.setState({currentRTVs: result}),
+    );
   }
 
   render(): JSX.Element {
     return (
       <div>
         <Header title='AMP Release Calendar' />
-        <ChannelTable currentReleases={CURRENTRELEASES} />
-        <div>
-          <Calendar events={this.state.events} />
-        </div>
+        <ChannelTable RTVs={this.state.currentRTVs} />
+        <Calendar events={this.state.events} />
       </div>
     );
   }

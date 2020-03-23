@@ -45,14 +45,3 @@ export class Release {
     this.isRollback = isRollback;
   }
 }
-
-export class CurrentRelease {
-  channel: Channel;
-  RTV: string;
-  isDisplayed: boolean;
-  constructor(channel: Channel, RTV: string, isDisplayed = false) {
-    this.channel = channel;
-    this.RTV = RTV;
-    this.isDisplayed = isDisplayed;
-  }
-}
