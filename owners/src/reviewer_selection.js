@@ -92,7 +92,16 @@ class ReviewerSelection {
    */
   static _findPotentialReviewers(fileTreeMap) {
     const deepestRules = this._deepestOwnersRules(fileTreeMap);
-    return this._reviewersForRules(deepestRules);
+
+    let root = Object.values(fileTreeMap)[0];
+    while (!root.isRoot) {
+      root = root.parent;
+    }
+    const reviewerSet = root.reviewerSetRule.owners;
+    const isAllowedReviewer = username =>
+      reviewerSet.some(owner => owner.includes(username));
+
+    return this._reviewersForRules(deepestRules).filter(isAllowedReviewer);
   }
 
   /** Part 2 **/
