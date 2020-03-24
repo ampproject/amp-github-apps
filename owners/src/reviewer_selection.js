@@ -98,9 +98,8 @@ class ReviewerSelection {
       root = root.parent;
     }
     const reviewerSet = root.reviewerSetRule.owners;
-    const isAllowedReviewer = username => reviewerSet.some(
-      owner => owner.includes(username)
-    );
+    const isAllowedReviewer = username =>
+      reviewerSet.some(owner => owner.includes(username));
 
     return this._reviewersForRules(deepestRules).filter(isAllowedReviewer);
   }
