@@ -54,5 +54,5 @@ export const DATA = [
   new Release('8888888888888', Channel.LTS, new Date('2020-03-08T08:44:29')),
   new Release('9999999999999', Channel.LTS, new Date('2020-03-09T08:44:29')),
   new Release('2111111111111', Channel.LTS, new Date('2020-03-10T08:44:29')),
-  new Release('233333333333', Channel.LTS, new Date('2020-03-11T08:44:29')),
+  new Release('2333333333333', Channel.LTS, new Date('2020-03-11T08:44:29')),
 ];

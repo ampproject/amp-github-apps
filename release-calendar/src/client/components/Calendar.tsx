@@ -28,36 +28,24 @@ export interface CalendarProps {
 
 export class Calendar extends React.Component<CalendarProps, {}> {
   render(): JSX.Element {
+    let eventsToDisplay: EventSourceInput[] = this.props.events;
     if (this.props.selectedChannel != null) {
-      return (
-        <div className='calendar'>
-          <FullCalendar
-            defaultView='dayGridMonth'
-            header={{
-              left: 'prev,next',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,listWeek',
-            }}
-            plugins={[dayGridPlugin, timeGridPlugin]}
-            events={this.props.events[this.props.selectedChannel]}
-          />
-        </div>
-      );
-    } else {
-      return (
-        <div className='calendar'>
-          <FullCalendar
-            defaultView='dayGridMonth'
-            header={{
-              left: 'prev,next',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,listWeek',
-            }}
-            plugins={[dayGridPlugin, timeGridPlugin]}
-            eventSources={this.props.events}
-          />
-        </div>
-      );
+      eventsToDisplay = [this.props.events[this.props.selectedChannel]];
     }
+
+    return (
+      <div className='calendar'>
+        <FullCalendar
+          defaultView='dayGridMonth'
+          header={{
+            left: 'prev,next',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek',
+          }}
+          plugins={[dayGridPlugin, timeGridPlugin]}
+          eventSources={eventsToDisplay}
+        />
+      </div>
+    );
   }
 }

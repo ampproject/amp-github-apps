@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import '@material/react-layout-grid/index.scss';
 import * as React from 'react';
 import {Calendar} from './Calendar';
 import {Cell, Grid, Row} from '@material/react-layout-grid';
 import {ChannelTable} from './ChannelTable';
 //TODO: remove DATA and instead populate with data from ./test/development-data.ts
-import '@material/react-card/index.scss';
-import '@material/react-layout-grid/index.scss';
 import {DATA} from '../models/data';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
-import {getChannelRTVs} from '../models/release-channel';
 import {getEvents} from '../models/release-event';
-import Card, {
-  CardActionIcons,
-  CardActions,
-  CardPrimaryContent,
-} from '@material/react-card';
+import {getMostRecentChannelRTVs} from '../models/release-channel';
 
 interface AppState {
   events: EventSourceInput[];
-  currentRTVs: string[];
+  currentRTVs: Map<string, string>;
   selectedChannel: number;
 }
 
@@ -42,7 +37,7 @@ export class App extends React.Component<{}, AppState> {
     super(props);
     this.state = {
       events: [],
-      currentRTVs: [],
+      currentRTVs: new Map(),
       selectedChannel: null,
     };
   }
@@ -55,7 +50,7 @@ export class App extends React.Component<{}, AppState> {
     Promise.resolve(getEvents(DATA)).then(result =>
       this.setState({events: result}),
     );
-    Promise.resolve(getChannelRTVs(DATA)).then(result =>
+    Promise.resolve(getMostRecentChannelRTVs(DATA)).then(result =>
       this.setState({currentRTVs: result}),
     );
   }
@@ -87,22 +82,12 @@ export class App extends React.Component<{}, AppState> {
         <Row>
           <Cell desktopColumns={3} phoneColumns={1} tabletColumns={2}>
             <span> TODO: Where RTVTable will go</span>
-            <Card>
-              <CardPrimaryContent>
-                <h1>RTVTable Card</h1>
-              </CardPrimaryContent>
-              <CardActions>
-                <CardActionIcons>
-                  <i>All of the RTVRows</i>
-                </CardActionIcons>
-              </CardActions>
-            </Card>
             {/* TODO: currently only allows for single channel select, implement multiple selection with checkboxes */}
             {/* TODO: figure out how to unhighlight a row after it is unselected */}
             <ChannelTable
               selectedChannel={this.state.selectedChannel}
               handleSelectChannel={this.handleSelectChannel}
-              RTVs={this.state.currentRTVs}
+              rtvs={this.state.currentRTVs}
             />
           </Cell>
           {/* TODO: look into material design vertical line to divide calendar from tables */}

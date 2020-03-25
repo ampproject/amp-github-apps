@@ -16,22 +16,21 @@
 
 import {Release} from '../../types';
 
-export function getChannelRTVs(releases: Release[]): string[] {
-  const channelRTVs: string[] = [];
-  channelRTVs.push(releases.find(release => release.channel == 'lts').name);
-  channelRTVs.push(releases.find(release => release.channel == 'stable').name);
-  channelRTVs.push(
-    releases.find(release => release.channel == 'perc-beta').name,
+export function getMostRecentChannelRTVs(
+  releases: Release[],
+): Map<string, string> {
+  const channels: string[] = [
+    'lts',
+    'stable',
+    'perc-beta',
+    'perc-experimental',
+    'opt-in-beta',
+    'opt-in-experimental',
+    'nightly',
+  ];
+  const map = new Map();
+  channels.forEach(channel =>
+    map.set(channel, releases.find(release => release.channel == channel).name),
   );
-  channelRTVs.push(
-    releases.find(release => release.channel == 'perc-experimental').name,
-  );
-  channelRTVs.push(
-    releases.find(release => release.channel == 'opt-in-beta').name,
-  );
-  channelRTVs.push(
-    releases.find(release => release.channel == 'opt-in-experimental').name,
-  );
-  channelRTVs.push(releases.find(release => release.channel == 'nightly').name);
-  return channelRTVs;
+  return map;
 }
