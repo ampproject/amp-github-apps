@@ -15,17 +15,26 @@
  */
 import * as React from 'react';
 import {Calendar} from './Calendar';
+import {Cell, Grid, Row} from '@material/react-layout-grid';
 import {ChannelTable} from './ChannelTable';
 //TODO: remove DATA and instead populate with data from ./test/development-data.ts
+import '@material/react-card/index.scss';
+import '@material/react-layout-grid/index.scss';
 import {DATA} from '../models/data';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
 import {getChannelRTVs} from '../models/release-channel';
 import {getEvents} from '../models/release-event';
+import Card, {
+  CardActionIcons,
+  CardActions,
+  CardPrimaryContent,
+} from '@material/react-card';
 
 interface AppState {
   events: EventSourceInput[];
   currentRTVs: string[];
+  selectedChannel: number;
 }
 
 export class App extends React.Component<{}, AppState> {
@@ -34,10 +43,14 @@ export class App extends React.Component<{}, AppState> {
     this.state = {
       events: [],
       currentRTVs: [],
+      selectedChannel: null,
     };
   }
 
-  //TODO: change fetch API call to service
+  //TODO: what is being called to the App component here
+  //is still is up for debate. For example, currently I have all of the events
+  //from all of forever going to the calendar component at all times and then
+  //narrowing what I display in there.
   componentDidMount(): void {
     Promise.resolve(getEvents(DATA)).then(result =>
       this.setState({events: result}),
@@ -47,13 +60,61 @@ export class App extends React.Component<{}, AppState> {
     );
   }
 
+  handleSelectChannel = (selected: number): void => {
+    this.setState({
+      selectedChannel: selected,
+    });
+  };
+
+  // TODO: widths for cells are very rough, will change! Also thinking about setting
+  // dimensions the same for all devices.
   render(): JSX.Element {
     return (
-      <div>
-        <Header title='AMP Release Calendar' />
-        <ChannelTable RTVs={this.state.currentRTVs} />
-        <Calendar events={this.state.events} />
-      </div>
+      <Grid>
+        <Row>
+          <Cell desktopColumns={9} phoneColumns={3} tabletColumns={6}>
+            <Header title='AMP Release Calendar' />
+          </Cell>
+          <Cell
+            desktopColumns={2}
+            phoneColumns={1}
+            tabletColumns={2}
+            align={'middle'}>
+            TODO: Where the SpaceBar will go
+          </Cell>
+        </Row>
+        <hr></hr>
+        <Row>
+          <Cell desktopColumns={3} phoneColumns={1} tabletColumns={2}>
+            <span> TODO: Where RTVTable will go</span>
+            <Card>
+              <CardPrimaryContent>
+                <h1>RTVTable Card</h1>
+              </CardPrimaryContent>
+              <CardActions>
+                <CardActionIcons>
+                  <i>All of the RTVRows</i>
+                </CardActionIcons>
+              </CardActions>
+            </Card>
+            {/* TODO: currently only allows for single channel select, implement multiple selection with checkboxes */}
+            {/* TODO: figure out how to unhighlight a row after it is unselected */}
+            <ChannelTable
+              selectedChannel={this.state.selectedChannel}
+              handleSelectChannel={this.handleSelectChannel}
+              RTVs={this.state.currentRTVs}
+            />
+          </Cell>
+          {/* TODO: look into material design vertical line to divide calendar from tables */}
+          <Cell desktopColumns={8} phoneColumns={3} tabletColumns={6}>
+            {/* Add a dynamic calendar title component, changes with channel and RTV selections */}
+            <Calendar
+              events={this.state.events}
+              selectedChannel={this.state.selectedChannel}
+            />
+          </Cell>
+        </Row>
+      </Grid>
     );
   }
 }

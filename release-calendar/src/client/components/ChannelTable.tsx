@@ -25,29 +25,25 @@ import List, {
 } from '@material/react-list';
 
 export interface ChannelTableProps {
+  // TODO: considering moving the RTVs out of the ChannelTable Component altogether and
+  // intead having them live directly next door. Still testing.
   RTVs: string[];
-}
-
-export interface ChannelTableState {
+  handleSelectChannel: (selected: number) => void;
   selectedChannel: number;
-  //TODO: figure out why ListItemMeta only allows for variables from state and not from props
-  //otherwise learn to be happy with RTVs in secondaryText
 }
 
-// eslint-disable-next-line prettier/prettier
-export class ChannelTable extends React.Component<ChannelTableProps,ChannelTableState
-> {
+export class ChannelTable extends React.Component<ChannelTableProps, {}> {
   constructor(props: Readonly<ChannelTableProps>) {
     super(props);
-    this.state = {
-      selectedChannel: null,
-    };
-    this.handleSelectChannel = this.handleSelectChannel.bind(this); //
+    this.handleChannelChange = this.handleChannelChange.bind(this);
   }
 
-  handleSelectChannel = (selected: number): void => {
-    this.setState({selectedChannel: selected});
-    console.log(this.state.selectedChannel);
+  handleChannelChange = (activatedItem: number): void => {
+    if (activatedItem === this.props.selectedChannel) {
+      this.props.handleSelectChannel(null);
+    } else {
+      this.props.handleSelectChannel(activatedItem);
+    }
   };
 
   render(): JSX.Element {
@@ -56,11 +52,14 @@ export class ChannelTable extends React.Component<ChannelTableProps,ChannelTable
         <ListGroup>
           <ListGroupSubheader tag='h2'>Current Releases</ListGroupSubheader>
           <List
-            twoLine
+            // TODO: if I do leave the RTVs in this component, will
+            // probably make each row two lines and in order to do that
+            // I just uncomment "twoLine" :)
+            //twoLine
             radioList
             singleSelection
-            selectedIndex={this.state.selectedChannel}
-            handleSelect={this.handleSelectChannel}>
+            selectedIndex={this.props.selectedChannel}
+            handleSelect={this.handleChannelChange}>
             <ListItem>
               <ListItemText
                 primaryText={'Long Term Stable'}

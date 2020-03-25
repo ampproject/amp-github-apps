@@ -30,6 +30,7 @@
     "@fullcalendar/timegrid": "4.4.0",
     "@material/react-button": "^0.15.0",
     "@material/react-card": "^0.15.0",
+    "@material/react-layout-grid": "^0.15.0",
     "@material/react-list": "^0.15.0",
     "@material/react-radio": "^0.15.0",
     "express": "4.17.1",
