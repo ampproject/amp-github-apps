@@ -24,23 +24,17 @@ import {DATA} from '../models/data';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
 import {getEvents} from '../models/release-event';
-import {getMostRecentChannelRTVs} from '../models/release-channel';
 
 interface AppState {
   events: EventSourceInput[];
-  currentRTVs: Map<string, string>;
   selectedChannel: number;
 }
 
 export class App extends React.Component<{}, AppState> {
-  constructor(props: unknown) {
-    super(props);
-    this.state = {
-      events: [],
-      currentRTVs: new Map(),
-      selectedChannel: null,
-    };
-  }
+  readonly state: AppState = {
+    events: [],
+    selectedChannel: null,
+  };
 
   //TODO: what is being called to the App component here
   //is still is up for debate. For example, currently I have all of the events
@@ -49,9 +43,6 @@ export class App extends React.Component<{}, AppState> {
   componentDidMount(): void {
     Promise.resolve(getEvents(DATA)).then(result =>
       this.setState({events: result}),
-    );
-    Promise.resolve(getMostRecentChannelRTVs(DATA)).then(result =>
-      this.setState({currentRTVs: result}),
     );
   }
 
@@ -87,7 +78,6 @@ export class App extends React.Component<{}, AppState> {
             <ChannelTable
               selectedChannel={this.state.selectedChannel}
               handleSelectChannel={this.handleSelectChannel}
-              rtvs={this.state.currentRTVs}
             />
           </Cell>
           {/* TODO: look into material design vertical line to divide calendar from tables */}

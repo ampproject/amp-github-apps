@@ -16,6 +16,8 @@
 
 import '@material/react-list/index.scss';
 import * as React from 'react';
+import {DATA} from '../models/data';
+import {getMostRecentChannelRTVs} from '../models/release-channel';
 import List, {
   ListDivider,
   ListGroup,
@@ -27,15 +29,29 @@ import List, {
 export interface ChannelTableProps {
   // TODO: considering moving the RTVs out of the ChannelTable Component altogether and
   // intead having them live directly next door. Still testing.
-  rtvs: Map<string, string>;
   handleSelectChannel: (selected: number) => void;
   selectedChannel: number;
 }
 
-export class ChannelTable extends React.Component<ChannelTableProps, {}> {
+export interface ChannleTableState {
+  rtvs: Map<string, string>;
+}
+
+// eslint-disable-next-line prettier/prettier
+export class ChannelTable extends React.Component<ChannelTableProps, ChannleTableState> {
+  state: ChannleTableState;
   constructor(props: Readonly<ChannelTableProps>) {
     super(props);
+    this.state = {
+      rtvs: new Map(),
+    };
     this.handleChannelChange = this.handleChannelChange.bind(this);
+  }
+
+  componentDidMount(): void {
+    Promise.resolve(getMostRecentChannelRTVs(DATA)).then(result =>
+      this.setState({rtvs: result}),
+    );
   }
 
   handleChannelChange = (activatedItem: number): void => {
@@ -63,49 +79,49 @@ export class ChannelTable extends React.Component<ChannelTableProps, {}> {
             <ListItem>
               <ListItemText
                 primaryText={'Long Term Stable'}
-                secondaryText={this.props.rtvs.get('lts')}
+                secondaryText={this.state.rtvs.get('lts')}
               />
             </ListItem>
             <ListDivider />
             <ListItem>
               <ListItemText
                 primaryText={'Stable'}
-                secondaryText={this.props.rtvs.get('stable')}
+                secondaryText={this.state.rtvs.get('stable')}
               />
             </ListItem>
             <ListDivider />
             <ListItem>
               <ListItemText
                 primaryText={'Opt-in Beta'}
-                secondaryText={this.props.rtvs.get('opt-in-beta')}
+                secondaryText={this.state.rtvs.get('opt-in-beta')}
               />
             </ListItem>
             <ListDivider />
             <ListItem>
               <ListItemText
                 primaryText={'Opt-in Experimental'}
-                secondaryText={this.props.rtvs.get('opt-in-experimental')}
+                secondaryText={this.state.rtvs.get('opt-in-experimental')}
               />
             </ListItem>
             <ListDivider />
             <ListItem>
               <ListItemText
                 primaryText={'1% Beta'}
-                secondaryText={this.props.rtvs.get('perc-beta')}
+                secondaryText={this.state.rtvs.get('perc-beta')}
               />
             </ListItem>
             <ListDivider />
             <ListItem>
               <ListItemText
                 primaryText={'1% Experimental'}
-                secondaryText={this.props.rtvs.get('perc-experimental')}
+                secondaryText={this.state.rtvs.get('perc-experimental')}
               />
             </ListItem>
             <ListDivider />
             <ListItem>
               <ListItemText
                 primaryText={'Nightly'}
-                secondaryText={this.props.rtvs.get('nightly')}
+                secondaryText={this.state.rtvs.get('nightly')}
               />
             </ListItem>
           </List>
