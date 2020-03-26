@@ -14,23 +14,32 @@
  * limitations under the License.
  */
 
-import {Release} from '../../types';
+import {Channel, Release} from '../../types';
 
-export function getMostRecentChannelRTVs(
-  releases: Release[],
-): Map<string, string> {
-  const channels: string[] = [
-    'lts',
-    'stable',
-    'perc-beta',
-    'perc-experimental',
-    'opt-in-beta',
-    'opt-in-experimental',
-    'nightly',
+function getMostRecent(channel: Channel, releases: Release[]): string {
+  let currentRelease: Release = null;
+  releases.forEach(release => {
+    if (release.channel == channel && !release.isRollback) {
+      if (currentRelease == null || currentRelease.date < release.date) {
+        currentRelease = release;
+      }
+    }
+  });
+  return currentRelease.name;
+}
+export function getCurrentReleases(releases: Release[]): Map<Channel, string> {
+  const channels: Channel[] = [
+    Channel.LTS,
+    Channel.STABLE,
+    Channel.PERCENT_BETA,
+    Channel.PERCENT_EXPERIMENTAL,
+    Channel.OPT_IN_BETA,
+    Channel.OPT_IN_EXPERIMENTAL,
+    Channel.NIGHTLY,
   ];
   const map = new Map();
   channels.forEach(channel =>
-    map.set(channel, releases.find(release => release.channel == channel).name),
+    map.set(channel, getMostRecent(channel, releases)),
   );
   return map;
 }

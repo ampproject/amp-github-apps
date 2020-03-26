@@ -28,10 +28,10 @@ export interface CalendarProps {
 
 export class Calendar extends React.Component<CalendarProps, {}> {
   render(): JSX.Element {
-    let eventsToDisplay: EventSourceInput[] = this.props.events;
-    if (this.props.selectedChannel != null) {
-      eventsToDisplay = [this.props.events[this.props.selectedChannel]];
-    }
+    const eventsToDisplay: EventSourceInput[] =
+      this.props.selectedChannel != null
+        ? [this.props.events[this.props.selectedChannel]]
+        : this.props.events;
 
     return (
       <div className='calendar'>

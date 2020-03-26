@@ -39,7 +39,7 @@ export const DATA = [
     '5555555555555',
     Channel.OPT_IN_BETA,
     new Date('2020-03-05T08:44:29'),
-    true,
+    false,
   ),
   new Release(
     '6666666666666',
@@ -51,8 +51,18 @@ export const DATA = [
     Channel.NIGHTLY,
     new Date('2020-03-07T08:44:29'),
   ),
-  new Release('8888888888888', Channel.LTS, new Date('2020-03-08T08:44:29')),
+  new Release(
+    '8888888888888',
+    Channel.LTS,
+    new Date('2020-03-08T08:44:29'),
+    true,
+  ),
   new Release('9999999999999', Channel.LTS, new Date('2020-03-09T08:44:29')),
   new Release('2111111111111', Channel.LTS, new Date('2020-03-10T08:44:29')),
-  new Release('2333333333333', Channel.LTS, new Date('2020-03-11T08:44:29')),
+  new Release(
+    '2333333333333',
+    Channel.LTS,
+    new Date('2020-03-11T08:44:29'),
+    true,
+  ),
 ];
