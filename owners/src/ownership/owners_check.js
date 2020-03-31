@@ -50,12 +50,20 @@ class CheckRun {
    * @return {!object} JSON object describing check-run.
    */
   get json() {
+    let text = `${this.text}\n\n${this.helpText}`;
+    if (text.length > this.textLimit) {
+      const info = '…[TRUNCATED]';
+      const over = text.length + info.length - this.textLimit;
+      const partialText = this.text.substr(0, this.text.length - over);
+      text = `${partialText}${info}\n\n${this.helpText}`;
+    }
+
     const checkRun = {
       name: GITHUB_CHECKRUN_NAME,
       output: {
         title: this.summary,
         summary: this.summary,
-        text: `${this.text}\n\n${this.helpText}`,
+        text,
       },
     };
 
@@ -72,6 +80,7 @@ class CheckRun {
     return checkRun;
   }
 }
+CheckRun.prototype.textLimit = 65535;
 CheckRun.prototype.helpText =
   'For a description of the OWNERS file syntax, see ' +
   `[this example file](${EXAMPLE_OWNERS_LINK}).\n` +
