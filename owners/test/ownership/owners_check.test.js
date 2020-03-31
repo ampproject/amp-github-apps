@@ -87,7 +87,7 @@ describe('check run', () => {
     });
 
     it('truncates text over the limit', () => {
-      sandbox.stub(CheckRun.prototype, 'textLimit').value(40)
+      sandbox.stub(CheckRun.prototype, 'textLimit').value(40);
       const checkRun = new CheckRun(
         CheckRunState.IN_PROGRESS,
         'Test summary',
