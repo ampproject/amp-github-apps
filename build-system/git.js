@@ -69,9 +69,7 @@ function gitMasterBaseline() {
  */
 function gitDiffNameOnlyMaster() {
   const masterBaseline = gitMasterBaseline();
-  return getStdout(`git diff --name-only ${masterBaseline}`)
-    .trim()
-    .split('\n');
+  return getStdout(`git diff --name-only ${masterBaseline}`).trim().split('\n');
 }
 
 module.exports = {
