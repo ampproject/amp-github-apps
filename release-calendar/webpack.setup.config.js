@@ -14,31 +14,37 @@
  * limitations under the License.
  */
 
-import {EntitySchema} from 'typeorm';
-import {Release} from '../../types';
+const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 
-export const ReleaseEntity = new EntitySchema<Release>({
-  name: 'release',
-  columns: {
-    name: {
-      primary: true,
-      type: String,
-      length: 13,
-    },
+module.exports = {
+  mode: 'development',
+  target: 'node',
+  entry: './test/setup.ts',
+  resolve: {
+    extensions: ['.ts'],
   },
-  relations: {
-    promotions: {
-      type: 'one-to-many',
-      target: 'promotion',
-      inverseSide: 'release',
-      nullable: true,
-    },
-    cherrypicked: {
-      type: 'one-to-one',
-      target: 'release',
-      nullable: true,
-    },
+  output: {
+    filename: 'bundle-setup.js',
+    path: path.resolve(__dirname, 'dist'),
   },
-});
-
-export default ReleaseEntity;
+  module: {
+    rules: [
+      {
+        test: /\.ts(x?)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'ts-loader',
+          },
+        ],
+      },
+      {
+        enforce: 'pre',
+        test: /\.js$/,
+        loader: 'source-map-loader',
+      },
+    ],
+  },
+  externals: [nodeExternals()],
+};

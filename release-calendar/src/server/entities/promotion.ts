@@ -14,17 +14,37 @@
  * limitations under the License.
  */
 
-import {Connection, Repository} from 'typeorm';
-import {Release} from './entities/release';
+import {Channel, Promotion} from '../../types';
+import {EntitySchema} from 'typeorm';
 
-export class ApiService {
-  private releaseRepository: Repository<Release>;
+const PromotionEntity = new EntitySchema<Promotion>({
+  name: 'promotion',
+  columns: {
+    id: {
+      type: Number,
+      primary: true,
+      generated: 'increment',
+    },
+    fromChannel: {
+      type: 'enum',
+      enum: Channel,
+    },
+    toChannel: {
+      type: 'enum',
+      enum: Channel,
+    },
+    date: {
+      type: 'timestamp',
+    },
+  },
+  relations: {
+    release: {
+      type: 'many-to-one',
+      target: 'release',
+      joinColumn: true,
+      nullable: false,
+    },
+  },
+});
 
-  constructor(connection: Connection) {
-    this.releaseRepository = connection.getRepository(Release);
-  }
-
-  async getReleases(): Promise<Release[]> {
-    return this.releaseRepository.find();
-  }
-}
+export default PromotionEntity;

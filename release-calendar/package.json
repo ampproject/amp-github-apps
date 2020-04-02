@@ -20,6 +20,9 @@
     "server": "npm run server-build && npm run server-serve",
     "server-build": "webpack --config ./webpack.server.config.js",
     "server-serve": "node -r dotenv/config ./dist/bundle-server.js",
+    "setup": "npm run setup-build && npm run setup-serve",
+    "setup-build": "webpack --config ./webpack.setup.config.js",
+    "setup-serve": "node -r dotenv/config ./dist/bundle-setup.js",
     "test": "jest --verbose=false"
   },
   "dependencies": {
