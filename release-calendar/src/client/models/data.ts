@@ -23,7 +23,7 @@ export const DATA = [
     new Date('2020-03-01T08:44:29'),
     true,
   ),
-  new Release('2222222222222', Channel.STABLE, new Date('2020-03-02T08:44:29')),
+  new Release('2003311743260', Channel.STABLE, new Date('2020-03-02T08:44:29')),
   new Release(
     '333333333333',
     Channel.PERCENT_BETA,

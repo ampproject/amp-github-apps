@@ -24,6 +24,16 @@ export enum Channel {
   NIGHTLY = 'nightly',
 }
 
+const ChannelTitles = new Map<Channel, string>();
+ChannelTitles.set(Channel.LTS, 'Long Term Stable');
+ChannelTitles.set(Channel.STABLE, 'Stable');
+ChannelTitles.set(Channel.PERCENT_BETA, '1% Beta');
+ChannelTitles.set(Channel.PERCENT_EXPERIMENTAL, '1% Experimental');
+ChannelTitles.set(Channel.OPT_IN_BETA, 'Opt-in Beta');
+ChannelTitles.set(Channel.OPT_IN_EXPERIMENTAL, 'Opt-in Experimental');
+ChannelTitles.set(Channel.NIGHTLY, 'Nightly');
+export {ChannelTitles};
+
 //TODO: switch from class to interface once data is coming from server
 //for now, it must be a class because of data.ts
 // export interface Release {

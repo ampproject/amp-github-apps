@@ -1,0 +1,30 @@
+@import "@material/list/mixins";
+@import "@material/ripple/mixins";
+@import "@material/radio/mixins";
+
+:not(.mdc-list--non-interactive) > :not(.mdc-list-item--disabled).mdc-list-item::before, :not(.mdc-list--non-interactive) > :not(.mdc-list-item--disabled).mdc-list-item::after {
+    position: absolute !important;
+    border-radius: 50% !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    content: "" !important;
+}
+:not(.mdc-list--non-interactive) > :not(.mdc-list-item--disabled).mdc-list-item::before, :not(.mdc-list--non-interactive) > :not(.mdc-list-item--disabled).mdc-list-item::after {
+    background-color: #000 !important;
+}
+:not(.mdc-list--non-interactive) > :not(.mdc-list-item--disabled).mdc-list-item.mdc-ripple-upgraded::after {
+    top: 0 !important;
+    left: 0 !important;
+    transform: scale(0) !important;
+    transform-origin: center center !important;
+}
+:not(.mdc-list--non-interactive) > :not(.mdc-list-item--disabled).mdc-list-item.mdc-ripple-upgraded::after {
+    width: var(--mdc-ripple-fg-size, 50%) !important;
+    height: var(--mdc-ripple-fg-size, 100%) !important;
+}
+.noOutline:focus {
+    outline: none !important;
+}
+// .outline {
+//     single-line-shape-radius: $radius, $rtl-reflexive, $density-scale
+// }

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+//TODO: Delete this whole file! We dont want it in the client side.
+//I"m just waiting to do it for now cause we might find use for parts of it later
 import {Channel, Release} from '../../types';
 
 function getMostRecent(channel: Channel, releases: Release[]): string {
