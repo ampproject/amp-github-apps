@@ -16,7 +16,7 @@
 
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {Release} from '../../types';
+import {Release} from './view-models';
 
 function convertReleaseToEvent(release: Release): EventInput {
   return {
