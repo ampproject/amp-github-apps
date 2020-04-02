@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-// const {Channel, Promotion, Release} = require('../src/types');
-// const {Connection, Repository} = require('typeorm');
-// const {PromotionEntity} = require('../src/server/entities/promotion');
-// const {ReleaseEntity} = require('../src/server/entities/release');
-
 import {Channel, Promotion, Release} from '../src/types';
 import {Connection, Repository} from 'typeorm';
 import PromotionEntity from '../src/server/entities/promotion';
