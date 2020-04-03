@@ -32,7 +32,7 @@ export class RepositoryService {
       .where('release.name = :name', {name})
       .getOne();
 
-    releaseQuery.then(release => {
+    releaseQuery.then((release) => {
       release.promotions.sort(
         (a, b): number => b.date.getTime() - a.date.getTime(),
       );
@@ -47,8 +47,8 @@ export class RepositoryService {
       .leftJoinAndSelect('release.promotions', 'promotion')
       .getMany();
 
-    releaseQuery.then(releases => {
-      releases.forEach(release =>
+    releaseQuery.then((releases) => {
+      releases.forEach((release) =>
         release.promotions.sort(
           (a, b): number => b.date.getTime() - a.date.getTime(),
         ),
