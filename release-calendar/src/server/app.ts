@@ -30,7 +30,7 @@ async function main(): Promise<void> {
     entities: [ReleaseEntity, PromotionEntity],
     synchronize: false,
     logging: false,
-  }).catch(error => {
+  }).catch((error) => {
     throw error;
   });
 
@@ -38,7 +38,7 @@ async function main(): Promise<void> {
   const app = express();
   const port = process.env.API_PORT;
 
-  app.use(function(req, res, next) {
+  app.use(function (req, res, next) {
     res.header(
       'Access-Control-Allow-Origin',
       `http://localhost:${process.env.WEB_PORT}`,
@@ -56,7 +56,7 @@ async function main(): Promise<void> {
 
   app.get('/', async (req, res) => {
     const releases = await repositoryService.getReleases();
-    res.json({items: releases});
+    res.json(releases);
   });
 }
 main();

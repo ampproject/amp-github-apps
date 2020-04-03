@@ -16,42 +16,18 @@
 
 import {Release} from './models/view-models';
 import {Release as ReleaseEntity} from '../types';
+import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
 export class ApiService implements ApiService {
-  private getRequest(url: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', url);
-
-      xhr.onload = (): void => {
-        if (xhr.status == 200) {
-          resolve(xhr.response);
-        } else {
-          reject({
-            status: xhr.status,
-            statusText: xhr.statusText,
-          });
-        }
-      };
-
-      xhr.onerror = (): void => {
-        reject({
-          status: xhr.status,
-          statusText: xhr.statusText,
-        });
-      };
-
-      xhr.send();
-    });
+  private getRequest(url: string): Promise<ReleaseEntity[]> {
+    return fetch(url).then((result) => result.json());
   }
 
   async getReleases(): Promise<Release[]> {
-    const response = await this.getRequest(SERVER_URL);
-    const releasesJson: ReleaseEntity[] = JSON.parse(response).items;
-    const releases = releasesJson.map(release => {
+    const releases = await this.getRequest(SERVER_URL);
+    return releases.map((release: ReleaseEntity) => {
       return new Release(release);
     });
-    return Promise.resolve(releases);
   }
 }
