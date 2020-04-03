@@ -18,12 +18,12 @@ import {RepositoryService} from './repository-service';
 
 function promoteRelease(
   release: Release,
-  fromChanel: Channel,
+  fromChannel: Channel,
   toChannel: Channel,
   startDate: Date,
 ): Promotion[] {
   const promotions = [];
-  promotions.push(new Promotion(release, fromChanel, toChannel, startDate));
+  promotions.push(new Promotion(release, fromChannel, toChannel, startDate));
   return promotions;
 }
 
@@ -38,7 +38,7 @@ export default async function addTestData(
       new Release('4234567890123'), // TODO(estherkim): promote to opt_in_*
       new Release('5234567890123'), // nightly
       new Release('6234567890123'),
-    ].map(async release => {
+    ].map(async (release) => {
       await repositoryService.createRelease(release);
     }),
   );
