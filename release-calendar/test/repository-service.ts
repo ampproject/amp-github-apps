@@ -43,7 +43,7 @@ export class RepositoryService {
     const entity = await this.releaseRepository.save(release);
     const promotion = new Promotion(entity, Channel.CREATED, Channel.NIGHTLY);
     await this.savePromotion(promotion);
-    return await this.getRelease(entity.name);
+    return this.getRelease(entity.name);
   }
 
   savePromotion(promotion: Promotion): Promise<Promotion> {

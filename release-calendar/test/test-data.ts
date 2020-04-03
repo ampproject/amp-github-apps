@@ -39,7 +39,7 @@ export default async function addTestData(
       new Release('5234567890123'), // nightly
       new Release('6234567890123'),
     ].map(async (release) => {
-      await repositoryService.createRelease(release);
+      return repositoryService.createRelease(release);
     }),
   );
 
