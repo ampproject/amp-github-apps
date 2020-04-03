@@ -26,28 +26,17 @@ export enum Channel {
   CREATED = 'created',
 }
 
-export interface Release {
+export class Release {
+  constructor(name: string) {
+    this.name = name;
+  }
+
   name: string;
   promotions: Promotion[];
   cherrypicked?: Release;
 }
 
-export class Release implements Release {
-  name: string;
-  constructor(name: string) {
-    this.name = name;
-  }
-}
-
-export interface Promotion {
-  id: number;
-  release: Release;
-  fromChannel: Channel;
-  toChannel: Channel;
-  date: Date;
-}
-
-export class Promotion implements Promotion {
+export class Promotion {
   constructor(
     release: Release,
     fromChannel: Channel,
