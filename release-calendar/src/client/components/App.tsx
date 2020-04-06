@@ -13,39 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
-import {Calendar} from './Calendar';
-import {ChannelTable} from './ChannelTable';
-//TODO: remove DATA and instead populate with data from ./test/development-data.ts
 import '../stylesheets/app.scss';
 import '../stylesheets/square.scss';
+import * as React from 'react';
+import {ApiService} from '../api-service';
+import {Calendar} from './Calendar';
 import {Channel} from '../../types';
-import {DATA} from '../models/data';
+import {ChannelTable} from './ChannelTable';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
+import {getCurrentReleases} from '../models/release-channel';
 import {getEvents} from '../models/release-event';
 
 interface AppState {
   events: Map<Channel, EventSourceInput>;
   selectedChannel: Map<Channel, boolean>;
   selectedRelease: string;
+  currentReleases: Map<Channel, string>;
 }
 
 export class App extends React.Component<{}, AppState> {
+  private apiService: ApiService = new ApiService();
+
   readonly state: AppState = {
     events: new Map(),
     selectedChannel: new Map(),
     selectedRelease: null,
+    currentReleases: new Map(),
   };
+  async componentDidMount(): Promise<void> {
+    const releases = await this.apiService.getReleases();
+    const events = getEvents(releases);
+    this.setState({events});
+    const current = getCurrentReleases(releases);
+    this.setState({currentReleases: current});
 
-  //TODO: what is being called to the App component here
-  //is still is up for debate. For example, currently I have all of the events
-  //from all of forever going to the calendar component at all times and then
-  //narrowing what I display in there.
-  componentDidMount(): void {
-    Promise.resolve(getEvents(DATA)).then(result =>
-      this.setState({events: result}),
-    );
     const channels: Channel[] = [
       Channel.LTS,
       Channel.STABLE,
@@ -93,6 +95,7 @@ export class App extends React.Component<{}, AppState> {
               handleSelectChannel={this.handleSelectChannel}
               selectedRelease={this.state.selectedRelease}
               handleSelectRelease={this.handleSelectRelease}
+              currentReleases={this.state.currentReleases}
             />
           </div>
           <div className='col-break'></div>

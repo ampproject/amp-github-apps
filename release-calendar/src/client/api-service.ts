@@ -14,31 +14,20 @@
  * limitations under the License.
  */
 
-import {EntitySchema} from 'typeorm';
-import {Release} from '../../types';
+import {Release} from './models/view-models';
+import {Release as ReleaseEntity} from '../types';
+import fetch from 'node-fetch';
+const SERVER_URL = `http://localhost:3000`;
 
-export const ReleaseEntity = new EntitySchema<Release>({
-  name: 'release',
-  columns: {
-    name: {
-      primary: true,
-      type: String,
-      length: 13,
-    },
-  },
-  relations: {
-    promotions: {
-      type: 'one-to-many',
-      target: 'promotion',
-      inverseSide: 'release',
-      nullable: true,
-    },
-    cherrypicked: {
-      type: 'one-to-one',
-      target: 'release',
-      nullable: true,
-    },
-  },
-});
+export class ApiService implements ApiService {
+  private getRequest(url: string): Promise<ReleaseEntity[]> {
+    return fetch(url).then(result => result.json());
+  }
 
-export default ReleaseEntity;
+  async getReleases(): Promise<Release[]> {
+    const releases = await this.getRequest(SERVER_URL);
+    return releases.map((release: ReleaseEntity) => {
+      return new Release(release);
+    });
+  }
+}

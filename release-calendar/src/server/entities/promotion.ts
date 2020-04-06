@@ -13,14 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Channel} from '../../types';
 
-const DATAMAP = new Map<Channel, string>();
-DATAMAP.set(Channel.LTS, '1111111111111');
-DATAMAP.set(Channel.STABLE, '2222222222222');
-DATAMAP.set(Channel.PERCENT_BETA, '333333333333');
-DATAMAP.set(Channel.PERCENT_EXPERIMENTAL, '4444444444444');
-DATAMAP.set(Channel.OPT_IN_BETA, '5555555555555');
-DATAMAP.set(Channel.OPT_IN_EXPERIMENTAL, '6666666666666');
-DATAMAP.set(Channel.NIGHTLY, '7777777777777');
-export {DATAMAP};
+import {Channel, Promotion} from '../../types';
+import {EntitySchema} from 'typeorm';
+
+const PromotionEntity = new EntitySchema<Promotion>({
+  name: 'promotion',
+  columns: {
+    id: {
+      type: Number,
+      primary: true,
+      generated: 'increment',
+    },
+    fromChannel: {
+      type: 'enum',
+      enum: Channel,
+    },
+    toChannel: {
+      type: 'enum',
+      enum: Channel,
+    },
+    date: {
+      type: 'timestamp',
+    },
+  },
+  relations: {
+    release: {
+      type: 'many-to-one',
+      target: 'release',
+      joinColumn: true,
+      nullable: false,
+    },
+  },
+});
+
+export default PromotionEntity;

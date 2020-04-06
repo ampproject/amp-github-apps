@@ -16,17 +16,14 @@
 import '../stylesheets/channelTable.scss';
 import * as React from 'react';
 import {Channel, ChannelTitles} from '../../types';
-import {DATA} from '../models/data';
 import {Square} from './Square';
-import {getCurrentReleases} from '../models/release-channel';
 
 export interface ChannelTableProps {
-  // TODO: considering moving the RTVs out of the ChannelTable Component altogether and
-  // intead having them live directly next door. Still testing.
   handleSelectChannel: (selected: Channel) => void;
   selectedChannel: Map<Channel, boolean>;
   handleSelectRelease: (selected: string) => void;
   selectedRelease: string;
+  currentReleases: Map<Channel, string>;
 }
 
 export interface ChannleTableState {
@@ -45,12 +42,6 @@ export class ChannelTable extends React.Component<ChannelTableProps,ChannleTable
       rtvs: new Map(),
     };
     this.handleChannelChange = this.handleChannelChange.bind(this);
-  }
-
-  componentDidMount(): void {
-    Promise.resolve(getCurrentReleases(DATA)).then(result =>
-      this.setState({rtvs: result}),
-    );
   }
 
   handleChannelChange = (value: Channel): void => {

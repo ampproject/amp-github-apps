@@ -16,10 +16,12 @@
 
 //TODO: Delete this whole file! We dont want it in the client side.
 //I"m just waiting to do it for now cause we might find use for parts of it later
-import {Channel, Release} from '../../types';
+import {Channel} from '../../types';
+import {Release} from './view-models';
 
 function getMostRecent(channel: Channel, releases: Release[]): string {
   let currentRelease: Release = null;
+  console.log(releases);
   releases.forEach(release => {
     if (release.channel == channel && !release.isRollback) {
       if (currentRelease == null || currentRelease.date < release.date) {

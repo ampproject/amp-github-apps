@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-import {Connection, Repository} from 'typeorm';
-import {Release} from './entities/release';
+import {Channel, Release as ReleaseEntity} from '../../types';
 
-export class ApiService {
-  private releaseRepository: Repository<Release>;
-
-  constructor(connection: Connection) {
-    this.releaseRepository = connection.getRepository(Release);
+export class Release {
+  constructor(entity: ReleaseEntity) {
+    const currentPromotion = entity.promotions[0];
+    this.name = entity.name;
+    this.channel = currentPromotion.toChannel;
+    this.date = currentPromotion.date;
+    this.isRollback = this.channel == Channel.ROLLBACK;
   }
 
-  async getReleases(): Promise<Release[]> {
-    return this.releaseRepository.find();
-  }
+  name: string;
+  channel: Channel;
+  date: Date;
+  isRollback: boolean;
 }

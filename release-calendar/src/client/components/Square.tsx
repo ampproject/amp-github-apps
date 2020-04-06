@@ -18,8 +18,6 @@ import '../stylesheets/square.scss';
 import * as React from 'react';
 
 export interface SquareProps {
-  // TODO: considering moving the RTVs out of the ChannelTable Component altogether and
-  // intead having them live directly next door. Still testing.
   channel: string;
   selected: boolean;
 }
