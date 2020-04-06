@@ -23,17 +23,18 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
 export interface CalendarProps {
-  events: EventSourceInput[];
+  events: Map<Channel, EventSourceInput>;
   selectedChannel: Map<Channel, boolean>;
 }
 
 export class Calendar extends React.Component<CalendarProps, {}> {
   render(): JSX.Element {
-    // const eventsToDisplay: EventSourceInput[] =
-    //   this.props.selectedChannel != null
-    //     ? [this.props.events[0]]
-    //     : this.props.events;
-
+    const eventsToDisplay: EventSourceInput[] = [];
+    for (const [channel, selected] of this.props.selectedChannel) {
+      if (selected) {
+        eventsToDisplay.push(this.props.events.get(channel));
+      }
+    }
     return (
       <div className='calendar'>
         <FullCalendar
@@ -44,7 +45,7 @@ export class Calendar extends React.Component<CalendarProps, {}> {
             right: 'dayGridMonth,timeGridWeek,listWeek',
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
-          eventSources={this.props.events}
+          eventSources={eventsToDisplay}
         />
       </div>
     );

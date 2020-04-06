@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import '@material/react-layout-grid/index.scss';
 import * as React from 'react';
 import {Calendar} from './Calendar';
-import {Cell, Grid, Row} from '@material/react-layout-grid';
 import {ChannelTable} from './ChannelTable';
 //TODO: remove DATA and instead populate with data from ./test/development-data.ts
+import '../stylesheets/app.scss';
+import '../stylesheets/square.scss';
 import {Channel} from '../../types';
 import {DATA} from '../models/data';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
@@ -27,14 +26,16 @@ import {Header} from './Header';
 import {getEvents} from '../models/release-event';
 
 interface AppState {
-  events: EventSourceInput[];
+  events: Map<Channel, EventSourceInput>;
   selectedChannel: Map<Channel, boolean>;
+  selectedRelease: string;
 }
 
 export class App extends React.Component<{}, AppState> {
   readonly state: AppState = {
-    events: [],
+    events: new Map(),
     selectedChannel: new Map(),
+    selectedRelease: null,
   };
 
   //TODO: what is being called to the App component here
@@ -69,41 +70,41 @@ export class App extends React.Component<{}, AppState> {
     });
   };
 
+  handleSelectRelease = (selected: string): void => {
+    this.setState({selectedRelease: selected});
+  };
+
   // TODO: widths for cells are very rough, will change! Also thinking about setting
   // dimensions the same for all devices.
   render(): JSX.Element {
     return (
-      <div>
-        <Grid>
-          <Row>
-            <Cell columns={8}>
-              <Header title='AMP Release Calendar' />
-            </Cell>
-            <Cell columns={4} align={'middle'}>
-              TODO: Where the SearchBar will go
-            </Cell>
-          </Row>
-          <hr></hr>
-          <Row>
-            <Cell columns={4}>
-              <span> TODO: Where RTVTable will go</span>
-              {/* TODO: currently only allows for single channel select, implement multiple selection with checkboxes */}
-              {/* TODO: figure out how to unhighlight a row after it is unselected */}
-              <ChannelTable
-                selectedChannel={this.state.selectedChannel}
-                handleSelectChannel={this.handleSelectChannel}
-              />
-            </Cell>
-            {/* TODO: look into material design vertical line to divide calendar from tables */}
-            <Cell columns={8}>
-              {/* Add a dynamic calendar title component, changes with channel and RTV selections */}
-              <Calendar
-                events={this.state.events}
-                selectedChannel={this.state.selectedChannel}
-              />
-            </Cell>
-          </Row>
-        </Grid>
+      <div className='AMP-Calendar'>
+        <div className='header'>
+          <Header title='AMP Release Calendar' />
+        </div>
+        <hr></hr>
+        <div className='main-container'>
+          <div className='col-sidePannel'>
+            <span> TODO: Where RTVTable will go</span>
+            {/* TODO: currently only allows for single channel select, implement multiple selection with checkboxes */}
+            {/* TODO: figure out how to unhighlight a row after it is unselected */}
+            <ChannelTable
+              selectedChannel={this.state.selectedChannel}
+              handleSelectChannel={this.handleSelectChannel}
+              selectedRelease={this.state.selectedRelease}
+              handleSelectRelease={this.handleSelectRelease}
+            />
+          </div>
+          <div className='col-break'></div>
+          {/* TODO: look into material design vertical line to divide calendar from tables */}
+          <div className='col-calendar'>
+            {/* Add a dynamic calendar title component, changes with channel and RTV selections */}
+            <Calendar
+              events={this.state.events}
+              selectedChannel={this.state.selectedChannel}
+            />
+          </div>
+        </div>
       </div>
     );
   }

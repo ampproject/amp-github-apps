@@ -27,20 +27,14 @@ export class Square extends React.Component<SquareProps, {}> {
   render(): JSX.Element {
     if (this.props.selected) {
       return (
-        <div className='square'>
-          <button className={this.props.channel} style={{outline: 'none'}}>
-            <div className='selected'> </div>
-          </button>
+        <div className='selected'>
+          <div className={this.props.channel}></div>
         </div>
       );
     }
     return (
-      <div className='square'>
-        <button
-          className={this.props.channel}
-          style={{opacity: '50%', outline: 'none'}}>
-          {' '}
-        </button>
+      <div className={this.props.channel} style={{outline: 'none'}}>
+        {' '}
       </div>
     );
   }

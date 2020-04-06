@@ -1,50 +1,42 @@
-.square{
-    width: 50px;
-    padding-top: 5%;
-    padding-bottom: 4%;
-    height: 90%;
-    .focus {
-        outline: 'none';
-    }
-}
 .lts {
-    width: 90%;
-    height: 90%;
+    width: 3em;
+    height: 3em;
     background-color: black;
     outline: 'none';
 }
 .stable {
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
     background-color: grey;
 }
 .perc-beta {
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
     background-color: blue;
 }
 .perc-experimental {
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
     background-color: green;
 }
 .opt-in-beta {
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
     background-color: purple;
 }
 .opt-in-experimental {
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
     background-color:silver;
 }
 .nightly {
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
     background-color: red;
 }
 .selected {
     outline: 'none';
-    width:100% !important;
-    height:100% !important;
+    opacity: 100% !important;
+    width:100%;
+    height:100%;
 }

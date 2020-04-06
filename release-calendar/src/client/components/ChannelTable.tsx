@@ -13,28 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import '../stylesheets/channelTable.scss';
-import '@material/react-list/index.scss';
 import * as React from 'react';
 import {Channel, ChannelTitles} from '../../types';
 import {DATA} from '../models/data';
 import {Square} from './Square';
 import {getCurrentReleases} from '../models/release-channel';
-// import List, {
-//   ListGroup,
-//   ListGroupSubheader,
-//   ListItem,
-//   ListItemGraphic,
-//   ListItemMeta,
-//   ListItemText,
-// } from '@material/react-list';
 
 export interface ChannelTableProps {
   // TODO: considering moving the RTVs out of the ChannelTable Component altogether and
   // intead having them live directly next door. Still testing.
   handleSelectChannel: (selected: Channel) => void;
   selectedChannel: Map<Channel, boolean>;
+  handleSelectRelease: (selected: string) => void;
+  selectedRelease: string;
 }
 
 export interface ChannleTableState {
@@ -65,6 +57,10 @@ export class ChannelTable extends React.Component<ChannelTableProps,ChannleTable
     this.props.handleSelectChannel(value);
   };
 
+  handleReleaseChange = (value: string): void => {
+    this.props.handleSelectRelease(value);
+  };
+
   render(): JSX.Element {
     const channels: Channel[] = [
       Channel.LTS,
@@ -76,65 +72,41 @@ export class ChannelTable extends React.Component<ChannelTableProps,ChannleTable
       Channel.NIGHTLY,
     ];
     return (
-      <div>
-        <div className='container'>
-          <h2>CurrentReleases</h2>
+      <div className='container'>
+        <p>Current Releases</p>
+        <div className='row-container'>
           {channels.map(channel => {
+            const rtv = this.state.rtvs.get(channel);
             return (
               // eslint-disable-next-line react/jsx-key
-              <div key={channel} className='row'>
+              <div key={channel}>
                 <div>
                   <button
+                    className='row'
                     key={channel}
                     value={channel}
                     onClick={(): void => this.handleChannelChange(channel)}>
-                    {ChannelTitles.get(channel)}
-                    <Square
-                      channel={channel}
-                      selected={this.props.selectedChannel.get(
-                        channel,
-                      )}></Square>
+                    <div className='square'>
+                      <Square
+                        channel={channel}
+                        selected={this.props.selectedChannel.get(
+                          channel,
+                        )}></Square>
+                    </div>
+                    <div className='label'>{ChannelTitles.get(channel)}</div>
                   </button>
                 </div>
-                <button>{this.state.rtvs.get(channel)}</button>
+                <button
+                  className='rtv-button'
+                  key={rtv}
+                  value={rtv}
+                  onClick={(): void => this.handleReleaseChange(rtv)}>
+                  {rtv}
+                </button>
               </div>
             );
           })}
         </div>
-        {/* <ListGroup>
-          <ListGroupSubheader tag='h2'>Current Releases</ListGroupSubheader>
-          <List
-            singleSelection
-            selectedIndex={this.props.selectedChannel}
-            handleSelect={this.handleChannelChange}>
-            {channels.map((channel, index) => {
-              return (
-                // eslint-disable-next-line react/jsx-key
-                <div>
-                  <ListItem className='outline'>
-                    <ListItemGraphic
-                      graphic={
-                        <Square
-                          channel={channel}
-                          selected={
-                            this.props.selectedChannel === index
-                          }></Square>
-                      }
-                    />
-                    <ListItemText
-                      className='noOutline'
-                      primaryText={ChannelTitles.get(channel)}
-                    />
-                    <ListItemMeta
-                      meta={<button>{this.state.rtvs.get(channel)}</button>}
-                    />
-                  </ListItem>
-                  <hr className='mdc-list-divider--inset' />
-                </div>
-              );
-            })}
-          </List>
-        </ListGroup> */}
       </div>
     );
   }

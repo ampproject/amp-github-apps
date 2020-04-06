@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import {Channel, Release} from '../../types';
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {Release} from '../../types';
 
 function convertReleaseToEvent(release: Release): EventInput {
   return {
@@ -27,28 +27,52 @@ function convertReleaseToEvent(release: Release): EventInput {
   };
 }
 
-export function getEvents(releases: Release[]): EventSourceInput[] {
-  const map = new Map();
+export function getEvents(releases: Release[]): Map<Channel, EventSourceInput> {
+  const mapRelease = new Map();
   releases.forEach(release => {
     const event = convertReleaseToEvent(release);
-    const channelEvents = map.get(event.className);
+    const channelEvents = mapRelease.get(event.className);
     if (!channelEvents) {
-      map.set(event.className, [event]);
+      mapRelease.set(event.className, [event]);
     } else {
-      map.set(event.className, [...channelEvents, event]);
+      mapRelease.set(event.className, [...channelEvents, event]);
     }
   });
-  return [
-    {events: map.get('lts'), color: 'black', textColor: 'white'},
-    {events: map.get('stable'), color: 'gray', textColor: 'white'},
-    {events: map.get('perc-beta'), color: 'blue', textColor: 'white'},
-    {events: map.get('perc-experimental'), color: 'green', textColor: 'white'},
-    {events: map.get('opt-in-beta'), color: 'purple', textColor: 'white'},
-    {
-      events: map.get('opt-in-experimental'),
-      color: 'silver',
-      textColor: 'white',
-    },
-    {events: map.get('nightly'), color: 'red', textColor: 'white'},
-  ];
+  const map: Map<Channel, EventSourceInput> = new Map();
+  map.set(Channel.LTS, {
+    events: mapRelease.get('lts'),
+    color: 'black',
+    textColor: 'white',
+  });
+  map.set(Channel.STABLE, {
+    events: mapRelease.get('stable'),
+    color: 'gray',
+    textColor: 'white',
+  });
+  map.set(Channel.PERCENT_BETA, {
+    events: mapRelease.get('perc-beta'),
+    color: 'blue',
+    textColor: 'white',
+  });
+  map.set(Channel.PERCENT_EXPERIMENTAL, {
+    events: mapRelease.get('perc-experimental'),
+    color: 'green',
+    textColor: 'white',
+  });
+  map.set(Channel.OPT_IN_BETA, {
+    events: mapRelease.get('opt-in-beta'),
+    color: 'purple',
+    textColor: 'white',
+  });
+  map.set(Channel.OPT_IN_EXPERIMENTAL, {
+    events: mapRelease.get('opt-in-experimental'),
+    color: 'silver',
+    textColor: 'white',
+  });
+  map.set(Channel.NIGHTLY, {
+    events: mapRelease.get('nightly'),
+    color: 'red',
+    textColor: 'white',
+  });
+  return map;
 }
