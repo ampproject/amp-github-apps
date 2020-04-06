@@ -16,7 +16,7 @@
 
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {Release} from '../../types';
+import {Release} from './view-models';
 
 function convertReleaseToEvent(release: Release): EventInput {
   return {
@@ -29,7 +29,7 @@ function convertReleaseToEvent(release: Release): EventInput {
 
 export function getEvents(releases: Release[]): EventSourceInput[] {
   const map = new Map();
-  releases.forEach(release => {
+  releases.forEach((release) => {
     const event = convertReleaseToEvent(release);
     const channelEvents = map.get(event.className);
     if (!channelEvents) {

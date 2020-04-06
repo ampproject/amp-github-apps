@@ -14,31 +14,19 @@
  * limitations under the License.
  */
 
-import {EntitySchema} from 'typeorm';
-import {Release} from '../../types';
+import {Channel, Release as ReleaseEntity} from '../../types';
 
-export const ReleaseEntity = new EntitySchema<Release>({
-  name: 'release',
-  columns: {
-    name: {
-      primary: true,
-      type: String,
-      length: 13,
-    },
-  },
-  relations: {
-    promotions: {
-      type: 'one-to-many',
-      target: 'promotion',
-      inverseSide: 'release',
-      nullable: true,
-    },
-    cherrypicked: {
-      type: 'one-to-one',
-      target: 'release',
-      nullable: true,
-    },
-  },
-});
+export class Release {
+  constructor(entity: ReleaseEntity) {
+    const currentPromotion = entity.promotions[0];
+    this.name = entity.name;
+    this.channel = currentPromotion.toChannel;
+    this.date = currentPromotion.date;
+    this.isRollback = this.channel == Channel.ROLLBACK;
+  }
 
-export default ReleaseEntity;
+  name: string;
+  channel: Channel;
+  date: Date;
+  isRollback: boolean;
+}

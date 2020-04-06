@@ -22,26 +22,41 @@ export enum Channel {
   OPT_IN_BETA = 'opt-in-beta',
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
   NIGHTLY = 'nightly',
+  ROLLBACK = 'rollback',
+  CREATED = 'created',
 }
 
-//TODO: switch from class to interface once data is coming from server
-//for now, it must be a class because of data.ts
-// export interface Release {
-//   name: string;
-//   channel: Channel;
-//   date: Date;
-//   isRollback: boolean;
-// }
-
 export class Release {
-  name: string;
-  channel: Channel;
-  date: Date;
-  isRollback: boolean;
-  constructor(name: string, channel: Channel, date: Date, isRollback = false) {
+  constructor(name: string) {
     this.name = name;
-    this.channel = channel;
-    this.date = date;
-    this.isRollback = isRollback;
   }
+
+  name: string;
+  promotions: Promotion[];
+  cherrypicked?: Release;
+}
+
+export class Promotion {
+  constructor(
+    release: Release,
+    fromChannel: Channel,
+    toChannel: Channel,
+    date?: Date,
+  ) {
+    this.release = release;
+    this.fromChannel = fromChannel;
+    this.toChannel = toChannel;
+    this.date = date ? date : new Date(Date.now());
+  }
+
+  id: number;
+  release: Release;
+  fromChannel: Channel;
+  toChannel: Channel;
+  date: Date;
+}
+
+export interface ApiService {
+  getRelease: (name: string) => Promise<Release>;
+  getReleases: () => Promise<Release[]>;
 }

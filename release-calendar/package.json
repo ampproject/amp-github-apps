@@ -20,6 +20,9 @@
     "server": "npm run server-build && npm run server-serve",
     "server-build": "webpack --config ./webpack.server.config.js",
     "server-serve": "node -r dotenv/config ./dist/bundle-server.js",
+    "setup": "npm run setup-build && npm run setup-serve",
+    "setup-build": "webpack --config ./webpack.setup.config.js",
+    "setup-serve": "node -r dotenv/config ./dist/bundle-setup.js",
     "test": "jest --verbose=false"
   },
   "dependencies": {
@@ -30,6 +33,7 @@
     "@fullcalendar/timegrid": "4.4.0",
     "express": "4.17.1",
     "mysql": "2.18.1",
+    "node-fetch": "2.6.0",
     "react": "16.13.0",
     "react-dom": "16.13.0",
     "typeorm": "0.2.24"
@@ -37,6 +41,7 @@
   "devDependencies": {
     "@types/jest": "25.1.4",
     "@types/node": "12.12.26",
+    "@types/node-fetch": "2.5.5",
     "@types/react": "16.9.23",
     "@types/react-dom": "16.9.5",
     "@types/webpack-dev-server": "3.10.0",

@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-import {Connection, Repository} from 'typeorm';
-import {Release} from './entities/release';
+import {Release} from './models/view-models';
+import {Release as ReleaseEntity} from '../types';
+import fetch from 'node-fetch';
+const SERVER_URL = `http://localhost:3000`;
 
-export class ApiService {
-  private releaseRepository: Repository<Release>;
-
-  constructor(connection: Connection) {
-    this.releaseRepository = connection.getRepository(Release);
+export class ApiService implements ApiService {
+  private getRequest(url: string): Promise<ReleaseEntity[]> {
+    return fetch(url).then((result) => result.json());
   }
 
   async getReleases(): Promise<Release[]> {
-    return this.releaseRepository.find();
+    const releases = await this.getRequest(SERVER_URL);
+    return releases.map((release: ReleaseEntity) => {
+      return new Release(release);
+    });
   }
 }

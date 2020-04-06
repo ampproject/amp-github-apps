@@ -16,9 +16,9 @@
 
 import {Connection, createConnection} from 'typeorm';
 import {RepositoryService} from './repository-service';
-import PromotionEntity from './entities/promotion';
-import ReleaseEntity from './entities/release';
-import express from 'express';
+import PromotionEntity from '../src/server/entities/promotion';
+import ReleaseEntity from '../src/server/entities/release';
+import addTestData from './test-data';
 
 async function main(): Promise<void> {
   const connection: Connection = await createConnection({
@@ -28,35 +28,16 @@ async function main(): Promise<void> {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: [ReleaseEntity, PromotionEntity],
-    synchronize: false,
+    synchronize: true,
+    dropSchema: true,
     logging: false,
   }).catch((error) => {
     throw error;
   });
-
   const repositoryService = new RepositoryService(connection);
-  const app = express();
-  const port = process.env.API_PORT;
-
-  app.use(function (req, res, next) {
-    res.header(
-      'Access-Control-Allow-Origin',
-      `http://localhost:${process.env.WEB_PORT}`,
-    );
-    res.header(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept',
-    );
-    next();
-  });
-
-  app.listen(port, () => {
-    console.log(`Express server is listening on port: ${port}`);
-  });
-
-  app.get('/', async (req, res) => {
-    const releases = await repositoryService.getReleases();
-    res.json(releases);
-  });
+  await addTestData(repositoryService);
+  console.log('Created test data.');
+  process.exit();
 }
+
 main();

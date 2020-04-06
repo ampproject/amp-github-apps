@@ -14,31 +14,37 @@
  * limitations under the License.
  */
 
+import {Channel, Promotion} from '../../types';
 import {EntitySchema} from 'typeorm';
-import {Release} from '../../types';
 
-export const ReleaseEntity = new EntitySchema<Release>({
-  name: 'release',
+const PromotionEntity = new EntitySchema<Promotion>({
+  name: 'promotion',
   columns: {
-    name: {
+    id: {
+      type: Number,
       primary: true,
-      type: String,
-      length: 13,
+      generated: 'increment',
+    },
+    fromChannel: {
+      type: 'enum',
+      enum: Channel,
+    },
+    toChannel: {
+      type: 'enum',
+      enum: Channel,
+    },
+    date: {
+      type: 'timestamp',
     },
   },
   relations: {
-    promotions: {
-      type: 'one-to-many',
-      target: 'promotion',
-      inverseSide: 'release',
-      nullable: true,
-    },
-    cherrypicked: {
-      type: 'one-to-one',
+    release: {
+      type: 'many-to-one',
       target: 'release',
-      nullable: true,
+      joinColumn: true,
+      nullable: false,
     },
   },
 });
 
-export default ReleaseEntity;
+export default PromotionEntity;

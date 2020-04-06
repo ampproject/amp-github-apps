@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 import * as React from 'react';
+import {ApiService} from '../api-service';
 import {Calendar} from './Calendar';
-//TODO: remove DATA and instead populate with data from ./test/development-data.ts
-import {DATA} from '../models/data';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
 import {getEvents} from '../models/release-event';
@@ -26,18 +25,20 @@ interface AppState {
 }
 
 export class App extends React.Component<{}, AppState> {
+  private apiService: ApiService;
+
   constructor(props: unknown) {
     super(props);
     this.state = {
       events: [],
     };
+    this.apiService = new ApiService();
   }
 
-  //TODO: change fetch API call to service
-  componentDidMount(): void {
-    Promise.resolve(getEvents(DATA)).then(result =>
-      this.setState({events: result}),
-    );
+  async componentDidMount(): Promise<void> {
+    const releases = await this.apiService.getReleases();
+    const events = getEvents(releases);
+    this.setState({events});
   }
 
   render(): JSX.Element {
