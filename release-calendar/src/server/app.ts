@@ -15,7 +15,7 @@
  */
 
 import {Connection, createConnection} from 'typeorm';
-import {RepositoryService} from './respository-service';
+import {RepositoryService} from './repository-service';
 import PromotionEntity from './entities/promotion';
 import ReleaseEntity from './entities/release';
 import express from 'express';
