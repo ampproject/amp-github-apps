@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {Octokit} from 'probot';
-import {ChecksListForRefParams, ChecksUpdateParams} from '@octokit/rest';
+import {Octokit} from '@octokit/rest';
 import {GitHubAPI} from 'probot/lib/github';
+
 
 const ACTION: Octokit.ChecksUpdateParamsActions = {
   label: 'Create a test site',
@@ -29,11 +29,11 @@ const owner = process.env.GH_OWNER;
 const repo = process.env.GH_REPO;
 
 export class PullRequest {
-  private github: GitHubAPI;
+  private github: Octokit;
   private headSha: string;
 
   constructor(github: GitHubAPI, headSha: string) {
-    this.github = github;
+    this.github = github as unknown as Octokit;
     this.headSha = headSha;
   }
 
@@ -51,7 +51,7 @@ export class PullRequest {
   async deploymentInProgress() {
     const check = await this.getCheck_();
 
-    const params: ChecksUpdateParams = {
+    const params: Octokit.ChecksUpdateParams = {
       owner,
       repo,
       check_run_id: check.id,
@@ -74,7 +74,7 @@ export class PullRequest {
   async deploymentCompleted(bucketUrl: string, serveUrl: string) {
     const check = await this.getCheck_();
 
-    const params: ChecksUpdateParams = {
+    const params: Octokit.ChecksUpdateParams = {
       owner,
       repo,
       check_run_id: check.id,
@@ -102,7 +102,7 @@ export class PullRequest {
   async deploymentErrored(error: Error) {
     const check = await this.getCheck_();
 
-    const params: ChecksUpdateParams = {
+    const params: Octokit.ChecksUpdateParams = {
       owner,
       repo,
       check_run_id: check.id,
@@ -125,7 +125,7 @@ export class PullRequest {
   async buildCompleted(id: number) {
     const check = await this.getCheck_();
 
-    const params: ChecksUpdateParams = {
+    const params: Octokit.ChecksUpdateParams = {
       owner,
       repo,
       check_run_id: check.id,
@@ -150,7 +150,7 @@ export class PullRequest {
   async buildErrored() {
     const check = await this.getCheck_();
 
-    const params: ChecksUpdateParams = {
+    const params: Octokit.ChecksUpdateParams = {
       owner,
       repo,
       check_run_id: check.id,
@@ -172,7 +172,7 @@ export class PullRequest {
   async buildSkipped() {
     const check = await this.getCheck_();
 
-    const params: ChecksUpdateParams = {
+    const params: Octokit.ChecksUpdateParams = {
       owner,
       repo,
       check_run_id: check.id,
@@ -235,7 +235,7 @@ export class PullRequest {
       } as Octokit.ChecksListForRefResponseCheckRunsItemOutput;
     }
 
-    const params: ChecksUpdateParams = {
+    const params: Octokit.ChecksUpdateParams = {
       owner,
       repo,
       check_run_id: check.id,
@@ -249,7 +249,7 @@ export class PullRequest {
    * Get the check or return null if it does not exist.
    */
   private async getCheck_() {
-    const params: ChecksListForRefParams = {
+    const params: Octokit.ChecksListForRefParams = {
       owner,
       repo,
       ref: this.headSha,

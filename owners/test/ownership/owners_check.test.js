@@ -85,6 +85,21 @@ describe('check run', () => {
       expect(checkRunJson.conclusion).toBeUndefined();
       expect(checkRunJson.completed_at).toBeUndefined();
     });
+
+    it('truncates text over the limit', () => {
+      sandbox.stub(CheckRun.prototype, 'textLimit').value(40);
+      const checkRun = new CheckRun(
+        CheckRunState.IN_PROGRESS,
+        'Test summary',
+        'Test text content that is over the limit'
+      );
+      const checkRunJson = checkRun.json;
+
+      expect(checkRunJson.output.text.length).toEqual(40);
+      expect(checkRunJson.output.text).toEqual(
+        'Test text content…[TRUNCATED]\n\nHELP TEXT'
+      );
+    });
   });
 });
 

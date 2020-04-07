@@ -84,9 +84,7 @@ function determineBuildTargets(fileName = 'build-targets.js') {
     ALL_TARGETS.forEach(buildTargets.add, buildTargets);
   }
 
-  const targetList = Array.from(buildTargets)
-    .sort()
-    .join(', ');
+  const targetList = Array.from(buildTargets).sort().join(', ');
   console.log(
     bold(yellow(`${fileName}:`)),
     'Detected build targets:',

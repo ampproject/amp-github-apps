@@ -21,7 +21,7 @@ const SERVER_URL = `http://localhost:3000`;
 
 export class ApiService implements ApiService {
   private getRequest(url: string): Promise<ReleaseEntity[]> {
-    return fetch(url).then(result => result.json());
+    return fetch(url).then((result) => result.json());
   }
 
   async getReleases(): Promise<Release[]> {

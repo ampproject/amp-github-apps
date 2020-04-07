@@ -183,9 +183,7 @@ describe('GitHub API', () => {
 
     it('returns the response', async () => {
       expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/api/endpoint')
-        .reply(200, '_DATA_');
+      nock('https://api.github.com').get('/api/endpoint').reply(200, '_DATA_');
 
       const response = await github._customRequest('GET', '/api/endpoint');
       expect(response.data).toEqual('_DATA_');
@@ -207,7 +205,7 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .get('/api/endpoint')
-        .reply(200, function() {
+        .reply(200, function () {
           // Note: it is important this use `function` syntax (instead of arrow
           // syntax `() => {}` because it needs to access `this`.
           // eslint-disable-next-line no-invalid-this

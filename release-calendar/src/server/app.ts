@@ -15,7 +15,7 @@
  */
 
 import {Connection, createConnection} from 'typeorm';
-import {RepositoryService} from './respository-service';
+import {RepositoryService} from './repository-service';
 import PromotionEntity from './entities/promotion';
 import ReleaseEntity from './entities/release';
 import express from 'express';
@@ -30,7 +30,7 @@ async function main(): Promise<void> {
     entities: [ReleaseEntity, PromotionEntity],
     synchronize: false,
     logging: false,
-  }).catch(error => {
+  }).catch((error) => {
     throw error;
   });
 
@@ -38,7 +38,7 @@ async function main(): Promise<void> {
   const app = express();
   const port = process.env.API_PORT;
 
-  app.use(function(req, res, next) {
+  app.use(function (req, res, next) {
     res.header(
       'Access-Control-Allow-Origin',
       `http://localhost:${process.env.WEB_PORT}`,

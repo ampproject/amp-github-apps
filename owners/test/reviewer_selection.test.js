@@ -19,6 +19,7 @@ const sinon = require('sinon');
 const {
   OwnersRule,
   PatternOwnersRule,
+  ReviewerSetRule,
   SameDirPatternOwnersRule,
 } = require('../src/ownership/rules');
 const {ReviewerSelection} = require('../src/reviewer_selection');
@@ -204,13 +205,18 @@ describe('reviewer selection', () => {
   });
 
   describe('findPotentialReviewers', () => {
-    it('returns reviewers for the deepest trees', () => {
-      const fileTreeMap = ownersTree.buildFileTreeMap([
+    let fileTreeMap;
+
+    beforeEach(() => {
+      fileTreeMap = ownersTree.buildFileTreeMap([
         './main.js',
         'biz/style.css',
         'foo/bar/other_file.js',
       ]);
       sandbox.stub(ReviewerSelection, '_reviewersForRules').callThrough();
+    });
+
+    it('returns reviewers for the deepest trees', () => {
       const reviewers = ReviewerSelection._findPotentialReviewers(fileTreeMap);
 
       sandbox.assert.calledWith(
@@ -218,6 +224,17 @@ describe('reviewer selection', () => {
         sinon.match.array.contains([dirRules['/foo'], dirRules['/biz']])
       );
       expect(reviewers).toEqual(expect.arrayContaining(['child', 'kid']));
+    });
+
+    it('ignores users who are not in the allowed reviewer set', () => {
+      const reviewerTeam = new Team(42, 'ampproject', 'reviewer-set');
+      reviewerTeam.members = ['reviewer', 'kid', 'someone'];
+      ownersTree.addRule(
+        new ReviewerSetRule('OWNERS', [new TeamOwner(reviewerTeam)])
+      );
+
+      const reviewers = ReviewerSelection._findPotentialReviewers(fileTreeMap);
+      expect(reviewers).toEqual(['kid']);
     });
   });
 

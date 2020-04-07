@@ -37,13 +37,11 @@ exports.getPullRequestSnapshot = async (db, headSha) => {
  * @return {?number} the check run ID or null if not found.
  */
 exports.getCheckRunId = async (db, headSha, type, subType) => {
-  const existingCheck = await db('checks')
-    .first('checkRunId')
-    .where({
-      headSha,
-      type,
-      subType,
-    });
+  const existingCheck = await db('checks').first('checkRunId').where({
+    headSha,
+    type,
+    subType,
+  });
   if (existingCheck === undefined) {
     return null;
   } else {

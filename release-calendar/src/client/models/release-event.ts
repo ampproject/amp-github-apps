@@ -28,9 +28,10 @@ function convertReleaseToEvent(release: Release): EventInput {
   };
 }
 
-export function getEvents(releases: Release[]): Map<Channel, EventSourceInput> {
-  const mapRelease = new Map();
-  releases.forEach(release => {
+export function getEvents(releases: Release[]): EventSourceInput[] {
+  const map = new Map();
+  releases.forEach((release) => {
+
     const event = convertReleaseToEvent(release);
     const channelEvents = mapRelease.get(event.className);
     if (!channelEvents) {

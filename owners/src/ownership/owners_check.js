@@ -21,6 +21,9 @@ const GITHUB_CHECKRUN_NAME = 'ampproject/owners-check';
 const EXAMPLE_OWNERS_LINK = 'http://ampproject-owners-bot.appspot.com/example';
 const OWNERS_TREE_LINK = 'http://ampproject-owners-bot.appspot.com/tree';
 
+// GitHub API for Check Runs (https://developer.github.com/v3/checks/runs/) has
+// an undocumented character limit for the `output.text` field.
+const CHECKRUN_TEXT_LIMIT = 65535;
 const CheckRunState = {
   SUCCESS: 'success',
   IN_PROGRESS: 'in_progress',
@@ -50,12 +53,20 @@ class CheckRun {
    * @return {!object} JSON object describing check-run.
    */
   get json() {
+    let text = `${this.text}\n\n${this.helpText}`;
+    if (text.length > this.textLimit) {
+      const info = '…[TRUNCATED]';
+      const over = text.length + info.length - this.textLimit;
+      const partialText = this.text.substr(0, this.text.length - over);
+      text = `${partialText}${info}\n\n${this.helpText}`;
+    }
+
     const checkRun = {
       name: GITHUB_CHECKRUN_NAME,
       output: {
         title: this.summary,
         summary: this.summary,
-        text: `${this.text}\n\n${this.helpText}`,
+        text,
       },
     };
 
@@ -72,6 +83,7 @@ class CheckRun {
     return checkRun;
   }
 }
+CheckRun.prototype.textLimit = CHECKRUN_TEXT_LIMIT;
 CheckRun.prototype.helpText =
   'For a description of the OWNERS file syntax, see ' +
   `[this example file](${EXAMPLE_OWNERS_LINK}).\n` +
