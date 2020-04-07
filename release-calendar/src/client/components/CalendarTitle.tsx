@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import '../stylesheets/header.scss';
+import '../stylesheets/title.scss';
 import * as React from 'react';
 
-export interface HeaderProps {
+export interface CalendarTitleProps {
   title: string;
 }
 
-export class Header extends React.Component<HeaderProps, {}> {
+export class CalendarTitle extends React.Component<CalendarTitleProps, {}> {
   render(): JSX.Element {
-    return <div className='title'>{'AMP Release Calendar'}</div>;
+    return (
+      <div className='title-bar'>
+        <h1>{this.props.title}</h1>
+      </div>
+    );
   }
 }

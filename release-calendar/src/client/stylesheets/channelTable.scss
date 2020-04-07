@@ -10,6 +10,7 @@
     width:65%;
     height: 3em;
 }
+
 @media only screen and (max-width: 600px) {
     .rtv-button {
       width: 100%;
@@ -32,7 +33,7 @@ button {
     font-size: 14px;
     line-height: 3em;
     color: #24292e;
-    background-color: whitesmoke;
+    background-color:rgb(255, 255, 255);
 }
 .rtv-button{
     float:left;

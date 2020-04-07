@@ -1,32 +1,5 @@
-.header{
-    top: 10px;
-    overflow: hidden;
-    padding-top: 24px;
-}
-.head{
-    position: sticky;
-    display: flex;
-    align-items: center;
-    padding-bottom: 10px;
-    margin-right: auto;
-    height:40px
-}
-.logo-container{
-    height: 30px;
-    width: 30px;
-    float:left;
-}
 .title{
-    color: #005af0;
-    margin-left: 4px;
     font-family: Poppins,sans-serif;
     font-weight: 700;
     font-size: 1.5em;
-}
-.search-bar{
-    display: flex;
-    float:right;
-    margin-left: auto;
-    padding-bottom:10px;
-    top: 10px
 }

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import '../stylesheets/channelTable.scss';
+import '../stylesheets/title.scss';
 import * as React from 'react';
 import {Channel, ChannelTitles} from '../../types';
 import {Square} from './Square';
@@ -51,23 +52,25 @@ export class ChannelTable extends React.Component<ChannelTableProps,ChannleTable
   handleReleaseChange = (value: string): void => {
     this.props.handleSelectRelease(value);
   };
-
   render(): JSX.Element {
     const channels: Channel[] = [
-      Channel.LTS,
       Channel.STABLE,
       Channel.PERCENT_BETA,
       Channel.PERCENT_EXPERIMENTAL,
       Channel.OPT_IN_BETA,
       Channel.OPT_IN_EXPERIMENTAL,
-      Channel.NIGHTLY,
+      Channel.PERCENT_NIGHTLY,
+      Channel.OPT_IN_NIGHTLY,
+      Channel.LTS,
     ];
     return (
       <div className='container'>
-        <p>Current Releases</p>
+        <div className='title-bar'>
+          <h1>Current Releases</h1>
+        </div>
         <div className='row-container'>
           {channels.map(channel => {
-            const rtv = this.state.rtvs.get(channel);
+            const rtv = '1111111111111'; //this.state.rtvs.get(channel);
             return (
               // eslint-disable-next-line react/jsx-key
               <div key={channel}>

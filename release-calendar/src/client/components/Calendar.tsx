@@ -46,6 +46,8 @@ export class Calendar extends React.Component<CalendarProps, {}> {
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
           eventSources={eventsToDisplay}
+          contentHeight={430}
+          fixedWeekCount={false}
         />
       </div>
     );

@@ -21,7 +21,6 @@ import {Release} from './view-models';
 
 function getMostRecent(channel: Channel, releases: Release[]): string {
   let currentRelease: Release = null;
-  console.log(releases);
   releases.forEach(release => {
     if (release.channel == channel && !release.isRollback) {
       if (currentRelease == null || currentRelease.date < release.date) {
@@ -39,7 +38,8 @@ export function getCurrentReleases(releases: Release[]): Map<Channel, string> {
     Channel.PERCENT_EXPERIMENTAL,
     Channel.OPT_IN_BETA,
     Channel.OPT_IN_EXPERIMENTAL,
-    Channel.NIGHTLY,
+    Channel.PERCENT_NIGHTLY,
+    Channel.OPT_IN_NIGHTLY,
   ];
   const map = new Map();
   channels.forEach(channel =>

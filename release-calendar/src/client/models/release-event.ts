@@ -70,9 +70,14 @@ export function getEvents(releases: Release[]): Map<Channel, EventSourceInput> {
     color: 'silver',
     textColor: 'white',
   });
-  map.set(Channel.NIGHTLY, {
-    events: mapRelease.get('nightly'),
+  map.set(Channel.PERCENT_NIGHTLY, {
+    events: mapRelease.get('perc-nightly'),
     color: 'red',
+    textColor: 'white',
+  });
+  map.set(Channel.OPT_IN_NIGHTLY, {
+    events: mapRelease.get('opt-in-nightly'),
+    color: 'orange',
     textColor: 'white',
   });
   return map;

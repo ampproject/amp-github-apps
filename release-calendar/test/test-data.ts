@@ -32,8 +32,8 @@ export default async function addTestData(
 ): Promise<void> {
   await Promise.all(
     [
-      new Release('1234567890123'), // lts
-      new Release('2234567890123'), // TODO(estherkim): promote to stable
+      new Release('1234567890123'), // TODO(estherkim): promote to stable
+      new Release('2234567890123'), // lts
       new Release('3234567890123'), // TODO(estherkim): promote to percent_*
       new Release('4234567890123'), // TODO(estherkim): promote to opt_in_*
       new Release('5234567890123'), // nightly
@@ -47,7 +47,8 @@ export default async function addTestData(
   const promises = [];
   const startDate = new Date(Date.now());
   const channelsForBeta = [
-    Channel.NIGHTLY,
+    Channel.PERCENT_NIGHTLY,
+    Channel.OPT_IN_NIGHTLY,
     Channel.OPT_IN_BETA,
     Channel.PERCENT_BETA,
     Channel.STABLE,
@@ -67,7 +68,8 @@ export default async function addTestData(
   }
 
   const channelsForExperimental = [
-    Channel.NIGHTLY,
+    Channel.PERCENT_NIGHTLY,
+    Channel.OPT_IN_NIGHTLY,
     Channel.OPT_IN_EXPERIMENTAL,
     Channel.PERCENT_EXPERIMENTAL,
   ];

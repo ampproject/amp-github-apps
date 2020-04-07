@@ -21,7 +21,8 @@ export enum Channel {
   PERCENT_EXPERIMENTAL = 'perc-experimental',
   OPT_IN_BETA = 'opt-in-beta',
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
-  NIGHTLY = 'nightly',
+  PERCENT_NIGHTLY = 'perc-nightly',
+  OPT_IN_NIGHTLY = 'opt-in-nightly',
   ROLLBACK = 'rollback',
   CREATED = 'created',
 }
@@ -29,11 +30,12 @@ export enum Channel {
 const ChannelTitles = new Map<Channel, string>();
 ChannelTitles.set(Channel.LTS, 'Long Term Stable');
 ChannelTitles.set(Channel.STABLE, 'Stable');
-ChannelTitles.set(Channel.PERCENT_BETA, '1% Beta');
-ChannelTitles.set(Channel.PERCENT_EXPERIMENTAL, '1% Experimental');
+ChannelTitles.set(Channel.PERCENT_BETA, '% Beta');
+ChannelTitles.set(Channel.PERCENT_EXPERIMENTAL, '% Experimental');
 ChannelTitles.set(Channel.OPT_IN_BETA, 'Opt-in Beta');
 ChannelTitles.set(Channel.OPT_IN_EXPERIMENTAL, 'Opt-in Experimental');
-ChannelTitles.set(Channel.NIGHTLY, 'Nightly');
+ChannelTitles.set(Channel.PERCENT_NIGHTLY, '% Nightly');
+ChannelTitles.set(Channel.OPT_IN_NIGHTLY, 'Opt-in Nightly');
 export {ChannelTitles};
 
 export class Release {
