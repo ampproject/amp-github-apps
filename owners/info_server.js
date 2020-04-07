@@ -64,9 +64,7 @@ class Server {
     }
 
     this.router[method](uri, async (req, res, next) => {
-      handler(req)
-        .then(res.send.bind(res))
-        .catch(next);
+      handler(req).then(res.send.bind(res)).catch(next);
     });
   }
 

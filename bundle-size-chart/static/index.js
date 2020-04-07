@@ -30,10 +30,7 @@ const hoverLine = svg
   .append('path')
   .classed('hover-line', true)
   .attr('display', 'none');
-const dot = svg
-  .append('g')
-  .attr('display', 'none')
-  .classed('dot', true);
+const dot = svg.append('g').attr('display', 'none').classed('dot', true);
 dot.append('circle').attr('r', 2.5);
 const dotAnchor = dot.append('a');
 const dotFileNameText = dotAnchor
@@ -178,7 +175,7 @@ function moved() {
   const fileName = closestDataFile.substring(5);
   const bundleSize = closestDataRow[closestDataFile];
 
-  hoverLine.attr('d', function() {
+  hoverLine.attr('d', function () {
     let d = 'M' + x(closestDataRow.date) + ',' + height;
     d += ' ' + x(closestDataRow.date) + ',' + 0;
     return d;
