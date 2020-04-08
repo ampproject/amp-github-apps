@@ -21,8 +21,7 @@ export enum Channel {
   PERCENT_EXPERIMENTAL = 'perc-experimental',
   OPT_IN_BETA = 'opt-in-beta',
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
-  PERCENT_NIGHTLY = 'perc-nightly',
-  OPT_IN_NIGHTLY = 'opt-in-nightly',
+  NIGHTLY = 'nightly',
   ROLLBACK = 'rollback',
   CREATED = 'created',
 }

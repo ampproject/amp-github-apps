@@ -32,12 +32,11 @@ export default async function addTestData(
 ): Promise<void> {
   await Promise.all(
     [
-      new Release('1234567890123'), // lts
-      new Release('2234567890123'), // (TODO(estherkim): promote to stable) stable
-      new Release('3234567890123'), // (TODO(estherkim): promote to percent_*) percent_beta
-      new Release('4234567890123'), // (TODO(estherkim): promote to opt_in_*) opt_in_beta
-      new Release('5234567890123'), // opt_in_nightly
-      new Release('6234567890123'), // percent_nightly
+      new Release('1234567890123'), // nightly
+      new Release('2234567890123'), // lts
+      new Release('3234567890123'), // perc-beta and perc-experimental
+      new Release('4234567890123'), // stable
+      new Release('5234567890123'), // opt-in-beta and opt-in experimental
     ].map(async release => {
       return repositoryService.createRelease(release);
     }),
@@ -46,46 +45,39 @@ export default async function addTestData(
   const releases = await repositoryService.getReleases();
   const promises = [];
   const startDate = new Date(Date.now());
-  //TODO(ajwhatson):clarify with estherkim about what channel path of releases through nightly
   const channelsForBeta = [
-    Channel.PERCENT_NIGHTLY,
-    Channel.OPT_IN_NIGHTLY,
+    Channel.NIGHTLY,
     Channel.OPT_IN_BETA,
     Channel.PERCENT_BETA,
     Channel.STABLE,
     Channel.LTS,
   ];
+  const channelsForExperimental = [
+    Channel.NIGHTLY,
+    Channel.OPT_IN_EXPERIMENTAL,
+    Channel.PERCENT_EXPERIMENTAL,
+  ];
+
   for (let i = 0; i < releases.length; i++) {
     for (let j = 0; j < channelsForBeta.length - 1 - i; j++) {
       const newDate = new Date();
       newDate.setDate(startDate.getDate() + j + 1);
-      const promotions = promoteRelease(
+      const betaPromotions = promoteRelease(
         releases[i],
         channelsForBeta[j],
         channelsForBeta[j + 1],
         newDate,
       );
-      promises.push(repositoryService.savePromotions(promotions));
-    }
-
-    //TODO(ajwhatson):clarify with estherkim about what channel path of releases through nightly
-    const channelsForExperimental = [
-      Channel.PERCENT_NIGHTLY,
-      Channel.OPT_IN_NIGHTLY,
-      Channel.OPT_IN_EXPERIMENTAL,
-      Channel.PERCENT_EXPERIMENTAL,
-    ];
-
-    for (let k = 0; k < channelsForExperimental.length - 1 - i; k++) {
-      const newDate = new Date();
-      newDate.setDate(startDate.getDate() + k + 1);
-      const promotions = promoteRelease(
-        releases[i],
-        channelsForExperimental[k],
-        channelsForExperimental[k + 1],
-        newDate,
-      );
-      promises.push(repositoryService.savePromotions(promotions));
+      promises.push(repositoryService.savePromotions(betaPromotions));
+      if (j < 2) {
+        const experimentalPromotions = promoteRelease(
+          releases[i],
+          channelsForExperimental[j],
+          channelsForExperimental[j + 1],
+          newDate,
+        );
+        promises.push(repositoryService.savePromotions(experimentalPromotions));
+      }
     }
   }
 

@@ -37,7 +37,6 @@ async function main(): Promise<void> {
   const repositoryService = new RepositoryService(connection);
   await addTestData(repositoryService);
   console.log('Created test data.');
-  console.log(await repositoryService.getReleases());
   process.exit();
 }
 
