@@ -36,7 +36,7 @@ export default async function addTestData(
       new Release('2234567890123'), // lts
       new Release('3234567890123'), // perc-beta and perc-experimental
       new Release('4234567890123'), // stable
-      new Release('5234567890123'), // opt-in-beta and opt-in experimental
+      new Release('5234567890123'), // opt-in-beta and opt-in-experimental
     ].map(async release => {
       return repositoryService.createRelease(release);
     }),
@@ -69,7 +69,7 @@ export default async function addTestData(
         newDate,
       );
       promises.push(repositoryService.savePromotions(betaPromotions));
-      if (j < 2) {
+      if (j < channelsForExperimental.length) {
         const experimentalPromotions = promoteRelease(
           releases[i],
           channelsForExperimental[j],
