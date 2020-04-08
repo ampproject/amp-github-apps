@@ -42,12 +42,19 @@ export class Calendar extends React.Component<CalendarProps, {}> {
           header={{
             left: 'prev,next',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek',
+            right: 'dayGridMonth,dayGridWeek',
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
           eventSources={eventsToDisplay}
           contentHeight={430}
           fixedWeekCount={false}
+          displayEventTime={false}
+          // eventTimeFormat={{
+          //   hour: 'numeric',
+          //   minute: '2-digit',
+          //   meridiem: 'short',
+          // }}
+          views={{month: {eventLimit: 3}}}
         />
       </div>
     );

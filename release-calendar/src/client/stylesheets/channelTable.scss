@@ -1,7 +1,23 @@
-.container{
-    width: 100%;
-    height: 100%;
+
+button:focus {
+    outline: none !important;
 }
+
+body {
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #24292e;
+}
+
+button {
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+    font-size: 14px;
+    line-height: 3em;
+    color: #24292e;
+    background-color:rgb(255, 255, 255);
+}
+
 .row{
     float:left;
     padding-left: 0px;
@@ -11,30 +27,6 @@
     height: 3em;
 }
 
-@media only screen and (max-width: 600px) {
-    .rtv-button {
-      width: 100%;
-    }
-    .label {
-        width: 0%;
-    }
-  }
-button:focus {
-    outline: none !important;
-}
-body {
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #24292e;
-}
-button {
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-    font-size: 14px;
-    line-height: 3em;
-    color: #24292e;
-    background-color:rgb(255, 255, 255);
-}
 .rtv-button{
     float:left;
     width: 35%;
@@ -43,14 +35,19 @@ button {
     padding-left: 0px;
     padding-right: 0px;
 }
+
 .label{
-    width: 70%;
-    float: right;
+    width: 30%;
+    margin-left: 4em;
+    padding-right: 0px;
+    text-align: left;
+    position: absolute;
     height:3em;
+    text-overflow: clip;
+    overflow: hidden;
+    white-space: nowrap;
 }
-button:focus {
-    outline: none !important;
-}
+
 .square{
     float:left;
     width: 3em;

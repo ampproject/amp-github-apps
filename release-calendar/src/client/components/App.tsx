@@ -35,7 +35,6 @@ interface AppState {
 }
 
 export class App extends React.Component<{}, AppState> {
-
   private apiService: ApiService = new ApiService();
 
   readonly state: AppState = {
@@ -74,10 +73,28 @@ export class App extends React.Component<{}, AppState> {
     this.setState({
       selectedChannel: replace,
     });
+    this.setState({selectedRelease: null});
   };
 
   handleSelectRelease = (selected: string): void => {
-    this.setState({selectedRelease: selected});
+    if (this.state.selectedRelease === selected) {
+      this.setState({selectedRelease: null});
+    } else {
+      this.setState({selectedRelease: selected});
+      const channels: Channel[] = [
+        Channel.LTS,
+        Channel.STABLE,
+        Channel.PERCENT_BETA,
+        Channel.PERCENT_EXPERIMENTAL,
+        Channel.OPT_IN_BETA,
+        Channel.OPT_IN_EXPERIMENTAL,
+        Channel.PERCENT_NIGHTLY,
+        Channel.OPT_IN_NIGHTLY,
+      ];
+      const map = new Map();
+      channels.forEach(channel => map.set(channel, false));
+      this.setState({selectedChannel: map});
+    }
   };
 
   // TODO: widths for cells are very rough, will change! Also thinking about setting
