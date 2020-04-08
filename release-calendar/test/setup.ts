@@ -31,12 +31,13 @@ async function main(): Promise<void> {
     synchronize: true,
     dropSchema: true,
     logging: false,
-  }).catch((error) => {
+  }).catch(error => {
     throw error;
   });
   const repositoryService = new RepositoryService(connection);
   await addTestData(repositoryService);
   console.log('Created test data.');
+  console.log(await repositoryService.getReleases());
   process.exit();
 }
 

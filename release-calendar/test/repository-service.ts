@@ -41,7 +41,12 @@ export class RepositoryService {
 
   async createRelease(release: Release): Promise<Release> {
     const entity = await this.releaseRepository.save(release);
-    const promotion = new Promotion(entity, Channel.CREATED, Channel.NIGHTLY);
+    //TODO(ajwhatson):clarify with estherkim about what channel path of releases through nightly
+    const promotion = new Promotion(
+      entity,
+      Channel.CREATED,
+      Channel.PERCENT_NIGHTLY,
+    );
     await this.savePromotion(promotion);
     return this.getRelease(entity.name);
   }
