@@ -54,7 +54,7 @@ export default async function addTestData(
   ];
   const startDate = new Date(Date.now());
   startDate.setDate(startDate.getDate() - 30);
-  
+
   for (let i = 0; i < releases.length; i++) {
     const newDate = new Date();
     newDate.setDate(startDate.getDate() + i * 5);
@@ -76,7 +76,9 @@ export default async function addTestData(
           channelsForExperimental[j + 1],
           promoteDate,
         );
-        promotePromises.push(repositoryService.savePromotions(experimentalPromotions));
+        promotePromises.push(
+          repositoryService.savePromotions(experimentalPromotions),
+        );
       }
     }
   }
