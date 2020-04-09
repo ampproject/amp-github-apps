@@ -38,7 +38,8 @@ export default async function addTestData(
     new Release('5234567890123'), // nightly
   ];
 
-  const today = new Date(Date.now());
+  const today = new Date();
+  const startDate = new Date(today.setMonth(today.getMonth() - 1));
   const promotePromises = [];
   const createPromises = [];
   const channelsForBeta = [
@@ -55,12 +56,12 @@ export default async function addTestData(
   ];
 
   for (let i = 0; i < releases.length; i++) {
-    const newDate = new Date();
-    newDate.setDate(today.getDate() + i * 5 - 30);
+    const newDate = new Date(startDate);
+    newDate.setDate(startDate.getDate() + i * 5);
     createPromises.push(repositoryService.createRelease(releases[i], newDate));
     for (let j = 0; j < channelsForBeta.length - 1 - i; j++) {
-      const promoteDate = new Date();
-      promoteDate.setDate(newDate.getDate() + j + 1 - 30);
+      const promoteDate = new Date(newDate);
+      promoteDate.setDate(newDate.getDate() + j + 1);
       const betaPromotions = promoteRelease(
         releases[i],
         channelsForBeta[j],
