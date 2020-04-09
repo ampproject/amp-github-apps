@@ -39,7 +39,7 @@ export default async function addTestData(
   ];
 
   const today = new Date();
-  const startDate = new Date(today.setMonth(today.getMonth() - 1));
+  const startDate = new Date(today.setDate(today.getDate() - 20));
   const promotePromises = [];
   const createPromises = [];
   const channelsForBeta = [
