@@ -38,8 +38,10 @@ export default async function addTestData(
     new Release('5234567890123'), // nightly
     new Release('6234567890123'), // rollback
   ];
+
   const promotePromises = [];
   const createPromises = [];
+  const today = new Date(Date.now());
   const channelsForBeta = [
     Channel.NIGHTLY,
     Channel.OPT_IN_BETA,
@@ -52,7 +54,7 @@ export default async function addTestData(
     Channel.OPT_IN_EXPERIMENTAL,
     Channel.PERCENT_EXPERIMENTAL,
   ];
-  const today = new Date(Date.now());
+
   for (let i = 0; i < releases.length; i++) {
     const newDate = new Date();
     newDate.setDate(today.getDate() + i * 5);
@@ -78,6 +80,7 @@ export default async function addTestData(
       }
     }
   }
+
   const rollbackDate = new Date();
   rollbackDate.setDate(today.getDate() + 5 * 5 + 1);
   promotePromises.push(repositoryService.savePromotions(promoteRelease(releases[5], Channel.NIGHTLY, Channel.ROLLBACK, rollbackDate)));
