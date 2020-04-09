@@ -15,7 +15,7 @@
  */
 
 import {Channel, Promotion, Release} from '../src/types';
-import {Connection, Repository} from 'typeorm';
+import {Connection, Repository, Column} from 'typeorm';
 import PromotionEntity from '../src/server/entities/promotion';
 import ReleaseEntity from '../src/server/entities/release';
 
@@ -39,10 +39,19 @@ export class RepositoryService {
     return this.releaseRepository.find({relations: ['promotions']});
   }
 
-  async createRelease(release: Release): Promise<Release> {
+  async createRelease(release: Release, date?: Date): Promise<Release> {
     const entity = await this.releaseRepository.save(release);
-    const promotion = new Promotion(entity, Channel.CREATED, Channel.NIGHTLY);
-    await this.savePromotion(promotion);
+    const promotion = date? new Promotion(
+      entity,
+      Channel.CREATED,
+      Channel.NIGHTLY,
+      date,
+    ): new Promotion(entity,
+      Channel.CREATED,
+      Channel.NIGHTLY,);
+    await this.savePromotion(promotion).catch(function(error) {
+      console.log(error);
+    });
     return this.getRelease(entity.name);
   }
 
@@ -53,4 +62,5 @@ export class RepositoryService {
   savePromotions(promotions: Promotion[]): Promise<Promotion[]> {
     return this.promotionRepository.save(promotions);
   }
+
 }
