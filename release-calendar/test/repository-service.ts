@@ -15,7 +15,7 @@
  */
 
 import {Channel, Promotion, Release} from '../src/types';
-import {Connection, Repository, Column} from 'typeorm';
+import {Connection, Repository} from 'typeorm';
 import PromotionEntity from '../src/server/entities/promotion';
 import ReleaseEntity from '../src/server/entities/release';
 
@@ -49,9 +49,7 @@ export class RepositoryService {
     ): new Promotion(entity,
       Channel.CREATED,
       Channel.NIGHTLY,);
-    await this.savePromotion(promotion).catch(function(error) {
-      console.log(error);
-    });
+    await this.savePromotion(promotion);
     return this.getRelease(entity.name);
   }
 
@@ -62,5 +60,4 @@ export class RepositoryService {
   savePromotions(promotions: Promotion[]): Promise<Promotion[]> {
     return this.promotionRepository.save(promotions);
   }
-
 }

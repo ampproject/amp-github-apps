@@ -36,12 +36,10 @@ export default async function addTestData(
     new Release('3234567890123'), // perc-beta and perc-experimental
     new Release('4234567890123'), // opt-in-beta and opt-in-experimental
     new Release('5234567890123'), // nightly
-    new Release('6234567890123'), // rollback
   ];
 
   const promotePromises = [];
   const createPromises = [];
-  const today = new Date(Date.now());
   const channelsForBeta = [
     Channel.NIGHTLY,
     Channel.OPT_IN_BETA,
@@ -54,10 +52,12 @@ export default async function addTestData(
     Channel.OPT_IN_EXPERIMENTAL,
     Channel.PERCENT_EXPERIMENTAL,
   ];
-
+  const startDate = new Date(Date.now());
+  startDate.setDate(startDate.getDate() - 30);
+  
   for (let i = 0; i < releases.length; i++) {
     const newDate = new Date();
-    newDate.setDate(today.getDate() + i * 5);
+    newDate.setDate(startDate.getDate() + i * 5);
     createPromises.push(repositoryService.createRelease(releases[i], newDate));
     for (let j = 0; j < channelsForBeta.length - 1 - i; j++) {
       const promoteDate = new Date();
@@ -81,14 +81,6 @@ export default async function addTestData(
     }
   }
 
-  const rollbackDate = new Date();
-  rollbackDate.setDate(today.getDate() + 5 * 5 + 1);
-  promotePromises.push(repositoryService.savePromotions(promoteRelease(releases[5], Channel.NIGHTLY, Channel.ROLLBACK, rollbackDate)));
-  
-  await Promise.all(createPromises).catch(function(error) {
-     console.error(error);
-   });
-  await Promise.all(promotePromises).catch(function(error) {
-    console.error(error);
-  });
+  await Promise.all(createPromises);
+  await Promise.all(promotePromises);
 }
