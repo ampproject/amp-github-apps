@@ -31,7 +31,7 @@ async function main(): Promise<void> {
     synchronize: true,
     dropSchema: true,
     logging: false,
-  }).catch(error => {
+  }).catch((error) => {
     throw error;
   });
   const repositoryService = new RepositoryService(connection);
