@@ -70,8 +70,8 @@ describe('Probot webhooks', () => {
     ['pull_request.opened'],
     ['pull_request_review.submitted'],
     ['pull_request_review_comment.created'],
-  ])(`on %p event`, (eventName) => {
-    it('processes the comment for macros', async (done) => {
+  ])(`on %p event`, eventName => {
+    it('processes the comment for macros', async done => {
       await triggerWebhook(probot, eventName);
 
       expect(InviteBot.prototype.processComment).toBeCalledWith(
@@ -91,8 +91,8 @@ describe('Probot webhooks', () => {
     ['pull_request_review.dismissed'],
     ['pull_request_review_comment.edited'],
     ['pull_request_review_comment.deleted'],
-  ])(`on %p event`, (eventName) => {
-    it('does not processes the comment', async (done) => {
+  ])(`on %p event`, eventName => {
+    it('does not processes the comment', async done => {
       await triggerWebhook(probot, eventName);
 
       expect(InviteBot.prototype.processComment).not.toBeCalled();
@@ -101,7 +101,7 @@ describe('Probot webhooks', () => {
   });
 
   describe('on "organization.member_added" event', () => {
-    it('processes the accepted invite with follow-up actions', async (done) => {
+    it('processes the accepted invite with follow-up actions', async done => {
       await triggerWebhook(probot, 'organization.member_added');
 
       expect(InviteBot.prototype.processAcceptedInvite).toBeCalledWith(
@@ -112,7 +112,7 @@ describe('Probot webhooks', () => {
   });
 
   describe('on "organization.member_invited" event', () => {
-    it('does not process the new membership', async (done) => {
+    it('does not process the new membership', async done => {
       await triggerWebhook(probot, 'organization.member_invited');
 
       expect(InviteBot.prototype.processAcceptedInvite).not.toBeCalledWith();
@@ -121,7 +121,7 @@ describe('Probot webhooks', () => {
   });
 
   describe('on "organization.member_removed" event', () => {
-    it('does not process the new membership', async (done) => {
+    it('does not process the new membership', async done => {
       await triggerWebhook(probot, 'organization.member_removed');
 
       expect(InviteBot.prototype.processAcceptedInvite).not.toBeCalledWith();

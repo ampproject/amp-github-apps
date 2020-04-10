@@ -44,7 +44,7 @@ export class InvitationRecord {
     this.logger.info(`getInvites: Looking up recorded invites to @${username}`);
     return (
       await this.db('invites').select().where({username, archived: false})
-    ).map((invite) => {
+    ).map(invite => {
       // PostgresQL stores booleans as TINYINT, so we cast it to boolean.
       invite.archived = !!invite.archived;
       return invite;

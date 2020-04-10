@@ -85,13 +85,13 @@ describe('end-to-end', () => {
 
   describe('when a comment includes "/invite @someone"', () => {
     describe('when @someone is a member of the org', () => {
-      it("comments, doesn't record", async (done) => {
+      it("comments, doesn't record", async done => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.exists'))
-          .post('/repos/test_org/test_repo/issues/1337/comments', (body) => {
+          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
               body:
                 'You asked me to invite `@someone`, but they are already' +
@@ -116,13 +116,13 @@ describe('end-to-end', () => {
         archived: false,
       };
 
-      it('invites, records, comments', async (done) => {
+      it('invites, records, comments', async done => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.invited'))
-          .post('/repos/test_org/test_repo/issues/1337/comments', (body) => {
+          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
               body:
                 'An invitation to join `test_org` has been sent to ' +
@@ -143,9 +143,9 @@ describe('end-to-end', () => {
       describe('once the invite is accepted', () => {
         beforeEach(async () => record.recordInvite(recordedInvite));
 
-        it('comments, archives', async (done) => {
+        it('comments, archives', async done => {
           nock('https://api.github.com')
-            .post('/repos/test_org/test_repo/issues/1337/comments', (body) => {
+            .post('/repos/test_org/test_repo/issues/1337/comments', body => {
               expect(body).toEqual({
                 body: 'The invitation to `@someone` was accepted!',
               });
@@ -163,18 +163,18 @@ describe('end-to-end', () => {
 
   describe('when a comment includes "/tryassign @someone"', () => {
     describe('when @someone is a member of the org', () => {
-      it("assigns, comments, doesn't record", async (done) => {
+      it("assigns, comments, doesn't record", async done => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.exists'))
-          .post('/repos/test_org/test_repo/issues/1337/assignees', (body) => {
+          .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
             expect(body).toEqual({assignees: ['someone']});
             return true;
           })
           .reply(200)
-          .post('/repos/test_org/test_repo/issues/1337/comments', (body) => {
+          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
               body: "I've assigned this issue to `@someone`.",
             });
@@ -197,13 +197,13 @@ describe('end-to-end', () => {
         archived: false,
       };
 
-      it('invites, records, comments', async (done) => {
+      it('invites, records, comments', async done => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
           .put('/orgs/test_org/memberships/someone')
           .reply(200, getFixture('add_member.invited'))
-          .post('/repos/test_org/test_repo/issues/1337/comments', (body) => {
+          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
             expect(body).toEqual({
               body:
                 'An invitation to join `test_org` has been sent to ' +
@@ -222,19 +222,19 @@ describe('end-to-end', () => {
       });
 
       describe('once the invite is accepted', () => {
-        beforeEach(async (done) => {
+        beforeEach(async done => {
           await db('invites').insert(recordedInvite);
           done();
         });
 
-        it('assigns, comments, archives', async (done) => {
+        it('assigns, comments, archives', async done => {
           nock('https://api.github.com')
-            .post('/repos/test_org/test_repo/issues/1337/assignees', (body) => {
+            .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
               expect(body).toEqual({assignees: ['someone']});
               return true;
             })
             .reply(200)
-            .post('/repos/test_org/test_repo/issues/1337/comments', (body) => {
+            .post('/repos/test_org/test_repo/issues/1337/comments', body => {
               expect(body).toEqual({
                 body:
                   "The invitation to `@someone` was accepted! I've " +
@@ -253,7 +253,7 @@ describe('end-to-end', () => {
   });
 
   describe('when a comment includes no macros', () => {
-    it('ignores it', async (done) => {
+    it('ignores it', async done => {
       jest.spyOn(InviteBot.prototype, 'tryInvite');
       await triggerWebhook(probot, 'issue_comment.created');
 
@@ -264,7 +264,7 @@ describe('end-to-end', () => {
   });
 
   describe('when the author is not a member of the allow team', () => {
-    it('ignores it', async (done) => {
+    it('ignores it', async done => {
       jest.spyOn(InviteBot.prototype, 'tryInvite');
       nock('https://api.github.com')
         .get('/orgs/test_org/teams/wg-inviters/memberships/author')
@@ -278,7 +278,7 @@ describe('end-to-end', () => {
   });
 
   describe('when someone joins without a recorded invitation', () => {
-    it('ignores it', async (done) => {
+    it('ignores it', async done => {
       await triggerWebhook(probot, 'organization.member_added');
 
       // The test will fail if any unexpected network requests occur.

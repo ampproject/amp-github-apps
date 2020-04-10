@@ -52,7 +52,7 @@ describe('invitation record', () => {
   afterEach(async () => db('invites').truncate());
 
   describe('recordInvite', () => {
-    it('records an invite', async (done) => {
+    it('records an invite', async done => {
       record.recordInvite(invite);
 
       const recordedInvite: Invite = await db('invites').first();
@@ -60,7 +60,7 @@ describe('invitation record', () => {
       done();
     });
 
-    it('sets `archived = false`', async (done) => {
+    it('sets `archived = false`', async done => {
       record.recordInvite(invite);
 
       const recordedInvite: Invite = await db('invites').first();
@@ -71,7 +71,7 @@ describe('invitation record', () => {
 
   describe('getInvites', () => {
     describe('if no invite record exists for the user', () => {
-      it('returns an empty list', async (done) => {
+      it('returns an empty list', async done => {
         expect(record.getInvites('someone')).resolves.toEqual([]);
         done();
       });
@@ -83,7 +83,7 @@ describe('invitation record', () => {
         await record.recordInvite(otherInvite);
       });
 
-      it('returns the invites', async (done) => {
+      it('returns the invites', async done => {
         const invites: Array<Invite> = await record.getInvites('someone');
 
         expect(invites[0]).toMatchObject(invite);
@@ -97,7 +97,7 @@ describe('invitation record', () => {
         await record.recordInvite(archivedInvite);
       });
 
-      it('returns an empty list', async (done) => {
+      it('returns an empty list', async done => {
         expect(record.getInvites('someone')).resolves.toEqual([]);
         done();
       });
@@ -111,7 +111,7 @@ describe('invitation record', () => {
         await record.recordInvite(otherInvite);
       });
 
-      it('updates the invite records', async (done) => {
+      it('updates the invite records', async done => {
         await record.archiveInvites('someone');
 
         expect(record.getInvites('someone')).resolves.toEqual([]);
