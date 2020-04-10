@@ -16,4 +16,5 @@
 
 import {Application} from 'probot';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 module.exports = (app: Application) => {};
