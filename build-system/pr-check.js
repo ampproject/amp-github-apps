@@ -54,7 +54,7 @@ function runAppTests(appName) {
  * @return {number} process exit code.
  */
 function main() {
-  timedExecOrDie('eslint .');
+  timedExecOrDie('eslint . --ext .ts,.tsx');
   let buildTargets = new Set(ALL_TARGETS);
 
   if (isTravisPushBuild()) {
@@ -75,6 +75,9 @@ function main() {
   }
   if (buildTargets.has('PR_DEPLOY')) {
     runAppTests('pr-deploy');
+  }
+  if (buildTargets.has('RELEASE_CALENDAR')) {
+    runAppTests('release-calendar');
   }
   if (buildTargets.has('TEST_STATUS')) {
     runAppTests('test-status');
