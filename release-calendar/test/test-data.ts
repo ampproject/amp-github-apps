@@ -30,22 +30,18 @@ function promoteRelease(
 export default async function addTestData(
   repositoryService: RepositoryService,
 ): Promise<void> {
-  await Promise.all(
-    [
-      new Release('1234567890123'), // lts
-      new Release('2234567890123'), // TODO(estherkim): promote to stable
-      new Release('3234567890123'), // TODO(estherkim): promote to percent_*
-      new Release('4234567890123'), // TODO(estherkim): promote to opt_in_*
-      new Release('5234567890123'), // nightly
-      new Release('6234567890123'),
-    ].map(async (release) => {
-      return repositoryService.createRelease(release);
-    }),
-  );
+  const releases = [
+    new Release('1234567890123'), // lts
+    new Release('2234567890123'), // stable
+    new Release('3234567890123'), // perc-beta and perc-experimental
+    new Release('4234567890123'), // opt-in-beta and opt-in-experimental
+    new Release('5234567890123'), // nightly
+  ];
 
-  const releases = await repositoryService.getReleases();
-  const promises = [];
-  const startDate = new Date(Date.now());
+  const today = new Date();
+  const startDate = new Date(today.setDate(today.getDate() - 20));
+  const promotePromises = [];
+  const createPromises = [];
   const channelsForBeta = [
     Channel.NIGHTLY,
     Channel.OPT_IN_BETA,
@@ -53,36 +49,40 @@ export default async function addTestData(
     Channel.STABLE,
     Channel.LTS,
   ];
-
-  for (let i = 0; i < channelsForBeta.length - 1; i++) {
-    const newDate = new Date();
-    newDate.setDate(startDate.getDate() + i + 1);
-    const promotions = promoteRelease(
-      releases[0],
-      channelsForBeta[i],
-      channelsForBeta[i + 1],
-      newDate,
-    );
-    promises.push(repositoryService.savePromotions(promotions));
-  }
-
   const channelsForExperimental = [
     Channel.NIGHTLY,
     Channel.OPT_IN_EXPERIMENTAL,
     Channel.PERCENT_EXPERIMENTAL,
   ];
 
-  for (let i = 0; i < channelsForExperimental.length - 1; i++) {
-    const newDate = new Date();
-    newDate.setDate(startDate.getDate() + i + 1);
-    const promotions = promoteRelease(
-      releases[0],
-      channelsForExperimental[i],
-      channelsForExperimental[i + 1],
-      newDate,
-    );
-    promises.push(repositoryService.savePromotions(promotions));
+  for (let i = 0; i < releases.length; i++) {
+    const newDate = new Date(startDate);
+    newDate.setDate(startDate.getDate() + i * 5);
+    createPromises.push(repositoryService.createRelease(releases[i], newDate));
+    for (let j = 0; j < channelsForBeta.length - 1 - i; j++) {
+      const promoteDate = new Date(newDate);
+      promoteDate.setDate(newDate.getDate() + j + 1);
+      const betaPromotions = promoteRelease(
+        releases[i],
+        channelsForBeta[j],
+        channelsForBeta[j + 1],
+        promoteDate,
+      );
+      promotePromises.push(repositoryService.savePromotions(betaPromotions));
+      if (j < channelsForExperimental.length - 1) {
+        const experimentalPromotions = promoteRelease(
+          releases[i],
+          channelsForExperimental[j],
+          channelsForExperimental[j + 1],
+          promoteDate,
+        );
+        promotePromises.push(
+          repositoryService.savePromotions(experimentalPromotions),
+        );
+      }
+    }
   }
 
-  await Promise.all(promises);
+  await Promise.all(createPromises);
+  await Promise.all(promotePromises);
 }
