@@ -17,7 +17,7 @@ import {Database, dbConnect} from './db';
 
 /** Set up the database table. */
 export function setupDb(db: Database) {
-  return db.schema.createTable('invites', table => {
+  return db.schema.createTable('invites', (table) => {
     table.increments('id').primary();
     table.string('username', 40);
     table.string('repo', 100);
@@ -40,7 +40,7 @@ if (require.main === module) {
     .then(() => {
       console.info('Database tables created');
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(error.message);
     })
     .then(() => {
