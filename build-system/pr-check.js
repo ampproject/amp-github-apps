@@ -76,9 +76,6 @@ function main() {
   if (buildTargets.has('PR_DEPLOY')) {
     runAppTests('pr-deploy');
   }
-  if (buildTargets.has('RELEASE_CALENDAR')) {
-    runAppTests('release-calendar');
-  }
   if (buildTargets.has('TEST_STATUS')) {
     runAppTests('test-status');
   }
