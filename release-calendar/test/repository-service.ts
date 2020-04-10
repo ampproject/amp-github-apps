@@ -41,9 +41,7 @@ export class RepositoryService {
 
   async createRelease(release: Release, date?: Date): Promise<Release> {
     const entity = await this.releaseRepository.save(release);
-    const promotion = date
-      ? new Promotion(entity, Channel.CREATED, Channel.NIGHTLY, date)
-      : new Promotion(entity, Channel.CREATED, Channel.NIGHTLY);
+    const promotion = new Promotion(entity, Channel.CREATED, Channel.NIGHTLY, date);
     await this.savePromotion(promotion);
     return this.getRelease(entity.name);
   }
