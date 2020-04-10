@@ -18,10 +18,15 @@ import {ApiService} from '../api-service';
 import {Calendar} from './Calendar';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
-import {getEvents} from '../models/release-event';
+import {
+  convertReleaseToEvent,
+  convertPromotionToEvent,
+  getEvents,
+} from '../models/release-event';
 
 interface AppState {
-  events: EventSourceInput[];
+  channelEvents: EventSourceInput[];
+  currentEvents: EventSourceInput[];
 }
 
 export class App extends React.Component<{}, AppState> {
@@ -30,15 +35,27 @@ export class App extends React.Component<{}, AppState> {
   constructor(props: unknown) {
     super(props);
     this.state = {
-      events: [],
+      channelEvents: [],
+      currentEvents: [],
     };
     this.apiService = new ApiService();
   }
 
   async componentDidMount(): Promise<void> {
     const releases = await this.apiService.getReleases();
-    const events = getEvents(releases);
-    this.setState({events});
+    const currentEvents = getEvents(
+      releases.map((release) => {
+        return convertReleaseToEvent(release);
+      }),
+    );
+    this.setState({currentEvents});
+    const promotions = await this.apiService.getPromotions();
+    const channelEvents = getEvents(
+      promotions.map((promotion) => {
+        return convertPromotionToEvent(promotion);
+      }),
+    );
+    this.setState({channelEvents});
   }
 
   render(): JSX.Element {
@@ -46,7 +63,7 @@ export class App extends React.Component<{}, AppState> {
       <div>
         <Header title='AMP Release Calendar' />
         <div>
-          <Calendar events={this.state.events} />
+          <Calendar events={this.state.channelEvents} />
         </div>
       </div>
     );

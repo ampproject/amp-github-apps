@@ -14,20 +14,33 @@
  * limitations under the License.
  */
 
-import {Release} from './models/view-models';
-import {Release as ReleaseEntity} from '../types';
+import {Release, Promotion} from './models/view-models';
+import {Release as ReleaseEntity, Promotion as PromotionEntity} from '../types';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
 export class ApiService implements ApiService {
-  private getRequest(url: string): Promise<ReleaseEntity[]> {
+  private getReleaseRequest(url: string): Promise<ReleaseEntity[]> {
+    return fetch(url).then((result) => result.json());
+  }
+
+  private getPromotionRequest(url: string): Promise<PromotionEntity[]> {
     return fetch(url).then((result) => result.json());
   }
 
   async getReleases(): Promise<Release[]> {
-    const releases = await this.getRequest(SERVER_URL);
+    const releases = await this.getReleaseRequest(SERVER_URL);
     return releases.map((release: ReleaseEntity) => {
       return new Release(release);
+    });
+  }
+
+  async getPromotions(): Promise<Promotion[]> {
+    const promotions = await this.getPromotionRequest(
+      SERVER_URL + '/promotion/',
+    );
+    return promotions.map((promotion: PromotionEntity) => {
+      return new Promotion(promotion);
     });
   }
 }

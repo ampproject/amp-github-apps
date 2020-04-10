@@ -53,4 +53,8 @@ export class RepositoryService {
   savePromotions(promotions: Promotion[]): Promise<Promotion[]> {
     return this.promotionRepository.save(promotions);
   }
+
+  async getPromotions(): Promise<Promotion[]> {
+    return this.promotionRepository.find({relations: ['releases']});
+  }
 }

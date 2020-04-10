@@ -15,14 +15,17 @@
  */
 
 import {Connection, Repository} from 'typeorm';
-import {Release} from '../types';
+import {Release, Promotion} from '../types';
 import ReleaseEntity from './entities/release';
+import PromotionEntity from './entities/promotion';
 
 export class RepositoryService {
   private releaseRepository: Repository<Release>;
+  private promotionRepository: Repository<Promotion>;
 
   constructor(connection: Connection) {
     this.releaseRepository = connection.getRepository(ReleaseEntity);
+    this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
   getRelease(name: string): Promise<Release> {
@@ -56,5 +59,15 @@ export class RepositoryService {
     });
 
     return releaseQuery;
+  }
+
+  getPromotions(): Promise<Promotion[]> {
+    const promotionQuery = this.promotionRepository
+      .createQueryBuilder('promotion')
+      .leftJoinAndSelect('promotion.release', 'release')
+      .orderBy('promotion.date', 'DESC')
+      .getMany();
+
+    return promotionQuery;
   }
 }
