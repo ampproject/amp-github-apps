@@ -39,9 +39,9 @@ export class RepositoryService {
     return this.releaseRepository.find({relations: ['promotions']});
   }
 
-  async createRelease(release: Release): Promise<Release> {
+  async createRelease(release: Release, date?: Date): Promise<Release> {
     const entity = await this.releaseRepository.save(release);
-    const promotion = new Promotion(entity, Channel.CREATED, Channel.NIGHTLY);
+    const promotion = new Promotion(entity, Channel.CREATED, Channel.NIGHTLY, date);
     await this.savePromotion(promotion);
     return this.getRelease(entity.name);
   }
