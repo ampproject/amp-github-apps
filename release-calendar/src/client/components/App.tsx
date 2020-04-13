@@ -18,6 +18,7 @@ import {ApiService} from '../api-service';
 import {Calendar} from './Calendar';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
+import {ChannelTable} from './ChannelTable';
 import {getEvents} from '../models/release-event';
 
 interface AppState {
@@ -46,6 +47,9 @@ export class App extends React.Component<{}, AppState> {
       <div>
         <Header title='AMP Release Calendar' />
         <div>
+          <div className='col-sidePannel'>
+            <ChannelTable />
+          </div>
           <Calendar events={this.state.events} />
         </div>
       </div>
