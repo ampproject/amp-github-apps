@@ -18,15 +18,6 @@ button {
     background-color:rgb(255, 255, 255);
 }
 
-.row{
-    float:left;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-top: 0px;
-    width:65%;
-    height: 3em;
-}
-
 .rtv-button{
     float:left;
     width: 35%;
@@ -37,7 +28,7 @@ button {
 }
 
 .label{
-    width: 30%;
+    width: inherit;
     margin-left: 4em;
     padding-right: 0px;
     text-align: left;
@@ -46,11 +37,59 @@ button {
     text-overflow: clip;
     overflow: hidden;
     white-space: nowrap;
+    line-height:3em;
 }
 
-.square{
+.row {
+    float:left;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 0px;
+    width:65%;
+    height: 3em;
+    cursor: pointer;
+    user-select: none;
+    -webkit-appearance: button;
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
+    border-image: initial;
+  }
+  
+/* Hide the browser's default*/
+.row input {
+    opacity: 0;
+    cursor: pointer;
+    float:left;
+    width: 0;
+    height: 0;
+  }
+  
+  .square {
     float:left;
     width: 3em;
     height: 3em;
     opacity: 100%;
-}
+    background-color: black;
+  }
+  
+  /* On mouse-over*/
+  .row:hover input ~ .square {
+    opacity: 50% !important;
+  }
+  
+  /* When checked */
+  .row input:checked ~ .square {
+    opacity: 50% !important;
+  }
+.square:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the checkmark when checked */
+  .row input:checked ~ .square:after {
+    display: block;
+  }

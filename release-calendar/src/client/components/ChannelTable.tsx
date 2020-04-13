@@ -17,6 +17,7 @@ import * as React from 'react';
 import {channels} from '../../types';
 import '../stylesheets/square.scss';
 import '../stylesheets/channelTable.scss';
+import {Square} from './Square';
 
 export class ChannelTable extends React.Component<{}, {}> {
   //TODO(ajwhatson):
@@ -37,13 +38,10 @@ export class ChannelTable extends React.Component<{}, {}> {
             const rtv = '1111111111111';
             return (
               <div key={channel}>
-                <div>
-                  <label className='row' key={channel}>
-                    {channel}
-                    <input
-                      type={'radio'}
-                      id={channel}
-                      className='square'></input>
+                <div className='row'>
+                  <label htmlFor={channel}>
+                    <div className='label'>{channel}</div>
+                    <Square channel={channel}></Square>
                   </label>
                 </div>
                 <button className='rtv-button'>{rtv}</button>

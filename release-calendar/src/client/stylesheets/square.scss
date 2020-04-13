@@ -1,53 +1,35 @@
-.lts {
+.square-lts {
     width: 3em;
     height: 3em;
     background-color: black;
-    outline: 'none';
 }
-.stable {
-    width: 100%;
-    height: 100%;
+.square-stable {
+    width: 3em;
+    height: 3em;
     background-color: grey;
 }
-.perc-beta {
-    width: 100%;
-    height: 100%;
+.square-perc-beta {
+    width: 3em;
+    height: 3em;
     background-color: blue;
 }
-.perc-experimental {
-    width: 100%;
-    height: 100%;
+.square-perc-experimental {
+    width: 3em;
+    height: 3em;
     background-color: green;
 }
-.opt-in-beta {
-    width: 100%;
-    height: 100%;
+.square-opt-in-beta {
+    width: 3em;
+    height: 3em;
     background-color: purple;
 }
-.opt-in-experimental {
-    width: 100%;
-    height: 100%;
+.square-opt-in-experimental {
+    width: 3em;
+    height: 3em;
     background-color:silver;
 }
-.opt-in-nightly {
-    width: 100%;
-    height: 100%;
-    background-color: orange;
-}
-.perc-nightly {
-    width: 100%;
-    height: 100%;
+.square-nightly {
+    width: 3em;
+    height: 3em;
     background-color: red;
-}
-.selected {
-    outline: 'none';
-    opacity: 50% !important;
-    width:100%;
-    height:100%;
-}
-.unselected {
-    outline: 'none';
-    opacity: 100% !important;
-    width:100%;
-    height:100%;
 }
