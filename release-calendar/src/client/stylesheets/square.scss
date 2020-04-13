@@ -1,0 +1,53 @@
+.lts {
+    width: 3em;
+    height: 3em;
+    background-color: black;
+    outline: 'none';
+}
+.stable {
+    width: 100%;
+    height: 100%;
+    background-color: grey;
+}
+.perc-beta {
+    width: 100%;
+    height: 100%;
+    background-color: blue;
+}
+.perc-experimental {
+    width: 100%;
+    height: 100%;
+    background-color: green;
+}
+.opt-in-beta {
+    width: 100%;
+    height: 100%;
+    background-color: purple;
+}
+.opt-in-experimental {
+    width: 100%;
+    height: 100%;
+    background-color:silver;
+}
+.opt-in-nightly {
+    width: 100%;
+    height: 100%;
+    background-color: orange;
+}
+.perc-nightly {
+    width: 100%;
+    height: 100%;
+    background-color: red;
+}
+.selected {
+    outline: 'none';
+    opacity: 50% !important;
+    width:100%;
+    height:100%;
+}
+.unselected {
+    outline: 'none';
+    opacity: 100% !important;
+    width:100%;
+    height:100%;
+}

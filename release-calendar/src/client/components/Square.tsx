@@ -15,16 +15,27 @@
  */
 
 import * as React from 'react';
+import '../stylesheets/square.scss'
 
 export interface SquareProps {
   channel: string;
+  selected: boolean;
 }
 export class Square extends React.Component<SquareProps, {}> {
-  render(): JSX.Element {
 
+  getSquareClassNames(): string{
+    if (this.props.selected) {
+        return 'selected';
+    } 
+    return 'unselected';
+}   
+
+  render(): JSX.Element {
     return (
-      <div className={this.props.channel} style={{outline: 'none'}}>
-        {' '}
+      <div className={this.getSquareClassNames()}>
+        <input type='radio' id={this.props.channel} className={this.props.channel} style={{outline: 'none'}}>
+          {' '}
+        </input>
       </div>
     );
   }

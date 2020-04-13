@@ -20,6 +20,7 @@ import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
 import {ChannelTable} from './ChannelTable';
 import {getEvents} from '../models/release-event';
+import '../stylesheets/app.scss';
 
 interface AppState {
   events: EventSourceInput[];
