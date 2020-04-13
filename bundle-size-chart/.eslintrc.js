@@ -1,4 +1,6 @@
-{
+const path = require('path');
+
+module.exports = {
   "root": true,
   "plugins": ["@typescript-eslint"],
   "env": {
@@ -14,7 +16,7 @@
       "modules": true
     },
     "useJSXTextNode": true,
-    "project": "tsconfig.json"    
+    'project': path.resolve(__dirname, './tsconfig.json')
   },  
   "rules": {
     "array-bracket-spacing": [2, "never"],

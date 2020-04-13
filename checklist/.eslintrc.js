@@ -1,4 +1,6 @@
-{
+const path = require('path');
+
+module.exports = {
   "root": true,
   "plugins": ["@typescript-eslint", "prettier"],
   "extends": [
@@ -22,7 +24,7 @@
       "modules": true
     },
     "useJSXTextNode": true,
-    "project": "./tsconfig.json"
+    'project': path.resolve(__dirname, './tsconfig.json')
   },
   "rules": {
     "curly": 2,

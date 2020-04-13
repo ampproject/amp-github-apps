@@ -14,8 +14,8 @@
   },
   "scripts": {
     "start": "node build-system/pr-check.js",
-    "lint": "eslint .",
-    "fix": "eslint . --fix",
+    "lint": "eslint . --ext .ts,.tsx",
+    "fix": "eslint . --ext .ts,.tsx --fix",
     "replace-secrets": "node bin/replace-secrets.js",
     "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },

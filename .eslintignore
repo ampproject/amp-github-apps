@@ -1,4 +1,6 @@
 */node_modules/*
 bundle-size/*.example.js
-test-status/*.example.js
+pr-deploy/*/*.js
 project-metrics/metrics_service/third_party/*
+release-calendar/dist/*
+test-status/*.example.js

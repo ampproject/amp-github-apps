@@ -54,7 +54,7 @@ function runAppTests(appName) {
  * @return {number} process exit code.
  */
 function main() {
-  timedExecOrDie('eslint .');
+  timedExecOrDie('eslint . --ext .ts,.tsx');
   let buildTargets = new Set(ALL_TARGETS);
 
   if (isTravisPushBuild()) {
