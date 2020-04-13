@@ -15,16 +15,18 @@ button {
     font-size: 14px;
     line-height: 3em;
     color: #24292e;
-    background-color:rgb(255, 255, 255);
+    background-color:white;
 }
 
 .rtv-button{
+    -webkit-appearance: button;
     float:left;
     width: 35%;
     height: 3em;
     text-align: center;
     padding-left: 0px;
     padding-right: 0px;
+    background-color: white;
 }
 
 .label{
@@ -38,6 +40,7 @@ button {
     overflow: hidden;
     white-space: nowrap;
     line-height:3em;
+    -webkit-appearance: button;
 }
 
 .row {

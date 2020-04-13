@@ -15,6 +15,7 @@
  */
 
 import '../stylesheets/calendar.scss';
+import '../stylesheets/title.scss'
 import * as React from 'react';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import FullCalendar from '@fullcalendar/react';
@@ -29,6 +30,9 @@ export class Calendar extends React.Component<CalendarProps, {}> {
   render(): JSX.Element {
     return (
       <div className='calendar'>
+        <div className='title-bar'>
+          <h1>Calendar Title</h1>
+        </div>
         <FullCalendar
           defaultView='dayGridMonth'
           header={{
@@ -38,6 +42,10 @@ export class Calendar extends React.Component<CalendarProps, {}> {
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
           eventSources={this.props.events}
+          contentHeight={430}
+          fixedWeekCount={false}
+          displayEventTime={false}
+          views={{month: {eventLimit: 3}}}
         />
       </div>
     );
