@@ -6,22 +6,15 @@ button:focus {
 body {
     font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
     font-size: 14px;
-    line-height: 1.5;
-    color: #24292e;
-}
-
-button {
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-    font-size: 14px;
     line-height: 3em;
     color: #24292e;
-    background-color:white;
 }
 
 .rtv-button{
-    -webkit-appearance: button;
+    -webkit-appearance: none;
     float:left;
     width: 35%;
+    font-size: 14px;
     height: 3em;
     text-align: center;
     padding-left: 0px;
@@ -62,37 +55,37 @@ button {
   
 /* Hide the browser's default*/
 .row input {
-    opacity: 0;
-    cursor: pointer;
-    float:left;
-    width: 0;
-    height: 0;
-  }
+  opacity: 0;
+  cursor: pointer;
+  float:left;
+  width: 0;
+  height: 0;
+}
   
-  .square {
-    float:left;
-    width: 3em;
-    height: 3em;
-    opacity: 100%;
-    background-color: black;
-  }
+.square {
+   float:left;
+   width: 3em;
+   height: 3em;
+   opacity: 100%;
+   background-color: black;
+}
   
-  /* On mouse-over*/
-  .row:hover input ~ .square {
+/* On mouse-over*/
+.row:hover input ~ .square {
     opacity: 50% !important;
-  }
+}
   
-  /* When checked */
-  .row input:checked ~ .square {
+/* When checked */
+.row input:checked ~ .square {
     opacity: 50% !important;
-  }
+}
 .square:after {
     content: "";
     position: absolute;
     display: none;
-  }
+}
   
-  /* Show the checkmark when checked */
-  .row input:checked ~ .square:after {
+/* Show the checkmark when checked */
+.row input:checked ~ .square:after {
     display: block;
-  }
+}

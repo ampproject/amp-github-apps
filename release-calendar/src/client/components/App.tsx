@@ -42,22 +42,22 @@ export class App extends React.Component<{}, AppState> {
     const events = getEvents(releases);
     this.setState({events});
   }
-          
+
   render(): JSX.Element {
     return (
       <div className='AMP-Calendar'>
         <Header title='AMP Release Calendar' />
         <div>
           <div className='main-container'>
-          <div className='col-sidePannel'>
-            <ChannelTable />
-          </div>
-          <div className='col-break'></div>
-          <div className='col-calendar'>
-          <Calendar events={this.state.events} />
+            <div className='col-sidePannel'>
+              <ChannelTable />
+            </div>
+            <div className='col-break'></div>
+            <div className='col-calendar'>
+              <Calendar events={this.state.events} />
+            </div>
           </div>
         </div>
-      </div>
       </div>
     );
   }

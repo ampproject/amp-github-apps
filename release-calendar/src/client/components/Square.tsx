@@ -21,7 +21,6 @@ export interface SquareProps {
   channel: string;
 }
 export class Square extends React.Component<SquareProps, {}> {
-
   render(): JSX.Element {
     return (
       <div className={'square-' + this.props.channel}>

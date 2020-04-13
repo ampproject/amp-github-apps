@@ -15,7 +15,7 @@
  */
 
 import '../stylesheets/calendar.scss';
-import '../stylesheets/title.scss'
+import '../stylesheets/title.scss';
 import * as React from 'react';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import FullCalendar from '@fullcalendar/react';
@@ -42,7 +42,7 @@ export class Calendar extends React.Component<CalendarProps, {}> {
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
           eventSources={this.props.events}
-          contentHeight={430}
+          contentHeight={480} //will be 430 when header is added
           fixedWeekCount={false}
           displayEventTime={false}
           views={{month: {eventLimit: 3}}}
