@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import '../stylesheets/app.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Calendar} from './Calendar';
@@ -20,7 +22,6 @@ import {ChannelTable} from './ChannelTable';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
 import {getEvents} from '../models/release-event';
-import '../stylesheets/app.scss';
 
 interface AppState {
   events: EventSourceInput[];

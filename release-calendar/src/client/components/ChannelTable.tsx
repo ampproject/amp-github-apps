@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import * as React from 'react';
-import {channels} from '../../types';
 import '../stylesheets/channelTable.scss';
 import '../stylesheets/square.scss';
+import {channels} from '../../types';
 import {Square} from './Square';
 
 export class ChannelTable extends React.Component<{}, {}> {

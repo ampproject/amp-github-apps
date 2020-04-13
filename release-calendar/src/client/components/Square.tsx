@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import '../stylesheets/square.scss'; 
 import * as React from 'react';
-import '../stylesheets/square.scss';
 
 export interface SquareProps {
   channel: string;
