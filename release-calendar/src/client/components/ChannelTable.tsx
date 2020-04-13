@@ -46,7 +46,7 @@ export class ChannelTable extends React.Component<{}, {}> {
             const rtv = '1111111111111';
             return (
               <div>
-                <div className='row'>
+                <div className='row' key={channel}>
                   <label htmlFor={channel}>
                     <div className='label'>{channel}</div>
                     <div className={'square-' + channel}>
