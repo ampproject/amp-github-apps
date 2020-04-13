@@ -1,4 +1,4 @@
-AMP Invite Bot
+AMP Error Issue Bot
 ==============
 
 A GitHub App that files issues for new production errors surfaced by AMP Error Reporting.
@@ -31,3 +31,22 @@ To run the app locally, run `npm run start`.
 > To automatically reload as files are changed, run `npm run dev`.
 
 To run tests, run `npm test`.
+
+Deployment
+----------
+
+After setting up the app locally, use `gcloud` to deploy the app and cron tasks:
+
+1. Configure the project for the first time: `gcloud init`
+2. Deploy the function for the first time:
+    ```
+    gcloud functions deploy [FUNCTION_NAME] \
+      --source dist/ \
+      --entry-point app \
+      --runtime nodejs10 \
+      --trigger-http
+    ```
+    * When deploying after the first time, the `--runtime` and `--trigger-http` flags may be omitted
+3. To configure Cloud Build auto-deployment, follow [this guide](https://github.com/ampproject/amp-github-apps/blob/master/DEPLOYMENT.md)
+
+This GitHub App is deployed as a [Google Cloud Function](https://cloud.google.com/functions/docs/) at the endpoint: https://us-central1-amp-error-issue-bot.cloudfunctions.net/
