@@ -17,31 +17,41 @@
 import '../stylesheets/channelTable.scss';
 import '../stylesheets/square.scss';
 import * as React from 'react';
-import {channels} from '../../types';
-import {Square} from './Square';
+import {Channel} from '../../types';
 
 export class ChannelTable extends React.Component<{}, {}> {
   //TODO(ajwhatson):
   // add event handling with onClick functions
-  // send state from app carrying Map<Channel, boolean> to map selected channels
-  // add styling
+  // send state from app carrying array of booleans to represent selected channels
   // add app call for most recent releases in each channel
+
+  channels: Channel[] = [
+    Channel.STABLE,
+    Channel.PERCENT_BETA,
+    Channel.PERCENT_EXPERIMENTAL,
+    Channel.OPT_IN_BETA,
+    Channel.OPT_IN_EXPERIMENTAL,
+    Channel.NIGHTLY,
+    Channel.LTS,
+  ];
 
   render(): JSX.Element {
     return (
-      <div className='container'>
+      <div>
         <div className='title-bar'>
           <h1>Current Releases</h1>
         </div>
         <div className='row-container'>
-          {channels.map((channel) => {
+          {this.channels.map((channel) => {
             const rtv = '1111111111111';
             return (
-              <div key={channel}>
+              <div>
                 <div className='row'>
                   <label htmlFor={channel}>
                     <div className='label'>{channel}</div>
-                    <Square channel={channel}></Square>
+                    <div className={'square-' + channel}>
+                      <input type='checkbox' id={channel}></input>
+                    </div>
                   </label>
                 </div>
                 <button className='rtv-button'>{rtv}</button>

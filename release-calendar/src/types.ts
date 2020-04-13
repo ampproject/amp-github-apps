@@ -26,16 +26,6 @@ export enum Channel {
   CREATED = 'created',
 }
 
-export const channels: Channel[] = [
-  Channel.STABLE,
-  Channel.PERCENT_BETA,
-  Channel.PERCENT_EXPERIMENTAL,
-  Channel.OPT_IN_BETA,
-  Channel.OPT_IN_EXPERIMENTAL,
-  Channel.NIGHTLY,
-  Channel.LTS,
-];
-
 export class Release {
   constructor(name: string) {
     this.name = name;
