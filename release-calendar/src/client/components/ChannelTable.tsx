@@ -45,8 +45,8 @@ export class ChannelTable extends React.Component<{}, {}> {
           {this.channels.map((channel) => {
             const rtv = '1111111111111';
             return (
-              <div>
-                <div className='row' key={channel}>
+              <div key={channel}>
+                <div className='row'>
                   <label htmlFor={channel}>
                     <div className='label'>{channel}</div>
                     <div className={'square-' + channel}>
