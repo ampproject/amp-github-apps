@@ -16,9 +16,9 @@
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Calendar} from './Calendar';
+import {ChannelTable} from './ChannelTable';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
-import {ChannelTable} from './ChannelTable';
 import {getEvents} from '../models/release-event';
 import '../stylesheets/app.scss';
 

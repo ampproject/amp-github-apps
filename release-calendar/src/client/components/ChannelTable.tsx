@@ -15,8 +15,8 @@
  */
 import * as React from 'react';
 import {channels} from '../../types';
-import '../stylesheets/square.scss';
 import '../stylesheets/channelTable.scss';
+import '../stylesheets/square.scss';
 import {Square} from './Square';
 
 export class ChannelTable extends React.Component<{}, {}> {
