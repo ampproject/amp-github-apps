@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import '../stylesheets/square.scss'; 
+import '../stylesheets/square.scss';
 import * as React from 'react';
 
 export interface SquareProps {

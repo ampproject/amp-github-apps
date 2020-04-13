@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
+
 import '../stylesheets/channelTable.scss';
 import '../stylesheets/square.scss';
+import * as React from 'react';
 import {channels} from '../../types';
 import {Square} from './Square';
 
@@ -25,7 +26,6 @@ export class ChannelTable extends React.Component<{}, {}> {
   // send state from app carrying Map<Channel, boolean> to map selected channels
   // add styling
   // add app call for most recent releases in each channel
-  //
 
   render(): JSX.Element {
     return (
