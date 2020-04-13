@@ -79,13 +79,13 @@ body {
 .row input:checked ~ .square {
     opacity: 50% !important;
 }
+
 .square:after {
     content: "";
     position: absolute;
     display: none;
 }
   
-/* Show the checkmark when checked */
 .row input:checked ~ .square:after {
     display: block;
 }
