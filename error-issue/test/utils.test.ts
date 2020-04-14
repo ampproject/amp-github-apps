@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {parsePrNumber, parseSource} from '../src/utils';
+import {parsePrNumber, parseSource, parseStacktrace} from '../src/utils';
 
 describe('parsePrNumber', () => {
   it('parses the PR number from a commit message', () => {
@@ -45,5 +45,45 @@ describe('parseSource', () => {
 
     expect(parseSource(cdnSource)).toBeNull();
     expect(parseSource(fakeSource)).toBeNull();
+  });
+});
+
+describe('parseStacktrace', () => {
+  it('parses frames from a stacktrace string', () => {
+    let frames = parseStacktrace(
+      `Error: undefined is not an object (evaluating 'b.length')
+        at length (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-next-page/1.0/service.js:785)
+        at queuePages_ (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-next-page/1.0/service.js:294)`
+    );
+    expect(frames).toEqual([
+      {
+        rtv: '2004030010070',
+        path: 'extensions/amp-next-page/1.0/service.js',
+        line: 785,
+      },
+      {
+        rtv: '2004030010070',
+        path: 'extensions/amp-next-page/1.0/service.js',
+        line: 294
+      }
+    ]);
+
+    frames = parseStacktrace(
+      `Error: null is not an object (evaluating 'b.acceleration.x')
+          at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)
+          at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)`
+    );
+    expect(frames).toEqual([
+      {
+        rtv: '2004030010070',
+        path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
+        line: 421,
+      },
+      {
+        rtv: '2004030010070',
+        path: 'src/event-helper-listen.js',
+        line: 58,
+      }
+    ]);
   });
 });
