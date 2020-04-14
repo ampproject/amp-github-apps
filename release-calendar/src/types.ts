@@ -26,19 +26,20 @@ export enum Channel {
   CREATED = 'created',
 }
 
-interface names {
-  [key: string]: string,
+interface Inames {
+  [key: string]: string;
 }
-export const channelNames: names= {
+
+export const channelNames: Inames = {
   'lts': 'Long Term Stable',
   'stable': 'Stable',
   'perc-beta': '% Beta',
   'perc-experimental': '% Experimental',
   'opt-in-beta': 'Opt-in Beta',
-  'opt-in-experimental'  : 'Opt-in Experimental',
-  'nightly': 'Nightly', 
+  'opt-in-experimental': 'Opt-in Experimental',
+  'nightly': 'Nightly',
+};
 
-}
 export class Release {
   constructor(name: string) {
     this.name = name;
