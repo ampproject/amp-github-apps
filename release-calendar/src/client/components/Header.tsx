@@ -22,6 +22,11 @@ export interface HeaderProps {
 
 export class Header extends React.Component<HeaderProps, {}> {
   render(): JSX.Element {
-    return <h1>{this.props.title}</h1>;
+    //TODO: remove inline styling, only there for now so that header text is aligned with content below
+    return (
+      <div style={{paddingLeft: '12px'}}>
+        <h1>{this.props.title}</h1>
+      </div>
+    );
   }
 }

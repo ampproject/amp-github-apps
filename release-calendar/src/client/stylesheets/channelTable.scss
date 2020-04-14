@@ -1,20 +1,6 @@
-
-button:focus {
-    outline: none !important;
-}
-
-body {
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-    font-size: 14px;
-    line-height: 3em;
-    color: #24292e;
-}
-
-.rtv-button{
-    -webkit-appearance: none;
+.rtv-button {
     float:left;
     width: 35%;
-    font-size: 14px;
     height: 3em;
     text-align: center;
     padding-left: 0px;
@@ -22,70 +8,111 @@ body {
     background-color: white;
 }
 
-.label{
+.label {
+    float: left;
     width: inherit;
     margin-left: 4em;
     padding-right: 0px;
     text-align: left;
     position: absolute;
-    height:3em;
     text-overflow: clip;
     overflow: hidden;
     white-space: nowrap;
     line-height:3em;
-    -webkit-appearance: button;
 }
 
 .row {
     float:left;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-top: 0px;
     width:65%;
     height: 3em;
-    cursor: pointer;
-    user-select: none;
-    -webkit-appearance: button;
     box-sizing: border-box;
     border-width: 1px;
     border-style: solid;
     border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
-    border-image: initial;
   }
-  
-/* Hide the browser's default*/
-.row input {
-  opacity: 0;
-  cursor: pointer;
-  float:left;
-  width: 0;
-  height: 0;
-}
-  
-.square {
-   float:left;
-   width: 3em;
-   height: 3em;
-   opacity: 100%;
-   background-color: black;
-}
-  
-/* On mouse-over*/
-.row:hover input ~ .square {
-    opacity: 50% !important;
-}
-  
-/* When checked */
-.row input:checked ~ .square {
-    opacity: 50% !important;
+
+@mixin square() {
+    display: none;
+	&:checked + i {
+		&:after {
+			opacity: .7;
+		}
+	}
+  + i {
+    box-sizing: border-box;
+    &:before, &:after {
+       box-sizing: border-box;
+    }
+  }
+	+ i {
+		position: relative;
+		display: inline-block;
+		width: 3em;
+	    height: 3em;
+		background: inherit;
+        
+		&:hover:after { opacity: .2; }
+
+		&:after {
+			content: '';
+			opacity: 0;
+			position: absolute;
+			top: .3em;
+			left: .3em;
+			width: 2.4em;
+			height: 2.4em;
+            background-color: white;
+            
+		}
+	}
 }
 
-.square:after {
-    content: "";
-    position: absolute;
-    display: none;
+label {
+  .square {
+    @include square();
+  }
 }
-  
-.row input:checked ~ .square:after {
-    display: block;
+
+//Colors: (to Esther: should I do label the colors this way or is it unnecessary)
+$lts: black;
+$stable: grey;
+$perc-beta: blue;
+$perc-experimental: green;
+$opt-in-beta: purple;
+$opt-in-experimental: silver;
+$nightly: red;
+
+@mixin square($channel) {
+    float: left;
+    width: 3em;
+    height: 3em;
+    background-color: #{$channel};
+}
+
+.square-lts {
+    @include square($lts);
+}
+
+.square-stable {
+    @include square($stable);
+}
+
+.square-perc-beta {
+    @include square($perc-beta);
+}
+
+.square-perc-experimental {
+    @include square($perc-experimental);
+}
+
+.square-opt-in-beta {
+    @include square($opt-in-beta);
+}
+
+.square-opt-in-experimental {
+    @include square($opt-in-experimental);
+}
+
+.square-nightly {
+    @include square($nightly);
 }

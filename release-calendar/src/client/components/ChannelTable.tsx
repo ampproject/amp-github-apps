@@ -15,14 +15,13 @@
  */
 
 import '../stylesheets/channelTable.scss';
-import '../stylesheets/square.scss';
 import * as React from 'react';
-import {Channel} from '../../types';
+import {Channel, ChannelTitles} from '../../types';
 
 export class ChannelTable extends React.Component<{}, {}> {
   //TODO(ajwhatson):
   // add event handling with onClick functions
-  // send state from app carrying array of booleans to represent selected channels
+  // send state from app carrying array of selected channels
   // add app call for most recent releases in each channel
 
   channels: Channel[] = [
@@ -46,14 +45,16 @@ export class ChannelTable extends React.Component<{}, {}> {
             const rtv = '1111111111111';
             return (
               <div key={channel}>
-                <div className='row'>
-                  <label htmlFor={channel}>
-                    <div className='label'>{channel}</div>
-                    <div className={'square-' + channel}>
-                      <input type='checkbox' id={channel}></input>
-                    </div>
-                  </label>
-                </div>
+                <label className='row' htmlFor={channel}>
+                  <div className={'square-' + channel}>
+                    <input
+                      type='checkbox'
+                      className='square'
+                      id={channel}></input>
+                    <i></i>
+                  </div>
+                  <div className='label'>{ChannelTitles.get(channel)}</div>
+                </label>
                 <button className='rtv-button'>{rtv}</button>
               </div>
             );
