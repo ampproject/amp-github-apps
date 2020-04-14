@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {parsePrNumber} from '../src/utils';
+import {parsePrNumber, parseSource} from '../src/utils';
 
 describe('parsePrNumber', () => {
   it('parses the PR number from a commit message', () => {
@@ -25,5 +25,25 @@ describe('parsePrNumber', () => {
   it('returns 0 when the commit message contains no PR number', () => {
     const prNumber = parsePrNumber('Direct commit to master branch');
     expect(prNumber).toEqual(0);
+  });
+});
+
+describe('parseSource', () => {
+  it('parses the components of a standardized source URL:line string', () => {
+    const source = 'https://raw.githubusercontent.com/ampproject/amphtml/' +
+      '2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421';
+    const {rtv, path, line} = parseSource(source);
+
+    expect(rtv).toEqual('2004030010070');
+    expect(path).toEqual('extensions/amp-delight-player/0.1/amp-delight-player.js');
+    expect(line).toEqual(421);
+  });
+
+  it('returns null for non-standardized sources', () => {
+    const cdnSource = 'https://cdn.ampproject.org/rtv/2004030010070/v0.js:1337';
+    const fakeSource = 'unexpected-token-js:1';
+
+    expect(parseSource(cdnSource)).toBeNull();
+    expect(parseSource(fakeSource)).toBeNull();
   });
 });
