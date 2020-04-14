@@ -24,7 +24,7 @@ export function getFixture(name: string): {[key: string]: any} {
   return JSON.parse(
     fs.readFileSync(path.join(__dirname, `${name}.json`)).toString('utf8')
   );
-};
+}
 
 export function getGraphQLResponse(ref: string, path: string): GraphQLResponse {
   const basename = path.replace(/\./g, '_').replace(/\//g, '-');
