@@ -16,7 +16,7 @@
 
 import '../stylesheets/channelTable.scss';
 import * as React from 'react';
-import {Channel, ChannelTitles} from '../../types';
+import {Channel, channelNames} from '../../types';
 
 export class ChannelTable extends React.Component<{}, {}> {
   //TODO(ajwhatson):
@@ -41,21 +41,21 @@ export class ChannelTable extends React.Component<{}, {}> {
           <h1>Current Releases</h1>
         </div>
         <div className='row-container'>
-          {this.channels.map((channel) => {
+          {this.channels.map((channel: string) => {
             const rtv = '1111111111111';
             return (
               <div key={channel}>
-                <label className='row' htmlFor={channel}>
-                  <div className={'square-' + channel}>
+                <label className='row-button' htmlFor={channel}>
+                  <div className={channel}>
                     <input
                       type='checkbox'
                       className='square'
                       id={channel}></input>
                     <i></i>
                   </div>
-                  <div className='label'>{ChannelTitles.get(channel)}</div>
+                  <div className='row-text'>{channelNames[channel]}</div>
                 </label>
-                <button className='rtv-button'>{rtv}</button>
+                <button className='release-button'>{rtv}</button>
               </div>
             );
           })}

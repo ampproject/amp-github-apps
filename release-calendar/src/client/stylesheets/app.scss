@@ -12,12 +12,12 @@
     display: block;
     position: relative;
     padding: 16px;
-    padding-top: 0px;
     border-radius: 4px;
 }
 
 .col-side-pannel {
     @include container-shadow;
+    padding-top: 0px;
     max-width: 390;
     width: 30%;
     float:left;
@@ -25,7 +25,7 @@
 
 .col-calendar {
     @include container-shadow;
-    max-width: 819 px;
+    max-width: 900 px;
     width: 63%;
     float:right;
 }

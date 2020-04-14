@@ -26,16 +26,19 @@ export enum Channel {
   CREATED = 'created',
 }
 
-const ChannelTitles = new Map<Channel, string>();
-ChannelTitles.set(Channel.LTS, 'Long Term Stable');
-ChannelTitles.set(Channel.STABLE, 'Stable');
-ChannelTitles.set(Channel.PERCENT_BETA, '% Beta');
-ChannelTitles.set(Channel.PERCENT_EXPERIMENTAL, '% Experimental');
-ChannelTitles.set(Channel.OPT_IN_BETA, 'Opt-in Beta');
-ChannelTitles.set(Channel.OPT_IN_EXPERIMENTAL, 'Opt-in Experimental');
-ChannelTitles.set(Channel.NIGHTLY, 'Nightly');
-export {ChannelTitles};
+interface names {
+  [key: string]: string,
+}
+export const channelNames: names= {
+  'lts': 'Long Term Stable',
+  'stable': 'Stable',
+  'perc-beta': '% Beta',
+  'perc-experimental': '% Experimental',
+  'opt-in-beta': 'Opt-in Beta',
+  'opt-in-experimental'  : 'Opt-in Experimental',
+  'nightly': 'Nightly', 
 
+}
 export class Release {
   constructor(name: string) {
     this.name = name;

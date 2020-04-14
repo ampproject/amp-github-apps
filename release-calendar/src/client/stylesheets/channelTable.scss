@@ -1,4 +1,10 @@
-.rtv-button {
+.title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0px;
+}
+.release-button {
     float:left;
     width: 35%;
     height: 3em;
@@ -8,7 +14,7 @@
     background-color: white;
 }
 
-.label {
+.row-text {
     float: left;
     width: inherit;
     margin-left: 4em;
@@ -21,7 +27,7 @@
     line-height:3em;
 }
 
-.row {
+.row-button {
     float:left;
     width:65%;
     height: 3em;
@@ -73,7 +79,7 @@ label {
   }
 }
 
-//Colors: (to Esther: should I do label the colors this way or is it unnecessary)
+//Colors
 $lts: black;
 $stable: grey;
 $perc-beta: blue;
@@ -89,30 +95,30 @@ $nightly: red;
     background-color: #{$channel};
 }
 
-.square-lts {
+.row-button > .lts{
     @include square($lts);
 }
 
-.square-stable {
+.row-button > .stable {
     @include square($stable);
 }
 
-.square-perc-beta {
+.row-button > .perc-beta {
     @include square($perc-beta);
 }
 
-.square-perc-experimental {
+.row-button > .perc-experimental {
     @include square($perc-experimental);
 }
 
-.square-opt-in-beta {
+.row-button > .opt-in-beta {
     @include square($opt-in-beta);
 }
 
-.square-opt-in-experimental {
+.row-button > .opt-in-experimental {
     @include square($opt-in-experimental);
 }
 
-.square-nightly {
+.row-button > .nightly {
     @include square($nightly);
 }
