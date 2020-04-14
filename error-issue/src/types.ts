@@ -48,14 +48,16 @@ export interface StackFrame {
 
 /** GraphQL query response structure. */
 namespace GraphQL {
-  interface User { login: string };
+  interface User {
+    login: string;
+  }
 
   interface Commit {
     changedFiles: number;
     committedDate: string;
     messageHeadline: string;
-    author: { user: User };
-  };
+    author: {user: User};
+  }
 
   interface Blame {
     ranges: Array<{
@@ -63,12 +65,12 @@ namespace GraphQL {
       startingLine: number;
       endingLine: number;
     }>;
-  };
+  }
 
   export interface QueryResponse {
     repository: {
-      ref: null|{ target: { blame: Blame } }
+      ref: null | {target: {blame: Blame}};
     };
-  };
-};
+  }
+}
 export type GraphQLResponse = GraphQL.QueryResponse;

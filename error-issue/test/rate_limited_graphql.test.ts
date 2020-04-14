@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import octokit from '@octokit/graphql';
 import nock from 'nock';
 
 import {RateLimitedGraphQL} from '../src/rate_limited_graphql';
@@ -24,7 +23,7 @@ jest.useFakeTimers();
 describe('RateLimitedGraphQL', () => {
   let client: RateLimitedGraphQL;
   const query = '{ viewer { login } }';
-  const response = { data: { viewer: { login: 'auser' } } };
+  const response = {data: {viewer: {login: 'auser'}}};
 
   beforeAll(() => {
     nock.disableNetConnect();
@@ -51,7 +50,7 @@ describe('RateLimitedGraphQL', () => {
   it('returns the query result', async () => {
     nock('https://api.github.com')
       .post('/graphql')
-      .reply(200, response)
+      .reply(200, response);
 
     await expect(client.runQuery(query)).resolves.toEqual(response.data);
   });
@@ -59,7 +58,7 @@ describe('RateLimitedGraphQL', () => {
   it('queues multiple queries and executes after delay', async () => {
     nock('https://api.github.com')
       .post('/graphql')
-      .reply(200, response)
+      .reply(200, response);
 
     const firstQuery = client.runQuery(query);
     // If later queries execute before they are nocked, the test will fail.

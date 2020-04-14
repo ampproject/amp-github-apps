@@ -20,7 +20,7 @@ import {GraphQLResponse} from './types';
 const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
 
 /** Returns a promise that resolves after a specified number of milliseconds. */
-function sleep(ms: number): Promise<any> {
+async function sleep(ms: number): Promise<any> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -32,18 +32,18 @@ export class RateLimitedGraphQL {
   private execute: (query: string) => Promise<GraphQLResponse>;
 
   constructor(token: string, private frequencyMs: number = GRAPHQL_FREQ_MS) {
-    this.execute = (query) => graphql(
-      query,
-      {headers: {authorization: `token ${token}`}}
-    ) as Promise<GraphQLResponse>;
+    this.execute = async query =>
+      graphql(query, {headers: {authorization: `token ${token}`}}) as Promise<
+        GraphQLResponse
+      >;
   }
 
-  runQuery(query: string): Promise<GraphQLResponse> {
-    return new Promise((resolve, reject) => {
+  async runQuery(query: string): Promise<GraphQLResponse> {
+    return new Promise(resolve => {
       this.ready = this.ready
-        .then(() => this.execute(query))
+        .then(async () => this.execute(query))
         .then(resolve)
-        .then(() => sleep(this.frequencyMs))
+        .then(async () => sleep(this.frequencyMs));
     });
   }
 }

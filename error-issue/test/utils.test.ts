@@ -30,12 +30,15 @@ describe('parsePrNumber', () => {
 
 describe('parseSource', () => {
   it('parses the components of a standardized source URL:line string', () => {
-    const source = 'https://raw.githubusercontent.com/ampproject/amphtml/' +
+    const source =
+      'https://raw.githubusercontent.com/ampproject/amphtml/' +
       '2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421';
     const {rtv, path, line} = parseSource(source);
 
     expect(rtv).toEqual('2004030010070');
-    expect(path).toEqual('extensions/amp-delight-player/0.1/amp-delight-player.js');
+    expect(path).toEqual(
+      'extensions/amp-delight-player/0.1/amp-delight-player.js'
+    );
     expect(line).toEqual(421);
   });
 
@@ -46,7 +49,7 @@ describe('parseSource', () => {
       ['https://raw.githubusercontent.com/ampproject/amphtml/undefined'],
     ])('returns null for "%s"', source => {
       expect(parseSource(source)).toBeNull();
-    })
+    });
   });
 });
 
@@ -66,8 +69,8 @@ describe('parseStacktrace', () => {
       {
         rtv: '2004030010070',
         path: 'extensions/amp-next-page/1.0/service.js',
-        line: 294
-      }
+        line: 294,
+      },
     ]);
 
     frames = parseStacktrace(
@@ -85,7 +88,7 @@ describe('parseStacktrace', () => {
         rtv: '2004030010070',
         path: 'src/event-helper-listen.js',
         line: 58,
-      }
+      },
     ]);
   });
 });

@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import {graphql} from '@octokit/graphql';
-
 import {parsePrNumber, parseStacktrace} from './utils';
 import {RateLimitedGraphQL} from './rate_limited_graphql';
 import {BlameRange, GraphQLResponse, ILogger, StackFrame} from './types';
@@ -32,9 +30,9 @@ export class BlameFinder {
     private repoOwner: string,
     private repoName: string,
     client: RateLimitedGraphQL,
-    private logger: ILogger = console,
+    private logger: ILogger = console
   ) {
-    this.graphql = query => client.runQuery(query);
+    this.graphql = async query => client.runQuery(query);
   }
 
   /** Fetches the blame info for a file. */
@@ -45,7 +43,7 @@ export class BlameFinder {
       return this.files[cacheKey];
     }
 
-    const queryRef = (ref: string): Promise<GraphQLResponse> => {
+    const queryRef = async (ref: string): Promise<GraphQLResponse> => {
       this.logger.info(`Running blame query for \`${ref}:${path}\``);
       return this.graphql(
         `{
@@ -85,7 +83,7 @@ export class BlameFinder {
     const {ranges} = repository.ref.target.blame;
     this.logger.debug(`Found ${ranges.length} blame ranges`);
 
-    return this.files[cacheKey] = ranges
+    return (this.files[cacheKey] = ranges
       .filter(({commit}) => commit.author.user)
       .map(({commit, startingLine, endingLine}) => ({
         path,
@@ -96,7 +94,7 @@ export class BlameFinder {
         committedDate: new Date(commit.committedDate),
         changedFiles: commit.changedFiles,
         prNumber: parsePrNumber(commit.messageHeadline),
-      }));
+      })));
   }
 
   /** Fetches the blame range for a line of a file. */
@@ -116,7 +114,7 @@ export class BlameFinder {
     const stackFrames = parseStacktrace(stacktrace);
     // Note: The GraphQL client wrapper will handle debouncing API requests.
     const blames = await Promise.all(
-      stackFrames.map(frame => this.blameForLine(frame))
+      stackFrames.map(async frame => this.blameForLine(frame))
     );
 
     return blames.filter(({prNumber}) => prNumber);

@@ -16,7 +16,7 @@
 
 import {StackFrame} from './types';
 
-const SOURCE_PREFIX = "https://raw.githubusercontent.com/ampproject/amphtml/";
+const SOURCE_PREFIX = 'https://raw.githubusercontent.com/ampproject/amphtml/';
 const SOURCE_PATTERN = /^(?<rtv>\d+)\/(?<path>[^:]+):(?<line>\d+)(?<column>:\d+)?$/;
 
 /** Parses a PR number from a commit message, or 0 if none is found. */
@@ -29,7 +29,7 @@ export function parsePrNumber(message: string): number {
  * Parses the RTV, path, and line from a source URL:line string.
  * See https://github.com/ampproject/error-tracker/blob/master/utils/stacktrace/standardize-stack-trace.js
  */
-export function parseSource(source: string): null|StackFrame {
+export function parseSource(source: string): null | StackFrame {
   if (!source.startsWith(SOURCE_PREFIX)) {
     return null;
   }
@@ -49,5 +49,5 @@ export function parseStacktrace(stacktrace: string): Array<StackFrame> {
     .split('\n')
     .map(line => line.match(/^\s*at .*\((?<source>.+)\)$/))
     .filter(Boolean)
-    .map(({groups}) => parseSource(groups.source))
+    .map(({groups}) => parseSource(groups.source));
 }

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import nock from 'nock';
 
 import {RateLimitedGraphQL} from '../src/rate_limited_graphql';
@@ -36,7 +35,7 @@ describe('BlameFinder', () => {
     blameFinder = new BlameFinder(
       'test_org',
       'test_repo',
-      new RateLimitedGraphQL('__TOKEN__', 0),
+      new RateLimitedGraphQL('__TOKEN__', 0)
     );
     nock.cleanAll();
   });
@@ -53,11 +52,11 @@ describe('BlameFinder', () => {
     const rtv = '2004030010070';
 
     it('issues a GraphQL query for the file the the specified ref', async () => {
-      const path = 'extensions/amp-next-page/1.0/service.js'
+      const path = 'extensions/amp-next-page/1.0/service.js';
 
       nock('https://api.github.com')
         .post('/graphql', ({query}) => {
-          expect(query).toContain(`ref(qualifiedName: "${rtv}")`)
+          expect(query).toContain(`ref(qualifiedName: "${rtv}")`);
           expect(query).toContain(`blame(path: "${path}"`);
           return true;
         })
@@ -67,7 +66,7 @@ describe('BlameFinder', () => {
     });
 
     it('caches blame queries for rtv-path pairs', async () => {
-      const path = 'extensions/amp-next-page/1.0/service.js'
+      const path = 'extensions/amp-next-page/1.0/service.js';
 
       nock('https://api.github.com')
         .post('/graphql')
@@ -84,13 +83,13 @@ describe('BlameFinder', () => {
 
       nock('https://api.github.com')
         .post('/graphql', ({query}) => {
-          expect(query).toContain(`ref(qualifiedName: "not-a-ref")`)
+          expect(query).toContain(`ref(qualifiedName: "not-a-ref")`);
           expect(query).toContain(`blame(path: "${path}"`);
           return true;
         })
         .reply(200, getGraphQLResponse('not-a-ref', path))
         .post('/graphql', ({query}) => {
-          expect(query).toContain(`ref(qualifiedName: "master")`)
+          expect(query).toContain(`ref(qualifiedName: "master")`);
           expect(query).toContain(`blame(path: "${path}"`);
           return true;
         })
@@ -104,7 +103,7 @@ describe('BlameFinder', () => {
 
       nock('https://api.github.com')
         .post('/graphql')
-        .reply(200, getGraphQLResponse(rtv, path))
+        .reply(200, getGraphQLResponse(rtv, path));
 
       const ranges = await blameFinder.blameForFile(rtv, path);
       expect(ranges[0]).toMatchObject({
@@ -159,8 +158,12 @@ describe('BlameFinder', () => {
         .post('/graphql')
         .reply(200, getGraphQLResponse(rtv, path));
 
-      await expect(blameFinder.blameForLine({rtv, path, line: 1337})).rejects.toEqual(
-        new RangeError('Unable to find line 1337 in blame for "extensions/amp-next-page/1.0/service.js"')
+      await expect(
+        blameFinder.blameForLine({rtv, path, line: 1337})
+      ).rejects.toEqual(
+        new RangeError(
+          'Unable to find line 1337 in blame for "extensions/amp-next-page/1.0/service.js"'
+        )
       );
     });
   });
@@ -173,29 +176,41 @@ describe('BlameFinder', () => {
 
       nock('https://api.github.com')
         .post('/graphql')
-        .reply(200, getGraphQLResponse('2004030010070', 'extensions/amp-delight-player/0.1/amp-delight-player.js'))
+        .reply(
+          200,
+          getGraphQLResponse(
+            '2004030010070',
+            'extensions/amp-delight-player/0.1/amp-delight-player.js'
+          )
+        )
         .post('/graphql')
-        .reply(200, getGraphQLResponse('2004030010070','src/event-helper-listen.js'));
+        .reply(
+          200,
+          getGraphQLResponse('2004030010070', 'src/event-helper-listen.js')
+        );
 
       const blames = blameFinder.blameForStacktrace(stacktrace);
 
-      await expect(blames).resolves.toEqual([{
-        path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
-        startingLine: 396,
-        endingLine: 439,
-        author: 'xymw',
-        committedDate: new Date('2018-11-12T21:22:43.000Z'),
-        changedFiles: 15,
-        prNumber: 17939
-      }, {
-        path: 'src/event-helper-listen.js',
-        startingLine: 57,
-        endingLine: 59,
-        author: 'rsimha',
-        committedDate: new Date('2017-12-13T23:56:40.000Z'),
-        changedFiles: 340,
-        prNumber: 12450
-      }])
+      await expect(blames).resolves.toEqual([
+        {
+          path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
+          startingLine: 396,
+          endingLine: 439,
+          author: 'xymw',
+          committedDate: new Date('2018-11-12T21:22:43.000Z'),
+          changedFiles: 15,
+          prNumber: 17939,
+        },
+        {
+          path: 'src/event-helper-listen.js',
+          startingLine: 57,
+          endingLine: 59,
+          author: 'rsimha',
+          committedDate: new Date('2017-12-13T23:56:40.000Z'),
+          changedFiles: 340,
+          prNumber: 12450,
+        },
+      ]);
     });
   });
 });
