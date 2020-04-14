@@ -42,9 +42,11 @@ describe('parseSource', () => {
   it('returns null for non-standardized sources', () => {
     const cdnSource = 'https://cdn.ampproject.org/rtv/2004030010070/v0.js:1337';
     const fakeSource = 'unexpected-token-js:1';
+    const badSource = 'https://raw.githubusercontent.com/ampproject/amphtml/undefined';
 
     expect(parseSource(cdnSource)).toBeNull();
     expect(parseSource(fakeSource)).toBeNull();
+    expect(parseSource(badSource)).toBeNull();
   });
 });
 

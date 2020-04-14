@@ -36,7 +36,7 @@ describe('RateLimitedGraphQL', () => {
   });
 
   beforeEach(() => {
-    client = new RateLimitedGraphQL('__TOKEN__', 1000);
+    client = new RateLimitedGraphQL('__TOKEN__');
     nock.cleanAll();
   });
 
