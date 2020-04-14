@@ -17,6 +17,7 @@
 import {graphql} from '@octokit/graphql';
 
 import {parsePrNumber} from './utils';
+import {RateLimitedGraphQL} from './rate_limited_graphql';
 import {BlameRange, GraphQLResponse, ILogger, StackFrame} from './types';
 
 /**
@@ -25,13 +26,17 @@ import {BlameRange, GraphQLResponse, ILogger, StackFrame} from './types';
 export class BlameFinder {
   // TODO(rcebulko): Use instance-level caching scheme.
   private files: {[key: string]: Array<BlameRange>} = {};
+  private graphql: (query: string) => Promise<GraphQLResponse>;
 
   constructor(
     private repoOwner: string,
     private repoName: string,
-    private token: string,
+    token: string,
     private logger: ILogger = console,
-  ) {}
+  ) {
+    const client = new RateLimitedGraphQL(token);
+    this.graphql = query => client.runQuery(query);
+  }
 
   /** Fetches the blame info for a file. */
   async blameForFile(ref: string, path: string): Promise<Array<BlameRange>> {
@@ -43,7 +48,7 @@ export class BlameFinder {
 
     const queryRef = (ref: string): Promise<GraphQLResponse> => {
       this.logger.info(`Running blame query for \`${ref}:${path}\``);
-      return graphql(
+      return this.graphql(
         `{
           repository(owner: "${this.repoOwner}", name: "${this.repoName}") {
             ref(qualifiedName: "${ref}") {
@@ -68,9 +73,8 @@ export class BlameFinder {
               }
             }
           }
-        }`,
-          {headers: {authorization: `token ${this.token}`}}
-        ) as Promise<GraphQLResponse>;
+        }`
+      );
     };
 
     let {repository} = await queryRef(ref);
@@ -97,7 +101,7 @@ export class BlameFinder {
   }
 
   /** Fetches the blame range for a line of a file. */
-  async blameForLine({rtv, path, line}: StackFrame) {
+  async blameForLine({rtv, path, line}: StackFrame): Promise<BlameRange> {
     const ranges = await this.blameForFile(rtv, path);
     for (const range of ranges) {
       if (range.startingLine <= line && range.endingLine >= line) {

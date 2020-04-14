@@ -123,7 +123,7 @@ describe('BlameFinder', () => {
         .post('/graphql')
         .reply(200, getGraphQLResponse(rtv, path));
 
-      expect(
+      await expect(
         blameFinder.blameForLine({rtv, path, line: 785})
       ).resolves.toMatchObject({
         path,
@@ -153,8 +153,9 @@ describe('BlameFinder', () => {
         .post('/graphql')
         .reply(200, getGraphQLResponse(rtv, path));
 
-      expect(blameFinder.blameForLine({rtv, path, line: 1337})).rejects.toEqual(
-        new RangeError('Unable to find line 1337 in blame for "extensions/amp-next-page/1.0/service.js"'));
+      await expect(blameFinder.blameForLine({rtv, path, line: 1337})).rejects.toEqual(
+        new RangeError('Unable to find line 1337 in blame for "extensions/amp-next-page/1.0/service.js"')
+      );
     });
   });
 });
