@@ -30,6 +30,8 @@ export class Calendar extends React.Component<CalendarProps, {}> {
   render(): JSX.Element {
     return (
       <div className='calendar'>
+        {/* TODO: Title was added to horizonatally align the ChannelTable and Calendar,
+            text for title will not stay "Calendar Title*/}
         <div className='title-bar'>
           <h1>Calendar Title</h1>
         </div>
