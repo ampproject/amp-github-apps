@@ -39,14 +39,14 @@ describe('parseSource', () => {
     expect(line).toEqual(421);
   });
 
-  it('returns null for non-standardized sources', () => {
-    const cdnSource = 'https://cdn.ampproject.org/rtv/2004030010070/v0.js:1337';
-    const fakeSource = 'unexpected-token-js:1';
-    const badSource = 'https://raw.githubusercontent.com/ampproject/amphtml/undefined';
-
-    expect(parseSource(cdnSource)).toBeNull();
-    expect(parseSource(fakeSource)).toBeNull();
-    expect(parseSource(badSource)).toBeNull();
+  describe('non-standardized sources', () => {
+    it.each([
+      ['https://cdn.ampproject.org/rtv/2004030010070/v0.js:1337'],
+      ['unexpected-token-js:1'],
+      ['https://raw.githubusercontent.com/ampproject/amphtml/undefined'],
+    ])('returns null for "%s"', source => {
+      expect(parseSource(source)).toBeNull();
+    })
   });
 });
 
