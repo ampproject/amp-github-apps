@@ -17,7 +17,7 @@
 import {graphql} from '@octokit/graphql';
 
 import {parsePrNumber} from './utils';
-import {BlameRange, GraphQLResponse, ILogger} from './types';
+import {BlameRange, GraphQLResponse, ILogger, StackFrame} from './types';
 
 /**
  * Service for looking up Git blame info for lines in a stacktrace.
@@ -94,5 +94,17 @@ export class BlameFinder {
         changedFiles: commit.changedFiles,
         prNumber: parsePrNumber(commit.messageHeadline),
       }));
+  }
+
+  /** Fetches the blame range for a line of a file. */
+  async blameForLine({rtv, path, line}: StackFrame) {
+    const ranges = await this.blameForFile(rtv, path);
+    for (const range of ranges) {
+      if (range.startingLine <= line && range.endingLine >= line) {
+        return range;
+      }
+    }
+
+    throw new RangeError(`Unable to find line ${line} in blame for "${path}"`);
   }
 }

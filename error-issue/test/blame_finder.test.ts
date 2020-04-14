@@ -107,10 +107,54 @@ describe('BlameFinder', () => {
         endingLine: 16,
 
         author: 'wassgha',
-        committedDate: new Date("2019-12-10T07:48:41Z"),
+        committedDate: new Date('2019-12-10T07:48:41Z'),
         changedFiles: 11,
         prNumber: 25636,
       });
+    });
+  });
+
+  describe('blameForLine', () => {
+    const rtv = '2004030010070';
+    const path = 'extensions/amp-next-page/1.0/service.js';
+
+    it('finds the relevant blame range', async () => {
+      nock('https://api.github.com')
+        .post('/graphql')
+        .reply(200, getGraphQLResponse(rtv, path));
+
+      expect(
+        blameFinder.blameForLine({rtv, path, line: 785})
+      ).resolves.toMatchObject({
+        path,
+        startingLine: 784,
+        endingLine: 788,
+
+        author: 'wassgha',
+        committedDate: new Date('2020-02-28T23:59:08Z'),
+        changedFiles: 24,
+        prNumber: 26841,
+      });
+    });
+
+    it('makes only one request per file', async () => {
+      nock('https://api.github.com')
+        .post('/graphql')
+        .reply(200, getGraphQLResponse(rtv, path));
+
+      await blameFinder.blameForLine({rtv, path, line: 785});
+      // If the second call triggers another query, the network request will
+      // cause `nock` to fail this test.
+      await blameFinder.blameForLine({rtv, path, line: 294});
+    });
+
+    it('throws an error if no range contains the desired line', async () => {
+      nock('https://api.github.com')
+        .post('/graphql')
+        .reply(200, getGraphQLResponse(rtv, path));
+
+      expect(blameFinder.blameForLine({rtv, path, line: 1337})).rejects.toEqual(
+        new RangeError('Unable to find line 1337 in blame for "extensions/amp-next-page/1.0/service.js"'));
     });
   });
 });
