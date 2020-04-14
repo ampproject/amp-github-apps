@@ -18,4 +18,4 @@ import express from 'express';
 
 module.exports.app = (req: express.Request, res: express.Response) => {
   res.sendStatus(200);
-}
+};
