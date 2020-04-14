@@ -16,7 +16,7 @@
 
 import {graphql} from '@octokit/graphql';
 
-import {parsePrNumber} from './utils';
+import {parsePrNumber, parseStacktrace} from './utils';
 import {RateLimitedGraphQL} from './rate_limited_graphql';
 import {BlameRange, GraphQLResponse, ILogger, StackFrame} from './types';
 
@@ -31,10 +31,9 @@ export class BlameFinder {
   constructor(
     private repoOwner: string,
     private repoName: string,
-    token: string,
+    client: RateLimitedGraphQL,
     private logger: ILogger = console,
   ) {
-    const client = new RateLimitedGraphQL(token);
     this.graphql = query => client.runQuery(query);
   }
 
@@ -110,5 +109,16 @@ export class BlameFinder {
     }
 
     throw new RangeError(`Unable to find line ${line} in blame for "${path}"`);
+  }
+
+  /** Fetches the blame ranges for each line in a stacktrace. */
+  async blameForStacktrace(stacktrace: string): Promise<Array<BlameRange>> {
+    const stackFrames = parseStacktrace(stacktrace);
+    // Note: The GraphQL client wrapper will handle debouncing API requests.
+    const blames = await Promise.all(
+      stackFrames.map(frame => this.blameForLine(frame))
+    );
+
+    return blames.filter(({prNumber}) => prNumber);
   }
 }

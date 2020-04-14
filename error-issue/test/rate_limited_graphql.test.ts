@@ -15,8 +15,8 @@
  */
 
 import octokit from '@octokit/graphql';
-
 import nock from 'nock';
+
 import {RateLimitedGraphQL} from '../src/rate_limited_graphql';
 
 jest.useFakeTimers();

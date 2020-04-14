@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-import {BlameFinder} from '../src/blame_finder';
-import {getGraphQLResponse} from './fixtures';
 
 import nock from 'nock';
+
+import {RateLimitedGraphQL} from '../src/rate_limited_graphql';
+import {BlameFinder} from '../src/blame_finder';
+import {getGraphQLResponse} from './fixtures';
 
 describe('BlameFinder', () => {
   let blameFinder: BlameFinder;
@@ -31,7 +33,11 @@ describe('BlameFinder', () => {
   });
 
   beforeEach(() => {
-    blameFinder = new BlameFinder('test_org', 'test_repo', '__TOKEN__');
+    blameFinder = new BlameFinder(
+      'test_org',
+      'test_repo',
+      new RateLimitedGraphQL('__TOKEN__', 0),
+    );
     nock.cleanAll();
   });
 
@@ -156,6 +162,40 @@ describe('BlameFinder', () => {
       await expect(blameFinder.blameForLine({rtv, path, line: 1337})).rejects.toEqual(
         new RangeError('Unable to find line 1337 in blame for "extensions/amp-next-page/1.0/service.js"')
       );
+    });
+  });
+
+  describe('blameForStacktrace', () => {
+    it('fetches blame info for lines in the stacktrace', async () => {
+      const stacktrace = `Error: null is not an object (evaluating 'b.acceleration.x')
+        at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)
+        at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)`;
+
+      nock('https://api.github.com')
+        .post('/graphql')
+        .reply(200, getGraphQLResponse('2004030010070', 'extensions/amp-delight-player/0.1/amp-delight-player.js'))
+        .post('/graphql')
+        .reply(200, getGraphQLResponse('2004030010070','src/event-helper-listen.js'));
+
+      const blames = blameFinder.blameForStacktrace(stacktrace);
+
+      await expect(blames).resolves.toEqual([{
+        path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
+        startingLine: 396,
+        endingLine: 439,
+        author: 'xymw',
+        committedDate: new Date('2018-11-12T21:22:43.000Z'),
+        changedFiles: 15,
+        prNumber: 17939
+      }, {
+        path: 'src/event-helper-listen.js',
+        startingLine: 57,
+        endingLine: 59,
+        author: 'rsimha',
+        committedDate: new Date('2017-12-13T23:56:40.000Z'),
+        changedFiles: 340,
+        prNumber: 12450
+      }])
     });
   });
 });
