@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import nock from 'nock';
+
 import {BlameFinder} from '../src/blame_finder.stub';
 import {IssueBuilder} from '../src/issue_builder.stub';
 import {ErrorIssueBot} from '../src/bot';
@@ -67,12 +69,41 @@ describe('ErrorIssueBot', () => {
     });
 
     it('builds the issue to be created', async () => {
-      await expect(bot.buildErrorIssue(errorReport)).resolves.toMatchObject({
+      await expect(bot.buildErrorIssue(errorReport)).resolves.toEqual({
         owner: 'test_org',
         repo: 'test_repo',
         title: 'issue title',
         labels: ['label'],
         body: 'issue body',
+      });
+    });
+  });
+
+  describe('report', () => {
+    const issueUrl = 'https://github.com/ampproject/amphtml/issues/1337';
+
+    it('creates an error issue', async () => {
+      nock('https://api.github.com')
+        .post('/repos/test_org/test_repo/issues', body => {
+          expect(body).toEqual({
+            title: 'issue title',
+            labels: ['label'],
+            body: 'issue body',
+          });
+          return true;
+        })
+        .reply(201, { html_url: issueUrl });
+
+      await expect(bot.report(errorReport)).resolves.toEqual(issueUrl);
+    });
+
+    it('propagates the error when the API call fails', async () => {
+      nock('https://api.github.com')
+        .post('/repos/test_org/test_repo/issues')
+        .reply(401, { name: 'HttpError', status: 401 });
+
+      await expect(bot.report(errorReport)).rejects.toMatchObject({
+        status: 401
       });
     });
   });
