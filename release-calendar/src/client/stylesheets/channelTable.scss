@@ -4,6 +4,7 @@
     align-items: center;
     padding-top: 0px;
 }
+
 .release-button {
     float:left;
     width: 35%;
@@ -15,16 +16,35 @@
 }
 
 .row-text {
-    float: left;
-    width: inherit;
     margin-left: 4em;
-    padding-right: 0px;
     text-align: left;
-    position: absolute;
     text-overflow: clip;
     overflow: hidden;
     white-space: nowrap;
-    line-height:3em;
+}
+
+.row-container {
+    overflow: hidden;
+    box-shadow:
+        rgba(0, 0, 0, 0.2) 0px 1px 2px,
+        rgba(0, 0, 0, 0.14) 0px 1px 2px,
+        rgba(0, 0, 0, 0.12) 0px 1px 4px;
+}
+
+//Colors
+$lts: black;
+$stable: grey;
+$perc-beta: blue;
+$perc-experimental: green;
+$opt-in-beta: purple;
+$opt-in-experimental: silver;
+$nightly: red;
+
+@mixin square($channel) {
+    float: left;
+    width: 3em;
+    height: 3em;
+    background-color: #{$channel};
 }
 
 .row-button {
@@ -35,7 +55,31 @@
     border-width: 1px;
     border-style: solid;
     border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
-  }
+    :active {
+        transform: translateY(1px);
+    }
+    .lts {
+        @include square($lts);
+    }
+    .stable {
+        @include square($stable);
+    }
+    .perc-beta{
+        @include square($perc-beta);
+    }
+    .perc-experimental {
+        @include square($perc-experimental);
+    }
+    .opt-in-beta {
+        @include square($opt-in-beta);
+    }
+    .opt-in-experimental {
+        @include square($opt-in-experimental);
+    }
+    .nightly {
+        @include square($nightly);
+    }
+}
 
 @mixin square() {
     display: none;
@@ -74,51 +118,7 @@
 }
 
 label {
-  .square {
-    @include square();
-  }
-}
-
-//Colors
-$lts: black;
-$stable: grey;
-$perc-beta: blue;
-$perc-experimental: green;
-$opt-in-beta: purple;
-$opt-in-experimental: silver;
-$nightly: red;
-
-@mixin square($channel) {
-    float: left;
-    width: 3em;
-    height: 3em;
-    background-color: #{$channel};
-}
-
-.row-button > .lts{
-    @include square($lts);
-}
-
-.row-button > .stable {
-    @include square($stable);
-}
-
-.row-button > .perc-beta {
-    @include square($perc-beta);
-}
-
-.row-button > .perc-experimental {
-    @include square($perc-experimental);
-}
-
-.row-button > .opt-in-beta {
-    @include square($opt-in-beta);
-}
-
-.row-button > .opt-in-experimental {
-    @include square($opt-in-experimental);
-}
-
-.row-button > .nightly {
-    @include square($nightly);
+    .square {
+      @include square();
+    }
 }

@@ -16,7 +16,7 @@
 
 import '../stylesheets/channelTable.scss';
 import * as React from 'react';
-import {Channel, channelNames} from '../../types';
+import {Channel} from '../../types';
 
 export class ChannelTable extends React.Component<{}, {}> {
   //TODO(ajwhatson):
@@ -24,43 +24,41 @@ export class ChannelTable extends React.Component<{}, {}> {
   // send state from app carrying array of selected channels
   // add app call for most recent releases in each channel
 
-  channels: Channel[] = [
-    Channel.STABLE,
-    Channel.PERCENT_BETA,
-    Channel.PERCENT_EXPERIMENTAL,
-    Channel.OPT_IN_BETA,
-    Channel.OPT_IN_EXPERIMENTAL,
-    Channel.NIGHTLY,
-    Channel.LTS,
+  rowsInfomation = [
+    {channel: Channel.STABLE, title: 'Stable'},
+    {channel: Channel.PERCENT_BETA, title: '% Beta'},
+    {channel: Channel.PERCENT_EXPERIMENTAL, title: '% Experimental'},
+    {channel: Channel.OPT_IN_BETA, title: 'Opt-in Beta'},
+    {channel: Channel.OPT_IN_EXPERIMENTAL, title: 'Opt-in Experimental'},
+    {channel: Channel.NIGHTLY, title: 'Nightly'},
+    {channel: Channel.LTS, title: 'Long Term Stable'},
   ];
 
   render(): JSX.Element {
     return (
-      <div>
-        <div className='title-bar'>
-          <h1>Current Releases</h1>
-        </div>
+      <>
+        <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
-          {this.channels.map((channel: string) => {
+          {this.rowsInfomation.map((row) => {
             const rtv = '1111111111111';
             return (
-              <div key={channel}>
-                <label className='row-button' htmlFor={channel}>
-                  <div className={channel}>
+              <div key={row.channel}>
+                <label className='row-button' htmlFor={row.channel}>
+                  <div className={row.channel}>
                     <input
                       type='checkbox'
                       className='square'
-                      id={channel}></input>
+                      id={row.channel}></input>
                     <i></i>
                   </div>
-                  <div className='row-text'>{channelNames[channel]}</div>
+                  <div className='row-text'>{row.title}</div>
                 </label>
                 <button className='release-button'>{rtv}</button>
               </div>
             );
           })}
         </div>
-      </div>
+      </>
     );
   }
 }
