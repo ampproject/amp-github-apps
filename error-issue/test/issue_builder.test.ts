@@ -118,19 +118,19 @@ describe('IssueBuilder', () => {
       const notes = builder.bodyNotes;
       expect(notes).toContain(
         '`@xymw` modified ' +
-        '`extensions/amp-delight-player/0.1/amp-delight-player.js:396-439` ' +
-        'in #17939 (Nov 12, 2018)'
+          '`extensions/amp-delight-player/0.1/amp-delight-player.js:396-439` ' +
+          'in #17939 (Nov 12, 2018)'
       );
       expect(notes).toContain(
         '`@rsimha` modified `src/event-helper-listen.js:57-59` in #12450 ' +
-        '(Dec 13, 2017)'
+          '(Dec 13, 2017)'
       );
     });
 
     it('suggests possible assignees, if known', () => {
-      builder.possibleAssignees = jest.fn().mockReturnValue(
-        ['someone', 'someoneelse']
-      );
+      builder.possibleAssignees = jest
+        .fn()
+        .mockReturnValue(['someone', 'someoneelse']);
       expect(builder.bodyNotes).toContain(
         '**Possible assignees:** `@someone`, `@someoneelse`'
       );
