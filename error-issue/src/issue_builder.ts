@@ -15,7 +15,7 @@
  */
 
 import {formatDate} from './utils';
-import {ErrorReport} from './types';
+import {BlameRange, ErrorReport} from './types';
 
 /**
  * Builds a GitHub issue for a reported error.
@@ -31,20 +31,21 @@ export class IssueBuilder {
     private repoOwner: string,
     private repoName: string,
     {errorId, firstSeen, dailyOccurrences, stacktrace}: ErrorReport,
+    private blames: Array<BlameRange>
   ) {
     const [message, ...stack] = stacktrace.split('\n');
     Object.assign(this, {errorId, firstSeen, dailyOccurrences, message, stack});
   }
 
-  get title() {
+  get title(): string {
     return `🚨 ${this.message}`;
   }
 
-  get labels() {
+  get labels(): Array<string> {
     return ['Type: Error Report'];
   }
 
-  get bodyDetails() {
+  get bodyDetails(): string {
     return [
       'Details',
       '---',
@@ -54,7 +55,7 @@ export class IssueBuilder {
     ].join('\n');
   }
 
-  get bodyStacktrace() {
+  get bodyStacktrace(): string {
     const indent = (line: string): string => line.replace(/^\s*/, '    ');
     return [
       'Stacktrace',
@@ -64,5 +65,26 @@ export class IssueBuilder {
       ...this.stack.map(indent),
       '```',
     ].join('\n');
+  }
+
+  private blameMessage({
+    path,
+    startingLine,
+    endingLine,
+    author,
+    committedDate,
+    prNumber,
+  }: BlameRange): string {
+    return `\`@${author}\` modified \`${path}:${startingLine}-${endingLine}\`` +
+      ` in #${prNumber} (${formatDate(committedDate)})`;
+  }
+
+  get bodyNotes(): string {
+    const blameInfo = this.blames.map(blame => this.blameMessage(blame));
+    return ['Notes', '---'].concat(blameInfo).join('\n');
+  }
+
+  get body(): string {
+    return [this.bodyDetails, this.bodyStacktrace, this.bodyNotes].join('\n\n');
   }
 }
