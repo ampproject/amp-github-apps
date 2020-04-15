@@ -68,7 +68,7 @@ describe('IssueBuilder', () => {
   ];
 
   beforeEach(() => {
-    builder = new IssueBuilder('test_org', 'test_repo', report, blames);
+    builder = new IssueBuilder(report, blames);
   });
 
   describe('title', () => {

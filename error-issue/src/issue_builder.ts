@@ -28,8 +28,6 @@ export class IssueBuilder {
   private stack: Array<string>;
 
   constructor(
-    private repoOwner: string,
-    private repoName: string,
     {errorId, firstSeen, dailyOccurrences, stacktrace}: ErrorReport,
     private blames: Array<BlameRange>
   ) {
