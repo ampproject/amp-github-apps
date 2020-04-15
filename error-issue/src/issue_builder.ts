@@ -17,6 +17,9 @@
 import {formatDate} from './utils';
 import {BlameRange, ErrorReport} from './types';
 
+const MAX_RECENT_EDITORS = 3;
+const MAX_CHANGED_FILES = 40;
+
 /**
  * Builds a GitHub issue for a reported error.
  */
@@ -79,9 +82,21 @@ export class IssueBuilder {
       ` in #${prNumber} (${formatDate(committedDate)})`;
   }
 
+  possibleAssignees(): Array<string> {
+    return [];
+  }
+
   get bodyNotes(): string {
-    const blameInfo = this.blames.map(blame => this.blameMessage(blame));
-    return ['Notes', '---'].concat(blameInfo).join('\n');
+    const possibleAssignees = this.possibleAssignees()
+      .map(a => `\`@${a}\``)
+      .join(', ');
+    const notes = ['Notes', '---'].concat(
+      this.blames.map(blame => this.blameMessage(blame))
+    ).join('\n');
+
+    return possibleAssignees
+      ? `${notes}\n\n**Possible assignees:** ${possibleAssignees}`
+      : notes;
   }
 
   get body(): string {

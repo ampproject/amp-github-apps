@@ -126,6 +126,15 @@ describe('IssueBuilder', () => {
         '(Dec 13, 2017)'
       );
     });
+
+    it('suggests possible assignees, if known', () => {
+      builder.possibleAssignees = jest.fn().mockReturnValue(
+        ['someone', 'someoneelse']
+      );
+      expect(builder.bodyNotes).toContain(
+        '**Possible assignees:** `@someone`, `@someoneelse`'
+      );
+    });
   });
 
   describe('body', () => {
