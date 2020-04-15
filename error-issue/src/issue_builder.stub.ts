@@ -20,9 +20,15 @@ import {BlameRange, ErrorReport} from './types';
  * Builds a GitHub issue for a reported error.
  */
 export class IssueBuilder {
-  public title: string = 'title';
-  public labels: Array<string> = ['label'];
-  public body: string = 'body'
+  get title(): string{
+    return 'title';
+  }
+  get labels(): Array<string>{
+    return ['label'];
+  }
+  get body(): string{
+    return 'body';
+  }
 
   constructor(report: ErrorReport, private blames: Array<BlameRange>) {}
 }

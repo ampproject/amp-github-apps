@@ -1,0 +1,79 @@
+/**
+ * Copyright 2020 The AMP HTML Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS-IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import {BlameFinder} from '../src/blame_finder.stub';
+import {IssueBuilder} from '../src/issue_builder.stub';
+import {ErrorIssueBot} from '../src/bot';
+
+describe('ErrorIssueBot', () => {
+  let bot: ErrorIssueBot;
+
+  const errorId = 'CL6chqbN2-bzBA';
+  const firstSeen = new Date('Feb 25, 2020');
+  const dailyOccurrences = 54647;
+  const stacktrace = `Error: null is not an object (evaluating 'b.acceleration.x')
+        at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)
+        at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)`;
+  const errorReport = {errorId, firstSeen, dailyOccurrences, stacktrace};
+
+  beforeEach(() => {
+    bot = new ErrorIssueBot('__TOKEN__', 'test_org', 'test_repo');
+
+    jest.spyOn(BlameFinder.prototype, 'blameForStacktrace').mockResolvedValue([
+      {
+        path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
+        startingLine: 396,
+        endingLine: 439,
+        author: 'xymw',
+        committedDate: new Date('2018-11-12T21:22:43.000Z'),
+        prNumber: 17939,
+        changedFiles: 15,
+      },
+      {
+        path: 'src/event-helper-listen.js',
+        startingLine: 57,
+        endingLine: 59,
+        author: 'rsimha',
+        committedDate: new Date('2017-12-13T23:56:40.000Z'),
+        prNumber: 12450,
+        changedFiles: 340,
+      },
+    ]);
+
+    jest.spyOn(IssueBuilder.prototype, 'title', 'get').mockReturnValue('issue title');
+    jest.spyOn(IssueBuilder.prototype, 'labels', 'get').mockReturnValue(['label']);
+    jest.spyOn(IssueBuilder.prototype, 'body', 'get').mockReturnValue('issue body');
+  });
+
+  describe('buildErrorIssue', () => {
+    it('determines blame for the stacktrace', async () => {
+      await bot.buildErrorIssue(errorReport);
+      expect(
+        BlameFinder.prototype.blameForStacktrace
+      ).toHaveBeenCalledWith(stacktrace);
+    });
+
+    it('builds the issue to be created', async () => {
+      await expect(bot.buildErrorIssue(errorReport)).resolves.toMatchObject({
+        owner: 'test_org',
+        repo: 'test_repo',
+        title: 'issue title',
+        labels: ['label'],
+        body: 'issue body',
+      });
+    });
+  });
+});
