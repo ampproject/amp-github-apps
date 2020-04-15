@@ -46,7 +46,7 @@ export class App extends React.Component<{}, AppState> {
 
   render(): JSX.Element {
     return (
-      <>
+      <React.Fragment>
         <Header title='AMP Release Calendar' />
         <div className='main-container'>
           <div className='col-channel-table'>
@@ -56,7 +56,7 @@ export class App extends React.Component<{}, AppState> {
             <Calendar events={this.state.events} />
           </div>
         </div>
-      </>
+      </React.Fragment.React.Fragment>
     );
   }
 }

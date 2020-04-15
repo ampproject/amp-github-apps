@@ -17,7 +17,6 @@
 import '../stylesheets/channelTable.scss';
 import * as React from 'react';
 import {Channel} from '../../types';
-import {Fragment} from 'react';
 
 export class ChannelTable extends React.Component<{}, {}> {
   //TODO(ajwhatson):
@@ -37,13 +36,13 @@ export class ChannelTable extends React.Component<{}, {}> {
 
   render(): JSX.Element {
     return (
-      <>
+      <React.Fragment>
         <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
           {this.rows.map((row) => {
             const rtv = '1111111111111';
             return (
-              <Fragment key={row.channel}>
+              <React.Fragment key={row.channel}>
                 <label className='row-button' htmlFor={row.channel}>
                   <div className={row.channel}>
                     <input
@@ -55,11 +54,11 @@ export class ChannelTable extends React.Component<{}, {}> {
                   <div className='row-text'>{row.title}</div>
                 </label>
                 <button className='release-button'>{rtv}</button>
-              </Fragment>
+              </React.Fragment>
             );
           })}
         </div>
-      </>
+      </React.Fragment>
     );
   }
 }
