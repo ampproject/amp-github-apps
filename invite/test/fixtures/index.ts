@@ -18,7 +18,7 @@ import path from 'path';
 import {Probot} from 'probot';
 import {WebhookEvent} from '@octokit/webhooks';
 
-type SampleWebhookEvent = {event: string, payload: WebhookEvent<any>}
+type SampleWebhookEvent = {event: string; payload: WebhookEvent<any>};
 
 /**
  * Get a JSON test fixture object.
@@ -27,7 +27,7 @@ export function getFixture(name: string): SampleWebhookEvent {
   return JSON.parse(
     fs.readFileSync(path.join(__dirname, `${name}.json`)).toString('utf8')
   );
-};
+}
 
 /**
  * Triggers a Probot webhook event using a payload from `fixtures/`.
@@ -39,7 +39,7 @@ export async function triggerWebhook(
   const {event, payload} = getFixture(eventName);
   await probot.receive({
     name: event,
-    id: '',  // required by type definition.
+    id: '', // required by type definition.
     payload,
   });
 }

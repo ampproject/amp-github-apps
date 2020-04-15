@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import {Application} from 'probot';
+import express from 'express';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-module.exports = (app: Application) => {};
+module.exports.app = (req: express.Request, res: express.Response) => {
+  res.sendStatus(200);
+};

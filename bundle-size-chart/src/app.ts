@@ -31,7 +31,7 @@ dotenv.config();
 const app = express();
 app.use(express.static('static'));
 
-app.get('/_cron', async (request, response) => {
+app.get('/_cron', async(request, response) => {
   response.setTimeout(CRON_TIMEOUT_MS);
   console.log('Running CRON job to save latest bundle sizes into a CSV file');
 
@@ -91,7 +91,7 @@ app.get('/_cron', async (request, response) => {
   const skippedShas: Array<string> = [];
   for (const masterCommit of masterCommits) {
     try {
-      
+
       const contents = await github.repos.getContents({
         owner: 'ampproject',
         repo: 'amphtml-build-artifacts',
@@ -124,7 +124,7 @@ app.get('/_cron', async (request, response) => {
     {id: 'message', title: 'message'},
     {id: 'date', title: 'date'}
   );
-  
+
   console.log(`CSV headers: ${JSON.stringify(header)}`);
   console.log(`CSV first 3 rows: ${JSON.stringify(records.slice(0, 3))}`);
   const csvWriter = createObjectCsvStringifier({header});

@@ -34,9 +34,11 @@ module.exports = (app: Application) => {
 
   const helpUserToTag = process.env.HELP_USER_TO_TAG || null;
 
-  function botFromContext(
-    {github, payload, log}: Context<CommentWebhookPayload>
-  ) {
+  function botFromContext({
+    github,
+    payload,
+    log,
+  }: Context<CommentWebhookPayload>) {
     return new InviteBot(
       // This type-cast is required because Probot exports a separate GitHubAPI
       // class, even though it's in Octokit instance.
@@ -44,75 +46,87 @@ module.exports = (app: Application) => {
       payload.repository.owner.login,
       process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
-      log,
+      log
     );
   }
 
-  app.on('issue_comment.created', async (
-    context: Context<Webhooks.WebhookPayloadIssueComment>
-  ) => {
-    await botFromContext(context).processComment(
-      context.payload.repository.name,
-      context.payload.issue.number,
-      context.payload.comment.body,
-      context.payload.comment.user.login,
-    );
-  });
+  app.on(
+    'issue_comment.created',
+    async (context: Context<Webhooks.WebhookPayloadIssueComment>) => {
+      await botFromContext(context).processComment(
+        context.payload.repository.name,
+        context.payload.issue.number,
+        context.payload.comment.body,
+        context.payload.comment.user.login
+      );
+    }
+  );
 
-  app.on('issues.opened', async (
-    context: Context<Webhooks.WebhookPayloadIssues>
-  ) => {
-    await botFromContext(context).processComment(
-      context.payload.repository.name,
-      context.payload.issue.number,
-      context.payload.issue.body,
-      context.payload.issue.user.login,
-    );
-  });
+  app.on(
+    'issues.opened',
+    async (context: Context<Webhooks.WebhookPayloadIssues>) => {
+      await botFromContext(context).processComment(
+        context.payload.repository.name,
+        context.payload.issue.number,
+        context.payload.issue.body,
+        context.payload.issue.user.login
+      );
+    }
+  );
 
-  app.on('pull_request.opened', async (
-    context: Context<Webhooks.WebhookPayloadPullRequest>
-  ) => {
-    await botFromContext(context).processComment(
-      context.payload.repository.name,
-      context.payload.pull_request.number,
-      context.payload.pull_request.body,
-      context.payload.pull_request.user.login,
-    );
-  });
+  app.on(
+    'pull_request.opened',
+    async (context: Context<Webhooks.WebhookPayloadPullRequest>) => {
+      await botFromContext(context).processComment(
+        context.payload.repository.name,
+        context.payload.pull_request.number,
+        context.payload.pull_request.body,
+        context.payload.pull_request.user.login
+      );
+    }
+  );
 
-  app.on('pull_request_review.submitted', async (
-    context: Context<Webhooks.WebhookPayloadPullRequestReview>
-  ) => {
-    await botFromContext(context).processComment(
-      context.payload.repository.name,
-      context.payload.pull_request.number,
-      context.payload.review.body,
-      context.payload.review.user.login,
-    );
-  });
+  app.on(
+    'pull_request_review.submitted',
+    async (context: Context<Webhooks.WebhookPayloadPullRequestReview>) => {
+      await botFromContext(context).processComment(
+        context.payload.repository.name,
+        context.payload.pull_request.number,
+        context.payload.review.body,
+        context.payload.review.user.login
+      );
+    }
+  );
 
-  app.on('pull_request_review_comment.created', async (
-    context: Context<Webhooks.WebhookPayloadPullRequestReviewComment>
-  ) => {
-    await botFromContext(context).processComment(
-      context.payload.repository.name,
-      context.payload.pull_request.number,
-      context.payload.comment.body,
-      context.payload.comment.user.login,
-    );
-  });
+  app.on(
+    'pull_request_review_comment.created',
+    async (
+      context: Context<Webhooks.WebhookPayloadPullRequestReviewComment>
+    ) => {
+      await botFromContext(context).processComment(
+        context.payload.repository.name,
+        context.payload.pull_request.number,
+        context.payload.comment.body,
+        context.payload.comment.user.login
+      );
+    }
+  );
 
-  app.on('organization.member_added', async (
-    {github, event, payload, log}: Context<Webhooks.WebhookPayloadOrganization>
-  ) => {
-    const inviteBot = new InviteBot(
-      (github as unknown) as Octokit,
-      payload.organization.login,
-      process.env.ALLOW_TEAM_SLUG,
-      helpUserToTag,
+  app.on(
+    'organization.member_added',
+    async ({
+      github,
+      payload,
       log,
-    );
-    await inviteBot.processAcceptedInvite(payload.membership.user.login);
-  });
+    }: Context<Webhooks.WebhookPayloadOrganization>) => {
+      const inviteBot = new InviteBot(
+        (github as unknown) as Octokit,
+        payload.organization.login,
+        process.env.ALLOW_TEAM_SLUG,
+        helpUserToTag,
+        log
+      );
+      await inviteBot.processAcceptedInvite(payload.membership.user.login);
+    }
+  );
 };
