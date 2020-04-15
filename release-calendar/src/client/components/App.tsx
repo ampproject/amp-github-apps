@@ -56,7 +56,7 @@ export class App extends React.Component<{}, AppState> {
             <Calendar events={this.state.events} />
           </div>
         </div>
-      </React.Fragment.React.Fragment>
+      </React.Fragment>
     );
   }
 }
