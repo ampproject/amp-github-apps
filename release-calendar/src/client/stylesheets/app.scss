@@ -1,6 +1,7 @@
 .main-container {
     padding: 12px;
     padding-top: 24px;
+    overflow: hidden;
 }
 
 @mixin container-shadow {
@@ -12,7 +13,7 @@
     border-radius: 4px;
 }
 
-.col-side-pannel {
+.col-channel-table {
     @include container-shadow;
     padding-top: 0px;
     width: 30%;
@@ -26,7 +27,7 @@
 }
 
 @media only screen and (max-width: 940px) {
-    .col-side-pannel {
+    .col-channel-table {
         float:left;
         width: 50%;
     }
@@ -39,7 +40,7 @@
 }
 
 @media only screen and (max-width: 600px) {
-    .col-side-pannel {
+    .col-channel-table {
         width: 70%;
     }
 }
@@ -54,11 +55,12 @@ body {
 
 button {
     -webkit-appearance: none;
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-    font-size: 14px;
-    line-height: 3em;
-}
-
-button:focus {
-    outline: none;
-}
+    font-family: inherit;
+    font-size: inherit;
+    &:focus {
+       outline: none; 
+    }
+    &:active {
+        transform: translateY(1px);
+    }
+} 

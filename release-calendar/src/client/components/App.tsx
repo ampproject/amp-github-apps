@@ -49,7 +49,7 @@ export class App extends React.Component<{}, AppState> {
       <>
         <Header title='AMP Release Calendar' />
         <div className='main-container'>
-          <div className='col-side-pannel'>
+          <div className='col-channel-table'>
             <ChannelTable />
           </div>
           <div className='col-calendar'>

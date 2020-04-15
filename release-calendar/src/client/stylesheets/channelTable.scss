@@ -6,7 +6,7 @@
 }
 
 .release-button {
-    float:left;
+    float: left;
     width: 35%;
     height: 3em;
     text-align: center;
@@ -39,22 +39,24 @@ $perc-experimental: green;
 $opt-in-beta: purple;
 $opt-in-experimental: silver;
 $nightly: red;
+$grey-border:rgb(216, 216, 216) 
+             rgb(209, 209, 209)
+             rgb(186, 186, 186);
 
 @mixin square($channel) {
     float: left;
     width: 3em;
-    height: 3em;
+    height: inherit;
     background-color: #{$channel};
 }
 
 .row-button {
-    float:left;
-    width:65%;
+    float: left;
+    width: 65%;
     height: 3em;
     box-sizing: border-box;
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
+    border: 1px solid;
+    border-color: $grey-border;
     :active {
         transform: translateY(1px);
     }
@@ -81,44 +83,34 @@ $nightly: red;
     }
 }
 
-@mixin square() {
-    display: none;
-	&:checked + i {
-		&:after {
-			opacity: .7;
-		}
-	}
-  + i {
-    box-sizing: border-box;
-    &:before, &:after {
-       box-sizing: border-box;
-    }
-  }
-	+ i {
-		position: relative;
-		display: inline-block;
-		width: 3em;
-	    height: 3em;
-		background: inherit;
-        
-		&:hover:after { opacity: .2; }
-
-		&:after {
-			content: '';
-			opacity: 0;
-			position: absolute;
-			top: .3em;
-			left: .3em;
-			width: 2.4em;
-			height: 2.4em;
-            background-color: white;
-            
-		}
-	}
-}
-
 label {
-    .square {
-      @include square();
+    .click-square {
+        display: none;
+        &:checked + i {
+            &:after {
+                opacity: .7;
+            }
+        }
+        + i {
+            box-sizing: border-box;
+            position: relative;
+            display: inline-block;
+            width: inherit;
+            height: inherit;
+            background: inherit;
+            &:hover:after { 
+                opacity: .2; 
+            }
+            &:after {
+                content: '';
+                opacity: 0;
+                position: absolute;
+                top: .3em;
+                left: .3em;
+                width: 2.4em;
+                height: 2.4em;
+                background-color: white; 
+            }
+        }
     }
 }

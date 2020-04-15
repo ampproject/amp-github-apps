@@ -17,6 +17,7 @@
 import '../stylesheets/channelTable.scss';
 import * as React from 'react';
 import {Channel} from '../../types';
+import {Fragment} from 'react';
 
 export class ChannelTable extends React.Component<{}, {}> {
   //TODO(ajwhatson):
@@ -24,7 +25,7 @@ export class ChannelTable extends React.Component<{}, {}> {
   // send state from app carrying array of selected channels
   // add app call for most recent releases in each channel
 
-  rowsInfomation = [
+  rows = [
     {channel: Channel.STABLE, title: 'Stable'},
     {channel: Channel.PERCENT_BETA, title: '% Beta'},
     {channel: Channel.PERCENT_EXPERIMENTAL, title: '% Experimental'},
@@ -39,22 +40,22 @@ export class ChannelTable extends React.Component<{}, {}> {
       <>
         <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
-          {this.rowsInfomation.map((row) => {
+          {this.rows.map((row) => {
             const rtv = '1111111111111';
             return (
-              <div key={row.channel}>
+              <Fragment key={row.channel}>
                 <label className='row-button' htmlFor={row.channel}>
                   <div className={row.channel}>
                     <input
                       type='checkbox'
-                      className='square'
+                      className='click-square'
                       id={row.channel}></input>
                     <i></i>
                   </div>
                   <div className='row-text'>{row.title}</div>
                 </label>
                 <button className='release-button'>{rtv}</button>
-              </div>
+              </Fragment>
             );
           })}
         </div>
