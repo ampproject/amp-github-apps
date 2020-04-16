@@ -23,12 +23,12 @@
 .col-calendar {
     @include container-shadow;
     width: 63%;
-    float:right;
+    float: right;
 }
 
-@media only screen and (max-width: 940px) {
+@media only screen and (max-width: 1030px) {
     .col-channel-table {
-        float:left;
+        float: left;
         width: 50%;
     }
     .col-calendar {
@@ -46,15 +46,18 @@
 }
 
 body {
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
     font-size: 14px;
     line-height: 3em;
     color: #24292e;
     margin: 0px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 button {
     -webkit-appearance: none;
+    -moz-appearance: none;
     font-family: inherit;
     font-size: inherit;
     &:focus {

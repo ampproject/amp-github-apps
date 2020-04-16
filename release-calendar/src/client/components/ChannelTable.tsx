@@ -40,7 +40,7 @@ export class ChannelTable extends React.Component<{}, {}> {
         <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
           {this.rows.map((row) => {
-            const rtv = '1111111111111';
+            const rtv = '0000000000000';
             return (
               <React.Fragment key={row.channel}>
                 <label className='row-button' htmlFor={row.channel}>
