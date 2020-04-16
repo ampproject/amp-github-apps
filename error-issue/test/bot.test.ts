@@ -64,13 +64,13 @@ describe('ErrorIssueBot', () => {
       },
     ]);
 
-  afterEach(() => {
-    // Fail the test if there were unused nocks.
-    if (!nock.isDone()) {
-      throw new Error('Not all nock interceptors were used!');
-    }
-    nock.cleanAll();
-  });
+    afterEach(() => {
+      // Fail the test if there were unused nocks.
+      if (!nock.isDone()) {
+        throw new Error('Not all nock interceptors were used!');
+      }
+      nock.cleanAll();
+    });
 
     jest
       .spyOn(IssueBuilder.prototype, 'title', 'get')
