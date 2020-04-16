@@ -20,13 +20,13 @@ import {BlameRange, ErrorReport} from './types';
  * Builds a GitHub issue for a reported error.
  */
 export class IssueBuilder {
-  get title(): string{
+  get title(): string {
     return 'title';
   }
-  get labels(): Array<string>{
+  get labels(): Array<string> {
     return ['label'];
   }
-  get body(): string{
+  get body(): string {
     return 'body';
   }
 

@@ -26,7 +26,7 @@ const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const bot = new ErrorIssueBot(
   GITHUB_ACCESS_TOKEN,
   GITHUB_REPO_OWNER,
-  GITHUB_REPO_NAME,
+  GITHUB_REPO_NAME
 );
 
 module.exports.app = async (req: express.Request, res: express.Response) => {

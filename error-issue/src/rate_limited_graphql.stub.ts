@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-import {graphql} from '@octokit/graphql';
 import {GraphQLResponse} from './types';
 
 /** Wrapper around the GraphQL client providing built-in query rate-limiting. */
 export class RateLimitedGraphQL {
-  constructor(token: string, private frequencyMs: number) {
-  }
+  constructor(token: string, private frequencyMs: number) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async runQuery(query: string): Promise<GraphQLResponse> {
     return null as GraphQLResponse;
   }

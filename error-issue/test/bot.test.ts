@@ -55,17 +55,23 @@ describe('ErrorIssueBot', () => {
       },
     ]);
 
-    jest.spyOn(IssueBuilder.prototype, 'title', 'get').mockReturnValue('issue title');
-    jest.spyOn(IssueBuilder.prototype, 'labels', 'get').mockReturnValue(['label']);
-    jest.spyOn(IssueBuilder.prototype, 'body', 'get').mockReturnValue('issue body');
+    jest
+      .spyOn(IssueBuilder.prototype, 'title', 'get')
+      .mockReturnValue('issue title');
+    jest
+      .spyOn(IssueBuilder.prototype, 'labels', 'get')
+      .mockReturnValue(['label']);
+    jest
+      .spyOn(IssueBuilder.prototype, 'body', 'get')
+      .mockReturnValue('issue body');
   });
 
   describe('buildErrorIssue', () => {
     it('determines blame for the stacktrace', async () => {
       await bot.buildErrorIssue(errorReport);
-      expect(
-        BlameFinder.prototype.blameForStacktrace
-      ).toHaveBeenCalledWith(stacktrace);
+      expect(BlameFinder.prototype.blameForStacktrace).toHaveBeenCalledWith(
+        stacktrace
+      );
     });
 
     it('builds the issue to be created', async () => {
@@ -92,7 +98,7 @@ describe('ErrorIssueBot', () => {
           });
           return true;
         })
-        .reply(201, { html_url: issueUrl });
+        .reply(201, {html_url: issueUrl});
 
       await expect(bot.report(errorReport)).resolves.toEqual(issueUrl);
     });
@@ -100,10 +106,10 @@ describe('ErrorIssueBot', () => {
     it('propagates the error when the API call fails', async () => {
       nock('https://api.github.com')
         .post('/repos/test_org/test_repo/issues')
-        .reply(401, { name: 'HttpError', status: 401 });
+        .reply(401, {name: 'HttpError', status: 401});
 
       await expect(bot.report(errorReport)).rejects.toMatchObject({
-        status: 401
+        status: 401,
       });
     });
   });

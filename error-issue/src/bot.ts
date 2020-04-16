@@ -15,7 +15,6 @@
  */
 
 import {Octokit} from '@octokit/rest';
-import statusCodes from 'http-status-codes';
 
 import {RateLimitedGraphQL} from './rate_limited_graphql.stub';
 import {BlameFinder} from './blame_finder.stub';

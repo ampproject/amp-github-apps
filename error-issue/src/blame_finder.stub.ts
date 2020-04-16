@@ -29,6 +29,7 @@ export class BlameFinder {
   ) {}
 
   /** Fetches the blame ranges for each line in a stacktrace. */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async blameForStacktrace(stacktrace: string): Promise<Array<BlameRange>> {
     return [];
   }
