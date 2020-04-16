@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 
-import {Channel, Promotion} from '../../types';
-import {EntitySchema} from 'typeorm';
+import {RateLimitedGraphQL} from './rate_limited_graphql.stub';
+import {BlameRange, ILogger} from './types';
 
-const PromotionEntity = new EntitySchema<Promotion>({
-  name: 'promotion',
-  columns: {
-    id: {
-      type: Number,
-      primary: true,
-      generated: 'increment',
-    },
-    channel: {
-      type: 'enum',
-      enum: Channel,
-    },
-    date: {
-      type: 'timestamp',
-    },
-  },
-  relations: {
-    release: {
-      type: 'many-to-one',
-      target: 'release',
-      joinColumn: true,
-      nullable: false,
-    },
-  },
-});
+/**
+ * Service for looking up Git blame info for lines in a stacktrace.
+ */
+export class BlameFinder {
+  constructor(
+    private repoOwner: string,
+    private repoName: string,
+    client: RateLimitedGraphQL,
+    private logger: ILogger = console
+  ) {}
 
-export default PromotionEntity;
+  /** Fetches the blame ranges for each line in a stacktrace. */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async blameForStacktrace(stacktrace: string): Promise<Array<BlameRange>> {
+    return [];
+  }
+}

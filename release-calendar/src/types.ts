@@ -23,7 +23,6 @@ export enum Channel {
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
   NIGHTLY = 'nightly',
   ROLLBACK = 'rollback',
-  CREATED = 'created',
 }
 
 export class Release {
@@ -37,22 +36,15 @@ export class Release {
 }
 
 export class Promotion {
-  constructor(
-    release: Release,
-    fromChannel: Channel,
-    toChannel: Channel,
-    date?: Date,
-  ) {
+  constructor(release: Release, channel: Channel, date?: Date) {
     this.release = release;
-    this.fromChannel = fromChannel;
-    this.toChannel = toChannel;
+    this.channel = channel;
     this.date = date ? date : new Date(Date.now());
   }
 
   id: number;
   release: Release;
-  fromChannel: Channel;
-  toChannel: Channel;
+  channel: Channel;
   date: Date;
 }
 

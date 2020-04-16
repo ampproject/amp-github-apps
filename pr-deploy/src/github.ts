@@ -85,10 +85,14 @@ export class PullRequest {
       output: {
         title: 'Success! A test site was created.',
         summary:
-          `You can now access the [**website**](${serveUrl}examples/article.amp.html) or browse the deployed [**Google Cloud Platform Bucket**](${bucketUrl}).<br/>` +
-          `To browse examples or manual tests, append your specific example/test to the following URL:<br/>` +
+          `You can now access the [**website**](${serveUrl}` +
+          'examples/article.amp.html) or browse the deployed ' +
+          `[**Google Cloud Platform Bucket**](${bucketUrl}).<br/>` +
+          'To browse examples or manual tests, append your specific ' +
+          'example/test to the following URL:<br/>' +
           `\`${serveUrl}examples/[YOUR_EXAMPLE_HERE]\`<br/>` +
-          `**For example:** You can access the sample [AMP article example](${serveUrl}examples/article.amp.html) at <br/>` +
+          '**For example:** You can access the sample [AMP article example]' +
+          `(${serveUrl}examples/article.amp.html) at <br/>` +
           `\`${serveUrl}examples/article.amp.html\``,
       },
     };

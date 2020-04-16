@@ -14,33 +14,14 @@
  * limitations under the License.
  */
 
-import {Channel, Promotion} from '../../types';
-import {EntitySchema} from 'typeorm';
+import {GraphQLResponse} from './types';
 
-const PromotionEntity = new EntitySchema<Promotion>({
-  name: 'promotion',
-  columns: {
-    id: {
-      type: Number,
-      primary: true,
-      generated: 'increment',
-    },
-    channel: {
-      type: 'enum',
-      enum: Channel,
-    },
-    date: {
-      type: 'timestamp',
-    },
-  },
-  relations: {
-    release: {
-      type: 'many-to-one',
-      target: 'release',
-      joinColumn: true,
-      nullable: false,
-    },
-  },
-});
+/** Wrapper around the GraphQL client providing built-in query rate-limiting. */
+export class RateLimitedGraphQL {
+  constructor(token: string, private frequencyMs: number) {}
 
-export default PromotionEntity;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async runQuery(query: string): Promise<GraphQLResponse> {
+    return null as GraphQLResponse;
+  }
+}

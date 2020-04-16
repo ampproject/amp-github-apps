@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import '../stylesheets/app.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Calendar} from './Calendar';
+import {ChannelTable} from './ChannelTable';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
 import {
@@ -60,12 +63,17 @@ export class App extends React.Component<{}, AppState> {
 
   render(): JSX.Element {
     return (
-      <div>
+      <React.Fragment>
         <Header title='AMP Release Calendar' />
-        <div>
-          <Calendar events={this.state.channelEvents} />
+        <div className='main-container'>
+          <div className='col-channel-table'>
+            <ChannelTable />
+          </div>
+          <div className='col-calendar'>
+            <Calendar events={this.state.currentEvents} />
+          </div>
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }

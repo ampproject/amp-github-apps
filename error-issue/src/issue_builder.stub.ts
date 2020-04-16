@@ -14,33 +14,21 @@
  * limitations under the License.
  */
 
-import {Channel, Promotion} from '../../types';
-import {EntitySchema} from 'typeorm';
+import {BlameRange, ErrorReport} from './types';
 
-const PromotionEntity = new EntitySchema<Promotion>({
-  name: 'promotion',
-  columns: {
-    id: {
-      type: Number,
-      primary: true,
-      generated: 'increment',
-    },
-    channel: {
-      type: 'enum',
-      enum: Channel,
-    },
-    date: {
-      type: 'timestamp',
-    },
-  },
-  relations: {
-    release: {
-      type: 'many-to-one',
-      target: 'release',
-      joinColumn: true,
-      nullable: false,
-    },
-  },
-});
+/**
+ * Builds a GitHub issue for a reported error.
+ */
+export class IssueBuilder {
+  get title(): string {
+    return 'title';
+  }
+  get labels(): Array<string> {
+    return ['label'];
+  }
+  get body(): string {
+    return 'body';
+  }
 
-export default PromotionEntity;
+  constructor(report: ErrorReport, private blames: Array<BlameRange>) {}
+}
