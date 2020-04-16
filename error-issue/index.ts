@@ -19,7 +19,7 @@ import statusCodes from 'http-status-codes';
 import {ErrorIssueBot} from './src/bot';
 import {ErrorReport} from './src/types';
 
-const GITHUB_REPO = process.env.GITHUB_REPO || 'rcebulko/amphtml';
+const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 
