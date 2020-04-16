@@ -37,15 +37,15 @@ export class Release {
 }
 
 export class Promotion {
-  constructor(release: Release, toChannel: Channel, date?: Date) {
+  constructor(release: Release, channel: Channel, date?: Date) {
     this.release = release;
-    this.toChannel = toChannel;
+    this.channel = channel;
     this.date = date ? date : new Date(Date.now());
   }
 
   id: number;
   release: Release;
-  toChannel: Channel;
+  channel: Channel;
   date: Date;
 }
 

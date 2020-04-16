@@ -18,11 +18,11 @@ import {RepositoryService} from './repository-service';
 
 function promoteRelease(
   release: Release,
-  toChannel: Channel,
+  channel: Channel,
   startDate: Date,
 ): Promotion[] {
   const promotions = [];
-  promotions.push(new Promotion(release, toChannel, startDate));
+  promotions.push(new Promotion(release, channel, startDate));
   return promotions;
 }
 
