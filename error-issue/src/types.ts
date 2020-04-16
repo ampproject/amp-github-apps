@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
+/** A standard logging interface. */
+export interface ILogger {
+  debug(message: string, ...extraInfo: any[]): void;
+  warn(message: string, ...extraInfo: any[]): void;
+  error(message: string, ...extraInfo: any[]): void;
+  info(message: string, ...extraInfo: any[]): void;
+}
+
 /**
  * Information about a range of lines from a Git blame.
  * See https://developer.github.com/v4/object/blamerange/
@@ -28,6 +36,34 @@ export interface BlameRange {
   prNumber: number;
   changedFiles: number;
 }
+
+namespace GraphQL {
+  interface User {
+    login: string;
+  }
+
+  interface Commit {
+    changedFiles: number;
+    committedDate: string;
+    messageHeadline: string;
+    author: {user: User};
+  }
+
+  interface Blame {
+    ranges: Array<{
+      commit: Commit;
+      startingLine: number;
+      endingLine: number;
+    }>;
+  }
+
+  export interface QueryResponse {
+    repository: {
+      ref: null | {target: {blame: Blame}};
+    };
+  }
+}
+export type GraphQLResponse = GraphQL.QueryResponse;
 
 /** Information about a Pantheon error report. */
 export interface ErrorReport {
