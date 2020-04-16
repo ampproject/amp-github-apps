@@ -23,7 +23,6 @@ export enum Channel {
   OPT_IN_EXPERIMENTAL = 'opt-in-experimental',
   NIGHTLY = 'nightly',
   ROLLBACK = 'rollback',
-  CREATED = 'created',
 }
 
 export class Release {
