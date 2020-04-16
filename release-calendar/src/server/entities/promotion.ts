@@ -25,10 +25,6 @@ const PromotionEntity = new EntitySchema<Promotion>({
       primary: true,
       generated: 'increment',
     },
-    fromChannel: {
-      type: 'enum',
-      enum: Channel,
-    },
     toChannel: {
       type: 'enum',
       enum: Channel,
