@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-/**
- * A standard logging interface.
- */
+/** A standard logging interface. */
 export interface ILogger {
   debug(message: string, ...extraInfo: any[]): void;
   warn(message: string, ...extraInfo: any[]): void;
@@ -74,3 +72,11 @@ namespace GraphQL {
   }
 }
 export type GraphQLResponse = GraphQL.QueryResponse;
+
+/** Information about a Pantheon error report. */
+export interface ErrorReport {
+  errorId: string;
+  firstSeen: Date;
+  dailyOccurrences: number;
+  stacktrace: string;
+}
