@@ -31,8 +31,17 @@ describe('ErrorIssueBot', () => {
         at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)`;
   const errorReport = {errorId, firstSeen, dailyOccurrences, stacktrace};
 
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.enableNetConnect();
+  });
+
   beforeEach(() => {
     bot = new ErrorIssueBot('__TOKEN__', 'test_org', 'test_repo');
+    nock.cleanAll();
 
     jest.spyOn(BlameFinder.prototype, 'blameForStacktrace').mockResolvedValue([
       {
@@ -54,6 +63,14 @@ describe('ErrorIssueBot', () => {
         changedFiles: 340,
       },
     ]);
+
+  afterEach(() => {
+    // Fail the test if there were unused nocks.
+    if (!nock.isDone()) {
+      throw new Error('Not all nock interceptors were used!');
+    }
+    nock.cleanAll();
+  });
 
     jest
       .spyOn(IssueBuilder.prototype, 'title', 'get')
