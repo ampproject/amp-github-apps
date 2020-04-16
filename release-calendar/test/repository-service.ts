@@ -35,18 +35,26 @@ export class RepositoryService {
     });
   }
 
-  async getReleases(): Promise<Release[]> {
-    return this.releaseRepository.find({relations: ['promotions']});
+  getReleases(): Promise<Release[]> {
+    const releaseQuery = this.releaseRepository
+      .createQueryBuilder('release')
+      .leftJoinAndSelect('release.promotions', 'promotion')
+      .getMany();
+
+    releaseQuery.then((releases) => {
+      releases.forEach((release) =>
+        release.promotions.sort(
+          (a, b): number => b.date.getTime() - a.date.getTime(),
+        ),
+      );
+    });
+
+    return releaseQuery;
   }
 
   async createRelease(release: Release, date?: Date): Promise<Release> {
     const entity = await this.releaseRepository.save(release);
-    const promotion = new Promotion(
-      entity,
-      Channel.CREATED,
-      Channel.NIGHTLY,
-      date,
-    );
+    const promotion = new Promotion(entity, Channel.NIGHTLY, date);
     await this.savePromotion(promotion);
     return this.getRelease(entity.name);
   }

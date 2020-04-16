@@ -18,12 +18,11 @@ import {RepositoryService} from './repository-service';
 
 function promoteRelease(
   release: Release,
-  fromChannel: Channel,
-  toChannel: Channel,
+  channel: Channel,
   startDate: Date,
 ): Promotion[] {
   const promotions = [];
-  promotions.push(new Promotion(release, fromChannel, toChannel, startDate));
+  promotions.push(new Promotion(release, channel, startDate));
   return promotions;
 }
 
@@ -58,13 +57,14 @@ export default async function addTestData(
   for (let i = 0; i < releases.length; i++) {
     const newDate = new Date(startDate);
     newDate.setDate(startDate.getDate() + i * 5);
-    createPromises.push(repositoryService.createRelease(releases[i], newDate));
+    createPromises.push(
+      await repositoryService.createRelease(releases[i], newDate),
+    );
     for (let j = 0; j < channelsForBeta.length - 1 - i; j++) {
       const promoteDate = new Date(newDate);
       promoteDate.setDate(newDate.getDate() + j + 1);
       const betaPromotions = promoteRelease(
         releases[i],
-        channelsForBeta[j],
         channelsForBeta[j + 1],
         promoteDate,
       );
@@ -72,7 +72,6 @@ export default async function addTestData(
       if (j < channelsForExperimental.length - 1) {
         const experimentalPromotions = promoteRelease(
           releases[i],
-          channelsForExperimental[j],
           channelsForExperimental[j + 1],
           promoteDate,
         );
