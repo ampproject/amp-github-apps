@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-import {Connection, Repository} from 'typeorm';
-import {Release, Promotion} from '../types';
+import {Connection, Repository, ObjectLiteral} from 'typeorm';
+import {Channel, Release, Promotion} from '../types';
 import ReleaseEntity from './entities/release';
-import PromotionEntity from './entities/promotion';
 
 export class RepositoryService {
   private releaseRepository: Repository<Release>;
-  private promotionRepository: Repository<Promotion>;
 
   constructor(connection: Connection) {
     this.releaseRepository = connection.getRepository(ReleaseEntity);
-    this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
   getRelease(name: string): Promise<Release> {
@@ -61,13 +58,57 @@ export class RepositoryService {
     return releaseQuery;
   }
 
-  getPromotions(): Promise<Promotion[]> {
-    const promotionQuery = this.promotionRepository
-      .createQueryBuilder('promotion')
-      .leftJoinAndSelect('promotion.release', 'release')
-      .orderBy('promotion.date', 'DESC')
+  include(arr: Release[], rel: Release): boolean {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].name === rel.name) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async getCurrentReleases(): Promise<Release[]> {
+    const rollbackQuery = this.releaseRepository
+      .createQueryBuilder('release')
+      .innerJoin(
+        'release.promotions',
+        'promotion',
+        'promotion.channel = :channel',
+        {channel: 'rollback'},
+      )
+      .select('release.name')
+      .addSelect('promotion.channel')
       .getMany();
 
-    return promotionQuery;
+    const channelQueries = [
+      Channel.LTS,
+      Channel.NIGHTLY,
+      Channel.OPT_IN_BETA,
+      Channel.OPT_IN_EXPERIMENTAL,
+      Channel.PERCENT_BETA,
+      Channel.PERCENT_EXPERIMENTAL,
+      Channel.STABLE,
+    ].map((eachChannel) =>
+      this.releaseRepository
+        .createQueryBuilder('release')
+        .innerJoinAndSelect(
+          'release.promotions',
+          'promotion',
+          'promotion.channel = :channel',
+          {channel: eachChannel},
+        )
+        .select('release.name')
+        .addSelect('promotion.channel')
+        .orderBy('promotion.date', 'DESC')
+        .getMany(),
+    );
+
+    const results: Release[] = [];
+    const rollback = await rollbackQuery;
+    const channels = await Promise.all(channelQueries);
+    channels.forEach((channel) =>
+      results.push(channel.find((first) => !this.include(rollback, first))),
+    );
+    return results;
   }
 }

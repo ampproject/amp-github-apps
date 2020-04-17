@@ -17,8 +17,27 @@
 import '../stylesheets/channelTable.scss';
 import * as React from 'react';
 import {Channel} from '../../types';
+import {ApiService} from '../api-service';
 
-export class ChannelTable extends React.Component<{}, {}> {
+interface ChannelTableState {
+  currentReleases: Map<Channel, string>;
+}
+
+export class ChannelTable extends React.Component<{}, ChannelTableState> {
+  private apiService: ApiService;
+
+  constructor(props: unknown) {
+    super(props);
+    this.state = {
+      currentReleases: new Map<Channel, string>(),
+    };
+    this.apiService = new ApiService();
+  }
+
+  async componentDidMount(): Promise<void> {
+    const currentReleases = await this.apiService.getCurrentReleases();
+    this.setState({currentReleases});
+  }
   //TODO(ajwhatson):
   // add event handling with onClick functions
   // send state from app carrying array of selected channels
@@ -40,7 +59,6 @@ export class ChannelTable extends React.Component<{}, {}> {
         <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
           {this.rows.map((row) => {
-            const rtv = '0000000000000';
             return (
               <React.Fragment key={row.channel}>
                 <label className='row-button' htmlFor={row.channel}>
@@ -53,7 +71,9 @@ export class ChannelTable extends React.Component<{}, {}> {
                   </div>
                   <div className='row-text'>{row.title}</div>
                 </label>
-                <button className='release-button'>{rtv}</button>
+                <button className='release-button'>
+                  {this.state.currentReleases.get(row.channel)}
+                </button>
               </React.Fragment>
             );
           })}

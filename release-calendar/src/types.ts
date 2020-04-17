@@ -51,5 +51,5 @@ export class Promotion {
 export interface ApiService {
   getRelease: (name: string) => Promise<Release>;
   getReleases: () => Promise<Release[]>;
-  getPromotions: () => Promise<Promotion[]>;
+  getCurrentReleases: () => Promise<Promotion[]>;
 }

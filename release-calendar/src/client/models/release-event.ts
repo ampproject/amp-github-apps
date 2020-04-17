@@ -16,9 +16,9 @@
 
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {Release, Promotion} from './view-models';
+import {Release} from './view-models';
 
-export function convertReleaseToEvent(release: Release): EventInput {
+function convertReleaseToEvent(release: Release): EventInput {
   return {
     title: release.name,
     start: release.date,
@@ -26,17 +26,11 @@ export function convertReleaseToEvent(release: Release): EventInput {
     extendedProps: {isRollback: release.isRollback},
   };
 }
-export function convertPromotionToEvent(promotion: Promotion): EventInput {
-  return {
-    title: promotion.name,
-    start: promotion.date,
-    className: promotion.channel,
-    extendedProps: {isRollback: promotion.isRollback},
-  };
-}
-export function getEvents(event: EventInput[]) {
+
+export function getEvents(releases: Release[]): EventSourceInput[] {
   const map = new Map();
-  event.forEach((event) => {
+  releases.forEach((release) => {
+    const event = convertReleaseToEvent(release);
     const channelEvents = map.get(event.className);
     if (!channelEvents) {
       map.set(event.className, [event]);

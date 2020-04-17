@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-import {Release, Promotion} from './models/view-models';
-import {Release as ReleaseEntity, Promotion as PromotionEntity} from '../types';
+import {Release} from './models/view-models';
+import {Release as ReleaseEntity, Channel} from '../types';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
 export class ApiService implements ApiService {
   private getReleaseRequest(url: string): Promise<ReleaseEntity[]> {
-    return fetch(url).then((result) => result.json());
-  }
-
-  private getPromotionRequest(url: string): Promise<PromotionEntity[]> {
     return fetch(url).then((result) => result.json());
   }
 
@@ -35,12 +31,14 @@ export class ApiService implements ApiService {
     });
   }
 
-  async getPromotions(): Promise<Promotion[]> {
-    const promotions = await this.getPromotionRequest(
-      SERVER_URL + '/promotion/',
+  async getCurrentReleases(): Promise<Map<Channel, string>> {
+    const currentReleases = await this.getReleaseRequest(
+      SERVER_URL + '/current-releases/',
     );
-    return promotions.map((promotion: PromotionEntity) => {
-      return new Promotion(promotion);
+    const map = new Map<Channel, string>();
+    currentReleases.forEach((release: ReleaseEntity) => {
+      map.set(release.promotions[0].channel, release.name);
     });
+    return map;
   }
 }

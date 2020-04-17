@@ -21,15 +21,10 @@ import {Calendar} from './Calendar';
 import {ChannelTable} from './ChannelTable';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
-import {
-  convertReleaseToEvent,
-  convertPromotionToEvent,
-  getEvents,
-} from '../models/release-event';
+import {getEvents} from '../models/release-event';
 
 interface AppState {
-  channelEvents: EventSourceInput[];
-  currentEvents: EventSourceInput[];
+  events: EventSourceInput[];
 }
 
 export class App extends React.Component<{}, AppState> {
@@ -38,27 +33,15 @@ export class App extends React.Component<{}, AppState> {
   constructor(props: unknown) {
     super(props);
     this.state = {
-      channelEvents: [],
-      currentEvents: [],
+      events: [],
     };
     this.apiService = new ApiService();
   }
 
   async componentDidMount(): Promise<void> {
     const releases = await this.apiService.getReleases();
-    const currentEvents = getEvents(
-      releases.map((release) => {
-        return convertReleaseToEvent(release);
-      }),
-    );
-    this.setState({currentEvents});
-    const promotions = await this.apiService.getPromotions();
-    const channelEvents = getEvents(
-      promotions.map((promotion) => {
-        return convertPromotionToEvent(promotion);
-      }),
-    );
-    this.setState({channelEvents});
+    const events = getEvents(releases);
+    this.setState({events});
   }
 
   render(): JSX.Element {
@@ -70,7 +53,7 @@ export class App extends React.Component<{}, AppState> {
             <ChannelTable />
           </div>
           <div className='col-calendar'>
-            <Calendar events={this.state.currentEvents} />
+            <Calendar events={this.state.events} />
           </div>
         </div>
       </React.Fragment>
