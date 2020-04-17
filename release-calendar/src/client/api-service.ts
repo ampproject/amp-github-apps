@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {Release} from './models/view-models';
 import {Channel, Release as ReleaseEntity} from '../types';
+import {Release} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
