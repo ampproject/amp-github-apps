@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {Connection, Repository, ObjectLiteral} from 'typeorm';
-import {Channel, Release, Promotion} from '../types';
+import {Connection, Repository} from 'typeorm';
+import {Channel, Release} from '../types';
 import ReleaseEntity from './entities/release';
 
 export class RepositoryService {

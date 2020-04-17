@@ -15,7 +15,7 @@
  */
 
 import {Release} from './models/view-models';
-import {Release as ReleaseEntity, Channel} from '../types';
+import {Channel, Release as ReleaseEntity} from '../types';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 

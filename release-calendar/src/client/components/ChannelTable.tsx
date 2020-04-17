@@ -16,8 +16,8 @@
 
 import '../stylesheets/channelTable.scss';
 import * as React from 'react';
-import {Channel} from '../../types';
 import {ApiService} from '../api-service';
+import {Channel} from '../../types';
 
 interface ChannelTableState {
   currentReleases: Map<Channel, string>;
