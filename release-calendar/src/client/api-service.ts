@@ -20,19 +20,19 @@ import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
 export class ApiService implements ApiService {
-  private getReleaseRequest(url: string): Promise<ReleaseEntity[]> {
+  private getRequest(url: string): Promise<ReleaseEntity[]> {
     return fetch(url).then((result) => result.json());
   }
 
   async getReleases(): Promise<Release[]> {
-    const releases = await this.getReleaseRequest(SERVER_URL);
+    const releases = await this.getRequest(SERVER_URL);
     return releases.map((release: ReleaseEntity) => {
       return new Release(release);
     });
   }
 
   async getCurrentReleases(): Promise<Map<Channel, string>> {
-    const currentReleases = await this.getReleaseRequest(
+    const currentReleases = await this.getRequest(
       SERVER_URL + '/current-releases/',
     );
     const map = new Map<Channel, string>();
