@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import {Channel} from '../../types';
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Release} from './view-models';
@@ -27,28 +28,35 @@ function convertReleaseToEvent(release: Release): EventInput {
   };
 }
 
-export function getEvents(releases: Release[]): EventSourceInput[] {
-  const map = new Map();
+export function getEvents(releases: Release[]): Map<Channel, EventSourceInput> {
+  //TODO: move colors out to a central location so that colors
+  //are not seperately declared for the calendar and for the ChannelTable
+  const colors = new Map();
+  colors.set(Channel.LTS, 'black');
+  colors.set(Channel.STABLE, 'gray');
+  colors.set(Channel.PERCENT_BETA, 'blue');
+  colors.set(Channel.PERCENT_EXPERIMENTAL, 'green');
+  colors.set(Channel.OPT_IN_BETA, 'purple');
+  colors.set(Channel.OPT_IN_EXPERIMENTAL, 'silver');
+  colors.set(Channel.NIGHTLY, 'red');
+
+  const mapReleasesToEventInputs = new Map<Channel, EventInput[]>();
   releases.forEach((release) => {
     const event = convertReleaseToEvent(release);
-    const channelEvents = map.get(event.className);
+    const channelEvents = mapReleasesToEventInputs.get(release.channel);
     if (!channelEvents) {
-      map.set(event.className, [event]);
+      mapReleasesToEventInputs.set(release.channel, [event]);
     } else {
-      map.set(event.className, [...channelEvents, event]);
+      mapReleasesToEventInputs.set(release.channel, [...channelEvents, event]);
     }
   });
-  return [
-    {events: map.get('lts'), color: 'black', textColor: 'white'},
-    {events: map.get('stable'), color: 'gray', textColor: 'white'},
-    {events: map.get('perc-beta'), color: 'blue', textColor: 'white'},
-    {events: map.get('perc-experimental'), color: 'green', textColor: 'white'},
-    {events: map.get('opt-in-beta'), color: 'purple', textColor: 'white'},
-    {
-      events: map.get('opt-in-experimental'),
-      color: 'silver',
+  const mapEventInputToEventSources = new Map<Channel, EventSourceInput>();
+  mapReleasesToEventInputs.forEach((event, channel) => {
+    mapEventInputToEventSources.set(channel, {
+      events: event,
+      color: colors.get(channel),
       textColor: 'white',
-    },
-    {events: map.get('nightly'), color: 'red', textColor: 'white'},
-  ];
+    });
+  });
+  return mapEventInputToEventSources;
 }
