@@ -1,0 +1,4858 @@
+{
+  "data": {
+    "repository": {
+      "ref": {
+        "target": {
+          "blame": {
+            "ranges": [
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1,
+                "endingLine": 16
+              },
+              {
+                "commit": {
+                  "changedFiles": 20,
+                  "committedDate": "2020-01-14T19:35:00Z",
+                  "messageHeadline": "♻️ Rename amp-next-page 0.2 -> 1.0 (#26100)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 17,
+                "endingLine": 17
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 18,
+                "endingLine": 18
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 19,
+                "endingLine": 20
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 21,
+                "endingLine": 24
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 25,
+                "endingLine": 28
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 29,
+                "endingLine": 29
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 30,
+                "endingLine": 30
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 31,
+                "endingLine": 31
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 32,
+                "endingLine": 32
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 33,
+                "endingLine": 33
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 34,
+                "endingLine": 35
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 36,
+                "endingLine": 36
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 37,
+                "endingLine": 37
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 38,
+                "endingLine": 38
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 39,
+                "endingLine": 43
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 44,
+                "endingLine": 44
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 45,
+                "endingLine": 45
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 46,
+                "endingLine": 46
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 47,
+                "endingLine": 47
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 48,
+                "endingLine": 48
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-12-19T21:05:38Z",
+                  "messageHeadline": "♻️ Refactors visibility observing in amp-next-page v2 (#26032)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 49,
+                "endingLine": 49
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 50,
+                "endingLine": 52
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 53,
+                "endingLine": 53
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 54,
+                "endingLine": 60
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 61,
+                "endingLine": 61
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 62,
+                "endingLine": 63
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 64,
+                "endingLine": 70
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-12-19T21:05:38Z",
+                  "messageHeadline": "♻️ Refactors visibility observing in amp-next-page v2 (#26032)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 71,
+                "endingLine": 71
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 72,
+                "endingLine": 77
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 78,
+                "endingLine": 80
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 81,
+                "endingLine": 86
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 87,
+                "endingLine": 92
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 93,
+                "endingLine": 95
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 96,
+                "endingLine": 99
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 100,
+                "endingLine": 100
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 101,
+                "endingLine": 102
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 103,
+                "endingLine": 103
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 104,
+                "endingLine": 106
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 107,
+                "endingLine": 108
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 109,
+                "endingLine": 109
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 110,
+                "endingLine": 110
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-12-19T21:05:38Z",
+                  "messageHeadline": "♻️ Refactors visibility observing in amp-next-page v2 (#26032)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 111,
+                "endingLine": 112
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 113,
+                "endingLine": 116
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 117,
+                "endingLine": 119
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 120,
+                "endingLine": 122
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 123,
+                "endingLine": 133
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 134,
+                "endingLine": 135
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 136,
+                "endingLine": 139
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 140,
+                "endingLine": 143
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 144,
+                "endingLine": 146
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 147,
+                "endingLine": 156
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 157,
+                "endingLine": 168
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 169,
+                "endingLine": 169
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 170,
+                "endingLine": 170
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 171,
+                "endingLine": 172
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 173,
+                "endingLine": 174
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 175,
+                "endingLine": 182
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 183,
+                "endingLine": 184
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 185,
+                "endingLine": 186
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 187,
+                "endingLine": 189
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 190,
+                "endingLine": 190
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 191,
+                "endingLine": 191
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 192,
+                "endingLine": 192
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 193,
+                "endingLine": 193
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 194,
+                "endingLine": 194
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 195,
+                "endingLine": 198
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 199,
+                "endingLine": 200
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 201,
+                "endingLine": 206
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-12-19T21:05:38Z",
+                  "messageHeadline": "♻️ Refactors visibility observing in amp-next-page v2 (#26032)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 207,
+                "endingLine": 208
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 209,
+                "endingLine": 209
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 210,
+                "endingLine": 211
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 212,
+                "endingLine": 213
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 214,
+                "endingLine": 215
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 216,
+                "endingLine": 216
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 217,
+                "endingLine": 218
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 219,
+                "endingLine": 230
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 231,
+                "endingLine": 231
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 232,
+                "endingLine": 232
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 233,
+                "endingLine": 233
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 234,
+                "endingLine": 236
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 237,
+                "endingLine": 238
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 239,
+                "endingLine": 244
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 245,
+                "endingLine": 246
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 247,
+                "endingLine": 253
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 254,
+                "endingLine": 256
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 257,
+                "endingLine": 259
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 260,
+                "endingLine": 263
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-01-11T10:42:25Z",
+                  "messageHeadline": "✅ Implements unit test for `amp-next-page` v2 (#26269)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 264,
+                "endingLine": 264
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 265,
+                "endingLine": 266
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 267,
+                "endingLine": 268
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 269,
+                "endingLine": 269
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 270,
+                "endingLine": 270
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-01-11T10:42:25Z",
+                  "messageHeadline": "✅ Implements unit test for `amp-next-page` v2 (#26269)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 271,
+                "endingLine": 271
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 272,
+                "endingLine": 272
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 273,
+                "endingLine": 276
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 277,
+                "endingLine": 277
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 278,
+                "endingLine": 278
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 279,
+                "endingLine": 279
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 280,
+                "endingLine": 282
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 283,
+                "endingLine": 284
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 285,
+                "endingLine": 285
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 286,
+                "endingLine": 286
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 287,
+                "endingLine": 288
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 289,
+                "endingLine": 289
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 290,
+                "endingLine": 298
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 299,
+                "endingLine": 299
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 300,
+                "endingLine": 300
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 301,
+                "endingLine": 301
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 302,
+                "endingLine": 305
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 306,
+                "endingLine": 314
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 315,
+                "endingLine": 316
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 317,
+                "endingLine": 317
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 318,
+                "endingLine": 319
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 320,
+                "endingLine": 320
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 321,
+                "endingLine": 321
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 322,
+                "endingLine": 322
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 323,
+                "endingLine": 324
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 325,
+                "endingLine": 326
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 327,
+                "endingLine": 329
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 330,
+                "endingLine": 330
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 331,
+                "endingLine": 331
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 332,
+                "endingLine": 337
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2020-01-21T18:11:03Z",
+                  "messageHeadline": "Implements unit tests for hidden elements (#26389)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 338,
+                "endingLine": 338
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 339,
+                "endingLine": 340
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 341,
+                "endingLine": 343
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-12-19T21:05:38Z",
+                  "messageHeadline": "♻️ Refactors visibility observing in amp-next-page v2 (#26032)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 344,
+                "endingLine": 344
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 345,
+                "endingLine": 346
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-12-19T21:05:38Z",
+                  "messageHeadline": "♻️ Refactors visibility observing in amp-next-page v2 (#26032)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 347,
+                "endingLine": 347
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 348,
+                "endingLine": 350
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 351,
+                "endingLine": 351
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 352,
+                "endingLine": 365
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-12-19T21:05:38Z",
+                  "messageHeadline": "♻️ Refactors visibility observing in amp-next-page v2 (#26032)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 366,
+                "endingLine": 366
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 367,
+                "endingLine": 369
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-12-19T21:05:38Z",
+                  "messageHeadline": "♻️ Refactors visibility observing in amp-next-page v2 (#26032)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 370,
+                "endingLine": 371
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 372,
+                "endingLine": 374
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 375,
+                "endingLine": 376
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 377,
+                "endingLine": 378
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 379,
+                "endingLine": 379
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 380,
+                "endingLine": 396
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 397,
+                "endingLine": 397
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 398,
+                "endingLine": 414
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 415,
+                "endingLine": 415
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 416,
+                "endingLine": 416
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 417,
+                "endingLine": 417
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 418,
+                "endingLine": 426
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 427,
+                "endingLine": 431
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 432,
+                "endingLine": 432
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 433,
+                "endingLine": 437
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 438,
+                "endingLine": 438
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 439,
+                "endingLine": 439
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 440,
+                "endingLine": 447
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 448,
+                "endingLine": 454
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 455,
+                "endingLine": 455
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 456,
+                "endingLine": 459
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 460,
+                "endingLine": 460
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 461,
+                "endingLine": 462
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 463,
+                "endingLine": 463
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 464,
+                "endingLine": 464
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 465,
+                "endingLine": 466
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 467,
+                "endingLine": 470
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 471,
+                "endingLine": 471
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 472,
+                "endingLine": 474
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 475,
+                "endingLine": 475
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 476,
+                "endingLine": 478
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 479,
+                "endingLine": 479
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 480,
+                "endingLine": 480
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T00:31:50Z",
+                  "messageHeadline": "✨amp-next-page v2 history manipulation (#25971)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 481,
+                "endingLine": 483
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 484,
+                "endingLine": 484
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 485,
+                "endingLine": 486
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 487,
+                "endingLine": 487
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 488,
+                "endingLine": 488
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 489,
+                "endingLine": 490
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 491,
+                "endingLine": 491
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 492,
+                "endingLine": 492
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 493,
+                "endingLine": 493
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 494,
+                "endingLine": 494
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 495,
+                "endingLine": 495
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 496,
+                "endingLine": 496
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 497,
+                "endingLine": 509
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 510,
+                "endingLine": 510
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 511,
+                "endingLine": 518
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 519,
+                "endingLine": 519
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 520,
+                "endingLine": 520
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 521,
+                "endingLine": 521
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 522,
+                "endingLine": 522
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 523,
+                "endingLine": 523
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 524,
+                "endingLine": 524
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 525,
+                "endingLine": 525
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 526,
+                "endingLine": 527
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 528,
+                "endingLine": 532
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 533,
+                "endingLine": 533
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 534,
+                "endingLine": 537
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 538,
+                "endingLine": 538
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 539,
+                "endingLine": 545
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 546,
+                "endingLine": 546
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 547,
+                "endingLine": 547
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 548,
+                "endingLine": 548
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 549,
+                "endingLine": 549
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 550,
+                "endingLine": 554
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 555,
+                "endingLine": 557
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 558,
+                "endingLine": 565
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 566,
+                "endingLine": 570
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 571,
+                "endingLine": 571
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 572,
+                "endingLine": 572
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 573,
+                "endingLine": 581
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 582,
+                "endingLine": 583
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 584,
+                "endingLine": 584
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 585,
+                "endingLine": 587
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 588,
+                "endingLine": 594
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 595,
+                "endingLine": 595
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 596,
+                "endingLine": 607
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 608,
+                "endingLine": 608
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 609,
+                "endingLine": 628
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 629,
+                "endingLine": 633
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 634,
+                "endingLine": 635
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 636,
+                "endingLine": 639
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 640,
+                "endingLine": 642
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 643,
+                "endingLine": 645
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 646,
+                "endingLine": 650
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 651,
+                "endingLine": 652
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2020-01-21T18:11:03Z",
+                  "messageHeadline": "Implements unit tests for hidden elements (#26389)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 653,
+                "endingLine": 653
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 654,
+                "endingLine": 656
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 657,
+                "endingLine": 657
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 658,
+                "endingLine": 658
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 659,
+                "endingLine": 659
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 660,
+                "endingLine": 668
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 669,
+                "endingLine": 669
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 670,
+                "endingLine": 670
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 671,
+                "endingLine": 671
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 672,
+                "endingLine": 672
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 673,
+                "endingLine": 673
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 674,
+                "endingLine": 675
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 676,
+                "endingLine": 676
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 677,
+                "endingLine": 677
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 678,
+                "endingLine": 678
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 679,
+                "endingLine": 683
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 684,
+                "endingLine": 684
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 685,
+                "endingLine": 687
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2020-01-13T19:55:12Z",
+                  "messageHeadline": "✨Handling sticky, fixed and hidden elements in `amp-next-page` v2 (#2…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 688,
+                "endingLine": 689
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 690,
+                "endingLine": 737
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 738,
+                "endingLine": 738
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 739,
+                "endingLine": 743
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 744,
+                "endingLine": 747
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 748,
+                "endingLine": 750
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 751,
+                "endingLine": 751
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 752,
+                "endingLine": 752
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 753,
+                "endingLine": 753
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 754,
+                "endingLine": 754
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 755,
+                "endingLine": 755
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 756,
+                "endingLine": 757
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 758,
+                "endingLine": 761
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 762,
+                "endingLine": 762
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 763,
+                "endingLine": 763
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 764,
+                "endingLine": 766
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 767,
+                "endingLine": 774
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-23T17:05:42Z",
+                  "messageHeadline": "✨Implement infinite article loading on `amp-next-page` v2 (#26296)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 775,
+                "endingLine": 777
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 778,
+                "endingLine": 781
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 782,
+                "endingLine": 782
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 783,
+                "endingLine": 783
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 784,
+                "endingLine": 788
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 789,
+                "endingLine": 789
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 790,
+                "endingLine": 790
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 791,
+                "endingLine": 797
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 798,
+                "endingLine": 801
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 802,
+                "endingLine": 809
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 810,
+                "endingLine": 810
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 811,
+                "endingLine": 813
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 814,
+                "endingLine": 817
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 818,
+                "endingLine": 818
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 819,
+                "endingLine": 819
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 820,
+                "endingLine": 821
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 822,
+                "endingLine": 823
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 824,
+                "endingLine": 824
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 825,
+                "endingLine": 825
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 826,
+                "endingLine": 837
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 838,
+                "endingLine": 838
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 839,
+                "endingLine": 841
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 842,
+                "endingLine": 842
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 843,
+                "endingLine": 843
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 844,
+                "endingLine": 845
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 846,
+                "endingLine": 848
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 849,
+                "endingLine": 850
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 851,
+                "endingLine": 876
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 877,
+                "endingLine": 879
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 880,
+                "endingLine": 880
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 881,
+                "endingLine": 883
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 884,
+                "endingLine": 884
+              },
+              {
+                "commit": {
+                  "changedFiles": 9,
+                  "committedDate": "2020-01-28T01:23:37Z",
+                  "messageHeadline": "♻️<amp-next-page> v2 minor renaming and fixes (#26468)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 885,
+                "endingLine": 885
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 886,
+                "endingLine": 887
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 888,
+                "endingLine": 890
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 891,
+                "endingLine": 891
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 892,
+                "endingLine": 892
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 893,
+                "endingLine": 894
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 895,
+                "endingLine": 901
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2020-02-03T20:14:04Z",
+                  "messageHeadline": "✨ Remote loading of pages for <amp-next-page> v2 (#26470)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 902,
+                "endingLine": 902
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 903,
+                "endingLine": 904
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 905,
+                "endingLine": 905
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 906,
+                "endingLine": 906
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 907,
+                "endingLine": 907
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 908,
+                "endingLine": 908
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 909,
+                "endingLine": 914
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 915,
+                "endingLine": 915
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 916,
+                "endingLine": 924
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 925,
+                "endingLine": 925
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 926,
+                "endingLine": 930
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 931,
+                "endingLine": 931
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-01-31T22:17:09Z",
+                  "messageHeadline": "✨ <amp-next-page> v2 default and templated separator elements (#26413)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 932,
+                "endingLine": 939
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 940,
+                "endingLine": 942
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2020-01-13T21:05:56Z",
+                  "messageHeadline": "`amp-next-page-v2`: better manual tests (#26099)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 943,
+                "endingLine": 943
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 944,
+                "endingLine": 946
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 947,
+                "endingLine": 951
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 952,
+                "endingLine": 952
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 953,
+                "endingLine": 954
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 955,
+                "endingLine": 955
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 956,
+                "endingLine": 958
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 959,
+                "endingLine": 964
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 965,
+                "endingLine": 965
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 966,
+                "endingLine": 967
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 968,
+                "endingLine": 968
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 969,
+                "endingLine": 972
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 973,
+                "endingLine": 973
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 974,
+                "endingLine": 977
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 978,
+                "endingLine": 980
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 981,
+                "endingLine": 991
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 992,
+                "endingLine": 992
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 993,
+                "endingLine": 993
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 994,
+                "endingLine": 994
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 995,
+                "endingLine": 995
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 996,
+                "endingLine": 998
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 999,
+                "endingLine": 1003
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1004,
+                "endingLine": 1004
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1005,
+                "endingLine": 1007
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1008,
+                "endingLine": 1009
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1010,
+                "endingLine": 1020
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1021,
+                "endingLine": 1025
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1026,
+                "endingLine": 1027
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1028,
+                "endingLine": 1028
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1029,
+                "endingLine": 1030
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1031,
+                "endingLine": 1049
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1050,
+                "endingLine": 1050
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1051,
+                "endingLine": 1051
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1052,
+                "endingLine": 1053
+              },
+              {
+                "commit": {
+                  "changedFiles": 24,
+                  "committedDate": "2020-02-28T23:59:08Z",
+                  "messageHeadline": "📖<amp-next-page> documentation and validation (#26841)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1054,
+                "endingLine": 1056
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2020-02-11T21:16:02Z",
+                  "messageHeadline": "✨<amp-next-page> v2 default and templated footers (more articles box)…",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1057,
+                "endingLine": 1057
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2019-12-10T07:48:41Z",
+                  "messageHeadline": "✨ Initial implementation of amp-next-page v2 (#25636)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 1058,
+                "endingLine": 1059
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

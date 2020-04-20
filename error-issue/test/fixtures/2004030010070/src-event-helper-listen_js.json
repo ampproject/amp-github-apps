@@ -1,0 +1,406 @@
+{
+  "data": {
+    "repository": {
+      "ref": {
+        "target": {
+          "blame": {
+            "ranges": [
+              {
+                "commit": {
+                  "changedFiles": 16,
+                  "committedDate": "2017-03-23T18:19:12Z",
+                  "messageHeadline": "Refactor AmpContext dependencies for building (#8258)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 1,
+                "endingLine": 16
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 17,
+                "endingLine": 17
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 18,
+                "endingLine": 21
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 22,
+                "endingLine": 22
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-18T00:33:03Z",
+                  "messageHeadline": "Passive event listener wrapper (#10721)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 23,
+                "endingLine": 23
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2020-03-05T19:57:00Z",
+                  "messageHeadline": "Use { passive: true } on gesture.js (#26876)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 24,
+                "endingLine": 29
+              },
+              {
+                "commit": {
+                  "changedFiles": 16,
+                  "committedDate": "2017-03-23T18:19:12Z",
+                  "messageHeadline": "Refactor AmpContext dependencies for building (#8258)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 30,
+                "endingLine": 39
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-18T00:33:03Z",
+                  "messageHeadline": "Passive event listener wrapper (#10721)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 40,
+                "endingLine": 40
+              },
+              {
+                "commit": {
+                  "changedFiles": 16,
+                  "committedDate": "2017-03-23T18:19:12Z",
+                  "messageHeadline": "Refactor AmpContext dependencies for building (#8258)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 41,
+                "endingLine": 42
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 43,
+                "endingLine": 48
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 49,
+                "endingLine": 50
+              },
+              {
+                "commit": {
+                  "changedFiles": 44,
+                  "committedDate": "2018-06-26T20:32:15Z",
+                  "messageHeadline": "Fixing jsdocs in `src` folder (#16312)",
+                  "author": {
+                    "user": {
+                      "login": "prateekbh"
+                    }
+                  }
+                },
+                "startingLine": 51,
+                "endingLine": 56
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 57,
+                "endingLine": 59
+              },
+              {
+                "commit": {
+                  "changedFiles": 37,
+                  "committedDate": "2019-08-20T17:49:44Z",
+                  "messageHeadline": "Prefix more AMP window globals (#24054)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 60,
+                "endingLine": 61
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 62,
+                "endingLine": 70
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 71,
+                "endingLine": 73
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 74,
+                "endingLine": 77
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 78,
+                "endingLine": 80
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 81,
+                "endingLine": 88
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-18T00:33:03Z",
+                  "messageHeadline": "Passive event listener wrapper (#10721)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 89,
+                "endingLine": 95
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 96,
+                "endingLine": 100
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-18T00:33:03Z",
+                  "messageHeadline": "Passive event listener wrapper (#10721)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 101,
+                "endingLine": 101
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 102,
+                "endingLine": 116
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-18T00:33:03Z",
+                  "messageHeadline": "Passive event listener wrapper (#10721)",
+                  "author": {
+                    "user": {
+                      "login": "wassgha"
+                    }
+                  }
+                },
+                "startingLine": 117,
+                "endingLine": 117
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 118,
+                "endingLine": 118
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 119,
+                "endingLine": 120
+              },
+              {
+                "commit": {
+                  "changedFiles": 340,
+                  "committedDate": "2017-12-13T23:56:40Z",
+                  "messageHeadline": "Update gulp-eslint version to 4.0 (#12450)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 121,
+                "endingLine": 123
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2020-03-05T19:57:00Z",
+                  "messageHeadline": "Use { passive: true } on gesture.js (#26876)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 124,
+                "endingLine": 160
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

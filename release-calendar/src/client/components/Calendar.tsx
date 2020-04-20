@@ -21,6 +21,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
+const CALENDAR_CONTENT_HEIGHT = 480;
+const EVENT_LIMIT_DISPLAYED = 3;
+
 export interface CalendarProps {
   events: EventSourceInput[];
 }
@@ -38,6 +41,10 @@ export class Calendar extends React.Component<CalendarProps, {}> {
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
           eventSources={this.props.events}
+          contentHeight={CALENDAR_CONTENT_HEIGHT} //will be 430 when header is added
+          fixedWeekCount={false}
+          displayEventTime={false}
+          views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
         />
       </div>
     );

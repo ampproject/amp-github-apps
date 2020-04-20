@@ -1,0 +1,69 @@
+.main-container {
+    padding: 12px;
+    padding-top: 24px;
+    overflow: hidden;
+}
+
+@mixin container-shadow {
+    box-shadow:
+        rgba(0, 0, 0, 0.2) 0px 2px 4px -1px,
+        rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
+        rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+    padding: 16px;
+    border-radius: 4px;
+}
+
+.col-channel-table {
+    @include container-shadow;
+    padding-top: 0px;
+    width: 30%;
+    float:left;
+}
+
+.col-calendar {
+    @include container-shadow;
+    width: 63%;
+    float: right;
+}
+
+@media only screen and (max-width: 1030px) {
+    .col-channel-table {
+        float: left;
+        width: 50%;
+    }
+    .col-calendar {
+        width: 90%;
+        margin-top: 5px;
+        clear: both;
+        float: left;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .col-channel-table {
+        width: 70%;
+    }
+}
+
+body {
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-size: 14px;
+    line-height: 3em;
+    color: #24292e;
+    margin: 0px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    font-family: inherit;
+    font-size: inherit;
+    &:focus {
+       outline: none; 
+    }
+    &:active {
+        transform: translateY(1px);
+    }
+} 

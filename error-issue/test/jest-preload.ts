@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-import {GraphQLResponse} from './types';
-
-/** Wrapper around the GraphQL client providing built-in query rate-limiting. */
-export class RateLimitedGraphQL {
-  constructor(token: string, private frequencyMs: number) {}
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async runQuery(query: string): Promise<GraphQLResponse> {
-    return null as GraphQLResponse;
-  }
-}
+global.console.log = jest.fn();
+global.console.info = jest.fn();
+global.console.debug = jest.fn();
+// Allow the environment to override if desired.
+process.env.LOG_LEVEL = process.env.LOG_LEVEL || 'warn';

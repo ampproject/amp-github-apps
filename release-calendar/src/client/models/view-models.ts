@@ -20,7 +20,7 @@ export class Release {
   constructor(entity: ReleaseEntity) {
     const currentPromotion = entity.promotions[0];
     this.name = entity.name;
-    this.channel = currentPromotion.toChannel;
+    this.channel = currentPromotion.channel;
     this.date = currentPromotion.date;
     this.isRollback = this.channel == Channel.ROLLBACK;
   }

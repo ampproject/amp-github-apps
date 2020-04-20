@@ -37,6 +37,14 @@ export interface BlameRange {
   changedFiles: number;
 }
 
+/** A frame in a stacktrace. */
+export interface StackFrame {
+  rtv: string;
+  path: string;
+  line: number;
+}
+
+/** GraphQL query response structure. */
 namespace GraphQL {
   interface User {
     login: string;

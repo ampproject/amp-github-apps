@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+import {StackFrame} from './types';
+
+const SOURCE_PREFIX = 'https://raw.githubusercontent.com/ampproject/amphtml/';
+const SOURCE_PATTERN = /^(?<rtv>\d+)\/(?<path>[^:]+):(?<line>\d+)(?<column>:\d+)?$/;
+
 /** Formats a date for display in a GitHub issue. */
 export function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', {
@@ -21,4 +26,37 @@ export function formatDate(date: Date): string {
     month: 'short',
     year: 'numeric',
   });
+}
+
+/** Parses a PR number from a commit message, or 0 if none is found. */
+export function parsePrNumber(message: string): number {
+  const matches = message.match(/^.*\(#(?<prNumber>\d+)\)/);
+  return matches ? parseInt(matches.groups.prNumber, 10) : 0;
+}
+
+/**
+ * Parses the RTV, path, and line from a source URL:line string.
+ * See https://github.com/ampproject/error-tracker/blob/master/utils/stacktrace/standardize-stack-trace.js
+ */
+export function parseSource(source: string): null | StackFrame {
+  if (!source.startsWith(SOURCE_PREFIX)) {
+    return null;
+  }
+
+  const matches = source.substr(SOURCE_PREFIX.length).match(SOURCE_PATTERN);
+  if (!matches) {
+    return null;
+  }
+
+  const {rtv, path, line} = matches.groups;
+  return {rtv, path, line: parseInt(line, 10)};
+}
+
+/** Parses stack frames from a standardized stacktrace. */
+export function parseStacktrace(stacktrace: string): Array<StackFrame> {
+  return stacktrace
+    .split('\n')
+    .map(line => line.match(/^\s*at .*\((?<source>.+)\)$/))
+    .filter(Boolean)
+    .map(({groups}) => parseSource(groups.source));
 }
