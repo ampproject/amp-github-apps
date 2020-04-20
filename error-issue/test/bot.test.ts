@@ -16,7 +16,7 @@
 
 import nock from 'nock';
 
-import {BlameFinder} from '../src/blame_finder.stub';
+import {BlameFinder} from '../src/blame_finder';
 import {IssueBuilder} from '../src/issue_builder.stub';
 import {ErrorIssueBot} from '../src/bot';
 

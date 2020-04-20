@@ -1,0 +1,5444 @@
+{
+  "data": {
+    "repository": {
+      "ref": {
+        "target": {
+          "blame": {
+            "ranges": [
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 1,
+                "endingLine": 16
+              },
+              {
+                "commit": {
+                  "changedFiles": 45,
+                  "committedDate": "2015-09-21T13:20:30Z",
+                  "messageHeadline": "Make linting functional. Yaihh.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 17,
+                "endingLine": 17
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2016-07-26T23:01:54Z",
+                  "messageHeadline": "Stricter enforcement of getMode DCE (#4222)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 18,
+                "endingLine": 18
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 19,
+                "endingLine": 24
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-10T14:21:23Z",
+                  "messageHeadline": "Provide a way to turn logging on and off.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 25,
+                "endingLine": 25
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 26,
+                "endingLine": 36
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 37,
+                "endingLine": 43
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 44,
+                "endingLine": 44
+              },
+              {
+                "commit": {
+                  "changedFiles": 39,
+                  "committedDate": "2018-06-27T17:56:54Z",
+                  "messageHeadline": "Fix js docs in `ads` and `3p` folder (#16377)",
+                  "author": {
+                    "user": {
+                      "login": "prateekbh"
+                    }
+                  }
+                },
+                "startingLine": 45,
+                "endingLine": 45
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 46,
+                "endingLine": 51
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-12-17T22:09:44Z",
+                  "messageHeadline": "Report dev error at viewer channel timeout (#25931)",
+                  "author": {
+                    "user": {
+                      "login": "zhouyx"
+                    }
+                  }
+                },
+                "startingLine": 52,
+                "endingLine": 59
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 60,
+                "endingLine": 60
+              },
+              {
+                "commit": {
+                  "changedFiles": 39,
+                  "committedDate": "2018-06-27T17:56:54Z",
+                  "messageHeadline": "Fix js docs in `ads` and `3p` folder (#16377)",
+                  "author": {
+                    "user": {
+                      "login": "prateekbh"
+                    }
+                  }
+                },
+                "startingLine": 61,
+                "endingLine": 61
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 62,
+                "endingLine": 67
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 68,
+                "endingLine": 78
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-02-06T21:29:11Z",
+                  "messageHeadline": "Directly report logged errors instead of relying on rethrowing (#7358)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 79,
+                "endingLine": 84
+              },
+              {
+                "commit": {
+                  "changedFiles": 37,
+                  "committedDate": "2019-08-20T17:49:44Z",
+                  "messageHeadline": "Prefix more AMP window globals (#24054)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 85,
+                "endingLine": 85
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-02-06T21:29:11Z",
+                  "messageHeadline": "Directly report logged errors instead of relying on rethrowing (#7358)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 86,
+                "endingLine": 86
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 87,
+                "endingLine": 87
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 88,
+                "endingLine": 100
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 101,
+                "endingLine": 101
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 102,
+                "endingLine": 104
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 105,
+                "endingLine": 106
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 107,
+                "endingLine": 116
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2019-09-16T17:51:28Z",
+                  "messageHeadline": "🐛 Message extraction: Fallback on unserialize objects (#24500)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 117,
+                "endingLine": 117
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 118,
+                "endingLine": 119
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 120,
+                "endingLine": 126
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 127,
+                "endingLine": 127
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 128,
+                "endingLine": 128
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2019-09-16T17:51:28Z",
+                  "messageHeadline": "🐛 Message extraction: Fallback on unserialize objects (#24500)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 129,
+                "endingLine": 132
+              },
+              {
+                "commit": {
+                  "changedFiles": 1369,
+                  "committedDate": "2020-03-30T23:24:53Z",
+                  "messageHeadline": "📦 Update dependency prettier to v2 (#27350)",
+                  "author": {
+                    "user": {
+                      "login": "renovate-bot"
+                    }
+                  }
+                },
+                "startingLine": 133,
+                "endingLine": 133
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2019-09-16T21:20:29Z",
+                  "messageHeadline": "🐛 Logging message toString() blunder fix (#24549)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 134,
+                "endingLine": 134
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2019-09-16T17:51:28Z",
+                  "messageHeadline": "🐛 Message extraction: Fallback on unserialize objects (#24500)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 135,
+                "endingLine": 135
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 136,
+                "endingLine": 136
+              },
+              {
+                "commit": {
+                  "changedFiles": 123,
+                  "committedDate": "2018-05-14T21:56:10Z",
+                  "messageHeadline": "🚮 Restrict comments to 80 columns (exempt JSDoc annotations) (#15247)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 137,
+                "endingLine": 142
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-10T14:21:23Z",
+                  "messageHeadline": "Provide a way to turn logging on and off.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 143,
+                "endingLine": 143
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 144,
+                "endingLine": 144
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 145,
+                "endingLine": 147
+              },
+              {
+                "commit": {
+                  "changedFiles": 123,
+                  "committedDate": "2018-05-14T21:56:10Z",
+                  "messageHeadline": "🚮 Restrict comments to 80 columns (exempt JSDoc annotations) (#15247)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 148,
+                "endingLine": 152
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2017-07-28T22:26:36Z",
+                  "messageHeadline": "Update comment on use of suffix in Log class (#10683)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 153,
+                "endingLine": 153
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2015-09-03T07:38:47Z",
+                  "messageHeadline": "chore: change `Widnow` typo to `Window`",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 154,
+                "endingLine": 154
+              },
+              {
+                "commit": {
+                  "changedFiles": 27,
+                  "committedDate": "2016-06-10T23:59:21Z",
+                  "messageHeadline": "Fix all type errors in alp.js and turn on testing this on Travis. (#3…",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 155,
+                "endingLine": 155
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 156,
+                "endingLine": 156
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 157,
+                "endingLine": 157
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 158,
+                "endingLine": 158
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2015-09-04T04:58:32Z",
+                  "messageHeadline": "Fix tests broken by recent resource refactoring.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 159,
+                "endingLine": 161
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2016-03-17T03:35:25Z",
+                  "messageHeadline": "fix some const declarations",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 162,
+                "endingLine": 162
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2015-09-04T04:58:32Z",
+                  "messageHeadline": "Fix tests broken by recent resource refactoring.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 163,
+                "endingLine": 163
+              },
+              {
+                "commit": {
+                  "changedFiles": 37,
+                  "committedDate": "2019-08-20T17:49:44Z",
+                  "messageHeadline": "Prefix more AMP window globals (#24054)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 164,
+                "endingLine": 164
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 165,
+                "endingLine": 165
+              },
+              {
+                "commit": {
+                  "changedFiles": 27,
+                  "committedDate": "2016-06-10T23:59:21Z",
+                  "messageHeadline": "Fix all type errors in alp.js and turn on testing this on Travis. (#3…",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 166,
+                "endingLine": 166
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 167,
+                "endingLine": 168
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2016-03-17T03:35:25Z",
+                  "messageHeadline": "fix some const declarations",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 169,
+                "endingLine": 169
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 170,
+                "endingLine": 170
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 171,
+                "endingLine": 172
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 173,
+                "endingLine": 180
+              },
+              {
+                "commit": {
+                  "changedFiles": 1369,
+                  "committedDate": "2020-03-30T23:24:53Z",
+                  "messageHeadline": "📦 Update dependency prettier to v2 (#27350)",
+                  "author": {
+                    "user": {
+                      "login": "renovate-bot"
+                    }
+                  }
+                },
+                "startingLine": 181,
+                "endingLine": 182
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 183,
+                "endingLine": 187
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-10T14:21:23Z",
+                  "messageHeadline": "Provide a way to turn logging on and off.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 188,
+                "endingLine": 189
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 190,
+                "endingLine": 193
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 194,
+                "endingLine": 194
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 195,
+                "endingLine": 195
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 196,
+                "endingLine": 202
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 203,
+                "endingLine": 203
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-10T14:21:23Z",
+                  "messageHeadline": "Provide a way to turn logging on and off.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 204,
+                "endingLine": 204
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 205,
+                "endingLine": 205
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-10T14:21:23Z",
+                  "messageHeadline": "Provide a way to turn logging on and off.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 206,
+                "endingLine": 206
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 207,
+                "endingLine": 208
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2016-06-27T18:48:54Z",
+                  "messageHeadline": "replace some props on the object returned by getMode during compile t…",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 209,
+                "endingLine": 209
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 210,
+                "endingLine": 210
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2016-01-12T00:13:31Z",
+                  "messageHeadline": "Make our integration tests pass reliably on SauceLabs.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 211,
+                "endingLine": 211
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 212,
+                "endingLine": 213
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-07-06T17:07:13Z",
+                  "messageHeadline": "Optimize functions that showed up in profile. (#3905)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 214,
+                "endingLine": 214
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 215,
+                "endingLine": 215
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-10T14:21:23Z",
+                  "messageHeadline": "Provide a way to turn logging on and off.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 216,
+                "endingLine": 216
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 217,
+                "endingLine": 218
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2016-06-27T18:48:54Z",
+                  "messageHeadline": "replace some props on the object returned by getMode during compile t…",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 219,
+                "endingLine": 219
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 220,
+                "endingLine": 220
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-10T14:21:23Z",
+                  "messageHeadline": "Provide a way to turn logging on and off.",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 221,
+                "endingLine": 221
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 222,
+                "endingLine": 223
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2016-07-26T23:01:54Z",
+                  "messageHeadline": "Stricter enforcement of getMode DCE (#4222)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 224,
+                "endingLine": 224
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 225,
+                "endingLine": 229
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 230,
+                "endingLine": 230
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 231,
+                "endingLine": 231
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 232,
+                "endingLine": 232
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 233,
+                "endingLine": 233
+              },
+              {
+                "commit": {
+                  "changedFiles": 79,
+                  "committedDate": "2015-11-10T19:16:45Z",
+                  "messageHeadline": "switch `var` to `let` or `const`",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 234,
+                "endingLine": 234
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 235,
+                "endingLine": 240
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 241,
+                "endingLine": 241
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 242,
+                "endingLine": 242
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-08-28T21:12:15Z",
+                  "messageHeadline": "amp-script: Update local script example and FAQs (#24242)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 243,
+                "endingLine": 249
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2018-01-04T19:02:43Z",
+                  "messageHeadline": "Change default user logging level of AMP runtime from `OFF` to `WARN`…",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 250,
+                "endingLine": 250
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 251,
+                "endingLine": 251
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 252,
+                "endingLine": 255
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 256,
+                "endingLine": 259
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 260,
+                "endingLine": 260
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 261,
+                "endingLine": 264
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 265,
+                "endingLine": 265
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 266,
+                "endingLine": 266
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 267,
+                "endingLine": 267
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 268,
+                "endingLine": 268
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 269,
+                "endingLine": 269
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2015-09-24T16:56:57Z",
+                  "messageHeadline": "Gesture and gesture recognizers",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 270,
+                "endingLine": 271
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 272,
+                "endingLine": 274
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 275,
+                "endingLine": 275
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 276,
+                "endingLine": 276
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 277,
+                "endingLine": 277
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 278,
+                "endingLine": 278
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 279,
+                "endingLine": 279
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 280,
+                "endingLine": 280
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2015-09-24T16:56:57Z",
+                  "messageHeadline": "Gesture and gesture recognizers",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 281,
+                "endingLine": 282
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 283,
+                "endingLine": 285
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 286,
+                "endingLine": 286
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 287,
+                "endingLine": 287
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 288,
+                "endingLine": 288
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 289,
+                "endingLine": 289
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 290,
+                "endingLine": 290
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 291,
+                "endingLine": 291
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2015-09-24T16:56:57Z",
+                  "messageHeadline": "Gesture and gesture recognizers",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 292,
+                "endingLine": 293
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 294,
+                "endingLine": 296
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 297,
+                "endingLine": 298
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 299,
+                "endingLine": 299
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2015-09-04T14:50:08Z",
+                  "messageHeadline": "Allow var args in logging and pass them through right to the console.log",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 300,
+                "endingLine": 300
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-12-20T00:55:01Z",
+                  "messageHeadline": "add expectedError method (#6581)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 301,
+                "endingLine": 302
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 303,
+                "endingLine": 303
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-12-20T00:55:01Z",
+                  "messageHeadline": "add expectedError method (#6581)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 304,
+                "endingLine": 304
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2018-07-06T20:17:01Z",
+                  "messageHeadline": "Better debugging for amp-bind, amp-list (#16494)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 305,
+                "endingLine": 305
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2015-09-24T16:56:57Z",
+                  "messageHeadline": "Gesture and gesture recognizers",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 306,
+                "endingLine": 306
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 307,
+                "endingLine": 307
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 308,
+                "endingLine": 311
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 312,
+                "endingLine": 312
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-12-20T00:55:01Z",
+                  "messageHeadline": "add expectedError method (#6581)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 313,
+                "endingLine": 318
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2017-07-19T21:18:11Z",
+                  "messageHeadline": "user error trigger (#10148)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 319,
+                "endingLine": 319
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-12-20T00:55:01Z",
+                  "messageHeadline": "add expectedError method (#6581)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 320,
+                "endingLine": 321
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2017-07-19T21:18:11Z",
+                  "messageHeadline": "user error trigger (#10148)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 322,
+                "endingLine": 322
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-12-20T00:55:01Z",
+                  "messageHeadline": "add expectedError method (#6581)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 323,
+                "endingLine": 324
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2017-07-19T21:18:11Z",
+                  "messageHeadline": "user error trigger (#10148)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 325,
+                "endingLine": 325
+              },
+              {
+                "commit": {
+                  "changedFiles": 37,
+                  "committedDate": "2019-08-20T17:49:44Z",
+                  "messageHeadline": "Prefix more AMP window globals (#24054)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 326,
+                "endingLine": 327
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-12-20T00:55:01Z",
+                  "messageHeadline": "add expectedError method (#6581)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 328,
+                "endingLine": 333
+              },
+              {
+                "commit": {
+                  "changedFiles": 256,
+                  "committedDate": "2017-06-14T19:53:07Z",
+                  "messageHeadline": "Upgrade eslint (#9885)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 334,
+                "endingLine": 334
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-12-20T00:55:01Z",
+                  "messageHeadline": "add expectedError method (#6581)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 335,
+                "endingLine": 336
+              },
+              {
+                "commit": {
+                  "changedFiles": 256,
+                  "committedDate": "2017-06-14T19:53:07Z",
+                  "messageHeadline": "Upgrade eslint (#9885)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 337,
+                "endingLine": 337
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-12-20T00:55:01Z",
+                  "messageHeadline": "add expectedError method (#6581)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 338,
+                "endingLine": 340
+              },
+              {
+                "commit": {
+                  "changedFiles": 37,
+                  "committedDate": "2019-08-20T17:49:44Z",
+                  "messageHeadline": "Prefix more AMP window globals (#24054)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 341,
+                "endingLine": 342
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2015-09-24T16:56:57Z",
+                  "messageHeadline": "Gesture and gesture recognizers",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 343,
+                "endingLine": 343
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 344,
+                "endingLine": 345
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 346,
+                "endingLine": 347
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2016-03-15T22:56:16Z",
+                  "messageHeadline": "Logging: rethrowAsync facility",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 348,
+                "endingLine": 348
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 349,
+                "endingLine": 350
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2016-03-15T22:56:16Z",
+                  "messageHeadline": "Logging: rethrowAsync facility",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 351,
+                "endingLine": 352
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 353,
+                "endingLine": 355
+              },
+              {
+                "commit": {
+                  "changedFiles": 91,
+                  "committedDate": "2015-09-02T23:06:35Z",
+                  "messageHeadline": "Initial commit",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 356,
+                "endingLine": 356
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 357,
+                "endingLine": 357
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2016-12-20T00:55:01Z",
+                  "messageHeadline": "add expectedError method (#6581)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 358,
+                "endingLine": 369
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 370,
+                "endingLine": 380
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-06-11T21:36:58Z",
+                  "messageHeadline": "fix type narrowing problem so that we can remove casts (#22788)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 381,
+                "endingLine": 383
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 384,
+                "endingLine": 385
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 386,
+                "endingLine": 386
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 387,
+                "endingLine": 387
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-06-11T21:36:58Z",
+                  "messageHeadline": "fix type narrowing problem so that we can remove casts (#22788)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 388,
+                "endingLine": 389
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 390,
+                "endingLine": 390
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-06-11T21:36:58Z",
+                  "messageHeadline": "fix type narrowing problem so that we can remove casts (#22788)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 391,
+                "endingLine": 398
+              },
+              {
+                "commit": {
+                  "changedFiles": 26,
+                  "committedDate": "2019-05-22T23:18:38Z",
+                  "messageHeadline": "🏗✨ Upgrade closure compiler to v20190513 (#22446)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 399,
+                "endingLine": 399
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 400,
+                "endingLine": 400
+              },
+              {
+                "commit": {
+                  "changedFiles": 42,
+                  "committedDate": "2016-06-12T00:59:55Z",
+                  "messageHeadline": "Fix compile errors in 3p and fix all unknown types in amp.js (#3552)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 401,
+                "endingLine": 401
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 402,
+                "endingLine": 402
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 403,
+                "endingLine": 403
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 404,
+                "endingLine": 408
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 409,
+                "endingLine": 410
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 411,
+                "endingLine": 411
+              },
+              {
+                "commit": {
+                  "changedFiles": 42,
+                  "committedDate": "2016-06-12T00:59:55Z",
+                  "messageHeadline": "Fix compile errors in 3p and fix all unknown types in amp.js (#3552)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 412,
+                "endingLine": 412
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 413,
+                "endingLine": 416
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 417,
+                "endingLine": 417
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 418,
+                "endingLine": 418
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 419,
+                "endingLine": 421
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 422,
+                "endingLine": 426
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2019-09-16T17:51:28Z",
+                  "messageHeadline": "🐛 Message extraction: Fallback on unserialize objects (#24500)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 427,
+                "endingLine": 427
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 428,
+                "endingLine": 433
+              },
+              {
+                "commit": {
+                  "changedFiles": 37,
+                  "committedDate": "2019-08-20T17:49:44Z",
+                  "messageHeadline": "Prefix more AMP window globals (#24054)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 434,
+                "endingLine": 435
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 436,
+                "endingLine": 439
+              },
+              {
+                "commit": {
+                  "changedFiles": 17,
+                  "committedDate": "2016-09-09T17:50:59Z",
+                  "messageHeadline": "Fix lots of type errors and introduces assertElement. (#4885)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 440,
+                "endingLine": 446
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 447,
+                "endingLine": 447
+              },
+              {
+                "commit": {
+                  "changedFiles": 17,
+                  "committedDate": "2016-09-09T17:50:59Z",
+                  "messageHeadline": "Fix lots of type errors and introduces assertElement. (#4885)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 448,
+                "endingLine": 449
+              },
+              {
+                "commit": {
+                  "changedFiles": 26,
+                  "committedDate": "2019-05-22T23:18:38Z",
+                  "messageHeadline": "🏗✨ Upgrade closure compiler to v20190513 (#22446)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 450,
+                "endingLine": 450
+              },
+              {
+                "commit": {
+                  "changedFiles": 17,
+                  "committedDate": "2016-09-09T17:50:59Z",
+                  "messageHeadline": "Fix lots of type errors and introduces assertElement. (#4885)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 451,
+                "endingLine": 453
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 454,
+                "endingLine": 455
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 456,
+                "endingLine": 456
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 457,
+                "endingLine": 458
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 459,
+                "endingLine": 459
+              },
+              {
+                "commit": {
+                  "changedFiles": 17,
+                  "committedDate": "2016-09-09T17:50:59Z",
+                  "messageHeadline": "Fix lots of type errors and introduces assertElement. (#4885)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 460,
+                "endingLine": 461
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 462,
+                "endingLine": 462
+              },
+              {
+                "commit": {
+                  "changedFiles": 52,
+                  "committedDate": "2016-09-10T05:13:06Z",
+                  "messageHeadline": "Fix all type errors in v0.js and turn on type checking on travis (#4908)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 463,
+                "endingLine": 463
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2017-01-25T19:23:36Z",
+                  "messageHeadline": "Clarify that assertString/Number allow empty string and zero (#7202)",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 464,
+                "endingLine": 465
+              },
+              {
+                "commit": {
+                  "changedFiles": 52,
+                  "committedDate": "2016-09-10T05:13:06Z",
+                  "messageHeadline": "Fix all type errors in v0.js and turn on type checking on travis (#4908)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 466,
+                "endingLine": 466
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2017-01-25T19:23:36Z",
+                  "messageHeadline": "Clarify that assertString/Number allow empty string and zero (#7202)",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 467,
+                "endingLine": 467
+              },
+              {
+                "commit": {
+                  "changedFiles": 52,
+                  "committedDate": "2016-09-10T05:13:06Z",
+                  "messageHeadline": "Fix all type errors in v0.js and turn on type checking on travis (#4908)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 468,
+                "endingLine": 469
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 470,
+                "endingLine": 470
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2017-01-25T19:23:36Z",
+                  "messageHeadline": "Clarify that assertString/Number allow empty string and zero (#7202)",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 471,
+                "endingLine": 471
+              },
+              {
+                "commit": {
+                  "changedFiles": 26,
+                  "committedDate": "2019-05-22T23:18:38Z",
+                  "messageHeadline": "🏗✨ Upgrade closure compiler to v20190513 (#22446)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 472,
+                "endingLine": 472
+              },
+              {
+                "commit": {
+                  "changedFiles": 52,
+                  "committedDate": "2016-09-10T05:13:06Z",
+                  "messageHeadline": "Fix all type errors in v0.js and turn on type checking on travis (#4908)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 473,
+                "endingLine": 474
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 475,
+                "endingLine": 476
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 477,
+                "endingLine": 477
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 478,
+                "endingLine": 479
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 480,
+                "endingLine": 480
+              },
+              {
+                "commit": {
+                  "changedFiles": 52,
+                  "committedDate": "2016-09-10T05:13:06Z",
+                  "messageHeadline": "Fix all type errors in v0.js and turn on type checking on travis (#4908)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 481,
+                "endingLine": 483
+              },
+              {
+                "commit": {
+                  "changedFiles": 12,
+                  "committedDate": "2016-09-15T08:05:39Z",
+                  "messageHeadline": "fix carousel types (#4989)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 484,
+                "endingLine": 484
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2017-01-25T19:23:36Z",
+                  "messageHeadline": "Clarify that assertString/Number allow empty string and zero (#7202)",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 485,
+                "endingLine": 486
+              },
+              {
+                "commit": {
+                  "changedFiles": 12,
+                  "committedDate": "2016-09-15T08:05:39Z",
+                  "messageHeadline": "fix carousel types (#4989)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 487,
+                "endingLine": 487
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2017-01-25T19:23:36Z",
+                  "messageHeadline": "Clarify that assertString/Number allow empty string and zero (#7202)",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 488,
+                "endingLine": 488
+              },
+              {
+                "commit": {
+                  "changedFiles": 12,
+                  "committedDate": "2016-09-15T08:05:39Z",
+                  "messageHeadline": "fix carousel types (#4989)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 489,
+                "endingLine": 490
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 491,
+                "endingLine": 491
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2017-01-25T19:23:36Z",
+                  "messageHeadline": "Clarify that assertString/Number allow empty string and zero (#7202)",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 492,
+                "endingLine": 493
+              },
+              {
+                "commit": {
+                  "changedFiles": 26,
+                  "committedDate": "2019-05-22T23:18:38Z",
+                  "messageHeadline": "🏗✨ Upgrade closure compiler to v20190513 (#22446)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 494,
+                "endingLine": 494
+              },
+              {
+                "commit": {
+                  "changedFiles": 12,
+                  "committedDate": "2016-09-15T08:05:39Z",
+                  "messageHeadline": "fix carousel types (#4989)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 495,
+                "endingLine": 496
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 497,
+                "endingLine": 498
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 499,
+                "endingLine": 499
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 500,
+                "endingLine": 501
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 502,
+                "endingLine": 502
+              },
+              {
+                "commit": {
+                  "changedFiles": 12,
+                  "committedDate": "2016-09-15T08:05:39Z",
+                  "messageHeadline": "fix carousel types (#4989)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 503,
+                "endingLine": 505
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2018-12-26T23:50:24Z",
+                  "messageHeadline": "Add assertArray function to log.js (#19937)",
+                  "author": {
+                    "user": {
+                      "login": "cathyxz"
+                    }
+                  }
+                },
+                "startingLine": 506,
+                "endingLine": 510
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 511,
+                "endingLine": 511
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2018-12-26T23:50:24Z",
+                  "messageHeadline": "Add assertArray function to log.js (#19937)",
+                  "author": {
+                    "user": {
+                      "login": "cathyxz"
+                    }
+                  }
+                },
+                "startingLine": 512,
+                "endingLine": 512
+              },
+              {
+                "commit": {
+                  "changedFiles": 26,
+                  "committedDate": "2019-05-22T23:18:38Z",
+                  "messageHeadline": "🏗✨ Upgrade closure compiler to v20190513 (#22446)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 513,
+                "endingLine": 513
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2018-12-26T23:50:24Z",
+                  "messageHeadline": "Add assertArray function to log.js (#19937)",
+                  "author": {
+                    "user": {
+                      "login": "cathyxz"
+                    }
+                  }
+                },
+                "startingLine": 514,
+                "endingLine": 515
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 516,
+                "endingLine": 520
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 521,
+                "endingLine": 521
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2018-12-26T23:50:24Z",
+                  "messageHeadline": "Add assertArray function to log.js (#19937)",
+                  "author": {
+                    "user": {
+                      "login": "cathyxz"
+                    }
+                  }
+                },
+                "startingLine": 522,
+                "endingLine": 524
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2018-01-30T23:07:16Z",
+                  "messageHeadline": "Layers: Scoring Algorithm (#12958)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 525,
+                "endingLine": 530
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 531,
+                "endingLine": 531
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2018-01-30T23:07:16Z",
+                  "messageHeadline": "Layers: Scoring Algorithm (#12958)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 532,
+                "endingLine": 532
+              },
+              {
+                "commit": {
+                  "changedFiles": 26,
+                  "committedDate": "2019-05-22T23:18:38Z",
+                  "messageHeadline": "🏗✨ Upgrade closure compiler to v20190513 (#22446)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 533,
+                "endingLine": 533
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2018-01-30T23:07:16Z",
+                  "messageHeadline": "Layers: Scoring Algorithm (#12958)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 534,
+                "endingLine": 535
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 536,
+                "endingLine": 537
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 538,
+                "endingLine": 538
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 539,
+                "endingLine": 540
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 541,
+                "endingLine": 541
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2018-01-30T23:07:16Z",
+                  "messageHeadline": "Layers: Scoring Algorithm (#12958)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 542,
+                "endingLine": 544
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 545,
+                "endingLine": 545
+              },
+              {
+                "commit": {
+                  "changedFiles": 123,
+                  "committedDate": "2018-05-14T21:56:10Z",
+                  "messageHeadline": "🚮 Restrict comments to 80 columns (exempt JSDoc annotations) (#15247)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 546,
+                "endingLine": 547
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 548,
+                "endingLine": 548
+              },
+              {
+                "commit": {
+                  "changedFiles": 27,
+                  "committedDate": "2016-06-10T23:59:21Z",
+                  "messageHeadline": "Fix all type errors in alp.js and turn on testing this on Travis. (#3…",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 549,
+                "endingLine": 549
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 550,
+                "endingLine": 551
+              },
+              {
+                "commit": {
+                  "changedFiles": 39,
+                  "committedDate": "2018-06-27T17:56:54Z",
+                  "messageHeadline": "Fix js docs in `ads` and `3p` folder (#16377)",
+                  "author": {
+                    "user": {
+                      "login": "prateekbh"
+                    }
+                  }
+                },
+                "startingLine": 552,
+                "endingLine": 552
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 553,
+                "endingLine": 553
+              },
+              {
+                "commit": {
+                  "changedFiles": 26,
+                  "committedDate": "2019-05-22T23:18:38Z",
+                  "messageHeadline": "🏗✨ Upgrade closure compiler to v20190513 (#22446)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 554,
+                "endingLine": 554
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 555,
+                "endingLine": 556
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2016-11-29T20:45:56Z",
+                  "messageHeadline": "A4A amp nameframe (#6099)",
+                  "author": {
+                    "user": null
+                  }
+                },
+                "startingLine": 557,
+                "endingLine": 558
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 559,
+                "endingLine": 559
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 560,
+                "endingLine": 560
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 561,
+                "endingLine": 567
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-05-03T23:17:30Z",
+                  "messageHeadline": "Duplicate errors that are un-writable (#9046)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 568,
+                "endingLine": 568
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 569,
+                "endingLine": 574
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2017-02-24T01:58:14Z",
+                  "messageHeadline": "A4A: log sampling of errors as dev-expected (#7726)",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 575,
+                "endingLine": 576
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 577,
+                "endingLine": 578
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 579,
+                "endingLine": 584
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 585,
+                "endingLine": 585
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 586,
+                "endingLine": 586
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 587,
+                "endingLine": 587
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 588,
+                "endingLine": 600
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 601,
+                "endingLine": 601
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 602,
+                "endingLine": 603
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 604,
+                "endingLine": 604
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 605,
+                "endingLine": 605
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 606,
+                "endingLine": 606
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 607,
+                "endingLine": 610
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 611,
+                "endingLine": 611
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 612,
+                "endingLine": 614
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-08-01T19:38:29Z",
+                  "messageHeadline": "🐛 Correctly interpolate expanded log messages (#23631)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 615,
+                "endingLine": 637
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 638,
+                "endingLine": 639
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 640,
+                "endingLine": 642
+              },
+              {
+                "commit": {
+                  "changedFiles": 27,
+                  "committedDate": "2016-06-10T23:59:21Z",
+                  "messageHeadline": "Fix all type errors in alp.js and turn on testing this on Travis. (#3…",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 643,
+                "endingLine": 643
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 644,
+                "endingLine": 645
+              },
+              {
+                "commit": {
+                  "changedFiles": 1369,
+                  "committedDate": "2020-03-30T23:24:53Z",
+                  "messageHeadline": "📦 Update dependency prettier to v2 (#27350)",
+                  "author": {
+                    "user": {
+                      "login": "renovate-bot"
+                    }
+                  }
+                },
+                "startingLine": 646,
+                "endingLine": 646
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2019-09-16T17:51:28Z",
+                  "messageHeadline": "🐛 Message extraction: Fallback on unserialize objects (#24500)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 647,
+                "endingLine": 653
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2017-04-03T22:01:27Z",
+                  "messageHeadline": "Instrument amp-form at the ampdoc level (#8101)",
+                  "author": {
+                    "user": {
+                      "login": "cvializ"
+                    }
+                  }
+                },
+                "startingLine": 654,
+                "endingLine": 655
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 656,
+                "endingLine": 657
+              },
+              {
+                "commit": {
+                  "changedFiles": 1,
+                  "committedDate": "2019-09-16T17:51:28Z",
+                  "messageHeadline": "🐛 Message extraction: Fallback on unserialize objects (#24500)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 658,
+                "endingLine": 658
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 659,
+                "endingLine": 670
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-05-03T23:17:30Z",
+                  "messageHeadline": "Duplicate errors that are un-writable (#9046)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 671,
+                "endingLine": 676
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2018-10-10T19:50:59Z",
+                  "messageHeadline": "🏗✨ Upgrade to Babel 7 (#18574)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 677,
+                "endingLine": 678
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-05-03T23:17:30Z",
+                  "messageHeadline": "Duplicate errors that are un-writable (#9046)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 679,
+                "endingLine": 681
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2018-10-10T19:50:59Z",
+                  "messageHeadline": "🏗✨ Upgrade to Babel 7 (#18574)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 682,
+                "endingLine": 683
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-05-03T23:17:30Z",
+                  "messageHeadline": "Duplicate errors that are un-writable (#9046)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 684,
+                "endingLine": 688
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2018-10-10T19:50:59Z",
+                  "messageHeadline": "🏗✨ Upgrade to Babel 7 (#18574)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 689,
+                "endingLine": 689
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-05-03T23:17:30Z",
+                  "messageHeadline": "Duplicate errors that are un-writable (#9046)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 690,
+                "endingLine": 691
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 692,
+                "endingLine": 692
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2016-03-15T22:56:16Z",
+                  "messageHeadline": "Logging: rethrowAsync facility",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 693,
+                "endingLine": 695
+              },
+              {
+                "commit": {
+                  "changedFiles": 13,
+                  "committedDate": "2018-07-25T21:50:16Z",
+                  "messageHeadline": "🏗🐛 Prevent most async throwing of errors during tests (#16916)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 696,
+                "endingLine": 696
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2016-03-15T22:56:16Z",
+                  "messageHeadline": "Logging: rethrowAsync facility",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 697,
+                "endingLine": 697
+              },
+              {
+                "commit": {
+                  "changedFiles": 13,
+                  "committedDate": "2018-07-25T21:50:16Z",
+                  "messageHeadline": "🏗🐛 Prevent most async throwing of errors during tests (#16916)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 698,
+                "endingLine": 698
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2016-03-15T22:56:16Z",
+                  "messageHeadline": "Logging: rethrowAsync facility",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 699,
+                "endingLine": 703
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-05-03T23:17:30Z",
+                  "messageHeadline": "Duplicate errors that are un-writable (#9046)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 704,
+                "endingLine": 704
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2016-03-15T22:56:16Z",
+                  "messageHeadline": "Logging: rethrowAsync facility",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 705,
+                "endingLine": 711
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-05-03T23:17:30Z",
+                  "messageHeadline": "Duplicate errors that are un-writable (#9046)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 712,
+                "endingLine": 712
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2016-03-15T22:56:16Z",
+                  "messageHeadline": "Logging: rethrowAsync facility",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 713,
+                "endingLine": 727
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-02-06T21:29:11Z",
+                  "messageHeadline": "Directly report logged errors instead of relying on rethrowing (#7358)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 728,
+                "endingLine": 728
+              },
+              {
+                "commit": {
+                  "changedFiles": 11,
+                  "committedDate": "2017-02-16T21:39:09Z",
+                  "messageHeadline": "Fix undefined reportError (#7588)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 729,
+                "endingLine": 729
+              },
+              {
+                "commit": {
+                  "changedFiles": 37,
+                  "committedDate": "2019-08-20T17:49:44Z",
+                  "messageHeadline": "Prefix more AMP window globals (#24054)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 730,
+                "endingLine": 730
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2017-02-06T21:29:11Z",
+                  "messageHeadline": "Directly report logged errors instead of relying on rethrowing (#7358)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 731,
+                "endingLine": 732
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2016-03-15T22:56:16Z",
+                  "messageHeadline": "Logging: rethrowAsync facility",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 733,
+                "endingLine": 734
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 735,
+                "endingLine": 735
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 736,
+                "endingLine": 736
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 737,
+                "endingLine": 737
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 738,
+                "endingLine": 738
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 739,
+                "endingLine": 739
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-08-23T15:32:03Z",
+                  "messageHeadline": "Prefix remaining window globals in src/ (#24147)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 740,
+                "endingLine": 740
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 741,
+                "endingLine": 742
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 743,
+                "endingLine": 743
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 744,
+                "endingLine": 744
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 745,
+                "endingLine": 745
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-08-23T15:32:03Z",
+                  "messageHeadline": "Prefix remaining window globals in src/ (#24147)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 746,
+                "endingLine": 746
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 747,
+                "endingLine": 751
+              },
+              {
+                "commit": {
+                  "changedFiles": 20,
+                  "committedDate": "2020-01-21T21:06:25Z",
+                  "messageHeadline": "🏗️ Use typeof type where appropriate (#26355)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 752,
+                "endingLine": 752
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 753,
+                "endingLine": 755
+              },
+              {
+                "commit": {
+                  "changedFiles": 39,
+                  "committedDate": "2018-06-27T17:56:54Z",
+                  "messageHeadline": "Fix js docs in `ads` and `3p` folder (#16377)",
+                  "author": {
+                    "user": {
+                      "login": "prateekbh"
+                    }
+                  }
+                },
+                "startingLine": 756,
+                "endingLine": 756
+              },
+              {
+                "commit": {
+                  "changedFiles": 20,
+                  "committedDate": "2020-01-21T21:06:25Z",
+                  "messageHeadline": "🏗️ Use typeof type where appropriate (#26355)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 757,
+                "endingLine": 757
+              },
+              {
+                "commit": {
+                  "changedFiles": 39,
+                  "committedDate": "2018-06-27T17:56:54Z",
+                  "messageHeadline": "Fix js docs in `ads` and `3p` folder (#16377)",
+                  "author": {
+                    "user": {
+                      "login": "prateekbh"
+                    }
+                  }
+                },
+                "startingLine": 758,
+                "endingLine": 758
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 759,
+                "endingLine": 760
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2016-09-22T21:37:34Z",
+                  "messageHeadline": "make sure to init instances extensions can use (#5161)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 761,
+                "endingLine": 761
+              },
+              {
+                "commit": {
+                  "changedFiles": 123,
+                  "committedDate": "2018-05-14T21:56:10Z",
+                  "messageHeadline": "🚮 Restrict comments to 80 columns (exempt JSDoc annotations) (#15247)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 762,
+                "endingLine": 768
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2016-09-22T21:37:34Z",
+                  "messageHeadline": "make sure to init instances extensions can use (#5161)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 769,
+                "endingLine": 770
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 771,
+                "endingLine": 772
+              },
+              {
+                "commit": {
+                  "changedFiles": 39,
+                  "committedDate": "2018-06-27T17:56:54Z",
+                  "messageHeadline": "Fix js docs in `ads` and `3p` folder (#16377)",
+                  "author": {
+                    "user": {
+                      "login": "prateekbh"
+                    }
+                  }
+                },
+                "startingLine": 773,
+                "endingLine": 773
+              },
+              {
+                "commit": {
+                  "changedFiles": 20,
+                  "committedDate": "2020-01-21T21:06:25Z",
+                  "messageHeadline": "🏗️ Use typeof type where appropriate (#26355)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 774,
+                "endingLine": 774
+              },
+              {
+                "commit": {
+                  "changedFiles": 39,
+                  "committedDate": "2018-06-27T17:56:54Z",
+                  "messageHeadline": "Fix js docs in `ads` and `3p` folder (#16377)",
+                  "author": {
+                    "user": {
+                      "login": "prateekbh"
+                    }
+                  }
+                },
+                "startingLine": 775,
+                "endingLine": 775
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 776,
+                "endingLine": 779
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 780,
+                "endingLine": 786
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2018-07-16T19:05:45Z",
+                  "messageHeadline": "Use dev().info for prod logging (#16731)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 787,
+                "endingLine": 787
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 788,
+                "endingLine": 788
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 789,
+                "endingLine": 789
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 790,
+                "endingLine": 790
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 791,
+                "endingLine": 791
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 792,
+                "endingLine": 796
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 797,
+                "endingLine": 797
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 798,
+                "endingLine": 801
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 802,
+                "endingLine": 802
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 803,
+                "endingLine": 803
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 804,
+                "endingLine": 808
+              },
+              {
+                "commit": {
+                  "changedFiles": 85,
+                  "committedDate": "2018-05-15T21:21:17Z",
+                  "messageHeadline": "📖 JSDoc: Use `@return` instead of `@returns` (#15320)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 809,
+                "endingLine": 809
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 810,
+                "endingLine": 811
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 812,
+                "endingLine": 814
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 815,
+                "endingLine": 816
+              },
+              {
+                "commit": {
+                  "changedFiles": 1369,
+                  "committedDate": "2020-03-30T23:24:53Z",
+                  "messageHeadline": "📦 Update dependency prettier to v2 (#27350)",
+                  "author": {
+                    "user": {
+                      "login": "renovate-bot"
+                    }
+                  }
+                },
+                "startingLine": 817,
+                "endingLine": 817
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 818,
+                "endingLine": 825
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 826,
+                "endingLine": 826
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 827,
+                "endingLine": 827
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 828,
+                "endingLine": 828
+              },
+              {
+                "commit": {
+                  "changedFiles": 123,
+                  "committedDate": "2018-05-14T21:56:10Z",
+                  "messageHeadline": "🚮 Restrict comments to 80 columns (exempt JSDoc annotations) (#15247)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 829,
+                "endingLine": 831
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 832,
+                "endingLine": 835
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2018-07-16T19:05:45Z",
+                  "messageHeadline": "Use dev().info for prod logging (#16731)",
+                  "author": {
+                    "user": {
+                      "login": "choumx"
+                    }
+                  }
+                },
+                "startingLine": 836,
+                "endingLine": 836
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 837,
+                "endingLine": 837
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 838,
+                "endingLine": 838
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 839,
+                "endingLine": 839
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 840,
+                "endingLine": 840
+              },
+              {
+                "commit": {
+                  "changedFiles": 10,
+                  "committedDate": "2016-09-13T19:42:05Z",
+                  "messageHeadline": "Make Log DCEable. (#4963)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 841,
+                "endingLine": 845
+              },
+              {
+                "commit": {
+                  "changedFiles": 7,
+                  "committedDate": "2016-03-12T00:30:30Z",
+                  "messageHeadline": "Separate dev and pub logs. Prepare devlog for DCE.",
+                  "author": {
+                    "user": {
+                      "login": "dvoytenko"
+                    }
+                  }
+                },
+                "startingLine": 846,
+                "endingLine": 846
+              },
+              {
+                "commit": {
+                  "changedFiles": 1369,
+                  "committedDate": "2020-03-30T23:24:53Z",
+                  "messageHeadline": "📦 Update dependency prettier to v2 (#27350)",
+                  "author": {
+                    "user": {
+                      "login": "renovate-bot"
+                    }
+                  }
+                },
+                "startingLine": 847,
+                "endingLine": 847
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 848,
+                "endingLine": 855
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 856,
+                "endingLine": 856
+              },
+              {
+                "commit": {
+                  "changedFiles": 161,
+                  "committedDate": "2016-08-03T22:35:24Z",
+                  "messageHeadline": "Remove side effect exports (#4261)",
+                  "author": {
+                    "user": {
+                      "login": "jridgewell"
+                    }
+                  }
+                },
+                "startingLine": 857,
+                "endingLine": 857
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 858,
+                "endingLine": 861
+              },
+              {
+                "commit": {
+                  "changedFiles": 85,
+                  "committedDate": "2018-05-15T21:21:17Z",
+                  "messageHeadline": "📖 JSDoc: Use `@return` instead of `@returns` (#15320)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 862,
+                "endingLine": 862
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2017-08-07T22:10:26Z",
+                  "messageHeadline": "Exclude errors generated from A4A iframe (#10562)",
+                  "author": {
+                    "user": {
+                      "login": "tiendt"
+                    }
+                  }
+                },
+                "startingLine": 863,
+                "endingLine": 869
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 870,
+                "endingLine": 882
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-06-11T21:36:58Z",
+                  "messageHeadline": "fix type narrowing problem so that we can remove casts (#22788)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 883,
+                "endingLine": 885
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 886,
+                "endingLine": 887
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 888,
+                "endingLine": 888
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 889,
+                "endingLine": 897
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-06-11T21:36:58Z",
+                  "messageHeadline": "fix type narrowing problem so that we can remove casts (#22788)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 898,
+                "endingLine": 898
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 899,
+                "endingLine": 899
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-06-11T21:36:58Z",
+                  "messageHeadline": "fix type narrowing problem so that we can remove casts (#22788)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 900,
+                "endingLine": 908
+              },
+              {
+                "commit": {
+                  "changedFiles": 26,
+                  "committedDate": "2019-05-22T23:18:38Z",
+                  "messageHeadline": "🏗✨ Upgrade closure compiler to v20190513 (#22446)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 909,
+                "endingLine": 909
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 910,
+                "endingLine": 910
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 911,
+                "endingLine": 923
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 924,
+                "endingLine": 926
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 927,
+                "endingLine": 939
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 940,
+                "endingLine": 953
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-06-11T21:36:58Z",
+                  "messageHeadline": "fix type narrowing problem so that we can remove casts (#22788)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 954,
+                "endingLine": 956
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 957,
+                "endingLine": 958
+              },
+              {
+                "commit": {
+                  "changedFiles": 32,
+                  "committedDate": "2019-07-23T16:59:03Z",
+                  "messageHeadline": "🏗Extract and indirect log message string (#22146)",
+                  "author": {
+                    "user": {
+                      "login": "alanorozco"
+                    }
+                  }
+                },
+                "startingLine": 959,
+                "endingLine": 959
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 960,
+                "endingLine": 968
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-06-11T21:36:58Z",
+                  "messageHeadline": "fix type narrowing problem so that we can remove casts (#22788)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 969,
+                "endingLine": 969
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 970,
+                "endingLine": 970
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-06-11T21:36:58Z",
+                  "messageHeadline": "fix type narrowing problem so that we can remove casts (#22788)",
+                  "author": {
+                    "user": {
+                      "login": "erwinmombay"
+                    }
+                  }
+                },
+                "startingLine": 971,
+                "endingLine": 979
+              },
+              {
+                "commit": {
+                  "changedFiles": 26,
+                  "committedDate": "2019-05-22T23:18:38Z",
+                  "messageHeadline": "🏗✨ Upgrade closure compiler to v20190513 (#22446)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 980,
+                "endingLine": 980
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 981,
+                "endingLine": 981
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 982,
+                "endingLine": 1007
+              },
+              {
+                "commit": {
+                  "changedFiles": 8,
+                  "committedDate": "2018-12-20T15:53:53Z",
+                  "messageHeadline": "Actually make type inference work for asserts. (#19940)",
+                  "author": {
+                    "user": {
+                      "login": "cramforce"
+                    }
+                  }
+                },
+                "startingLine": 1008,
+                "endingLine": 1008
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
