@@ -58,15 +58,6 @@ export class RepositoryService {
     return releaseQuery;
   }
 
-  include(arr: Release[], rel: Release): boolean {
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i].name === rel.name) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   async getCurrentReleases(): Promise<Release[]> {
     const rollbackQuery = this.releaseRepository
       .createQueryBuilder('release')
@@ -103,12 +94,11 @@ export class RepositoryService {
         .getMany(),
     );
 
-    const results: Release[] = [];
     const rollback = await rollbackQuery;
     const channels = await Promise.all(channelQueries);
-    channels.forEach((channel) =>
-      results.push(channel.find((first) => !this.include(rollback, first))),
+    const currentReleases = channels.map((channel) =>
+      channel.find((first) => rollback.indexOf(first) == -1),
     );
-    return results;
+    return currentReleases;
   }
 }

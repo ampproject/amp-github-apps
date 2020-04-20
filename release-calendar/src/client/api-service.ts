@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import {Channel, Release as ReleaseEntity} from '../types';
+import {ApiServiceInterface, Channel, Release as ReleaseEntity} from '../types';
 import {Release} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
-export class ApiService implements ApiService {
+export class ApiService implements ApiServiceInterface {
   private getRequest(url: string): Promise<ReleaseEntity[]> {
     return fetch(url).then((result) => result.json());
   }

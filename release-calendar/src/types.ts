@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {Release as ReleaseViewModel} from './client/models/view-models';
 
 export enum Channel {
   LTS = 'lts',
@@ -48,8 +49,7 @@ export class Promotion {
   date: Date;
 }
 
-export interface ApiService {
-  getRelease: (name: string) => Promise<Release>;
-  getReleases: () => Promise<Release[]>;
-  getCurrentReleases: () => Promise<Promotion[]>;
+export interface ApiServiceInterface {
+  getReleases: () => Promise<ReleaseViewModel[]>;
+  getCurrentReleases: () => Promise<Map<Channel, string>>;
 }
