@@ -18,7 +18,7 @@ import {
   formatDate,
   parsePrNumber,
   parseSource,
-  parseStacktrace
+  parseStacktrace,
 } from '../src/utils';
 
 describe('formatDate', () => {
