@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import {Channel, Release as ReleaseEntity} from '../../types';
+import {
+  Channel,
+  Promotion as PromotionEntity,
+  Release as ReleaseEntity,
+} from '../../types';
 
 export class Release {
   constructor(entity: ReleaseEntity) {
@@ -29,4 +33,14 @@ export class Release {
   channel: Channel;
   date: Date;
   isRollback: boolean;
+}
+
+export class Promotion {
+  constructor(entity: PromotionEntity) {
+    this.name = entity.releaseName;
+    this.channel = entity.channel;
+  }
+
+  name: string;
+  channel: Channel;
 }

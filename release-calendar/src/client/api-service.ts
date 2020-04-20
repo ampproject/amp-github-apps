@@ -14,31 +14,37 @@
  * limitations under the License.
  */
 
-import {ApiServiceInterface, Channel, Release as ReleaseEntity} from '../types';
-import {Release} from './models/view-models';
+import {
+  ApiServiceInterface,
+  Promotion as PromotionEntity,
+  Release as ReleaseEntity,
+} from '../types';
+import {Promotion, Release} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
 export class ApiService implements ApiServiceInterface {
-  private getRequest(url: string): Promise<ReleaseEntity[]> {
+  private getReleaseRequest(url: string): Promise<ReleaseEntity[]> {
+    return fetch(url).then((result) => result.json());
+  }
+
+  private getPromotionRequest(url: string): Promise<PromotionEntity[]> {
     return fetch(url).then((result) => result.json());
   }
 
   async getReleases(): Promise<Release[]> {
-    const releases = await this.getRequest(SERVER_URL);
+    const releases = await this.getReleaseRequest(SERVER_URL);
     return releases.map((release: ReleaseEntity) => {
       return new Release(release);
     });
   }
 
-  async getCurrentReleases(): Promise<Map<Channel, string>> {
-    const currentReleases = await this.getRequest(
+  async getCurrentReleases(): Promise<Promotion[]> {
+    const currentReleases = await this.getPromotionRequest(
       SERVER_URL + '/current-releases/',
     );
-    const map = new Map<Channel, string>();
-    currentReleases.forEach((release: ReleaseEntity) => {
-      map.set(release.promotions[0].channel, release.name);
+    return currentReleases.map((promotion: PromotionEntity) => {
+      return new Promotion(promotion);
     });
-    return map;
   }
 }

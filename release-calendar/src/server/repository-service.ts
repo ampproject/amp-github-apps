@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-import {Channel, Release} from '../types';
+import {Channel, Promotion, Release} from '../types';
 import {Connection, Repository} from 'typeorm';
+import PromotionEntity from './entities/promotion';
 import ReleaseEntity from './entities/release';
 
 export class RepositoryService {
   private releaseRepository: Repository<Release>;
+  private promotionRepository: Repository<Promotion>;
 
   constructor(connection: Connection) {
     this.releaseRepository = connection.getRepository(ReleaseEntity);
+    this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
   getRelease(name: string): Promise<Release> {
@@ -58,16 +61,12 @@ export class RepositoryService {
     return releaseQuery;
   }
 
-  async getCurrentReleases(): Promise<Release[]> {
-    const rollbackQuery = this.releaseRepository
-      .createQueryBuilder('release')
-      .innerJoin(
-        'release.promotions',
-        'promotion',
-        'promotion.channel = :channel',
-        {channel: 'rollback'},
-      )
-      .select('release.name')
+  async getCurrentReleases(): Promise<Promotion[]> {
+    const rollbackQuery = this.promotionRepository
+      .createQueryBuilder('promotion')
+      .where('promotion.channel = :channel', {channel: Channel.ROLLBACK})
+      .select('promotion.releaseName')
+      .groupBy('promotion.releaseName')
       .addSelect('promotion.channel')
       .getMany();
 
@@ -80,15 +79,11 @@ export class RepositoryService {
       Channel.PERCENT_EXPERIMENTAL,
       Channel.STABLE,
     ].map((eachChannel) =>
-      this.releaseRepository
-        .createQueryBuilder('release')
-        .innerJoinAndSelect(
-          'release.promotions',
-          'promotion',
-          'promotion.channel = :channel',
-          {channel: eachChannel},
-        )
-        .select('release.name')
+      this.promotionRepository
+        .createQueryBuilder('promotion')
+        .where('promotion.channel = :channel', {channel: eachChannel})
+        .select('promotion.releaseName')
+        .groupBy('promotion.releaseName')
         .addSelect('promotion.channel')
         .orderBy('promotion.date', 'DESC')
         .getMany(),

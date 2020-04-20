@@ -32,12 +32,16 @@ const PromotionEntity = new EntitySchema<Promotion>({
     date: {
       type: 'timestamp',
     },
+    releaseName: {
+      type: String,
+      length: 13,
+    },
   },
   relations: {
     release: {
       type: 'many-to-one',
       target: 'release',
-      joinColumn: true,
+      joinColumn: {name: 'releaseName', referencedColumnName: 'name'},
       nullable: false,
     },
   },

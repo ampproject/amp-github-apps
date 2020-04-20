@@ -18,6 +18,7 @@ import '../stylesheets/channelTable.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
+import {getCurrentReleases} from '../models/promotion-current';
 
 interface ChannelTableState {
   currentReleases: Map<Channel, string>;
@@ -35,8 +36,10 @@ export class ChannelTable extends React.Component<{}, ChannelTableState> {
   }
 
   async componentDidMount(): Promise<void> {
-    const currentReleases = await this.apiService.getCurrentReleases();
-    this.setState({currentReleases});
+    const promotions = await this.apiService.getCurrentReleases();
+    console.log(promotions);
+    this.setState({currentReleases: getCurrentReleases(promotions)});
+    console.log(this.state.currentReleases);
   }
   //TODO(ajwhatson):
   // add event handling with onClick functions
