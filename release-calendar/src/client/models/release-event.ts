@@ -23,6 +23,7 @@ function convertReleaseToEvent(release: Release): EventInput {
   return {
     title: release.name,
     start: release.date,
+    //TODO: I plan to use className as how I will move colors to central location
     className: release.channel,
     extendedProps: {isRollback: release.isRollback},
   };
@@ -40,23 +41,24 @@ export function getEvents(releases: Release[]): Map<Channel, EventSourceInput> {
   colors.set(Channel.OPT_IN_EXPERIMENTAL, 'silver');
   colors.set(Channel.NIGHTLY, 'red');
 
-  const mapReleasesToEventInputs = new Map<Channel, EventInput[]>();
+  const eventInputs = new Map<Channel, EventInput[]>();
   releases.forEach((release) => {
     const event = convertReleaseToEvent(release);
-    const channelEvents = mapReleasesToEventInputs.get(release.channel);
+    const channelEvents = eventInputs.get(release.channel);
     if (!channelEvents) {
-      mapReleasesToEventInputs.set(release.channel, [event]);
+      eventInputs.set(release.channel, [event]);
     } else {
-      mapReleasesToEventInputs.set(release.channel, [...channelEvents, event]);
+      eventInputs.set(release.channel, [...channelEvents, event]);
     }
   });
-  const mapEventInputToEventSources = new Map<Channel, EventSourceInput>();
-  mapReleasesToEventInputs.forEach((event, channel) => {
-    mapEventInputToEventSources.set(channel, {
-      events: event,
+  const eventSources = new Map<Channel, EventSourceInput>();
+  eventInputs.forEach((eventInput, channel) => {
+    eventSources.set(channel, {
+      events: eventInput,
+      //TODO: will remove when colors declarations are moved to a central location
       color: colors.get(channel),
       textColor: 'white',
     });
   });
-  return mapEventInputToEventSources;
+  return eventSources;
 }
