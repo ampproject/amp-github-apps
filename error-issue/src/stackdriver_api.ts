@@ -79,7 +79,7 @@ export class StackdriverApi {
     ];
     const url = `groupStats?${params.join('&')}`;
 
-    console.log(`Fetching first ${pageSize} error groups: ${url}`);
+    console.info(`Fetching first ${pageSize} error groups: ${url}`);
     const {error, errorGroupStats} = await this.get(url);
     if (error) {
       const {code, status, message} = error;
@@ -96,7 +96,7 @@ export class StackdriverApi {
    * See https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groups/get
    */
   async getGroup(groupId: string): Promise<Stackdriver.ErrorGroup> {
-    console.log(`Fetching details for error group "${groupId}"`);
+    console.info(`Fetching details for error group "${groupId}"`);
     return this.get(`groups/${groupId}`);
   }
 
@@ -108,7 +108,7 @@ export class StackdriverApi {
     groupId: string,
     issueUrl: string
   ): Promise<Stackdriver.ErrorGroup> {
-    console.log(
+    console.info(
       `Updating tracking issue for error group "${groupId}" to "${issueUrl}"`
     );
     return this.put(`groups/${groupId}`, {

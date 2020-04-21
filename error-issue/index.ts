@@ -48,7 +48,7 @@ module.exports.app = async (req: express.Request, res: express.Response) => {
 
   try {
     const issueUrl = await bot.report(parsedReport);
-    res.redirect(302, issueUrl);
+    res.redirect(statusCodes.MOVED_TEMPORARILY, issueUrl);
   } catch (errResp) {
     console.warn(errResp);
     res.status(errResp.status || 500);

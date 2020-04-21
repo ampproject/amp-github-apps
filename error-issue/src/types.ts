@@ -94,7 +94,7 @@ export namespace Stackdriver {
   export interface ErrorGroup {
     name: string;
     groupId: string;
-    trackingIssues: Array<{
+    trackingIssues?: Array<{
       url: string;
     }>;
   }
