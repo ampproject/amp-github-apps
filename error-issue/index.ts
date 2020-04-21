@@ -81,3 +81,31 @@ module.exports.errorMonitor = async (
     res.json({error: error.toString()});
   }
 };
+
+function createErrorReportUrl(report: ErrorReport) {
+  const params = Object.entries(report)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+
+  return `https://us-central1-amp-error-issue-bot.cloudfunctions.net/` +
+    `error-issue?${params}`;
+}
+
+/** Diagnostic endpoint to list new untracked errors. */
+module.exports.errorList = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  try {
+    const reports = await monitor.newErrorsToReport();
+    res.json({
+      errorReports: reports.map(report => ({
+        createUrl: createErrorReportUrl(report),
+        ...report,
+      }))
+    });
+  } catch (error) {
+    res.status(500);
+    res.json({error: error.toString()});
+  }
+};
