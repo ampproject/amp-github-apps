@@ -52,12 +52,9 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   }
 
   render(): JSX.Element {
-    const displayedEvents: EventSourceInput[] = [];
-    this.props.channels.forEach((channel) => {
-      if (this.state.events.has(channel)) {
-        displayedEvents.push(this.state.events.get(channel));
-      }
-    });
+    const displayEvents: EventSourceInput[] = this.props.channels
+      .filter((channel) => this.state.events.has(channel))
+      .map((channel) => this.state.events.get(channel));
     return (
       <div className='calendar'>
         <FullCalendar
@@ -68,7 +65,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
             right: 'dayGridMonth,timeGridWeek,listWeek',
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
-          eventSources={displayedEvents}
+          eventSources={displayEvents}
           contentHeight={CALENDAR_CONTENT_HEIGHT} //will be 430 when header is added
           fixedWeekCount={false}
           displayEventTime={false}
