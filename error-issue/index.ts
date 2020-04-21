@@ -35,7 +35,7 @@ const bot = new ErrorIssueBot(
 );
 
 const stackdriver = new StackdriverApi(PROJECT_ID);
-const monitor = new ErrorMonitor(stackdriver);
+const monitor = new ErrorMonitor(stackdriver, 1000);
 
 /** Endpoint to create a GitHub issue for an error report. */
 module.exports.errorIssue = async (
@@ -75,7 +75,34 @@ module.exports.errorMonitor = async (
   res: express.Response,
 ) => {
   try {
-    res.json({issues: await monitor.monitorAndReport()});
+    res.json({issueUrls: await monitor.monitorAndReport()});
+  } catch (error) {
+    res.status(500);
+    res.json({error: error.toString()});
+  }
+};
+
+function errorReportUrl(report: ErrorReport) {
+  const params = Object.entries(report)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+
+  return `https://us-central1-amp-error-issue-bot.cloudfunctions.net/error-issue?${params}`;
+}
+
+/** Diagnostic endpoint to list new untracked errors. */
+module.exports.errorList = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  try {
+    const reports = await monitor.newErrorsToReport();
+    res.json({
+      errorReports: reports.map(report => ({
+        createUrl: errorReportUrl(report),
+        ...report,
+      }))
+    });
   } catch (error) {
     res.status(500);
     res.json({error: error.toString()});

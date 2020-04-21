@@ -59,6 +59,16 @@ steps:
       - dist/
       - --entry-point
       - errorMonitor
+  - name: gcr.io/cloud-builders/gcloud
+    dir: error-issue
+    args:
+      - functions
+      - deploy
+      - error-list
+      - --source
+      - dist/
+      - --entry-point
+      - errorList
 
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
