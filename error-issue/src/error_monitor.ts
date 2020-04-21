@@ -20,7 +20,6 @@ import {ErrorReport, Stackdriver} from './types';
 import fetch from 'node-fetch';
 import statusCodes from 'http-status-codes';
 
-// const ERROR_ISSUE_REPORT_ENDPOINT = 'http://localhost:8080';
 const ERROR_ISSUE_REPORT_ENDPOINT =
   'https://us-central1-amp-error-issue-bot.cloudfunctions.net/error-issue';
 
@@ -43,26 +42,31 @@ export class ErrorMonitor {
   }
 
   /** Finds frequent errors to create tracking issues for. */
-  async newErrorsToReport(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  async newErrorsToReport(): Promise<Array<ErrorReport>> {
     return (await this.client.listGroups(this.pageLimit))
       .filter(({group}) => !this.hasTrackingIssue(group))
-      .filter(groupStats => this.hasHighFrequency(groupStats));
+      .filter(groupStats => this.hasHighFrequency(groupStats))
+      .map(groupStats => this.groupStatsToReport(groupStats));
   }
 
-  /** Reports an error to the bot endpoint, returning the created issue URL. */
-  async reportError({
+  private groupStatsToReport({
     group,
     firstSeenTime,
     timedCounts,
-    representative,
-  }: Stackdriver.ErrorGroupStats): Promise<string> {
-    console.info(`Reporting error group ${group.groupId} to error issue bot`);
-    const errorReport: ErrorReport = {
+    representative
+  }: Stackdriver.ErrorGroupStats): ErrorReport {
+    return {
       errorId: group.groupId,
       firstSeen: firstSeenTime,
       dailyOccurrences: timedCounts[0].count,
       stacktrace: representative.message,
     };
+  }
+
+  /** Reports an error to the bot endpoint, returning the created issue URL. */
+  async reportError(errorReport: ErrorReport): Promise<string> {
+    const {errorId} = errorReport;
+    console.info(`Reporting error group ${errorId} to error issue bot`);
     const {status, statusText, headers} = await fetch(
       ERROR_ISSUE_REPORT_ENDPOINT,
       {
@@ -76,7 +80,7 @@ export class ErrorMonitor {
     if (status !== statusCodes.MOVED_TEMPORARILY) {
       throw new Error(
         `HTTP ${status} (${statusText}): ` +
-          `Failed to file GitHub issue for "${group.groupId}`
+          `Failed to file GitHub issue for "${errorId}`
       );
     }
 
@@ -88,14 +92,14 @@ export class ErrorMonitor {
   /** Identifies new, frequent errors and reports GitHub issues. */
   async monitorAndReport() {
     const errors = await this.newErrorsToReport();
-    console.debug(`Found ${errors.length} new error groups to report`);
+    console.info(`Found ${errors.length} new error groups to report`);
     const urls: Array<string> = [];
 
     for (const error of errors) {
       try {
         const url = await this.reportError(error);
         urls.push(url);
-        await this.client.setGroupIssue(error.group.groupId, url);
+        await this.client.setGroupIssue(error.errorId, url);
       } catch (error) {
         console.error(error);
       }

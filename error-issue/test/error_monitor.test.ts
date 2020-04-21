@@ -31,7 +31,7 @@ describe('ErrorMonitor', () => {
   const infrequentGroup: Stackdriver.ErrorGroupStats = {
     group: {
       name: 'Error: Infrequent error',
-      groupId: 'abc123',
+      groupId: 'infrequent_id',
     },
     count: 2000,
     timedCounts: [
@@ -47,7 +47,7 @@ describe('ErrorMonitor', () => {
   const acknowledgedGroup: Stackdriver.ErrorGroupStats = {
     group: {
       name: 'Error: Acknowledged error',
-      groupId: 'def456',
+      groupId: 'acknowledged_id',
       trackingIssues: [{url: 'https://github.com/blah/blah'}],
     },
     count: 20000,
@@ -64,7 +64,7 @@ describe('ErrorMonitor', () => {
   const newGroup: Stackdriver.ErrorGroupStats = {
     group: {
       name: 'Error: New error',
-      groupId: 'ghi789',
+      groupId: 'new_id',
     },
     count: 20000,
     timedCounts: [
@@ -78,6 +78,12 @@ describe('ErrorMonitor', () => {
     representative: {message: 'Error: New error'},
   };
   const errorGroups = [infrequentGroup, acknowledgedGroup, newGroup];
+  const newReport = {
+    errorId: 'new_id',
+    firstSeen: new Date('Feb 20, 2020'),
+    dailyOccurrences: 6000,
+    stacktrace: 'Error: New error',
+  };
 
   beforeAll(() => {
     nock.disableNetConnect();
@@ -103,19 +109,21 @@ describe('ErrorMonitor', () => {
 
   describe('newErrorsToReport', () => {
     it('ignores infrequent errors', async () => {
-      await expect(monitor.newErrorsToReport()).resolves.not.toContain(
-        infrequentGroup
-      );
+      const newErrors = await monitor.newErrorsToReport();
+      const newErrorIds = newErrors.map(({errorId}) => errorId);
+      expect(newErrorIds).not.toContain('infrequent_id');
     });
 
     it('ignores errors with an existing tracking issue', async () => {
-      await expect(monitor.newErrorsToReport()).resolves.not.toContain(
-        acknowledgedGroup
-      );
+      const newErrors = await monitor.newErrorsToReport();
+      const newErrorIds = newErrors.map(({errorId}) => errorId);
+      expect(newErrorIds).not.toContain('acknowledged_id');
     });
 
     it('includes new frequent errors', async () => {
-      await expect(monitor.newErrorsToReport()).resolves.toContain(newGroup);
+      const newErrors = await monitor.newErrorsToReport();
+      const newErrorIds = newErrors.map(({errorId}) => errorId);
+      expect(newErrorIds).toContain('new_id');
     });
   });
 
@@ -124,7 +132,7 @@ describe('ErrorMonitor', () => {
       nock('https://us-central1-amp-error-issue-bot.cloudfunctions.net')
         .post('/error-issue', body => {
           expect(body).toMatchObject({
-            errorId: 'ghi789',
+            errorId: 'new_id',
             firstSeen: expect.stringMatching(/^2020-02-20T/),
             dailyOccurrences: 6000,
             stacktrace: 'Error: New error',
@@ -133,7 +141,7 @@ describe('ErrorMonitor', () => {
         })
         .reply(302);
 
-      await monitor.reportError(newGroup);
+      await monitor.reportError(newReport);
     });
 
     it('returns the URL of the created issue', async () => {
@@ -141,7 +149,7 @@ describe('ErrorMonitor', () => {
         .post('/error-issue')
         .reply(302, null, { Location: 'http://github.com.com/blah/blah' });
 
-      await expect(monitor.reportError(newGroup))
+      await expect(monitor.reportError(newReport))
         .resolves
         .toEqual('http://github.com.com/blah/blah');
     });
@@ -151,7 +159,7 @@ describe('ErrorMonitor', () => {
         .post('/error-issue')
         .reply(400);
 
-      await expect(monitor.reportError(newGroup))
+      await expect(monitor.reportError(newReport))
         .rejects
         .toThrow('HTTP 400 (Bad Request)');
     });
@@ -168,7 +176,7 @@ describe('ErrorMonitor', () => {
       await monitor.monitorAndReport();
 
       expect(monitor.reportError).toHaveBeenCalledTimes(1);
-      expect(monitor.reportError).toHaveBeenCalledWith(newGroup);
+      expect(monitor.reportError).toHaveBeenCalledWith(newReport);
     });
 
     it('returns created URLs', async () => {
@@ -181,7 +189,7 @@ describe('ErrorMonitor', () => {
       await monitor.monitorAndReport()
 
       expect(stackdriver.setGroupIssue).toHaveBeenCalledWith(
-        'ghi789',
+        'new_id',
         'https://github.com/blah/blah',
       );
     });
