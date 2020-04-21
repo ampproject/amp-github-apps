@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+require('dotenv').config();
+
 import express from 'express';
 import statusCodes from 'http-status-codes';
 import {ErrorIssueBot} from './src/bot';
