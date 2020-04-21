@@ -24,27 +24,36 @@ interface ChannelTableState {
   currentReleases: Map<Channel, string>;
 }
 
-export class ChannelTable extends React.Component<{}, ChannelTableState> {
+interface ChannelTableProps {
+  channels: Channel[];
+  handleSelectedChannel: (channel: Channel, checked: boolean) => void;
+}
+
+// eslint-disable-next-line prettier/prettier
+export class ChannelTable 
+  extends React.Component<ChannelTableProps, ChannelTableState> {
   private apiService: ApiService;
 
-  constructor(props: unknown) {
+  constructor(props: Readonly<ChannelTableProps>) {
     super(props);
     this.state = {
       currentReleases: new Map<Channel, string>(),
     };
     this.apiService = new ApiService();
+    this.handleChannelClick = this.handleChannelClick.bind(this);
   }
 
   async componentDidMount(): Promise<void> {
     const promotions = await this.apiService.getCurrentReleases();
-    console.log(promotions);
     this.setState({currentReleases: getCurrentReleases(promotions)});
-    console.log(this.state.currentReleases);
   }
-  //TODO(ajwhatson):
-  // add event handling with onClick functions
-  // send state from app carrying array of selected channels
-  // add app call for most recent releases in each channel
+
+  handleChannelClick = (
+    channel: Channel,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
+    this.props.handleSelectedChannel(channel, event.target.checked);
+  };
 
   rows = [
     {channel: Channel.STABLE, title: 'Stable'},
@@ -69,7 +78,10 @@ export class ChannelTable extends React.Component<{}, ChannelTableState> {
                     <input
                       type='checkbox'
                       className='click-square'
-                      id={row.channel}></input>
+                      id={row.channel}
+                      onChange={(e): void =>
+                        this.handleChannelClick(row.channel, e)
+                      }></input>
                     <i></i>
                   </div>
                   <div className='row-text'>{row.title}</div>

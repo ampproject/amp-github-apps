@@ -16,7 +16,10 @@
 
 import '../stylesheets/calendar.scss';
 import * as React from 'react';
+import {ApiService} from '../api-service';
+import {Channel} from '../../types';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
+import {getEvents} from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -25,11 +28,33 @@ const CALENDAR_CONTENT_HEIGHT = 480;
 const EVENT_LIMIT_DISPLAYED = 3;
 
 export interface CalendarProps {
-  events: EventSourceInput[];
+  channels: Channel[];
 }
 
-export class Calendar extends React.Component<CalendarProps, {}> {
+export interface CalendarState {
+  events: Map<Channel, EventSourceInput>;
+}
+
+export class Calendar extends React.Component<CalendarProps, CalendarState> {
+  private apiService: ApiService;
+
+  constructor(props: Readonly<CalendarProps>) {
+    super(props);
+    this.state = {
+      events: new Map<Channel, EventSourceInput>(),
+    };
+    this.apiService = new ApiService();
+  }
+
+  async componentDidMount(): Promise<void> {
+    const releases = await this.apiService.getReleases();
+    this.setState({events: getEvents(releases)});
+  }
+
   render(): JSX.Element {
+    const displayEvents: EventSourceInput[] = this.props.channels
+      .filter((channel) => this.state.events.has(channel))
+      .map((channel) => this.state.events.get(channel));
     return (
       <div className='calendar'>
         <FullCalendar
@@ -40,7 +65,7 @@ export class Calendar extends React.Component<CalendarProps, {}> {
             right: 'dayGridMonth,timeGridWeek,listWeek',
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
-          eventSources={this.props.events}
+          eventSources={displayEvents}
           contentHeight={CALENDAR_CONTENT_HEIGHT} //will be 430 when header is added
           fixedWeekCount={false}
           displayEventTime={false}

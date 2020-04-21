@@ -16,33 +16,30 @@
 
 import '../stylesheets/app.scss';
 import * as React from 'react';
-import {ApiService} from '../api-service';
 import {Calendar} from './Calendar';
+import {Channel} from '../../types';
 import {ChannelTable} from './ChannelTable';
-import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Header} from './Header';
-import {getEvents} from '../models/release-event';
 
 interface AppState {
-  events: EventSourceInput[];
+  channels: Channel[];
 }
 
 export class App extends React.Component<{}, AppState> {
-  private apiService: ApiService;
-
   constructor(props: unknown) {
     super(props);
     this.state = {
-      events: [],
+      channels: [],
     };
-    this.apiService = new ApiService();
   }
 
-  async componentDidMount(): Promise<void> {
-    const releases = await this.apiService.getReleases();
-    const events = getEvents(releases);
-    this.setState({events});
-  }
+  handleSelectedChannel = (channel: Channel, toChecked: boolean): void => {
+    this.setState({
+      channels: toChecked
+        ? this.state.channels.concat(channel)
+        : this.state.channels.filter((item) => channel !== item),
+    });
+  };
 
   render(): JSX.Element {
     return (
@@ -50,10 +47,13 @@ export class App extends React.Component<{}, AppState> {
         <Header title='AMP Release Calendar' />
         <div className='main-container'>
           <div className='col-channel-table'>
-            <ChannelTable />
+            <ChannelTable
+              channels={this.state.channels}
+              handleSelectedChannel={this.handleSelectedChannel}
+            />
           </div>
           <div className='col-calendar'>
-            <Calendar events={this.state.events} />
+            <Calendar channels={this.state.channels} />
           </div>
         </div>
       </React.Fragment>

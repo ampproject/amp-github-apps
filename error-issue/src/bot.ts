@@ -16,8 +16,8 @@
 
 import {Octokit} from '@octokit/rest';
 
-import {RateLimitedGraphQL} from './rate_limited_graphql.stub';
-import {BlameFinder} from './blame_finder.stub';
+import {RateLimitedGraphQL} from './rate_limited_graphql';
+import {BlameFinder} from './blame_finder';
 import {IssueBuilder} from './issue_builder.stub';
 import {ErrorReport} from './types';
 
