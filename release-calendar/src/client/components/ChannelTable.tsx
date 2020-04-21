@@ -18,11 +18,16 @@ import '../stylesheets/channelTable.scss';
 import * as React from 'react';
 import {Channel} from '../../types';
 
-export class ChannelTable extends React.Component<{}, {}> {
-  //TODO(ajwhatson):
-  // add event handling with onClick functions
-  // send state from app carrying array of selected channels
-  // add app call for most recent releases in each channel
+interface ChannelTableProps {
+  channels: Channel[];
+  handleSelectedChannel: (channel: Channel, checked: boolean) => void;
+}
+
+export class ChannelTable extends React.Component<ChannelTableProps, {}> {
+  constructor(props: Readonly<ChannelTableProps>) {
+    super(props);
+    this.handleChannelClick = this.handleChannelClick.bind(this);
+  }
 
   rows = [
     {channel: Channel.STABLE, title: 'Stable'},
@@ -33,6 +38,13 @@ export class ChannelTable extends React.Component<{}, {}> {
     {channel: Channel.NIGHTLY, title: 'Nightly'},
     {channel: Channel.LTS, title: 'Long Term Stable'},
   ];
+
+  handleChannelClick = (
+    channel: Channel,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
+    this.props.handleSelectedChannel(channel, event.target.checked);
+  };
 
   render(): JSX.Element {
     return (
@@ -48,7 +60,10 @@ export class ChannelTable extends React.Component<{}, {}> {
                     <input
                       type='checkbox'
                       className='click-square'
-                      id={row.channel}></input>
+                      id={row.channel}
+                      onChange={(e): void =>
+                        this.handleChannelClick(row.channel, e)
+                      }></input>
                     <i></i>
                   </div>
                   <div className='row-text'>{row.title}</div>
