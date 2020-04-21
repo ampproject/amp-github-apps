@@ -19,7 +19,7 @@ import {
   Promotion as PromotionEntity,
   Release as ReleaseEntity,
 } from '../types';
-import {Promotion, Release} from './models/view-models';
+import {CurrentReleases, Release} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
@@ -39,12 +39,10 @@ export class ApiService implements ApiServiceInterface {
     });
   }
 
-  async getCurrentReleases(): Promise<Promotion[]> {
+  async getCurrentReleases(): Promise<CurrentReleases> {
     const currentReleases = await this.getPromotionRequest(
       SERVER_URL + '/current-releases/',
     );
-    return currentReleases.map((promotion: PromotionEntity) => {
-      return new Promotion(promotion);
-    });
+    return new CurrentReleases(currentReleases);
   }
 }

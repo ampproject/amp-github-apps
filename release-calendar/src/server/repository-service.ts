@@ -89,11 +89,11 @@ export class RepositoryService {
         .getMany(),
     );
 
-    const rollback = await rollbackQuery;
+    const rollbacks = await rollbackQuery;
     const releasesInEachChannel = await Promise.all(channelQueries);
     const currentReleases = releasesInEachChannel.map((releasesInOneChannel) =>
       releasesInOneChannel.find(
-        (latestRelease) => rollback.indexOf(latestRelease) == -1,
+        (latestRelease) => rollbacks.indexOf(latestRelease) == -1,
       ),
     );
 

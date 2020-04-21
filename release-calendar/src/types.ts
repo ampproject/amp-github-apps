@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  Promotion as PromotionViewModel,
+  CurrentReleases,
   Release as ReleaseViewModel,
 } from './client/models/view-models';
 
@@ -56,5 +56,5 @@ export class Promotion {
 
 export interface ApiServiceInterface {
   getReleases: () => Promise<ReleaseViewModel[]>;
-  getCurrentReleases: () => Promise<PromotionViewModel[]>;
+  getCurrentReleases: () => Promise<CurrentReleases>;
 }

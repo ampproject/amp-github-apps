@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Channel,
-  Promotion as PromotionEntity,
-  Release as ReleaseEntity,
-} from '../../types';
+import {Channel, Promotion, Release as ReleaseEntity} from '../../types';
 
 export class Release {
   constructor(entity: ReleaseEntity) {
@@ -35,12 +31,13 @@ export class Release {
   isRollback: boolean;
 }
 
-export class Promotion {
-  constructor(entity: PromotionEntity) {
-    this.name = entity.releaseName;
-    this.channel = entity.channel;
+export class CurrentReleases {
+  constructor(promotions: Promotion[]) {
+    this.map = new Map<Channel, string>();
+    promotions.forEach((promotion) => {
+      this.map.set(promotion.channel, promotion.releaseName);
+    });
   }
 
-  name: string;
-  channel: Channel;
+  map: Map<Channel, string>;
 }
