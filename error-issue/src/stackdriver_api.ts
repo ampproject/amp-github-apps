@@ -30,7 +30,7 @@ export class StackdriverApi {
   /** Makes an API request. */
   private async fetch(path: string, options: Object): Promise<any> {
     return fetch(`${this.baseUrl}/${path}`, {
-      headers: {'Authorization': `Bearer ${this.token}`},
+      headers: {},//'Authorization': `Bearer ${this.token}`},
       ...options,
     }).then(async res => res.json());
   }
