@@ -80,6 +80,7 @@ export class IssueBuilder {
   }
 
   possibleAssignees(): Array<string> {
+    // TODO(rcebulko): Identify reasonable assignees for the issue.
     return [];
   }
 
