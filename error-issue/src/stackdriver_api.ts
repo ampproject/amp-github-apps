@@ -14,52 +14,89 @@
  * limitations under the License.
  */
 
+import {Stackdriver} from './types';
 import fetch from 'node-fetch';
 
-const OAUTH_TOKEN = process.env.OAUTH_TOKEN;
-const SERVICE = 'https://clouderrorreporting.googleapis.com'
+const SERVICE = 'https://clouderrorreporting.googleapis.com';
+const SECONDS_IN_DAY = 60 * 60 * 24;
 
-class StackdriverApi {
+export class StackdriverApi {
   private baseUrl: string;
 
   constructor(private token: string, private projectId: string) {
-    this.baseUrl = `${SERVICE}/v1beta1/projects/${projectId}`
+    this.baseUrl = `${SERVICE}/v1beta1/projects/${projectId}`;
   }
 
   /** Makes an API request. */
   private async fetch(path: string, options: Object): Promise<any> {
     return fetch(`${this.baseUrl}/${path}`, {
-        headers: { 'Authorization': `Bearer ${this.token}` },
-        ...options,
-      })
-      .then(res => {console.log(res); return res.json()});
+      headers: {'Authorization': `Bearer ${this.token}`},
+      ...options,
+    }).then(async res => res.json());
   }
 
   /** Makes a GET request to the API. */
-  async get(path: string) {
+  async get(path: string): Promise<any> {
     return this.fetch(path, {method: 'GET'});
   }
 
   /** Makes a POST request to the API. */
-  async put(path: string, data: Object) {
-    console.log(JSON.stringify(data))
+  async put(path: string, data: Object): Promise<any> {
     return this.fetch(path, {method: 'PUT', body: JSON.stringify(data)});
+  }
+
+  private deserializeErrorGroupStats({
+    group,
+    count,
+    timedCounts,
+    firstSeenTime,
+    representative,
+  }: Stackdriver.SerializedErrorGroupStats): Stackdriver.ErrorGroupStats {
+    return {
+      group,
+      count: parseInt(count, 10),
+      timedCounts: timedCounts.map(tc => ({
+        count: parseInt(tc.count, 10),
+        startTime: new Date(tc.startTime),
+        endTime: new Date(tc.endTime),
+      })),
+      firstSeenTime: new Date(firstSeenTime),
+      representative: {message: representative.message},
+    };
   }
 
   /**
    * List groups of errors.
    * See https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list
    */
-  async listGroups() {
-    return this.get('groupStats?timeRange.period=PERIOD_1_DAY')
-      .then(({errorGroupStats}) => errorGroupStats);
+  async listGroups(
+    pageSize: number = 20
+  ): Promise<Array<Stackdriver.ErrorGroupStats>> {
+    const params = [
+      'timeRange.period=PERIOD_1_DAY',
+      `pageSize=${pageSize}`,
+      `timedCountDuration=${SECONDS_IN_DAY}s`,
+    ];
+    const url = `groupStats?${params.join('&')}`;
+
+    console.log(`Fetching first ${pageSize} error groups: ${url}`);
+    const {error, errorGroupStats} = await this.get(url);
+    if (error) {
+      const {code, status, message} = error;
+      throw new Error(`HTTP ${code} (${status}): ${message}`);
+    }
+
+    return errorGroupStats.map((stats: Stackdriver.SerializedErrorGroupStats) =>
+      this.deserializeErrorGroupStats(stats)
+    );
   }
 
   /**
    * Fetches details for a specific error group.
    * See https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groups/get
    */
-  async getGroup(groupId: string) {
+  async getGroup(groupId: string): Promise<Stackdriver.ErrorGroup> {
+    console.log(`Fetching details for error group "${groupId}"`);
     return this.get(`groups/${groupId}`);
   }
 
@@ -67,16 +104,15 @@ class StackdriverApi {
    * Sets the tracking issue for an error group.
    * See https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groups/update
    */
-  async setGroupIssue(groupId: string, issueUrl: string) {
+  async setGroupIssue(
+    groupId: string,
+    issueUrl: string
+  ): Promise<Stackdriver.ErrorGroup> {
+    console.log(
+      `Updating tracking issue for error group "${groupId}" to "${issueUrl}"`
+    );
     return this.put(`groups/${groupId}`, {
-      trackingIssues: [{url: issueUrl}]
+      trackingIssues: [{url: issueUrl}],
     });
   }
 }
-// console.log(resp.text());
-// fetch(`${BASE_URL}/groupStats`).then(console.log);
-const client = new StackdriverApi(process.env.OAUTH_TOKEN, 'amp-error-reporting-ads');
-client.setGroupIssue(
-  'CJml1-3R4YL8qQE',
-  'https://github.com/ampproject/amphtml/issues/27675'
-).then(console.log).catch(console.error);

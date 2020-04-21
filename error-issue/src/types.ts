@@ -80,3 +80,58 @@ export interface ErrorReport {
   dailyOccurrences: number;
   stacktrace: string;
 }
+
+/**
+ * Types used in Stackdriver API requests.
+ * Note that other fields may be present, but only the ones relevant are
+ * included in the definitions below.
+ */
+export namespace Stackdriver {
+  interface TrackingIssue {
+    url: string;
+  }
+
+  export interface ErrorGroup {
+    name: string;
+    groupId: string;
+    trackingIssues: Array<{
+      url: string;
+    }>;
+  }
+
+  interface SerializedTimedCount {
+    count: string;
+    startTime: string;
+    endTime: string;
+  }
+
+  interface TimedCount {
+    count: number;
+    startTime: Date;
+    endTime: Date;
+  }
+
+  interface ErrorEvent {
+    message: string;
+  }
+
+  export interface SerializedErrorGroupStats {
+    group: ErrorGroup;
+    count: string;
+    timedCounts: Array<SerializedTimedCount>;
+    firstSeenTime: string;
+    representative: {
+      message: string;
+    };
+  }
+
+  export interface ErrorGroupStats {
+    group: ErrorGroup;
+    count: number;
+    timedCounts: Array<TimedCount>;
+    firstSeenTime: Date;
+    representative: {
+      message: string;
+    };
+  }
+}
