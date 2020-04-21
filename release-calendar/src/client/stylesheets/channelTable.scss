@@ -1,3 +1,5 @@
+@use 'base';
+
 .title-bar {
     display: flex;
     justify-content: space-between;
@@ -31,24 +33,16 @@
         rgba(0, 0, 0, 0.12) 0px 1px 4px;
 }
 
-//Colors
-$lts: black;
-$stable: grey;
-$perc-beta: blue;
-$perc-experimental: green;
-$opt-in-beta: purple;
-$opt-in-experimental: silver;
-$nightly: red;
-$grey-border:rgb(216, 216, 216) 
-             rgb(209, 209, 209)
-             rgb(186, 186, 186);
-
 @mixin square($channel) {
     float: left;
     width: 3em;
     height: inherit;
     background-color: #{$channel};
 }
+
+$grey-border:rgb(216, 216, 216) 
+             rgb(209, 209, 209)
+             rgb(186, 186, 186);
 
 .row-button {
     float: left;
@@ -61,25 +55,25 @@ $grey-border:rgb(216, 216, 216)
         transform: translateY(1px);
     }
     .lts {
-        @include square($lts);
+        @include square(base.$lts);
     }
     .stable {
-        @include square($stable);
+        @include square(base.$stable);
     }
     .perc-beta{
-        @include square($perc-beta);
+        @include square(base.$perc-beta);
     }
     .perc-experimental {
-        @include square($perc-experimental);
+        @include square(base.$perc-experimental);
     }
     .opt-in-beta {
-        @include square($opt-in-beta);
+        @include square(base.$opt-in-beta);
     }
     .opt-in-experimental {
-        @include square($opt-in-experimental);
+        @include square(base.$opt-in-experimental);
     }
     .nightly {
-        @include square($nightly);
+        @include square(base.$nightly);
     }
 }
 

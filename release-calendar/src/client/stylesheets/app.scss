@@ -1,3 +1,5 @@
+@use 'base';
+
 .main-container {
     padding: 12px;
     padding-top: 24px;
@@ -44,26 +46,3 @@
         width: 70%;
     }
 }
-
-body {
-    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-    font-size: 14px;
-    line-height: 3em;
-    color: #24292e;
-    margin: 0px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-}
-
-button {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    font-family: inherit;
-    font-size: inherit;
-    &:focus {
-       outline: none; 
-    }
-    &:active {
-        transform: translateY(1px);
-    }
-} 
