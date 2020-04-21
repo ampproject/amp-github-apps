@@ -38,7 +38,7 @@ steps:
       - package.json
       - dist/
 
-  # Deploy the app.
+  # Deploy the apps.
   - name: gcr.io/cloud-builders/gcloud
     dir: error-issue
     args:
@@ -48,7 +48,17 @@ steps:
       - --source
       - dist/
       - --entry-point
-      - app
+      - errorIssue
+  - name: gcr.io/cloud-builders/gcloud
+    dir: error-issue
+    args:
+      - functions
+      - deploy
+      - error-issue
+      - --source
+      - dist/
+      - --entry-point
+      - errorMonitor
 
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
