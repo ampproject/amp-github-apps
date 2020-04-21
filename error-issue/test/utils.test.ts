@@ -14,7 +14,19 @@
  * limitations under the License.
  */
 
-import {parsePrNumber, parseSource, parseStacktrace} from '../src/utils';
+import {
+  formatDate,
+  parsePrNumber,
+  parseSource,
+  parseStacktrace,
+} from '../src/utils';
+
+describe('formatDate', () => {
+  it('produces a short date format', () => {
+    const d = new Date('Feb 25, 2020');
+    expect(formatDate(d)).toEqual('Feb 25, 2020');
+  });
+});
 
 describe('parsePrNumber', () => {
   it('parses the PR number from a commit message', () => {
