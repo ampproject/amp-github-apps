@@ -90,10 +90,13 @@ export class RepositoryService {
     );
 
     const rollback = await rollbackQuery;
-    const channels = await Promise.all(channelQueries);
-    const currentReleases = channels.map((channel) =>
-      channel.find((first) => rollback.indexOf(first) == -1),
+    const releasesInEachChannel = await Promise.all(channelQueries);
+    const currentReleases = releasesInEachChannel.map((releasesInOneChannel) =>
+      releasesInOneChannel.find(
+        (latestRelease) => rollback.indexOf(latestRelease) == -1,
+      ),
     );
+
     return currentReleases;
   }
 }
