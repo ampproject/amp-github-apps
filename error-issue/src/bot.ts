@@ -32,7 +32,7 @@ export class ErrorIssueBot {
     private repoOwner: string,
     private repoName: string
   ) {
-    this.octokit = new Octokit({auth: token});
+    this.octokit = new Octokit({auth: `token ${token}`});
     this.blameFinder = new BlameFinder(
       repoOwner,
       repoName,
