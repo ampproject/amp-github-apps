@@ -38,17 +38,17 @@ steps:
       - package.json
       - dist/
 
-  # Deploy the app.
+  # Deploy the apps.
   - name: gcr.io/cloud-builders/gcloud
     dir: error-issue
     args:
       - functions
       - deploy
-      - error-issue
+      - $_FUNC_NAME
       - --source
       - dist/
       - --entry-point
-      - app
+      - $_FUNC_ENTRY
 
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
