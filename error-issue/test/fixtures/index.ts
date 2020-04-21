@@ -20,6 +20,7 @@ import {GraphQLResponse} from '../../src/types';
 export function getFixtureFile(filename: string): string {
   return fs.readFileSync(path.join(__dirname, filename)).toString('utf8');
 }
+
 /**
  * Get a JSON test fixture object.
  */
