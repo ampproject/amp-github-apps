@@ -47,7 +47,7 @@ export class IssueBuilder {
     return [
       'Details',
       '---',
-      `**Error report:** [link](go/ampe/${this.errorId})`,
+      `**Error report:** [link](http://go/ampe/${this.errorId})`,
       `**First seen:** ${formatDate(this.firstSeen)}`,
       `**Frequency:** ~ ${this.dailyOccurrences.toLocaleString('en-US')}/day`,
     ].join('\n');

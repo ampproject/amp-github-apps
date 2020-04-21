@@ -70,7 +70,7 @@ describe('IssueBuilder', () => {
   describe('bodyDetails', () => {
     it('links to the error', () => {
       expect(builder.bodyDetails).toContain(
-        '**Error report:** [link](go/ampe/CL6chqbN2-bzBA'
+        '**Error report:** [link](http://go/ampe/CL6chqbN2-bzBA'
       );
     });
 

@@ -1,6 +1,6 @@
 Details
 ---
-**Error report:** [link](go/ampe/CL6chqbN2-bzBA)
+**Error report:** [link](http://go/ampe/CL6chqbN2-bzBA)
 **First seen:** Feb 25, 2020
 **Frequency:** ~ 54,647/day
 
