@@ -17,13 +17,15 @@ import fs from 'fs';
 import path from 'path';
 import {GraphQLResponse} from '../../src/types';
 
+export function getFixtureFile(filename: string): string {
+  return fs.readFileSync(path.join(__dirname, filename)).toString('utf8');
+}
+
 /**
  * Get a JSON test fixture object.
  */
 export function getFixture(name: string): {[key: string]: any} {
-  return JSON.parse(
-    fs.readFileSync(path.join(__dirname, `${name}.json`)).toString('utf8')
-  );
+  return JSON.parse(getFixtureFile(`${name}.json`));
 }
 
 export function getGraphQLResponse(ref: string, path: string): GraphQLResponse {

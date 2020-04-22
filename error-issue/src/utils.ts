@@ -19,6 +19,15 @@ import {StackFrame} from './types';
 const SOURCE_PREFIX = 'https://raw.githubusercontent.com/ampproject/amphtml/';
 const SOURCE_PATTERN = /^(?<rtv>\d+)\/(?<path>[^:]+):(?<line>\d+)(?<column>:\d+)?$/;
 
+/** Formats a date for display in a GitHub issue. */
+export function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 /** Parses a PR number from a commit message, or 0 if none is found. */
 export function parsePrNumber(message: string): number {
   const matches = message.match(/^.*\(#(?<prNumber>\d+)\)/);

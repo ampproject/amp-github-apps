@@ -23,24 +23,12 @@ function convertReleaseToEvent(release: Release): EventInput {
   return {
     title: release.name,
     start: release.date,
-    //TODO: I plan to use className as how I will move colors to central location
     className: release.channel,
     extendedProps: {isRollback: release.isRollback},
   };
 }
 
 export function getEvents(releases: Release[]): Map<Channel, EventSourceInput> {
-  //TODO: move colors out to a central location so that colors
-  //are not seperately declared for the calendar and for the ChannelTable
-  const colors = new Map();
-  colors.set(Channel.LTS, 'black');
-  colors.set(Channel.STABLE, 'gray');
-  colors.set(Channel.PERCENT_BETA, 'blue');
-  colors.set(Channel.PERCENT_EXPERIMENTAL, 'green');
-  colors.set(Channel.OPT_IN_BETA, 'purple');
-  colors.set(Channel.OPT_IN_EXPERIMENTAL, 'silver');
-  colors.set(Channel.NIGHTLY, 'red');
-
   const eventInputs = new Map<Channel, EventInput[]>();
   releases.forEach((release) => {
     const event = convertReleaseToEvent(release);
@@ -55,8 +43,6 @@ export function getEvents(releases: Release[]): Map<Channel, EventSourceInput> {
   eventInputs.forEach((eventInput, channel) => {
     eventSources.set(channel, {
       events: eventInput,
-      //TODO: will remove when colors declarations are moved to a central location
-      color: colors.get(channel),
       textColor: 'white',
     });
   });

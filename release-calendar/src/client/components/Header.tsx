@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import '../stylesheets/header.scss';
 import * as React from 'react';
 
 export interface HeaderProps {
@@ -22,7 +23,7 @@ export interface HeaderProps {
 
 export class Header extends React.Component<HeaderProps, {}> {
   render(): JSX.Element {
-    //TODO: remove inline styling, only there for now so that header text is aligned with content below
-    return <h1 style={{paddingLeft: '12px'}}>{this.props.title}</h1>;
+    return <h1 className='header'>{this.props.title}</h1>;
+    //TODO: add help/about icon which links to a different amp page
   }
 }

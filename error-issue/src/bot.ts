@@ -18,7 +18,7 @@ import {Octokit} from '@octokit/rest';
 
 import {RateLimitedGraphQL} from './rate_limited_graphql';
 import {BlameFinder} from './blame_finder';
-import {IssueBuilder} from './issue_builder.stub';
+import {IssueBuilder} from './issue_builder';
 import {ErrorReport} from './types';
 
 const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
@@ -32,7 +32,7 @@ export class ErrorIssueBot {
     private repoOwner: string,
     private repoName: string
   ) {
-    this.octokit = new Octokit({auth: token});
+    this.octokit = new Octokit({auth: `token ${token}`});
     this.blameFinder = new BlameFinder(
       repoOwner,
       repoName,
