@@ -20,14 +20,16 @@ import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
 export class ApiService implements ApiService {
-  private getRequest(url: string): Promise<ReleaseEntity[]> {
+  private getRequest(url: string): Promise<ReleaseEntity> {
     return fetch(url).then((result) => result.json());
   }
 
-  async getReleases(): Promise<Release[]> {
-    const releases = await this.getRequest(SERVER_URL);
-    return releases.map((release: ReleaseEntity) => {
-      return new Release(release);
+  async getRelease(releaseName: string): Promise<Release[]> {
+    const release = await this.getRequest(
+      SERVER_URL + '/release/' + releaseName,
+    );
+    return release.promotions.map((promotion) => {
+      return new Release(release, promotion);
     });
   }
 }

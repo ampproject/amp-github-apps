@@ -47,7 +47,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   }
 
   async componentDidMount(): Promise<void> {
-    const releases = await this.apiService.getReleases();
+    const releases = await this.apiService.getRelease('1234567890123');
     this.setState({events: getEvents(releases)});
   }
 

@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-import {Channel, Release as ReleaseEntity} from '../../types';
+import {Channel, Promotion, Release as ReleaseEntity} from '../../types';
 
 export class Release {
-  constructor(entity: ReleaseEntity) {
-    const currentPromotion = entity.promotions[0];
+  constructor(entity: ReleaseEntity, promotion: Promotion) {
     this.name = entity.name;
-    this.channel = currentPromotion.channel;
-    this.date = currentPromotion.date;
+    this.channel = promotion.channel;
+    this.date = promotion.date;
     this.isRollback = this.channel == Channel.ROLLBACK;
   }
 

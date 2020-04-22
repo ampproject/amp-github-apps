@@ -32,12 +32,6 @@ export class RepositoryService {
       .where('release.name = :name', {name})
       .getOne();
 
-    releaseQuery.then((release) => {
-      release.promotions.sort(
-        (a, b): number => b.date.getTime() - a.date.getTime(),
-      );
-    });
-
     return releaseQuery;
   }
 

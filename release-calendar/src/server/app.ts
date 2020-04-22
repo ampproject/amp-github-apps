@@ -58,5 +58,10 @@ async function main(): Promise<void> {
     const releases = await repositoryService.getReleases();
     res.json(releases);
   });
+
+  app.get('/release/:release', async (req, res) => {
+    const releases = await repositoryService.getRelease(req.params.release);
+    res.json(releases);
+  });
 }
 main();
