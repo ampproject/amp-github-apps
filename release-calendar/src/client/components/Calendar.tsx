@@ -66,7 +66,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
           eventSources={displayEvents}
-          contentHeight={CALENDAR_CONTENT_HEIGHT} //will be 430 when header is added
+          contentHeight={CALENDAR_CONTENT_HEIGHT}
           fixedWeekCount={false}
           displayEventTime={false}
           views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
