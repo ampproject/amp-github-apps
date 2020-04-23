@@ -60,7 +60,6 @@ export class RepositoryService {
         .createQueryBuilder('promotion')
         .where('promotion.channel = :channel', {channel: eachChannel})
         .select('promotion')
-        .addSelect('promotion.releaseName')
         .orderBy('promotion.date', 'DESC')
         .getMany(),
     );
