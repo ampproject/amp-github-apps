@@ -86,70 +86,28 @@ describe('IssueBuilder', () => {
   });
 
   describe('possibleAssignees', () => {
+    const fakeBlame = (
+      path: string,
+      author: string,
+      dateStr: string,
+      changedFiles: number
+    ) => ({
+        path,
+        startingLine: 1,
+        endingLine: 10,
+        author,
+        committedDate: new Date(dateStr),
+        changedFiles,
+        prNumber: 1337,
+    });
     const blames = [
-      {
-        path: 'src/error.js',
-        startingLine: 1,
-        endingLine: 10,
-        author: 'log_author',
-        committedDate: new Date('Jan 1, 2020'),
-        changedFiles: 15,
-        prNumber: 12345,
-      },
-      {
-        path: 'src/log.js',
-        startingLine: 1,
-        endingLine: 10,
-        author: 'log_author',
-        committedDate: new Date('Jan 1, 2020'),
-        changedFiles: 15,
-        prNumber: 12345,
-      },
-      {
-        path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
-        startingLine: 396,
-        endingLine: 439,
-        author: 'recent_author',
-        committedDate: new Date('Apr 1, 2020'),
-        changedFiles: 4,
-        prNumber: 24680,
-      },
-      {
-        path: 'src/event-helper-listen.js',
-        startingLine: 57,
-        endingLine: 59,
-        author: 'older_author',
-        committedDate: new Date('Nov 1, 2019'),
-        changedFiles: 2,
-        prNumber: 13579,
-      },
-      {
-        path: 'src/event-helper-listen.js',
-        startingLine: 35,
-        endingLine: 45,
-        author: 'relevant_author',
-        committedDate: new Date('Dec 1, 2019'),
-        changedFiles: 2,
-        prNumber: 98765,
-      },
-      {
-        path: 'src/event-helper-listen.js',
-        startingLine: 35,
-        endingLine: 45,
-        author: 'first_author',
-        committedDate: new Date('Oct 1, 2019'),
-        changedFiles: 2,
-        prNumber: 98765,
-      },
-      {
-        path: 'src/event-helper-listen.js',
-        startingLine: 100,
-        endingLine: 200,
-        author: 'refactor_author',
-        committedDate: new Date('Dec 1, 2019'),
-        changedFiles: 340,
-        prNumber: 11235,
-      },
+      fakeBlame('src/error.js', 'log_author', 'Jan 1, 2020', 15),
+      fakeBlame('src/log.js', 'log_author', 'Jan 1, 2020', 15),
+      fakeBlame('dom.js', 'recent_author', 'Apr 1, 2020', 4),
+      fakeBlame('src/chunk.js', 'older_author', 'Nov 1, 2019', 2),
+      fakeBlame('src/chunk.js', 'relevant_author', 'Dec 1, 2019', 2),
+      fakeBlame('src/chunk.js', 'first_author', 'Oct 1, 2019', 2),
+      fakeBlame('src/chunk.js', 'refactor_author', 'Dec 1, 2019', 340),
     ];
 
     it('returns authors of most recent relevant PRs sorted by recency', () => {
