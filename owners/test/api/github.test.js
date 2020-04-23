@@ -480,6 +480,16 @@ describe('GitHub API', () => {
         .reply(200);
       await github.createBotComment(24574, 'test comment');
     });
+
+    it('returns the created comment', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .post('/repos/test_owner/test_repo/issues/24574/comments')
+        .reply(200, { id: 1337 });
+
+      const {id} = await github.createBotComment(24574, 'test comment');
+      expect(id).toEqual(1337);
+    });
   });
 
   describe('updateComment', () => {
@@ -492,6 +502,16 @@ describe('GitHub API', () => {
         })
         .reply(200);
       await github.updateComment(24574, 'updated comment');
+    });
+
+    it('returns the updated comment', async () => {
+      expect.assertions(1);
+      nock('https://api.github.com')
+        .patch('/repos/test_owner/test_repo/issues/comments/24574')
+        .reply(200, { id: 1337 });
+
+      const {id} = await github.updateComment(24574, 'updated comment');
+      expect(id).toEqual(1337)
     });
   });
 
