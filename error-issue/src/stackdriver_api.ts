@@ -20,11 +20,10 @@ import {GoogleAuth} from 'google-auth-library';
 
 const SERVICE = 'https://clouderrorreporting.googleapis.com';
 const SECONDS_IN_DAY = 60 * 60 * 24;
+const GAUTH_SCOPE = 'https://www.googleapis.com/auth/cloud-platform';
 
 export class StackdriverApi {
-  private auth = new GoogleAuth({
-    scopes: 'https://www.googleapis.com/auth/cloud-platform',
-  });
+  private auth = new GoogleAuth({scopes: GAUTH_SCOPE});
 
   constructor(private projectId: string) {}
 
