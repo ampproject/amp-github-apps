@@ -95,13 +95,13 @@ describe('IssueBuilder', () => {
       dateStr: string,
       changedFiles: number
     ) => ({
-        path,
-        startingLine: 1,
-        endingLine: 10,
-        author,
-        committedDate: new Date(dateStr),
-        changedFiles,
-        prNumber: 1337,
+      path,
+      startingLine: 1,
+      endingLine: 10,
+      author,
+      committedDate: new Date(dateStr),
+      changedFiles,
+      prNumber: 1337,
     });
     const blames = [
       fakeBlame('src/error.js', 'log_author', 'Jan 1, 2020', 15),
