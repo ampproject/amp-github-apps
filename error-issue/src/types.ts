@@ -87,10 +87,6 @@ export interface ErrorReport {
  * included in the definitions below.
  */
 export namespace Stackdriver {
-  interface TrackingIssue {
-    url: string;
-  }
-
   export interface ErrorGroup {
     name: string;
     groupId: string;
