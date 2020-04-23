@@ -143,6 +143,9 @@ class GitHub {
    */
   constructor(client, owner, repository, logger = console) {
     Object.assign(this, {client, owner, repository, logger});
+    // Optionally allow for providing a separate user-authenticated client for
+    // team @mention workarounds.
+    this.user = this;
   }
 
   /**
