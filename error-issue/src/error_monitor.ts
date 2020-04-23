@@ -41,14 +41,7 @@ export class ErrorMonitor {
     return timedCount && timedCount.count >= this.minFrequency;
   }
 
-  /** Finds frequent errors to create tracking issues for. */
-  async newErrorsToReport(): Promise<Array<ErrorReport>> {
-    return (await this.client.listGroups(this.pageLimit))
-      .filter(({group}) => !this.hasTrackingIssue(group))
-      .filter(groupStats => this.hasHighFrequency(groupStats))
-      .map(groupStats => this.reportFromGroupStats(groupStats));
-  }
-
+  /** Converts error group stats to an error report to be filed. */
   private reportFromGroupStats({
     group,
     firstSeenTime,
@@ -61,6 +54,14 @@ export class ErrorMonitor {
       dailyOccurrences: timedCounts[0].count,
       stacktrace: representative.message,
     };
+  }
+
+  /** Finds frequent errors to create tracking issues for. */
+  async newErrorsToReport(): Promise<Array<ErrorReport>> {
+    return (await this.client.listGroups(this.pageLimit))
+      .filter(({group}) => !this.hasTrackingIssue(group))
+      .filter(groupStats => this.hasHighFrequency(groupStats))
+      .map(groupStats => this.reportFromGroupStats(groupStats));
   }
 
   /** Reports an error to the bot endpoint, returning the created issue URL. */
