@@ -90,22 +90,25 @@ export class IssueBuilder {
       return [];
     }
 
-    return this.blames
-      // Ignore large PRs like refactors and Prettier formatting.
-      .filter(({changedFiles}) => changedFiles <= MAX_CHANGED_FILES)
-      // Ignore PRs from before the issue first appeared.
-      .filter(({committedDate}) => committedDate < this.firstSeen)
-      // Ignore lines in the stacktrace from error throwing/logging.
-      .filter(({path}) => !ERROR_HANDLING_FILES.includes(path))
-      .sort((a, b) => a.committedDate < b.committedDate ? 1 : -1)
-      .map(({author}) => author)
-      .slice(0, limit);
+    return (
+      this.blames
+        // Ignore large PRs like refactors and Prettier formatting.
+        .filter(({changedFiles}) => changedFiles <= MAX_CHANGED_FILES)
+        // Ignore PRs from before the issue first appeared.
+        .filter(({committedDate}) => committedDate < this.firstSeen)
+        // Ignore lines in the stacktrace from error throwing/logging.
+        .filter(({path}) => !ERROR_HANDLING_FILES.includes(path))
+        // Suggest most recent editors first.
+        .sort((a, b) => (a.committedDate < b.committedDate ? 1 : -1))
+        .map(({author}) => author)
+        .slice(0, limit)
+    );
   }
 
   get bodyNotes(): string {
     if (!this.blames.length) {
-      return ''
-    };
+      return '';
+    }
 
     const possibleAssignees = this.possibleAssignees(2)
       .map(a => `\`@${a}\``)

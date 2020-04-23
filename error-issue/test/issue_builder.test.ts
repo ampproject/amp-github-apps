@@ -171,7 +171,7 @@ describe('IssueBuilder', () => {
 
     it('does not try to assign very old errors', () => {
       const oldReport = Object.assign({}, report, {
-        firstSeen: new Date('Oct 1, 2017')
+        firstSeen: new Date('Oct 1, 2017'),
       });
       builder = new IssueBuilder(oldReport, blames);
       expect(builder.possibleAssignees()).toEqual([]);
