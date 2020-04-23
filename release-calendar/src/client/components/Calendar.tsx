@@ -19,7 +19,10 @@ import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {getEvents} from '../models/release-event';
+import {
+  getAllReleasesEvents,
+  getSingleReleaseEvents,
+} from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -29,10 +32,12 @@ const EVENT_LIMIT_DISPLAYED = 3;
 
 export interface CalendarProps {
   channels: Channel[];
+  singleRelease: string;
 }
 
 export interface CalendarState {
-  events: Map<Channel, EventSourceInput>;
+  allEvents: Map<Channel, EventSourceInput>;
+  singleEvents: EventSourceInput[];
 }
 
 export class Calendar extends React.Component<CalendarProps, CalendarState> {
@@ -41,20 +46,40 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   constructor(props: Readonly<CalendarProps>) {
     super(props);
     this.state = {
-      events: new Map<Channel, EventSourceInput>(),
+      allEvents: new Map<Channel, EventSourceInput>(),
+      singleEvents: [],
     };
     this.apiService = new ApiService();
   }
 
   async componentDidMount(): Promise<void> {
-    const releases = await this.apiService.getRelease('1234567890123');
-    this.setState({events: getEvents(releases)});
+    const releases = await this.apiService.getReleases();
+    this.setState({allEvents: getAllReleasesEvents(releases)});
+  }
+
+  async componentDidUpdate(prevProps: CalendarProps): Promise<void> {
+    if (prevProps.singleRelease != this.props.singleRelease) {
+      if (prevProps.singleRelease == null) {
+        const release = await this.apiService.getRelease(
+          this.props.singleRelease,
+        );
+        this.setState({singleEvents: getSingleReleaseEvents(release)});
+      } else {
+        this.setState({singleEvents: []});
+      }
+    }
   }
 
   render(): JSX.Element {
-    const displayEvents: EventSourceInput[] = this.props.channels
-      .filter((channel) => this.state.events.has(channel))
-      .map((channel) => this.state.events.get(channel));
+    //TODO: fix indent rule in my prettier config, currently enlint and prettier are at odds
+    /* eslint-disable @typescript-eslint/indent */
+    const displayEvents: EventSourceInput[] =
+      this.props.singleRelease != null
+        ? this.state.singleEvents
+        : this.props.channels
+            .filter((channel) => this.state.allEvents.has(channel))
+            .map((channel) => this.state.allEvents.get(channel));
+
     return (
       <div className='calendar'>
         <FullCalendar

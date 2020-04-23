@@ -16,16 +16,27 @@
 
 import {Channel, Promotion, Release as ReleaseEntity} from '../../types';
 
-export class Release {
-  constructor(entity: ReleaseEntity, promotion: Promotion) {
-    this.name = entity.name;
-    this.channel = promotion.channel;
-    this.date = promotion.date;
-    this.isRollback = this.channel == Channel.ROLLBACK;
+export class EventInput {
+  constructor(release: ReleaseEntity, promotion: Promotion) {
+    this.title = release.name;
+    this.start = promotion.date;
+    this.className = promotion.channel;
+    this.extendedProps = {
+      isRollback: promotion.channel == Channel.ROLLBACK,
+      channel: promotion.channel,
+    };
   }
 
-  name: string;
-  channel: Channel;
-  date: Date;
-  isRollback: boolean;
+  get rollback(): boolean {
+    return this.extendedProps.isRollback;
+  }
+
+  get channel(): Channel {
+    return this.extendedProps.channel;
+  }
+
+  title: string;
+  start: Date;
+  className: Channel;
+  extendedProps: {isRollback: boolean; channel: Channel};
 }

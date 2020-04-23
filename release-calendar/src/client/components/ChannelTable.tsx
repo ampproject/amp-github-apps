@@ -21,6 +21,7 @@ import {Channel} from '../../types';
 interface ChannelTableProps {
   channels: Channel[];
   handleSelectedChannel: (channel: Channel, checked: boolean) => void;
+  handleSelectedRelease: (release: string) => void;
 }
 
 export class ChannelTable extends React.Component<ChannelTableProps, {}> {
@@ -46,13 +47,17 @@ export class ChannelTable extends React.Component<ChannelTableProps, {}> {
     this.props.handleSelectedChannel(channel, event.target.checked);
   };
 
+  handleReleaseClick = (release: string): void => {
+    this.props.handleSelectedRelease(release);
+  };
+
   render(): JSX.Element {
     return (
       <React.Fragment>
         <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
           {this.rows.map((row) => {
-            const rtv = '0000000000000';
+            const rtv = '1234567890123';
             return (
               <React.Fragment key={row.channel}>
                 <label className='row-button' htmlFor={row.channel}>
@@ -68,7 +73,11 @@ export class ChannelTable extends React.Component<ChannelTableProps, {}> {
                   </div>
                   <div className='row-text'>{row.title}</div>
                 </label>
-                <button className='release-button'>{rtv}</button>
+                <button
+                  className='release-button'
+                  onClick={(): void => this.handleReleaseClick(rtv)}>
+                  {rtv}
+                </button>
               </React.Fragment>
             );
           })}

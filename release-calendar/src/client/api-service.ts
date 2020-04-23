@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Release} from './models/view-models';
+import {EventInput} from './models/view-models';
 import {Release as ReleaseEntity} from '../types';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
@@ -24,12 +24,23 @@ export class ApiService implements ApiService {
     return fetch(url).then((result) => result.json());
   }
 
-  async getRelease(releaseName: string): Promise<Release[]> {
+  private getRequests(url: string): Promise<ReleaseEntity[]> {
+    return fetch(url).then((result) => result.json());
+  }
+
+  async getReleases(): Promise<EventInput[]> {
+    const releases = await this.getRequests(SERVER_URL);
+    return releases.map((release) => {
+      return new EventInput(release, release.promotions[0]);
+    });
+  }
+
+  async getRelease(releaseName: string): Promise<EventInput[]> {
     const release = await this.getRequest(
       SERVER_URL + '/release/' + releaseName,
     );
     return release.promotions.map((promotion) => {
-      return new Release(release, promotion);
+      return new EventInput(release, promotion);
     });
   }
 }
