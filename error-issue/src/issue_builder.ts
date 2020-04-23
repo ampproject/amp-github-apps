@@ -18,6 +18,7 @@ import {formatDate} from './utils';
 import {BlameRange, ErrorReport} from './types';
 
 const MAX_CHANGED_FILES = 40;
+const MAX_POSSIBLE_ASSIGNEES = 2;
 const ERROR_HANDLING_FILES = ['src/error.js', 'src/log.js'];
 const ONE_YEAR_MS = 1000 * 60 * 60 * 24 * 365;
 
@@ -83,7 +84,7 @@ export class IssueBuilder {
     );
   }
 
-  possibleAssignees(limit: number = 3): Array<string> {
+  possibleAssignees(limit: number = MAX_POSSIBLE_ASSIGNEES): Array<string> {
     const timeSinceError = Date.now() - this.firstSeen.valueOf();
     if (timeSinceError > ONE_YEAR_MS) {
       // Don't try to guess at assignees for old errors.
@@ -110,7 +111,7 @@ export class IssueBuilder {
       return '';
     }
 
-    const possibleAssignees = this.possibleAssignees(2)
+    const possibleAssignees = this.possibleAssignees()
       .map(a => `\`@${a}\``)
       .join(', ');
     const notes = ['Notes', '---']

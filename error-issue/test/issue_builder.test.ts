@@ -115,7 +115,7 @@ describe('IssueBuilder', () => {
 
     it('returns authors of most recent relevant PRs sorted by recency', () => {
       builder = new IssueBuilder(report, blames);
-      expect(builder.possibleAssignees()).toEqual([
+      expect(builder.possibleAssignees(3)).toEqual([
         'relevant_author',
         'older_author',
         'first_author',
@@ -124,7 +124,7 @@ describe('IssueBuilder', () => {
 
     it('limits the number of suggestions', () => {
       builder = new IssueBuilder(report, blames);
-      expect(builder.possibleAssignees(2)).toEqual([
+      expect(builder.possibleAssignees()).toEqual([
         'relevant_author',
         'older_author',
       ]);
