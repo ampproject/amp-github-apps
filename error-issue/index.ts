@@ -63,7 +63,7 @@ module.exports.errorIssue = async (
     res.redirect(statusCodes.MOVED_TEMPORARILY, issueUrl);
   } catch (errResp) {
     console.warn(errResp);
-    res.status(errResp.status || 500);
+    res.status(errResp.status || statusCodes.INTERNAL_SERVER_ERROR);
     res.set('Content-Type', 'application/json');
     res.send(JSON.stringify(errResp, null, 2));
   }
@@ -77,7 +77,7 @@ module.exports.errorMonitor = async (
   try {
     res.json({issueUrls: await monitor.monitorAndReport()});
   } catch (error) {
-    res.status(500);
+    res.status(statusCodes.INTERNAL_SERVER_ERROR);
     res.json({error: error.toString()});
   }
 };
@@ -104,7 +104,7 @@ module.exports.errorList = async (
       })),
     });
   } catch (error) {
-    res.status(500);
+    res.status(statusCodes.INTERNAL_SERVER_ERROR);
     res.json({error: error.toString()});
   }
 };
