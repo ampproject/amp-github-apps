@@ -20,6 +20,7 @@ import {getFixtureFile} from './fixtures';
 
 describe('IssueBuilder', () => {
   let builder: IssueBuilder;
+  const now = new Date('Mar 1, 2020');
   const report: ErrorReport = {
     errorId: 'CL6chqbN2-bzBA',
     firstSeen: new Date('Feb 25, 2020'),
@@ -28,6 +29,9 @@ describe('IssueBuilder', () => {
         at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)
         at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)`,
   };
+  const oldReport = Object.assign({}, report, {
+    firstSeen: new Date('Oct 1, 2017'),
+  });
   const blames = [
     {
       path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
@@ -50,6 +54,7 @@ describe('IssueBuilder', () => {
   ];
 
   beforeEach(() => {
+    jest.spyOn(Date, 'now').mockReturnValue(now.valueOf());
     builder = new IssueBuilder(report, blames);
   });
 
@@ -83,6 +88,54 @@ describe('IssueBuilder', () => {
     });
   });
 
+  describe('possibleAssignees', () => {
+    const fakeBlame = (
+      path: string,
+      author: string,
+      dateStr: string,
+      changedFiles: number
+    ) => ({
+      path,
+      startingLine: 1,
+      endingLine: 10,
+      author,
+      committedDate: new Date(dateStr),
+      changedFiles,
+      prNumber: 1337,
+    });
+    const blames = [
+      fakeBlame('src/error.js', 'log_author', 'Jan 1, 2020', 15),
+      fakeBlame('src/log.js', 'log_author', 'Jan 1, 2020', 15),
+      fakeBlame('dom.js', 'recent_author', 'Apr 1, 2020', 4),
+      fakeBlame('src/chunk.js', 'older_author', 'Nov 1, 2019', 2),
+      fakeBlame('src/chunk.js', 'relevant_author', 'Dec 1, 2019', 2),
+      fakeBlame('src/chunk.js', 'first_author', 'Oct 1, 2019', 2),
+      fakeBlame('src/chunk.js', 'refactor_author', 'Dec 1, 2019', 340),
+    ];
+
+    it('returns authors of most recent relevant PRs sorted by recency', () => {
+      builder = new IssueBuilder(report, blames);
+      expect(builder.possibleAssignees(3)).toEqual([
+        'relevant_author',
+        'older_author',
+        'first_author',
+      ]);
+    });
+
+    it('limits the number of suggestions', () => {
+      builder = new IssueBuilder(report, blames);
+      expect(builder.possibleAssignees()).toEqual([
+        'relevant_author',
+        'older_author',
+      ]);
+    });
+
+    it('does not try to assign very old errors', () => {
+      builder = new IssueBuilder(oldReport, blames);
+      expect(builder.possibleAssignees()).toEqual([]);
+    });
+  });
+
   describe('bodyStacktrace', () => {
     it('renders the indented stacktrace in markdown', () => {
       expect(builder.bodyStacktrace).toContain(
@@ -110,12 +163,15 @@ describe('IssueBuilder', () => {
     });
 
     it('suggests possible assignees, if known', () => {
-      builder.possibleAssignees = jest
-        .fn()
-        .mockReturnValue(['someone', 'someoneelse']);
-      expect(builder.bodyNotes).toContain(
-        '**Possible assignees:** `@someone`, `@someoneelse`'
-      );
+      expect(builder.bodyNotes).toContain('**Possible assignees:** `@xymw`');
+
+      builder = new IssueBuilder(oldReport, blames);
+      expect(builder.bodyNotes).not.toContain('Possible assignees:');
+    });
+
+    it('returns empty string when there is no blame info', () => {
+      builder = new IssueBuilder(report, []);
+      expect(builder.bodyNotes).toEqual('');
     });
   });
 
