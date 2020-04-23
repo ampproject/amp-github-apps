@@ -20,7 +20,7 @@ import express from 'express';
 import statusCodes from 'http-status-codes';
 import {ErrorIssueBot} from './src/bot';
 import {StackdriverApi} from './src/stackdriver_api';
-import {ErrorMonitor} from './src/error_monitor';
+import {ErrorMonitor, ERROR_ISSUE_ENDPOINT} from './src/error_monitor';
 import {ErrorReport} from './src/types';
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
@@ -40,7 +40,7 @@ const monitor = new ErrorMonitor(stackdriver);
 /** Endpoint to create a GitHub issue for an error report. */
 module.exports.errorIssue = async (
   req: express.Request,
-  res: express.Response,
+  res: express.Response
 ) => {
   const errorReport = req.method === 'POST' ? req.body : req.query;
   const {errorId, firstSeen, dailyOccurrences, stacktrace} = errorReport;
@@ -72,7 +72,7 @@ module.exports.errorIssue = async (
 /** Endpoint to trigger a scan for new frequent errors. */
 module.exports.errorMonitor = async (
   req: express.Request,
-  res: express.Response,
+  res: express.Response
 ) => {
   try {
     res.json({issueUrls: await monitor.monitorAndReport()});
@@ -87,14 +87,13 @@ function createErrorReportUrl(report: ErrorReport) {
     .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
     .join('&');
 
-  return `https://us-central1-amp-error-issue-bot.cloudfunctions.net/` +
-    `error-issue?${params}`;
+  return `${ERROR_ISSUE_ENDPOINT}?${params}`;
 }
 
 /** Diagnostic endpoint to list new untracked errors. */
 module.exports.errorList = async (
   req: express.Request,
-  res: express.Response,
+  res: express.Response
 ) => {
   try {
     const reports = await monitor.newErrorsToReport();
@@ -102,7 +101,7 @@ module.exports.errorList = async (
       errorReports: reports.map(report => ({
         createUrl: createErrorReportUrl(report),
         ...report,
-      }))
+      })),
     });
   } catch (error) {
     res.status(500);

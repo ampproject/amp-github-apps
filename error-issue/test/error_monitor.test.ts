@@ -147,11 +147,11 @@ describe('ErrorMonitor', () => {
     it('returns the URL of the created issue', async () => {
       nock('https://us-central1-amp-error-issue-bot.cloudfunctions.net')
         .post('/error-issue')
-        .reply(302, null, { Location: 'http://github.com.com/blah/blah' });
+        .reply(302, null, {Location: 'http://github.com.com/blah/blah'});
 
-      await expect(monitor.reportError(newReport))
-        .resolves
-        .toEqual('http://github.com.com/blah/blah');
+      await expect(monitor.reportError(newReport)).resolves.toEqual(
+        'http://github.com.com/blah/blah'
+      );
     });
 
     it('throws an error when error creation fails', async () => {
@@ -159,17 +159,17 @@ describe('ErrorMonitor', () => {
         .post('/error-issue')
         .reply(400);
 
-      await expect(monitor.reportError(newReport))
-        .rejects
-        .toThrow('HTTP 400 (Bad Request)');
+      await expect(monitor.reportError(newReport)).rejects.toThrow(
+        'HTTP 400 (Bad Request)'
+      );
     });
   });
 
   describe('monitorAndReport', () => {
     beforeEach(() => {
-      monitor.reportError = jest.fn().mockReturnValue(
-        'https://github.com/blah/blah'
-      );
+      monitor.reportError = jest
+        .fn()
+        .mockReturnValue('https://github.com/blah/blah');
     });
 
     it('reports new errors', async () => {
@@ -181,16 +181,16 @@ describe('ErrorMonitor', () => {
 
     it('returns created URLs', async () => {
       await expect(monitor.monitorAndReport()).resolves.toEqual([
-        'https://github.com/blah/blah'
+        'https://github.com/blah/blah',
       ]);
     });
 
     it('sets tracking issues for new errors', async () => {
-      await monitor.monitorAndReport()
+      await monitor.monitorAndReport();
 
       expect(stackdriver.setGroupIssue).toHaveBeenCalledWith(
         'new_id',
-        'https://github.com/blah/blah',
+        'https://github.com/blah/blah'
       );
     });
 

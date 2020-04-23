@@ -20,7 +20,7 @@ import {ErrorReport, Stackdriver} from './types';
 import fetch from 'node-fetch';
 import statusCodes from 'http-status-codes';
 
-const ERROR_ISSUE_REPORT_ENDPOINT =
+export const ERROR_ISSUE_ENDPOINT = process.env.ERROR_ISSUE_ENDPOINT ||
   'https://us-central1-amp-error-issue-bot.cloudfunctions.net/error-issue';
 
 export class ErrorMonitor {
@@ -53,7 +53,7 @@ export class ErrorMonitor {
     group,
     firstSeenTime,
     timedCounts,
-    representative
+    representative,
   }: Stackdriver.ErrorGroupStats): ErrorReport {
     return {
       errorId: group.groupId,
@@ -68,7 +68,7 @@ export class ErrorMonitor {
     const {errorId} = errorReport;
     console.info(`Reporting error group ${errorId} to error issue bot`);
     const {status, statusText, headers} = await fetch(
-      ERROR_ISSUE_REPORT_ENDPOINT,
+      ERROR_ISSUE_ENDPOINT,
       {
         method: 'POST',
         redirect: 'manual',

@@ -23,7 +23,7 @@ const SECONDS_IN_DAY = 60 * 60 * 24;
 
 export class StackdriverApi {
   private auth = new GoogleAuth({
-    scopes: 'https://www.googleapis.com/auth/cloud-platform'
+    scopes: 'https://www.googleapis.com/auth/cloud-platform',
   });
 
   constructor(private projectId: string) {}
@@ -31,13 +31,13 @@ export class StackdriverApi {
   /** Makes a request to the Cloud Error Reporting API. */
   private async request(
     endpoint: string,
-    method: 'GET'|'PUT',
-    body?: Object,
+    method: 'GET' | 'PUT',
+    body?: Object
   ): Promise<any> {
     const client = await this.auth.getClient();
     const opts: GaxiosOptions = {
       url: `${SERVICE}/v1beta1/projects/${this.projectId}/${endpoint}`,
-      method
+      method,
     };
 
     if (method === 'GET') {
@@ -83,8 +83,8 @@ export class StackdriverApi {
       timedCountDuration: `${SECONDS_IN_DAY}s`,
     });
 
-    return errorGroupStats.map(
-      (stats: Stackdriver.SerializedErrorGroupStats) => this.deserialize(stats)
+    return errorGroupStats.map((stats: Stackdriver.SerializedErrorGroupStats) =>
+      this.deserialize(stats)
     );
   }
 
