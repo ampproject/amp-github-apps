@@ -70,6 +70,9 @@ function main() {
   if (buildTargets.has('INVITE')) {
     runAppTests('invite');
   }
+  if (buildTargets.has('ERROR_ISSUE')) {
+    runAppTests('error-issue');
+  }
   if (buildTargets.has('OWNERS')) {
     runAppTests('owners');
   }
