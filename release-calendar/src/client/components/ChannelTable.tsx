@@ -29,9 +29,10 @@ interface ChannelTableProps {
   handleSelectedChannel: (channel: Channel, checked: boolean) => void;
 }
 
-// eslint-disable-next-line prettier/prettier
-export class ChannelTable 
-  extends React.Component<ChannelTableProps, ChannelTableState> {
+export class ChannelTable extends React.Component<
+  ChannelTableProps,
+  ChannelTableState
+> {
   private apiService: ApiService;
 
   constructor(props: Readonly<ChannelTableProps>) {
