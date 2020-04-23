@@ -79,7 +79,7 @@ export class StackdriverApi {
     console.info(`Fetching first ${pageSize} error groups`);
     const {errorGroupStats} = await this.request('groupStats', 'GET', {
       'timeRange.period': 'PERIOD_1_DAY',
-      pageSize: pageSize,
+      pageSize,
       timedCountDuration: `${SECONDS_IN_DAY}s`,
     });
 

@@ -108,22 +108,10 @@ describe('ErrorMonitor', () => {
   });
 
   describe('newErrorsToReport', () => {
-    it('ignores infrequent errors', async () => {
+    it('ignores infrequent and already-tracked errors', async () => {
       const newErrors = await monitor.newErrorsToReport();
       const newErrorIds = newErrors.map(({errorId}) => errorId);
-      expect(newErrorIds).not.toContain('infrequent_id');
-    });
-
-    it('ignores errors with an existing tracking issue', async () => {
-      const newErrors = await monitor.newErrorsToReport();
-      const newErrorIds = newErrors.map(({errorId}) => errorId);
-      expect(newErrorIds).not.toContain('acknowledged_id');
-    });
-
-    it('includes new frequent errors', async () => {
-      const newErrors = await monitor.newErrorsToReport();
-      const newErrorIds = newErrors.map(({errorId}) => errorId);
-      expect(newErrorIds).toContain('new_id');
+      expect(newErrorIds).toEqual(['new_id']);
     });
   });
 
