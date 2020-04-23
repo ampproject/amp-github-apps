@@ -161,6 +161,14 @@ describe('IssueBuilder', () => {
       ]);
     });
 
+    it('limits the number of suggestions', () => {
+      builder = new IssueBuilder(report, blames);
+      expect(builder.possibleAssignees(2)).toEqual([
+        'relevant_author',
+        'older_author',
+      ]);
+    });
+
     it('does not try to assign very old errors', () => {
       const oldReport = Object.assign({}, report, {
         firstSeen: new Date('Oct 1, 2017')

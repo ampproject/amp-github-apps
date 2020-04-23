@@ -83,7 +83,7 @@ export class IssueBuilder {
     );
   }
 
-  possibleAssignees(): Array<string> {
+  possibleAssignees(limit: number = 3): Array<string> {
     const timeSinceError = Date.now() - this.firstSeen.valueOf();
     if (timeSinceError > ONE_YEAR_MS) {
       // Don't try to guess at assignees for old errors.
@@ -98,7 +98,8 @@ export class IssueBuilder {
       // Ignore lines in the stacktrace from error throwing/logging.
       .filter(({path}) => !ERROR_HANDLING_FILES.includes(path))
       .sort((a, b) => a.committedDate < b.committedDate ? 1 : -1)
-      .map(({author}) => author);
+      .map(({author}) => author)
+      .slice(0, limit);
   }
 
   get bodyNotes(): string {
@@ -106,7 +107,7 @@ export class IssueBuilder {
       return ''
     };
 
-    const possibleAssignees = this.possibleAssignees()
+    const possibleAssignees = this.possibleAssignees(2)
       .map(a => `\`@${a}\``)
       .join(', ');
     const notes = ['Notes', '---']
