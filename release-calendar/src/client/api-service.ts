@@ -14,33 +14,48 @@
  * limitations under the License.
  */
 
-import {EventInput} from './models/view-models';
-import {Release as ReleaseEntity} from '../types';
+import {
+  ApiServiceInterface,
+  Promotion as PromotionEntity,
+  Release as ReleaseEntity,
+} from '../types';
+import {CurrentReleases, EventInput} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
-export class ApiService implements ApiService {
-  private getRequest(url: string): Promise<ReleaseEntity> {
+export class ApiService implements ApiServiceInterface {
+  private getReleasesRequest(url: string): Promise<ReleaseEntity[]> {
     return fetch(url).then((result) => result.json());
   }
 
-  private getRequests(url: string): Promise<ReleaseEntity[]> {
+  private getPromotionsRequest(url: string): Promise<PromotionEntity[]> {
+    return fetch(url).then((result) => result.json());
+  }
+
+  private getReleaseRequest(url: string): Promise<ReleaseEntity> {
     return fetch(url).then((result) => result.json());
   }
 
   async getReleases(): Promise<EventInput[]> {
-    const releases = await this.getRequests(SERVER_URL);
+    const releases = await this.getReleasesRequest(SERVER_URL);
     return releases.map((release) => {
       return new EventInput(release, release.promotions[0]);
     });
   }
 
   async getRelease(releaseName: string): Promise<EventInput[]> {
-    const release = await this.getRequest(
+    const release = await this.getReleaseRequest(
       SERVER_URL + '/release/' + releaseName,
     );
     return release.promotions.map((promotion) => {
       return new EventInput(release, promotion);
     });
+  }
+
+  async getCurrentReleases(): Promise<CurrentReleases> {
+    const currentReleases = await this.getPromotionsRequest(
+      SERVER_URL + '/current-releases/',
+    );
+    return new CurrentReleases(currentReleases);
   }
 }

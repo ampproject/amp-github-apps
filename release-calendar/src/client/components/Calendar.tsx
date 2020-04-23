@@ -59,7 +59,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
 
   async componentDidUpdate(prevProps: CalendarProps): Promise<void> {
     if (prevProps.singleRelease != this.props.singleRelease) {
-      if (prevProps.singleRelease == null) {
+      if (this.props.singleRelease != null) {
         const release = await this.apiService.getRelease(
           this.props.singleRelease,
         );
@@ -71,8 +71,6 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   }
 
   render(): JSX.Element {
-    //TODO: fix indent rule in my prettier config, currently enlint and prettier are at odds
-    /* eslint-disable @typescript-eslint/indent */
     const displayEvents: EventSourceInput[] =
       this.props.singleRelease != null
         ? this.state.singleEvents

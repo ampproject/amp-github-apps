@@ -16,7 +16,13 @@
 
 import '../stylesheets/channelTable.scss';
 import * as React from 'react';
+import {ApiService} from '../api-service';
 import {Channel} from '../../types';
+import {CurrentReleases} from '../models/view-models';
+
+interface ChannelTableState {
+  currentReleases: Map<Channel, string>;
+}
 
 interface ChannelTableProps {
   channels: Channel[];
@@ -24,21 +30,25 @@ interface ChannelTableProps {
   handleSelectedRelease: (release: string) => void;
 }
 
-export class ChannelTable extends React.Component<ChannelTableProps, {}> {
+export class ChannelTable extends React.Component<
+  ChannelTableProps,
+  ChannelTableState
+> {
+  private apiService: ApiService;
+
   constructor(props: Readonly<ChannelTableProps>) {
     super(props);
+    this.state = {
+      currentReleases: new Map<Channel, string>(),
+    };
+    this.apiService = new ApiService();
     this.handleChannelClick = this.handleChannelClick.bind(this);
   }
 
-  rows = [
-    {channel: Channel.STABLE, title: 'Stable'},
-    {channel: Channel.PERCENT_BETA, title: '% Beta'},
-    {channel: Channel.PERCENT_EXPERIMENTAL, title: '% Experimental'},
-    {channel: Channel.OPT_IN_BETA, title: 'Opt-in Beta'},
-    {channel: Channel.OPT_IN_EXPERIMENTAL, title: 'Opt-in Experimental'},
-    {channel: Channel.NIGHTLY, title: 'Nightly'},
-    {channel: Channel.LTS, title: 'Long Term Stable'},
-  ];
+  async componentDidMount(): Promise<void> {
+    const currentReleases: CurrentReleases = await this.apiService.getCurrentReleases();
+    this.setState({currentReleases: currentReleases.map});
+  }
 
   handleChannelClick = (
     channel: Channel,
@@ -51,13 +61,22 @@ export class ChannelTable extends React.Component<ChannelTableProps, {}> {
     this.props.handleSelectedRelease(release);
   };
 
+  rows = [
+    {channel: Channel.STABLE, title: 'Stable'},
+    {channel: Channel.PERCENT_BETA, title: '% Beta'},
+    {channel: Channel.PERCENT_EXPERIMENTAL, title: '% Experimental'},
+    {channel: Channel.OPT_IN_BETA, title: 'Opt-in Beta'},
+    {channel: Channel.OPT_IN_EXPERIMENTAL, title: 'Opt-in Experimental'},
+    {channel: Channel.NIGHTLY, title: 'Nightly'},
+    {channel: Channel.LTS, title: 'Long Term Stable'},
+  ];
+
   render(): JSX.Element {
     return (
       <React.Fragment>
         <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
           {this.rows.map((row) => {
-            const rtv = '1234567890123';
             return (
               <React.Fragment key={row.channel}>
                 <label className='row-button' htmlFor={row.channel}>
@@ -75,8 +94,12 @@ export class ChannelTable extends React.Component<ChannelTableProps, {}> {
                 </label>
                 <button
                   className='release-button'
-                  onClick={(): void => this.handleReleaseClick(rtv)}>
-                  {rtv}
+                  onClick={(): void =>
+                    this.handleReleaseClick(
+                      this.state.currentReleases.get(row.channel),
+                    )
+                  }>
+                  {this.state.currentReleases.get(row.channel)}
                 </button>
               </React.Fragment>
             );
