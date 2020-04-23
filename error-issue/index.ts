@@ -38,10 +38,7 @@ const stackdriver = new StackdriverApi(PROJECT_ID);
 const monitor = new ErrorMonitor(stackdriver);
 
 /** Endpoint to create a GitHub issue for an error report. */
-module.exports.errorIssue = async (
-  req: express.Request,
-  res: express.Response
-) => {
+export async function errorIssue(req: express.Request, res: express.Response) {
   const errorReport = req.method === 'POST' ? req.body : req.query;
   const {errorId, firstSeen, dailyOccurrences, stacktrace} = errorReport;
 
@@ -67,20 +64,20 @@ module.exports.errorIssue = async (
     res.set('Content-Type', 'application/json');
     res.send(JSON.stringify(errResp, null, 2));
   }
-};
+}
 
 /** Endpoint to trigger a scan for new frequent errors. */
-module.exports.errorMonitor = async (
+export async function errorMonitor(
   req: express.Request,
   res: express.Response
-) => {
+) {
   try {
     res.json({issueUrls: await monitor.monitorAndReport()});
   } catch (error) {
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
     res.json({error: error.toString()});
   }
-};
+}
 
 function createErrorReportUrl(report: ErrorReport) {
   const params = Object.entries(report)
@@ -91,10 +88,7 @@ function createErrorReportUrl(report: ErrorReport) {
 }
 
 /** Diagnostic endpoint to list new untracked errors. */
-module.exports.errorList = async (
-  req: express.Request,
-  res: express.Response
-) => {
+export async function errorList(req: express.Request, res: express.Response) {
   try {
     const reports = await monitor.newErrorsToReport();
     res.json({
@@ -107,4 +101,4 @@ module.exports.errorList = async (
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
     res.json({error: error.toString()});
   }
-};
+}
