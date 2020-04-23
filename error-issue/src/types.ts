@@ -87,14 +87,6 @@ export interface ErrorReport {
  * included in the definitions below.
  */
 export namespace Stackdriver {
-  export interface ErrorGroup {
-    name: string;
-    groupId: string;
-    trackingIssues?: Array<{
-      url: string;
-    }>;
-  }
-
   interface SerializedTimedCount {
     count: string;
     startTime: string;
@@ -109,6 +101,14 @@ export namespace Stackdriver {
 
   interface ErrorEvent {
     message: string;
+  }
+
+  export interface ErrorGroup {
+    name: string;
+    groupId: string;
+    trackingIssues?: Array<{
+      url: string;
+    }>;
   }
 
   export interface SerializedErrorGroupStats {
