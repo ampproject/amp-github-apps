@@ -20,7 +20,8 @@ import {ErrorReport, Stackdriver} from './types';
 import fetch from 'node-fetch';
 import statusCodes from 'http-status-codes';
 
-export const ERROR_ISSUE_ENDPOINT = process.env.ERROR_ISSUE_ENDPOINT ||
+export const ERROR_ISSUE_ENDPOINT =
+  process.env.ERROR_ISSUE_ENDPOINT ||
   'https://us-central1-amp-error-issue-bot.cloudfunctions.net/error-issue';
 
 export class ErrorMonitor {
@@ -68,15 +69,12 @@ export class ErrorMonitor {
   async reportError(errorReport: ErrorReport): Promise<string> {
     const {errorId} = errorReport;
     console.info(`Reporting error group ${errorId} to error issue bot`);
-    const {status, statusText, headers} = await fetch(
-      ERROR_ISSUE_ENDPOINT,
-      {
-        method: 'POST',
-        redirect: 'manual',
-        body: JSON.stringify(errorReport),
-        headers: {'Content-Type': 'application/json'},
-      }
-    );
+    const {status, statusText, headers} = await fetch(ERROR_ISSUE_ENDPOINT, {
+      method: 'POST',
+      redirect: 'manual',
+      body: JSON.stringify(errorReport),
+      headers: {'Content-Type': 'application/json'},
+    });
 
     if (status !== statusCodes.MOVED_TEMPORARILY) {
       throw new Error(
