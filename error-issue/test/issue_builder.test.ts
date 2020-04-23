@@ -20,6 +20,7 @@ import {getFixtureFile} from './fixtures';
 
 describe('IssueBuilder', () => {
   let builder: IssueBuilder;
+  const now = new Date('Mar 1, 2020');
   const report: ErrorReport = {
     errorId: 'CL6chqbN2-bzBA',
     firstSeen: new Date('Feb 25, 2020'),
@@ -50,6 +51,7 @@ describe('IssueBuilder', () => {
   ];
 
   beforeEach(() => {
+    jest.spyOn(Date, 'now').mockReturnValue(now.valueOf());
     builder = new IssueBuilder(report, blames);
   });
 
@@ -80,6 +82,91 @@ describe('IssueBuilder', () => {
 
     it('records the daily frequency', () => {
       expect(builder.bodyDetails).toContain('**Frequency:** ~ 54,647/day');
+    });
+  });
+
+  describe('possibleAssignees', () => {
+    const blames = [
+      {
+        path: 'src/error.js',
+        startingLine: 1,
+        endingLine: 10,
+        author: 'log_author',
+        committedDate: new Date('Jan 1, 2020'),
+        changedFiles: 15,
+        prNumber: 12345,
+      },
+      {
+        path: 'src/log.js',
+        startingLine: 1,
+        endingLine: 10,
+        author: 'log_author',
+        committedDate: new Date('Jan 1, 2020'),
+        changedFiles: 15,
+        prNumber: 12345,
+      },
+      {
+        path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
+        startingLine: 396,
+        endingLine: 439,
+        author: 'recent_author',
+        committedDate: new Date('Apr 1, 2020'),
+        changedFiles: 4,
+        prNumber: 24680,
+      },
+      {
+        path: 'src/event-helper-listen.js',
+        startingLine: 57,
+        endingLine: 59,
+        author: 'older_author',
+        committedDate: new Date('Nov 1, 2019'),
+        changedFiles: 2,
+        prNumber: 13579,
+      },
+      {
+        path: 'src/event-helper-listen.js',
+        startingLine: 35,
+        endingLine: 45,
+        author: 'relevant_author',
+        committedDate: new Date('Dec 1, 2019'),
+        changedFiles: 2,
+        prNumber: 98765,
+      },
+      {
+        path: 'src/event-helper-listen.js',
+        startingLine: 35,
+        endingLine: 45,
+        author: 'first_author',
+        committedDate: new Date('Oct 1, 2019'),
+        changedFiles: 2,
+        prNumber: 98765,
+      },
+      {
+        path: 'src/event-helper-listen.js',
+        startingLine: 100,
+        endingLine: 200,
+        author: 'refactor_author',
+        committedDate: new Date('Dec 1, 2019'),
+        changedFiles: 340,
+        prNumber: 11235,
+      },
+    ];
+
+    it('returns authors of most recent relevant PRs sorted by recency', () => {
+      builder = new IssueBuilder(report, blames);
+      expect(builder.possibleAssignees()).toEqual([
+        'relevant_author',
+        'older_author',
+        'first_author',
+      ]);
+    });
+
+    it('does not try to assign very old errors', () => {
+      const oldReport = Object.assign({}, report, {
+        firstSeen: new Date('Oct 1, 2017')
+      });
+      builder = new IssueBuilder(oldReport, blames);
+      expect(builder.possibleAssignees()).toEqual([]);
     });
   });
 
@@ -116,6 +203,14 @@ describe('IssueBuilder', () => {
       expect(builder.bodyNotes).toContain(
         '**Possible assignees:** `@someone`, `@someoneelse`'
       );
+
+      builder.possibleAssignees = jest.fn().mockReturnValue([]);
+      expect(builder.bodyNotes).not.toContain('Possible assignees:');
+    });
+
+    it('returns empty string when there is no blame info', () => {
+      builder = new IssueBuilder(report, []);
+      expect(builder.bodyNotes).toEqual('');
     });
   });
 

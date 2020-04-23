@@ -17,6 +17,10 @@
 import {formatDate} from './utils';
 import {BlameRange, ErrorReport} from './types';
 
+const MAX_CHANGED_FILES = 40;
+const ERROR_HANDLING_FILES = ['src/error.js', 'src/log.js'];
+const ONE_YEAR_MS = 1000 * 60 * 60 * 24 * 365;
+
 /**
  * Builds a GitHub issue for a reported error.
  */
@@ -80,11 +84,28 @@ export class IssueBuilder {
   }
 
   possibleAssignees(): Array<string> {
-    // TODO(rcebulko): Identify reasonable assignees for the issue.
-    return [];
+    const timeSinceError = Date.now() - this.firstSeen.valueOf();
+    if (timeSinceError > ONE_YEAR_MS) {
+      // Don't try to guess at assignees for old errors.
+      return [];
+    }
+
+    return this.blames
+      // Ignore large PRs like refactors and Prettier formatting.
+      .filter(({changedFiles}) => changedFiles <= MAX_CHANGED_FILES)
+      // Ignore PRs from before the issue first appeared.
+      .filter(({committedDate}) => committedDate < this.firstSeen)
+      // Ignore lines in the stacktrace from error throwing/logging.
+      .filter(({path}) => !ERROR_HANDLING_FILES.includes(path))
+      .sort((a, b) => a.committedDate < b.committedDate ? 1 : -1)
+      .map(({author}) => author);
   }
 
   get bodyNotes(): string {
+    if (!this.blames.length) {
+      return ''
+    };
+
     const possibleAssignees = this.possibleAssignees()
       .map(a => `\`@${a}\``)
       .join(', ');
