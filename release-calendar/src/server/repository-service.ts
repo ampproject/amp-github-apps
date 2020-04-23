@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
+import {Channel, Promotion, Release} from '../types';
 import {Connection, Repository} from 'typeorm';
-import {Release} from '../types';
+import PromotionEntity from './entities/promotion';
 import ReleaseEntity from './entities/release';
 
 export class RepositoryService {
   private releaseRepository: Repository<Release>;
+  private promotionRepository: Repository<Promotion>;
 
   constructor(connection: Connection) {
     this.releaseRepository = connection.getRepository(ReleaseEntity);
+    this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
   getRelease(name: string): Promise<Release> {
@@ -56,5 +59,44 @@ export class RepositoryService {
     });
 
     return releaseQuery;
+  }
+
+  async getCurrentReleases(): Promise<Promotion[]> {
+    const rollbackQuery = this.promotionRepository
+      .createQueryBuilder('promotion')
+      .where('promotion.channel = :channel', {channel: Channel.ROLLBACK})
+      .select('promotion.releaseName')
+      .groupBy('promotion.releaseName')
+      .addSelect('promotion.channel')
+      .getMany();
+
+    const channelQueries = [
+      Channel.LTS,
+      Channel.NIGHTLY,
+      Channel.OPT_IN_BETA,
+      Channel.OPT_IN_EXPERIMENTAL,
+      Channel.PERCENT_BETA,
+      Channel.PERCENT_EXPERIMENTAL,
+      Channel.STABLE,
+    ].map((eachChannel) =>
+      this.promotionRepository
+        .createQueryBuilder('promotion')
+        .where('promotion.channel = :channel', {channel: eachChannel})
+        .select('promotion.releaseName')
+        .groupBy('promotion.releaseName')
+        .addSelect('promotion.channel')
+        .orderBy('promotion.date', 'DESC')
+        .getMany(),
+    );
+
+    const rollbacks = await rollbackQuery;
+    const releasesInEachChannel = await Promise.all(channelQueries);
+    const currentReleases = releasesInEachChannel.map((releasesInOneChannel) =>
+      releasesInOneChannel.find(
+        (latestRelease) => rollbacks.indexOf(latestRelease) == -1,
+      ),
+    );
+
+    return currentReleases;
   }
 }

@@ -16,18 +16,45 @@
 
 import '../stylesheets/channelTable.scss';
 import * as React from 'react';
+import {ApiService} from '../api-service';
 import {Channel} from '../../types';
+import {CurrentReleases} from '../models/view-models';
+
+interface ChannelTableState {
+  currentReleases: Map<Channel, string>;
+}
 
 interface ChannelTableProps {
   channels: Channel[];
   handleSelectedChannel: (channel: Channel, checked: boolean) => void;
 }
 
-export class ChannelTable extends React.Component<ChannelTableProps, {}> {
+export class ChannelTable extends React.Component<
+  ChannelTableProps,
+  ChannelTableState
+> {
+  private apiService: ApiService;
+
   constructor(props: Readonly<ChannelTableProps>) {
     super(props);
+    this.state = {
+      currentReleases: new Map<Channel, string>(),
+    };
+    this.apiService = new ApiService();
     this.handleChannelClick = this.handleChannelClick.bind(this);
   }
+
+  async componentDidMount(): Promise<void> {
+    const currentReleases: CurrentReleases = await this.apiService.getCurrentReleases();
+    this.setState({currentReleases: currentReleases.map});
+  }
+
+  handleChannelClick = (
+    channel: Channel,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
+    this.props.handleSelectedChannel(channel, event.target.checked);
+  };
 
   rows = [
     {channel: Channel.STABLE, title: 'Stable'},
@@ -39,20 +66,12 @@ export class ChannelTable extends React.Component<ChannelTableProps, {}> {
     {channel: Channel.LTS, title: 'Long Term Stable'},
   ];
 
-  handleChannelClick = (
-    channel: Channel,
-    event: React.ChangeEvent<HTMLInputElement>,
-  ): void => {
-    this.props.handleSelectedChannel(channel, event.target.checked);
-  };
-
   render(): JSX.Element {
     return (
       <React.Fragment>
         <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
           {this.rows.map((row) => {
-            const rtv = '0000000000000';
             return (
               <React.Fragment key={row.channel}>
                 <label className='row-button' htmlFor={row.channel}>
@@ -68,7 +87,9 @@ export class ChannelTable extends React.Component<ChannelTableProps, {}> {
                   </div>
                   <div className='row-text'>{row.title}</div>
                 </label>
-                <button className='release-button'>{rtv}</button>
+                <button className='release-button'>
+                  {this.state.currentReleases.get(row.channel)}
+                </button>
               </React.Fragment>
             );
           })}

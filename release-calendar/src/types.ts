@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {
+  CurrentReleases,
+  Release as ReleaseViewModel,
+} from './client/models/view-models';
 
 export enum Channel {
   LTS = 'lts',
@@ -39,16 +43,18 @@ export class Promotion {
   constructor(release: Release, channel: Channel, date?: Date) {
     this.release = release;
     this.channel = channel;
+    this.releaseName = release.name;
     this.date = date ? date : new Date(Date.now());
   }
 
   id: number;
   release: Release;
   channel: Channel;
+  releaseName: string;
   date: Date;
 }
 
-export interface ApiService {
-  getRelease: (name: string) => Promise<Release>;
-  getReleases: () => Promise<Release[]>;
+export interface ApiServiceInterface {
+  getReleases: () => Promise<ReleaseViewModel[]>;
+  getCurrentReleases: () => Promise<CurrentReleases>;
 }
