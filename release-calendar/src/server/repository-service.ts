@@ -28,6 +28,16 @@ export class RepositoryService {
     this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
+  channels = [
+    Channel.LTS,
+    Channel.NIGHTLY,
+    Channel.OPT_IN_BETA,
+    Channel.OPT_IN_EXPERIMENTAL,
+    Channel.PERCENT_BETA,
+    Channel.PERCENT_EXPERIMENTAL,
+    Channel.STABLE,
+  ];
+
   getRelease(name: string): Promise<Release> {
     const releaseQuery = this.releaseRepository
       .createQueryBuilder('release')
@@ -44,12 +54,17 @@ export class RepositoryService {
     return releaseQuery;
   }
 
-  getReleases(): Promise<Promotion[]> {
-    const promotionQuery = this.promotionRepository
-      .createQueryBuilder('promotion')
-      .getMany();
-
-    return promotionQuery;
+  getReleases(): Promise<Promotion[][]> {
+    const channelQueries = this.channels.map((eachChannel) =>
+      this.promotionRepository
+        .createQueryBuilder('promotion')
+        .where('promotion.channel = :channel', {channel: eachChannel})
+        .select('promotion')
+        .addSelect('promotion.releaseName')
+        .orderBy('promotion.date', 'DESC')
+        .getMany(),
+    );
+    return Promise.all(channelQueries);
   }
 
   async getCurrentReleases(): Promise<Promotion[]> {
@@ -61,15 +76,7 @@ export class RepositoryService {
       .addSelect('promotion.channel')
       .getMany();
 
-    const channelQueries = [
-      Channel.LTS,
-      Channel.NIGHTLY,
-      Channel.OPT_IN_BETA,
-      Channel.OPT_IN_EXPERIMENTAL,
-      Channel.PERCENT_BETA,
-      Channel.PERCENT_EXPERIMENTAL,
-      Channel.STABLE,
-    ].map((eachChannel) =>
+    const channelQueries = this.channels.map((eachChannel) =>
       this.promotionRepository
         .createQueryBuilder('promotion')
         .where('promotion.channel = :channel', {channel: eachChannel})

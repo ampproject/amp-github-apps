@@ -14,21 +14,35 @@
  * limitations under the License.
  */
 
-import {ApiServiceInterface, Promotion as PromotionEntity} from '../types';
+import {ApiServiceInterface, Promotion} from '../types';
 import {CurrentReleases, EventInput} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
 export class ApiService implements ApiServiceInterface {
-  private getPromotionRequest(url: string): Promise<PromotionEntity[]> {
+  private getPromotionRequest(url: string): Promise<Promotion[]> {
+    return fetch(url).then((result) => result.json());
+  }
+  private getPromotionRequests(url: string): Promise<Promotion[][]> {
     return fetch(url).then((result) => result.json());
   }
 
   async getReleases(): Promise<EventInput[]> {
-    const promotions = await this.getPromotionRequest(SERVER_URL);
-    return promotions.map((promotion: PromotionEntity) => {
-      return new EventInput(promotion);
+    const promotions = await this.getPromotionRequests(SERVER_URL);
+    const collect: EventInput[] = [];
+    promotions.forEach((promotionsInChannel: Promotion[]) => {
+      const endDate: Date = new Date();
+      collect.push(new EventInput(promotionsInChannel[0], endDate));
+      for (let i = 1; i < promotionsInChannel.length; i++) {
+        collect.push(
+          new EventInput(
+            promotionsInChannel[i],
+            promotionsInChannel[i - 1].date,
+          ),
+        );
+      }
     });
+    return collect;
   }
 
   async getCurrentReleases(): Promise<CurrentReleases> {
