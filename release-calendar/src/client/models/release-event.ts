@@ -17,28 +17,20 @@
 import {Channel} from '../../types';
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {Release} from './view-models';
 
-function convertReleaseToEvent(release: Release): EventInput {
-  return {
-    title: release.name,
-    start: release.date,
-    className: release.channel,
-    extendedProps: {isRollback: release.isRollback},
-  };
-}
-
-export function getEvents(releases: Release[]): Map<Channel, EventSourceInput> {
+export function getAllReleasesEvents(
+  events: EventInput[],
+): Map<Channel, EventSourceInput> {
   const eventInputs = new Map<Channel, EventInput[]>();
-  releases.forEach((release) => {
-    const event = convertReleaseToEvent(release);
-    const channelEvents = eventInputs.get(release.channel);
+  events.forEach((event) => {
+    const channelEvents = eventInputs.get(event.channel);
     if (!channelEvents) {
-      eventInputs.set(release.channel, [event]);
+      eventInputs.set(event.channel, [event]);
     } else {
-      eventInputs.set(release.channel, [...channelEvents, event]);
+      eventInputs.set(event.channel, [...channelEvents, event]);
     }
   });
+
   const eventSources = new Map<Channel, EventSourceInput>();
   eventInputs.forEach((eventInput, channel) => {
     eventSources.set(channel, {

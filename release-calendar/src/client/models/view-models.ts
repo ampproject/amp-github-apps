@@ -14,21 +14,31 @@
  * limitations under the License.
  */
 
-import {Channel, Promotion, Release as ReleaseEntity} from '../../types';
+import {Channel, Promotion} from '../../types';
 
-export class Release {
-  constructor(entity: ReleaseEntity) {
-    const currentPromotion = entity.promotions[0];
-    this.name = entity.name;
-    this.channel = currentPromotion.channel;
-    this.date = currentPromotion.date;
-    this.isRollback = this.channel == Channel.ROLLBACK;
+export class EventInput {
+  constructor(promotion: Promotion) {
+    this.title = promotion.releaseName;
+    this.start = promotion.date;
+    this.className = promotion.channel;
+    this.extendedProps = {
+      isRollback: promotion.channel == Channel.ROLLBACK,
+      channel: promotion.channel,
+    };
   }
 
-  name: string;
-  channel: Channel;
-  date: Date;
-  isRollback: boolean;
+  get rollback(): boolean {
+    return this.extendedProps.isRollback;
+  }
+
+  get channel(): Channel {
+    return this.extendedProps.channel;
+  }
+
+  title: string;
+  start: Date;
+  className: Channel;
+  extendedProps: {isRollback: boolean; channel: Channel};
 }
 
 export class CurrentReleases {

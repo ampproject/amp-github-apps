@@ -44,21 +44,12 @@ export class RepositoryService {
     return releaseQuery;
   }
 
-  getReleases(): Promise<Release[]> {
-    const releaseQuery = this.releaseRepository
-      .createQueryBuilder('release')
-      .leftJoinAndSelect('release.promotions', 'promotion')
+  getReleases(): Promise<Promotion[]> {
+    const promotionQuery = this.promotionRepository
+      .createQueryBuilder('promotion')
       .getMany();
 
-    releaseQuery.then((releases) => {
-      releases.forEach((release) =>
-        release.promotions.sort(
-          (a, b): number => b.date.getTime() - a.date.getTime(),
-        ),
-      );
-    });
-
-    return releaseQuery;
+    return promotionQuery;
   }
 
   async getCurrentReleases(): Promise<Promotion[]> {
