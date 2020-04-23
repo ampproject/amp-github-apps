@@ -45,6 +45,10 @@ const targetMatchers = [
     func: file => file.startsWith('checklist/'),
   },
   {
+    targets: ['ERROR_ISSUE'],
+    func: file => file.startsWith('error-issue/'),
+  },
+  {
     targets: ['INVITE'],
     func: file => file.startsWith('invite/'),
   },
