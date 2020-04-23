@@ -29,6 +29,9 @@ describe('IssueBuilder', () => {
         at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)
         at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)`,
   };
+  const oldReport = Object.assign({}, report, {
+    firstSeen: new Date('Oct 1, 2017'),
+  });
   const blames = [
     {
       path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
@@ -128,9 +131,6 @@ describe('IssueBuilder', () => {
     });
 
     it('does not try to assign very old errors', () => {
-      const oldReport = Object.assign({}, report, {
-        firstSeen: new Date('Oct 1, 2017'),
-      });
       builder = new IssueBuilder(oldReport, blames);
       expect(builder.possibleAssignees()).toEqual([]);
     });
@@ -163,14 +163,9 @@ describe('IssueBuilder', () => {
     });
 
     it('suggests possible assignees, if known', () => {
-      builder.possibleAssignees = jest
-        .fn()
-        .mockReturnValue(['someone', 'someoneelse']);
-      expect(builder.bodyNotes).toContain(
-        '**Possible assignees:** `@someone`, `@someoneelse`'
-      );
+      expect(builder.bodyNotes).toContain('**Possible assignees:** `@xymw`');
 
-      builder.possibleAssignees = jest.fn().mockReturnValue([]);
+      builder = new IssueBuilder(oldReport, blames);
       expect(builder.bodyNotes).not.toContain('Possible assignees:');
     });
 
