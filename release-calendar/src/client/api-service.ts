@@ -28,17 +28,15 @@ export class ApiService implements ApiServiceInterface {
   }
 
   async getReleases(): Promise<EventInput[]> {
-    const promotions = await this.getPromotionRequests(SERVER_URL);
+    const gridOfPromotions = await this.getPromotionRequests(SERVER_URL);
     const collect: EventInput[] = [];
-    promotions.forEach((promotionsInChannel: Promotion[]) => {
+    //each row is all the promotions that have occured in a single channel
+    gridOfPromotions.forEach((rowOfPromotions: Promotion[]) => {
       const endDate: Date = new Date();
-      collect.push(new EventInput(promotionsInChannel[0], endDate));
-      for (let i = 1; i < promotionsInChannel.length; i++) {
+      collect.push(new EventInput(rowOfPromotions[0], endDate));
+      for (let i = 1; i < rowOfPromotions.length; i++) {
         collect.push(
-          new EventInput(
-            promotionsInChannel[i],
-            promotionsInChannel[i - 1].date,
-          ),
+          new EventInput(rowOfPromotions[i], rowOfPromotions[i - 1].date),
         );
       }
     });

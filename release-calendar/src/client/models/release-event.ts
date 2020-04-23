@@ -23,12 +23,8 @@ export function getAllReleasesEvents(
 ): Map<Channel, EventSourceInput> {
   const eventInputs = new Map<Channel, EventInput[]>();
   events.forEach((event) => {
-    const channelEvents = eventInputs.get(event.channel);
-    if (!channelEvents) {
-      eventInputs.set(event.channel, [event]);
-    } else {
-      eventInputs.set(event.channel, [...channelEvents, event]);
-    }
+    const channelEvents = eventInputs.get(event.channel) || [];
+    eventInputs.set(event.channel, [...channelEvents, event]);
   });
 
   const eventSources = new Map<Channel, EventSourceInput>();
