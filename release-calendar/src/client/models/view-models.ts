@@ -22,13 +22,11 @@ export class Release {
     this.name = entity.name;
     this.channel = currentPromotion.channel;
     this.date = currentPromotion.date;
-    this.isRollback = this.channel == Channel.ROLLBACK;
   }
 
   name: string;
   channel: Channel;
   date: Date;
-  isRollback: boolean;
 }
 
 export class CurrentReleases {

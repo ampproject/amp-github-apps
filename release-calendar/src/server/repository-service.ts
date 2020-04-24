@@ -62,14 +62,6 @@ export class RepositoryService {
   }
 
   async getCurrentReleases(): Promise<Promotion[]> {
-    const rollbackQuery = this.promotionRepository
-      .createQueryBuilder('promotion')
-      .where('promotion.channel = :channel', {channel: Channel.ROLLBACK})
-      .select('promotion.releaseName')
-      .groupBy('promotion.releaseName')
-      .addSelect('promotion.channel')
-      .getMany();
-
     const channelQueries = [
       Channel.LTS,
       Channel.NIGHTLY,
@@ -86,17 +78,9 @@ export class RepositoryService {
         .groupBy('promotion.releaseName')
         .addSelect('promotion.channel')
         .orderBy('promotion.date', 'DESC')
-        .getMany(),
+        .getOne(),
     );
 
-    const rollbacks = await rollbackQuery;
-    const releasesInEachChannel = await Promise.all(channelQueries);
-    const currentReleases = releasesInEachChannel.map((releasesInOneChannel) =>
-      releasesInOneChannel.find(
-        (latestRelease) => rollbacks.indexOf(latestRelease) == -1,
-      ),
-    );
-
-    return currentReleases;
+    return Promise.all(channelQueries);
   }
 }
