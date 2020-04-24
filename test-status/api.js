@@ -373,13 +373,17 @@ exports.installApiRouter = (app, db) => {
   });
 
   buildCop.post('/update', async (request, response) => {
-    if (!('username' in request.body) || !request.body.username) {
+    if (
+      !('build-cop' in request.body) ||
+      !('primary' in request.body['build-cop']) ||
+      !request.body['build-cop'].primary
+    ) {
       return response
         .status(400)
-        .end('POST request to /build-cop must contain field "username"');
+        .end('POST request to /build-cop must contain "build-cop.primary"');
     }
 
-    await db('buildCop').update({username: request.body.username});
+    await db('buildCop').update({username: request.body['build-cop'].primary});
 
     return response.end();
   });
