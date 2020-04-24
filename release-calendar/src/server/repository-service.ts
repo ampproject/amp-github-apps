@@ -62,25 +62,17 @@ export class RepositoryService {
   }
 
   async getCurrentReleases(): Promise<Promotion[]> {
-    const channelQueries = [
-      Channel.LTS,
-      Channel.NIGHTLY,
-      Channel.OPT_IN_BETA,
-      Channel.OPT_IN_EXPERIMENTAL,
-      Channel.PERCENT_BETA,
-      Channel.PERCENT_EXPERIMENTAL,
-      Channel.STABLE,
-    ].map((eachChannel) =>
-      this.promotionRepository
-        .createQueryBuilder('promotion')
-        .where('promotion.channel = :channel', {channel: eachChannel})
-        .select('promotion.releaseName')
-        .groupBy('promotion.releaseName')
-        .addSelect('promotion.channel')
-        .orderBy('promotion.date', 'DESC')
-        .getOne(),
+    return Promise.all(
+      Object.keys(Channel).map((channel) => {
+        return this.promotionRepository
+          .createQueryBuilder('promotion')
+          .where('promotion.channel = :channel', {channel})
+          .select('promotion.releaseName')
+          .groupBy('promotion.releaseName')
+          .addSelect('promotion.channel')
+          .orderBy('promotion.date', 'DESC')
+          .getOne();
+      }),
     );
-
-    return Promise.all(channelQueries);
   }
 }
