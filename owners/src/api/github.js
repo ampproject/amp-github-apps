@@ -143,6 +143,9 @@ class GitHub {
    */
   constructor(client, owner, repository, logger = console) {
     Object.assign(this, {client, owner, repository, logger});
+    // Optionally allow for providing a separate user-authenticated client for
+    // team @mention workarounds.
+    this.user = this;
   }
 
   /**
@@ -368,16 +371,19 @@ class GitHub {
    *
    * @param {number} number PR number.
    * @param {string} body comment body.
+   * @return {Object} API response
    */
   async createBotComment(number, body) {
     this.logger.info(`Adding bot comment to PR #${number}`);
     this.logger.debug('[createBotComment]', number, body);
 
-    await this._customRequest(
+    const {data} = await this._customRequest(
       'POST',
       `/repos/${this.owner}/${this.repository}/issues/${number}/comments`,
       {body}
     );
+
+    return data
   }
 
   /**
@@ -388,16 +394,19 @@ class GitHub {
    *
    * @param {number} commentId ID of comment to update.
    * @param {string} body comment body.
+   * @return {Object} API response
    */
   async updateComment(commentId, body) {
     this.logger.info(`Replacing comment with ID ${commentId}`);
     this.logger.debug('[updateComment]', commentId, body);
 
-    await this._customRequest(
+    const {data} = await this._customRequest(
       'PATCH',
       `/repos/${this.owner}/${this.repository}/issues/comments/${commentId}`,
       {body}
     );
+
+    return data;
   }
 
   /**
