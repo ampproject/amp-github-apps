@@ -56,7 +56,7 @@ namespace GraphQL {
     messageHeadline: string;
     author: {
       name: string;
-      user: null|User;
+      user: null | User;
     };
   }
 

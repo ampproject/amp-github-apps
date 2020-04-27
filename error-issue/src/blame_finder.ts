@@ -84,8 +84,8 @@ export class BlameFinder {
     const {ranges} = repository.ref.target.blame;
     this.logger.debug(`Found ${ranges.length} blame ranges`);
 
-    return (this.files[cacheKey] = ranges
-      .map(({commit, startingLine, endingLine}) => ({
+    return (this.files[cacheKey] = ranges.map(
+      ({commit, startingLine, endingLine}) => ({
         path,
         startingLine,
         endingLine,
@@ -96,7 +96,8 @@ export class BlameFinder {
         committedDate: new Date(commit.committedDate),
         changedFiles: commit.changedFiles,
         prNumber: parsePrNumber(commit.messageHeadline),
-      })));
+      })
+    ));
   }
 
   /** Fetches the blame range for a line of a file. */

@@ -221,26 +221,35 @@ describe('BlameFinder', () => {
 
       nock('https://api.github.com')
         .post('/graphql')
-        .reply(200, getGraphQLResponse('2004172112280', 'extensions/amp-base-carousel/0.1/dimensions.js'));
+        .reply(
+          200,
+          getGraphQLResponse(
+            '2004172112280',
+            'extensions/amp-base-carousel/0.1/dimensions.js'
+          )
+        );
 
       const blames = blameFinder.blameForStacktrace(stacktrace);
-      await expect(blames).resolves.toEqual([{
-        path: 'extensions/amp-base-carousel/0.1/dimensions.js',
-        startingLine: 58,
-        endingLine: 58,
-        author: '@rsimha',
-        committedDate: new Date('2019-05-16T14:59:15Z'),
-        changedFiles: 1623,
-        prNumber: 21212
-      }, {
-        path: 'extensions/amp-base-carousel/0.1/dimensions.js',
-        startingLine: 67,
-        endingLine: 86,
-        author: 'Sepand Parhami',
-        committedDate: new Date('2019-01-17T22:56:30Z'),
-        changedFiles: 2,
-        prNumber: 20389
-      }]);
+      await expect(blames).resolves.toEqual([
+        {
+          path: 'extensions/amp-base-carousel/0.1/dimensions.js',
+          startingLine: 58,
+          endingLine: 58,
+          author: '@rsimha',
+          committedDate: new Date('2019-05-16T14:59:15Z'),
+          changedFiles: 1623,
+          prNumber: 21212,
+        },
+        {
+          path: 'extensions/amp-base-carousel/0.1/dimensions.js',
+          startingLine: 67,
+          endingLine: 86,
+          author: 'Sepand Parhami',
+          committedDate: new Date('2019-01-17T22:56:30Z'),
+          changedFiles: 2,
+          prNumber: 20389,
+        },
+      ]);
     });
   });
 });
