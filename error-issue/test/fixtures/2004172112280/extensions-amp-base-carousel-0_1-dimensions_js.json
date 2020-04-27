@@ -11,6 +11,7 @@
                   "committedDate": "2019-01-10T20:42:35Z",
                   "messageHeadline": "✨Initial skeleton of amp-carousel v2. (#20228)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -23,6 +24,7 @@
                   "committedDate": "2019-01-22T21:07:37Z",
                   "messageHeadline": "Additional logic for carousel v2. (#20439)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -35,6 +37,7 @@
                   "committedDate": "2019-03-05T18:40:35Z",
                   "messageHeadline": "Make changes to support `<amp-inline-gallery>`. (#21194)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -47,6 +50,7 @@
                   "committedDate": "2019-01-16T22:58:16Z",
                   "messageHeadline": "Carousel v2: add logic for spacers for looping. (#20293)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -59,6 +63,7 @@
                   "committedDate": "2019-01-10T20:42:35Z",
                   "messageHeadline": "✨Initial skeleton of amp-carousel v2. (#20228)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -71,6 +76,7 @@
                   "committedDate": "2019-01-16T22:58:16Z",
                   "messageHeadline": "Carousel v2: add logic for spacers for looping. (#20293)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -83,6 +89,7 @@
                   "committedDate": "2019-05-16T14:59:15Z",
                   "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
                   "author": {
+                    "name": "Raghu Simha",
                     "user": {
                       "login": "rsimha"
                     }
@@ -97,6 +104,7 @@
                   "committedDate": "2019-01-16T22:58:16Z",
                   "messageHeadline": "Carousel v2: add logic for spacers for looping. (#20293)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -109,6 +117,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -121,6 +130,7 @@
                   "committedDate": "2019-11-07T20:28:53Z",
                   "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -133,6 +143,7 @@
                   "committedDate": "2019-01-16T22:58:16Z",
                   "messageHeadline": "Carousel v2: add logic for spacers for looping. (#20293)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -145,6 +156,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -157,6 +169,7 @@
                   "committedDate": "2019-01-22T21:07:37Z",
                   "messageHeadline": "Additional logic for carousel v2. (#20439)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -169,6 +182,7 @@
                   "committedDate": "2019-03-05T18:40:35Z",
                   "messageHeadline": "Make changes to support `<amp-inline-gallery>`. (#21194)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -181,6 +195,7 @@
                   "committedDate": "2019-01-22T21:07:37Z",
                   "messageHeadline": "Additional logic for carousel v2. (#20439)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -193,6 +208,7 @@
                   "committedDate": "2019-11-07T20:28:53Z",
                   "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -205,6 +221,7 @@
                   "committedDate": "2019-01-22T21:07:37Z",
                   "messageHeadline": "Additional logic for carousel v2. (#20439)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -217,6 +234,7 @@
                   "committedDate": "2019-05-16T14:59:15Z",
                   "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
                   "author": {
+                    "name": "Raghu Simha",
                     "user": {
                       "login": "rsimha"
                     }
@@ -231,6 +249,7 @@
                   "committedDate": "2019-11-07T20:28:53Z",
                   "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -243,6 +262,7 @@
                   "committedDate": "2019-01-22T21:07:37Z",
                   "messageHeadline": "Additional logic for carousel v2. (#20439)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -255,6 +275,7 @@
                   "committedDate": "2019-11-07T20:28:53Z",
                   "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -267,6 +288,7 @@
                   "committedDate": "2019-01-22T21:07:37Z",
                   "messageHeadline": "Additional logic for carousel v2. (#20439)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -279,6 +301,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -291,6 +314,7 @@
                   "committedDate": "2019-05-16T14:59:15Z",
                   "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
                   "author": {
+                    "name": "Raghu Simha",
                     "user": {
                       "login": "rsimha"
                     }
@@ -305,6 +329,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -317,6 +342,7 @@
                   "committedDate": "2019-05-16T14:59:15Z",
                   "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
                   "author": {
+                    "name": "Raghu Simha",
                     "user": {
                       "login": "rsimha"
                     }
@@ -331,6 +357,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -343,6 +370,7 @@
                   "committedDate": "2019-05-16T14:59:15Z",
                   "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
                   "author": {
+                    "name": "Raghu Simha",
                     "user": {
                       "login": "rsimha"
                     }
@@ -357,6 +385,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -369,6 +398,7 @@
                   "committedDate": "2019-05-16T14:59:15Z",
                   "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
                   "author": {
+                    "name": "Raghu Simha",
                     "user": {
                       "login": "rsimha"
                     }
@@ -383,6 +413,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -395,6 +426,7 @@
                   "committedDate": "2019-11-07T20:28:53Z",
                   "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -407,6 +439,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -419,6 +452,7 @@
                   "committedDate": "2019-11-07T20:28:53Z",
                   "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -431,6 +465,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -443,6 +478,7 @@
                   "committedDate": "2019-11-07T20:28:53Z",
                   "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -455,6 +491,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -467,6 +504,7 @@
                   "committedDate": "2019-05-16T14:59:15Z",
                   "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
                   "author": {
+                    "name": "Raghu Simha",
                     "user": {
                       "login": "rsimha"
                     }
@@ -481,6 +519,7 @@
                   "committedDate": "2019-11-07T20:28:53Z",
                   "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
@@ -493,6 +532,7 @@
                   "committedDate": "2019-01-17T22:56:30Z",
                   "messageHeadline": "Add additional carousel v2 logic. (#20389)",
                   "author": {
+                    "name": "Sepand Parhami",
                     "user": null
                   }
                 },
