@@ -69,22 +69,37 @@ export class StackdriverApi {
   }
 
   /**
-   * List groups of errors.
+   * Fetch one or more error groups from the Stackdriver API.
    * See https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list
    */
-  async listGroups(
-    pageSize: number = 20
-  ): Promise<Array<Stackdriver.ErrorGroupStats>> {
-    console.info(`Fetching first ${pageSize} error groups`);
+  private async getGroups(opts: {
+    pageSize?: number,
+    groupId?: string
+  }): Promise<Array<Stackdriver.ErrorGroupStats>> {
     const {errorGroupStats} = await this.request('groupStats', 'GET', {
       'timeRange.period': 'PERIOD_1_DAY',
-      pageSize,
       timedCountDuration: `${SECONDS_IN_DAY}s`,
+      ...opts,
     });
 
     return errorGroupStats.map((stats: Stackdriver.SerializedErrorGroupStats) =>
       this.deserialize(stats)
     );
+  }
+
+  /** List groups of errors. */
+  async listGroups(
+    pageSize: number = 20
+  ): Promise<Array<Stackdriver.ErrorGroupStats>> {
+    console.info(`Fetching first ${pageSize} error groups`);
+    return this.getGroups({pageSize});
+  }
+
+  /** Get details about an error group. */
+  async getGroup(groupId: string): Promise<Stackdriver.ErrorGroupStats> {
+    console.info(`Fetching group stats for error gorup "${groupId}"`);
+    const errorGroupStats = await this.getGroups({groupId});
+    return errorGroupStats[0];
   }
 
   /**
