@@ -113,9 +113,14 @@ export class BlameFinder {
   async blameForStacktrace(stacktrace: string): Promise<Array<BlameRange>> {
     const stackFrames = parseStacktrace(stacktrace);
     // Note: The GraphQL client wrapper will handle debouncing API requests.
-    const blames = await Promise.all(
-      stackFrames.map(async frame => this.blameForLine(frame))
-    );
+    const blames = [];
+    for (const frame of stackFrames) {
+      try {
+        blames.push(await this.blameForLine(frame));
+      } catch {
+        // Ignore lines with no blame info.
+      }
+    }
 
     return blames.filter(({prNumber}) => prNumber);
   }
