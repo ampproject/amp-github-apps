@@ -73,8 +73,8 @@ export class StackdriverApi {
    * See https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list
    */
   private async getGroups(opts: {
-    pageSize?: number,
-    groupId?: string
+    pageSize?: number;
+    groupId?: string;
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
     const {errorGroupStats} = await this.request('groupStats', 'GET', {
       'timeRange.period': 'PERIOD_1_DAY',

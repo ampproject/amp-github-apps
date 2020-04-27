@@ -46,7 +46,7 @@ export async function errorIssue(req: express.Request, res: express.Response) {
     firstSeen,
     dailyOccurrences,
     stacktrace,
-    linkIssue
+    linkIssue,
   } = errorReport;
 
   if (!errorId) {
@@ -71,7 +71,7 @@ export async function errorIssue(req: express.Request, res: express.Response) {
       group,
       timedCounts,
       firstSeenTime,
-      representative
+      representative,
     } = await stackdriver.getGroup(errorId);
 
     if (group.trackingIssues) {
@@ -137,7 +137,7 @@ export async function errorList(req: express.Request, res: express.Response) {
           createAndLinkUrl: `${createUrl}&linkIssue=1`,
           ...report,
         };
-      })
+      }),
     });
   } catch (error) {
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
