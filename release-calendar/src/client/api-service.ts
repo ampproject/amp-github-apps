@@ -23,22 +23,23 @@ export class ApiService implements ApiServiceInterface {
   private getPromotionRequest(url: string): Promise<Promotion[]> {
     return fetch(url).then((result) => result.json());
   }
-  private getPromotionRequests(url: string): Promise<Promotion[][]> {
-    return fetch(url).then((result) => result.json());
-  }
 
   async getReleases(): Promise<EventInput[]> {
-    const gridOfPromotions = await this.getPromotionRequests(SERVER_URL);
+    const allPromotions = await this.getPromotionRequest(SERVER_URL);
+    const map = new Map();
+    allPromotions.forEach((promotion) => {
+      const channelPromotions = map.get(promotion.channel) || [];
+      map.set(promotion.channel, [...channelPromotions, promotion]);
+    });
     const collect: EventInput[] = [];
-    //each row is all the promotions that have occured in a single channel
-    gridOfPromotions.forEach((rowOfPromotions: Promotion[]) => {
-      collect.push(new EventInput(rowOfPromotions[0], new Date()));
+    map.forEach((promotionsInChannel: Promotion[]) => {
+      collect.push(new EventInput(promotionsInChannel[0], new Date()));
       collect.push(
-        ...rowOfPromotions
+        ...promotionsInChannel
           .slice(1)
           .map(
             (promotion, i) =>
-              new EventInput(promotion, rowOfPromotions[i].date),
+              new EventInput(promotion, promotionsInChannel[i].date),
           ),
       );
     });

@@ -54,16 +54,12 @@ export class RepositoryService {
     return releaseQuery;
   }
 
-  getReleases(): Promise<Promotion[][]> {
-    const channelQueries = this.channels.map((eachChannel) =>
-      this.promotionRepository
-        .createQueryBuilder('promotion')
-        .where('promotion.channel = :channel', {channel: eachChannel})
-        .select('promotion')
-        .orderBy('promotion.date', 'DESC')
-        .getMany(),
-    );
-    return Promise.all(channelQueries);
+  async getReleases(): Promise<Promotion[]> {
+    const channelQueries = this.promotionRepository
+      .createQueryBuilder('promotion')
+      .orderBy('promotion.date', 'DESC')
+      .getMany();
+    return channelQueries;
   }
 
   async getCurrentReleases(): Promise<Promotion[]> {
