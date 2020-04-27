@@ -28,7 +28,7 @@ export class ErrorMonitor {
   constructor(
     private client: StackdriverApi,
     private minFrequency: number = 5000,
-    private pageLimit: number = 25
+    private pageLimit: number = 40
   ) {}
 
   /** Tests if an error group already has an associated issue. */
