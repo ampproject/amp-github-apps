@@ -28,9 +28,9 @@ export class ApiService {
     return fetch(url).then((result) => result.json());
   }
 
-  async getRelease(releaseString: string): Promise<ReleaseEventInput[]> {
+  async getRelease(requestedRelease: string): Promise<ReleaseEventInput[]> {
     const release = await this.getReleaseRequest(
-      SERVER_URL + '/release/' + releaseString,
+      SERVER_URL + '/release/' + requestedRelease,
     );
     return [
       new ReleaseEventInput(release.promotions[0], new Date()),
