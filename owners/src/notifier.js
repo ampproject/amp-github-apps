@@ -101,9 +101,8 @@ class OwnersNotifier {
     }
 
     const body = fileNotifyComments.join('\n\n');
-    let comment;
     if (botComment) {
-      comment = await github.updateComment(botComment.id, body);
+      await github.updateComment(botComment.id, body);
     } else {
       botComment = await github.createBotComment(this.pr.number, body);
     }
