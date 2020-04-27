@@ -104,7 +104,7 @@ export async function errorList(req: express.Request, res: express.Response) {
     const reports = await lister.newErrorsToReport();
     res.json({
       errorReports: reports.map(report => {
-        const createUrl = createErrorReportUrl(reports);
+        const createUrl = createErrorReportUrl(report);
         return {
           createUrl,
           createAndLinkUrl: `${createUrl}&linkIssue=1`,
