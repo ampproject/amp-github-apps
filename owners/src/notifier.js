@@ -81,7 +81,7 @@ class OwnersNotifier {
    * @param {!GitHub} github GitHub API interface.
    */
   async createNotificationComment(github) {
-    const [botComment] = await github.getBotComments(this.pr.number);
+    let [botComment] = await github.getBotComments(this.pr.number);
     const notifies = this.getOwnersToNotify();
     delete notifies[this.pr.author];
 
@@ -100,11 +100,23 @@ class OwnersNotifier {
       return;
     }
 
-    const comment = fileNotifyComments.join('\n\n');
+    const body = fileNotifyComments.join('\n\n');
     if (botComment) {
-      await github.updateComment(botComment.id, comment);
+      await github.updateComment(botComment.id, body);
     } else {
-      await github.createBotComment(this.pr.number, comment);
+      botComment = await github.createBotComment(this.pr.number, body);
+    }
+
+    // App-authenticated comments appear to come from the app user (ie.
+    // `amp-owners-bot`) but can't tag teams. The workaround is doing a fake
+    // update to the comment with a user-authenticated client, which enables the
+    // @ mention but leaves the comment author as the app name.
+    const teamNotifies = Object.keys(notifies).filter(n => n.includes('/'));
+    if (teamNotifies.length) {
+      await github.user.updateComment(
+        botComment.id,
+        `${body}\n<!-- Edited to fix team @ mention -->`
+      );
     }
   }
 

@@ -14,28 +14,23 @@
  * limitations under the License.
  */
 
-import {
-  ApiServiceInterface,
-  Promotion as PromotionEntity,
-  Release as ReleaseEntity,
-} from '../types';
-import {CurrentReleases, Release} from './models/view-models';
+import {Channel, Promotion} from '../types';
+import {CurrentReleases, ReleaseEventInput} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
-export class ApiService implements ApiServiceInterface {
-  private getReleaseRequest(url: string): Promise<ReleaseEntity[]> {
+export class ApiService {
+  private getPromotionRequest(url: string): Promise<Promotion[]> {
     return fetch(url).then((result) => result.json());
   }
 
-  private getPromotionRequest(url: string): Promise<PromotionEntity[]> {
-    return fetch(url).then((result) => result.json());
-  }
-
-  async getReleases(): Promise<Release[]> {
-    const releases = await this.getReleaseRequest(SERVER_URL);
-    return releases.map((release: ReleaseEntity) => {
-      return new Release(release);
+  async getReleases(): Promise<ReleaseEventInput[]> {
+    const allPromotions = await this.getPromotionRequest(SERVER_URL);
+    const map = new Map<Channel, Date>();
+    return allPromotions.map((promotion: Promotion) => {
+      const date = map.get(promotion.channel) || new Date();
+      map.set(promotion.channel, promotion.date);
+      return new ReleaseEventInput(promotion, date);
     });
   }
 

@@ -21,7 +21,7 @@ import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {EventApi, View} from '@fullcalendar/core';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {getEvents} from '../models/release-event';
+import {getAllReleasesEvents} from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
 import ReactDOM from 'react-dom';
 import Tippy from '@tippyjs/react';
@@ -52,7 +52,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
 
   async componentDidMount(): Promise<void> {
     const releases = await this.apiService.getReleases();
-    this.setState({events: getEvents(releases)});
+    this.setState({events: getAllReleasesEvents(releases)});
   }
 
   tooltip = (arg: {

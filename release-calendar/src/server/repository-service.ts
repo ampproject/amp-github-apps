@@ -28,6 +28,16 @@ export class RepositoryService {
     this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
+  channels = [
+    Channel.LTS,
+    Channel.NIGHTLY,
+    Channel.OPT_IN_BETA,
+    Channel.OPT_IN_EXPERIMENTAL,
+    Channel.PERCENT_BETA,
+    Channel.PERCENT_EXPERIMENTAL,
+    Channel.STABLE,
+  ];
+
   getRelease(name: string): Promise<Release> {
     const releaseQuery = this.releaseRepository
       .createQueryBuilder('release')
@@ -44,21 +54,12 @@ export class RepositoryService {
     return releaseQuery;
   }
 
-  getReleases(): Promise<Release[]> {
-    const releaseQuery = this.releaseRepository
-      .createQueryBuilder('release')
-      .leftJoinAndSelect('release.promotions', 'promotion')
+  async getReleases(): Promise<Promotion[]> {
+    const channelQueries = this.promotionRepository
+      .createQueryBuilder('promotion')
+      .orderBy('promotion.date', 'DESC')
       .getMany();
-
-    releaseQuery.then((releases) => {
-      releases.forEach((release) =>
-        release.promotions.sort(
-          (a, b): number => b.date.getTime() - a.date.getTime(),
-        ),
-      );
-    });
-
-    return releaseQuery;
+    return channelQueries;
   }
 
   async getCurrentReleases(): Promise<Promotion[]> {

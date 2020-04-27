@@ -36,28 +36,66 @@ const bot = new ErrorIssueBot(
 
 const stackdriver = new StackdriverApi(PROJECT_ID);
 const monitor = new ErrorMonitor(stackdriver);
+const lister = new ErrorMonitor(stackdriver, 2500, 40);
 
 /** Endpoint to create a GitHub issue for an error report. */
 export async function errorIssue(req: express.Request, res: express.Response) {
   const errorReport = req.method === 'POST' ? req.body : req.query;
-  const {errorId, firstSeen, dailyOccurrences, stacktrace} = errorReport;
+  const {
+    errorId,
+    firstSeen,
+    dailyOccurrences,
+    stacktrace,
+    linkIssue,
+  } = errorReport;
 
-  if (!(errorId && firstSeen && dailyOccurrences && stacktrace)) {
+  if (!errorId) {
     res.status(statusCodes.BAD_REQUEST);
-    return res.send('Missing error report params');
+    return res.send('Missing error ID param');
   }
 
   console.debug(`Processing http://go/ampe/${errorId}`);
-  const parsedReport: ErrorReport = {
-    errorId,
-    firstSeen: new Date(firstSeen),
-    dailyOccurrences: parseInt(dailyOccurrences, 10),
-    stacktrace,
-  };
+  const shouldLinkIssue = linkIssue === '1';
+
+  let parsedReport: ErrorReport;
+  if (firstSeen && dailyOccurrences && stacktrace) {
+    parsedReport = {
+      errorId,
+      firstSeen: new Date(firstSeen),
+      dailyOccurrences: Number(dailyOccurrences),
+      stacktrace,
+    };
+  } else {
+    // If only an error ID is specified, fetch the details from the API.
+    const {
+      group,
+      timedCounts,
+      firstSeenTime,
+      representative,
+    } = await stackdriver.getGroup(errorId);
+
+    if (group.trackingIssues) {
+      // If the error is already tracked, redirect to the existing issue
+      return res.redirect(
+        statusCodes.MOVED_TEMPORARILY,
+        group.trackingIssues[0].url
+      );
+    }
+
+    parsedReport = {
+      errorId,
+      firstSeen: firstSeenTime,
+      dailyOccurrences: timedCounts[0].count,
+      stacktrace: representative.message,
+    };
+  }
 
   try {
     const issueUrl = await bot.report(parsedReport);
     res.redirect(statusCodes.MOVED_TEMPORARILY, issueUrl);
+    if (shouldLinkIssue) {
+      stackdriver.setGroupIssue(errorId, issueUrl);
+    }
   } catch (errResp) {
     console.warn(errResp);
     res.status(errResp.status || statusCodes.INTERNAL_SERVER_ERROR);
@@ -90,12 +128,16 @@ function createErrorReportUrl(report: ErrorReport) {
 /** Diagnostic endpoint to list new untracked errors. */
 export async function errorList(req: express.Request, res: express.Response) {
   try {
-    const reports = await monitor.newErrorsToReport();
+    const reports = await lister.newErrorsToReport();
     res.json({
-      errorReports: reports.map(report => ({
-        createUrl: createErrorReportUrl(report),
-        ...report,
-      })),
+      errorReports: reports.map(report => {
+        const createUrl = createErrorReportUrl(report);
+        return {
+          createUrl,
+          createAndLinkUrl: `${createUrl}&linkIssue=1`,
+          ...report,
+        };
+      }),
     });
   } catch (error) {
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
