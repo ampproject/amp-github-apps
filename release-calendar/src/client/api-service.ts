@@ -32,13 +32,15 @@ export class ApiService implements ApiServiceInterface {
     const collect: EventInput[] = [];
     //each row is all the promotions that have occured in a single channel
     gridOfPromotions.forEach((rowOfPromotions: Promotion[]) => {
-      const endDate: Date = new Date();
-      collect.push(new EventInput(rowOfPromotions[0], endDate));
-      for (let i = 1; i < rowOfPromotions.length; i++) {
-        collect.push(
-          new EventInput(rowOfPromotions[i], rowOfPromotions[i - 1].date),
-        );
-      }
+      collect.push(new EventInput(rowOfPromotions[0], new Date()));
+      collect.push(
+        ...rowOfPromotions
+          .slice(1)
+          .map(
+            (promotion, i) =>
+              new EventInput(promotion, rowOfPromotions[i].date),
+          ),
+      );
     });
     return collect;
   }
