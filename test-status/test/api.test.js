@@ -339,7 +339,9 @@ describe('test-status/api', () => {
       .post('/v0/build-cop/update')
       .send({
         accessToken: '1a2b3c',
-        username: 'anothergithuber',
+        'build-cop': {
+          primary: 'anothergithuber',
+        },
       })
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
@@ -356,7 +358,9 @@ describe('test-status/api', () => {
     await request(probot.server)
       .post('/v0/build-cop/update')
       .send({
-        username: 'anothergithuber',
+        'build-cop': {
+          primary: 'anothergithuber',
+        },
       })
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
@@ -372,7 +376,9 @@ describe('test-status/api', () => {
       .post('/v0/build-cop/update')
       .send({
         accessToken: 'THIS ACCESS TOKEN IS INCORRECT',
-        username: 'anothergithuber',
+        'build-cop': {
+          primary: 'anothergithuber',
+        },
       })
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
@@ -381,13 +387,31 @@ describe('test-status/api', () => {
     expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
   });
 
-  test('reject missing username for build cop updates', async () => {
+  test('reject missing build-cop object for build cop updates', async () => {
     expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
 
     await request(probot.server)
       .post('/v0/build-cop/update')
       .send({
         accessToken: '1a2b3c',
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect(400);
+
+    expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
+  });
+
+  test('reject missing primary field for build cop updates', async () => {
+    expect(await db('buildCop').pluck('username')).toMatchObject(['agithuber']);
+
+    await request(probot.server)
+      .post('/v0/build-cop/update')
+      .send({
+        accessToken: '1a2b3c',
+        'build-cop': {
+          secondary: 'anothergithuber',
+        },
       })
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')

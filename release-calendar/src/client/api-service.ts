@@ -14,46 +14,47 @@
  * limitations under the License.
  */
 
-import {
-  ApiServiceInterface,
-  Promotion as PromotionEntity,
-  Release as ReleaseEntity,
-} from '../types';
-import {CurrentReleases, EventInput} from './models/view-models';
+import {Channel, Promotion, Release} from '../types';
+import {CurrentReleases, ReleaseEventInput} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
-export class ApiService implements ApiServiceInterface {
-  private getReleasesRequest(url: string): Promise<ReleaseEntity[]> {
+export class ApiService {
+  private getPromotionRequest(url: string): Promise<Promotion[]> {
     return fetch(url).then((result) => result.json());
   }
 
-  private getPromotionsRequest(url: string): Promise<PromotionEntity[]> {
+  private getReleaseRequest(url: string): Promise<Release> {
     return fetch(url).then((result) => result.json());
   }
 
-  private getReleaseRequest(url: string): Promise<ReleaseEntity> {
-    return fetch(url).then((result) => result.json());
-  }
-
-  async getReleases(): Promise<EventInput[]> {
-    const releases = await this.getReleasesRequest(SERVER_URL);
-    return releases.map((release) => {
-      return new EventInput(release, release.promotions[0]);
-    });
-  }
-
-  async getRelease(releaseName: string): Promise<EventInput[]> {
+  async getRelease(releaseString: string): Promise<ReleaseEventInput[]> {
     const release = await this.getReleaseRequest(
-      SERVER_URL + '/release/' + releaseName,
+      SERVER_URL + '/release/' + releaseString,
     );
-    return release.promotions.map((promotion) => {
-      return new EventInput(release, promotion);
+    return [
+      new ReleaseEventInput(release.promotions[0], new Date()),
+      ...release.promotions
+        .slice(1)
+        .map(
+          (promotion, i) =>
+            new ReleaseEventInput(promotion, release.promotions[i].date),
+        ),
+    ];
+  }
+
+  async getReleases(): Promise<ReleaseEventInput[]> {
+    const allPromotions = await this.getPromotionRequest(SERVER_URL);
+    const map = new Map<Channel, Date>();
+    return allPromotions.map((promotion: Promotion) => {
+      const date = map.get(promotion.channel) || new Date();
+      map.set(promotion.channel, promotion.date);
+      return new ReleaseEventInput(promotion, date);
     });
   }
 
   async getCurrentReleases(): Promise<CurrentReleases> {
-    const currentReleases = await this.getPromotionsRequest(
+    const currentReleases = await this.getPromotionRequest(
       SERVER_URL + '/current-releases/',
     );
     return new CurrentReleases(currentReleases);

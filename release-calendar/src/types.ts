@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {CurrentReleases, EventInput} from './client/models/view-models';
 
 export enum Channel {
   LTS = 'lts',
@@ -49,10 +48,4 @@ export class Promotion {
   channel: Channel;
   releaseName: string;
   date: Date;
-}
-
-export interface ApiServiceInterface {
-  getRelease: (release: string) => Promise<EventInput[]>;
-  getReleases: () => Promise<EventInput[]>;
-  getCurrentReleases: () => Promise<CurrentReleases>;
 }

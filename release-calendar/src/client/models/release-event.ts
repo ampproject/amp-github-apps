@@ -15,20 +15,16 @@
  */
 
 import {Channel} from '../../types';
-import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
+import {ReleaseEventInput} from './view-models';
 
 export function getAllReleasesEvents(
-  events: EventInput[],
+  events: ReleaseEventInput[],
 ): Map<Channel, EventSourceInput> {
-  const eventInputs = new Map<Channel, EventInput[]>();
+  const eventInputs = new Map<Channel, ReleaseEventInput[]>();
   events.forEach((event) => {
-    const channelEvents = eventInputs.get(event.getChannel);
-    if (!channelEvents) {
-      eventInputs.set(event.channel, [event]);
-    } else {
-      eventInputs.set(event.channel, [...channelEvents, event]);
-    }
+    const channelEvents = eventInputs.get(event.channel) || [];
+    eventInputs.set(event.channel, [...channelEvents, event]);
   });
 
   const eventSources = new Map<Channel, EventSourceInput>();
@@ -42,10 +38,10 @@ export function getAllReleasesEvents(
 }
 
 export function getSingleReleaseEvents(
-  eventInputs: EventInput[],
+  eventInputs: ReleaseEventInput[],
 ): EventSourceInput[] {
   return eventInputs.map(
-    (event: EventInput): EventSourceInput => {
+    (event: ReleaseEventInput): EventSourceInput => {
       return {events: [event], textColor: 'white'};
     },
   );

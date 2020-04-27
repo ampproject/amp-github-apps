@@ -15,6 +15,19 @@
   background-color: none;
 }
 
+.event-button {
+  outline: none;
+  background-color: inherit;
+  border-color: inherit;
+  color: inherit;
+  padding-left: 3px;
+  padding-top: 3px;
+  text-align: left;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+
 @mixin color($channel) {
   background-color: $channel;
   border-color: $channel;

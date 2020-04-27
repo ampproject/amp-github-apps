@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-import {Channel, Promotion, Release as ReleaseEntity} from '../../types';
+import {Channel, Promotion} from '../../types';
+import {EventInput} from '@fullcalendar/core';
 
-export class EventInput {
-  constructor(release: ReleaseEntity, promotion: Promotion) {
-    this.title = release.name;
+export class ReleaseEventInput implements EventInput {
+  constructor(promotion: Promotion, endDate: Date) {
+    this.title = promotion.releaseName;
     this.start = promotion.date;
+    this.end = endDate;
     this.className = promotion.channel;
     this.extendedProps = {
-      isRollback: promotion.channel == Channel.ROLLBACK,
       channel: promotion.channel,
     };
-  }
-
-  get rollback(): boolean {
-    return this.extendedProps.isRollback;
   }
 
   get channel(): Channel {
@@ -37,8 +34,9 @@ export class EventInput {
 
   title: string;
   start: Date;
+  end: Date;
   className: Channel;
-  extendedProps: {isRollback: boolean; channel: Channel};
+  extendedProps: {channel: Channel};
 }
 
 export class CurrentReleases {

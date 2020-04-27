@@ -39,6 +39,7 @@ module.exports = app => {
       let handlerGithub;
       try {
         handlerGithub = GitHub.fromContext(context);
+        handlerGithub.user = github;
       } catch (e) {
         // Some webhooks do not provide a GitHub instance in their context.
         handlerGithub = github;

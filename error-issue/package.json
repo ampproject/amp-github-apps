@@ -16,7 +16,9 @@
     "build:watch": "tsc -w --p tsconfig.json",
     "start": "functions-framework --target=app --source=dist",
     "dev": "nodemon",
-    "deploy-tag": "git tag 'deploy-error-issue-'`date --utc '+%Y%m%d%H%M%S'`",
+    "deploy-tag-issue": "git tag 'deploy-error-issue-'`date --utc '+%Y%m%d%H%M%S'`",
+    "deploy-tag-monitor": "git tag 'deploy-error-monitor-'`date --utc '+%Y%m%d%H%M%S'`",
+    "deploy-tag-list": "git tag 'deploy-error-list-'`date --utc '+%Y%m%d%H%M%S'`",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
@@ -27,13 +29,16 @@
     "@octokit/rest": "16.43.1",
     "@probot/serverless-gcf": "0.2.0",
     "dotenv": "8.2.0",
-    "http-status-codes": "1.4.0"
+    "google-auth-library": "6.0.0",
+    "http-status-codes": "1.4.0",
+    "node-fetch": "2.6.0"
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "1.5.1",
     "@types/express": "4.17.6",
     "@types/jest": "25.1.2",
     "@types/node": "13.7.0",
+    "@types/node-fetch": "2.5.6",
     "@typescript-eslint/eslint-plugin": "2.19.2",
     "@typescript-eslint/parser": "2.19.2",
     "eslint": "6.8.0",

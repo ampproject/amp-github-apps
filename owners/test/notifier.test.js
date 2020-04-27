@@ -193,10 +193,11 @@ describe('notifier', () => {
   describe('createNotificationComment', () => {
     let getCommentsStub;
     let notifier;
+    const botComment = {id: 42}
 
     beforeEach(() => {
-      sandbox.stub(GitHub.prototype, 'createBotComment');
-      sandbox.stub(GitHub.prototype, 'updateComment').returns();
+      sandbox.stub(GitHub.prototype, 'createBotComment').returns(botComment);
+      sandbox.stub(GitHub.prototype, 'updateComment').returns(botComment);
       getCommentsStub = sandbox.stub(GitHub.prototype, 'getBotComments');
       getCommentsStub.returns([]);
 
@@ -237,13 +238,21 @@ describe('notifier', () => {
           expect.assertions(2);
           await notifier.createNotificationComment(github);
 
-          sandbox.assert.calledOnce(github.updateComment);
           const [commentId, comment] = github.updateComment.getCall(0).args;
           expect(commentId).toEqual(42);
           expect(comment).toContain(
             'Hey @a_subscriber, these files were changed:\n```\nfoo/main.js\n```',
             'Hey @ampproject/some_team, these files were changed:\n```\nfoo/main.js\n```'
           );
+        });
+
+        it('updates team mentions with the user client', async () => {
+          expect.assertions(2);
+          await notifier.createNotificationComment(github);
+
+          const [commentId, comment] = github.updateComment.getCall(1).args;
+          expect(commentId).toEqual(42);
+          expect(comment).toContain('<!-- Edited to fix team @ mention -->');
         });
       });
 
@@ -259,6 +268,28 @@ describe('notifier', () => {
             'Hey @a_subscriber, these files were changed:\n```\nfoo/main.js\n```',
             'Hey @ampproject/some_team, these files were changed:\n```\nfoo/main.js\n```'
           );
+        });
+
+        it('updates team mentions with the user client', async () => {
+          expect.assertions(2);
+          await notifier.createNotificationComment(github);
+
+          sandbox.assert.calledOnce(github.createBotComment);
+          sandbox.assert.calledOnce(github.updateComment);
+          const [commentId, comment] = github.updateComment.getCall(0).args;
+          expect(commentId).toEqual(42);
+          expect(comment).toContain('<!-- Edited to fix team @ mention -->');
+        });
+
+        it('does not update if no team is mentioned', async done => {
+          OwnersNotifier.prototype.getOwnersToNotify.restore();
+          sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns({
+            'a_subscriber': ['foo/main.js'],
+          });
+          await notifier.createNotificationComment(github);
+
+          sandbox.assert.notCalled(github.updateComment);
+          done();
         });
       });
     });
