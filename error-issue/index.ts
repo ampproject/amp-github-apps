@@ -41,7 +41,13 @@ const lister = new ErrorMonitor(stackdriver, 2500, 40);
 /** Endpoint to create a GitHub issue for an error report. */
 export async function errorIssue(req: express.Request, res: express.Response) {
   const errorReport = req.method === 'POST' ? req.body : req.query;
-  const {errorId, firstSeen, dailyOccurrences, stacktrace} = errorReport;
+  const {
+    errorId,
+    firstSeen,
+    dailyOccurrences,
+    stacktrace,
+    linkIssue
+  } = errorReport;
 
   if (!(errorId && firstSeen && dailyOccurrences && stacktrace)) {
     res.status(statusCodes.BAD_REQUEST);
@@ -49,6 +55,7 @@ export async function errorIssue(req: express.Request, res: express.Response) {
   }
 
   console.debug(`Processing http://go/ampe/${errorId}`);
+  const shouldLinkIssue = linkIssue === '1';
   const parsedReport: ErrorReport = {
     errorId,
     firstSeen: new Date(firstSeen),
@@ -59,6 +66,9 @@ export async function errorIssue(req: express.Request, res: express.Response) {
   try {
     const issueUrl = await bot.report(parsedReport);
     res.redirect(statusCodes.MOVED_TEMPORARILY, issueUrl);
+    if (shouldLinkIssue) {
+      stackdriver.setGroupIssue(errorId, issueUrl);
+    }
   } catch (errResp) {
     console.warn(errResp);
     res.status(errResp.status || statusCodes.INTERNAL_SERVER_ERROR);
@@ -92,9 +102,11 @@ function createErrorReportUrl(report: ErrorReport) {
 export async function errorList(req: express.Request, res: express.Response) {
   try {
     const reports = await lister.newErrorsToReport();
+    const createUrl = createErrorReportUrl(report);
     res.json({
       errorReports: reports.map(report => ({
-        createUrl: createErrorReportUrl(report),
+        createUrl,
+        createAndLinkUrl: `${createUrl}&linkIssue=1`,
         ...report,
       })),
     });
