@@ -54,7 +54,10 @@ namespace GraphQL {
     changedFiles: number;
     committedDate: string;
     messageHeadline: string;
-    author: {user: null|User};
+    author: {
+      name: string;
+      user: null|User;
+    };
   }
 
   interface Blame {

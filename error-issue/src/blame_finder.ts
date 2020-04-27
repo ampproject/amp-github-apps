@@ -59,6 +59,7 @@ export class BlameFinder {
                         committedDate
                         messageHeadline
                         author {
+                          name
                           user { login }
                         }
                       }
@@ -84,13 +85,14 @@ export class BlameFinder {
     this.logger.debug(`Found ${ranges.length} blame ranges`);
 
     return (this.files[cacheKey] = ranges
-      .filter(({commit}) => commit.author.user)
       .map(({commit, startingLine, endingLine}) => ({
         path,
         startingLine,
         endingLine,
 
-        author: commit.author.user.login,
+        author: commit.author.user
+          ? `@${commit.author.user.login}`
+          : commit.author.name,
         committedDate: new Date(commit.committedDate),
         changedFiles: commit.changedFiles,
         prNumber: parsePrNumber(commit.messageHeadline),
