@@ -116,7 +116,7 @@ class OwnersNotifier {
     if (teamNotifies.length) {
       await github.user.updateComment(
         botComment.id,
-        `${body}\n<!-- Edited to fix team @mention -->`
+        `${body}\n<!-- Edited to fix team @ mention -->`
       );
     }
   }

@@ -252,7 +252,7 @@ describe('notifier', () => {
 
           const [commentId, comment] = github.updateComment.getCall(1).args;
           expect(commentId).toEqual(42);
-          expect(comment).toContain('<!-- Edited to fix team @mention -->');
+          expect(comment).toContain('<!-- Edited to fix team @ mention -->');
         });
       });
 
@@ -278,7 +278,7 @@ describe('notifier', () => {
           sandbox.assert.calledOnce(github.updateComment);
           const [commentId, comment] = github.updateComment.getCall(0).args;
           expect(commentId).toEqual(42);
-          expect(comment).toContain('<!-- Edited to fix team @mention -->');
+          expect(comment).toContain('<!-- Edited to fix team @ mention -->');
         });
 
         it('does not update if no team is mentioned', async done => {
