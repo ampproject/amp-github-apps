@@ -15,13 +15,13 @@
  */
 
 import {Channel} from '../../types';
-import {EventInput} from '@fullcalendar/core/structs/event';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
+import {MyEventInput} from './view-models';
 
 export function getAllReleasesEvents(
-  events: EventInput[],
+  events: MyEventInput[],
 ): Map<Channel, EventSourceInput> {
-  const eventInputs = new Map<Channel, EventInput[]>();
+  const eventInputs = new Map<Channel, MyEventInput[]>();
   events.forEach((event) => {
     const channelEvents = eventInputs.get(event.channel) || [];
     eventInputs.set(event.channel, [...channelEvents, event]);

@@ -15,8 +15,9 @@
  */
 
 import {Channel, Promotion} from '../../types';
+import {EventInput} from '@fullcalendar/core';
 
-export class EventInput {
+export class MyEventInput implements EventInput {
   constructor(promotion: Promotion, endDate: Date) {
     this.title = promotion.releaseName;
     this.start = promotion.date;

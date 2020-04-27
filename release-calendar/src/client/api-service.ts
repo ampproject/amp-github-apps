@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import {ApiServiceInterface, Channel, Promotion} from '../types';
-import {CurrentReleases, EventInput} from './models/view-models';
+import {Channel, Promotion} from '../types';
+import {CurrentReleases, MyEventInput} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
-export class ApiService implements ApiServiceInterface {
+export class ApiService {
   private getPromotionRequest(url: string): Promise<Promotion[]> {
     return fetch(url).then((result) => result.json());
   }
 
-  async getReleases(): Promise<EventInput[]> {
+  async getReleases(): Promise<MyEventInput[]> {
     const allPromotions = await this.getPromotionRequest(SERVER_URL);
     const map = new Map<Channel, Date>();
     return allPromotions.map((promotion: Promotion) => {
       const date = map.get(promotion.channel) || new Date();
       map.set(promotion.channel, promotion.date);
-      return new EventInput(promotion, date);
+      return new MyEventInput(promotion, date);
     });
   }
 
