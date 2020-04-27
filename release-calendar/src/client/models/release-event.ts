@@ -16,12 +16,12 @@
 
 import {Channel} from '../../types';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {MyEventInput} from './view-models';
+import {ReleaseEventInput} from './view-models';
 
 export function getAllReleasesEvents(
-  events: MyEventInput[],
+  events: ReleaseEventInput[],
 ): Map<Channel, EventSourceInput> {
-  const eventInputs = new Map<Channel, MyEventInput[]>();
+  const eventInputs = new Map<Channel, ReleaseEventInput[]>();
   events.forEach((event) => {
     const channelEvents = eventInputs.get(event.channel) || [];
     eventInputs.set(event.channel, [...channelEvents, event]);

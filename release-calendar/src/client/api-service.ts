@@ -15,7 +15,7 @@
  */
 
 import {Channel, Promotion} from '../types';
-import {CurrentReleases, MyEventInput} from './models/view-models';
+import {CurrentReleases, ReleaseEventInput} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
 
@@ -24,13 +24,13 @@ export class ApiService {
     return fetch(url).then((result) => result.json());
   }
 
-  async getReleases(): Promise<MyEventInput[]> {
+  async getReleases(): Promise<ReleaseEventInput[]> {
     const allPromotions = await this.getPromotionRequest(SERVER_URL);
     const map = new Map<Channel, Date>();
     return allPromotions.map((promotion: Promotion) => {
       const date = map.get(promotion.channel) || new Date();
       map.set(promotion.channel, promotion.date);
-      return new MyEventInput(promotion, date);
+      return new ReleaseEventInput(promotion, date);
     });
   }
 
