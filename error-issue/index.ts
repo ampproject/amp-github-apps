@@ -49,19 +49,46 @@ export async function errorIssue(req: express.Request, res: express.Response) {
     linkIssue
   } = errorReport;
 
-  if (!(errorId && firstSeen && dailyOccurrences && stacktrace)) {
+  if (!errorId) {
     res.status(statusCodes.BAD_REQUEST);
-    return res.send('Missing error report params');
+    return res.send('Missing error ID param');
   }
 
   console.debug(`Processing http://go/ampe/${errorId}`);
   const shouldLinkIssue = linkIssue === '1';
-  const parsedReport: ErrorReport = {
-    errorId,
-    firstSeen: new Date(firstSeen),
-    dailyOccurrences: parseInt(dailyOccurrences, 10),
-    stacktrace,
-  };
+
+  let parsedReport: ErrorReport;
+  if (firstSeen && dailyOccurrences && stacktrace) {
+    parsedReport = {
+      errorId,
+      firstSeen: new Date(firstSeen),
+      dailyOccurrences: Number(dailyOccurrences),
+      stacktrace,
+    };
+  } else {
+    // If only an error ID is specified, fetch the details from the API.
+    const {
+      group,
+      timedCounts,
+      firstSeenTime,
+      representative
+    } = await stackdriver.getGroup(errorId);
+
+    if (group.trackingIssues) {
+      // If the error is already tracked, redirect to the existing issue
+      return res.redirect(
+        statusCodes.MOVED_TEMPORARILY,
+        group.trackingIssues[0].url
+      );
+    }
+
+    parsedReport = {
+      errorId,
+      firstSeen: firstSeenTime,
+      dailyOccurrences: timedCounts[0].count,
+      stacktrace: representative.message,
+    };
+  }
 
   try {
     const issueUrl = await bot.report(parsedReport);
