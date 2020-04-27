@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {ApiServiceInterface, Promotion} from '../types';
+import {ApiServiceInterface, Channel, Promotion} from '../types';
 import {CurrentReleases, EventInput} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_URL = `http://localhost:3000`;
@@ -26,24 +26,12 @@ export class ApiService implements ApiServiceInterface {
 
   async getReleases(): Promise<EventInput[]> {
     const allPromotions = await this.getPromotionRequest(SERVER_URL);
-    const map = new Map();
-    allPromotions.forEach((promotion) => {
-      const channelPromotions = map.get(promotion.channel) || [];
-      map.set(promotion.channel, [...channelPromotions, promotion]);
+    const map = new Map<Channel, Date>();
+    return allPromotions.map((promotion: Promotion) => {
+      const date = map.get(promotion.channel) || new Date();
+      map.set(promotion.channel, promotion.date);
+      return new EventInput(promotion, date);
     });
-    const collect: EventInput[] = [];
-    map.forEach((promotionsInChannel: Promotion[]) => {
-      collect.push(new EventInput(promotionsInChannel[0], new Date()));
-      collect.push(
-        ...promotionsInChannel
-          .slice(1)
-          .map(
-            (promotion, i) =>
-              new EventInput(promotion, promotionsInChannel[i].date),
-          ),
-      );
-    });
-    return collect;
   }
 
   async getCurrentReleases(): Promise<CurrentReleases> {
