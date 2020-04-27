@@ -190,7 +190,6 @@ describe('BlameFinder', () => {
         );
 
       const blames = blameFinder.blameForStacktrace(stacktrace);
-
       await expect(blames).resolves.toEqual([
         {
           path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
@@ -211,6 +210,29 @@ describe('BlameFinder', () => {
           prNumber: 12450,
         },
       ]);
+    });
+
+    it('ignores commits without an associated GitHub user', async () => {
+      const stacktrace = `Error: Cannot read property 'getBoundingClientRect' of undefined
+        at el (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:58)
+        at getDimension (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:73)
+        at getCenter (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:97)
+        at getPosition (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:155)`;
+
+      nock('https://api.github.com')
+        .post('/graphql')
+        .reply(200, getGraphQLResponse('2004172112280', 'extensions/amp-base-carousel/0.1/dimensions.js'));
+
+      const blames = blameFinder.blameForStacktrace(stacktrace);
+      await expect(blames).resolves.toEqual([{
+        path: 'extensions/amp-base-carousel/0.1/dimensions.js',
+        startingLine: 58,
+        endingLine: 58,
+        author: 'rsimha',
+        committedDate: new Date('2019-05-16T14:59:15Z'),
+        changedFiles: 1623,
+        prNumber: 21212
+      }]);
     });
   });
 });
