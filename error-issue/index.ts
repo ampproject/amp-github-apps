@@ -36,6 +36,7 @@ const bot = new ErrorIssueBot(
 
 const stackdriver = new StackdriverApi(PROJECT_ID);
 const monitor = new ErrorMonitor(stackdriver);
+const lister = new ErrorMonitor(stackdriver, 2500, 40);
 
 /** Endpoint to create a GitHub issue for an error report. */
 export async function errorIssue(req: express.Request, res: express.Response) {
@@ -90,7 +91,7 @@ function createErrorReportUrl(report: ErrorReport) {
 /** Diagnostic endpoint to list new untracked errors. */
 export async function errorList(req: express.Request, res: express.Response) {
   try {
-    const reports = await monitor.newErrorsToReport();
+    const reports = await lister.newErrorsToReport();
     res.json({
       errorReports: reports.map(report => ({
         createUrl: createErrorReportUrl(report),
