@@ -19,12 +19,15 @@ import {EventInput} from '@fullcalendar/core';
 
 export class ReleaseEventInput implements EventInput {
   constructor(promotion: Promotion, endDate: Date) {
+    const endTime = new Date(endDate);
+    endTime.setDate(endTime.getDate() - 1);
     this.title = promotion.releaseName;
     this.start = promotion.date;
-    this.end = endDate;
+    this.end = endTime;
     this.className = promotion.channel;
     this.extendedProps = {
       channel: promotion.channel,
+      preciseEnd: endDate,
     };
   }
 
@@ -32,11 +35,15 @@ export class ReleaseEventInput implements EventInput {
     return this.extendedProps.channel;
   }
 
+  get perciseEnd(): Date {
+    return this.extendedProps.preciseEnd;
+  }
+
   title: string;
   start: Date;
   end: Date;
   className: Channel;
-  extendedProps: {channel: Channel};
+  extendedProps: {channel: Channel; preciseEnd: Date};
 }
 
 export class CurrentReleases {

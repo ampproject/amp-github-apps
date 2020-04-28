@@ -30,7 +30,7 @@ export class ApiService {
 
   async getRelease(requestedRelease: string): Promise<ReleaseEventInput[]> {
     const release = await this.getReleaseRequest(
-      SERVER_URL + '/release/' + requestedRelease,
+      SERVER_URL + '/releases/' + requestedRelease,
     );
     return [
       new ReleaseEventInput(release.promotions[0], new Date()),
