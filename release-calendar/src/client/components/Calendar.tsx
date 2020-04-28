@@ -15,7 +15,6 @@
  */
 
 import '../stylesheets/calendar.scss';
-import 'tippy.js/dist/tippy.css';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
@@ -24,8 +23,8 @@ import {EventCard} from './EventCard';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {getAllReleasesEvents} from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
+import Popup from 'reactjs-popup';
 import ReactDOM from 'react-dom';
-import Tippy from '@tippyjs/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
@@ -65,17 +64,13 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     view: View;
   }): void => {
     const Content = (): JSX.Element => (
-      <Tippy
-        interactive={true}
-        trigger={'click'}
-        placement={'left'}
-        arrow={false}
-        offset={[0, 5]}
-        content={
-          <EventCard event={arg.event}>{arg.event.classNames}</EventCard>
-        }>
-        <button className={'event-button'}>{arg.event.title}</button>
-      </Tippy>
+      <Popup
+        trigger={<button className={'event-button'}>{arg.event.title}</button>}
+        modal
+        closeOnDocumentClick
+        position='right center'>
+        <EventCard event={arg.event}>{arg.event.classNames}</EventCard>
+      </Popup>
     );
     ReactDOM.render(<Content />, arg.el);
   };

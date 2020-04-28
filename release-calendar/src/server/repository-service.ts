@@ -63,30 +63,8 @@ export class RepositoryService {
   }
 
   async getCurrentReleases(): Promise<Promotion[]> {
-    // return Promise.all([
-    //   this.promotionRepository
-    //     .createQueryBuilder('promotion')
-    //     .where('promotion.channel = :channel', {channel: Channel.OPT_IN_BETA})
-    //     .select('promotion.releaseName')
-    //     .groupBy('promotion.releaseName')
-    //     .addSelect('promotion.channel')
-    //     .orderBy('promotion.date', 'DESC')
-    //     .getOne(),
-    //   this.promotionRepository
-    //     .createQueryBuilder('promotion')
-    //     .where('promotion.channel = :channel', {
-    //       channel: Channel.OPT_IN_EXPERIMENTAL,
-    //     })
-    //     .select('promotion.releaseName')
-    //     .groupBy('promotion.releaseName')
-    //     .addSelect('promotion.channel')
-    //     .orderBy('promotion.date', 'DESC')
-    //     .getOne(),
-    // ]);
-
     return Promise.all(
-      Object.keys(Channel).map((channel) => {
-        console.log(channel);
+      this.channels.map((channel) => {
         return this.promotionRepository
           .createQueryBuilder('promotion')
           .where('promotion.channel = :channel', {channel})

@@ -42,7 +42,6 @@ export class ReleaseEventInput implements EventInput {
 export class CurrentReleases {
   constructor(promotions: Promotion[]) {
     this.map = new Map<Channel, string>();
-    console.log(promotions);
     promotions.forEach((promotion) => {
       this.map.set(promotion.channel, promotion.releaseName);
     });

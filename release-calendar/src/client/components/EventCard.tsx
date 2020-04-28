@@ -18,6 +18,7 @@ import '../stylesheets/eventCard.scss';
 import * as React from 'react';
 import {Channel} from '../../types';
 import {EventApi} from '@fullcalendar/core';
+import moment from 'moment';
 
 export interface EventCardProps {
   event: EventApi;
@@ -33,6 +34,7 @@ export class EventCard extends React.Component<EventCardProps, {}> {
     {channel: Channel.NIGHTLY, title: 'Nightly'},
     {channel: Channel.LTS, title: 'Long Term Stable'},
   ];
+
   render(): JSX.Element {
     return (
       <>
@@ -40,10 +42,16 @@ export class EventCard extends React.Component<EventCardProps, {}> {
           <br className={this.props.event.classNames[0]}></br>
         </div>
         <div className={'event-content'}>
-          <div className={'channel'}>
-            {this.props.event.extendedProps.isRollback} //change to channel and
-            then change to readable form
-          </div>
+          <div>{this.props.event.title}</div>
+          <div>{moment(this.props.event.start).format('LT')}</div>
+          <div>{moment(this.props.event.end).format('LT')}</div>
+          <a
+            href={
+              'https://github.com/ampproject/amphtml/releases/tag/' +
+              this.props.event.title
+            }>
+            {'to the github release body..'}
+          </a>
         </div>
       </>
     );
