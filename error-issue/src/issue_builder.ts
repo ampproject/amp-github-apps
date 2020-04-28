@@ -79,7 +79,7 @@ export class IssueBuilder {
     prNumber,
   }: BlameRange): string {
     return (
-      `\`@${author}\` modified \`${path}:${startingLine}-${endingLine}\`` +
+      `\`${author}\` modified \`${path}:${startingLine}-${endingLine}\`` +
       ` in #${prNumber} (${formatDate(committedDate)})`
     );
   }
@@ -91,19 +91,22 @@ export class IssueBuilder {
       return [];
     }
 
-    return (
-      this.blames
-        // Ignore large PRs like refactors and Prettier formatting.
-        .filter(({changedFiles}) => changedFiles <= MAX_CHANGED_FILES)
-        // Ignore PRs from before the issue first appeared.
-        .filter(({committedDate}) => committedDate < this.firstSeen)
-        // Ignore lines in the stacktrace from error throwing/logging.
-        .filter(({path}) => !ERROR_HANDLING_FILES.includes(path))
-        // Suggest most recent editors first.
-        .sort((a, b) => (a.committedDate < b.committedDate ? 1 : -1))
-        .map(({author}) => author)
-        .slice(0, limit)
-    );
+    return Array.from(
+      new Set(
+        this.blames
+          // Ignore large PRs like refactors and Prettier formatting.
+          .filter(({changedFiles}) => changedFiles <= MAX_CHANGED_FILES)
+          // Ignore PRs from before the issue first appeared.
+          .filter(({committedDate}) => committedDate < this.firstSeen)
+          // Ignore lines in the stacktrace from error throwing/logging.
+          .filter(({path}) => !ERROR_HANDLING_FILES.includes(path))
+          // Ignore blames from commits without an associated GitHub user.
+          .filter(({author}) => author.startsWith('@'))
+          // Suggest most recent editors first.
+          .sort((a, b) => (a.committedDate < b.committedDate ? 1 : -1))
+          .map(({author}) => author)
+      )
+    ).slice(0, limit);
   }
 
   get bodyNotes(): string {
@@ -112,7 +115,7 @@ export class IssueBuilder {
     }
 
     const possibleAssignees = this.possibleAssignees()
-      .map(a => `\`@${a}\``)
+      .map(a => `\`${a}\``)
       .join(', ');
     const notes = ['Notes', '---']
       .concat(this.blames.map(blame => this.blameMessage(blame)))

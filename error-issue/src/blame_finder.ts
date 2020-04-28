@@ -59,6 +59,7 @@ export class BlameFinder {
                         committedDate
                         messageHeadline
                         author {
+                          name
                           user { login }
                         }
                       }
@@ -83,18 +84,20 @@ export class BlameFinder {
     const {ranges} = repository.ref.target.blame;
     this.logger.debug(`Found ${ranges.length} blame ranges`);
 
-    return (this.files[cacheKey] = ranges
-      .filter(({commit}) => commit.author.user)
-      .map(({commit, startingLine, endingLine}) => ({
+    return (this.files[cacheKey] = ranges.map(
+      ({commit, startingLine, endingLine}) => ({
         path,
         startingLine,
         endingLine,
 
-        author: commit.author.user.login,
+        author: commit.author.user
+          ? `@${commit.author.user.login}`
+          : commit.author.name,
         committedDate: new Date(commit.committedDate),
         changedFiles: commit.changedFiles,
         prNumber: parsePrNumber(commit.messageHeadline),
-      })));
+      })
+    ));
   }
 
   /** Fetches the blame range for a line of a file. */
@@ -113,9 +116,14 @@ export class BlameFinder {
   async blameForStacktrace(stacktrace: string): Promise<Array<BlameRange>> {
     const stackFrames = parseStacktrace(stacktrace);
     // Note: The GraphQL client wrapper will handle debouncing API requests.
-    const blames = await Promise.all(
-      stackFrames.map(async frame => this.blameForLine(frame))
-    );
+    const blames = [];
+    for (const frame of stackFrames) {
+      try {
+        blames.push(await this.blameForLine(frame));
+      } catch {
+        // Ignore lines with no blame info.
+      }
+    }
 
     return blames.filter(({prNumber}) => prNumber);
   }
