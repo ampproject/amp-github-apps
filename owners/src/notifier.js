@@ -85,15 +85,20 @@ class OwnersNotifier {
     const notifies = this.getOwnersToNotify();
     delete notifies[this.pr.author];
 
-    const fileNotifyComments = Object.entries(
-      notifies
-    ).map(([name, filenames]) =>
-      [
-        `Hey @${name}, these files were changed:`,
-        '```',
-        ...filenames,
-        '```',
-      ].join('\n')
+    const filenameLists = {};
+    Object.entries(notifies).forEach(([name, filenames]) => {
+      const list = ['```', ...filenames, '```'].join('\n');
+      if (list in filenameLists) {
+        filenameLists[list].push(name);
+      } else {
+        filenameLists[list] = [name];
+      }
+    });
+    const fileNotifyComments = Object.entries(filenameLists).map(
+      ([filenameList, names]) => {
+        const nameList = names.map(n => `@${n}`).join(', ');
+        return `Hey ${nameList}! These files were changed:\n${filenameList}`;
+      }
     );
 
     if (!fileNotifyComments.length) {
