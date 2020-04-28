@@ -28,16 +28,6 @@ export class RepositoryService {
     this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
-  channels = [
-    Channel.LTS,
-    Channel.NIGHTLY,
-    Channel.OPT_IN_BETA,
-    Channel.OPT_IN_EXPERIMENTAL,
-    Channel.PERCENT_BETA,
-    Channel.PERCENT_EXPERIMENTAL,
-    Channel.STABLE,
-  ];
-
   getRelease(name: string): Promise<Release> {
     const releaseQuery = this.releaseRepository
       .createQueryBuilder('release')
@@ -64,7 +54,15 @@ export class RepositoryService {
 
   async getCurrentReleases(): Promise<Promotion[]> {
     return Promise.all(
-      Object.keys(Channel).map((channel) => {
+      [
+        Channel.LTS,
+        Channel.NIGHTLY,
+        Channel.OPT_IN_BETA,
+        Channel.OPT_IN_EXPERIMENTAL,
+        Channel.PERCENT_BETA,
+        Channel.PERCENT_EXPERIMENTAL,
+        Channel.STABLE,
+      ].map((channel) => {
         return this.promotionRepository
           .createQueryBuilder('promotion')
           .where('promotion.channel = :channel', {channel})
