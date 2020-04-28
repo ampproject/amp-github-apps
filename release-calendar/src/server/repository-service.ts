@@ -59,7 +59,7 @@ export class RepositoryService {
 
   async getCurrentReleases(): Promise<Promotion[]> {
     return Promise.all(
-      Object.keys(Channel).map((channel) => {
+      this.channels.map((channel) => {
         return this.promotionRepository
           .createQueryBuilder('promotion')
           .where('promotion.channel = :channel', {channel})
