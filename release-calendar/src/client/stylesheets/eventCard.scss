@@ -1,0 +1,22 @@
+@use 'base';
+
+.event-top{
+    background-color: base.$lts;
+    width: 190px;
+    position: relative;
+    float: top;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.channel {
+    color: black;
+    float: bottom;
+}
+
+.event-content {
+    overflow: hidden;
+    padding: .5em;
+}

@@ -20,6 +20,7 @@ import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {EventApi, View} from '@fullcalendar/core';
+import {EventCard} from './EventCard';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {getAllReleasesEvents} from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
@@ -70,8 +71,9 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
         placement={'left'}
         arrow={false}
         offset={[0, 5]}
-        //TODO: decide on the content of each tooltip and create component for it
-        content={<div>{arg.event.classNames}</div>}>
+        content={
+          <EventCard event={arg.event}>{arg.event.classNames}</EventCard>
+        }>
         <button className={'event-button'}>{arg.event.title}</button>
       </Tippy>
     );
