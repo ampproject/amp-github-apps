@@ -193,7 +193,7 @@ describe('notifier', () => {
   describe('createNotificationComment', () => {
     let getCommentsStub;
     let notifier;
-    const botComment = {id: 42}
+    const botComment = {id: 42};
 
     beforeEach(() => {
       sandbox.stub(GitHub.prototype, 'createBotComment').returns(botComment);
@@ -242,7 +242,7 @@ describe('notifier', () => {
           expect(commentId).toEqual(42);
           expect(comment).toContain(
             'Hey @a_subscriber, @ampproject/some_team! ' +
-            'These files were changed:\n```\nfoo/main.js\n```',
+              'These files were changed:\n```\nfoo/main.js\n```'
           );
         });
 
@@ -266,7 +266,7 @@ describe('notifier', () => {
           expect(prNumber).toEqual(1337);
           expect(comment).toContain(
             'Hey @a_subscriber, @ampproject/some_team! ' +
-            'These files were changed:\n```\nfoo/main.js\n```',
+              'These files were changed:\n```\nfoo/main.js\n```'
           );
         });
 

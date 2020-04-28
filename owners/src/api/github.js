@@ -383,7 +383,7 @@ class GitHub {
       {body}
     );
 
-    return data
+    return data;
   }
 
   /**

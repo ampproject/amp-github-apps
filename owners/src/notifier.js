@@ -94,10 +94,12 @@ class OwnersNotifier {
         filenameLists[list] = [name];
       }
     });
-    const fileNotifyComments = Object.entries(filenameLists).map(([filenameList, names]) => {
-      const nameList = names.map(n => `@${n}`).join(', ');
-      return `Hey ${nameList}! These files were changed:\n${filenameList}`;
-    });
+    const fileNotifyComments = Object.entries(filenameLists).map(
+      ([filenameList, names]) => {
+        const nameList = names.map(n => `@${n}`).join(', ');
+        return `Hey ${nameList}! These files were changed:\n${filenameList}`;
+      }
+    );
 
     if (!fileNotifyComments.length) {
       return;
