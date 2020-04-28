@@ -20,7 +20,7 @@ import {EventInput} from '@fullcalendar/core';
 export class ReleaseEventInput implements EventInput {
   constructor(promotion: Promotion, endDate: Date) {
     const dayPriorToEnd = new Date(endDate);
-    dayPriorToEnd.setDate(dayPriorToEnd.getDate() - 1);
+    dayPriorToEnd.setDate(endDate.getDate() - 1);
     this.title = promotion.releaseName;
     this.start = promotion.date;
     this.end = dayPriorToEnd;
