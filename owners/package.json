@@ -11,6 +11,8 @@
   "scripts": {
     "init": "node scripts/warm_cache.js",
     "dev": "node info_server.js",
+    "lint": "eslint .",
+    "fix": "eslint . --fix",
     "start": "probot run ./index.js",
     "deploy-tag": "git tag 'deploy-owners-'`date --utc '+%Y%m%d%H%M%S'`",
     "test": "jest",
