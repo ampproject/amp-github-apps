@@ -62,7 +62,7 @@ const jsConfig = (...childConfigs) => merge.all([
       'no-throw-literal': 'error',
       'no-undef': 'error',
       'no-unused-expressions': 'error',
-      'no-unused-vars': 'error',
+      'no-unused-vars': ['error', { 'argsIgnorePattern': "^(_$|unused)"}],
       'no-useless-call': 'error',
       'no-useless-concat': 'error',
       'no-var': 'error',
