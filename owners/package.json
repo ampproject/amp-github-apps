@@ -12,7 +12,10 @@
     "init": "node scripts/warm_cache.js",
     "dev": "node info_server.js",
     "lint": "eslint .",
+<<<<<<< HEAD
     "fix": "eslint . --fix",
+=======
+>>>>>>> 24eba7b... Inherit config for owners bot
     "start": "probot run ./index.js",
     "deploy-tag": "git tag 'deploy-owners-'`date --utc '+%Y%m%d%H%M%S'`",
     "test": "jest",
@@ -32,8 +35,13 @@
     "sleep-promise": "8.0.1"
   },
   "devDependencies": {
+    "deepmerge": "4.2.2",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.11.0",
+    "eslint-plugin-prettier": "3.1.3",
     "jest": "25.2.4",
     "nock": "12.0.3",
+    "prettier": "2.0.5",
     "sinon": "9.0.1",
     "smee-client": "1.1.0",
     "supertest": "4.0.2"
