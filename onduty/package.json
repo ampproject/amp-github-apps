@@ -62,6 +62,9 @@
       "<rootDir>/build/"
     ],
     "preset": "ts-jest",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/jest-preload.ts"
+    ],
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "<rootDir>/node_modules/",
