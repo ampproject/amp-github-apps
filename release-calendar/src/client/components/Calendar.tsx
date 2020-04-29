@@ -22,14 +22,46 @@ import {EventApi, View} from '@fullcalendar/core';
 import {EventCard} from './EventCard';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {getAllReleasesEvents} from '../models/release-event';
+import {usePopper} from 'react-popper';
 import FullCalendar from '@fullcalendar/react';
-import Popup from 'reactjs-popup';
 import ReactDOM from 'react-dom';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
 const CALENDAR_CONTENT_HEIGHT = 480;
 const EVENT_LIMIT_DISPLAYED = 3;
+
+const Example = (children: {event: EventApi}): JSX.Element => {
+  const [referenceElement, setReferenceElement] = React.useState(null);
+  const [popperElement, setPopperElement] = React.useState(null);
+  const {styles, attributes} = usePopper(referenceElement, popperElement, {
+    placement: 'left',
+    strategy: 'fixed',
+    modifiers: [
+      {
+        name: 'offset',
+        options: {
+          offset: [0, 5],
+        },
+      },
+    ],
+  });
+
+  return (
+    <>
+      <button className={'event-button'} ref={setReferenceElement}>
+        {children.event.title}
+      </button>
+
+      {/* {ReactDOM.createPortal( */}
+      <div ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+        <EventCard event={children.event}></EventCard>
+      </div>
+      {/* document.querySelector('#app'),
+      )} */}
+    </>
+  );
+};
 
 export interface CalendarProps {
   channels: Channel[];
@@ -63,15 +95,9 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     el: HTMLElement;
     view: View;
   }): void => {
-    const Content = (): JSX.Element => (
-      <Popup
-        trigger={<button className={'event-button'}>{arg.event.title}</button>}
-        modal
-        closeOnDocumentClick
-        position='right center'>
-        <EventCard event={arg.event}>{arg.event.classNames}</EventCard>
-      </Popup>
-    );
+    const Content = (): JSX.Element => {
+      return <Example event={arg.event}></Example>;
+    };
     ReactDOM.render(<Content />, arg.el);
   };
 
@@ -79,6 +105,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     const displayEvents: EventSourceInput[] = this.props.channels
       .filter((channel) => this.state.events.has(channel))
       .map((channel) => this.state.events.get(channel));
+
     return (
       <div className='calendar'>
         <FullCalendar

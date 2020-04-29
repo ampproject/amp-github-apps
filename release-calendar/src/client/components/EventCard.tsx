@@ -37,7 +37,7 @@ export class EventCard extends React.Component<EventCardProps, {}> {
 
   render(): JSX.Element {
     return (
-      <>
+      <div className={'event-card'}>
         <div className={'event-top'}>
           <br className={this.props.event.classNames[0]}></br>
         </div>
@@ -53,7 +53,7 @@ export class EventCard extends React.Component<EventCardProps, {}> {
             {'to the github release body..'}
           </a>
         </div>
-      </>
+      </div>
     );
   }
 }

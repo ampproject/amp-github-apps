@@ -1,0 +1,548 @@
+{
+  "data": {
+    "repository": {
+      "ref": {
+        "target": {
+          "blame": {
+            "ranges": [
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2019-01-10T20:42:35Z",
+                  "messageHeadline": "✨Initial skeleton of amp-carousel v2. (#20228)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 1,
+                "endingLine": 16
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-01-22T21:07:37Z",
+                  "messageHeadline": "Additional logic for carousel v2. (#20439)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 17,
+                "endingLine": 17
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-03-05T18:40:35Z",
+                  "messageHeadline": "Make changes to support `<amp-inline-gallery>`. (#21194)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 18,
+                "endingLine": 18
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2019-01-16T22:58:16Z",
+                  "messageHeadline": "Carousel v2: add logic for spacers for looping. (#20293)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 19,
+                "endingLine": 19
+              },
+              {
+                "commit": {
+                  "changedFiles": 6,
+                  "committedDate": "2019-01-10T20:42:35Z",
+                  "messageHeadline": "✨Initial skeleton of amp-carousel v2. (#20228)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 20,
+                "endingLine": 34
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2019-01-16T22:58:16Z",
+                  "messageHeadline": "Carousel v2: add logic for spacers for looping. (#20293)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 35,
+                "endingLine": 57
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "name": "Raghu Simha",
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 58,
+                "endingLine": 58
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2019-01-16T22:58:16Z",
+                  "messageHeadline": "Carousel v2: add logic for spacers for looping. (#20293)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 59,
+                "endingLine": 66
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 67,
+                "endingLine": 86
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-11-07T20:28:53Z",
+                  "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 87,
+                "endingLine": 99
+              },
+              {
+                "commit": {
+                  "changedFiles": 3,
+                  "committedDate": "2019-01-16T22:58:16Z",
+                  "messageHeadline": "Carousel v2: add logic for spacers for looping. (#20293)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 100,
+                "endingLine": 111
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 112,
+                "endingLine": 112
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-01-22T21:07:37Z",
+                  "messageHeadline": "Additional logic for carousel v2. (#20439)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 113,
+                "endingLine": 122
+              },
+              {
+                "commit": {
+                  "changedFiles": 4,
+                  "committedDate": "2019-03-05T18:40:35Z",
+                  "messageHeadline": "Make changes to support `<amp-inline-gallery>`. (#21194)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 123,
+                "endingLine": 127
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-01-22T21:07:37Z",
+                  "messageHeadline": "Additional logic for carousel v2. (#20439)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 128,
+                "endingLine": 137
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-11-07T20:28:53Z",
+                  "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 138,
+                "endingLine": 158
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-01-22T21:07:37Z",
+                  "messageHeadline": "Additional logic for carousel v2. (#20439)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 159,
+                "endingLine": 173
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "name": "Raghu Simha",
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 174,
+                "endingLine": 179
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-11-07T20:28:53Z",
+                  "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 180,
+                "endingLine": 180
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-01-22T21:07:37Z",
+                  "messageHeadline": "Additional logic for carousel v2. (#20439)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 181,
+                "endingLine": 187
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-11-07T20:28:53Z",
+                  "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 188,
+                "endingLine": 188
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-01-22T21:07:37Z",
+                  "messageHeadline": "Additional logic for carousel v2. (#20439)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 189,
+                "endingLine": 201
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 202,
+                "endingLine": 209
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "name": "Raghu Simha",
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 210,
+                "endingLine": 210
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 211,
+                "endingLine": 212
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "name": "Raghu Simha",
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 213,
+                "endingLine": 213
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 214,
+                "endingLine": 223
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "name": "Raghu Simha",
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 224,
+                "endingLine": 224
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 225,
+                "endingLine": 225
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "name": "Raghu Simha",
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 226,
+                "endingLine": 226
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 227,
+                "endingLine": 245
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-11-07T20:28:53Z",
+                  "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 246,
+                "endingLine": 248
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 249,
+                "endingLine": 249
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-11-07T20:28:53Z",
+                  "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 250,
+                "endingLine": 256
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 257,
+                "endingLine": 257
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-11-07T20:28:53Z",
+                  "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 258,
+                "endingLine": 258
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 259,
+                "endingLine": 259
+              },
+              {
+                "commit": {
+                  "changedFiles": 1623,
+                  "committedDate": "2019-05-16T14:59:15Z",
+                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "author": {
+                    "name": "Raghu Simha",
+                    "user": {
+                      "login": "rsimha"
+                    }
+                  }
+                },
+                "startingLine": 260,
+                "endingLine": 262
+              },
+              {
+                "commit": {
+                  "changedFiles": 5,
+                  "committedDate": "2019-11-07T20:28:53Z",
+                  "messageHeadline": "🐛♻️Refactor, changes to amp-base-carousel for amp-inline-gallery. (#2…",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 263,
+                "endingLine": 263
+              },
+              {
+                "commit": {
+                  "changedFiles": 2,
+                  "committedDate": "2019-01-17T22:56:30Z",
+                  "messageHeadline": "Add additional carousel v2 logic. (#20389)",
+                  "author": {
+                    "name": "Sepand Parhami",
+                    "user": null
+                  }
+                },
+                "startingLine": 264,
+                "endingLine": 266
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

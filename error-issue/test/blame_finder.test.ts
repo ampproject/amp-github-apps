@@ -111,7 +111,7 @@ describe('BlameFinder', () => {
         startingLine: 1,
         endingLine: 16,
 
-        author: 'wassgha',
+        author: '@wassgha',
         committedDate: new Date('2019-12-10T07:48:41Z'),
         changedFiles: 11,
         prNumber: 25636,
@@ -135,7 +135,7 @@ describe('BlameFinder', () => {
         startingLine: 784,
         endingLine: 788,
 
-        author: 'wassgha',
+        author: '@wassgha',
         committedDate: new Date('2020-02-28T23:59:08Z'),
         changedFiles: 24,
         prNumber: 26841,
@@ -190,13 +190,12 @@ describe('BlameFinder', () => {
         );
 
       const blames = blameFinder.blameForStacktrace(stacktrace);
-
       await expect(blames).resolves.toEqual([
         {
           path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
           startingLine: 396,
           endingLine: 439,
-          author: 'xymw',
+          author: '@xymw',
           committedDate: new Date('2018-11-12T21:22:43.000Z'),
           changedFiles: 15,
           prNumber: 17939,
@@ -205,10 +204,50 @@ describe('BlameFinder', () => {
           path: 'src/event-helper-listen.js',
           startingLine: 57,
           endingLine: 59,
-          author: 'rsimha',
+          author: '@rsimha',
           committedDate: new Date('2017-12-13T23:56:40.000Z'),
           changedFiles: 340,
           prNumber: 12450,
+        },
+      ]);
+    });
+
+    it('ignores commits without an associated GitHub user', async () => {
+      const stacktrace = `Error: Cannot read property 'getBoundingClientRect' of undefined
+        at el (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:58)
+        at getDimension (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:73)
+        at getCenter (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:97)
+        at getPosition (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:155)`;
+
+      nock('https://api.github.com')
+        .post('/graphql')
+        .reply(
+          200,
+          getGraphQLResponse(
+            '2004172112280',
+            'extensions/amp-base-carousel/0.1/dimensions.js'
+          )
+        );
+
+      const blames = blameFinder.blameForStacktrace(stacktrace);
+      await expect(blames).resolves.toEqual([
+        {
+          path: 'extensions/amp-base-carousel/0.1/dimensions.js',
+          startingLine: 58,
+          endingLine: 58,
+          author: '@rsimha',
+          committedDate: new Date('2019-05-16T14:59:15Z'),
+          changedFiles: 1623,
+          prNumber: 21212,
+        },
+        {
+          path: 'extensions/amp-base-carousel/0.1/dimensions.js',
+          startingLine: 67,
+          endingLine: 86,
+          author: 'Sepand Parhami',
+          committedDate: new Date('2019-01-17T22:56:30Z'),
+          changedFiles: 2,
+          prNumber: 20389,
         },
       ]);
     });

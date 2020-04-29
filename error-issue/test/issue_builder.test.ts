@@ -37,7 +37,7 @@ describe('IssueBuilder', () => {
       path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
       startingLine: 396,
       endingLine: 439,
-      author: 'xymw',
+      author: '@xymw',
       committedDate: new Date('2018-11-12T21:22:43.000Z'),
       changedFiles: 15,
       prNumber: 17939,
@@ -46,7 +46,7 @@ describe('IssueBuilder', () => {
       path: 'src/event-helper-listen.js',
       startingLine: 57,
       endingLine: 59,
-      author: 'rsimha',
+      author: '@rsimha',
       committedDate: new Date('2017-12-13T23:56:40.000Z'),
       changedFiles: 340,
       prNumber: 12450,
@@ -104,29 +104,29 @@ describe('IssueBuilder', () => {
       prNumber: 1337,
     });
     const blames = [
-      fakeBlame('src/error.js', 'log_author', 'Jan 1, 2020', 15),
-      fakeBlame('src/log.js', 'log_author', 'Jan 1, 2020', 15),
-      fakeBlame('dom.js', 'recent_author', 'Apr 1, 2020', 4),
-      fakeBlame('src/chunk.js', 'older_author', 'Nov 1, 2019', 2),
-      fakeBlame('src/chunk.js', 'relevant_author', 'Dec 1, 2019', 2),
-      fakeBlame('src/chunk.js', 'first_author', 'Oct 1, 2019', 2),
-      fakeBlame('src/chunk.js', 'refactor_author', 'Dec 1, 2019', 340),
+      fakeBlame('src/error.js', '@log_author', 'Jan 1, 2020', 15),
+      fakeBlame('src/log.js', '@log_author', 'Jan 1, 2020', 15),
+      fakeBlame('dom.js', 're@cent_author', 'Apr 1, 2020', 4),
+      fakeBlame('src/chunk.js', '@older_author', 'Nov 1, 2019', 2),
+      fakeBlame('src/chunk.js', '@relevant_author', 'Dec 1, 2019', 2),
+      fakeBlame('src/chunk.js', '@first_author', 'Oct 1, 2019', 2),
+      fakeBlame('src/chunk.js', '@refactor_author', 'Dec 1, 2019', 340),
     ];
 
     it('returns authors of most recent relevant PRs sorted by recency', () => {
       builder = new IssueBuilder(report, blames);
       expect(builder.possibleAssignees(3)).toEqual([
-        'relevant_author',
-        'older_author',
-        'first_author',
+        '@relevant_author',
+        '@older_author',
+        '@first_author',
       ]);
     });
 
     it('limits the number of suggestions', () => {
       builder = new IssueBuilder(report, blames);
       expect(builder.possibleAssignees()).toEqual([
-        'relevant_author',
-        'older_author',
+        '@relevant_author',
+        '@older_author',
       ]);
     });
 

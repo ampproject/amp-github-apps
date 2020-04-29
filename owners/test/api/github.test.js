@@ -485,7 +485,7 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .post('/repos/test_owner/test_repo/issues/24574/comments')
-        .reply(200, { id: 1337 });
+        .reply(200, {id: 1337});
 
       const {id} = await github.createBotComment(24574, 'test comment');
       expect(id).toEqual(1337);
@@ -508,10 +508,10 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .patch('/repos/test_owner/test_repo/issues/comments/24574')
-        .reply(200, { id: 1337 });
+        .reply(200, {id: 1337});
 
       const {id} = await github.updateComment(24574, 'updated comment');
-      expect(id).toEqual(1337)
+      expect(id).toEqual(1337);
     });
   });
 
