@@ -25,7 +25,8 @@
     "@octokit/auth": "1.1.1",
     "@octokit/rest": "16.43.1",
     "@probot/serverless-gcf": "0.2.0",
-    "dotenv": "8.2.0"
+    "dotenv": "8.2.0",
+    "sleep-promise": "8.0.1"
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "1.5.1",
