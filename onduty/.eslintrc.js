@@ -18,7 +18,12 @@ const path = require('path');
 
 module.exports = {
   "root": true,
-  "plugins": ["@typescript-eslint", "prettier"],
+  "plugins": [
+    "@typescript-eslint",
+    "notice",
+    "prettier",
+    "sort-imports-es6-autofix"
+  ],
   "extends": [
     "prettier/@typescript-eslint",
     "plugin:prettier/recommended"
@@ -39,7 +44,6 @@ module.exports = {
     "ecmaFeatures": {
       "modules": true
     },
-    "useJSXTextNode": true,
     "project": path.resolve(__dirname, './tsconfig.json')
   },
   "rules": {
@@ -68,8 +72,26 @@ module.exports = {
     "no-useless-concat": 2,
     "no-undef": 2,
     "no-warning-comments": [2, { "terms": ["do not submit"], "location": "anywhere" }],
+    'notice/notice': [
+      'error',
+      {
+        'mustMatch': 'Copyright 20\\d{2} The AMP HTML Authors\\.',
+        'templateFile': path.resolve(__dirname, '../build-system/LICENSE-TEMPLATE.txt'),
+        'messages': {
+          'whenFailedToMatch': 'Missing or incorrect license header'
+        }
+      }
+    ],
     "prefer-const": 2,
     "radix": 2,
+    'sort-imports-es6-autofix/sort-imports-es6': [
+      'error',
+      {
+        'ignoreCase': false,
+        'ignoreMemberSort': false,
+        'memberSyntaxSortOrder': ['none', 'all', 'multiple', 'single']
+      }
+    ],
     "@typescript-eslint/no-unused-vars": 2,
     "@typescript-eslint/promise-function-async": 2
   }

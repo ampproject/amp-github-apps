@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 The AMP HTML Authors.
+ * Copyright 2020 The AMP HTML Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
 
 import express from 'express';
 
-module.exports.refreshRotation = (req: express.Request, res: express.Response) => {
+module.exports.refreshRotation = (
+  req: express.Request,
+  res: express.Response
+) => {
   // TODO(#778): Update GitHub teams based on rotations.
   res.send('Triggered `reportRotation`');
 };
