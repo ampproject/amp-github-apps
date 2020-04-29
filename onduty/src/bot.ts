@@ -35,10 +35,6 @@ export class OndutyBot {
 
   async updateRotation(type: RotationType, rotation: Rotation): Promise<void> {
     const teamName = this.rotationTeams[type];
-    if (!teamName) {
-      this.logger.error(`[updateRotation] Missing ${type} rotation team`);
-      return;
-    }
     this.logger.info('[updateRotation] Updating ${type} rotation');
 
     const members = await this.github.getTeamMembers(teamName);
@@ -55,6 +51,12 @@ export class OndutyBot {
     for (const oldMember of oldMembers) {
       await this.github.removeFromTeam(teamName, oldMember);
       await sleep(API_RATE_LIMIT_MS);
+    }
+  }
+
+  async handleUpdate(update: RotationUpdate) {
+    for (const [type, rotation] of Object.entries(update)) {
+      await this.updateRotation(type as RotationType, rotation);
     }
   }
 }

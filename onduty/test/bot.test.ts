@@ -51,7 +51,7 @@ describe('OndutyBot', () => {
     jest.spyOn(github, 'addToTeam').mockResolvedValue(undefined);
     jest.spyOn(github, 'removeFromTeam').mockResolvedValue(undefined);
 
-    bot = new OndutyBot(github, rotationTeams);
+    bot = new OndutyBot(github, rotationTeams, fakeConsole);
   });
 
   describe('updateRotation', () => {
@@ -81,6 +81,28 @@ describe('OndutyBot', () => {
         'build-team',
         'builder-old-primary'
       );
+    });
+  });
+
+  describe('handleUpdates', () => {
+    beforeEach(() => {
+      mocked(github.getTeamMembers)
+        .mockResolvedValueOnce(['builder-old-primary', 'builder-primary'])
+        .mockResolvedValueOnce(['releaser-old-primary', 'releaser-primary']);
+    });
+
+    it('updates each rotation', async () => {
+      jest.spyOn(bot, 'updateRotation');
+      await bot.handleUpdate(rotations);
+
+      expect(bot.updateRotation).toHaveBeenCalledWith('build-cop', {
+        primary: 'builder-primary',
+        secondary: 'builder-secondary',
+      });
+      expect(bot.updateRotation).toHaveBeenCalledWith('release-on-duty', {
+        primary: 'releaser-primary',
+        secondary: 'releaser-secondary',
+      });
     });
   });
 });
