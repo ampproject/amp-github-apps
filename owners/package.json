@@ -12,10 +12,7 @@
     "init": "node scripts/warm_cache.js",
     "dev": "node info_server.js",
     "lint": "eslint .",
-<<<<<<< HEAD
     "fix": "eslint . --fix",
-=======
->>>>>>> 24eba7b... Inherit config for owners bot
     "start": "probot run ./index.js",
     "deploy-tag": "git tag 'deploy-owners-'`date --utc '+%Y%m%d%H%M%S'`",
     "test": "jest",
