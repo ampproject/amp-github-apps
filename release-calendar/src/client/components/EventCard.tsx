@@ -16,15 +16,37 @@
 
 import '../stylesheets/eventCard.scss';
 import * as React from 'react';
+import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {EventApi} from '@fullcalendar/core';
+import {ReleaseDates} from '../models/view-models';
 import moment from 'moment';
 
 export interface EventCardProps {
   eventApi: EventApi;
 }
 
-export class EventCard extends React.Component<EventCardProps, {}> {
+interface EventCardState {
+  releaseDates: ReleaseDates[];
+}
+
+export class EventCard extends React.Component<EventCardProps, EventCardState> {
+  private apiService: ApiService;
+
+  constructor(props: Readonly<EventCardProps>) {
+    super(props);
+    this.state = {
+      releaseDates: [],
+    };
+    this.apiService = new ApiService();
+  }
+  async componentDidMount(): Promise<void> {
+    const releaseDates: ReleaseDates[] = await this.apiService.getReleaseDates(
+      this.props.eventApi.title,
+    );
+    this.setState({releaseDates});
+  }
+
   schedule = [
     {
       channel: Channel.NIGHTLY,
@@ -70,52 +92,67 @@ export class EventCard extends React.Component<EventCardProps, {}> {
         <div className={this.props.eventApi.classNames[0]}>
           <div className={'event-top'}></div>
           <div className={'event-content'}>
-            <h2 className={'title-row'}>{this.props.eventApi.title}</h2>
-            {isCherryPick && (
-              <div className={'content-row'}>
-                <div className={'icon'}>
-                  <span role='img' aria-label={'flower'}>
-                    {'🌸'}
-                  </span>
-                </div>
-                <div className={'text'}>{'Cherrypick!'}</div>
-              </div>
-            )}
-            <div className={'content-row'}>
-              <div className={'icon'}>
-                <span role='img' aria-label={'laptop'}>
-                  {'🖥'}
+            <div className='content-row'>
+              <div className={'big-emoji'}>
+                <span role='img' aria-label={'train'}>
+                  {'🚄'}
                 </span>
               </div>
-              <div className={'text'}>
-                <a
-                  href={
-                    'https://github.com/ampproject/amphtml/releases/tag/' +
-                    this.props.eventApi.title
-                  }
-                  target='_blank'
-                  rel='noopener noreferrer'>
-                  {'Github Release'}
-                </a>
-              </div>
+              <h2
+                className={
+                  'title-row'
+                }>{`Release ${this.props.eventApi.title}`}</h2>
             </div>
-            <h3 className={'title-row'}>{'Schedule'}</h3>
-            {this.schedule.map((row) => {
-              return (
-                <div className={'content-row'} key={row.emoji}>
-                  <div className={'icon'}>
-                    <span role='img' aria-label={'row.emojiName'}>
-                      {row.emoji}
+            <div className='content-content'>
+              {isCherryPick && (
+                <div className={'content-row'}>
+                  <div className={'emoji'}>
+                    <span role='img' aria-label={'flower'}>
+                      {'🌸'}
                     </span>
                   </div>
-                  <div className={'text'}>
-                    {row.text +
-                      //TODO: add date of promotion
-                      moment(this.props.eventApi.end).format('MMMM Do, hA')}
-                  </div>
+                  <div className={'text'}>{'Cherrypick!'}</div>
                 </div>
-              );
-            })}
+              )}
+              <div className={'content-row'}>
+                <div className={'emoji'}>
+                  <span role='img' aria-label={'laptop'}>
+                    {'🖥'}
+                  </span>
+                </div>
+                <div className={'text'}>
+                  <a
+                    href={`https://github.com/ampproject/amphtml/releases/tag/${this.props.eventApi.title}`}
+                    target='_blank'
+                    rel='noopener noreferrer'>
+                    {'Github Release'}
+                  </a>
+                </div>
+              </div>
+              <h3 className={'subtitle-row'}>{'Schedule'}</h3>
+              {this.schedule.map((row) => {
+                const index = this.state.releaseDates.findIndex(
+                  (releaseDate) => releaseDate.channel == row.channel,
+                );
+                return (
+                  index != -1 && (
+                    <div className={'content-row'} key={row.emoji}>
+                      <div className={'emoji'}>
+                        <span role='img' aria-label={'row.emojiName'}>
+                          {row.emoji}
+                        </span>
+                      </div>
+                      <div className={'text'}>
+                        {row.text +
+                          moment(this.state.releaseDates[index].start).format(
+                            'MMMM Do, hA',
+                          )}
+                      </div>
+                    </div>
+                  )
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

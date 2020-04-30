@@ -16,6 +16,10 @@
     float: top;
 }
 
+.content-content {
+    padding-top: 15px;
+}
+
 .event-content {
     float: bottom;
     height: 250px;
@@ -25,7 +29,13 @@
     padding: 1em;
     float: bottom;
 }
+
 .title-row {
+    display: flex;
+    margin: 0em;
+}
+
+.subtitle-row {
     display: flex;
     margin: .5em 0em;
 }
@@ -37,13 +47,21 @@
     line-height: 1.8em;
 }
 
-.icon {
+.emoji {
+    padding-right: .6em;
     position: relative;
     float: left;
+    font-size: 20px;
+}
+
+.big-emoji {
+    padding-right: .3em;
+    position: relative;
+    float: left;
+    font-size: 40px;
 }
 
 .text {
-    padding-left: .6em;
     text-align: left;
     text-overflow: clip;
     overflow: hidden;
