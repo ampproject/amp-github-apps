@@ -15,8 +15,8 @@
  */
 
 import {Application, Context} from 'probot';
-import Webhooks from '@octokit/webhooks';
 import {Octokit} from '@octokit/rest';
+import Webhooks from '@octokit/webhooks';
 
 import {InviteBot} from './src/invite_bot';
 

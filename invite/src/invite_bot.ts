@@ -16,10 +16,10 @@
 
 import {Octokit} from '@octokit/rest';
 
-import {dbConnect} from './db';
 import {GitHub} from './github';
 import {ILogger, Invite, InviteAction} from './types';
 import {InvitationRecord} from './invitation_record';
+import {dbConnect} from './db';
 
 const INVITE_MACROS: Record<string, InviteAction> = {
   invite: InviteAction.INVITE,
@@ -27,9 +27,9 @@ const INVITE_MACROS: Record<string, InviteAction> = {
 };
 
 // Regex source: https://github.com/shinnn/github-username-regex
-const USERNAME_PATTERN: string = '[a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38}';
-const MACRO_PATTERN: string = `/(${Object.keys(INVITE_MACROS).join('|')})`;
-const FULL_MACRO_REGEX: RegExp = new RegExp(
+const USERNAME_PATTERN = '[a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38}';
+const MACRO_PATTERN = `/(${Object.keys(INVITE_MACROS).join('|')})`;
+const FULL_MACRO_REGEX = new RegExp(
   // (?<!\\S) ensures the macro is not preceded by a non-space character.
   `(?<!\\S)${MACRO_PATTERN} @${USERNAME_PATTERN}`,
   'ig'

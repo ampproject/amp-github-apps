@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import Knex from 'knex';
 import {mocked} from 'ts-jest/utils';
+import Knex from 'knex';
 
-import {setupDb} from '../src/setup_db';
-import {dbConnect} from '../src/db';
-import {Invite, InviteAction} from '../src/types';
-import {InvitationRecord} from '../src/invitation_record';
-import {InviteBot} from '../src/invite_bot';
 import {GitHub} from '../src/github';
+import {InvitationRecord} from '../src/invitation_record';
+import {Invite, InviteAction} from '../src/types';
+import {InviteBot} from '../src/invite_bot';
+import {dbConnect} from '../src/db';
+import {setupDb} from '../src/setup_db';
 
 jest.mock('../src/db', () => {
   const testDb = Knex({

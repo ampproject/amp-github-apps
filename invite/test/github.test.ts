@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+import {Octokit} from '@octokit/rest';
 import {createTokenAuth} from '@octokit/auth';
 import nock from 'nock';
-import {Octokit} from '@octokit/rest';
 
-import {getFixture} from './fixtures';
 import {GitHub} from '../src/github';
+import {getFixture} from './fixtures';
 
 describe('GitHub interface', () => {
   const githubClient: Octokit = new Octokit({
