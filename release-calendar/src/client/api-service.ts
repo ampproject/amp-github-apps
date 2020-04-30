@@ -30,7 +30,7 @@ export class ApiService {
 
   async getRelease(requestedRelease: string): Promise<ReleaseEventInput[]> {
     const release = await this.getReleaseRequest(
-      SERVER_URL + '/releases/' + requestedRelease,
+      `${SERVER_URL}/releases/${requestedRelease}`,
     );
     return [
       new ReleaseEventInput(release.promotions[0], new Date()),
@@ -55,7 +55,7 @@ export class ApiService {
 
   async getCurrentReleases(): Promise<CurrentReleases> {
     const currentReleases = await this.getPromotionRequest(
-      SERVER_URL + '/current-releases/',
+      `${SERVER_URL}/current-releases/`,
     );
     return new CurrentReleases(currentReleases);
   }
