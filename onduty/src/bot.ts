@@ -24,7 +24,7 @@ import {
 } from 'onduty';
 import sleep from 'sleep-promise';
 
-const API_RATE_LIMIT_MS = 250;
+const API_RATE_LIMIT_MS = Number(process.env.API_RATE_LIMIT_MS) || 250;
 
 export class OndutyBot {
   constructor(
