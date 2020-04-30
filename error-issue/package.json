@@ -11,7 +11,6 @@
   "scripts": {
     "lint": "eslint **/*.ts",
     "fix": "eslint **/*.ts --fix",
-    "lint-conflicts": "eslint --print-config app.ts | eslint-config-prettier-check",
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
     "start": "functions-framework --target=app --source=dist",
@@ -19,6 +18,7 @@
     "deploy-tag-issue": "git tag 'deploy-error-issue-'`date --utc '+%Y%m%d%H%M%S'`",
     "deploy-tag-monitor": "git tag 'deploy-error-monitor-'`date --utc '+%Y%m%d%H%M%S'`",
     "deploy-tag-list": "git tag 'deploy-error-list-'`date --utc '+%Y%m%d%H%M%S'`",
+    "pretest": "npm run lint",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
