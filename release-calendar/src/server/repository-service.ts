@@ -33,13 +33,8 @@ export class RepositoryService {
       .createQueryBuilder('release')
       .leftJoinAndSelect('release.promotions', 'promotion')
       .where('release.name = :name', {name})
+      .orderBy('promotion.date', 'DESC')
       .getOne();
-
-    releaseQuery.then((release) => {
-      release.promotions.sort(
-        (a, b): number => b.date.getTime() - a.date.getTime(),
-      );
-    });
 
     return releaseQuery;
   }
