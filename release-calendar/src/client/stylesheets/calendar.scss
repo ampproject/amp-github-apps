@@ -3,6 +3,40 @@
 @import '~@fullcalendar/daygrid/main.css';
 @import '~@fullcalendar/timegrid/main.css';
 
+@mixin on {
+  background-color: base.$amp-blue;
+  border-color: base.$amp-off-blue;
+  &:hover {
+    border-color: base.$amp-yellow;
+    background-color: base.$amp-blue;
+  }
+}
+
+@mixin off {
+  background-color: base.$amp-off-blue;
+  border-color: base.$amp-blue;
+  &:hover {
+    border-color: base.$amp-yellow;
+    background-color: base.$amp-blue;
+  }
+}
+
+.fc-button-active {
+  @include on;
+}
+
+.fc-button-primary {
+  @include on;
+}
+
+.fc-button-primary:not(:disabled).fc-button-active {
+  @include off;
+}
+
+.fc-unthemed td.fc-today {
+  background-color: base.$amp-yellow;
+}
+
 .fc-view {
   box-shadow:
   rgba(0, 0, 0, 0.2) 0px 1px 2px,

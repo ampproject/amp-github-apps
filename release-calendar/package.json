@@ -32,15 +32,14 @@
     "@fullcalendar/react": "4.4.0",
     "@fullcalendar/timegrid": "4.4.0",
     "@popperjs/core": "2.4.0",
-    "@tippyjs/react": "4.0.2",
     "express": "4.17.1",
+    "material-design-icons": "3.0.1",
     "moment": "2.24.0",
     "mysql": "2.18.1",
     "node-fetch": "2.6.0",
     "react": "16.13.0",
     "react-dom": "16.13.0",
     "react-popper": "2.2.3",
-    "reactjs-popup": "1.5.0",
     "typeorm": "0.2.24"
   },
   "devDependencies": {

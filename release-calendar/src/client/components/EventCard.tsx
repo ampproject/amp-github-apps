@@ -16,42 +16,77 @@
 
 import '../stylesheets/eventCard.scss';
 import * as React from 'react';
-import {Channel} from '../../types';
 import {EventApi} from '@fullcalendar/core';
 import moment from 'moment';
 
 export interface EventCardProps {
-  event: EventApi;
+  eventApi: EventApi;
 }
 
 export class EventCard extends React.Component<EventCardProps, {}> {
-  rows = [
-    {channel: Channel.STABLE, title: 'Stable'},
-    {channel: Channel.PERCENT_BETA, title: '% Beta'},
-    {channel: Channel.PERCENT_EXPERIMENTAL, title: '% Experimental'},
-    {channel: Channel.OPT_IN_BETA, title: 'Opt-in Beta'},
-    {channel: Channel.OPT_IN_EXPERIMENTAL, title: 'Opt-in Experimental'},
-    {channel: Channel.NIGHTLY, title: 'Nightly'},
-    {channel: Channel.LTS, title: 'Long Term Stable'},
+  //TODO: use readable channel titles in eventCard
+
+  content = [
+    {icon: 'pageview', text: this.props.eventApi.title},
+    {
+      icon: 'alarm_on',
+      text:
+        'entered channel at ' +
+        moment(this.props.eventApi.start).format('MMMM Do, hA'),
+    },
+    {
+      icon: 'alarm_off',
+      text:
+        'left channel at ' +
+        moment(this.props.eventApi.end).format('MMMM Do, hA'),
+    },
   ];
 
   render(): JSX.Element {
     return (
       <div className={'event-card'}>
-        <div className={'event-top'}>
-          <br className={this.props.event.classNames[0]}></br>
-        </div>
-        <div className={'event-content'}>
-          <div>{this.props.event.title}</div>
-          <div>{moment(this.props.event.start).format('LT')}</div>
-          <div>{moment(this.props.event.end).format('LT')}</div>
-          <a
-            href={
-              'https://github.com/ampproject/amphtml/releases/tag/' +
-              this.props.event.title
-            }>
-            {'to the github release body..'}
-          </a>
+        <div
+          className={this.props.eventApi.classNames[0]}
+          style={{
+            borderTopLeftRadius: '5px',
+            borderTopRightRadius: '5px',
+            height: 'inherit',
+          }}>
+          <div className={'event-top'}></div>
+          <div className={'event-content'}>
+            {this.content.map((row) => {
+              return (
+                <div className={'content-row'} key={row.icon}>
+                  <div className={'icon'}>
+                    <i
+                      className='material-icons'
+                      style={{lineHeight: 'inherit'}}>
+                      {row.icon}
+                    </i>
+                  </div>
+                  <div className={'text'}>{row.text}</div>
+                </div>
+              );
+            })}
+            <div className={'content-row'}>
+              <div className={'icon'}>
+                <i className='material-icons' style={{lineHeight: 'inherit'}}>
+                  code
+                </i>
+              </div>
+              <div className={'text'}>
+                <a
+                  href={
+                    'https://github.com/ampproject/amphtml/releases/tag/' +
+                    this.props.eventApi.title
+                  }
+                  target='_blank'
+                  rel='noopener noreferrer'>
+                  {'to the github release body..'}
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

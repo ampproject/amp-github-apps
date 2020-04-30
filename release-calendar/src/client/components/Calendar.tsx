@@ -18,50 +18,15 @@ import '../stylesheets/calendar.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
-import {EventApi, View} from '@fullcalendar/core';
-import {EventCard} from './EventCard';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
+import {Tooltip} from './TooltipHook';
 import {getAllReleasesEvents} from '../models/release-event';
-import {usePopper} from 'react-popper';
 import FullCalendar from '@fullcalendar/react';
-import ReactDOM from 'react-dom';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
-const CALENDAR_CONTENT_HEIGHT = 480;
-const EVENT_LIMIT_DISPLAYED = 3;
-
-const Example = (children: {event: EventApi}): JSX.Element => {
-  const [referenceElement, setReferenceElement] = React.useState(null);
-  const [popperElement, setPopperElement] = React.useState(null);
-  const {styles, attributes} = usePopper(referenceElement, popperElement, {
-    placement: 'left',
-    strategy: 'fixed',
-    modifiers: [
-      {
-        name: 'offset',
-        options: {
-          offset: [0, 5],
-        },
-      },
-    ],
-  });
-
-  return (
-    <>
-      <button className={'event-button'} ref={setReferenceElement}>
-        {children.event.title}
-      </button>
-
-      {/* {ReactDOM.createPortal( */}
-      <div ref={setPopperElement} style={styles.popper} {...attributes.popper}>
-        <EventCard event={children.event}></EventCard>
-      </div>
-      {/* document.querySelector('#app'),
-      )} */}
-    </>
-  );
-};
+const CALENDAR_CONTENT_HEIGHT = 610;
+const EVENT_LIMIT_DISPLAYED = 4;
 
 export interface CalendarProps {
   channels: Channel[];
@@ -87,20 +52,6 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     this.setState({events: getAllReleasesEvents(releases)});
   }
 
-  tooltip = (arg: {
-    isMirror: boolean;
-    isStart: boolean;
-    isEnd: boolean;
-    event: EventApi;
-    el: HTMLElement;
-    view: View;
-  }): void => {
-    const Content = (): JSX.Element => {
-      return <Example event={arg.event}></Example>;
-    };
-    ReactDOM.render(<Content />, arg.el);
-  };
-
   render(): JSX.Element {
     const displayEvents: EventSourceInput[] = this.props.channels
       .filter((channel) => this.state.events.has(channel))
@@ -121,7 +72,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
           fixedWeekCount={false}
           displayEventTime={false}
           views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
-          eventRender={this.tooltip}
+          eventRender={Tooltip}
         />
       </div>
     );

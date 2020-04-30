@@ -3,6 +3,7 @@
 .main-container {
     padding: 12px;
     padding-top: 24px;
+    padding-bottom: 48px;
     overflow: hidden;
 }
 
@@ -45,4 +46,26 @@
     .col-channel-table {
         width: 70%;
     }
+}
+
+.lts {
+    background-color: base.$lts;
+}
+.stable {
+    background-color: base.$stable;
+}
+.perc-beta{
+    background-color: base.$perc-beta;
+}
+.perc-experimental {
+    background-color: base.$perc-experimental;
+}
+.opt-in-beta {
+    background-color: base.$opt-in-beta;
+}
+.opt-in-experimental {
+    background-color: base.$opt-in-experimental;
+}
+.nightly {
+    background-color: base.$nightly;
 }
