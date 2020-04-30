@@ -53,6 +53,6 @@ steps:
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
 secrets:
-  - kmsKeyName: projects/amp-error-issue-bot/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+  - kmsKeyName: projects/amp-onduty-bot/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
     secretEnv:
       GITHUB_ACCESS_TOKEN: CiQABN6IaI0vpQfHhTVNugtITotY7VcbmP33BNYj1w6pFo1MAzYSUQBEODKd17VSdRGarh40l0xE7rDSdJZbXKFWpuWjbuDCCqvWnaNsNOUpsDjBzQPRPv9AsgMQQYD/gfXA1VNBvqFL/JVjknovInnnRsDIarW0Og==
