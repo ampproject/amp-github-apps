@@ -42,6 +42,7 @@ export async function refreshRotation(
   req: express.Request,
   res: express.Response
 ) {
+  console.debug(req.body);
   const {access_token: token, ...rotations}: RotationReporterPayload = req.body;
 
   try {
