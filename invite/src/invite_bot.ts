@@ -17,8 +17,8 @@
 import {Octokit} from '@octokit/rest';
 
 import {GitHub} from './github';
-import {ILogger, Invite, InviteAction} from './types';
 import {InvitationRecord} from './invitation_record';
+import {Invite, InviteAction, Logger} from './types';
 import {dbConnect} from './db';
 
 const INVITE_MACROS: Record<string, InviteAction> = {
@@ -59,7 +59,7 @@ export class InviteBot {
     private org: string,
     private allowTeamSlug: string,
     helpUsernameToTag: string | null = null,
-    private logger: ILogger = console
+    private logger: Logger = console
   ) {
     this.github = new GitHub(client, org, logger);
     this.record = new InvitationRecord(dbConnect(), logger);

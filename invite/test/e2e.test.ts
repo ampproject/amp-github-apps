@@ -24,7 +24,7 @@ import {InviteAction} from '../src/types';
 import {InviteBot} from '../src/invite_bot';
 import {getFixture, triggerWebhook} from './fixtures';
 import {setupDb} from '../src/setup_db';
-const app = require('../app');
+import app from '../app';
 
 jest.mock('../src/db', () => {
   const testDb = Knex({
@@ -35,7 +35,7 @@ jest.mock('../src/db', () => {
 
   return {
     Database: Knex,
-    dbConnect: () => testDb,
+    dbConnect: (): Knex => testDb,
   };
 });
 
@@ -61,8 +61,8 @@ describe('end-to-end', () => {
     probot = new Probot({});
     const probotApp = probot.load(app);
     probotApp.app = {
-      getInstallationAccessToken: async () => 'test',
-      getSignedJsonWebToken: () => 'test',
+      getInstallationAccessToken: async (): Promise<string> => 'test',
+      getSignedJsonWebToken: (): string => 'test',
     };
   });
 

@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-const appFn = require('./app');
-const {serverless} = require('@probot/serverless-gcf');
+import {serverless} from '@probot/serverless-gcf';
+import appFn from './app';
 module.exports.probot = serverless(appFn);

@@ -31,7 +31,7 @@
 import {Database, dbConnect} from './db';
 
 /** Set up the database table. */
-export function setupDb(db: Database) {
+export async function setupDb(db: Database): Promise<unknown> {
   return db.schema.createTable('invites', table => {
     table.increments('id').primary();
     table.string('username', 40);

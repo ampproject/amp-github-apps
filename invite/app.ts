@@ -27,7 +27,7 @@ type CommentWebhookPayload =
   | Webhooks.WebhookPayloadPullRequestReview
   | Webhooks.WebhookPayloadPullRequestReviewComment;
 
-module.exports = (app: Application) => {
+module.exports = (app: Application): void => {
   if (process.env.NODE_ENV !== 'test') {
     require('dotenv').config();
   }
@@ -38,7 +38,7 @@ module.exports = (app: Application) => {
     github,
     payload,
     log,
-  }: Context<CommentWebhookPayload>) {
+  }: Context<CommentWebhookPayload>): InviteBot {
     return new InviteBot(
       // This type-cast is required because Probot exports a separate GitHubAPI
       // class, even though it's in Octokit instance.

@@ -17,7 +17,7 @@
 /**
  * A standard logging interface.
  */
-export interface ILogger {
+export interface Logger {
   debug(message: string, ...extraInfo: any[]): void;
   warn(message: string, ...extraInfo: any[]): void;
   error(message: string, ...extraInfo: any[]): void;

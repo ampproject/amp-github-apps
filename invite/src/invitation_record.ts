@@ -15,7 +15,7 @@
  */
 
 import {Database} from './db';
-import {ILogger, Invite} from './types';
+import {Invite, Logger} from './types';
 
 /**
  * A record of invites sent by the bot that may require follow-up actions.
@@ -24,7 +24,7 @@ export class InvitationRecord {
   /**
    * Constructor.
    */
-  constructor(private db: Database, private logger: ILogger = console) {}
+  constructor(private db: Database, private logger: Logger = console) {}
 
   /**
    * Records an invite created by the bot.
