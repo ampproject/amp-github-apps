@@ -44,10 +44,16 @@ module.exports.refreshRotation = (
 ) => {
   const {access_token: token, ...rotations}: RotationReporterPayload = req.body;
 
-  if (token === GITHUB_ACCESS_TOKEN) {
-    bot.handleUpdate(rotations);
-    res.sendStatus(statusCodes.OK);
-  } else {
-    res.sendStatus(statusCodes.UNAUTHORIZED);
+  try {
+    if (token === GITHUB_ACCESS_TOKEN) {
+      bot.handleUpdate(rotations);
+      res.sendStatus(statusCodes.OK);
+    } else {
+      res.sendStatus(statusCodes.UNAUTHORIZED);
+    }
+  } catch (e) {
+    console.error(e);
+    res.status(statusCodes.INTERNAL_SERVER_ERROR);
+    res.send(String(e));
   }
 };
