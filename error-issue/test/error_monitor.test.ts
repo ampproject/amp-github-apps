@@ -15,7 +15,7 @@
  */
 
 import {ErrorMonitor} from '../src/error_monitor';
-import {Stackdriver} from '../src/types';
+import {Stackdriver} from 'error-issue-bot';
 import {StackdriverApi} from '../src/stackdriver_api';
 
 import {mocked} from 'ts-jest/utils';

@@ -16,7 +16,7 @@
 
 import {GaxiosOptions} from 'gaxios';
 import {GoogleAuth} from 'google-auth-library';
-import {Stackdriver} from './types';
+import {Stackdriver} from 'error-issue-bot';
 
 const SERVICE = 'https://clouderrorreporting.googleapis.com';
 const SECONDS_IN_DAY = 60 * 60 * 24;
@@ -76,11 +76,11 @@ export class StackdriverApi {
     pageSize?: number;
     groupId?: string;
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
-    const {errorGroupStats} = await this.request('groupStats', 'GET', {
+    const {errorGroupStats} = (await this.request('groupStats', 'GET', {
       'timeRange.period': 'PERIOD_1_DAY',
       timedCountDuration: `${SECONDS_IN_DAY}s`,
       ...opts,
-    });
+    })) as Record<string, Array<Stackdriver.SerializedErrorGroupStats>>;
 
     return errorGroupStats.map((stats: Stackdriver.SerializedErrorGroupStats) =>
       this.deserialize(stats)
@@ -113,6 +113,6 @@ export class StackdriverApi {
     );
     return this.request(`groups/${groupId}`, 'PUT', {
       trackingIssues: [{url: issueUrl}],
-    });
+    }) as Promise<Stackdriver.ErrorGroup>;
   }
 }

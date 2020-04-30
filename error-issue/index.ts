@@ -16,12 +16,12 @@
 
 require('dotenv').config();
 
+import {ERROR_ISSUE_ENDPOINT, ErrorMonitor} from './src/error_monitor';
+import {ErrorIssueBot} from './src/bot';
+import {ErrorReport} from 'error-issue-bot';
+import {StackdriverApi} from './src/stackdriver_api';
 import express from 'express';
 import statusCodes from 'http-status-codes';
-import {ErrorIssueBot} from './src/bot';
-import {StackdriverApi} from './src/stackdriver_api';
-import {ErrorMonitor, ERROR_ISSUE_ENDPOINT} from './src/error_monitor';
-import {ErrorReport} from './src/types';
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
