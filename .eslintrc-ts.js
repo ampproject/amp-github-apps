@@ -51,15 +51,5 @@ module.exports = {
     'indent': 'off',
     'no-unused-vars': 'off',
     'semi': 'off',
-
-    'sort-requires/sort-requires': 'off',
-    'sort-imports-es6-autofix/sort-imports-es6': [
-      'error',
-      {
-        'ignoreCase': false,
-        'ignoreMemberSort': false,
-        'memberSyntaxSortOrder': ['none', 'all', 'multiple', 'single']
-      }
-    ],
   },
 };
