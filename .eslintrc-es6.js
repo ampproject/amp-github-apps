@@ -79,7 +79,6 @@ module.exports = {
     'object-shorthand': ['error', 'properties', { 'avoidQuotes': true }],
     'prefer-const': 'error',
     'prettier/prettier': 'error',
-    'prefer-const': 'error',
     'radix': 'error',
     'sort-requires/sort-requires': 'error'
   },
