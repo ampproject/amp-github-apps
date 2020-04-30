@@ -55,4 +55,4 @@ steps:
 secrets:
   - kmsKeyName: projects/amp-error-issue-bot/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
     secretEnv:
-      GITHUB_ACCESS_TOKEN: CiQA/MPS5ZuGhFpj7GILuU9q9XcWuTxgLNqVJssCybRAKUJdtBMSUQB8LNNh3TCOBOOjZPO7mZU3WK5xbTbxOJP21z+21p3+pmpEYL2AgfRfNA3ozyYZzYWM/AJqanuYluyVikKhBtQUUO1y5RuTOzRHKwsWwlz6fw==
+      GITHUB_ACCESS_TOKEN: CiQABN6IaI0vpQfHhTVNugtITotY7VcbmP33BNYj1w6pFo1MAzYSUQBEODKd17VSdRGarh40l0xE7rDSdJZbXKFWpuWjbuDCCqvWnaNsNOUpsDjBzQPRPv9AsgMQQYD/gfXA1VNBvqFL/JVjknovInnnRsDIarW0Og==
