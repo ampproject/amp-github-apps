@@ -39,7 +39,7 @@ export function getFixtureFile(filename: string): string {
 /**
  * Get a JSON test fixture object.
  */
-export function getFixture(name: string): {[key: string]: any} {
+export function getFixture(name: string): {[key: string]: unknown} {
   return JSON.parse(getFixtureFile(`${name}.json`));
 }
 

@@ -39,7 +39,10 @@ const monitor = new ErrorMonitor(stackdriver);
 const lister = new ErrorMonitor(stackdriver, 2500, 40);
 
 /** Endpoint to create a GitHub issue for an error report. */
-export async function errorIssue(req: express.Request, res: express.Response) {
+export async function errorIssue(
+  req: express.Request,
+  res: express.Response
+): void {
   const errorReport = req.method === 'POST' ? req.body : req.query;
   const {
     errorId,
@@ -108,7 +111,7 @@ export async function errorIssue(req: express.Request, res: express.Response) {
 export async function errorMonitor(
   req: express.Request,
   res: express.Response
-) {
+): void {
   try {
     res.json({issueUrls: await monitor.monitorAndReport()});
   } catch (error) {
@@ -117,7 +120,7 @@ export async function errorMonitor(
   }
 }
 
-function createErrorReportUrl(report: ErrorReport) {
+function createErrorReportUrl(report: ErrorReport): string {
   const params = Object.entries(report)
     .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
     .join('&');
@@ -126,7 +129,10 @@ function createErrorReportUrl(report: ErrorReport) {
 }
 
 /** Diagnostic endpoint to list new untracked errors. */
-export async function errorList(req: express.Request, res: express.Response) {
+export async function errorList(
+  req: express.Request,
+  res: express.Response
+): void {
   try {
     const reports = await lister.newErrorsToReport();
     res.json({
