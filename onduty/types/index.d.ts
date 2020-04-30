@@ -22,4 +22,13 @@ declare module 'onduty' {
     error(message: string, ...extraInfo: unknown[]): void;
     info(message: string, ...extraInfo: unknown[]): void;
   }
+
+  export interface Rotation {
+    primary: string;
+    secondary: null | string;
+  }
+
+  export type RotationType = 'build-cop' | 'release-on-duty';
+  export type RotationUpdate = Record<RotationType, Rotation>;
+  export type RotationTeamMap = Record<RotationType, string>;
 }
