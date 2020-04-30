@@ -24,7 +24,7 @@ import {
 } from 'onduty';
 import sleep from 'sleep-promise';
 
-const API_RATE_LIMIT_MS = 250;
+const API_RATE_LIMIT_MS = Number(process.env.API_RATE_LIMIT_MS) || 250;
 
 export class OndutyBot {
   constructor(
@@ -35,7 +35,7 @@ export class OndutyBot {
 
   async updateRotation(type: RotationType, rotation: Rotation): Promise<void> {
     const teamName = this.rotationTeams[type];
-    this.logger.info('[updateRotation] Updating ${type} rotation');
+    this.logger.info(`[updateRotation] Updating ${type} rotation`);
 
     const members = await this.github.getTeamMembers(teamName);
     const currentRotation = Object.values(rotation)
@@ -54,7 +54,7 @@ export class OndutyBot {
     }
   }
 
-  async handleUpdate(update: RotationUpdate) {
+  async handleUpdate(update: RotationUpdate): Promise<void> {
     for (const [type, rotation] of Object.entries(update)) {
       await this.updateRotation(type as RotationType, rotation);
     }

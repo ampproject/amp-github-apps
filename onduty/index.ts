@@ -14,12 +14,46 @@
  * limitations under the License.
  */
 
+import {GitHub} from './src/github';
+import {Octokit} from '@octokit/rest';
+import {OndutyBot} from './src/bot';
+import {RotationReporterPayload, RotationTeamMap} from 'onduty';
 import express from 'express';
+import statusCodes from 'http-status-codes';
 
-module.exports.refreshRotation = (
+require('dotenv').config();
+const {
+  GITHUB_ACCESS_TOKEN,
+  GITHUB_ORG,
+  RELEASE_ONDUTY_TEAM,
+  BUILD_COP_TEAM,
+} = process.env;
+
+const ROTATION_TEAMS: RotationTeamMap = {
+  'release-on-duty': RELEASE_ONDUTY_TEAM,
+  'build-cop': BUILD_COP_TEAM,
+};
+
+const octokit = new Octokit({auth: `token ${GITHUB_ACCESS_TOKEN}`});
+const github = new GitHub(octokit, GITHUB_ORG);
+const bot = new OndutyBot(github, ROTATION_TEAMS);
+
+export async function refreshRotation(
   req: express.Request,
   res: express.Response
-) => {
-  // TODO(#778): Update GitHub teams based on rotations.
-  res.send('Triggered `reportRotation`');
-};
+) {
+  const {access_token: token, ...rotations}: RotationReporterPayload = req.body;
+
+  try {
+    if (token === GITHUB_ACCESS_TOKEN) {
+      await bot.handleUpdate(rotations);
+      res.sendStatus(statusCodes.OK);
+    } else {
+      res.sendStatus(statusCodes.UNAUTHORIZED);
+    }
+  } catch (e) {
+    console.error(e);
+    res.status(statusCodes.INTERNAL_SERVER_ERROR);
+    res.send(String(e));
+  }
+}
