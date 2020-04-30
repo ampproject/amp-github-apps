@@ -18,7 +18,7 @@ import path from 'path';
 import {Probot} from 'probot';
 import {WebhookEvent} from '@octokit/webhooks';
 
-type SampleWebhookEvent = {event: string; payload: WebhookEvent<any>};
+type SampleWebhookEvent = {event: string; payload: WebhookEvent<unknown>};
 
 /**
  * Get a JSON test fixture object.
