@@ -31,4 +31,8 @@ declare module 'onduty' {
   export type RotationType = 'build-cop' | 'release-on-duty';
   export type RotationUpdate = Record<RotationType, Rotation>;
   export type RotationTeamMap = Record<RotationType, string>;
+
+  export interface RotationReporterPayload extends RotationUpdate {
+    access_token: string;
+  }
 }
