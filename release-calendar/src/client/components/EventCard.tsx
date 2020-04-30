@@ -16,6 +16,7 @@
 
 import '../stylesheets/eventCard.scss';
 import * as React from 'react';
+import {Channel} from '../../types';
 import {EventApi} from '@fullcalendar/core';
 import moment from 'moment';
 
@@ -24,55 +25,67 @@ export interface EventCardProps {
 }
 
 export class EventCard extends React.Component<EventCardProps, {}> {
-  //TODO: use readable channel titles in eventCard
-
-  content = [
-    {icon: 'pageview', text: this.props.eventApi.title},
+  schedule = [
     {
-      icon: 'alarm_on',
-      text:
-        'entered channel at ' +
-        moment(this.props.eventApi.start).format('MMMM Do, hA'),
+      channel: Channel.NIGHTLY,
+      text: 'Created as Nightly on ',
+      title: 'Nightly',
+      emoji: '🌙',
+      emojiName: 'moon',
     },
     {
-      icon: 'alarm_off',
-      text:
-        'left channel at ' +
-        moment(this.props.eventApi.end).format('MMMM Do, hA'),
+      channel: Channel.OPT_IN_EXPERIMENTAL,
+      text: 'Promoted to Opt-in Experimental, Opt-In Beta on ',
+      title: 'Opt-in Experimental',
+      emoji: '✋',
+      emojiName: 'hand',
+    },
+    {
+      channel: Channel.PERCENT_EXPERIMENTAL,
+      text: 'Promoted to 1% Experimental, 1% Beta on ',
+      title: '1% Experimental',
+      emoji: '🧪',
+      emojiName: 'experiment',
+    },
+    {
+      channel: Channel.STABLE,
+      text: 'Promoted to Stable on ',
+      title: 'Stable',
+      emoji: '🏠',
+      emojiName: 'house',
+    },
+    {
+      channel: Channel.LTS,
+      text: 'Promoted to LTS on ',
+      title: 'Long Term Stable',
+      emoji: '🏙️',
+      emojiName: 'city',
     },
   ];
 
   render(): JSX.Element {
+    const isCherryPick = true;
     return (
       <div className={'event-card'}>
-        <div
-          className={this.props.eventApi.classNames[0]}
-          style={{
-            borderTopLeftRadius: '5px',
-            borderTopRightRadius: '5px',
-            height: 'inherit',
-          }}>
+        <div className={this.props.eventApi.classNames[0]}>
           <div className={'event-top'}></div>
           <div className={'event-content'}>
-            {this.content.map((row) => {
-              return (
-                <div className={'content-row'} key={row.icon}>
-                  <div className={'icon'}>
-                    <i
-                      className='material-icons'
-                      style={{lineHeight: 'inherit'}}>
-                      {row.icon}
-                    </i>
-                  </div>
-                  <div className={'text'}>{row.text}</div>
+            <h2 className={'title-row'}>{this.props.eventApi.title}</h2>
+            {isCherryPick && (
+              <div className={'content-row'}>
+                <div className={'icon'}>
+                  <span role='img' aria-label={'flower'}>
+                    {'🌸'}
+                  </span>
                 </div>
-              );
-            })}
+                <div className={'text'}>{'Cherrypick!'}</div>
+              </div>
+            )}
             <div className={'content-row'}>
               <div className={'icon'}>
-                <i className='material-icons' style={{lineHeight: 'inherit'}}>
-                  code
-                </i>
+                <span role='img' aria-label={'laptop'}>
+                  {'🖥'}
+                </span>
               </div>
               <div className={'text'}>
                 <a
@@ -82,10 +95,27 @@ export class EventCard extends React.Component<EventCardProps, {}> {
                   }
                   target='_blank'
                   rel='noopener noreferrer'>
-                  {'to the github release body..'}
+                  {'Github Release'}
                 </a>
               </div>
             </div>
+            <h3 className={'title-row'}>{'Schedule'}</h3>
+            {this.schedule.map((row) => {
+              return (
+                <div className={'content-row'} key={row.emoji}>
+                  <div className={'icon'}>
+                    <span role='img' aria-label={'row.emojiName'}>
+                      {row.emoji}
+                    </span>
+                  </div>
+                  <div className={'text'}>
+                    {row.text +
+                      //TODO: add date of promotion
+                      moment(this.props.eventApi.end).format('MMMM Do, hA')}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
