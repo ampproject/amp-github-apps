@@ -38,15 +38,15 @@ const octokit = new Octokit({auth: `token ${GITHUB_ACCESS_TOKEN}`});
 const github = new GitHub(octokit, GITHUB_ORG);
 const bot = new OndutyBot(github, ROTATION_TEAMS);
 
-module.exports.refreshRotation = (
+export async function refreshRotation(
   req: express.Request,
   res: express.Response
-) => {
+) {
   const {access_token: token, ...rotations}: RotationReporterPayload = req.body;
 
   try {
     if (token === GITHUB_ACCESS_TOKEN) {
-      bot.handleUpdate(rotations);
+      await bot.handleUpdate(rotations);
       res.sendStatus(statusCodes.OK);
     } else {
       res.sendStatus(statusCodes.UNAUTHORIZED);
@@ -56,4 +56,4 @@ module.exports.refreshRotation = (
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
     res.send(String(e));
   }
-};
+}
