@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {formatDate} from './utils';
 import {BlameRange, ErrorReport} from './types';
+import {formatDate} from './utils';
 
 const MAX_CHANGED_FILES = 40;
 const MAX_POSSIBLE_ASSIGNEES = 2;

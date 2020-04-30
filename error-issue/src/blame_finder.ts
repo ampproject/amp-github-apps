@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {parsePrNumber, parseStacktrace} from './utils';
-import {RateLimitedGraphQL} from './rate_limited_graphql';
 import {BlameRange, GraphQLResponse, ILogger, StackFrame} from './types';
+import {RateLimitedGraphQL} from './rate_limited_graphql';
+import {parsePrNumber, parseStacktrace} from './utils';
 
 /**
  * Service for looking up Git blame info for lines in a stacktrace.
@@ -32,7 +32,8 @@ export class BlameFinder {
     client: RateLimitedGraphQL,
     private logger: ILogger = console
   ) {
-    this.graphql = async query => client.runQuery(query);
+    this.graphql = async (query: string): Promise<GraphQLResponse> =>
+      client.runQuery(query);
   }
 
   /** Fetches the blame info for a file. */
