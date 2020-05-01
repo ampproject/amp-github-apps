@@ -77,7 +77,7 @@ describe('On-Duty Bot', () => {
           primary: 'onduty-primary',
           secondary: 'onduty-secondary',
         },
-        'access_token': '_TOKEN_',
+        accessToken: '_TOKEN_',
       }),
       response
     );
@@ -96,7 +96,7 @@ describe('On-Duty Bot', () => {
           primary: 'onduty-primary',
           secondary: 'onduty-secondary',
         },
-        'access_token': '_BAD_TOKEN_',
+        accessToken: '_BAD_TOKEN_',
       }),
       response
     );
@@ -119,7 +119,7 @@ describe('On-Duty Bot', () => {
           primary: 'onduty-primary',
           secondary: 'onduty-secondary',
         },
-        'access_token': '_TOKEN_',
+        accessToken: '_TOKEN_',
       }),
       response
     );
