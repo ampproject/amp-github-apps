@@ -14,6 +14,4 @@
  * limitations under the License.
  */
 
-import {serverless} from '@probot/serverless-gcf';
-import appFn from './app';
-module.exports.probot = serverless(appFn);
+declare module '@probot/serverless-gcf';
