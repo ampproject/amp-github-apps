@@ -14,7 +14,8 @@
  */
 'use strict';
 
-const {getBuildCop, getCheckRunId, getPullRequestSnapshot} = require('./db');
+const BUILD_COP_TEAM = process.env.BUILD_COP_TEAM || 'ampproject/build-cop';
+const {getCheckRunId, getPullRequestSnapshot} = require('./db');
 
 /**
  * Create a parameters object for a new status check line.
@@ -90,7 +91,6 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
  * @param {number} checkRunId the existing check run ID.
  * @param {number} passed number of tests that passed.
  * @param {number} failed number of tests that failed.
- * @param {string} buildCop the GitHub username of the current build cop.
  * @param {string?} travisJobUrl optional Travis job URL.
  * @return {!object} a parameters object for github.checks.update.
  */
@@ -101,7 +101,6 @@ function createReportedCheckParams(
   checkRunId,
   passed,
   failed,
-  buildCop,
   travisJobUrl
 ) {
   const {owner, repo, headSha} = pullRequestSnapshot;
@@ -113,12 +112,7 @@ function createReportedCheckParams(
     completed_at: new Date().toISOString(),
   };
   if (failed > 0) {
-    const detailsUrl = new URL(
-      `/tests/${headSha}/${type}/${subType}/status`,
-      process.env.WEB_UI_BASE_URL
-    );
     Object.assign(params, {
-      details_url: detailsUrl.href,
       conclusion: 'action_required',
       output: {
         title: `${failed} test${failed != 1 ? 's' : ''} failed`,
@@ -134,7 +128,7 @@ function createReportedCheckParams(
           '1. Restart the failed ' +
           (travisJobUrl ? `[Travis job](${travisJobUrl})\n` : 'Travis job\n') +
           '2. Rebase your pull request on the latest `master` branch\n' +
-          `3. Contact the weekly build cop (@${buildCop}), who can advise ` +
+          `3. Contact the weekly build cop (@${BUILD_COP_TEAM}), who can advise ` +
           'you how to proceed, or skip this test run for you.',
       },
     });
@@ -159,7 +153,6 @@ function createReportedCheckParams(
  * @param {string} type major tests type slug (e.g., unit, integration).
  * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {number} checkRunId the existing check run ID.
- * @param {string} buildCop the GitHub username of the current build cop.
  * @param {string?} travisJobUrl optional Travis job URL.
  * @return {!object} a parameters object for github.checks.update.
  */
@@ -168,21 +161,15 @@ function createErroredCheckParams(
   type,
   subType,
   checkRunId,
-  buildCop,
   travisJobUrl
 ) {
   const {owner, repo, headSha} = pullRequestSnapshot;
-  const detailsUrl = new URL(
-    `/tests/${headSha}/${type}/${subType}/status`,
-    process.env.WEB_UI_BASE_URL
-  );
   return {
     owner,
     repo,
     check_run_id: checkRunId,
     status: 'completed',
     completed_at: new Date().toISOString(),
-    details_url: detailsUrl.href,
     conclusion: 'action_required',
     output: {
       title: `Tests have errored`,
@@ -196,7 +183,7 @@ function createErroredCheckParams(
         '1. Restart the failed ' +
         (travisJobUrl ? `[Travis job](${travisJobUrl})\n` : 'Travis job\n') +
         '2. Rebase your pull request on the latest `master` branch\n' +
-        `3. Contact the weekly build cop (@${buildCop}), who can advise you ` +
+        `3. Contact the weekly build cop (@${BUILD_COP_TEAM}), who can advise you ` +
         'how to proceed, or skip this test run for you.',
     },
   };
@@ -277,7 +264,6 @@ exports.installApiRouter = (app, db) => {
       const {headSha, type, subType, passed, failed} = request.params;
       const travisJobUrl =
         'travisJobUrl' in request.body ? request.body.travisJobUrl : null;
-      const buildCop = await getBuildCop(db);
       app.log(
         `Reporting the results of the ${type} tests (${subType}) to the ` +
           `GitHub check for pull request with head commit SHA ${headSha}`
@@ -302,7 +288,6 @@ exports.installApiRouter = (app, db) => {
         checkRunId,
         passed,
         failed,
-        buildCop,
         travisJobUrl
       );
       const github = await app.auth(pullRequestSnapshot.installationId);
@@ -322,7 +307,6 @@ exports.installApiRouter = (app, db) => {
       const {headSha, type, subType} = request.params;
       const travisJobUrl =
         'travisJobUrl' in request.body ? request.body.travisJobUrl : null;
-      const buildCop = await getBuildCop(db);
       app.log(
         `Reporting that ${type} tests (${subType}) have errored to the ` +
           `GitHub check for pull request with head commit SHA ${headSha}`
@@ -344,7 +328,6 @@ exports.installApiRouter = (app, db) => {
         type,
         subType,
         checkRunId,
-        buildCop,
         travisJobUrl
       );
       const github = await app.auth(pullRequestSnapshot.installationId);
@@ -357,34 +340,4 @@ exports.installApiRouter = (app, db) => {
       return response.end();
     }
   );
-
-  const buildCop = app.route('/v0/build-cop');
-  buildCop.use(require('express').json());
-  buildCop.use((request, response, next) => {
-    if (
-      !('accessToken' in request.body) ||
-      request.body.accessToken != process.env.BUILD_COP_UPDATE_TOKEN
-    ) {
-      app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
-      response.status(403).end('Access token missing or not authorized');
-    } else {
-      next();
-    }
-  });
-
-  buildCop.post('/update', async (request, response) => {
-    if (
-      !('build-cop' in request.body) ||
-      !('primary' in request.body['build-cop']) ||
-      !request.body['build-cop'].primary
-    ) {
-      return response
-        .status(400)
-        .end('POST request to /build-cop must contain "build-cop.primary"');
-    }
-
-    await db('buildCop').update({username: request.body['build-cop'].primary});
-
-    return response.end();
-  });
 };
