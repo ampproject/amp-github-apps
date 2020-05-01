@@ -15,6 +15,7 @@
     "dev": "node info_server.js",
     "start": "probot run ./index.js",
     "deploy-tag": "git tag 'deploy-owners-'`date --utc '+%Y%m%d%H%M%S'`",
+    "pretest": "npm run lint",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
