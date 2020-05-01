@@ -33,6 +33,6 @@ declare module 'onduty' {
   export type RotationTeamMap = Record<RotationType, string>;
 
   export interface RotationReporterPayload extends RotationUpdate {
-    access_token: string;
+    accessToken: string;
   }
 }

@@ -41,11 +41,11 @@ const bot = new OndutyBot(github, ROTATION_TEAMS);
 export async function refreshRotation(
   req: express.Request,
   res: express.Response
-) {
-  const {access_token: token, ...rotations}: RotationReporterPayload = req.body;
+): Promise<void> {
+  const {accessToken, ...rotations}: RotationReporterPayload = req.body;
 
   try {
-    if (token === GITHUB_ACCESS_TOKEN) {
+    if (accessToken === GITHUB_ACCESS_TOKEN) {
       await bot.handleUpdate(rotations);
       res.sendStatus(statusCodes.OK);
     } else {
