@@ -73,7 +73,6 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
         this.gotoDate(release[0].start);
       } else {
         this.setState({singleEvents: []});
-        this.gotoDate(new Date());
       }
     }
   }
@@ -119,7 +118,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
         <FullCalendar
           defaultView='dayGridMonth'
           header={{
-            left: 'prev,next',
+            left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,listWeek',
           }}
