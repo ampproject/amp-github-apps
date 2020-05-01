@@ -276,6 +276,7 @@ describe('test-status/api', () => {
         expect(body).toMatchObject({
           status: 'completed',
           conclusion: 'action_required',
+          output: {
             title: 'Tests have errored',
           },
         });
