@@ -90,7 +90,7 @@ describe('team', () => {
   describe('getMembers', () => {
     let sandbox;
     let team;
-    const fakeGithub = {getTeamMembers: id => ['coder', 'githubuser']};
+    const fakeGithub = {getTeamMembers: unusedId => ['coder', 'githubuser']};
 
     beforeEach(() => {
       sandbox = sinon.createSandbox();
@@ -601,7 +601,7 @@ describe('GitHub API', () => {
           '/search/code?q=filename%3Aexact-match%20repo%3Atest_owner%2Ftest_repo&per_page=100'
         )
         .reply(200, {
-          total_count: 3,
+          'total_count': 3,
           items: [
             {name: 'not-exact-match', path: 'foo/not-exact-match', sha: ''},
             {name: 'exact-match', path: 'foo/exact-match', sha: ''},
@@ -623,7 +623,7 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .post('/repos/test_owner/test_repo/check-runs', body => {
           expect(body).toMatchObject({
-            head_sha: '_test_hash_',
+            'head_sha': '_test_hash_',
             name: 'ampproject/owners-check',
             status: 'completed',
             conclusion: 'neutral',

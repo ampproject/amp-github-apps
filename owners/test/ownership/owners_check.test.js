@@ -139,10 +139,10 @@ describe('owners check', () => {
         'extra/script.js', // extra_reviewer, root_owner
       ],
       {
-        the_author: true,
+        'the_author': true,
         approver: true,
-        other_approver: true,
-        extra_reviewer: false,
+        'other_approver': true,
+        'extra_reviewer': false,
       }
     );
   });
