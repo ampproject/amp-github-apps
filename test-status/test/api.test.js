@@ -49,7 +49,6 @@ describe('test-status/api', () => {
   beforeEach(async () => {
     process.env = {
       WEB_UI_BASE_URL: 'http://localhost:3000/',
-      BUILD_COP_UPDATE_TOKEN: '1a2b3c',
     };
 
     await db('buildCop').update({username: 'agithuber'});
