@@ -14,6 +14,8 @@
   },
   "main": "dist/app.js",
   "scripts": {
+    "lint": "eslint .",
+    "fix": "npm run -- --fix",
     "dev": "nodemon",
     "deploy": "gcloud --project amp-bundle-size-chart app deploy",
     "deploy-cron": "gcloud --project amp-bundle-size-chart app deploy cron.yaml",
@@ -33,6 +35,7 @@
     "typescript": "3.7.5"
   },
   "devDependencies": {
+    "eslint": "6.8.0",
     "nodemon": "2.0.2",
     "ts-node": "8.6.2"
   },
