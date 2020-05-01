@@ -358,34 +358,4 @@ exports.installApiRouter = (app, db) => {
       return response.end();
     }
   );
-
-  const buildCop = app.route('/v0/build-cop');
-  buildCop.use(require('express').json());
-  buildCop.use((request, response, next) => {
-    if (
-      !('accessToken' in request.body) ||
-      request.body.accessToken != process.env.BUILD_COP_UPDATE_TOKEN
-    ) {
-      app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
-      response.status(403).end('Access token missing or not authorized');
-    } else {
-      next();
-    }
-  });
-
-  buildCop.post('/update', async (request, response) => {
-    if (
-      !('build-cop' in request.body) ||
-      !('primary' in request.body['build-cop']) ||
-      !request.body['build-cop'].primary
-    ) {
-      return response
-        .status(400)
-        .end('POST request to /build-cop must contain "build-cop.primary"');
-    }
-
-    await db('buildCop').update({username: request.body['build-cop'].primary});
-
-    return response.end();
-  });
 };
