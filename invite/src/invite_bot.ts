@@ -17,11 +17,11 @@
 import {Octokit} from '@octokit/rest';
 
 import {GitHub} from './github';
-import {InvitationRecord} from './invitation_record';
-import {Invite, InviteAction, Logger} from './types';
+import {InvitationRecord, InviteAction} from './invitation_record';
+import {Invite, InviteActionType, Logger} from 'invite-bot';
 import {dbConnect} from './db';
 
-const INVITE_MACROS: Record<string, InviteAction> = {
+const INVITE_MACROS: Record<string, InviteActionType> = {
   invite: InviteAction.INVITE,
   tryassign: InviteAction.INVITE_AND_ASSIGN,
 };
@@ -130,8 +130,8 @@ export class InviteBot {
   }
 
   /** Parses a comment for invitation macros. */
-  parseMacros(comment: string): Record<string, InviteAction> {
-    const macros: Record<string, InviteAction> = {};
+  parseMacros(comment: string): Record<string, InviteActionType> {
+    const macros: Record<string, InviteActionType> = {};
     const matches = comment.match(FULL_MACRO_REGEX);
 
     if (matches) {

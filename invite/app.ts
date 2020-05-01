@@ -27,7 +27,7 @@ type CommentWebhookPayload =
   | Webhooks.WebhookPayloadPullRequestReview
   | Webhooks.WebhookPayloadPullRequestReviewComment;
 
-module.exports = (app: Application): void => {
+export default (app: Application): void => {
   if (process.env.NODE_ENV !== 'test') {
     require('dotenv').config();
   }

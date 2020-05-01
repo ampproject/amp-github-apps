@@ -16,7 +16,7 @@
 
 import {Octokit} from '@octokit/rest';
 
-import {Logger} from './types';
+import {Logger} from 'invite-bot';
 
 /** Interface for working with the GitHub API. */
 export class GitHub {

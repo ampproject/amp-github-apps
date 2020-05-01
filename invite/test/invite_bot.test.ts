@@ -18,8 +18,8 @@ import {mocked} from 'ts-jest/utils';
 import Knex from 'knex';
 
 import {GitHub} from '../src/github';
-import {InvitationRecord} from '../src/invitation_record';
-import {Invite, InviteAction} from '../src/types';
+import {InvitationRecord, InviteAction} from '../src/invitation_record';
+import {Invite} from 'invite-bot';
 import {InviteBot} from '../src/invite_bot';
 import {dbConnect} from '../src/db';
 import {setupDb} from '../src/setup_db';

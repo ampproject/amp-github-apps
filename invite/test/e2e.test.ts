@@ -19,8 +19,7 @@ import Knex from 'knex';
 import nock from 'nock';
 
 import {Database, dbConnect} from '../src/db';
-import {InvitationRecord} from '../src/invitation_record';
-import {InviteAction} from '../src/types';
+import {InvitationRecord, InviteAction} from '../src/invitation_record';
 import {InviteBot} from '../src/invite_bot';
 import {getFixture, triggerWebhook} from './fixtures';
 import {setupDb} from '../src/setup_db';

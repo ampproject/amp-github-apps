@@ -15,7 +15,12 @@
  */
 
 import {Database} from './db';
-import {Invite, Logger} from './types';
+import {Invite, InviteActionType, Logger} from 'invite-bot';
+
+export const InviteAction: Record<string, InviteActionType> = {
+  INVITE: 'invite',
+  INVITE_AND_ASSIGN: 'invite_and_assign',
+};
 
 /**
  * A record of invites sent by the bot that may require follow-up actions.
