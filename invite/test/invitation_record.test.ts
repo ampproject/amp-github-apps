@@ -17,9 +17,9 @@
 import Knex from 'knex';
 
 import {Database} from '../src/db';
+import {InvitationRecord, InviteAction} from '../src/invitation_record';
+import {Invite} from 'invite-bot';
 import {setupDb} from '../src/setup_db';
-import {Invite, InviteAction} from '../src/types';
-import {InvitationRecord} from '../src/invitation_record';
 
 describe('invitation record', () => {
   const db: Database = Knex({

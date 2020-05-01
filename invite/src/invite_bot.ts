@@ -16,20 +16,20 @@
 
 import {Octokit} from '@octokit/rest';
 
-import {dbConnect} from './db';
 import {GitHub} from './github';
-import {ILogger, Invite, InviteAction} from './types';
-import {InvitationRecord} from './invitation_record';
+import {InvitationRecord, InviteAction} from './invitation_record';
+import {Invite, InviteActionType, Logger} from 'invite-bot';
+import {dbConnect} from './db';
 
-const INVITE_MACROS: Record<string, InviteAction> = {
+const INVITE_MACROS: Record<string, InviteActionType> = {
   invite: InviteAction.INVITE,
   tryassign: InviteAction.INVITE_AND_ASSIGN,
 };
 
 // Regex source: https://github.com/shinnn/github-username-regex
-const USERNAME_PATTERN: string = '[a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38}';
-const MACRO_PATTERN: string = `/(${Object.keys(INVITE_MACROS).join('|')})`;
-const FULL_MACRO_REGEX: RegExp = new RegExp(
+const USERNAME_PATTERN = '[a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38}';
+const MACRO_PATTERN = `/(${Object.keys(INVITE_MACROS).join('|')})`;
+const FULL_MACRO_REGEX = new RegExp(
   // (?<!\\S) ensures the macro is not preceded by a non-space character.
   `(?<!\\S)${MACRO_PATTERN} @${USERNAME_PATTERN}`,
   'ig'
@@ -59,7 +59,7 @@ export class InviteBot {
     private org: string,
     private allowTeamSlug: string,
     helpUsernameToTag: string | null = null,
-    private logger: ILogger = console
+    private logger: Logger = console
   ) {
     this.github = new GitHub(client, org, logger);
     this.record = new InvitationRecord(dbConnect(), logger);
@@ -130,8 +130,8 @@ export class InviteBot {
   }
 
   /** Parses a comment for invitation macros. */
-  parseMacros(comment: string): Record<string, InviteAction> {
-    const macros: Record<string, InviteAction> = {};
+  parseMacros(comment: string): Record<string, InviteActionType> {
+    const macros: Record<string, InviteActionType> = {};
     const matches = comment.match(FULL_MACRO_REGEX);
 
     if (matches) {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import {BlameRange, ErrorReport} from 'error-issue-bot';
 import {formatDate} from './utils';
-import {BlameRange, ErrorReport} from './types';
 
 const MAX_CHANGED_FILES = 40;
 const MAX_POSSIBLE_ASSIGNEES = 2;

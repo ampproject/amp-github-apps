@@ -19,7 +19,7 @@ import nock from 'nock';
 
 import {InviteBot} from '../src/invite_bot';
 import {triggerWebhook} from './fixtures';
-const app = require('../app');
+import app from '../app';
 
 describe('Probot webhooks', () => {
   let probot: Probot;
@@ -36,8 +36,8 @@ describe('Probot webhooks', () => {
     probot = new Probot({});
     const probotApp = probot.load(app);
     probotApp.app = {
-      getInstallationAccessToken: async () => 'test',
-      getSignedJsonWebToken: () => 'test',
+      getInstallationAccessToken: async (): Promise<string> => 'test',
+      getSignedJsonWebToken: (): string => 'test',
     };
   });
 
@@ -48,10 +48,14 @@ describe('Probot webhooks', () => {
   beforeEach(() => {
     jest
       .spyOn(InviteBot.prototype, 'processComment')
-      .mockImplementation(async () => {});
+      .mockImplementation(async () => {
+        // Do nothing
+      });
     jest
       .spyOn(InviteBot.prototype, 'processAcceptedInvite')
-      .mockImplementation(async () => {});
+      .mockImplementation(async () => {
+        // Do nothing
+      });
   });
 
   afterEach(() => {

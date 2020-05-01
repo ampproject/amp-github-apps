@@ -21,7 +21,7 @@ import {
   ReleaseEventInput,
 } from './models/view-models';
 import fetch from 'node-fetch';
-const SERVER_URL = `http://localhost:3000`;
+const SERVER_ENDPOINT = `${process.env.SERVER_URL}:${process.env.SERVER_PORT}`;
 
 export class ApiService {
   private getPromotionRequest(url: string): Promise<Promotion[]> {
@@ -34,7 +34,7 @@ export class ApiService {
 
   async getRelease(requestedRelease: string): Promise<ReleaseEventInput[]> {
     const release = await this.getReleaseRequest(
-      `${SERVER_URL}/releases/${requestedRelease}`,
+      `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
     );
     return [
       new ReleaseEventInput(release.promotions[0], new Date()),
@@ -48,7 +48,7 @@ export class ApiService {
   }
 
   async getReleases(): Promise<ReleaseEventInput[]> {
-    const allPromotions = await this.getPromotionRequest(SERVER_URL);
+    const allPromotions = await this.getPromotionRequest(SERVER_ENDPOINT);
     const map = new Map<Channel, Date>();
     return allPromotions.map((promotion: Promotion) => {
       const date = map.get(promotion.channel) || new Date();
@@ -59,14 +59,14 @@ export class ApiService {
 
   async getCurrentReleases(): Promise<CurrentReleases> {
     const currentReleases = await this.getPromotionRequest(
-      `${SERVER_URL}/current-releases/`,
+      `${SERVER_ENDPOINT}/current-releases/`,
     );
     return new CurrentReleases(currentReleases);
   }
 
   async getReleaseDates(requestedRelease: string): Promise<ReleaseDates> {
     const release = await this.getReleaseRequest(
-      `${SERVER_URL}/releases/${requestedRelease}`,
+      `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
     );
     return new ReleaseDates(release);
   }

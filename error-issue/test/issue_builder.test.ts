@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import {BlameRange, ErrorReport} from 'error-issue-bot';
 import {IssueBuilder} from '../src/issue_builder';
-import {ErrorReport} from '../src/types';
 import {getFixtureFile} from './fixtures';
 
 describe('IssueBuilder', () => {
@@ -94,7 +94,7 @@ describe('IssueBuilder', () => {
       author: string,
       dateStr: string,
       changedFiles: number
-    ) => ({
+    ): BlameRange => ({
       path,
       startingLine: 1,
       endingLine: 10,

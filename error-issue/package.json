@@ -9,9 +9,8 @@
     "node": "^12.13.1"
   },
   "scripts": {
-    "lint": "eslint **/*.ts",
-    "fix": "eslint **/*.ts --fix",
-    "lint-conflicts": "eslint --print-config app.ts | eslint-config-prettier-check",
+    "lint": "eslint . --ext .ts",
+    "fix": "eslint . --ext .ts --fix",
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
     "start": "functions-framework --target=app --source=dist",

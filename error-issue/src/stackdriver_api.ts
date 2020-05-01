@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {Stackdriver} from './types';
 import {GaxiosOptions} from 'gaxios';
 import {GoogleAuth} from 'google-auth-library';
+import {Stackdriver} from 'error-issue-bot';
 
 const SERVICE = 'https://clouderrorreporting.googleapis.com';
 const SECONDS_IN_DAY = 60 * 60 * 24;
@@ -31,8 +31,8 @@ export class StackdriverApi {
   private async request(
     endpoint: string,
     method: 'GET' | 'PUT',
-    body?: Object
-  ): Promise<any> {
+    body?: Record<string, unknown>
+  ): Promise<unknown> {
     const client = await this.auth.getClient();
     const opts: GaxiosOptions = {
       url: `${SERVICE}/v1beta1/projects/${this.projectId}/${endpoint}`,
@@ -76,11 +76,11 @@ export class StackdriverApi {
     pageSize?: number;
     groupId?: string;
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
-    const {errorGroupStats} = await this.request('groupStats', 'GET', {
+    const {errorGroupStats} = (await this.request('groupStats', 'GET', {
       'timeRange.period': 'PERIOD_1_DAY',
       timedCountDuration: `${SECONDS_IN_DAY}s`,
       ...opts,
-    });
+    })) as Record<string, Array<Stackdriver.SerializedErrorGroupStats>>;
 
     return errorGroupStats.map((stats: Stackdriver.SerializedErrorGroupStats) =>
       this.deserialize(stats)
@@ -88,9 +88,7 @@ export class StackdriverApi {
   }
 
   /** List groups of errors. */
-  async listGroups(
-    pageSize: number = 20
-  ): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  async listGroups(pageSize = 20): Promise<Array<Stackdriver.ErrorGroupStats>> {
     console.info(`Fetching first ${pageSize} error groups`);
     return this.getGroups({pageSize});
   }
@@ -115,6 +113,6 @@ export class StackdriverApi {
     );
     return this.request(`groups/${groupId}`, 'PUT', {
       trackingIssues: [{url: issueUrl}],
-    });
+    }) as Promise<Stackdriver.ErrorGroup>;
   }
 }
