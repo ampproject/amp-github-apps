@@ -23,6 +23,5 @@ const db = dbConnect();
 
 module.exports = app => {
   installGitHubWebhooks(app, db);
-  installWebUiRouter(app, db);
   installApiRouter(app, db);
 };
