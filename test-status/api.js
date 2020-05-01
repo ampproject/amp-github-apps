@@ -112,12 +112,7 @@ function createReportedCheckParams(
     completed_at: new Date().toISOString(),
   };
   if (failed > 0) {
-    const detailsUrl = new URL(
-      `/tests/${headSha}/${type}/${subType}/status`,
-      process.env.WEB_UI_BASE_URL
-    );
     Object.assign(params, {
-      details_url: detailsUrl.href,
       conclusion: 'action_required',
       output: {
         title: `${failed} test${failed != 1 ? 's' : ''} failed`,
@@ -169,17 +164,12 @@ function createErroredCheckParams(
   travisJobUrl
 ) {
   const {owner, repo, headSha} = pullRequestSnapshot;
-  const detailsUrl = new URL(
-    `/tests/${headSha}/${type}/${subType}/status`,
-    process.env.WEB_UI_BASE_URL
-  );
   return {
     owner,
     repo,
     check_run_id: checkRunId,
     status: 'completed',
     completed_at: new Date().toISOString(),
-    details_url: detailsUrl.href,
     conclusion: 'action_required',
     output: {
       title: `Tests have errored`,

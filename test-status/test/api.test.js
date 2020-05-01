@@ -47,10 +47,6 @@ describe('test-status/api', () => {
   });
 
   beforeEach(async () => {
-    process.env = {
-      WEB_UI_BASE_URL: 'http://localhost:3000/',
-    };
-
     nock('https://api.github.com')
       .post('/app/installations/123456/access_tokens')
       .reply(200, {token: 'test'});
@@ -210,7 +206,7 @@ describe('test-status/api', () => {
     ],
   ])(
     'Update a failed existing check with /report/%d/%d action',
-    async (passed, failed, title, detailsUrl) => {
+    async (passed, failed, title) => {
       await db('pullRequestSnapshots').insert({
         headSha: HEAD_SHA,
         owner: 'ampproject',
@@ -230,7 +226,6 @@ describe('test-status/api', () => {
           expect(body).toMatchObject({
             status: 'completed',
             conclusion: 'action_required',
-            details_url: detailsUrl,
             output: {
               title,
             },
@@ -281,10 +276,6 @@ describe('test-status/api', () => {
         expect(body).toMatchObject({
           status: 'completed',
           conclusion: 'action_required',
-          details_url:
-            `http://localhost:3000/tests/${HEAD_SHA}/unit/` +
-            'saucelabs/status',
-          output: {
             title: 'Tests have errored',
           },
         });
