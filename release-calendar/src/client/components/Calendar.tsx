@@ -56,6 +56,8 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     this.apiService = new ApiService();
   }
 
+  calendarReference = React.createRef<FullCalendar>();
+
   async componentDidMount(): Promise<void> {
     const releases = await this.apiService.getReleases();
     this.setState({allEvents: getAllReleasesEvents(releases)});
@@ -68,11 +70,18 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
           this.props.singleRelease,
         );
         this.setState({singleEvents: getSingleReleaseEvents(release)});
+        this.gotoDate(release[0].start);
       } else {
         this.setState({singleEvents: []});
+        this.gotoDate(new Date());
       }
     }
   }
+
+  gotoDate = (date: Date): void => {
+    const calendarApi = this.calendarReference.current.getApi();
+    calendarApi.gotoDate(date);
+  };
 
   tooltip = (arg: {
     isMirror: boolean;
@@ -114,6 +123,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,listWeek',
           }}
+          ref={this.calendarReference}
           plugins={[dayGridPlugin, timeGridPlugin]}
           eventSources={displayEvents}
           contentHeight={CALENDAR_CONTENT_HEIGHT}

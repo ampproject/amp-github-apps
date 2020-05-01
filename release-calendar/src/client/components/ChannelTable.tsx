@@ -43,6 +43,7 @@ export class ChannelTable extends React.Component<
     };
     this.apiService = new ApiService();
     this.handleChannelClick = this.handleChannelClick.bind(this);
+    this.handleReleaseClick = this.handleReleaseClick.bind(this);
   }
 
   async componentDidMount(): Promise<void> {
