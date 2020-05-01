@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Channel, Promotion} from '../types';
+import {Channel, Promotion, Release} from '../types';
 import {CurrentReleases, ReleaseEventInput} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_ENDPOINT = `${process.env.SERVER_URL}:${process.env.SERVER_PORT}`;
@@ -22,6 +22,25 @@ const SERVER_ENDPOINT = `${process.env.SERVER_URL}:${process.env.SERVER_PORT}`;
 export class ApiService {
   private getPromotionRequest(url: string): Promise<Promotion[]> {
     return fetch(url).then((result) => result.json());
+  }
+
+  private getReleaseRequest(url: string): Promise<Release> {
+    return fetch(url).then((result) => result.json());
+  }
+
+  async getRelease(requestedRelease: string): Promise<ReleaseEventInput[]> {
+    const release = await this.getReleaseRequest(
+      `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
+    );
+    return [
+      new ReleaseEventInput(release.promotions[0], new Date()),
+      ...release.promotions
+        .slice(1)
+        .map(
+          (promotion, i) =>
+            new ReleaseEventInput(promotion, release.promotions[i].date),
+        ),
+    ];
   }
 
   async getReleases(): Promise<ReleaseEventInput[]> {
@@ -36,7 +55,7 @@ export class ApiService {
 
   async getCurrentReleases(): Promise<CurrentReleases> {
     const currentReleases = await this.getPromotionRequest(
-      SERVER_ENDPOINT + '/current-releases/',
+      `${SERVER_ENDPOINT}/current-releases/`,
     );
     return new CurrentReleases(currentReleases);
   }
