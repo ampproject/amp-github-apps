@@ -39,11 +39,11 @@ export function getFixtureFile(filename: string): string {
 /**
  * Get a JSON test fixture object.
  */
-export function getFixture(name: string): {[key: string]: unknown} {
+export function getFixture(name: string): Record<string, unknown> {
   return JSON.parse(getFixtureFile(`${name}.json`));
 }
 
 export function getGraphQLResponse(ref: string, path: string): GraphQLResponse {
   const basename = path.replace(/\./g, '_').replace(/\//g, '-');
-  return getFixture(`${ref}/${basename}`) as GraphQLResponse;
+  return (getFixture(`${ref}/${basename}`) as unknown) as GraphQLResponse;
 }

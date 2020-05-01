@@ -42,7 +42,7 @@ const lister = new ErrorMonitor(stackdriver, 2500, 40);
 export async function errorIssue(
   req: express.Request,
   res: express.Response
-): void {
+): Promise<unknown> {
   const errorReport = req.method === 'POST' ? req.body : req.query;
   const {
     errorId,
@@ -111,7 +111,7 @@ export async function errorIssue(
 export async function errorMonitor(
   req: express.Request,
   res: express.Response
-): void {
+): Promise<void> {
   try {
     res.json({issueUrls: await monitor.monitorAndReport()});
   } catch (error) {
@@ -132,7 +132,7 @@ function createErrorReportUrl(report: ErrorReport): string {
 export async function errorList(
   req: express.Request,
   res: express.Response
-): void {
+): Promise<void> {
   try {
     const reports = await lister.newErrorsToReport();
     res.json({
