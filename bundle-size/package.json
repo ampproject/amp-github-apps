@@ -20,6 +20,7 @@
     "deploy-tag": "git tag 'deploy-bundle-size-'`date --utc '+%Y%m%d%H%M%S'`",
     "setup-db": "node ./setup-db.js",
     "start": "probot run ./app.js",
+    "pretest": "npm run lint",
     "test": "jest"
   },
   "dependencies": {
