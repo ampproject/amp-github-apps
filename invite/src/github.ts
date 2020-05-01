@@ -16,7 +16,7 @@
 
 import {Octokit} from '@octokit/rest';
 
-import {ILogger} from './types';
+import {Logger} from 'invite-bot';
 
 /** Interface for working with the GitHub API. */
 export class GitHub {
@@ -24,7 +24,7 @@ export class GitHub {
   constructor(
     private client: Octokit,
     private org: string,
-    private logger: ILogger = console
+    private logger: Logger = console
   ) {}
 
   /**

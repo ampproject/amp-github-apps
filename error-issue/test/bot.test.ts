@@ -17,8 +17,8 @@
 import nock from 'nock';
 
 import {BlameFinder} from '../src/blame_finder';
-import {IssueBuilder} from '../src/issue_builder';
 import {ErrorIssueBot} from '../src/bot';
+import {IssueBuilder} from '../src/issue_builder';
 
 describe('ErrorIssueBot', () => {
   let bot: ErrorIssueBot;
@@ -115,7 +115,7 @@ describe('ErrorIssueBot', () => {
           });
           return true;
         })
-        .reply(201, {html_url: issueUrl});
+        .reply(201, {'html_url': issueUrl});
 
       await expect(bot.report(errorReport)).resolves.toEqual(issueUrl);
     });

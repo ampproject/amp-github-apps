@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import {ErrorReport, Stackdriver} from 'error-issue-bot';
 import {StackdriverApi} from './stackdriver_api';
-import {ErrorReport, Stackdriver} from './types';
 
 import fetch from 'node-fetch';
 import statusCodes from 'http-status-codes';
@@ -32,12 +32,12 @@ export class ErrorMonitor {
   ) {}
 
   /** Tests if an error group already has an associated issue. */
-  private hasTrackingIssue(group: Stackdriver.ErrorGroup) {
+  private hasTrackingIssue(group: Stackdriver.ErrorGroup): boolean {
     return !!group.trackingIssues;
   }
 
   /** Tests if an error group is occurring frequently enough to report. */
-  private hasHighFrequency(groupStats: Stackdriver.ErrorGroupStats) {
+  private hasHighFrequency(groupStats: Stackdriver.ErrorGroupStats): boolean {
     const timedCount = groupStats.timedCounts[0];
     return timedCount && timedCount.count >= this.minFrequency;
   }
@@ -89,7 +89,7 @@ export class ErrorMonitor {
   }
 
   /** Identifies new, frequent errors and reports GitHub issues. */
-  async monitorAndReport() {
+  async monitorAndReport(): Promise<Array<string>> {
     const errors = await this.newErrorsToReport();
     console.info(`Found ${errors.length} new error groups to report`);
     const urls: Array<string> = [];

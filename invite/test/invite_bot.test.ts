@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import Knex from 'knex';
 import {mocked} from 'ts-jest/utils';
+import Knex from 'knex';
 
-import {setupDb} from '../src/setup_db';
-import {dbConnect} from '../src/db';
-import {Invite, InviteAction} from '../src/types';
-import {InvitationRecord} from '../src/invitation_record';
-import {InviteBot} from '../src/invite_bot';
 import {GitHub} from '../src/github';
+import {InvitationRecord, InviteAction} from '../src/invitation_record';
+import {Invite} from 'invite-bot';
+import {InviteBot} from '../src/invite_bot';
+import {dbConnect} from '../src/db';
+import {setupDb} from '../src/setup_db';
 
 jest.mock('../src/db', () => {
   const testDb = Knex({
@@ -33,7 +33,7 @@ jest.mock('../src/db', () => {
 
   return {
     Database: Knex,
-    dbConnect: () => testDb,
+    dbConnect: (): Knex => testDb,
   };
 });
 
@@ -46,12 +46,12 @@ describe('Invite Bot', () => {
 
   beforeEach(() => {
     jest.spyOn(GitHub.prototype, 'inviteUser');
-    jest
-      .spyOn(GitHub.prototype, 'addComment')
-      .mockImplementation(async () => {});
-    jest
-      .spyOn(GitHub.prototype, 'assignIssue')
-      .mockImplementation(async () => {});
+    jest.spyOn(GitHub.prototype, 'addComment').mockImplementation(async () => {
+      // Do nothing
+    });
+    jest.spyOn(GitHub.prototype, 'assignIssue').mockImplementation(async () => {
+      // Do nothing
+    });
     jest.spyOn(InvitationRecord.prototype, 'recordInvite');
 
     inviteBot = new InviteBot(
@@ -90,7 +90,9 @@ describe('Invite Bot', () => {
       jest.spyOn(inviteBot, 'userCanTrigger');
       jest.spyOn(inviteBot, 'parseMacros');
       jest.spyOn(inviteBot, 'tryInvite');
-      jest.spyOn(inviteBot, 'tryAssign').mockImplementation(async () => {});
+      jest.spyOn(inviteBot, 'tryAssign').mockImplementation(async () => {
+        // Do nothing
+      });
     });
 
     it('ignores empty comments', async done => {
@@ -195,8 +197,12 @@ describe('Invite Bot', () => {
     beforeEach(() => {
       jest
         .spyOn(GitHub.prototype, 'addComment')
-        .mockImplementation(async () => {});
-      jest.spyOn(inviteBot, 'tryAssign').mockImplementation(async () => {});
+        .mockImplementation(async () => {
+          //Do nothing
+        });
+      jest.spyOn(inviteBot, 'tryAssign').mockImplementation(async () => {
+        // Do nothing
+      });
     });
 
     it('checks the record for invites to the user', async done => {
@@ -508,7 +514,9 @@ describe('Invite Bot', () => {
         mocked(GitHub.prototype.inviteUser).mockRejectedValue(
           new Error('Uh-oh!')
         );
-        jest.spyOn(console, 'error').mockImplementation(() => {});
+        jest.spyOn(console, 'error').mockImplementation(() => {
+          // Do nothing
+        });
       });
 
       it('logs an error', async done => {

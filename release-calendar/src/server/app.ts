@@ -23,7 +23,8 @@ import express from 'express';
 async function main(): Promise<void> {
   const connection: Connection = await createConnection({
     type: 'mysql',
-    host: process.env.HOST,
+    port: Number(process.env.DB_PORT),
+    host: process.env.DB_HOST,
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -36,12 +37,12 @@ async function main(): Promise<void> {
 
   const repositoryService = new RepositoryService(connection);
   const app = express();
-  const port = process.env.API_PORT;
+  const port = process.env.SERVER_PORT;
 
   app.use(function (req, res, next) {
     res.header(
       'Access-Control-Allow-Origin',
-      `http://localhost:${process.env.WEB_PORT}`,
+      `${process.env.CLIENT_URL}:${process.env.CLIENT_PORT}`,
     );
     res.header(
       'Access-Control-Allow-Headers',
