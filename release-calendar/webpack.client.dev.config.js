@@ -16,9 +16,10 @@
 
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   target: 'web',
   devtool: 'source-map',
   devServer: {
@@ -71,9 +72,17 @@ module.exports = {
     ],
   },
   plugins: [
+    new Dotenv({
+      path: '.env', // TODO - switch for prod and dev
+    }),
     new HtmlWebPackPlugin({
-      template: './src/client/index.html',
-      'filename': './index.html',
+      template: './src/client/index.ejs',
+      templateParameters: {
+        'scripts':
+          '<script src="./node_modules/react/umd/react.development.js"></script>' +
+          '<script src="./node_modules/react-dom/umd/react-dom.development.js"></script>',
+      },
+      filename: './index.html',
     }),
   ],
   externals: {
