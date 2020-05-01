@@ -15,6 +15,7 @@
  */
 
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
@@ -23,6 +24,19 @@ const port = process.env.CLIENT_PORT;
 const DIST_DIR = path.join(__dirname, 'dist');
 
 app.use(express.static(DIST_DIR));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+//  apply to all requests
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+  }),
+);
 
 app.get('*', async (req, res) => {
   res.sendFile(path.join(DIST_DIR, 'index.html'));
