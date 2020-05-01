@@ -1,5 +1,5 @@
 /**
- * Copyright 2018, the AMP HTML authors
+ * Copyright 2018, the AMP HTML authors. All Rights Reserved
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,7 +54,6 @@ function runAppTests(appName) {
  * @return {number} process exit code.
  */
 function main() {
-  timedExecOrDie('eslint . --ext .ts,.tsx');
   let buildTargets = new Set(ALL_TARGETS);
 
   if (isTravisPushBuild()) {
@@ -76,8 +75,14 @@ function main() {
   if (buildTargets.has('OWNERS')) {
     runAppTests('owners');
   }
+  if (buildTargets.has('ONDUTY')) {
+    runAppTests('onduty');
+  }
   if (buildTargets.has('PR_DEPLOY')) {
     runAppTests('pr-deploy');
+  }
+  if (buildTargets.has('RELEASE_CALENDAR')) {
+    runAppTests('release-calendar');
   }
   if (buildTargets.has('TEST_STATUS')) {
     runAppTests('test-status');

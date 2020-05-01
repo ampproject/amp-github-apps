@@ -26,9 +26,12 @@ const {gitDiffNameOnlyMaster} = require('./git');
 const ALL_TARGETS = [
   'BUNDLE_SIZE',
   'CHECKLIST',
+  'ERROR_ISSUE',
   'INVITE',
+  'ONDUTY',
   'OWNERS',
   'PR_DEPLOY',
+  'RELEASE_CALENDAR',
   'TEST_STATUS',
 ];
 
@@ -53,12 +56,20 @@ const targetMatchers = [
     func: file => file.startsWith('invite/'),
   },
   {
+    targets: ['ONDUTY'],
+    func: file => file.startsWith('onduty/'),
+  },
+  {
     targets: ['OWNERS'],
     func: file => file.startsWith('owners/'),
   },
   {
     targets: ['PR_DEPLOY'],
     func: file => file.startsWith('pr-deploy/'),
+  },
+  {
+    targets: ['RELEASE_CALENDAR'],
+    func: file => file.startsWith('release-calendar/'),
   },
   {
     targets: ['TEST_STATUS'],
