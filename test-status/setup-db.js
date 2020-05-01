@@ -54,18 +54,6 @@ function setupDb(db) {
         .foreign('headSha')
         .references('pullRequestSnapshots.headSha')
         .onDelete('CASCADE');
-    })
-    .createTable('buildCop', table => {
-      table.comment(
-        'Singleton table to store the GitHub username of active build cop'
-      );
-
-      table.string('username', 255);
-    })
-    .then(() => {
-      return db('buildCop').insert({
-        username: 'UNINITIALIZED',
-      });
     });
 }
 

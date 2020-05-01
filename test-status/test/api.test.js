@@ -51,8 +51,6 @@ describe('test-status/api', () => {
       WEB_UI_BASE_URL: 'http://localhost:3000/',
     };
 
-    await db('buildCop').update({username: 'agithuber'});
-
     nock('https://api.github.com')
       .post('/app/installations/123456/access_tokens')
       .reply(200, {token: 'test'});
