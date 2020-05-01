@@ -22,6 +22,7 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "test/**/*.ts",
-    "webpack.*.config.js"
+    "webpack.*.config.js",
+    "server.js"
   ]
 }
