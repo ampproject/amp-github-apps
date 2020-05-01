@@ -17,7 +17,7 @@
     "start": "probot run ./dist/app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-checklist-'`date --utc '+%Y%m%d%H%M%S'`",
-    "test": "jest",
+    "test": "echo No tests defined for this app!",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
   "license": "Apache-2.0",
