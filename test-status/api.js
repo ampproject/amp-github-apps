@@ -103,7 +103,7 @@ function createReportedCheckParams(
   failed,
   travisJobUrl
 ) {
-  const {owner, repo, headSha} = pullRequestSnapshot;
+  const {owner, repo} = pullRequestSnapshot;
   const params = {
     owner,
     repo,
@@ -163,7 +163,7 @@ function createErroredCheckParams(
   checkRunId,
   travisJobUrl
 ) {
-  const {owner, repo, headSha} = pullRequestSnapshot;
+  const {owner, repo} = pullRequestSnapshot;
   return {
     owner,
     repo,

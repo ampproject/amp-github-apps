@@ -17,7 +17,6 @@
 const {dbConnect} = require('./db-connect');
 const {installApiRouter} = require('./api');
 const {installGitHubWebhooks} = require('./webhooks');
-const {installWebUiRouter} = require('./web');
 
 const db = dbConnect();
 
