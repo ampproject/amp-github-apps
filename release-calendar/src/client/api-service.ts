@@ -64,12 +64,10 @@ export class ApiService {
     return new CurrentReleases(currentReleases);
   }
 
-  async getReleaseDates(requestedRelease: string): Promise<ReleaseDates[]> {
+  async getReleaseDates(requestedRelease: string): Promise<ReleaseDates> {
     const release = await this.getReleaseRequest(
       `${SERVER_URL}/releases/${requestedRelease}`,
     );
-    return release.promotions.map((promotion) => {
-      return new ReleaseDates(promotion);
-    });
+    return new ReleaseDates(release);
   }
 }

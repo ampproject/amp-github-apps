@@ -27,7 +27,7 @@ export interface EventCardProps {
 }
 
 interface EventCardState {
-  releaseDates: ReleaseDates[];
+  releaseDates: ReleaseDates;
 }
 
 export class EventCard extends React.Component<EventCardProps, EventCardState> {
@@ -36,12 +36,12 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
   constructor(props: Readonly<EventCardProps>) {
     super(props);
     this.state = {
-      releaseDates: [],
+      releaseDates: null,
     };
     this.apiService = new ApiService();
   }
   async componentDidMount(): Promise<void> {
-    const releaseDates: ReleaseDates[] = await this.apiService.getReleaseDates(
+    const releaseDates: ReleaseDates = await this.apiService.getReleaseDates(
       this.props.eventApi.title,
     );
     this.setState({releaseDates});
@@ -86,7 +86,6 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
   ];
 
   render(): JSX.Element {
-    const isCherryPick = true;
     return (
       <div className={'event-card'}>
         <div className={this.props.eventApi.classNames[0]}>
@@ -104,7 +103,9 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
                 }>{`Release ${this.props.eventApi.title}`}</h2>
             </div>
             <div className='content-content'>
-              {isCherryPick && (
+              {/* TODO: uncomment below when cherrypick is connected 
+              (will be adding cherrypick attribute to releaseDates) */}
+              {/* {this.state.releaseDates.cherrypick && (
                 <div className={'content-row'}>
                   <div className={'emoji'}>
                     <span role='img' aria-label={'flower'}>
@@ -113,7 +114,7 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
                   </div>
                   <div className={'text'}>{'Cherrypick!'}</div>
                 </div>
-              )}
+              )} */}
               <div className={'content-row'}>
                 <div className={'emoji'}>
                   <span role='img' aria-label={'laptop'}>
@@ -130,28 +131,26 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
                 </div>
               </div>
               <h3 className={'subtitle-row'}>{'Schedule'}</h3>
-              {this.schedule.map((row) => {
-                const index = this.state.releaseDates.findIndex(
-                  (releaseDate) => releaseDate.channel == row.channel,
-                );
-                return (
-                  index != -1 && (
-                    <div className={'content-row'} key={row.emoji}>
-                      <div className={'emoji'}>
-                        <span role='img' aria-label={'row.emojiName'}>
-                          {row.emoji}
-                        </span>
+              {this.state.releaseDates != null &&
+                this.state.releaseDates.dates.map((row) => {
+                  const match = this.schedule.find(
+                    (type) => type.channel == row.channel,
+                  );
+                  return (
+                    match && (
+                      <div className={'content-row'} key={match.emoji}>
+                        <div className={'emoji'}>
+                          <span role='img' aria-label={'row.emojiName'}>
+                            {match.emoji}
+                          </span>
+                        </div>
+                        <div className={'text'}>
+                          {match.text + moment(row.date).format('MMMM Do, hA')}
+                        </div>
                       </div>
-                      <div className={'text'}>
-                        {row.text +
-                          moment(this.state.releaseDates[index].start).format(
-                            'MMMM Do, hA',
-                          )}
-                      </div>
-                    </div>
-                  )
-                );
-              })}
+                    )
+                  );
+                })}
             </div>
           </div>
         </div>
