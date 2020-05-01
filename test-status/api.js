@@ -14,6 +14,7 @@
  */
 'use strict';
 
+const BUILD_COP_TEAM = process.env.BUILD_COP_TEAM || 'ampproject/build-cop';
 const {getBuildCop, getCheckRunId, getPullRequestSnapshot} = require('./db');
 
 /**
@@ -134,7 +135,7 @@ function createReportedCheckParams(
           '1. Restart the failed ' +
           (travisJobUrl ? `[Travis job](${travisJobUrl})\n` : 'Travis job\n') +
           '2. Rebase your pull request on the latest `master` branch\n' +
-          `3. Contact the weekly build cop (@${buildCop}), who can advise ` +
+          `3. Contact the weekly build cop (@${BUILD_COP_TEAM}), who can advise ` +
           'you how to proceed, or skip this test run for you.',
       },
     });
@@ -196,7 +197,7 @@ function createErroredCheckParams(
         '1. Restart the failed ' +
         (travisJobUrl ? `[Travis job](${travisJobUrl})\n` : 'Travis job\n') +
         '2. Rebase your pull request on the latest `master` branch\n' +
-        `3. Contact the weekly build cop (@${buildCop}), who can advise you ` +
+        `3. Contact the weekly build cop (@${BUILD_COP_TEAM}), who can advise you ` +
         'how to proceed, or skip this test run for you.',
     },
   };
