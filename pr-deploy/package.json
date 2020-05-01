@@ -13,9 +13,12 @@
     "node": "^12.13.1"
   },
   "scripts": {
+    "lint": "eslint . --ext .ts",
+    "fix": "npm run lint -- --fix",
     "build": "tsc ./src/*.ts --esModuleInterop",
     "dev": "nodemon",
     "start": "probot run ./src/app.js",
+    "pretest": "npm run lint",
     "test": "jest --verbose=false"
   },
   "dependencies": {

@@ -19,13 +19,10 @@ const path = require('path');
 module.exports = {
   'root': true,
   'plugins': [
-      '@typescript-eslint',
-      'notice',
-      'prettier',
-      'sort-imports-es6-autofix',
     'notice',
     'prettier',
-    'sort-requires',
+    'sort-imports-es6-autofix',
+    'sort-requires'
   ],
   'env': {
     'es6': true,
@@ -37,6 +34,7 @@ module.exports = {
   ],
   'parserOptions': {
     'ecmaVersion': 2018,
+    'sourceType': 'module',
   },
   'rules': {
     'camelcase': 'error',
@@ -80,6 +78,14 @@ module.exports = {
     'prefer-const': 'error',
     'prettier/prettier': 'error',
     'radix': 'error',
-    'sort-requires/sort-requires': 'error'
+    'sort-imports-es6-autofix/sort-imports-es6': [
+      'error',
+      {
+        'ignoreCase': false,
+        'ignoreMemberSort': false,
+        'memberSyntaxSortOrder': ['none', 'all', 'multiple', 'single']
+      }
+    ],
+    'sort-requires/sort-requires': 'error',
   },
 };

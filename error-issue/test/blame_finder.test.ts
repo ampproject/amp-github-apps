@@ -16,8 +16,8 @@
 
 import nock from 'nock';
 
-import {RateLimitedGraphQL} from '../src/rate_limited_graphql';
 import {BlameFinder} from '../src/blame_finder';
+import {RateLimitedGraphQL} from '../src/rate_limited_graphql';
 import {getGraphQLResponse} from './fixtures';
 
 describe('BlameFinder', () => {

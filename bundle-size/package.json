@@ -13,6 +13,8 @@
     "node": "^12.13.1"
   },
   "scripts": {
+    "lint": "eslint .",
+    "fix": "npm run -- --fix",
     "dev": "nodemon",
     "deploy": "gcloud --project amp-bundle-size-bot app deploy",
     "deploy-tag": "git tag 'deploy-bundle-size-'`date --utc '+%Y%m%d%H%M%S'`",
@@ -30,6 +32,7 @@
     "sleep-promise": "8.0.1"
   },
   "devDependencies": {
+    "eslint": "6.8.0",
     "fancy-log": "1.3.3",
     "jest": "25.2.4",
     "nock": "12.0.3",

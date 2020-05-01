@@ -15,11 +15,11 @@
  */
 
 import {ErrorMonitor} from '../src/error_monitor';
+import {Stackdriver} from 'error-issue-bot';
 import {StackdriverApi} from '../src/stackdriver_api';
-import {Stackdriver} from '../src/types';
 
-import nock from 'nock';
 import {mocked} from 'ts-jest/utils';
+import nock from 'nock';
 
 describe('ErrorMonitor', () => {
   let monitor: ErrorMonitor;
@@ -183,7 +183,9 @@ describe('ErrorMonitor', () => {
     });
 
     it('handles failed attempts to report errors', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => {});
+      jest.spyOn(console, 'error').mockImplementation(() => {
+        // Do nothing
+      });
       monitor.reportError = jest.fn().mockImplementation(async () => {
         throw new Error('Oops!');
       });

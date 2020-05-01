@@ -16,10 +16,10 @@
 
 import {Octokit} from '@octokit/rest';
 
-import {RateLimitedGraphQL} from './rate_limited_graphql';
 import {BlameFinder} from './blame_finder';
+import {ErrorReport} from 'error-issue-bot';
 import {IssueBuilder} from './issue_builder';
-import {ErrorReport} from './types';
+import {RateLimitedGraphQL} from './rate_limited_graphql';
 
 const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
 

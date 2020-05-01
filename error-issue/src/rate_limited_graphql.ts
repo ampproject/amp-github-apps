@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import {GraphQLResponse} from 'error-issue-bot';
 import {graphql} from '@octokit/graphql';
-import {GraphQLResponse} from './types';
 
 const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
 
 /** Returns a promise that resolves after a specified number of milliseconds. */
-async function sleep(ms: number): Promise<any> {
+async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -28,11 +28,11 @@ async function sleep(ms: number): Promise<any> {
  * Wrapper around the GraphQL client providing built-in query rate-limiting.
  */
 export class RateLimitedGraphQL {
-  private ready: Promise<any> = Promise.resolve();
+  private ready: Promise<void> = Promise.resolve();
   private execute: (query: string) => Promise<GraphQLResponse>;
 
   constructor(token: string, private frequencyMs: number = GRAPHQL_FREQ_MS) {
-    this.execute = async query =>
+    this.execute = async (query: string): Promise<GraphQLResponse> =>
       graphql(query, {headers: {authorization: `token ${token}`}}) as Promise<
         GraphQLResponse
       >;
