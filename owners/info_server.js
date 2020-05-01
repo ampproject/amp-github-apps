@@ -95,7 +95,7 @@ class Server {
    * @return {!Promise} a promise that resolves once the server is started.
    */
   listen(port) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _) => {
       this.app.listen(port, () => {
         this.logger.info(`Info server listening on port ${port}`);
         resolve();
@@ -159,22 +159,22 @@ class InfoServer extends Server {
   initRoutes() {
     const ownersFile = fs.readFileSync(EXAMPLE_OWNERS_PATH).toString('utf8');
 
-    this.get('/', async req =>
+    this.get('/', async () =>
       this.render('status', {
         repository: `${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPOSITORY}`,
       })
     );
 
-    this.get('/tree', async req => {
+    this.get('/tree', async () => {
       const {result, errors} = this.ownersBot.treeParse;
       return this.render('tree', {ownersTree: result, errors});
     });
 
-    this.get('/teams', async req => {
+    this.get('/teams', async () => {
       return this.render('teams', {teams: Object.values(this.ownersBot.teams)});
     });
 
-    this.get('/example', async req => {
+    this.get('/example', async () => {
       return this.render('example', {ownersFile: hl(ownersFile)});
     });
 
@@ -215,11 +215,11 @@ class InfoServer extends Server {
       }
     });
 
-    this.cron('refreshTree', async req => {
+    this.cron('refreshTree', async () => {
       await this.ownersBot.refreshTree(this.logger);
     });
 
-    this.cron('refreshTeams', async req => {
+    this.cron('refreshTeams', async () => {
       await this.ownersBot.initTeams(this.github);
     });
 

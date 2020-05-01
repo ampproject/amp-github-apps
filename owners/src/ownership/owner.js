@@ -44,7 +44,7 @@ class Owner {
    * @throws {Error} if called on the abstract base `Owner` class.
    * @param {string} username username to check.
    */
-  includes(username) {
+  includes(unusedUsername) {
     throw new Error('Not implemented for abstract class `Owner`');
   }
 
