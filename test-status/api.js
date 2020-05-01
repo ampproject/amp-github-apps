@@ -32,7 +32,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
     owner: pullRequestSnapshot.owner,
     repo: pullRequestSnapshot.repo,
     name: `ampproject/tests/${type} (${subType})`,
-    head_sha: pullRequestSnapshot.headSha,
+    'head_sha': pullRequestSnapshot.headSha,
   };
   switch (status) {
     case 'queued':
@@ -50,7 +50,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
     case 'started':
       Object.assign(params, {
         status: 'in_progress',
-        started_at: new Date().toISOString(),
+        'started_at': new Date().toISOString(),
         output: {
           title: 'Tests are running on Travis',
           summary:
@@ -64,7 +64,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
       Object.assign(params, {
         status: 'completed',
         conclusion: 'neutral',
-        completed_at: new Date().toISOString(),
+        'completed_at': new Date().toISOString(),
         output: {
           title: 'Tests were not required',
           summary:
@@ -108,9 +108,9 @@ function createReportedCheckParams(
   const params = {
     owner,
     repo,
-    check_run_id: checkRunId,
+    'check_run_id': checkRunId,
     status: 'completed',
-    completed_at: new Date().toISOString(),
+    'completed_at': new Date().toISOString(),
   };
   if (failed > 0) {
     Object.assign(params, {
@@ -169,9 +169,9 @@ function createErroredCheckParams(
   return {
     owner,
     repo,
-    check_run_id: checkRunId,
+    'check_run_id': checkRunId,
     status: 'completed',
-    completed_at: new Date().toISOString(),
+    'completed_at': new Date().toISOString(),
     conclusion: 'action_required',
     output: {
       title: `Tests have errored`,
@@ -250,7 +250,7 @@ exports.installApiRouter = (app, db) => {
       } else {
         await github.checks.update(
           Object.assign(params, {
-            check_run_id: checkRunId,
+            'check_run_id': checkRunId,
           })
         );
       }
