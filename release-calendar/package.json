@@ -13,7 +13,8 @@
     "node": "12.13.1"
   },
   "scripts": {
-    "lint": "eslint --quiet --fix src/* test/* --ext .ts,.tsx ",
+    "lint": "eslint . --quiet --ext .ts,.tsx ",
+    "fix": "npm lint -- --fix",
     "client": "npm run client-build && npm run client-serve",
     "client-build": "webpack --config ./webpack.client.config.js",
     "client-serve": "webpack-dev-server --mode development --open --hot --config ./webpack.client.config.js",
@@ -23,6 +24,7 @@
     "setup": "npm run setup-build && npm run setup-serve",
     "setup-build": "webpack --config ./webpack.setup.config.js",
     "setup-serve": "node -r dotenv/config ./dist/bundle-setup.js",
+    "pretest": "npm run lint",
     "test": "jest --verbose=false"
   },
   "dependencies": {
