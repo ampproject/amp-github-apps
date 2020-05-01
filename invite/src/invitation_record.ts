@@ -15,7 +15,12 @@
  */
 
 import {Database} from './db';
-import {ILogger, Invite} from './types';
+import {Invite, InviteActionType, Logger} from 'invite-bot';
+
+export const InviteAction: Record<string, InviteActionType> = {
+  INVITE: 'invite',
+  INVITE_AND_ASSIGN: 'invite_and_assign',
+};
 
 /**
  * A record of invites sent by the bot that may require follow-up actions.
@@ -24,7 +29,7 @@ export class InvitationRecord {
   /**
    * Constructor.
    */
-  constructor(private db: Database, private logger: ILogger = console) {}
+  constructor(private db: Database, private logger: Logger = console) {}
 
   /**
    * Records an invite created by the bot.
