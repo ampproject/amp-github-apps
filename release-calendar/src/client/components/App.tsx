@@ -35,18 +35,27 @@ export class App extends React.Component<{}, AppState> {
     };
   }
 
+  componentDidMount(): void {
+    this.setState({channels: Object.values(Channel)});
+  }
+
   handleSelectedChannel = (channel: Channel, toChecked: boolean): void => {
-    this.setState({
-      channels: toChecked
-        ? this.state.channels.concat(channel)
-        : this.state.channels.filter((item) => channel !== item),
-    });
+    const channels = toChecked
+      ? this.state.channels.concat(channel)
+      : this.state.channels.filter((item) => channel !== item);
+    this.setState({channels});
+    if (this.state.release != null) {
+      this.setState({release: null});
+    }
   };
 
   handleSelectedRelease = (selectedRelease: string): void => {
-    this.setState({
-      release: this.state.release != selectedRelease ? selectedRelease : null,
-    });
+    const release =
+      this.state.release != selectedRelease ? selectedRelease : null;
+    this.setState({release});
+    if (this.state.channels.length) {
+      this.setState({channels: []});
+    }
   };
 
   render(): JSX.Element {
