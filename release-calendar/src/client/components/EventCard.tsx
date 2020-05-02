@@ -51,35 +51,30 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
     {
       channel: Channel.NIGHTLY,
       text: 'Created as Nightly on ',
-      title: 'Nightly',
       emoji: '🌙',
       emojiName: 'moon',
     },
     {
       channel: Channel.OPT_IN_EXPERIMENTAL,
       text: 'Promoted to Opt-in Experimental, Opt-In Beta on ',
-      title: 'Opt-in Experimental',
       emoji: '✋',
       emojiName: 'hand',
     },
     {
       channel: Channel.PERCENT_EXPERIMENTAL,
       text: 'Promoted to 1% Experimental, 1% Beta on ',
-      title: '1% Experimental',
       emoji: '🧪',
       emojiName: 'experiment',
     },
     {
       channel: Channel.STABLE,
       text: 'Promoted to Stable on ',
-      title: 'Stable',
       emoji: '🏠',
       emojiName: 'house',
     },
     {
       channel: Channel.LTS,
       text: 'Promoted to LTS on ',
-      title: 'Long Term Stable',
       emoji: '🏙️',
       emojiName: 'city',
     },
@@ -126,7 +121,7 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
                     href={`https://github.com/ampproject/amphtml/releases/tag/${this.props.eventApi.title}`}
                     target='_blank'
                     rel='noopener noreferrer'>
-                    {'Github Release'}
+                    {'GitHub Release'}
                   </a>
                 </div>
               </div>

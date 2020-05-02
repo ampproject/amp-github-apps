@@ -29,7 +29,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
 const CALENDAR_CONTENT_HEIGHT = 610;
-const EVENT_LIMIT_DISPLAYED = 4;
+const EVENT_LIMIT_DISPLAYED = 3;
 
 export interface CalendarProps {
   channels: Channel[];
