@@ -14,12 +14,16 @@
   },
   "main": "dist/app.js",
   "scripts": {
+    "lint": "eslint src --ext .js,.ts",
+    "fix": "npm run -- --fix",
     "dev": "nodemon",
     "deploy": "gcloud --project amp-bundle-size-chart app deploy",
     "deploy-cron": "gcloud --project amp-bundle-size-chart app deploy cron.yaml",
     "deploy-tag": "git tag 'deploy-bundle-size-chart-'`date --utc '+%Y%m%d%H%M%S'`",
     "prestart": "tsc",
-    "start": "node dist/app.js"
+    "start": "node dist/app.js",
+    "pretest": "npm run lint",
+    "test": "echo No tests defined for this app"
   },
   "dependencies": {
     "@google-cloud/storage": "4.3.0",
@@ -33,6 +37,7 @@
     "typescript": "3.7.5"
   },
   "devDependencies": {
+    "eslint": "6.8.0",
     "nodemon": "2.0.2",
     "ts-node": "8.6.2"
   },

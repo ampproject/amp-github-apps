@@ -2,7 +2,7 @@ AMP Test Status Bot
 ===================
 
 A GitHub App that reports the status of different test types on the AMPHTML
-repository, and allows the build cop to skip flaky tests.
+repository.
 
 This app runs on an instance of Google AppEngine and is installed exclusively on [ampproject/amphtml](https://github.com/ampproject/amphtml).
 
@@ -33,41 +33,7 @@ from this comma separated list of IP addresses will be processed.
   * If `failed` is 0, sets the check's conclusion to `success`, which turns the
     check green
   * If `failed` ≥ 1, sets the check's conclusion to `action_required`, which
-    turns the check red. It also sets a URL to resolve the issue back to the web
-    interface of this app, which can only be accessed by the weekly build cop or
-    a fixed set of authorized users
-
-### API for Build Cop updates
-
-The App has the following API point, which are to be triggered by a cron script
-from the build cop rotation tool. The `BUILD_COP_UPDATE_TOKEN` environment
-variable must be set to a unique token, to be sent in the JSON POST requests
-for validation.
-
-* `POST /v0/build-cop/update`
-  * Receives a JSON object with two fields: `accessToken` (which must be set to
-    the same value as the `BUILD_COP_UPDATE_TOKEN` environment variable) and
-    `username`, which is the GitHub username of the current build cop
-
-### Web UI
-
-The App provides a web interface for the weekly build cop. Login is performed
-via GitHub authentication, and the interface can only be accessed by the weekly
-build cop or a fixed set of authorized users. Other users will receive a 403
-error page.
-
-The interface has the following paths:
-
-* `GET /:headSha/:type/:subType/status`
-  * Displays the status of the check as reported from Travis, and provides a
-    link to skip these test
-* `GET /:headSha/:type/:subType/skip`
-  * Displays the above, plus a form to add a reason for why they are skipping
-    the tests
-* `POST /:headSha/:type/:subType/skip`
-  * Updates the equivalent check's conclusion to `success` with the provided
-    explanation from the form, and redirects the build cop back to the pull
-    request
+    turns the check red.
 
 
 Local development
@@ -99,7 +65,7 @@ Follow these setup instructions to start developing for this App locally:
    take note of the App ID, Client ID, and Client secret
 7. Install the application on a GitHub repository that you want to use for
    testing. You might want to create a new repository for this purpose.
-8. Copy the `.env.example` file to `.env` and modify the fields based on the
+8. Copy the `redacted.env` file to `.env` and modify the fields based on the
    instructions in that file and the values from the GitHub App page
    * The value for the `PRIVATE_KEY` field is a base64 representation of the
      `.pem` file you downloaded from the GitHub App page. On Linux/Mac you can

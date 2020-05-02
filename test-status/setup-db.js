@@ -1,5 +1,5 @@
 /**
- * Copyright 2019, the AMP HTML authors
+ * Copyright 2019, the AMP HTML authors. All Rights Reserved
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,18 +54,6 @@ function setupDb(db) {
         .foreign('headSha')
         .references('pullRequestSnapshots.headSha')
         .onDelete('CASCADE');
-    })
-    .createTable('buildCop', table => {
-      table.comment(
-        'Singleton table to store the GitHub username of active build cop'
-      );
-
-      table.string('username', 255);
-    })
-    .then(() => {
-      return db('buildCop').insert({
-        username: 'UNINITIALIZED',
-      });
     });
 }
 

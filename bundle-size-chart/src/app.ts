@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import {Octokit} from '@octokit/rest';
+import {Storage} from '@google-cloud/storage';
 import {createObjectCsvStringifier} from 'csv-writer';
 import {createTokenAuth} from '@octokit/auth';
 import dotenv from 'dotenv';
 import express from 'express';
 import process from 'process';
-import {Octokit} from '@octokit/rest';
-import {Storage} from '@google-cloud/storage';
 
 const CRON_TIMEOUT_MS = 600000; // 10 minutes, the GAE cron timeout limit.
 const MAX_COMMIT_DAYS = 365;
@@ -31,7 +31,7 @@ dotenv.config();
 const app = express();
 app.use(express.static('static'));
 
-app.get('/_cron', async(request, response) => {
+app.get('/_cron', async (request, response) => {
   response.setTimeout(CRON_TIMEOUT_MS);
   console.log('Running CRON job to save latest bundle sizes into a CSV file');
 
@@ -61,7 +61,7 @@ app.get('/_cron', async(request, response) => {
     auth: process.env.ACCESS_TOKEN,
   });
 
-  const masterCommits: Array<{sha: string, message: string, date: string}> = [];
+  const masterCommits: Array<{sha: string; message: string; date: string}> = [];
   const options = github.repos.listCommits.endpoint.merge({
     owner: 'ampproject',
     repo: 'amphtml',
@@ -87,11 +87,10 @@ app.get('/_cron', async(request, response) => {
 
   console.log('Retrieving bundle size JSON files');
   const files = new Set<string>();
-  const records: Array<{[key: string]: string|number}> = [];
+  const records: Array<{[key: string]: string | number}> = [];
   const skippedShas: Array<string> = [];
   for (const masterCommit of masterCommits) {
     try {
-
       const contents = await github.repos.getContents({
         owner: 'ampproject',
         repo: 'amphtml-build-artifacts',
@@ -100,7 +99,7 @@ app.get('/_cron', async(request, response) => {
       // For reasons that are beyond me, despite the fact that `content` is a
       // property of Octokit.ReposGetContentsResponse, it doesn't compile :(
       const bundleSizes = JSON.parse(
-        Buffer.from((contents.data as any).content, 'base64').toString()
+        Buffer.from((contents.data as unknown).content, 'base64').toString()
       );
 
       records.push(Object.assign({}, masterCommit, bundleSizes));
@@ -116,9 +115,9 @@ app.get('/_cron', async(request, response) => {
     `Skipped unretrievable JSON files for commit SHAs: ${skippedShas}`
   );
 
-  const header = Array.from(files).sort().map(
-    file => ({id: file, title: file})
-  );
+  const header = Array.from(files)
+    .sort()
+    .map(file => ({id: file, title: file}));
   header.unshift(
     {id: 'sha', title: 'sha'},
     {id: 'message', title: 'message'},
@@ -131,10 +130,11 @@ app.get('/_cron', async(request, response) => {
 
   try {
     console.log('Storing bundle-sizes.csv file in Google Cloud bucket...');
-    await bucket.file('bundle-sizes.csv').save(
-      csvWriter.getHeaderString() + csvWriter.stringifyRecords(records),
-      {resumable: false}
-    );
+    await bucket
+      .file('bundle-sizes.csv')
+      .save(csvWriter.getHeaderString() + csvWriter.stringifyRecords(records), {
+        resumable: false,
+      });
     console.log('Done!');
   } catch (e) {
     console.error(e);
