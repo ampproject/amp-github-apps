@@ -15,7 +15,11 @@
  */
 
 import {Channel, Promotion, Release} from '../types';
-import {CurrentReleases, ReleaseEventInput} from './models/view-models';
+import {
+  CurrentReleases,
+  ReleaseEventInput,
+  SingleReleasePromotion,
+} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_ENDPOINT = `${process.env.SERVER_URL}:${process.env.SERVER_PORT}`;
 
@@ -28,7 +32,10 @@ export class ApiService {
     return fetch(url).then((result) => result.json());
   }
 
-  async getRelease(requestedRelease: string): Promise<ReleaseEventInput[]> {
+  //TODO: specialize this for use in EventCard
+  async getEventSchedule(
+    requestedRelease: string,
+  ): Promise<ReleaseEventInput[]> {
     const release = await this.getReleaseRequest(
       `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
     );
@@ -41,6 +48,17 @@ export class ApiService {
             new ReleaseEventInput(promotion, release.promotions[i].date),
         ),
     ];
+  }
+
+  async getRelease(
+    requestedRelease: string,
+  ): Promise<SingleReleasePromotion[]> {
+    const release = await this.getReleaseRequest(
+      `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
+    );
+    return release.promotions.map((promotion) => {
+      return new SingleReleasePromotion(promotion);
+    });
   }
 
   async getReleases(): Promise<ReleaseEventInput[]> {

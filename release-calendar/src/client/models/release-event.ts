@@ -15,19 +15,20 @@
  */
 
 import {Channel} from '../../types';
-import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {ReleaseEventInput} from './view-models';
+import {EventInput} from '@fullcalendar/core/structs/event';
+import {ExtendedEventSourceInput} from '@fullcalendar/core/structs/event-source';
+import {ReleaseEventInput, SingleReleasePromotion} from './view-models';
 
 export function getAllReleasesEvents(
   events: ReleaseEventInput[],
-): Map<Channel, EventSourceInput> {
+): Map<Channel, ExtendedEventSourceInput> {
   const eventInputs = new Map<Channel, ReleaseEventInput[]>();
   events.forEach((event) => {
     const channelEvents = eventInputs.get(event.channel) || [];
     eventInputs.set(event.channel, [...channelEvents, event]);
   });
 
-  const eventSources = new Map<Channel, EventSourceInput>();
+  const eventSources = new Map<Channel, ExtendedEventSourceInput>();
   eventInputs.forEach((eventInput, channel) => {
     eventSources.set(channel, {
       events: eventInput,
@@ -38,11 +39,19 @@ export function getAllReleasesEvents(
 }
 
 export function getSingleReleaseEvents(
-  eventInputs: ReleaseEventInput[],
-): EventSourceInput[] {
-  return eventInputs.map(
-    (event: ReleaseEventInput): EventSourceInput => {
-      return {events: [event], textColor: 'white'};
-    },
-  );
+  SingleReleasePromotions: SingleReleasePromotion[],
+  allReleases: Map<Channel, ExtendedEventSourceInput>,
+): ExtendedEventSourceInput[] {
+  return SingleReleasePromotions.map((promotion: SingleReleasePromotion) => {
+    return {
+      events: [
+        (allReleases.get(promotion.channel).events as EventInput[]).find(
+          (event) => {
+            return event.start == promotion.date;
+          },
+        ),
+      ],
+      textColor: 'white',
+    };
+  });
 }
