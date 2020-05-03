@@ -20,7 +20,7 @@ import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {EventApi} from '@fullcalendar/core';
 import {ReleaseDates} from '../models/view-models';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 export interface EventCardProps {
   eventApi: EventApi;
@@ -140,7 +140,10 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
                           </span>
                         </div>
                         <div className={'text'}>
-                          {match.text + moment(row.date).format('MMMM Do, hA')}
+                          {match.text +
+                            moment
+                              .tz(row.date, moment.tz.guess())
+                              .format('MMMM Do, hA z')}
                         </div>
                       </div>
                     )
