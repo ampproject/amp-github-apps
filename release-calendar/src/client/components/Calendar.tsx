@@ -77,10 +77,10 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     }
   }
 
-  gotoDate = (date: Date): void => {
+  gotoDate(date: Date): void {
     const calendarApi = this.calendarReference.current.getApi();
     calendarApi.gotoDate(date);
-  };
+  }
 
   tooltip = (arg: {
     isMirror: boolean;
