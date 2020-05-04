@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import '../stylesheets/eventCard.scss';
+import '../stylesheets/releaseCard.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {EventApi} from '@fullcalendar/core';
 import {ReleaseDates} from '../models/view-models';
+import {channelTitles} from './ChannelTable';
 import moment from 'moment-timezone';
 
 export interface ReleaseCardProps {
@@ -53,35 +54,54 @@ export class ReleaseCard extends React.Component<
   history = [
     {
       channel: Channel.NIGHTLY,
-      text: 'Created as Nightly on ',
       emoji: '🌙',
       emojiName: 'moon',
     },
     {
       channel: Channel.OPT_IN_EXPERIMENTAL,
-      text: 'Promoted to Opt-in Experimental, Opt-In Beta on ',
       emoji: '✋',
       emojiName: 'hand',
     },
     {
       channel: Channel.PERCENT_EXPERIMENTAL,
-      text: 'Promoted to 1% Experimental, 1% Beta on ',
       emoji: '🧪',
       emojiName: 'experiment',
     },
     {
       channel: Channel.STABLE,
-      text: 'Promoted to Stable on ',
       emoji: '🏠',
       emojiName: 'house',
     },
     {
       channel: Channel.LTS,
-      text: 'Promoted to LTS on ',
       emoji: '🏙️',
       emojiName: 'city',
     },
   ];
+
+  getTitle(search: Channel): string {
+    if (search == Channel.OPT_IN_EXPERIMENTAL) {
+      return `${
+        channelTitles.find(
+          (channel) => channel.channel == Channel.OPT_IN_EXPERIMENTAL,
+        ).title
+      }, ${
+        channelTitles.find((channel) => channel.channel == Channel.OPT_IN_BETA)
+          .title
+      }`;
+    } else if (search == Channel.PERCENT_EXPERIMENTAL) {
+      return `${
+        channelTitles.find(
+          (channel) => channel.channel == Channel.PERCENT_EXPERIMENTAL,
+        ).title
+      }, ${
+        channelTitles.find((channel) => channel.channel == Channel.PERCENT_BETA)
+          .title
+      }`;
+    } else {
+      return channelTitles.find((channel) => channel.channel == search).title;
+    }
+  }
 
   render(): JSX.Element {
     return (
@@ -128,7 +148,7 @@ export class ReleaseCard extends React.Component<
                   </a>
                 </div>
               </div>
-              <h3 className={'subtitle-row'}>{'Schedule'}</h3>
+              <h3 className={'subtitle-row'}>{'Release History'}</h3>
               {this.state.releaseDates != null &&
                 this.state.releaseDates.dates.map((row) => {
                   const match = this.history.find(
@@ -143,10 +163,13 @@ export class ReleaseCard extends React.Component<
                           </span>
                         </div>
                         <div className={'text'}>
-                          {match.text +
-                            moment
-                              .tz(row.date, moment.tz.guess())
-                              .format('MMMM Do, hA z')}
+                          {`${
+                            match.channel != Channel.NIGHTLY
+                              ? 'Promoted to '
+                              : 'Created as '
+                          } ${this.getTitle(match.channel)} on ${moment
+                            .tz(row.date, moment.tz.guess())
+                            .format('MMMM Do, hA z')}`}
                         </div>
                       </div>
                     )

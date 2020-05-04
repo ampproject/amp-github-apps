@@ -34,6 +34,7 @@
     "@fullcalendar/react": "4.4.0",
     "@fullcalendar/timegrid": "4.4.0",
     "@popperjs/core": "2.4.0",
+    "@types/express-rate-limit": "5.0.0",
     "@types/jest": "25.1.4",
     "@types/moment-timezone": "0.5.13",
     "@types/node": "12.12.26",

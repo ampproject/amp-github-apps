@@ -30,6 +30,16 @@ interface ChannelTableProps {
   handleSelectedRelease: (release: string) => void;
 }
 
+export const channelTitles = [
+  {channel: Channel.STABLE, title: 'Stable'},
+  {channel: Channel.PERCENT_BETA, title: '% Beta'},
+  {channel: Channel.PERCENT_EXPERIMENTAL, title: '% Experimental'},
+  {channel: Channel.OPT_IN_BETA, title: 'Opt-in Beta'},
+  {channel: Channel.OPT_IN_EXPERIMENTAL, title: 'Opt-in Experimental'},
+  {channel: Channel.NIGHTLY, title: 'Nightly'},
+  {channel: Channel.LTS, title: 'Long Term Stable'},
+];
+
 export class ChannelTable extends React.Component<
   ChannelTableProps,
   ChannelTableState
@@ -61,22 +71,12 @@ export class ChannelTable extends React.Component<
     this.props.handleSelectedRelease(release);
   };
 
-  rows = [
-    {channel: Channel.STABLE, title: 'Stable'},
-    {channel: Channel.PERCENT_BETA, title: '% Beta'},
-    {channel: Channel.PERCENT_EXPERIMENTAL, title: '% Experimental'},
-    {channel: Channel.OPT_IN_BETA, title: 'Opt-in Beta'},
-    {channel: Channel.OPT_IN_EXPERIMENTAL, title: 'Opt-in Experimental'},
-    {channel: Channel.NIGHTLY, title: 'Nightly'},
-    {channel: Channel.LTS, title: 'Long Term Stable'},
-  ];
-
   render(): JSX.Element {
     return (
       <React.Fragment>
         <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
-          {this.rows.map((row) => {
+          {channelTitles.map((row) => {
             return (
               <React.Fragment key={row.channel}>
                 <label className='row-button' htmlFor={row.channel}>
