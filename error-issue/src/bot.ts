@@ -22,6 +22,7 @@ import {IssueBuilder} from './issue_builder';
 import {RateLimitedGraphQL} from './rate_limited_graphql';
 
 const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
+const NOCOPY_SENTINEL = '<!-- DO NOT COPY BELOW -->';
 const RELEASE_ONDUTY =
   process.env.RELEASE_ONDUTY || 'ampproject/release-on-duty';
 
@@ -64,5 +65,28 @@ export class ErrorIssueBot {
     const issue = await this.buildErrorIssue(errorReport);
     const {data} = await this.octokit.issues.create(issue);
     return data.html_url;
+  }
+
+  /** Copies an issue from one repo to another. */
+  async copyIssue(
+    fromIssueNumber: number,
+    fromRepo: string,
+    toRepo: string
+  ): Promise<void> {
+    const {data} = await this.octokit.issues.get({
+      owner: this.repoOwner,
+      repo: fromRepo,
+      'issue_number': fromIssueNumber,
+    });
+    const {title, body, labels} = data;
+    const trimmedBody = body.split(NOCOPY_SENTINEL, 1)[0].trim();
+
+    await this.octokit.issues.create({
+      owner: this.repoOwner,
+      repo: toRepo,
+      title,
+      body: trimmedBody,
+      labels: labels.map(({name}) => name),
+    });
   }
 }

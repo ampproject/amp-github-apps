@@ -130,4 +130,48 @@ describe('ErrorIssueBot', () => {
       });
     });
   });
+
+  describe('copyIssue', () => {
+    it('fetches and recreates an issue', async () => {
+      nock('https://api.github.com')
+        .get('/repos/test_org/issue_repo/issues/1337')
+        .reply(200, {
+          title: 'Issue title',
+          body: 'Issue body',
+          labels: [{name: 'Type: Error Report'}],
+        })
+        .post('/repos/test_org/code_repo/issues', body => {
+          expect(body).toMatchObject({
+            title: 'Issue title',
+            body: 'Issue body',
+            labels: ['Type: Error Report'],
+          });
+          return true;
+        })
+        .reply(201);
+
+      await bot.copyIssue(1337, 'issue_repo', 'code_repo');
+    });
+
+    it('drops content past <!-- DO NOT COPY -->', async () => {
+      nock('https://api.github.com')
+        .get('/repos/test_org/issue_repo/issues/1337')
+        .reply(200, {
+          title: 'Issue title',
+          body: 'Issue body\n<!-- DO NOT COPY BELOW -->Click here to copy!',
+          labels: [{name: 'Type: Error Report'}],
+        })
+        .post('/repos/test_org/code_repo/issues', body => {
+          expect(body).toMatchObject({
+            title: 'Issue title',
+            body: 'Issue body',
+            labels: ['Type: Error Report'],
+          });
+          return true;
+        })
+        .reply(201);
+
+      await bot.copyIssue(1337, 'issue_repo', 'code_repo');
+    });
+  });
 });
