@@ -10,8 +10,6 @@ steps:
       - replace-secrets
       - --
       - onduty
-    secretEnv:
-      - GITHUB_ACCESS_TOKEN
 
   # Compile the app from Typescript into dist/.
   - name: gcr.io/cloud-builders/npm
