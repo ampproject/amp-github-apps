@@ -23,59 +23,25 @@
 const {bold, cyan, yellow} = require('ansi-colors');
 const {gitDiffNameOnlyMaster} = require('./git');
 
-const ALL_TARGETS = [
-  'BUNDLE_SIZE',
-  'CHECKLIST',
-  'ERROR_ISSUE',
-  'INVITE',
-  'ONDUTY',
-  'OWNERS',
-  'PR_DEPLOY',
-  'RELEASE_CALENDAR',
-  'TEST_STATUS',
+const APPS_TO_TEST = [
+  'bundle-size',
+  'checklist',
+  'error-issue',
+  'invite',
+  'onduty',
+  'owners',
+  'pr-deploy',
+  'release-calendar',
+  'test-status',
 ];
 
 /**
  * A mapping of functions that match a given file to one or more build targets.
  */
-const targetMatchers = [
-  {
-    targets: ['BUNDLE_SIZE'],
-    func: file => file.startsWith('bundle-size/'),
-  },
-  {
-    targets: ['CHECKLIST'],
-    func: file => file.startsWith('checklist/'),
-  },
-  {
-    targets: ['ERROR_ISSUE'],
-    func: file => file.startsWith('error-issue/'),
-  },
-  {
-    targets: ['INVITE'],
-    func: file => file.startsWith('invite/'),
-  },
-  {
-    targets: ['ONDUTY'],
-    func: file => file.startsWith('onduty/'),
-  },
-  {
-    targets: ['OWNERS'],
-    func: file => file.startsWith('owners/'),
-  },
-  {
-    targets: ['PR_DEPLOY'],
-    func: file => file.startsWith('pr-deploy/'),
-  },
-  {
-    targets: ['RELEASE_CALENDAR'],
-    func: file => file.startsWith('release-calendar/'),
-  },
-  {
-    targets: ['TEST_STATUS'],
-    func: file => file.startsWith('test-status/'),
-  },
-];
+const targetMatchers = APPS_TO_TEST.map(app => ({
+  targets: [app],
+  func: file => file.startsWith(`${app}/`),
+}));
 
 /**
  * Populates buildTargets with a set of build targets contained in a PR after
@@ -96,7 +62,7 @@ function determineBuildTargets(fileName = 'build-targets.js') {
 
   if (buildTargets.size === 0) {
     // Default to running all test targets if no other targets are matched.
-    ALL_TARGETS.forEach(buildTargets.add, buildTargets);
+    APPS_TO_TEST.forEach(buildTargets.add, buildTargets);
   }
 
   const targetList = Array.from(buildTargets).sort().join(', ');
@@ -110,6 +76,6 @@ function determineBuildTargets(fileName = 'build-targets.js') {
 }
 
 module.exports = {
-  ALL_TARGETS,
+  APPS_TO_TEST,
   determineBuildTargets,
 };

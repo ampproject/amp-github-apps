@@ -48,7 +48,9 @@ export class ApiService {
   }
 
   async getReleases(): Promise<ReleaseEventInput[]> {
-    const allPromotions = await this.getPromotionRequest(SERVER_ENDPOINT);
+    const allPromotions = await this.getPromotionRequest(
+      `${SERVER_ENDPOINT}/releases/`,
+    );
     const map = new Map<Channel, Date>();
     return allPromotions.map((promotion: Promotion) => {
       const date = map.get(promotion.channel) || new Date();
