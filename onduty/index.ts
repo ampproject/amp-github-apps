@@ -42,18 +42,20 @@ export async function refreshRotation(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
-  const {accessToken, ...rotations}: RotationReporterPayload = req.body;
+  res.sendStatus(statusCodes.NOT_READY);
 
-  try {
-    if (accessToken === GITHUB_ACCESS_TOKEN) {
-      await bot.handleUpdate(rotations);
-      res.sendStatus(statusCodes.OK);
-    } else {
-      res.sendStatus(statusCodes.UNAUTHORIZED);
-    }
-  } catch (e) {
-    console.error(e);
-    res.status(statusCodes.INTERNAL_SERVER_ERROR);
-    res.send(String(e));
-  }
+  // const {accessToken, ...rotations}: RotationReporterPayload = req.body;
+
+  // try {
+  //   if (accessToken === GITHUB_ACCESS_TOKEN) {
+  //     await bot.handleUpdate(rotations);
+  //     res.sendStatus(statusCodes.OK);
+  //   } else {
+  //     res.sendStatus(statusCodes.UNAUTHORIZED);
+  //   }
+  // } catch (e) {
+  //   console.error(e);
+  //   res.status(statusCodes.INTERNAL_SERVER_ERROR);
+  //   res.send(String(e));
+  // }
 }
