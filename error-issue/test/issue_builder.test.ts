@@ -55,7 +55,12 @@ describe('IssueBuilder', () => {
 
   beforeEach(() => {
     jest.spyOn(Date, 'now').mockReturnValue(now.valueOf());
-    builder = new IssueBuilder(report, blames, 'test_org/onduty-team');
+    builder = new IssueBuilder(
+      report,
+      blames,
+      'test_org/code_repo',
+      'test_org/onduty-team'
+    );
   });
 
   describe('title', () => {
@@ -154,11 +159,11 @@ describe('IssueBuilder', () => {
       expect(notes).toContain(
         '`@xymw` modified ' +
           '`extensions/amp-delight-player/0.1/amp-delight-player.js:396-439` ' +
-          'in #17939 (Nov 12, 2018)'
+          'in test_org/code_repo#17939 (Nov 12, 2018)'
       );
       expect(notes).toContain(
-        '`@rsimha` modified `src/event-helper-listen.js:57-59` in #12450 ' +
-          '(Dec 13, 2017)'
+        '`@rsimha` modified `src/event-helper-listen.js:57-59` in ' +
+          'test_org/code_repo#12450 (Dec 13, 2017)'
       );
     });
 

@@ -14,8 +14,8 @@ Error: null is not an object (evaluating 'b.acceleration.x')
 
 Notes
 ---
-`@xymw` modified `extensions/amp-delight-player/0.1/amp-delight-player.js:396-439` in #17939 (Nov 12, 2018)
-`@rsimha` modified `src/event-helper-listen.js:57-59` in #12450 (Dec 13, 2017)
+`@xymw` modified `extensions/amp-delight-player/0.1/amp-delight-player.js:396-439` in test_org/code_repo#17939 (Nov 12, 2018)
+`@rsimha` modified `src/event-helper-listen.js:57-59` in test_org/code_repo#12450 (Dec 13, 2017)
 
 **Possible assignees:** `@xymw`
 

@@ -35,6 +35,7 @@ export class IssueBuilder {
   constructor(
     {errorId, firstSeen, dailyOccurrences, stacktrace}: ErrorReport,
     private blames: Array<BlameRange>,
+    private codeRepoSlug: string = '',
     private releaseOnduty?: string
   ) {
     const [message, ...stack] = stacktrace.split('\n');
@@ -81,7 +82,7 @@ export class IssueBuilder {
   }: BlameRange): string {
     return (
       `\`${author}\` modified \`${path}:${startingLine}-${endingLine}\`` +
-      ` in #${prNumber} (${formatDate(committedDate)})`
+      ` in ${this.codeRepoSlug}#${prNumber} (${formatDate(committedDate)})`
     );
   }
 
