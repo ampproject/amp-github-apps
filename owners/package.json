@@ -9,6 +9,8 @@
     "node": "^12.13.1"
   },
   "scripts": {
+    "lint": "eslint .",
+    "fix": "npm run lint -- --fix",
     "init": "node scripts/warm_cache.js",
     "dev": "node info_server.js",
     "start": "probot run ./index.js",
@@ -30,6 +32,7 @@
     "sleep-promise": "8.0.1"
   },
   "devDependencies": {
+    "eslint": "6.8.0",
     "jest": "25.2.4",
     "nock": "12.0.3",
     "sinon": "9.0.1",

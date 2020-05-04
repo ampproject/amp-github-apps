@@ -9,8 +9,8 @@
     "node": "^12.13.1"
   },
   "scripts": {
-    "lint": "eslint **/*.ts",
-    "fix": "eslint **/*.ts --fix",
+    "lint": "eslint . --ext .ts",
+    "fix": "npm run -- --fix",
     "lint-conflicts": "eslint --print-config app.ts | eslint-config-prettier-check",
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
