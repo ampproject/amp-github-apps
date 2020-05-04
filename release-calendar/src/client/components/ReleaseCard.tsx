@@ -22,18 +22,21 @@ import {EventApi} from '@fullcalendar/core';
 import {ReleaseDates} from '../models/view-models';
 import moment from 'moment-timezone';
 
-export interface EventCardProps {
+export interface ReleaseCardProps {
   eventApi: EventApi;
 }
 
-interface EventCardState {
+interface ReleaseCardState {
   releaseDates: ReleaseDates;
 }
 
-export class EventCard extends React.Component<EventCardProps, EventCardState> {
+export class ReleaseCard extends React.Component<
+  ReleaseCardProps,
+  ReleaseCardState
+> {
   private apiService: ApiService;
 
-  constructor(props: Readonly<EventCardProps>) {
+  constructor(props: Readonly<ReleaseCardProps>) {
     super(props);
     this.state = {
       releaseDates: null,
@@ -47,7 +50,7 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
     this.setState({releaseDates});
   }
 
-  schedule = [
+  history = [
     {
       channel: Channel.NIGHTLY,
       text: 'Created as Nightly on ',
@@ -128,7 +131,7 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
               <h3 className={'subtitle-row'}>{'Schedule'}</h3>
               {this.state.releaseDates != null &&
                 this.state.releaseDates.dates.map((row) => {
-                  const match = this.schedule.find(
+                  const match = this.history.find(
                     (type) => type.channel == row.channel,
                   );
                   return (

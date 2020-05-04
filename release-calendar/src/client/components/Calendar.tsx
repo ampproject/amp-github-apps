@@ -19,7 +19,7 @@ import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {Tooltip} from './TooltipHook';
+import {Tooltip} from './Tooltip';
 import {
   getAllReleasesEvents,
   getSingleReleaseEvents,

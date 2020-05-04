@@ -14,28 +14,13 @@
  * limitations under the License.
  */
 
-import {EventApi, View} from '@fullcalendar/core';
-import {EventCard} from './EventCard';
+import {EventApi} from '@fullcalendar/core';
+import {ReleaseCard} from './ReleaseCard';
 import {usePopper} from 'react-popper';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 const TOOLTIP_HEIGHT = 300;
-
-export const Tooltip = (arg: {
-  isMirror: boolean;
-  isStart: boolean;
-  isEnd: boolean;
-  event: EventApi;
-  el: HTMLElement;
-  view: View;
-}): void => {
-  const Content = (): JSX.Element => {
-    return <Hook event={arg.event}></Hook>;
-  };
-
-  ReactDOM.render(<Content />, arg.el);
-};
 
 export const Hook = (children: {event: EventApi}): JSX.Element => {
   const [referenceElement, setReferenceElement] = React.useState(null);
@@ -94,7 +79,7 @@ export const Hook = (children: {event: EventApi}): JSX.Element => {
             ref={setPopperElement}
             style={{...{zIndex: 999}, ...styles.popper}}
             {...attributes.popper}>
-            {isClicked && <EventCard eventApi={children.event}></EventCard>}
+            {isClicked && <ReleaseCard eventApi={children.event}></ReleaseCard>}
           </div>
         </div>,
         document.querySelector('#app'),

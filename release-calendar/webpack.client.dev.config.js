@@ -86,10 +86,12 @@ module.exports = {
       },
       filename: './index.html',
     }),
+    /** For moment-timezone to limit timezone data */
     new MomentTimezoneDataPlugin({
       startYear: 2000,
-      endYear: new Date().getFullYear(),
     }),
+    /** for moment-timezone, a workaround to convince webpack not to
+     *  look for locales already included in the moment-with-locales.js */
     new webpack.ContextReplacementPlugin(
       /\.\/locale$/,
       'empty-module',
