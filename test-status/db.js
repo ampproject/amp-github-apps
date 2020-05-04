@@ -1,5 +1,5 @@
 /**
- * Copyright 2019, the AMP HTML authors
+ * Copyright 2019, the AMP HTML authors. All Rights Reserved
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -91,16 +91,4 @@ exports.getCheckRunResults = async (db, headSha, type, subType) => {
     }
     return existingCheck;
   }
-};
-
-/**
- * Get the GitHub username of the current build cop.
- *
- * @param {!Knex} db instantiated database connection.
- * @return {string} the GitHub username of the current build cop.
- */
-exports.getBuildCop = async db => {
-  return await db('buildCop')
-    .first('username')
-    .then(row => row['username']);
 };

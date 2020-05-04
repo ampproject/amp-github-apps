@@ -85,6 +85,7 @@ export class ChannelTable extends React.Component<
                       type='checkbox'
                       className='click-square'
                       id={row.channel}
+                      checked={this.props.channels.includes(row.channel)}
                       onChange={(e): void =>
                         this.handleChannelClick(row.channel, e)
                       }></input>
