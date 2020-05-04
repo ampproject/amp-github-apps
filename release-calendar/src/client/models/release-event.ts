@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {Channel} from '../../types';
+import {Channel, Promotion} from '../../types';
 import {EventInput} from '@fullcalendar/core/structs/event';
 import {ExtendedEventSourceInput} from '@fullcalendar/core/structs/event-source';
-import {ReleaseEventInput, SingleReleasePromotion} from './view-models';
+import {ReleaseEventInput} from './view-models';
 
 export function getAllReleasesEvents(
   events: ReleaseEventInput[],
@@ -39,10 +39,10 @@ export function getAllReleasesEvents(
 }
 
 export function getSingleReleaseEvents(
-  SingleReleasePromotions: SingleReleasePromotion[],
+  SingleReleasePromotions: Promotion[],
   allReleases: Map<Channel, ExtendedEventSourceInput>,
 ): ExtendedEventSourceInput[] {
-  return SingleReleasePromotions.map((promotion: SingleReleasePromotion) => {
+  return SingleReleasePromotions.map((promotion: Promotion) => {
     return {
       events: [
         (allReleases.get(promotion.channel).events as EventInput[]).find(

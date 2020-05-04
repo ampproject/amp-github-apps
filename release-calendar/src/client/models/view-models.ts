@@ -56,13 +56,3 @@ export class CurrentReleases {
 
   map: Map<Channel, string>;
 }
-
-export class SingleReleasePromotion {
-  constructor(promotion: Promotion) {
-    this.channel = promotion.channel;
-    this.date = promotion.date;
-  }
-
-  channel: Channel;
-  date: Date;
-}
