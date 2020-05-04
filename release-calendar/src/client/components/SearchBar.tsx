@@ -45,7 +45,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     this.apiService = new ApiService();
   }
 
-  Other = (): JSX.Element => {
+  Search = (): JSX.Element => {
     const {register, handleSubmit, watch, errors} = useForm<FormData>({
       mode: 'onChange',
       reValidateMode: 'onChange',
@@ -107,6 +107,6 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
   };
 
   render(): JSX.Element {
-    return <this.Other></this.Other>;
+    return <this.Search></this.Search>;
   }
 }
