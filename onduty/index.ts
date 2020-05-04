@@ -42,7 +42,7 @@ export async function refreshRotation(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
-  res.sendStatus(statusCodes.NOT_READY);
+  res.sendStatus(statusCodes.INTERNAL_SERVER_ERROR);
 
   // const {accessToken, ...rotations}: RotationReporterPayload = req.body;
 
