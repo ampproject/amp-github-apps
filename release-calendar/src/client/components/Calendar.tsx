@@ -106,23 +106,21 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
             .map((channel) => this.state.allEvents.get(channel));
 
     return (
-      <div className='calendar'>
-        <FullCalendar
-          defaultView='dayGridMonth'
-          header={{
-            left: 'prev,next',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek',
-          }}
-          plugins={[dayGridPlugin, timeGridPlugin]}
-          eventSources={displayEvents}
-          contentHeight={CALENDAR_CONTENT_HEIGHT}
-          fixedWeekCount={false}
-          displayEventTime={false}
-          views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
-          eventRender={this.tooltip}
-        />
-      </div>
+      <FullCalendar
+        defaultView='dayGridMonth'
+        header={{
+          left: 'prev,next',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek',
+        }}
+        plugins={[dayGridPlugin, timeGridPlugin]}
+        eventSources={displayEvents}
+        contentHeight={CALENDAR_CONTENT_HEIGHT}
+        fixedWeekCount={false}
+        displayEventTime={false}
+        views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
+        eventRender={this.tooltip}
+      />
     );
   }
 }

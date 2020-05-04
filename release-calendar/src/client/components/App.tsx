@@ -20,6 +20,7 @@ import {Calendar} from './Calendar';
 import {Channel} from '../../types';
 import {ChannelTable} from './ChannelTable';
 import {Header} from './Header';
+import {SearchBar} from './SearchBar';
 
 interface AppState {
   channels: Channel[];
@@ -64,13 +65,18 @@ export class App extends React.Component<{}, AppState> {
         <Header title='AMP Release Calendar' />
         <div className='main-container'>
           <div className='col-channel-table'>
-            <ChannelTable
-              channels={this.state.channels}
-              handleSelectedChannel={this.handleSelectedChannel}
-              handleSelectedRelease={this.handleSelectedRelease}
-            />
+            <div className='search-bar'>
+              <SearchBar handleSelectedRelease={this.handleSelectedRelease} />
+            </div>
+            <div className='channel-table'>
+              <ChannelTable
+                channels={this.state.channels}
+                handleSelectedChannel={this.handleSelectedChannel}
+                handleSelectedRelease={this.handleSelectedRelease}
+              />
+            </div>
           </div>
-          <div className='col-calendar'>
+          <div className={'col-calendar calendar'}>
             <Calendar
               channels={this.state.channels}
               singleRelease={this.state.release}

@@ -16,16 +16,26 @@
 }
 
 .col-channel-table {
-    @include container-shadow;
-    padding-top: 0px;
-    width: 30%;
+    width: 33%;
     float:left;
 }
 
 .col-calendar {
-    @include container-shadow;
     width: 63%;
     float: right;
+}
+
+.search-bar {
+    @include container-shadow;
+    margin-bottom: 5px;
+}
+
+.channel-table {
+    @include container-shadow;
+}
+
+.calendar {
+    @include container-shadow;
 }
 
 @media only screen and (max-width: 1030px) {
@@ -46,3 +56,4 @@
         width: 70%;
     }
 }
+

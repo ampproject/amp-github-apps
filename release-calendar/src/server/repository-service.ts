@@ -28,6 +28,13 @@ export class RepositoryService {
     this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
+  countRelease(name: string): Promise<number> {
+    return this.releaseRepository
+      .createQueryBuilder('release')
+      .where('release.name = :name', {name})
+      .getCount();
+  }
+
   getRelease(name: string): Promise<Release> {
     const releaseQuery = this.releaseRepository
       .createQueryBuilder('release')
@@ -39,7 +46,7 @@ export class RepositoryService {
     return releaseQuery;
   }
 
-  async getReleases(): Promise<Promotion[]> {
+  getReleases(): Promise<Promotion[]> {
     const channelQueries = this.promotionRepository
       .createQueryBuilder('promotion')
       .orderBy('promotion.date', 'DESC')
@@ -47,7 +54,7 @@ export class RepositoryService {
     return channelQueries;
   }
 
-  async getCurrentReleases(): Promise<Promotion[]> {
+  getCurrentReleases(): Promise<Promotion[]> {
     return Promise.all(
       [
         Channel.LTS,

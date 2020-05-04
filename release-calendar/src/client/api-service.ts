@@ -28,6 +28,10 @@ export class ApiService {
     return fetch(url).then((result) => result.json());
   }
 
+  private checkRequest(url: string): Promise<number> {
+    return fetch(url).then((result) => result.json());
+  }
+
   async getRelease(requestedRelease: string): Promise<ReleaseEventInput[]> {
     const release = await this.getReleaseRequest(
       `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
@@ -41,6 +45,13 @@ export class ApiService {
             new ReleaseEventInput(promotion, release.promotions[i].date),
         ),
     ];
+  }
+
+  async isRelease(requestedRelease: string): Promise<boolean> {
+    const count = await this.checkRequest(
+      `${SERVER_ENDPOINT}/count-releases/${requestedRelease}`,
+    );
+    return count > 0;
   }
 
   async getReleases(): Promise<ReleaseEventInput[]> {
