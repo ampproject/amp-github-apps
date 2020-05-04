@@ -40,7 +40,7 @@ describe('ErrorIssueBot', () => {
   });
 
   beforeEach(() => {
-    bot = new ErrorIssueBot('__TOKEN__', 'test_org', 'test_repo');
+    bot = new ErrorIssueBot('__TOKEN__', 'test_org', 'code_repo', 'issue_repo');
     nock.cleanAll();
 
     jest.spyOn(BlameFinder.prototype, 'blameForStacktrace').mockResolvedValue([
@@ -94,7 +94,7 @@ describe('ErrorIssueBot', () => {
     it('builds the issue to be created', async () => {
       await expect(bot.buildErrorIssue(errorReport)).resolves.toEqual({
         owner: 'test_org',
-        repo: 'test_repo',
+        repo: 'issue_repo',
         title: 'issue title',
         labels: ['label'],
         body: 'issue body',
@@ -107,7 +107,7 @@ describe('ErrorIssueBot', () => {
 
     it('creates an error issue', async () => {
       nock('https://api.github.com')
-        .post('/repos/test_org/test_repo/issues', body => {
+        .post('/repos/test_org/issue_repo/issues', body => {
           expect(body).toEqual({
             title: 'issue title',
             labels: ['label'],
@@ -122,7 +122,7 @@ describe('ErrorIssueBot', () => {
 
     it('propagates the error when the API call fails', async () => {
       nock('https://api.github.com')
-        .post('/repos/test_org/test_repo/issues')
+        .post('/repos/test_org/issue_repo/issues')
         .reply(401, {name: 'HttpError', status: 401});
 
       await expect(bot.report(errorReport)).rejects.toMatchObject({

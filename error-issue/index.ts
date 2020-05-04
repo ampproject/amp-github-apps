@@ -23,15 +23,19 @@ import {StackdriverApi} from './src/stackdriver_api';
 import express from 'express';
 import statusCodes from 'http-status-codes';
 
-const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
-const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
-const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
-const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
+const {
+  GITHUB_ORG = 'ampproject',
+  CODE_REPO = 'amphtml',
+  ISSUE_REPO = 'amphtml',
+  PROJECT_ID = 'amp-error-reporting',
+  GITHUB_ACCESS_TOKEN,
+} = process.env;
 
 const bot = new ErrorIssueBot(
   GITHUB_ACCESS_TOKEN,
-  GITHUB_REPO_OWNER,
-  GITHUB_REPO_NAME
+  GITHUB_ORG,
+  CODE_REPO,
+  ISSUE_REPO
 );
 
 const stackdriver = new StackdriverApi(PROJECT_ID);
