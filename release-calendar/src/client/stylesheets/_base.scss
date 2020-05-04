@@ -1,30 +1,32 @@
 //Channel Colors
-$lts: MidnightBlue;
-$stable: Crimson;
-$perc-beta: DarkOrchid;
-$perc-experimental: MediumSeaGreen;
-$opt-in-beta: PaleVioletRed;
-$opt-in-experimental: SteelBlue;
-$nightly: Tomato;
+$lts: #191970;
+$stable: #dc143c;
+$perc-beta: #9932cc;
+$perc-experimental: #3cb371;
+$opt-in-beta: #d87093;
+$opt-in-experimental: #4682b4;
+$nightly: #ff6347;
 
 body {
-    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-    font-size: 14px;
-    color: #24292e;
-    margin: 0px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	color: #24292e;
+	font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+	font-size: 14px;
+	margin: 0;
 }
 
 button {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    font-family: inherit;
-    font-size: inherit;
-    &:focus {
-       outline: none; 
-    }
-    &:active {
-        transform: translateY(1px);
-    }
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	font-family: inherit;
+	font-size: inherit;
+
+	&:focus {
+		outline: none; 
+	}
+
+	&:active {
+		transform: translateY(1px);
+	}
 } 

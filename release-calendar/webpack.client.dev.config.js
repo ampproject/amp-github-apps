@@ -17,6 +17,7 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const StylelintPlugin = require('stylelint-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -84,6 +85,7 @@ module.exports = {
       },
       filename: './index.html',
     }),
+    new StylelintPlugin({fix: true}),
   ],
   externals: {
     'react': 'React',

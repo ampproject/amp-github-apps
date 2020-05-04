@@ -1,48 +1,49 @@
 @use 'base';
 
 .main-container {
-    padding: 12px;
-    padding-top: 24px;
-    overflow: hidden;
+	overflow: hidden;
+	padding: 12px;
+	padding-top: 24px;
 }
 
 @mixin container-shadow {
-    box-shadow:
-        rgba(0, 0, 0, 0.2) 0px 2px 4px -1px,
-        rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
-        rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
-    padding: 16px;
-    border-radius: 4px;
+	border-radius: 4px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 2px 4px -1px,
+		rgba(0, 0, 0, 0.14) 0 4px 5px 0,
+		rgba(0, 0, 0, 0.12) 0 1px 10px 0;
+	padding: 16px;
 }
 
 .col-channel-table {
-    @include container-shadow;
-    padding-top: 0px;
-    width: 30%;
-    float:left;
+	@include container-shadow;
+	float: left;
+	padding-top: 0;
+	width: 30%;
 }
 
 .col-calendar {
-    @include container-shadow;
-    width: 63%;
-    float: right;
+	@include container-shadow;
+	float: right;
+	width: 63%;
 }
 
 @media only screen and (max-width: 1030px) {
-    .col-channel-table {
-        float: left;
-        width: 50%;
-    }
-    .col-calendar {
-        width: 90%;
-        margin-top: 5px;
-        clear: both;
-        float: left;
-    }
+	.col-channel-table {
+		float: left;
+		width: 50%;
+	}
+
+	.col-calendar {
+		clear: both;
+		float: left;
+		margin-top: 5px;
+		width: 90%;
+	}
 }
 
 @media only screen and (max-width: 600px) {
-    .col-channel-table {
-        width: 70%;
-    }
+	.col-channel-table {
+		width: 70%;
+	}
 }
