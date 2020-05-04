@@ -20,7 +20,7 @@ import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {EventApi, View} from '@fullcalendar/core';
-import {ExtendedEventSourceInput} from '@fullcalendar/core/structs/event-source';
+import {ReleaseEventInput} from '../models/view-models';
 import {
   getAllReleasesEvents,
   getSingleReleaseEvents,
@@ -40,8 +40,8 @@ export interface CalendarProps {
 }
 
 export interface CalendarState {
-  allEvents: Map<Channel, ExtendedEventSourceInput>;
-  singleEvents: {releaseName: string; events: ExtendedEventSourceInput[]};
+  allEvents: Map<Channel, ReleaseEventInput[]>;
+  singleEvents: ReleaseEventInput[];
 }
 
 export class Calendar extends React.Component<CalendarProps, CalendarState> {
@@ -50,8 +50,8 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   constructor(props: Readonly<CalendarProps>) {
     super(props);
     this.state = {
-      allEvents: new Map<Channel, ExtendedEventSourceInput>(),
-      singleEvents: {releaseName: null, events: []},
+      allEvents: new Map<Channel, ReleaseEventInput[]>(),
+      singleEvents: [],
     };
     this.apiService = new ApiService();
   }
@@ -62,20 +62,17 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   }
 
   async componentDidUpdate(prevProps: CalendarProps): Promise<void> {
-    if (
-      this.props.singleRelease != prevProps.singleRelease &&
-      this.props.singleRelease != this.state.singleEvents.releaseName &&
-      this.props.singleRelease != null
-    ) {
-      const release = await this.apiService.getRelease(
-        this.props.singleRelease,
-      );
-      this.setState({
-        singleEvents: {
-          releaseName: this.props.singleRelease,
-          events: getSingleReleaseEvents(release, this.state.allEvents),
-        },
-      });
+    if (prevProps.singleRelease != this.props.singleRelease) {
+      if (this.props.singleRelease != null) {
+        const release = await this.apiService.getRelease(
+          this.props.singleRelease,
+        );
+        this.setState({
+          singleEvents: getSingleReleaseEvents(release, this.state.allEvents),
+        });
+      } else {
+        this.setState({singleEvents: []});
+      }
     }
   }
 
@@ -103,12 +100,20 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   };
 
   render(): JSX.Element {
-    const displayEvents: ExtendedEventSourceInput[] =
-      this.props.singleRelease != null
-        ? this.state.singleEvents.events
-        : this.props.channels
-            .filter((channel) => this.state.allEvents.has(channel))
-            .map((channel) => this.state.allEvents.get(channel));
+    let displayEvents: ReleaseEventInput[] = [];
+    if (this.props.singleRelease != null) {
+      displayEvents = this.state.singleEvents;
+    } else {
+      this.props.channels
+        .filter((channel) => this.state.allEvents.has(channel))
+        .forEach(
+          (channel) =>
+            (displayEvents = [
+              ...displayEvents,
+              ...this.state.allEvents.get(channel),
+            ]),
+        );
+    }
 
     return (
       <div className='calendar'>
@@ -120,7 +125,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
             right: 'dayGridMonth,timeGridWeek,listWeek',
           }}
           plugins={[dayGridPlugin, timeGridPlugin]}
-          eventSources={displayEvents}
+          eventSources={[{textColor: 'white', events: displayEvents}]}
           contentHeight={CALENDAR_CONTENT_HEIGHT}
           fixedWeekCount={false}
           displayEventTime={false}
