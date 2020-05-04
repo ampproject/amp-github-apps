@@ -21,4 +21,5 @@ process.env.GITHUB_ACCESS_TOKEN = '_TOKEN_';
 process.env.GITHUB_ORG = 'test_org';
 process.env.RELEASE_ONDUTY_TEAM = 'release-team';
 process.env.BUILD_COP_TEAM = 'build-team';
+process.env.BOT_USERNAME = 'bot-user';
 process.env.AMP_RATE_LIMIT_MS = '1';
