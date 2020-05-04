@@ -97,6 +97,7 @@ export class ErrorIssueBot {
 
   /** Copies an issue from the error report repo to the code repo. */
   async copyIssueToCodeRepo(issueNumber: number): Promise<void> {
+    // FR(rcebulko): Close the origininating issue and link to the public one.
     return this.copyIssue(issueNumber, this.issueRepoName, this.codeRepoName);
   }
 }
