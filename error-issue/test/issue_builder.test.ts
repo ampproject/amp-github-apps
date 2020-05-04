@@ -55,7 +55,7 @@ describe('IssueBuilder', () => {
 
   beforeEach(() => {
     jest.spyOn(Date, 'now').mockReturnValue(now.valueOf());
-    builder = new IssueBuilder(report, blames);
+    builder = new IssueBuilder(report, blames, 'test_org/onduty-team');
   });
 
   describe('title', () => {
@@ -172,6 +172,17 @@ describe('IssueBuilder', () => {
     it('returns empty string when there is no blame info', () => {
       builder = new IssueBuilder(report, []);
       expect(builder.bodyNotes).toEqual('');
+    });
+  });
+
+  describe('bodyTag', () => {
+    it('CCs the release on-duty', () => {
+      expect(builder.bodyTag).toEqual('/cc @test_org/onduty-team');
+    });
+
+    it('is undefined when no onduty team is provided', () => {
+      builder = new IssueBuilder(report, blames);
+      expect(builder.bodyTag).toBeUndefined();
     });
   });
 

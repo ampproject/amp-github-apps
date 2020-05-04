@@ -7,9 +7,17 @@ This project is split into two parts: a React client, and an Express and TypeORM
 
 To start: `cd release-calendar && npm install`
 
-To build the client: `npm run client-build`
-To serve the client: `npm run client-serve`
-To build and serve the client: `npm run client`
+To build and run the app for production: `npm run start`
+* This serves the client and backend on `ENV.SERVER_URL:ENV.SERVER_PORT`
+
+To build and serve the client for development: `npm run client`
+* Make sure to set `ENV.MODE` to anything but `production`
+* This uses webpack dev server for hot reloading
+* This uses React's development build from your local node_modules folder
+
+To build the client for production: `npn run client-build-prod`
+* Make sure to set `ENV.MODE` to `production`
+* This uses React's production build
 
 To build the server: `npm run server-build`
 To serve the server: `npm run server-serve`

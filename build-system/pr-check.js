@@ -16,7 +16,7 @@
 
 const colors = require('ansi-colors');
 const log = require('fancy-log');
-const {ALL_TARGETS, determineBuildTargets} = require('./build-targets');
+const {APPS_TO_TEST, determineBuildTargets} = require('./build-targets');
 const {execOrDie} = require('./exec');
 const {isTravisPushBuild} = require('./travis');
 
@@ -54,7 +54,7 @@ function runAppTests(appName) {
  * @return {number} process exit code.
  */
 function main() {
-  let buildTargets = new Set(ALL_TARGETS);
+  let buildTargets = new Set(APPS_TO_TEST);
 
   if (isTravisPushBuild()) {
     log.info('Travis push build; running all tests');
@@ -63,30 +63,7 @@ function main() {
     log.info(`Detected build targets: ${Array.from(buildTargets).join(', ')}`);
   }
 
-  if (buildTargets.has('BUNDLE_SIZE')) {
-    runAppTests('bundle-size');
-  }
-  if (buildTargets.has('INVITE')) {
-    runAppTests('invite');
-  }
-  if (buildTargets.has('ERROR_ISSUE')) {
-    runAppTests('error-issue');
-  }
-  if (buildTargets.has('OWNERS')) {
-    runAppTests('owners');
-  }
-  if (buildTargets.has('ONDUTY')) {
-    runAppTests('onduty');
-  }
-  if (buildTargets.has('PR_DEPLOY')) {
-    runAppTests('pr-deploy');
-  }
-  if (buildTargets.has('RELEASE_CALENDAR')) {
-    runAppTests('release-calendar');
-  }
-  if (buildTargets.has('TEST_STATUS')) {
-    runAppTests('test-status');
-  }
+  APPS_TO_TEST.filter(buildTargets.has, buildTargets).forEach(runAppTests);
 
   return 0;
 }
