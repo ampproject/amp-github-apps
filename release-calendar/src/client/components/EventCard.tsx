@@ -113,7 +113,7 @@ export class EventCard extends React.Component<EventCardProps, EventCardState> {
               <div className={'content-row'}>
                 <div className={'emoji'}>
                   <span role='img' aria-label={'laptop'}>
-                    {'🖥'}
+                    {'🔗'}
                   </span>
                 </div>
                 <div className={'text'}>
