@@ -132,6 +132,21 @@ function createErrorReportUrl(report: ErrorReport): string {
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
 }
 
+/** Endpoint to copy an issue from the issue repo to the code repo. */
+export async function transferIssue(
+  req: express.Request,
+  res: express.Response
+): Promise<void> {
+  try {
+    const {issueNumber} = req.method === 'POST' ? req.body : req.query;
+    await bot.copyIssueToCodeRepo(Number(issueNumber));
+    res.sendStatus(statusCodes.OK);
+  } catch (error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR);
+    res.json({error: error.toString()});
+  }
+}
+
 /** Diagnostic endpoint to list new untracked errors. */
 export async function errorList(
   req: express.Request,

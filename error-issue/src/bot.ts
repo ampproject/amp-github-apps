@@ -94,4 +94,9 @@ export class ErrorIssueBot {
       labels: labels.map(({name}) => name),
     });
   }
+
+  /** Copies an issue from the error report repo to the code repo. */
+  async copyIssueToCodeRepo(issueNumber: number): Promise<void> {
+    return this.copyIssue(issueNumber, this.issueRepoName, this.codeRepoName);
+  }
 }
