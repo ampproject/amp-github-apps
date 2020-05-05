@@ -49,6 +49,7 @@ export async function errorIssue(
     firstSeen,
     dailyOccurrences,
     stacktrace,
+    seenInVersions,
     linkIssue,
   } = errorReport;
 
@@ -61,21 +62,18 @@ export async function errorIssue(
   const shouldLinkIssue = linkIssue === '1';
 
   let parsedReport: ErrorReport;
-  if (firstSeen && dailyOccurrences && stacktrace) {
+  if (firstSeen && dailyOccurrences && stacktrace && seenInVersions) {
     parsedReport = {
       errorId,
       firstSeen: new Date(firstSeen),
       dailyOccurrences: Number(dailyOccurrences),
       stacktrace,
+      seenInVersions,
     };
   } else {
     // If only an error ID is specified, fetch the details from the API.
-    const {
-      group,
-      timedCounts,
-      firstSeenTime,
-      representative,
-    } = await stackdriver.getGroup(errorId);
+    const groupStats = await stackdriver.getGroup(errorId);
+    const {group} = groupStats;
 
     if (group.trackingIssues) {
       // If the error is already tracked, redirect to the existing issue
@@ -85,12 +83,7 @@ export async function errorIssue(
       );
     }
 
-    parsedReport = {
-      errorId,
-      firstSeen: firstSeenTime,
-      dailyOccurrences: timedCounts[0].count,
-      stacktrace: representative.message,
-    };
+    parsedReport = monitor.reportFromGroupStats(groupStats);
   }
 
   try {

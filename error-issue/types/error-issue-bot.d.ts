@@ -83,6 +83,7 @@ declare module 'error-issue-bot' {
     firstSeen: Date;
     dailyOccurrences: number;
     stacktrace: string;
+    seenInVersions: Array<string>;
   }
 
   /**

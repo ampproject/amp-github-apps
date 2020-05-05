@@ -84,7 +84,7 @@ describe('ErrorMonitor', () => {
       },
     ],
     firstSeenTime: new Date('Feb 20, 2020'),
-    numAffectedServices: 1,
+    numAffectedServices: 2,
     affectedServices: [prodStableService],
     representative: {message: 'Error: New error'},
   };
@@ -95,6 +95,7 @@ describe('ErrorMonitor', () => {
     firstSeen: new Date('Feb 20, 2020'),
     dailyOccurrences: 6000,
     stacktrace: 'Error: New error',
+    seenInVersions: ['04-24 Stable (1234)', '+1 more'],
   };
 
   beforeAll(() => {
