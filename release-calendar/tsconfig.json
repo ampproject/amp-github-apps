@@ -23,6 +23,5 @@
     "src/**/*.tsx",
     "test/**/*.ts",
     "webpack.*.config.js",
-    "server.js"
   ]
 }

@@ -34,7 +34,8 @@ export class IssueBuilder {
 
   constructor(
     {errorId, firstSeen, dailyOccurrences, stacktrace}: ErrorReport,
-    private blames: Array<BlameRange>
+    private blames: Array<BlameRange>,
+    private releaseOnduty?: string
   ) {
     const [message, ...stack] = stacktrace.split('\n');
     Object.assign(this, {errorId, firstSeen, dailyOccurrences, message, stack});
@@ -126,7 +127,16 @@ export class IssueBuilder {
       : notes;
   }
 
+  get bodyTag(): string | undefined {
+    return this.releaseOnduty && `/cc @${this.releaseOnduty}`;
+  }
+
   get body(): string {
-    return [this.bodyDetails, this.bodyStacktrace, this.bodyNotes].join('\n\n');
+    return [
+      this.bodyDetails,
+      this.bodyStacktrace,
+      this.bodyNotes,
+      this.bodyTag,
+    ].join('\n\n');
   }
 }

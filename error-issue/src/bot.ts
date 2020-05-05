@@ -22,6 +22,8 @@ import {IssueBuilder} from './issue_builder';
 import {RateLimitedGraphQL} from './rate_limited_graphql';
 
 const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
+const RELEASE_ONDUTY =
+  process.env.RELEASE_ONDUTY || 'ampproject/release-on-duty';
 
 export class ErrorIssueBot {
   private octokit: Octokit;
@@ -46,7 +48,7 @@ export class ErrorIssueBot {
   ): Promise<Octokit.IssuesCreateParams> {
     const {stacktrace} = errorReport;
     const blameRanges = await this.blameFinder.blameForStacktrace(stacktrace);
-    const builder = new IssueBuilder(errorReport, blameRanges);
+    const builder = new IssueBuilder(errorReport, blameRanges, RELEASE_ONDUTY);
     return {
       owner: this.repoOwner,
       repo: this.repoName,
