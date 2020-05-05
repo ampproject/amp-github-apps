@@ -43,9 +43,12 @@ export class OndutyBot {
       .filter(Boolean)
       .map(user => user.toLowerCase());
     const newMembers = currentRotation.filter(user => !members.includes(user));
+    console.log(members);
+    console.log(BOT_USERNAME);
     const oldMembers = members.filter(
       user => user !== BOT_USERNAME && !currentRotation.includes(user)
     );
+    console.log(oldMembers);
 
     for (const newMember of newMembers) {
       await this.github.addToTeam(teamName, newMember);
