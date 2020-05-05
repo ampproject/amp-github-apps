@@ -22,30 +22,30 @@
     "test": "jest --verbose=false"
   },
   "dependencies": {
-    "@google-cloud/storage": "4.3.0",
+    "@google-cloud/storage": "4.7.0",
     "dotenv": "8.2.0",
     "express": "4.17.1",
-    "mime-types": "2.1.26",
-    "probot": "9.9.1",
-    "typescript": "3.7.5",
+    "mime-types": "2.1.27",
+    "probot": "9.11.3",
+    "typescript": "3.8.3",
     "unzip-stream": "0.3.0"
   },
   "devDependencies": {
     "@types/bunyan": "1.8.6",
-    "@types/express": "4.17.2",
-    "@types/jest": "25.1.4",
+    "@types/express": "4.17.6",
+    "@types/jest": "25.2.1",
     "@types/mime-types": "2.1.0",
-    "@types/node": "12.12.26",
-    "@types/supertest": "2.0.8",
-    "@typescript-eslint/eslint-plugin": "2.19.0",
-    "@typescript-eslint/parser": "2.19.0",
+    "@types/node": "12.12.37",
+    "@types/supertest": "2.0.9",
+    "@typescript-eslint/eslint-plugin": "2.31.0",
+    "@typescript-eslint/parser": "2.31.0",
     "eslint": "6.8.0",
-    "jest": "25.2.4",
-    "nodemon": "2.0.2",
+    "jest": "25.5.4",
+    "nodemon": "2.0.3",
     "smee-client": "1.1.0",
     "supertest": "4.0.2",
-    "ts-jest": "25.3.0",
-    "ts-node": "8.6.2"
+    "ts-jest": "25.4.0",
+    "ts-node": "8.10.1"
   },
   "jest": {
     "preset": "ts-jest"
