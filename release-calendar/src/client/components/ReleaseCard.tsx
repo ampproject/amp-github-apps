@@ -22,6 +22,10 @@ import {EventApi} from '@fullcalendar/core';
 import {channelTitles} from './ChannelTable';
 import moment from 'moment-timezone';
 
+interface History {
+  [key: string]: {title: string; emoji: string; emojiName: string};
+}
+
 export interface ReleaseCardProps {
   eventApi: EventApi;
 }
@@ -43,6 +47,7 @@ export class ReleaseCard extends React.Component<
     };
     this.apiService = new ApiService();
   }
+
   async componentDidMount(): Promise<void> {
     const release = await this.apiService.getReleaseDates(
       this.props.eventApi.title,
@@ -50,57 +55,50 @@ export class ReleaseCard extends React.Component<
     this.setState({releaseDates: release.promotions});
   }
 
-  history = [
-    {
-      channel: Channel.NIGHTLY,
+  history: History = {
+    [Channel.NIGHTLY]: {
+      title: channelTitles.find((channel) => channel.channel == Channel.NIGHTLY)
+        .title,
       emoji: '🌙',
       emojiName: 'moon',
     },
-    {
-      channel: Channel.OPT_IN_EXPERIMENTAL,
-      emoji: '✋',
-      emojiName: 'hand',
-    },
-    {
-      channel: Channel.PERCENT_EXPERIMENTAL,
-      emoji: '🧪',
-      emojiName: 'experiment',
-    },
-    {
-      channel: Channel.STABLE,
-      emoji: '🏠',
-      emojiName: 'house',
-    },
-    {
-      channel: Channel.LTS,
-      emoji: '🏙️',
-      emojiName: 'city',
-    },
-  ];
-
-  getTitle(search: Channel): string {
-    if (search == Channel.OPT_IN_EXPERIMENTAL) {
-      return `${
+    [Channel.OPT_IN_EXPERIMENTAL]: {
+      title: `${
         channelTitles.find(
           (channel) => channel.channel == Channel.OPT_IN_EXPERIMENTAL,
         ).title
       }, ${
         channelTitles.find((channel) => channel.channel == Channel.OPT_IN_BETA)
           .title
-      }`;
-    } else if (search == Channel.PERCENT_EXPERIMENTAL) {
-      return `${
+      }`,
+      emoji: '✋',
+      emojiName: 'hand',
+    },
+    [Channel.PERCENT_EXPERIMENTAL]: {
+      title: `${
         channelTitles.find(
           (channel) => channel.channel == Channel.PERCENT_EXPERIMENTAL,
         ).title
       }, ${
         channelTitles.find((channel) => channel.channel == Channel.PERCENT_BETA)
           .title
-      }`;
-    } else {
-      return channelTitles.find((channel) => channel.channel == search).title;
-    }
-  }
+      }`,
+      emoji: '🧪',
+      emojiName: 'experiment',
+    },
+    [Channel.STABLE]: {
+      title: channelTitles.find((channel) => channel.channel == Channel.NIGHTLY)
+        .title,
+      emoji: '🏠',
+      emojiName: 'house',
+    },
+    [Channel.LTS]: {
+      title: channelTitles.find((channel) => channel.channel == Channel.NIGHTLY)
+        .title,
+      emoji: '🏙️',
+      emojiName: 'city',
+    },
+  };
 
   render(): JSX.Element {
     return (
@@ -150,9 +148,7 @@ export class ReleaseCard extends React.Component<
               <h3 className='subtitle-row'>{'Release History'}</h3>
               {this.state.releaseDates != null &&
                 this.state.releaseDates.map((row) => {
-                  const match = this.history.find(
-                    (type) => type.channel == row.channel,
-                  );
+                  const match = this.history[row.channel];
                   return (
                     match && (
                       <div className='content-row' key={match.emoji}>
@@ -163,10 +159,10 @@ export class ReleaseCard extends React.Component<
                         </div>
                         <div className='text'>
                           {`${
-                            match.channel != Channel.NIGHTLY
+                            row.channel != Channel.NIGHTLY
                               ? 'Promoted to '
                               : 'Created as '
-                          } ${this.getTitle(match.channel)} on ${moment
+                          } ${match.title} on ${moment
                             .tz(row.date, moment.tz.guess())
                             .format('MMMM Do, hA z')}`}
                         </div>
