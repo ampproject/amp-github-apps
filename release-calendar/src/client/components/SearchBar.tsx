@@ -26,8 +26,7 @@ export interface SearchBarProps {
 
 export interface SearchBarState {
   releaseNames: string[];
-  newValue: string;
-  newInputValue: string;
+  input: string;
   validSearch: boolean;
 }
 
@@ -37,8 +36,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     super(props);
     this.state = {
       releaseNames: [],
-      newValue: null,
-      newInputValue: null,
+      input: null,
       validSearch: null,
     };
     this.apiService = new ApiService();
@@ -76,9 +74,9 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     }
   }
 
-  onInputChange(_event: React.ChangeEvent<{}>, newInputValue: string): void {
-    if (newInputValue != null) {
-      this.setState({newInputValue});
+  onInputChange(_event: React.ChangeEvent<{}>, input: string): void {
+    if (input != null) {
+      this.setState({input});
     }
     if (this.state.validSearch != null) {
       this.setState({validSearch: null});
@@ -124,8 +122,8 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
               <TextField
                 {...params}
                 size='small'
-                error={this.isErrorDisplayed(this.state.newInputValue)}
-                label={this.labelText(this.state.newInputValue)}
+                error={this.isErrorDisplayed(this.state.input)}
+                label={this.labelText(this.state.input)}
                 variant='outlined'
                 InputProps={{
                   ...params.InputProps,
