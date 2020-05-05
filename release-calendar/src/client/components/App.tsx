@@ -25,6 +25,7 @@ import {SearchBar} from './SearchBar';
 interface AppState {
   channels: Channel[];
   release: string;
+  input: string;
 }
 
 export class App extends React.Component<{}, AppState> {
@@ -33,6 +34,7 @@ export class App extends React.Component<{}, AppState> {
     this.state = {
       channels: [],
       release: null,
+      input: null,
     };
   }
 
@@ -45,17 +47,30 @@ export class App extends React.Component<{}, AppState> {
       ? this.state.channels.concat(channel)
       : this.state.channels.filter((item) => channel !== item);
     this.setState({channels});
+    this.handleSearchInput(null);
     if (this.state.release != null) {
       this.setState({release: null});
     }
   };
 
-  handleSelectedRelease = (selectedRelease: string): void => {
+  handleSelectedRelease = (
+    selectedRelease: string,
+    clearSearchInput: boolean,
+  ): void => {
     const release =
       this.state.release != selectedRelease ? selectedRelease : null;
     this.setState({release});
     if (this.state.channels.length) {
       this.setState({channels: []});
+    }
+    if (clearSearchInput) {
+      this.handleSearchInput(null);
+    }
+  };
+
+  handleSearchInput = (input: string): void => {
+    if (this.state.input != input) {
+      this.setState({input});
     }
   };
 
@@ -66,7 +81,11 @@ export class App extends React.Component<{}, AppState> {
         <div className='main-container'>
           <div className='col-channel-table'>
             <div className='search-bar'>
-              <SearchBar handleSelectedRelease={this.handleSelectedRelease} />
+              <SearchBar
+                handleSelectedRelease={this.handleSelectedRelease}
+                input={this.state.input}
+                handleSearchInput={this.handleSearchInput}
+              />
             </div>
             <div className='channel-table'>
               <ChannelTable
@@ -76,7 +95,7 @@ export class App extends React.Component<{}, AppState> {
               />
             </div>
           </div>
-          <div className={'col-calendar calendar'}>
+          <div className='col-calendar'>
             <Calendar
               channels={this.state.channels}
               singleRelease={this.state.release}

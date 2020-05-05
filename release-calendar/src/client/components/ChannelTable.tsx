@@ -27,7 +27,7 @@ interface ChannelTableState {
 interface ChannelTableProps {
   channels: Channel[];
   handleSelectedChannel: (channel: Channel, checked: boolean) => void;
-  handleSelectedRelease: (release: string) => void;
+  handleSelectedRelease: (release: string, clearSearchInput: boolean) => void;
 }
 
 export class ChannelTable extends React.Component<
@@ -58,7 +58,7 @@ export class ChannelTable extends React.Component<
   };
 
   handleReleaseClick = (release: string): void => {
-    this.props.handleSelectedRelease(release);
+    this.props.handleSelectedRelease(release, true);
   };
 
   rows = [

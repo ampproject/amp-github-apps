@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-import '../stylesheets/searchBar.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import Autocomplete, {RenderInputParams} from '@material-ui/lab/Autocomplete';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import SearchIcon from '@material-ui/icons/Search';
 import TextField from '@material-ui/core/TextField';
 
 export interface SearchBarProps {
-  handleSelectedRelease: (release: string) => void;
+  handleSelectedRelease: (
+    selectedRelease: string,
+    clearSearchInput: boolean,
+  ) => void;
+  input: string;
+  handleSearchInput: (input: string) => void;
 }
 
 export interface SearchBarState {
   releaseNames: string[];
-  input: string;
   validSearch: boolean;
 }
 
@@ -36,7 +42,6 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     super(props);
     this.state = {
       releaseNames: [],
-      input: null,
       validSearch: null,
     };
     this.apiService = new ApiService();
@@ -55,7 +60,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     event.preventDefault();
   }
 
-  onClose(event: React.ChangeEvent<{}>, reason: string): void {
+  onClose(_event: React.ChangeEvent<{}>, reason: string): void {
     switch (reason) {
       case 'select-option': {
         this.setState({validSearch: true});
@@ -70,13 +75,13 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
 
   onChange(_event: React.ChangeEvent<{}>, newValue: string | null): void {
     if (this.state.releaseNames.includes(newValue)) {
-      this.props.handleSelectedRelease(newValue);
+      this.props.handleSelectedRelease(newValue, false);
     }
   }
 
   onInputChange(_event: React.ChangeEvent<{}>, input: string): void {
     if (input != null) {
-      this.setState({input});
+      this.props.handleSearchInput(input);
     }
     if (this.state.validSearch != null) {
       this.setState({validSearch: null});
@@ -85,16 +90,16 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
 
   labelText(input: string): string {
     if (this.state.validSearch == null) {
-      if (input != null) {
+      if (input != null && input?.length != 0) {
         return `${input.length}/13`;
       } else {
         return 'Search for a release...';
       }
     } else {
       if (this.state.validSearch) {
-        return 'Found! 👀';
+        return 'Selected ✅';
       } else {
-        return 'Error! 🙈';
+        return 'Not Found! 🙈';
       }
     }
   }
@@ -108,31 +113,36 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
 
   render(): JSX.Element {
     return (
-      <React.Fragment>
-        <h1 className='title-bar'>Release Search</h1>
-        <form onSubmit={this.onSubmit}>
-          <Autocomplete
-            freeSolo
-            id='release-autocomplete'
-            onClose={this.onClose}
-            onChange={this.onChange}
-            onInputChange={this.onInputChange}
-            options={this.state.releaseNames}
-            renderInput={(params: RenderInputParams): JSX.Element => (
-              <TextField
-                {...params}
-                size='small'
-                error={this.isErrorDisplayed(this.state.input)}
-                label={this.labelText(this.state.input)}
-                variant='outlined'
-                InputProps={{
-                  ...params.InputProps,
-                }}
-              />
-            )}
-          />
-        </form>
-      </React.Fragment>
+      <form onSubmit={this.onSubmit}>
+        <Autocomplete
+          freeSolo
+          value={this.props.input}
+          id='release-autocomplete'
+          onClose={this.onClose}
+          onChange={this.onChange}
+          onInputChange={this.onInputChange}
+          options={this.state.releaseNames}
+          renderInput={(params: RenderInputParams): JSX.Element => (
+            <TextField
+              {...params}
+              size='small'
+              error={this.isErrorDisplayed(this.props.input)}
+              label={this.labelText(this.props.input)}
+              variant='outlined'
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton type='submit' aria-label='search'>
+                      <SearchIcon></SearchIcon>
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          )}
+        />
+      </form>
     );
   }
 }

@@ -23,6 +23,7 @@
 .col-calendar {
     width: 63%;
     float: right;
+    @include container-shadow;
 }
 
 .search-bar {
@@ -31,10 +32,6 @@
 }
 
 .channel-table {
-    @include container-shadow;
-}
-
-.calendar {
     @include container-shadow;
 }
 
