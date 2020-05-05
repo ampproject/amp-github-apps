@@ -68,7 +68,7 @@ export const Hook = (children: {event: EventApi}): JSX.Element => {
   return (
     <React.Fragment>
       <button
-        className={'event-button'}
+        className='event-button'
         ref={setReferenceElement}
         onClick={(): void => setClick(!isClicked)}>
         {children.event.title}

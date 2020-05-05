@@ -17,9 +17,8 @@
 import '../stylesheets/releaseCard.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
-import {Channel} from '../../types';
+import {Channel, Promotion} from '../../types';
 import {EventApi} from '@fullcalendar/core';
-import {ReleaseDates} from '../models/view-models';
 import {channelTitles} from './ChannelTable';
 import moment from 'moment-timezone';
 
@@ -28,7 +27,7 @@ export interface ReleaseCardProps {
 }
 
 interface ReleaseCardState {
-  releaseDates: ReleaseDates;
+  releaseDates: Promotion[];
 }
 
 export class ReleaseCard extends React.Component<
@@ -45,10 +44,10 @@ export class ReleaseCard extends React.Component<
     this.apiService = new ApiService();
   }
   async componentDidMount(): Promise<void> {
-    const releaseDates: ReleaseDates = await this.apiService.getReleaseDates(
+    const release = await this.apiService.getReleaseDates(
       this.props.eventApi.title,
     );
-    this.setState({releaseDates});
+    this.setState({releaseDates: release.promotions});
   }
 
   history = [
@@ -105,13 +104,13 @@ export class ReleaseCard extends React.Component<
 
   render(): JSX.Element {
     return (
-      <div className={'event-card'}>
+      <div className='event-card'>
         <div className={this.props.eventApi.classNames[0]}>
-          <div className={'event-top'}></div>
-          <div className={'event-content'}>
+          <div className='event-top'></div>
+          <div className='event-content'>
             <div className='content-row'>
-              <div className={'big-emoji'}>
-                <span role='img' aria-label={'train'}>
+              <div className='big-emoji'>
+                <span role='img' aria-label='train'>
                   {'🚄'}
                 </span>
               </div>
@@ -124,22 +123,22 @@ export class ReleaseCard extends React.Component<
               {/* TODO: uncomment below when cherrypick is connected 
               (will be adding cherrypick attribute to releaseDates) */}
               {/* {this.state.releaseDates.cherrypick && (
-                <div className={'content-row'}>
-                  <div className={'emoji'}>
-                    <span role='img' aria-label={'flower'}>
+                <div className='content-row'>
+                  <div className='emoji'>
+                    <span role='img' aria-label='flower'>
                       {'🌸'}
                     </span>
                   </div>
-                  <div className={'text'}>{'Cherrypick!'}</div>
+                  <div className='text'>{'Cherrypick!'}</div>
                 </div>
               )} */}
-              <div className={'content-row'}>
-                <div className={'emoji'}>
-                  <span role='img' aria-label={'laptop'}>
+              <div className='content-row'>
+                <div className='emoji'>
+                  <span role='img' aria-label='laptop'>
                     {'🔗'}
                   </span>
                 </div>
-                <div className={'text'}>
+                <div className='text'>
                   <a
                     href={`https://github.com/ampproject/amphtml/releases/tag/${this.props.eventApi.title}`}
                     target='_blank'
@@ -148,21 +147,21 @@ export class ReleaseCard extends React.Component<
                   </a>
                 </div>
               </div>
-              <h3 className={'subtitle-row'}>{'Release History'}</h3>
+              <h3 className='subtitle-row'>{'Release History'}</h3>
               {this.state.releaseDates != null &&
-                this.state.releaseDates.dates.map((row) => {
+                this.state.releaseDates.map((row) => {
                   const match = this.history.find(
                     (type) => type.channel == row.channel,
                   );
                   return (
                     match && (
-                      <div className={'content-row'} key={match.emoji}>
-                        <div className={'emoji'}>
-                          <span role='img' aria-label={'row.emojiName'}>
+                      <div className='content-row' key={match.emoji}>
+                        <div className='emoji'>
+                          <span role='img' aria-label='row.emojiName'>
                             {match.emoji}
                           </span>
                         </div>
-                        <div className={'text'}>
+                        <div className='text'>
                           {`${
                             match.channel != Channel.NIGHTLY
                               ? 'Promoted to '

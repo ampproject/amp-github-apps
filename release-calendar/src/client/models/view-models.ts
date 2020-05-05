@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Channel, Promotion, Release} from '../../types';
+import {Channel, Promotion} from '../../types';
 import {EventInput} from '@fullcalendar/core';
 
 export class ReleaseEventInput implements EventInput {
@@ -55,14 +55,4 @@ export class CurrentReleases {
   }
 
   map: Map<Channel, string>;
-}
-
-export class ReleaseDates {
-  constructor(release: Release) {
-    this.dates = release.promotions.map((promotion) => {
-      return {channel: promotion.channel, date: promotion.date};
-    });
-  }
-
-  dates: {channel: Channel; date: Date}[];
 }

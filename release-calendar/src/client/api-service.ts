@@ -15,11 +15,7 @@
  */
 
 import {Channel, Promotion, Release} from '../types';
-import {
-  CurrentReleases,
-  ReleaseDates,
-  ReleaseEventInput,
-} from './models/view-models';
+import {CurrentReleases, ReleaseEventInput} from './models/view-models';
 import fetch from 'node-fetch';
 const SERVER_ENDPOINT = `${process.env.SERVER_URL}:${process.env.SERVER_PORT}`;
 
@@ -66,10 +62,9 @@ export class ApiService {
     return new CurrentReleases(currentReleases);
   }
 
-  async getReleaseDates(requestedRelease: string): Promise<ReleaseDates> {
-    const release = await this.getReleaseRequest(
+  async getReleaseDates(requestedRelease: string): Promise<Release> {
+    return await this.getReleaseRequest(
       `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
     );
-    return new ReleaseDates(release);
   }
 }
