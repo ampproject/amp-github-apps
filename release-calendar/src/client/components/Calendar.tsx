@@ -67,8 +67,12 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
         const release = await this.apiService.getRelease(
           this.props.singleRelease,
         );
+        const singleEvents = getSingleReleaseEvents(
+          release,
+          this.state.allEvents,
+        );
         this.setState({
-          singleEvents: getSingleReleaseEvents(release, this.state.allEvents),
+          singleEvents,
         });
       } else {
         this.setState({singleEvents: []});
