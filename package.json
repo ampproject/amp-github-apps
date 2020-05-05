@@ -20,21 +20,21 @@
     "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "2.19.0",
-    "@typescript-eslint/parser": "2.19.0",
+    "@typescript-eslint/eslint-plugin": "2.31.0",
+    "@typescript-eslint/parser": "2.31.0",
     "ansi-colors": "4.1.1",
-    "babel-eslint": "10.0.3",
+    "babel-eslint": "10.1.0",
     "eslint": "6.8.0",
     "eslint-config-google": "0.14.0",
-    "eslint-plugin-notice": "0.8.9",
-    "eslint-config-prettier": "6.10.0",
-    "eslint-plugin-prettier": "3.1.2",
-    "eslint-plugin-react": "7.18.3",
+    "eslint-plugin-notice": "0.9.10",
+    "eslint-config-prettier": "6.11.0",
+    "eslint-plugin-prettier": "3.1.3",
+    "eslint-plugin-react": "7.19.0",
     "eslint-plugin-sort-requires": "2.1.0",
     "eslint-plugin-sort-imports-es6-autofix": "0.5.0",
     "fancy-log": "1.3.3",
-    "prettier": "2.0.2",
-    "typescript": "3.7.5",
-    "yaml": "1.7.2"
+    "prettier": "2.0.5",
+    "typescript": "3.8.3",
+    "yaml": "1.9.2"
   }
 }
