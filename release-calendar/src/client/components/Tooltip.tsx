@@ -28,7 +28,9 @@ export const Tooltip = (arg: {
   view: View;
 }): void => {
   const Content = (): JSX.Element => {
-    return <Hook event={arg.event}></Hook>;
+    return (
+      <Hook title={arg.event.title} className={arg.event.classNames[0]}></Hook>
+    );
   };
 
   ReactDOM.render(<Content />, arg.el);

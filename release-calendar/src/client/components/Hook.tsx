@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import {EventApi} from '@fullcalendar/core';
 import {ReleaseCard} from './ReleaseCard';
 import {usePopper} from 'react-popper';
 import React from 'react';
@@ -22,7 +21,10 @@ import ReactDOM from 'react-dom';
 
 const TOOLTIP_HEIGHT = 300;
 
-export const Hook = (children: {event: EventApi}): JSX.Element => {
+export const Hook = (children: {
+  title: string;
+  className: string;
+}): JSX.Element => {
   const [referenceElement, setReferenceElement] = React.useState(null);
   const [popperElement, setPopperElement] = React.useState(null);
   const [isClicked, setClick] = React.useState(false);
@@ -71,7 +73,7 @@ export const Hook = (children: {event: EventApi}): JSX.Element => {
         className='event-button'
         ref={setReferenceElement}
         onClick={(): void => setClick(!isClicked)}>
-        {children.event.title}
+        {children.title}
       </button>
       {ReactDOM.createPortal(
         <div ref={node}>
@@ -79,7 +81,11 @@ export const Hook = (children: {event: EventApi}): JSX.Element => {
             ref={setPopperElement}
             style={{...{zIndex: 999}, ...styles.popper}}
             {...attributes.popper}>
-            {isClicked && <ReleaseCard eventApi={children.event}></ReleaseCard>}
+            {isClicked && (
+              <ReleaseCard
+                title={children.title}
+                className={children.className}></ReleaseCard>
+            )}
           </div>
         </div>,
         document.querySelector('#app'),

@@ -18,7 +18,6 @@ import '../stylesheets/releaseCard.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel, Promotion} from '../../types';
-import {EventApi} from '@fullcalendar/core';
 import {channelTitles} from './ChannelTable';
 import moment from 'moment-timezone';
 
@@ -27,7 +26,8 @@ interface History {
 }
 
 export interface ReleaseCardProps {
-  eventApi: EventApi;
+  title: string;
+  className: string;
 }
 
 interface ReleaseCardState {
@@ -49,9 +49,7 @@ export class ReleaseCard extends React.Component<
   }
 
   async componentDidMount(): Promise<void> {
-    const release = await this.apiService.getReleaseDates(
-      this.props.eventApi.title,
-    );
+    const release = await this.apiService.getReleaseDates(this.props.title);
     this.setState({releaseDates: release.promotions});
   }
 
@@ -103,7 +101,7 @@ export class ReleaseCard extends React.Component<
   render(): JSX.Element {
     return (
       <div className='event-card'>
-        <div className={this.props.eventApi.classNames[0]}>
+        <div className={this.props.className}>
           <div className='event-top'></div>
           <div className='event-content'>
             <div className='content-row'>
@@ -112,10 +110,7 @@ export class ReleaseCard extends React.Component<
                   {'🚄'}
                 </span>
               </div>
-              <h2
-                className={
-                  'title-row'
-                }>{`Release ${this.props.eventApi.title}`}</h2>
+              <h2 className='title-row'>{`Release ${this.props.title}`}</h2>
             </div>
             <div className='content-content'>
               {/* TODO: uncomment below when cherrypick is connected 
@@ -138,7 +133,7 @@ export class ReleaseCard extends React.Component<
                 </div>
                 <div className='text'>
                   <a
-                    href={`https://github.com/ampproject/amphtml/releases/tag/${this.props.eventApi.title}`}
+                    href={`https://github.com/ampproject/amphtml/releases/tag/${this.props.title}`}
                     target='_blank'
                     rel='noopener noreferrer'>
                     {'GitHub Release'}
