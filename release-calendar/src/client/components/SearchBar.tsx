@@ -82,6 +82,9 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
   onInputChange(_event: React.ChangeEvent<{}>, input: string): void {
     if (input != null) {
       this.props.handleSearchInput(input);
+      if (input.length == 0) {
+        this.props.handleSelectedRelease(null, false);
+      }
     }
     if (this.state.validSearch != null) {
       this.setState({validSearch: null});
