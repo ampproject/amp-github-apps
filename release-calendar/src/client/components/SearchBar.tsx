@@ -52,7 +52,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
   }
 
   async componentDidMount(): Promise<void> {
-    const releaseNames = await this.apiService.getReleaseNames();
+    const releaseNames = await this.apiService.getReleases();
     this.setState({releaseNames});
   }
 
@@ -116,7 +116,6 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
       <form onSubmit={this.onSubmit}>
         <Autocomplete
           freeSolo
-          value={this.props.input}
           id='release-autocomplete'
           onClose={this.onClose}
           onChange={this.onChange}
@@ -125,6 +124,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
           renderInput={(params: RenderInputParams): JSX.Element => (
             <TextField
               {...params}
+              value={this.props.input}
               size='small'
               error={this.isErrorDisplayed(this.props.input)}
               label={this.labelText(this.props.input)}

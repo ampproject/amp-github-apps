@@ -70,8 +70,8 @@ async function main(): Promise<void> {
     });
   }
 
-  app.get('/releases/', async (req, res) => {
-    const releases = await repositoryService.getReleases();
+  app.get('/promotions/', async (req, res) => {
+    const releases = await repositoryService.getPromotions();
     res.json(releases);
   });
 
@@ -80,13 +80,13 @@ async function main(): Promise<void> {
     res.json(release);
   });
 
-  app.get('/current-releases/', async (req, res) => {
-    const releases = await repositoryService.getCurrentReleases();
+  app.get('/current-promotions/', async (req, res) => {
+    const releases = await repositoryService.getCurrentPromotions();
     res.json(releases);
   });
 
-  app.get('/releaseNames/', async (req, res) => {
-    const releases = await repositoryService.getReleaseNames();
+  app.get('/releases/', async (req, res) => {
+    const releases = await repositoryService.getReleases();
     res.json(releases);
   });
 

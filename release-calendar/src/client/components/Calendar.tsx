@@ -22,7 +22,7 @@ import {Channel} from '../../types';
 import {EventApi, View} from '@fullcalendar/core';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {
-  getAllReleasesEvents,
+  getAllPromotionEvents,
   getSingleReleaseEvents,
 } from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
@@ -57,8 +57,8 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   }
 
   async componentDidMount(): Promise<void> {
-    const releases = await this.apiService.getReleases();
-    this.setState({allEvents: getAllReleasesEvents(releases)});
+    const promotions = await this.apiService.getPromotions();
+    this.setState({allEvents: getAllPromotionEvents(promotions)});
   }
 
   async componentDidUpdate(prevProps: CalendarProps): Promise<void> {

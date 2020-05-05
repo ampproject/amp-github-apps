@@ -18,7 +18,7 @@ import {Channel} from '../../types';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {ReleaseEventInput} from './view-models';
 
-export function getAllReleasesEvents(
+export function getAllPromotionEvents(
   events: ReleaseEventInput[],
 ): Map<Channel, EventSourceInput> {
   const eventInputs = new Map<Channel, ReleaseEventInput[]>();

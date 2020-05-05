@@ -28,7 +28,7 @@ export class RepositoryService {
     this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
-  getReleaseNames(): Promise<Release[]> {
+  getReleases(): Promise<Release[]> {
     return this.releaseRepository.createQueryBuilder('release').getMany();
   }
 
@@ -43,7 +43,7 @@ export class RepositoryService {
     return releaseQuery;
   }
 
-  getReleases(): Promise<Promotion[]> {
+  getPromotions(): Promise<Promotion[]> {
     const channelQueries = this.promotionRepository
       .createQueryBuilder('promotion')
       .orderBy('promotion.date', 'DESC')
@@ -51,7 +51,7 @@ export class RepositoryService {
     return channelQueries;
   }
 
-  getCurrentReleases(): Promise<Promotion[]> {
+  getCurrentPromotions(): Promise<Promotion[]> {
     return Promise.all(
       [
         Channel.LTS,

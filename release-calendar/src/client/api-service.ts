@@ -47,18 +47,18 @@ export class ApiService {
     ];
   }
 
-  async getReleaseNames(): Promise<string[]> {
+  async getReleases(): Promise<string[]> {
     const releases = await this.getReleasesRequest(
-      `${SERVER_ENDPOINT}/releaseNames/`,
+      `${SERVER_ENDPOINT}/releases/`,
     );
     return releases.map((release) => {
       return release.name;
     });
   }
 
-  async getReleases(): Promise<ReleaseEventInput[]> {
+  async getPromotions(): Promise<ReleaseEventInput[]> {
     const allPromotions = await this.getPromotionsRequest(
-      `${SERVER_ENDPOINT}/releases/`,
+      `${SERVER_ENDPOINT}/promotions/`,
     );
     const map = new Map<Channel, Date>();
     return allPromotions.map((promotion: Promotion) => {
@@ -68,9 +68,9 @@ export class ApiService {
     });
   }
 
-  async getCurrentReleases(): Promise<CurrentReleases> {
+  async getCurrentPromotions(): Promise<CurrentReleases> {
     const currentReleases = await this.getPromotionsRequest(
-      `${SERVER_ENDPOINT}/current-releases`,
+      `${SERVER_ENDPOINT}/current-promotions`,
     );
     return new CurrentReleases(currentReleases);
   }
