@@ -115,11 +115,18 @@ declare module 'error-issue-bot' {
       }>;
     }
 
+    export interface ServiceContext {
+      service: string;
+      version: string;
+    }
+
     export interface SerializedErrorGroupStats {
       group: ErrorGroup;
       count: string;
       timedCounts: Array<SerializedTimedCount>;
       firstSeenTime: string;
+      numAffectedServices: string;
+      affectedServices: Array<ServiceContext>;
       representative: {
         message: string;
       };
@@ -130,6 +137,8 @@ declare module 'error-issue-bot' {
       count: number;
       timedCounts: Array<TimedCount>;
       firstSeenTime: Date;
+      numAffectedServices: number;
+      affectedServices: Array<ServiceContext>;
       representative: {
         message: string;
       };

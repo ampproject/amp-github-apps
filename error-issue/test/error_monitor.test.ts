@@ -28,6 +28,11 @@ describe('ErrorMonitor', () => {
     setGroupIssue: jest.fn(),
   } as unknown) as StackdriverApi;
 
+  const prodStableService: Stackdriver.ServiceContext = {
+    service: 'CDN Production',
+    version: '04-24 Stable (1234)',
+  };
+
   const infrequentGroup: Stackdriver.ErrorGroupStats = {
     group: {
       name: 'Error: Infrequent error',
@@ -42,6 +47,8 @@ describe('ErrorMonitor', () => {
       },
     ],
     firstSeenTime: new Date('Feb 20, 2020'),
+    numAffectedServices: 1,
+    affectedServices: [prodStableService],
     representative: {message: 'Error: Infrequent error'},
   };
   const acknowledgedGroup: Stackdriver.ErrorGroupStats = {
@@ -59,6 +66,8 @@ describe('ErrorMonitor', () => {
       },
     ],
     firstSeenTime: new Date('Feb 20, 2020'),
+    numAffectedServices: 1,
+    affectedServices: [prodStableService],
     representative: {message: 'Error: Acknowledged error'},
   };
   const newGroup: Stackdriver.ErrorGroupStats = {
@@ -75,8 +84,11 @@ describe('ErrorMonitor', () => {
       },
     ],
     firstSeenTime: new Date('Feb 20, 2020'),
+    numAffectedServices: 1,
+    affectedServices: [prodStableService],
     representative: {message: 'Error: New error'},
   };
+
   const errorGroups = [infrequentGroup, acknowledgedGroup, newGroup];
   const newReport = {
     errorId: 'new_id',
