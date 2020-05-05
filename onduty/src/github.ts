@@ -59,10 +59,10 @@ export class GitHub {
       `[removeFromTeam] Removing ${username} from team "${teamName}"`
     );
 
-    await this.client.teams.removeMembershipInOrg({
-      org: this.org,
-      'team_slug': teamName,
-      username,
-    });
+    // await this.client.teams.removeMembershipInOrg({
+    //   org: this.org,
+    //   'team_slug': teamName,
+    //   username,
+    // });
   }
 }
