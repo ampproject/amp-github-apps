@@ -35,8 +35,7 @@ const bot = new ErrorIssueBot(
 );
 
 const stackdriver = new StackdriverApi(PROJECT_ID);
-const monitor = new ErrorMonitor(stackdriver);
-const lister = new ErrorMonitor(stackdriver, 2500, 40);
+const monitor = new ErrorMonitor(stackdriver, 2500, 40);
 
 /** Constructs an error report from JSON, fetching details via API if needed. */
 function errorReportFromJson({
@@ -141,7 +140,7 @@ export async function errorList(
   res: express.Response
 ): Promise<void> {
   try {
-    const reports = await lister.newErrorsToReport();
+    const reports = await monitor.newErrorsToReport();
     res.json({
       errorReports: reports.map(report => {
         const createUrl = createErrorReportUrl(report);
