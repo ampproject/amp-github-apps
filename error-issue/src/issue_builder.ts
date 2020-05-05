@@ -31,14 +31,28 @@ export class IssueBuilder {
   private dailyOccurrences: number;
   private message: string;
   private stack: Array<string>;
+  private seenInVersions: Array<string>;
 
   constructor(
-    {errorId, firstSeen, dailyOccurrences, stacktrace}: ErrorReport,
+    {
+      errorId,
+      firstSeen,
+      dailyOccurrences,
+      stacktrace,
+      seenInVersions,
+    }: ErrorReport,
     private blames: Array<BlameRange>,
     private releaseOnduty?: string
   ) {
     const [message, ...stack] = stacktrace.split('\n');
-    Object.assign(this, {errorId, firstSeen, dailyOccurrences, message, stack});
+    Object.assign(this, {
+      errorId,
+      firstSeen,
+      dailyOccurrences,
+      message,
+      stack,
+      seenInVersions,
+    });
   }
 
   get title(): string {
@@ -121,10 +135,20 @@ export class IssueBuilder {
     const notes = ['Notes', '---']
       .concat(this.blames.map(blame => this.blameMessage(blame)))
       .join('\n');
+    const sections = [notes];
 
-    return possibleAssignees
-      ? `${notes}\n\n**Possible assignees:** ${possibleAssignees}`
-      : notes;
+    if (this.seenInVersions.length) {
+      const versionList = ['**Seen in:**']
+        .concat(this.seenInVersions.map(v => `- ${v}`))
+        .join('\n');
+      sections.push(versionList);
+    }
+
+    if (possibleAssignees) {
+      sections.push(`**Possible assignees:** ${possibleAssignees}`);
+    }
+
+    return sections.join('\n\n');
   }
 
   get bodyTag(): string | undefined {

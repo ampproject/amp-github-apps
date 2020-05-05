@@ -179,6 +179,21 @@ describe('IssueBuilder', () => {
       builder = new IssueBuilder(report, []);
       expect(builder.bodyNotes).toEqual('');
     });
+
+    it('includes a list of versions the error is seen in', () => {
+      expect(builder.bodyNotes).toContain(
+        '**Seen in:**\n- 04-24 Beta (1234)\n- 04-24 Experimental (1234)\n' +
+          '- 04-24 Stable (1234)\n- +2 more'
+      );
+    });
+
+    it("doesn't try to list versions if none are provided", () => {
+      builder = new IssueBuilder(
+        Object.assign({}, report, {seenInVersions: []}),
+        blames
+      );
+      expect(builder.bodyNotes).not.toContain('**Seen in:**');
+    });
   });
 
   describe('bodyTag', () => {
