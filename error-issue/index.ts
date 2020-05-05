@@ -38,6 +38,33 @@ const stackdriver = new StackdriverApi(PROJECT_ID);
 const monitor = new ErrorMonitor(stackdriver);
 const lister = new ErrorMonitor(stackdriver, 2500, 40);
 
+/** Constructs an error report from JSON, fetching details via API if needed. */
+function errorReportFromJson({
+  errorId,
+  firstSeen,
+  dailyOccurrences,
+  stacktrace,
+  seenInVersions,
+}: {
+  errorId: string;
+  firstSeen?: string;
+  dailyOccurrences?: string | number;
+  stacktrace?: string;
+  seenInVersions?: Array<string>;
+}): ErrorReport {
+  if (firstSeen && dailyOccurrences && stacktrace && seenInVersions) {
+    return {
+      errorId,
+      firstSeen: new Date(firstSeen),
+      dailyOccurrences: Number(dailyOccurrences),
+      stacktrace,
+      seenInVersions,
+    };
+  }
+
+  throw new Error('Missing error report params');
+}
+
 /** Endpoint to create a GitHub issue for an error report. */
 export async function errorIssue(
   req: express.Request,
@@ -62,15 +89,9 @@ export async function errorIssue(
   const shouldLinkIssue = linkIssue === '1';
 
   let parsedReport: ErrorReport;
-  if (firstSeen && dailyOccurrences && stacktrace && seenInVersions) {
-    parsedReport = {
-      errorId,
-      firstSeen: new Date(firstSeen),
-      dailyOccurrences: Number(dailyOccurrences),
-      stacktrace,
-      seenInVersions,
-    };
-  } else {
+  try {
+    parsedReport = errorReportFromJson(errorReport);
+  } catch {
     // If only an error ID is specified, fetch the details from the API.
     const groupStats = await stackdriver.getGroup(errorId);
     const {group} = groupStats;
