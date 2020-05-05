@@ -24,6 +24,7 @@ import {
 } from 'onduty';
 import sleep from 'sleep-promise';
 
+const BOT_USERNAME = process.env.BOT_USERNAME;
 const API_RATE_LIMIT_MS = Number(process.env.API_RATE_LIMIT_MS) || 250;
 
 export class OndutyBot {
@@ -42,7 +43,9 @@ export class OndutyBot {
       .filter(Boolean)
       .map(user => user.toLowerCase());
     const newMembers = currentRotation.filter(user => !members.includes(user));
-    const oldMembers = members.filter(user => !currentRotation.includes(user));
+    const oldMembers = members.filter(
+      user => user !== BOT_USERNAME && !currentRotation.includes(user)
+    );
 
     for (const newMember of newMembers) {
       await this.github.addToTeam(teamName, newMember);

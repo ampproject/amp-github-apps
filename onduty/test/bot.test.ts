@@ -82,6 +82,14 @@ describe('OndutyBot', () => {
         'builder-old-primary'
       );
     });
+
+    it('ignores the bot user', async () => {
+      await bot.updateRotation('build-cop', rotations['build-cop']);
+      expect(github.removeFromTeam).not.toHaveBeenCalledWith(
+        'build-team',
+        'bot-user'
+      );
+    });
   });
 
   describe('handleUpdates', () => {
