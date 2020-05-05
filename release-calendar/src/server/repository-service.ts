@@ -28,11 +28,8 @@ export class RepositoryService {
     this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
-  countRelease(name: string): Promise<number> {
-    return this.releaseRepository
-      .createQueryBuilder('release')
-      .where('release.name = :name', {name})
-      .getCount();
+  getReleaseNames(): Promise<Release[]> {
+    return this.releaseRepository.createQueryBuilder('release').getMany();
   }
 
   getRelease(name: string): Promise<Release> {

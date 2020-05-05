@@ -85,12 +85,11 @@ async function main(): Promise<void> {
     res.json(releases);
   });
 
-
-  app.get('/count-releases/:release', async (req, res) => {
-    const releases = await repositoryService.countRelease(req.params.release);
+  app.get('/releaseNames/', async (req, res) => {
+    const releases = await repositoryService.getReleaseNames();
     res.json(releases);
   });
-          
+
   app.listen(port, () => {
     console.log(`App listening on port: ${port}`);
   });

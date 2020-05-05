@@ -17,10 +17,7 @@
 import '../stylesheets/searchBar.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
-import {useForm} from 'react-hook-form';
-import IconButton from '@material-ui/core/IconButton';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import SearchIcon from '@material-ui/icons/Search';
+import Autocomplete, {RenderInputParams} from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 
 export interface SearchBarProps {
@@ -28,85 +25,116 @@ export interface SearchBarProps {
 }
 
 export interface SearchBarState {
-  badSearch: string;
+  releaseNames: string[];
+  newValue: string;
+  newInputValue: string;
+  validSearch: boolean;
 }
-
-type FormData = {
-  release: string;
-};
 
 export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
   private apiService: ApiService;
   constructor(props: Readonly<SearchBarProps>) {
     super(props);
     this.state = {
-      badSearch: null,
+      releaseNames: [],
+      newValue: null,
+      newInputValue: null,
+      validSearch: null,
     };
     this.apiService = new ApiService();
+    this.onChange = this.onChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onClose = this.onClose.bind(this);
+    this.onInputChange = this.onInputChange.bind(this);
   }
 
-  Search = (): JSX.Element => {
-    const {register, handleSubmit, watch, errors} = useForm<FormData>({
-      mode: 'onChange',
-      reValidateMode: 'onChange',
-      validateCriteriaMode: 'all',
-    });
-    const onSubmit = handleSubmit(async ({release}) => {
-      if (await this.apiService.isRelease(release)) {
-        this.props.handleSelectedRelease(release);
-        this.setState({
-          badSearch: null,
-        });
-      } else {
-        this.setState({badSearch: `Release ${release} is not found 🤭`});
-      }
-    });
+  async componentDidMount(): Promise<void> {
+    const releaseNames = await this.apiService.getReleaseNames();
+    this.setState({releaseNames});
+  }
 
-    const labeltext = (input: string): string => {
-      if (input == undefined || input.length == 0) {
-        return 'Search for releases...';
-      } else {
-        const text = errors.release?.types?.pattern ? 'digits only' : '';
-        return `${input.length}/13 ${text}`;
-      }
-    };
+  onSubmit(event: React.FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+  }
 
+  onClose(event: React.ChangeEvent<{}>, reason: string): void {
+    switch (reason) {
+      case 'select-option': {
+        this.setState({validSearch: true});
+        break;
+      }
+      case 'create-option': {
+        this.setState({validSearch: false});
+        break;
+      }
+    }
+  }
+
+  onChange(_event: React.ChangeEvent<{}>, newValue: string | null): void {
+    if (this.state.releaseNames.includes(newValue)) {
+      this.props.handleSelectedRelease(newValue);
+    }
+  }
+
+  onInputChange(_event: React.ChangeEvent<{}>, newInputValue: string): void {
+    if (newInputValue != null) {
+      this.setState({newInputValue});
+    }
+    if (this.state.validSearch != null) {
+      this.setState({validSearch: null});
+    }
+  }
+
+  labelText(input: string): string {
+    if (this.state.validSearch == null) {
+      if (input != null) {
+        return `${input.length}/13`;
+      } else {
+        return 'Search for a release...';
+      }
+    } else {
+      if (this.state.validSearch) {
+        return 'Found! 👀';
+      } else {
+        return 'Error! 🙈';
+      }
+    }
+  }
+
+  isErrorDisplayed(input: string): boolean {
+    if (input?.length > 13) {
+      return true;
+    }
+    return !(input == null || /^[0-9]*$/.test(input));
+  }
+
+  render(): JSX.Element {
     return (
       <React.Fragment>
         <h1 className='title-bar'>Release Search</h1>
-        <form onSubmit={onSubmit}>
-          <TextField
-            name='release'
-            error={
-              (errors.release?.types?.pattern as boolean) ||
-              (errors.release?.types?.maxLength as boolean)
-            }
-            label={labeltext(watch('release'))}
-            helperText={this.state.badSearch}
-            fullWidth
-            size='small'
-            variant='outlined'
-            inputRef={register({
-              pattern: /^[0-9]*$/,
-              required: true,
-              maxLength: 13,
-              minLength: 13,
-            })}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position='start'>
-                  <IconButton type='submit' aria-label='search'>
-                    <SearchIcon></SearchIcon>
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}></TextField>
+        <form onSubmit={this.onSubmit}>
+          <Autocomplete
+            freeSolo
+            id='release-autocomplete'
+            onClose={this.onClose}
+            onChange={this.onChange}
+            onInputChange={this.onInputChange}
+            options={this.state.releaseNames}
+            renderInput={(params: RenderInputParams): JSX.Element => (
+              <TextField
+                {...params}
+                size='small'
+                error={this.isErrorDisplayed(this.state.newInputValue)}
+                label={this.labelText(this.state.newInputValue)}
+                variant='outlined'
+                InputProps={{
+                  ...params.InputProps,
+                }}
+              />
+            )}
+          />
         </form>
       </React.Fragment>
     );
-  };
-
-  render(): JSX.Element {
-    return <this.Search></this.Search>;
   }
 }
