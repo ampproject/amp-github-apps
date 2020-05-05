@@ -23,6 +23,14 @@ declare module 'error-issue-bot' {
     info(message: string, ...extraInfo: unknown[]): void;
   }
 
+  /** Service information to determine frequency scaling across diversions. */
+  export interface ServiceGroup {
+    // The percentage of traffic this diversion set sees.
+    diversionPercent: number;
+    // The base throttling rate of error reporting for this group.
+    throttleRate: number;
+  }
+
   /**
    * Information about a range of lines from a Git blame.
    * See https://developer.github.com/v4/object/blamerange/
