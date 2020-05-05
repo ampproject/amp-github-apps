@@ -29,7 +29,19 @@ describe('ErrorIssueBot', () => {
   const stacktrace = `Error: null is not an object (evaluating 'b.acceleration.x')
         at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)
         at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)`;
-  const errorReport = {errorId, firstSeen, dailyOccurrences, stacktrace};
+  const seenInVersions = [
+    '04-24 Beta (1234)',
+    '04-24 Experimental (1234)',
+    '04-24 Stable (1234)',
+    '+2 more',
+  ];
+  const errorReport = {
+    errorId,
+    firstSeen,
+    dailyOccurrences,
+    stacktrace,
+    seenInVersions,
+  };
 
   beforeAll(() => {
     nock.disableNetConnect();
