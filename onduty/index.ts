@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+require('dotenv').config();
+
 import {GitHub} from './src/github';
 import {Octokit} from '@octokit/rest';
 import {OndutyBot} from './src/bot';
@@ -21,7 +23,6 @@ import {RotationReporterPayload, RotationTeamMap} from 'onduty';
 import express from 'express';
 import statusCodes from 'http-status-codes';
 
-require('dotenv').config();
 const {
   GITHUB_ACCESS_TOKEN,
   GITHUB_ORG,
