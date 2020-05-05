@@ -71,14 +71,7 @@ export async function errorIssue(
   res: express.Response
 ): Promise<unknown> {
   const errorReport = req.method === 'POST' ? req.body : req.query;
-  const {
-    errorId,
-    firstSeen,
-    dailyOccurrences,
-    stacktrace,
-    seenInVersions,
-    linkIssue,
-  } = errorReport;
+  const {errorId, linkIssue} = errorReport;
 
   if (!errorId) {
     res.status(statusCodes.BAD_REQUEST);
