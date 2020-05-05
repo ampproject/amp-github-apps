@@ -26,9 +26,9 @@ export const ERROR_ISSUE_ENDPOINT =
 
 export class ErrorMonitor {
   constructor(
-    private client: StackdriverApi,
-    private minFrequency: number = 5000,
-    private pageLimit: number = 25
+    protected client: StackdriverApi,
+    protected minFrequency: number = 5000,
+    protected pageLimit: number = 25
   ) {}
 
   /** Tests if an error group already has an associated issue. */
@@ -37,7 +37,7 @@ export class ErrorMonitor {
   }
 
   /** Tests if an error group is occurring frequently enough to report. */
-  private hasHighFrequency(groupStats: Stackdriver.ErrorGroupStats): boolean {
+  protected hasHighFrequency(groupStats: Stackdriver.ErrorGroupStats): boolean {
     const timedCount = groupStats.timedCounts[0];
     return timedCount && timedCount.count >= this.minFrequency;
   }
@@ -68,9 +68,14 @@ export class ErrorMonitor {
     };
   }
 
+  /** Finds top occurring errors. */
+  protected async newErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+    return this.client.listGroups(this.pageLimit);
+  }
+
   /** Finds frequent errors to create tracking issues for. */
   async newErrorsToReport(): Promise<Array<ErrorReport>> {
-    return (await this.client.listGroups(this.pageLimit))
+    return (await this.newErrors())
       .filter(({group}) => !this.hasTrackingIssue(group))
       .filter(groupStats => this.hasHighFrequency(groupStats))
       .map(groupStats => this.reportFromGroupStats(groupStats));
