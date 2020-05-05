@@ -51,7 +51,9 @@ export class ErrorMonitor {
     numAffectedServices,
     affectedServices,
   }: Stackdriver.ErrorGroupStats): ErrorReport {
-    const seenInVersions = affectedServices.map(({version}) => version);
+    const seenInVersions = Array.from(
+      new Set(affectedServices.map(({version}) => version))
+    ).sort();
     const unlistedVersions = numAffectedServices - affectedServices.length;
     if (unlistedVersions) {
       seenInVersions.push(`+${unlistedVersions} more`);
