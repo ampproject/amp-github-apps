@@ -17,6 +17,8 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
@@ -84,6 +86,18 @@ module.exports = {
       },
       filename: './index.html',
     }),
+    /** For moment-timezone to limit timezone data */
+    new MomentTimezoneDataPlugin({
+      startYear: 2000,
+    }),
+    /** for moment-timezone, a workaround to convince webpack not to
+     *  look for locales already included in the moment-with-locales.js */
+    new webpack.ContextReplacementPlugin(
+      /\.\/locale$/,
+      'empty-module',
+      false,
+      /js$/,
+    ),
   ],
   externals: {
     'react': 'React',

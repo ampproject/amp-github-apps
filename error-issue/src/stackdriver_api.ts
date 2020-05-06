@@ -54,16 +54,20 @@ export class StackdriverApi {
     timedCounts,
     firstSeenTime,
     representative,
+    numAffectedServices,
+    affectedServices,
   }: Stackdriver.SerializedErrorGroupStats): Stackdriver.ErrorGroupStats {
     return {
       group,
-      count: parseInt(count, 10),
+      count: Number(count),
       timedCounts: timedCounts.map(tc => ({
-        count: parseInt(tc.count, 10),
+        count: Number(tc.count),
         startTime: new Date(tc.startTime),
         endTime: new Date(tc.endTime),
       })),
       firstSeenTime: new Date(firstSeenTime),
+      numAffectedServices: Number(numAffectedServices),
+      affectedServices,
       representative: {message: representative.message},
     };
   }

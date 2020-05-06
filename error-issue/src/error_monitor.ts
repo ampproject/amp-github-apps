@@ -43,17 +43,26 @@ export class ErrorMonitor {
   }
 
   /** Converts error group stats to an error report to be filed. */
-  private reportFromGroupStats({
+  reportFromGroupStats({
     group,
     firstSeenTime,
     timedCounts,
     representative,
+    numAffectedServices,
+    affectedServices,
   }: Stackdriver.ErrorGroupStats): ErrorReport {
+    const seenInVersions = affectedServices.map(({version}) => version);
+    const unlistedVersions = numAffectedServices - affectedServices.length;
+    if (unlistedVersions) {
+      seenInVersions.push(`+${unlistedVersions} more`);
+    }
+
     return {
       errorId: group.groupId,
       firstSeen: firstSeenTime,
       dailyOccurrences: timedCounts[0].count,
       stacktrace: representative.message,
+      seenInVersions,
     };
   }
 

@@ -74,4 +74,10 @@ export class ApiService {
     );
     return new CurrentReleases(currentReleases);
   }
+
+  async getReleaseDates(requestedRelease: string): Promise<Release> {
+    return await this.getReleaseRequest(
+      `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
+    );
+  }
 }
