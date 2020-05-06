@@ -166,6 +166,8 @@ export async function errorList(
     const reports = await lister.newErrorsToReport();
 
     res.json({
+      serviceType: serviceType || 'ALL',
+      serviceTypeThreshold: Math.ceil(lister.minFrequency),
       errorReports: reports.map(report => {
         const createUrl = createErrorReportUrl(report);
         return {
