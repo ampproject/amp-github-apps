@@ -20,26 +20,36 @@ import fetch from 'node-fetch';
 const SERVER_ENDPOINT = `${process.env.SERVER_URL}:${process.env.SERVER_PORT}`;
 
 export class ApiService {
-  private getPromotionRequest(url: string): Promise<Promotion[]> {
+  private getPromotionsRequest(url: string): Promise<Promotion[]> {
     return fetch(url).then((result) => result.json());
   }
 
   private getReleaseRequest(url: string): Promise<Release> {
     return fetch(url).then((result) => result.json());
   }
+  private getReleasesRequest(url: string): Promise<Release[]> {
+    return fetch(url).then((result) => result.json());
+  }
 
-  async getRelease(requestedRelease: string): Promise<Promotion[]> {
+  async getSinglePromotions(requestedRelease: string): Promise<Promotion[]> {
     const release = await this.getReleaseRequest(
       `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
     );
-    return release.promotions.map((promotion) => {
-      return new Promotion(release, promotion.channel, promotion.date);
+    return release.promotions;
+  }
+
+  async getReleases(): Promise<string[]> {
+    const releases = await this.getReleasesRequest(
+      `${SERVER_ENDPOINT}/releases/`,
+    );
+    return releases.map((release) => {
+      return release.name;
     });
   }
 
-  async getReleases(): Promise<ReleaseEventInput[]> {
-    const allPromotions = await this.getPromotionRequest(
-      `${SERVER_ENDPOINT}/releases/`,
+  async getPromotions(): Promise<ReleaseEventInput[]> {
+    const allPromotions = await this.getPromotionsRequest(
+      `${SERVER_ENDPOINT}/promotions/`,
     );
     const map = new Map<Channel, Date>();
     return allPromotions.map((promotion: Promotion) => {
@@ -49,10 +59,16 @@ export class ApiService {
     });
   }
 
-  async getCurrentReleases(): Promise<CurrentReleases> {
-    const currentReleases = await this.getPromotionRequest(
-      `${SERVER_ENDPOINT}/current-releases/`,
+  async getCurrentPromotions(): Promise<CurrentReleases> {
+    const currentReleases = await this.getPromotionsRequest(
+      `${SERVER_ENDPOINT}/current-promotions`,
     );
     return new CurrentReleases(currentReleases);
+  }
+
+  async getRelease(requestedRelease: string): Promise<Release> {
+    return await this.getReleaseRequest(
+      `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
+    );
   }
 }

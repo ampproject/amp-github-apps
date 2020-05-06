@@ -38,19 +38,40 @@ const stackdriver = new StackdriverApi(PROJECT_ID);
 const monitor = new ErrorMonitor(stackdriver);
 const lister = new ErrorMonitor(stackdriver, 2500, 40);
 
+/** Constructs an error report from JSON, fetching details via API if needed. */
+function errorReportFromJson({
+  errorId,
+  firstSeen,
+  dailyOccurrences,
+  stacktrace,
+  seenInVersions,
+}: {
+  errorId: string;
+  firstSeen?: string;
+  dailyOccurrences?: string | number;
+  stacktrace?: string;
+  seenInVersions?: Array<string>;
+}): ErrorReport {
+  if (firstSeen && dailyOccurrences && stacktrace && seenInVersions) {
+    return {
+      errorId,
+      firstSeen: new Date(firstSeen),
+      dailyOccurrences: Number(dailyOccurrences),
+      stacktrace,
+      seenInVersions,
+    };
+  }
+
+  throw new Error('Missing error report params');
+}
+
 /** Endpoint to create a GitHub issue for an error report. */
 export async function errorIssue(
   req: express.Request,
   res: express.Response
 ): Promise<unknown> {
   const errorReport = req.method === 'POST' ? req.body : req.query;
-  const {
-    errorId,
-    firstSeen,
-    dailyOccurrences,
-    stacktrace,
-    linkIssue,
-  } = errorReport;
+  const {errorId, linkIssue} = errorReport;
 
   if (!errorId) {
     res.status(statusCodes.BAD_REQUEST);
@@ -61,21 +82,12 @@ export async function errorIssue(
   const shouldLinkIssue = linkIssue === '1';
 
   let parsedReport: ErrorReport;
-  if (firstSeen && dailyOccurrences && stacktrace) {
-    parsedReport = {
-      errorId,
-      firstSeen: new Date(firstSeen),
-      dailyOccurrences: Number(dailyOccurrences),
-      stacktrace,
-    };
-  } else {
+  try {
+    parsedReport = errorReportFromJson(errorReport);
+  } catch {
     // If only an error ID is specified, fetch the details from the API.
-    const {
-      group,
-      timedCounts,
-      firstSeenTime,
-      representative,
-    } = await stackdriver.getGroup(errorId);
+    const groupStats = await stackdriver.getGroup(errorId);
+    const {group} = groupStats;
 
     if (group.trackingIssues) {
       // If the error is already tracked, redirect to the existing issue
@@ -85,12 +97,7 @@ export async function errorIssue(
       );
     }
 
-    parsedReport = {
-      errorId,
-      firstSeen: firstSeenTime,
-      dailyOccurrences: timedCounts[0].count,
-      stacktrace: representative.message,
-    };
+    parsedReport = monitor.reportFromGroupStats(groupStats);
   }
 
   try {

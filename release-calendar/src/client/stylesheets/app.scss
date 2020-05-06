@@ -3,6 +3,7 @@
 .main-container {
     padding: 12px;
     padding-top: 24px;
+    padding-bottom: 48px;
     overflow: hidden;
 }
 
@@ -16,16 +17,23 @@
 }
 
 .col-channel-table {
-    @include container-shadow;
-    padding-top: 0px;
-    width: 30%;
+    width: 33%;
     float:left;
 }
 
 .col-calendar {
-    @include container-shadow;
     width: 63%;
     float: right;
+    @include container-shadow;
+}
+
+.search-bar {
+    @include container-shadow;
+    margin-bottom: 5px;
+}
+
+.channel-table {
+    @include container-shadow;
 }
 
 @media only screen and (max-width: 1030px) {
