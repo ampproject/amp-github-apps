@@ -23,6 +23,13 @@ declare module 'error-issue-bot' {
     info(message: string, ...extraInfo: unknown[]): void;
   }
 
+  /** Types of service groups (indexes to ServiceName enum). */
+  export type ServiceGroupType =
+    | 'PRODUCTION'
+    | 'DEVELOPMENT'
+    | 'EXPERIMENTS'
+    | 'NIGHTLY';
+
   /** Service information to determine frequency scaling across diversions. */
   export interface ServiceGroup {
     // The percentage of traffic this diversion set sees.
