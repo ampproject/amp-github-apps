@@ -24,7 +24,10 @@ import {
 import {ErrorIssueBot} from './src/bot';
 import {ErrorReport, ServiceGroupType} from 'error-issue-bot';
 import {StackdriverApi} from './src/stackdriver_api';
+import {formatDate} from './src/utils';
+import Mustache from 'mustache';
 import express from 'express';
+import fs from 'fs';
 import querystring from 'querystring';
 import statusCodes from 'http-status-codes';
 
@@ -33,6 +36,8 @@ const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
 const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
+const ERROR_LIST_TEMPLATE = () =>
+  fs.readFileSync('./static/error-list.html').toString();
 
 const bot = new ErrorIssueBot(
   GITHUB_ACCESS_TOKEN,
@@ -164,6 +169,7 @@ export async function errorList(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
+  const {json} = req.query;
   // If a valid serviceType param is provided, such as "nightly" or
   // "production", filter to that service group.
   const serviceType = (req.query.serviceType || '').toString().toUpperCase();
@@ -171,8 +177,7 @@ export async function errorList(
   try {
     const lister = getLister(serviceType);
     const reports = await lister.newErrorsToReport();
-
-    res.json({
+    const viewData = {
       serviceType: serviceType || 'ALL',
       serviceTypeThreshold: Math.ceil(lister.minFrequency),
       normalizedThreshold: MIN_FREQUENCY,
@@ -181,11 +186,38 @@ export async function errorList(
         return {
           createUrl,
           createAndLinkUrl: `${createUrl}&linkIssue=1`,
+          message: report.stacktrace.split('\n', 1)[0],
           ...report,
         };
       }),
-    });
+    };
+
+    if (json) {
+      res.json(viewData);
+    } else {
+      res.send(
+        Mustache.render(
+          ERROR_LIST_TEMPLATE(),
+          Object.assign(
+            {
+              title: `New errors in ${serviceType.toLowerCase()}`,
+            },
+            viewData,
+            {
+              errorReports: viewData.errorReports.map((report: ErrorReport) => {
+                const {firstSeen, dailyOccurrences} = report;
+                return Object.assign({}, report, {
+                  firstSeen: formatDate(new Date(firstSeen)),
+                  dailyOccurrences: dailyOccurrences.toLocaleString('en-US'),
+                });
+              }),
+            }
+          )
+        )
+      );
+    }
   } catch (error) {
+    console.error(error);
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
     res.json({error: error.toString()});
   }
