@@ -15,6 +15,7 @@
  */
 
 import {ErrorMonitor} from '../src/error_monitor';
+import {ServiceErrorMonitor, ServiceName} from '../src/service_error_monitor';
 import {Stackdriver} from 'error-issue-bot';
 import {StackdriverApi} from '../src/stackdriver_api';
 
@@ -206,6 +207,13 @@ describe('ErrorMonitor', () => {
       await expect(monitor.monitorAndReport()).resolves.toEqual([]);
       expect(console.error).toHaveBeenCalled();
       mocked(console.error).mockRestore();
+    });
+  });
+
+  describe('service', () => {
+    it('creates a service monitor', () => {
+      const serviceMonitor = monitor.service(ServiceName.PRODUCTION);
+      expect(serviceMonitor).toBeInstanceOf(ServiceErrorMonitor);
     });
   });
 });

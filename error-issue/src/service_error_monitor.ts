@@ -67,3 +67,23 @@ export class ServiceErrorMonitor extends ErrorMonitor {
     return this.client.listServiceGroups(this.serviceName, this.pageLimit);
   }
 }
+
+declare module './error_monitor' {
+  interface ErrorMonitor {
+    service(serviceName: ServiceName): ServiceErrorMonitor;
+  }
+}
+/**
+ * Creates a service monitor using the same settings as this monitor.
+ * Note: This can't be done within ErrorMonitor due to the circular dependency.
+ */
+ErrorMonitor.prototype.service = function(
+  serviceName: ServiceName
+): ServiceErrorMonitor {
+  return new ServiceErrorMonitor(
+    this.client,
+    serviceName,
+    this.minFrequency,
+    this.pageLimit
+  );
+};
