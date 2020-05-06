@@ -18,7 +18,8 @@ require('dotenv').config();
 
 import {ERROR_ISSUE_ENDPOINT, ErrorMonitor} from './src/error_monitor';
 import {ErrorIssueBot} from './src/bot';
-import {ErrorReport} from 'error-issue-bot';
+import {ErrorReport, ServiceGroupType} from 'error-issue-bot';
+import {ServiceName} from './src/service_error_monitor';
 import {StackdriverApi} from './src/stackdriver_api';
 import express from 'express';
 import statusCodes from 'http-status-codes';
@@ -134,13 +135,36 @@ function createErrorReportUrl(report: ErrorReport): string {
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
 }
 
+/** Provides monitor to list errors, optionally filtered by service type. */
+function getLister(optServiceType?: string): ErrorMonitor {
+  if (!optServiceType) {
+    return monitor;
+  }
+
+  if (optServiceType in ServiceName) {
+    const serviceType: ServiceGroupType = optServiceType as ServiceGroupType;
+    return monitor.service(ServiceName[serviceType]);
+  }
+
+  throw new Error(
+    `Invalid service group "${optServiceType}"; must be one of ` +
+      `"${Object.keys(ServiceName).join('", "')}"`
+  );
+}
+
 /** Diagnostic endpoint to list new untracked errors. */
 export async function errorList(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
+  // If a valid serviceType param is provided, such as "nightly" or
+  // "production", filter to that service group.
+  const serviceType = (req.query.serviceType || '').toString().toUpperCase();
+
   try {
-    const reports = await monitor.newErrorsToReport();
+    const lister = getLister(serviceType);
+    const reports = await lister.newErrorsToReport();
+
     res.json({
       errorReports: reports.map(report => {
         const createUrl = createErrorReportUrl(report);
