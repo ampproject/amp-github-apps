@@ -55,44 +55,31 @@ export class ReleaseCard extends React.Component<
 
   history: History = {
     [Channel.NIGHTLY]: {
-      title: channelTitles.find((channel) => channel.channel == Channel.NIGHTLY)
-        .title,
+      title: channelTitles[Channel.NIGHTLY].title,
       emoji: '🌙',
       emojiName: 'moon',
     },
     [Channel.OPT_IN_EXPERIMENTAL]: {
-      title: `${
-        channelTitles.find(
-          (channel) => channel.channel == Channel.OPT_IN_EXPERIMENTAL,
-        ).title
-      }, ${
-        channelTitles.find((channel) => channel.channel == Channel.OPT_IN_BETA)
-          .title
+      title: `${channelTitles[Channel.OPT_IN_EXPERIMENTAL].title}, ${
+        channelTitles[Channel.OPT_IN_BETA].title
       }`,
       emoji: '✋',
       emojiName: 'hand',
     },
     [Channel.PERCENT_EXPERIMENTAL]: {
-      title: `${
-        channelTitles.find(
-          (channel) => channel.channel == Channel.PERCENT_EXPERIMENTAL,
-        ).title
-      }, ${
-        channelTitles.find((channel) => channel.channel == Channel.PERCENT_BETA)
-          .title
+      title: `${channelTitles[Channel.PERCENT_EXPERIMENTAL].title}, ${
+        channelTitles[Channel.PERCENT_BETA].title
       }`,
       emoji: '🧪',
       emojiName: 'experiment',
     },
     [Channel.STABLE]: {
-      title: channelTitles.find((channel) => channel.channel == Channel.NIGHTLY)
-        .title,
+      title: channelTitles[Channel.STABLE].title,
       emoji: '🏠',
       emojiName: 'house',
     },
     [Channel.LTS]: {
-      title: channelTitles.find((channel) => channel.channel == Channel.NIGHTLY)
-        .title,
+      title: channelTitles[Channel.LTS].title,
       emoji: '🏙️',
       emojiName: 'city',
     },
