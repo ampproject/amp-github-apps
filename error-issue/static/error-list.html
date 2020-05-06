@@ -1,0 +1,31 @@
+<!doctype html>
+<html ⚡>
+<head>
+  <title>New errors in {{serviceType}}</title>
+</head>
+<body>
+  <h1>Service Type: {{serviceType}}</h1>
+  <p>
+    All listed errors occur more than {{serviceTypeThreshold}}x/day, which is the equivalent of {{normalizedThreshold}}x/day in production.
+  </p>
+
+  {{#errorReports}}
+    <hr>
+    <section>
+      <h2><a href="http://go/ampe/{{errorId}}">{{message}}</a></h2>
+      <p><b>First Seen:</b> {{firstSeen}}</p>
+      <p><b>Daily Occurrences:</b> {{dailyOccurrences}}</p>
+      <p>
+        <b>Seen in:</b>
+        <ul>
+          {{#seenInVersions}}
+          <li>{{.}}</li>
+          {{/seenInVersions}}
+        </ul>
+      </p>
+      <pre>{{stacktrace}}</pre>
+      <a href="{{createAndLinkUrl}}"><button>Create issue</button></a>
+    </section>
+  {{/errorReports}}
+</body>
+</html>
