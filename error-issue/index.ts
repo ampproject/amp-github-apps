@@ -28,6 +28,7 @@ const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
+const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
 
 const bot = new ErrorIssueBot(
   GITHUB_ACCESS_TOKEN,
@@ -36,7 +37,7 @@ const bot = new ErrorIssueBot(
 );
 
 const stackdriver = new StackdriverApi(PROJECT_ID);
-const monitor = new ErrorMonitor(stackdriver, 2500, 40);
+const monitor = new ErrorMonitor(stackdriver, MIN_FREQUENCY, 40);
 
 /** Constructs an error report from JSON, fetching details via API if needed. */
 function errorReportFromJson({
@@ -168,6 +169,7 @@ export async function errorList(
     res.json({
       serviceType: serviceType || 'ALL',
       serviceTypeThreshold: Math.ceil(lister.minFrequency),
+      normalizedThreshold: MIN_FREQUENCY,
       errorReports: reports.map(report => {
         const createUrl = createErrorReportUrl(report);
         return {
