@@ -198,21 +198,15 @@ export async function errorList(
       res.send(
         Mustache.render(
           ERROR_LIST_TEMPLATE(),
-          Object.assign(
-            {
-              title: `New errors in ${serviceType.toLowerCase()}`,
-            },
-            viewData,
-            {
-              errorReports: viewData.errorReports.map((report: ErrorReport) => {
-                const {firstSeen, dailyOccurrences} = report;
-                return Object.assign({}, report, {
-                  firstSeen: formatDate(new Date(firstSeen)),
-                  dailyOccurrences: dailyOccurrences.toLocaleString('en-US'),
-                });
-              }),
-            }
-          )
+          Object.assign(viewData, {
+            errorReports: viewData.errorReports.map((report: ErrorReport) => {
+              const {firstSeen, dailyOccurrences} = report;
+              return Object.assign({}, report, {
+                firstSeen: formatDate(new Date(firstSeen)),
+                dailyOccurrences: dailyOccurrences.toLocaleString('en-US'),
+              });
+            }),
+          })
         )
       );
     }
