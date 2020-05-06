@@ -27,7 +27,7 @@ export const ERROR_ISSUE_ENDPOINT =
 export class ErrorMonitor {
   constructor(
     protected client: StackdriverApi,
-    protected minFrequency: number = 5000,
+    readonly minFrequency: number = 5000,
     protected pageLimit: number = 25
   ) {}
 
