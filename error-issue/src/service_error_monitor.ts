@@ -32,8 +32,8 @@ export enum ServiceName {
  */
 const SERVICE_GROUPS: Record<ServiceName, ServiceGroup> = {
   'CDN Production': {diversionPercent: 0.98, throttleRate: 0.1},
-  'CDN Development': {diversionPercent: 0.005, throttleRate: 1},
-  'CDN Experiments': {diversionPercent: 0.005, throttleRate: 1},
+  'CDN Development': {diversionPercent: 0.01, throttleRate: 1},
+  'CDN Experiments': {diversionPercent: 0.01, throttleRate: 1},
   'CDN Nightly': {diversionPercent: 0.0005, throttleRate: 1},
 };
 
