@@ -20,11 +20,15 @@ import fetch from 'node-fetch';
 const SERVER_ENDPOINT = `${process.env.SERVER_URL}:${process.env.SERVER_PORT}`;
 
 export class ApiService {
-  private getPromotionRequest(url: string): Promise<Promotion[]> {
+  private getPromotionsRequest(url: string): Promise<Promotion[]> {
     return fetch(url).then((result) => result.json());
   }
 
   private getReleaseRequest(url: string): Promise<Release> {
+    return fetch(url).then((result) => result.json());
+  }
+
+  private getReleasesRequest(url: string): Promise<Release[]> {
     return fetch(url).then((result) => result.json());
   }
 
@@ -43,9 +47,18 @@ export class ApiService {
     ];
   }
 
-  async getReleases(): Promise<ReleaseEventInput[]> {
-    const allPromotions = await this.getPromotionRequest(
+  async getReleases(): Promise<string[]> {
+    const releases = await this.getReleasesRequest(
       `${SERVER_ENDPOINT}/releases/`,
+    );
+    return releases.map((release) => {
+      return release.name;
+    });
+  }
+
+  async getPromotions(): Promise<ReleaseEventInput[]> {
+    const allPromotions = await this.getPromotionsRequest(
+      `${SERVER_ENDPOINT}/promotions/`,
     );
     const map = new Map<Channel, Date>();
     return allPromotions.map((promotion: Promotion) => {
@@ -55,9 +68,9 @@ export class ApiService {
     });
   }
 
-  async getCurrentReleases(): Promise<CurrentReleases> {
-    const currentReleases = await this.getPromotionRequest(
-      `${SERVER_ENDPOINT}/current-releases/`,
+  async getCurrentPromotions(): Promise<CurrentReleases> {
+    const currentReleases = await this.getPromotionsRequest(
+      `${SERVER_ENDPOINT}/current-promotions`,
     );
     return new CurrentReleases(currentReleases);
   }

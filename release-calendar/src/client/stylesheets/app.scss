@@ -17,16 +17,23 @@
 }
 
 .col-channel-table {
-    @include container-shadow;
-    padding-top: 0px;
-    width: 30%;
+    width: 33%;
     float:left;
 }
 
 .col-calendar {
-    @include container-shadow;
     width: 63%;
     float: right;
+    @include container-shadow;
+}
+
+.search-bar {
+    @include container-shadow;
+    margin-bottom: 5px;
+}
+
+.channel-table {
+    @include container-shadow;
 }
 
 @media only screen and (max-width: 1030px) {
@@ -46,26 +53,4 @@
     .col-channel-table {
         width: 70%;
     }
-}
-
-.lts {
-    background-color: base.$lts;
-}
-.stable {
-    background-color: base.$stable;
-}
-.perc-beta{
-    background-color: base.$perc-beta;
-}
-.perc-experimental {
-    background-color: base.$perc-experimental;
-}
-.opt-in-beta {
-    background-color: base.$opt-in-beta;
-}
-.opt-in-experimental {
-    background-color: base.$opt-in-experimental;
-}
-.nightly {
-    background-color: base.$nightly;
 }

@@ -21,7 +21,7 @@ import {Channel} from '../../types';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
 import {Tooltip} from './Tooltip';
 import {
-  getAllReleasesEvents,
+  getAllPromotionEvents,
   getSingleReleaseEvents,
 } from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
@@ -54,8 +54,8 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   }
 
   async componentDidMount(): Promise<void> {
-    const releases = await this.apiService.getReleases();
-    this.setState({allEvents: getAllReleasesEvents(releases)});
+    const promotions = await this.apiService.getPromotions();
+    this.setState({allEvents: getAllPromotionEvents(promotions)});
   }
 
   async componentDidUpdate(prevProps: CalendarProps): Promise<void> {
@@ -80,23 +80,21 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
             .map((channel) => this.state.allEvents.get(channel));
 
     return (
-      <div className='calendar'>
-        <FullCalendar
-          defaultView='dayGridMonth'
-          header={{
-            left: 'prev,next',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek',
-          }}
-          plugins={[dayGridPlugin, timeGridPlugin]}
-          eventSources={displayEvents}
-          contentHeight={CALENDAR_CONTENT_HEIGHT}
-          fixedWeekCount={false}
-          displayEventTime={false}
-          views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
-          eventRender={Tooltip}
-        />
-      </div>
+      <FullCalendar
+        defaultView='dayGridMonth'
+        header={{
+          left: 'prev,next',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek',
+        }}
+        plugins={[dayGridPlugin, timeGridPlugin]}
+        eventSources={displayEvents}
+        contentHeight={CALENDAR_CONTENT_HEIGHT}
+        fixedWeekCount={false}
+        displayEventTime={false}
+        views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
+        eventRender={Tooltip}
+      />
     );
   }
 }

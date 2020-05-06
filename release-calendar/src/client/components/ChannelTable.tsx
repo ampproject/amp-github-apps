@@ -31,7 +31,7 @@ interface ChannelTableState {
 interface ChannelTableProps {
   channels: Channel[];
   handleSelectedChannel: (channel: Channel, checked: boolean) => void;
-  handleSelectedRelease: (release: string) => void;
+  handleSelectedRelease: (release: string, clearSearchInput: boolean) => void;
 }
 
 export const channelTitles: Titles = {
@@ -60,7 +60,7 @@ export class ChannelTable extends React.Component<
   }
 
   async componentDidMount(): Promise<void> {
-    const currentReleases: CurrentReleases = await this.apiService.getCurrentReleases();
+    const currentReleases: CurrentReleases = await this.apiService.getCurrentPromotions();
     this.setState({currentReleases: currentReleases.map});
   }
 
@@ -72,7 +72,7 @@ export class ChannelTable extends React.Component<
   };
 
   handleReleaseClick = (release: string): void => {
-    this.props.handleSelectedRelease(release);
+    this.props.handleSelectedRelease(release, true);
   };
 
   render(): JSX.Element {
