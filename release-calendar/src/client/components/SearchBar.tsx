@@ -111,7 +111,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     if (input?.length > 13) {
       return true;
     }
-    return !(input == null || /^[0-9]*$/.test(input));
+    return !(input == null || /^\d*$/.test(input));
   }
 
   render(): JSX.Element {
