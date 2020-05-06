@@ -20,6 +20,10 @@ import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {CurrentReleases} from '../models/view-models';
 
+interface Titles {
+  [key: string]: {title: string};
+}
+
 interface ChannelTableState {
   currentReleases: Map<Channel, string>;
 }
@@ -29,6 +33,16 @@ interface ChannelTableProps {
   handleSelectedChannel: (channel: Channel, checked: boolean) => void;
   handleSelectedRelease: (release: string) => void;
 }
+
+export const channelTitles: Titles = {
+  [Channel.STABLE]: {title: 'Stable'},
+  [Channel.PERCENT_BETA]: {title: '% Beta'},
+  [Channel.PERCENT_EXPERIMENTAL]: {title: '% Experimental'},
+  [Channel.OPT_IN_BETA]: {title: 'Opt-in Beta'},
+  [Channel.OPT_IN_EXPERIMENTAL]: {title: 'Opt-in Experimental'},
+  [Channel.NIGHTLY]: {title: 'Nightly'},
+  [Channel.LTS]: {title: 'Long Term Stable'},
+};
 
 export class ChannelTable extends React.Component<
   ChannelTableProps,
@@ -61,46 +75,36 @@ export class ChannelTable extends React.Component<
     this.props.handleSelectedRelease(release);
   };
 
-  rows = [
-    {channel: Channel.STABLE, title: 'Stable'},
-    {channel: Channel.PERCENT_BETA, title: '% Beta'},
-    {channel: Channel.PERCENT_EXPERIMENTAL, title: '% Experimental'},
-    {channel: Channel.OPT_IN_BETA, title: 'Opt-in Beta'},
-    {channel: Channel.OPT_IN_EXPERIMENTAL, title: 'Opt-in Experimental'},
-    {channel: Channel.NIGHTLY, title: 'Nightly'},
-    {channel: Channel.LTS, title: 'Long Term Stable'},
-  ];
-
   render(): JSX.Element {
     return (
       <React.Fragment>
         <h1 className='title-bar'>Current Releases</h1>
         <div className='row-container'>
-          {this.rows.map((row) => {
+          {Object.values(Channel).map((channel) => {
             return (
-              <React.Fragment key={row.channel}>
-                <label className='row-button' htmlFor={row.channel}>
-                  <div className={row.channel}>
+              <React.Fragment key={channel}>
+                <label className='row-button' htmlFor={channel}>
+                  <div className={channel}>
                     <input
                       type='checkbox'
                       className='click-square'
-                      id={row.channel}
-                      checked={this.props.channels.includes(row.channel)}
+                      id={channel}
+                      checked={this.props.channels.includes(channel)}
                       onChange={(e): void =>
-                        this.handleChannelClick(row.channel, e)
+                        this.handleChannelClick(channel, e)
                       }></input>
                     <i></i>
                   </div>
-                  <div className='row-text'>{row.title}</div>
+                  <div className='row-text'>{channelTitles[channel].title}</div>
                 </label>
                 <button
                   className='release-button'
                   onClick={(): void =>
                     this.handleReleaseClick(
-                      this.state.currentReleases.get(row.channel),
+                      this.state.currentReleases.get(channel),
                     )
                   }>
-                  {this.state.currentReleases.get(row.channel)}
+                  {this.state.currentReleases.get(channel)}
                 </button>
               </React.Fragment>
             );

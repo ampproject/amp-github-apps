@@ -30,7 +30,7 @@ export default async function addTestData(
   repositoryService: RepositoryService,
 ): Promise<void> {
   const releases = [
-    new Release('1234567890123'), // lts
+    new Release('2004252135000'), // lts
     new Release('2234567890123'), // stable
     new Release('3234567890123'), // perc-beta and perc-experimental
     new Release('4234567890123'), // opt-in-beta and opt-in-experimental
