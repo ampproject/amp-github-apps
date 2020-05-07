@@ -1,30 +1,123 @@
 <!doctype html>
 <html ⚡>
 <head>
-  <title>New errors in {{serviceType}}</title>
+  <title>Top Errors in {{currentServiceType}}</title>
+
+  <style>
+    body {
+      color: #333;
+      font-family: sans-serif;
+      line-height: 1.25em;
+      text-align: center;
+    }
+    header {
+      margin: 50px 0 25px;
+    }
+    a {
+      text-decoration: none;
+    }
+    ul {
+      margin: 0;
+    }
+    button {
+      background-color: #fff;
+      border: 2px solid #d9edff;
+      border-radius: 20px;
+      color: #339dff;
+      cursor: pointer;
+      display: inline-block;
+      font-size: 16px;
+      margin: 5px;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+    }
+    button:focus {
+      outline: none;
+    }
+    .error-report {
+      border: 2px solid #e7e7e7;
+      border-radius: 20px;
+      margin: 25px auto;
+      max-width: 800px;
+      padding: 15px 30px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .button-service[selected] {
+      pointer-events: none;
+    }
+    .button-service[selected] button,
+    .button-create {
+      background-color: #339dff;
+      color: white;
+    }
+    .button-create {
+      display: block;
+      width: 100%;
+    }
+    .message {
+      color: #339dff;
+      font-family: monospace;
+      font-size: 1.25em;
+      line-height: 1.25em;
+    }
+    .stacktrace {
+      background-color: #f7f7f7;
+      border: 2px solid #e7e7e7;
+      border-radius: 5px;
+      line-height: 1.25em;
+      margin: 1.5em 0;
+      max-width: 100%;
+      overflow-x: scroll;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Service Type: {{serviceType}}</h1>
-  <p>
-    All listed errors occur more than {{serviceTypeThreshold}}x/day, which is the equivalent of {{normalizedThreshold}}x/day in production.
-  </p>
+  <header>
+    <h1 class="service-type">Top Errors in {{currentServiceType}}</h1>
+    <p>
+      All listed errors occur at least {{serviceTypeThreshold}}x/day, which is the equivalent of {{normalizedThreshold}}x/day in production.
+    </p>
+    <b>Other service types:</b>
+    {{#serviceTypeList}}
+    <a href="?serviceType={{formattedName}}"
+      class="button-service"
+      {{selected}}>
+      <button>{{formattedName}}</button>
+    </a>
+    {{/serviceTypeList}}
+  </header>
 
   {{#errorReports}}
-    <hr>
-    <section>
-      <h2><a href="http://go/ampe/{{errorId}}">{{message}}</a></h2>
-      <p><b>First Seen:</b> {{firstSeen}}</p>
-      <p><b>Daily Occurrences:</b> {{dailyOccurrences}}</p>
-      <p>
-        <b>Seen in:</b>
-        <ul>
+    <section class="error-report">
+      <h2>
+        <a target="_blank"
+          href="http://go/ampe/{{errorId}}?project=amp-error-reporting"
+          class="message">
+          {{message}}
+        </a>
+      </h2>
+
+      <div>
+        <strong>First Seen:</strong> {{firstSeen}}
+        <br>
+        <strong>Daily Occurrences:</strong> {{dailyOccurrences}}
+        <br>
+        <strong>Seen in:</strong>
+        <ul class="seen-list">
           {{#seenInVersions}}
           <li>{{.}}</li>
           {{/seenInVersions}}
         </ul>
-      </p>
-      <pre>{{stacktrace}}</pre>
-      <a href="{{createAndLinkUrl}}"><button>Create issue</button></a>
+      </div>
+
+      <pre class="stacktrace">{{stacktrace}}</pre>
+
+      <a target="_blank" href="{{createAndLinkUrl}}" >
+        <button class="button-create">Create issue</button>
+      </a>
     </section>
   {{/errorReports}}
 </body>
