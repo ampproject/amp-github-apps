@@ -35,9 +35,11 @@ steps:
       - server-build      
 
   # Deploy the app
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy']
-  timeout: '1600s'
+- name: gcr.io/cloud-builders/gcloud
+  dir: release-calendar
+  args:
+      - app
+      - deploy
 
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
