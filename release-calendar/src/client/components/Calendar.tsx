@@ -20,10 +20,7 @@ import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {ReleaseEventInput} from '../models/view-models';
 import {Tooltip} from './Tooltip';
-import {
-  getAllPromotionEvents,
-  getSingleReleaseEvents,
-} from '../models/release-event';
+import {getAllEvents, getSingleReleaseEvents} from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -55,17 +52,20 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
 
   async componentDidMount(): Promise<void> {
     const promotions = await this.apiService.getPromotions();
-    this.setState({allEvents: getAllPromotionEvents(promotions)});
+    this.setState({allEvents: getAllEvents(promotions)});
   }
 
   async componentDidUpdate(prevProps: CalendarProps): Promise<void> {
     if (prevProps.singleRelease != this.props.singleRelease) {
       if (this.props.singleRelease != null) {
-        const release = await this.apiService.getSinglePromotions(
+        const promotionsOfSingleRelease = await this.apiService.getSinglePromotions(
           this.props.singleRelease,
         );
         this.setState((prevState: CalendarState) => ({
-          singleEvents: getSingleReleaseEvents(release, prevState.allEvents),
+          singleEvents: getSingleReleaseEvents(
+            promotionsOfSingleRelease,
+            prevState.allEvents,
+          ),
         }));
       } else {
         this.setState({singleEvents: []});
@@ -88,7 +88,6 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
             ]),
         );
     }
-    console.log(displayEvents);
 
     return (
       <FullCalendar

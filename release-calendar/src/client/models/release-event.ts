@@ -17,7 +17,7 @@
 import {Channel, Promotion} from '../../types';
 import {ReleaseEventInput} from './view-models';
 
-export function getAllPromotionEvents(
+export function getAllEvents(
   events: ReleaseEventInput[],
 ): Map<Channel, ReleaseEventInput[]> {
   const eventInputs = new Map<Channel, ReleaseEventInput[]>();

@@ -53,7 +53,7 @@ export class ApiService {
     );
     const map = new Map<Channel, Date>();
     return allPromotions.map((promotion: Promotion) => {
-      const date = map.get(promotion.channel) || new Date();
+      const date = map.get(promotion.channel);
       map.set(promotion.channel, promotion.date);
       return new ReleaseEventInput(promotion, date);
     });

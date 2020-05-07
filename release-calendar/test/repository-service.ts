@@ -39,15 +39,8 @@ export class RepositoryService {
     const releaseQuery = this.releaseRepository
       .createQueryBuilder('release')
       .leftJoinAndSelect('release.promotions', 'promotion')
+      .orderBy('promotion.date', 'DESC')
       .getMany();
-
-    releaseQuery.then((releases) => {
-      releases.forEach((release) =>
-        release.promotions.sort(
-          (a, b): number => b.date.getTime() - a.date.getTime(),
-        ),
-      );
-    });
 
     return releaseQuery;
   }
