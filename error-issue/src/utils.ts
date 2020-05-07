@@ -56,7 +56,11 @@ export function parseSource(source: string): null | StackFrame {
 export function parseStacktrace(stacktrace: string): Array<StackFrame> {
   return stacktrace
     .split('\n')
-    .map(line => line.match(/^\s*at .*\((?<source>.+)\)$/))
+    .map(
+      line =>
+        line.match(/^\s*at .*\((?<source>.+)\)$/) ||
+        line.match(/^\s*at (?<source>https:.+)$/)
+    )
     .filter(Boolean)
     .map(({groups}) => parseSource(groups.source));
 }
