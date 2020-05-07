@@ -16,10 +16,13 @@
 
 require('dotenv').config();
 
-import {ERROR_ISSUE_ENDPOINT, ErrorMonitor} from './src/error_monitor';
+import {
+  ERROR_ISSUE_ENDPOINT,
+  ErrorMonitor,
+  ServiceName,
+} from './src/error_monitor';
 import {ErrorIssueBot} from './src/bot';
 import {ErrorReport, ServiceGroupType} from 'error-issue-bot';
-import {ServiceName} from './src/service_error_monitor';
 import {StackdriverApi} from './src/stackdriver_api';
 import express from 'express';
 import statusCodes from 'http-status-codes';
