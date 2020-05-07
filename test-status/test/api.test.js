@@ -80,7 +80,7 @@ describe('test-status/api', () => {
       .post('/repos/ampproject/amphtml/check-runs', body => {
         expect(body).toMatchObject({
           name: 'ampproject/tests/unit (saucelabs)',
-          head_sha: HEAD_SHA,
+          'head_sha': HEAD_SHA,
           status,
           output: {
             title,
@@ -126,7 +126,7 @@ describe('test-status/api', () => {
     const nocks = nock('https://api.github.com')
       .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
         expect(body).toMatchObject({
-          head_sha: HEAD_SHA,
+          'head_sha': HEAD_SHA,
           status: 'in_progress',
           output: {
             title: 'Tests are running on Travis',
