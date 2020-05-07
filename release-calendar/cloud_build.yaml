@@ -2,8 +2,9 @@ steps:
   # The first two steps are required to identify and inject un-redacted secrets.
   - name: gcr.io/cloud-builders/npm
     args:
-      - release-calendar
+      - install
       - yaml
+
   - name: gcr.io/cloud-builders/npm
     args:
       - run
