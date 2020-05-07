@@ -25,6 +25,7 @@ import {ErrorIssueBot} from './src/bot';
 import {ErrorReport, ServiceGroupType} from 'error-issue-bot';
 import {StackdriverApi} from './src/stackdriver_api';
 import express from 'express';
+import querystring from 'querystring';
 import statusCodes from 'http-status-codes';
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
@@ -134,10 +135,7 @@ export async function errorMonitor(
 }
 
 function createErrorReportUrl(report: ErrorReport): string {
-  const params = Object.entries(report)
-    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
-    .join('&');
-
+  const params = querystring.stringify(report);
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
 }
 
