@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import {ErrorMonitor} from '../src/error_monitor';
+import {
+  ErrorMonitor,
+  ServiceErrorMonitor,
+  ServiceName,
+} from '../src/error_monitor';
 import {Stackdriver} from 'error-issue-bot';
 import {StackdriverApi} from '../src/stackdriver_api';
 
@@ -107,7 +111,7 @@ describe('ErrorMonitor', () => {
   });
 
   beforeEach(() => {
-    monitor = new ErrorMonitor(stackdriver);
+    monitor = new ErrorMonitor(stackdriver, 5000);
     mocked(stackdriver.listGroups).mockResolvedValue(errorGroups);
     nock.cleanAll();
   });
@@ -206,6 +210,92 @@ describe('ErrorMonitor', () => {
       await expect(monitor.monitorAndReport()).resolves.toEqual([]);
       expect(console.error).toHaveBeenCalled();
       mocked(console.error).mockRestore();
+    });
+  });
+
+  describe('service', () => {
+    it('creates a service monitor', () => {
+      const serviceMonitor = monitor.service(ServiceName.PRODUCTION);
+      expect(serviceMonitor).toBeInstanceOf(ServiceErrorMonitor);
+    });
+  });
+});
+
+describe('ServiceErrorMonitor', () => {
+  let monitor: ServiceErrorMonitor;
+  const stackdriver = ({
+    listServiceGroups: jest.fn(),
+  } as unknown) as StackdriverApi;
+
+  const prodStableService: Stackdriver.ServiceContext = {
+    service: 'CDN Production',
+    version: '04-24 Stable (1234)',
+  };
+
+  const infrequentGroup: Stackdriver.ErrorGroupStats = {
+    group: {
+      name: 'Error: Infrequent error',
+      groupId: 'infrequent_id',
+    },
+    count: 200,
+    timedCounts: [
+      {
+        count: 4,
+        startTime: new Date('Feb 25, 2020'),
+        endTime: new Date('Feb 26, 2020'),
+      },
+    ],
+    firstSeenTime: new Date('Feb 20, 2020'),
+    numAffectedServices: 1,
+    affectedServices: [prodStableService],
+    representative: {message: 'Error: Infrequent error'},
+  };
+  const newGroup: Stackdriver.ErrorGroupStats = {
+    group: {
+      name: 'Error: New error',
+      groupId: 'new_id',
+    },
+    count: 2000,
+    timedCounts: [
+      {
+        count: 6000,
+        startTime: new Date('Feb 25, 2020'),
+        endTime: new Date('Feb 26, 2020'),
+      },
+    ],
+    firstSeenTime: new Date('Feb 20, 2020'),
+    numAffectedServices: 2,
+    affectedServices: [prodStableService],
+    representative: {message: 'Error: New error'},
+  };
+  const errorGroups = [infrequentGroup, newGroup];
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.enableNetConnect();
+  });
+
+  beforeEach(() => {
+    monitor = new ServiceErrorMonitor(
+      stackdriver,
+      ServiceName.DEVELOPMENT,
+      5000
+    );
+    mocked(stackdriver.listServiceGroups).mockResolvedValue(errorGroups);
+  });
+
+  describe('newErrorsToReport', () => {
+    it('ignores infrequent errors, scaled for the service', async () => {
+      const newErrors = await monitor.newErrorsToReport();
+      const newErrorIds = newErrors.map(({errorId}) => errorId);
+      expect(newErrorIds).toEqual(['new_id']);
+      expect(stackdriver.listServiceGroups).toHaveBeenCalledWith(
+        'CDN Development',
+        25
+      );
     });
   });
 });

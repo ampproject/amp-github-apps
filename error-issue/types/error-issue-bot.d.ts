@@ -23,6 +23,21 @@ declare module 'error-issue-bot' {
     info(message: string, ...extraInfo: unknown[]): void;
   }
 
+  /** Types of service groups (indexes to ServiceName enum). */
+  export type ServiceGroupType =
+    | 'PRODUCTION'
+    | 'DEVELOPMENT'
+    | 'EXPERIMENTS'
+    | 'NIGHTLY';
+
+  /** Service information to determine frequency scaling across diversions. */
+  export interface ServiceGroup {
+    // The percentage of traffic this diversion set sees.
+    diversionPercent: number;
+    // The base throttling rate of error reporting for this group.
+    throttleRate: number;
+  }
+
   /**
    * Information about a range of lines from a Git blame.
    * See https://developer.github.com/v4/object/blamerange/
