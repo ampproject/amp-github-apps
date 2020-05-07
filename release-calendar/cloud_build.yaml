@@ -11,7 +11,7 @@ steps:
       - --
       - release-calendar
     secretEnv:
-      - DB_USER
+      - DB_USERNAME
       - DB_PASSWORD
 
   # Install node packages  
