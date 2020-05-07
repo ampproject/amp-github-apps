@@ -135,7 +135,10 @@ export async function errorMonitor(
 }
 
 function createErrorReportUrl(report: ErrorReport): string {
-  const params = querystring.stringify(report);
+  const params = querystring.stringify({
+    ...report,
+    firstSeen: report.firstSeen.toString(),
+  });
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
 }
 
