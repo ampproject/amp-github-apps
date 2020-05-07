@@ -46,5 +46,5 @@ steps:
 secrets:
   - kmsKeyName: projects/amp-release-calendar/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
     secretEnv:
-      DB_USER: CiQAvF4DHWDrMTBZvbCxwRpkA1AT9k+fRDNvKVFKFmvb9WsBtRQSLwDYFKiUQ+96PiBOialv1MC1VhgctciMC5T5xkOJtURbURyN/O0SgGpRlHm8SGB+
+      DB_USERNAME: CiQAvF4DHWDrMTBZvbCxwRpkA1AT9k+fRDNvKVFKFmvb9WsBtRQSLwDYFKiUQ+96PiBOialv1MC1VhgctciMC5T5xkOJtURbURyN/O0SgGpRlHm8SGB+
       DB_PASSWORD: CiQAvF4DHVS/vkFxZQxF9AwHS0ELlfGYVSxPONmtfmVaK4PZx2ISLwDYFKiUJgUhlqEZRGNoPxcr27zigWXiZwibVrpLEcaklecTI48xCGvnmmkjwZkG
