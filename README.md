@@ -45,7 +45,7 @@ The app runs on an instance of [Google AppEngine](https://amp-project-metrics.ap
 
 A ReactJS, Express and MySQL web app that displays AMPHTML release activity on a calendar.
 
-The app runs on an instance of Google AppEngine and is deployed at //TODO
+The app runs on an instance of Google AppEngine and is deployed at amp-release-calendar.appspot.com
 
 
 ### [Test Status Bot](test-status/README.md)
