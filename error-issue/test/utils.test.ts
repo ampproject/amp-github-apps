@@ -103,4 +103,24 @@ describe('parseStacktrace', () => {
       },
     ]);
   });
+
+  it('handles lines with no function included', () => {
+    const frames = parseStacktrace(
+      `Error: undefined is not an object (evaluating 'b.length')
+        at https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-next-page/1.0/service.js:785
+        at https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-next-page/1.0/service.js:294`
+    );
+    expect(frames).toEqual([
+      {
+        rtv: '2004030010070',
+        path: 'extensions/amp-next-page/1.0/service.js',
+        line: 785,
+      },
+      {
+        rtv: '2004030010070',
+        path: 'extensions/amp-next-page/1.0/service.js',
+        line: 294,
+      },
+    ]);
+  });
 });
