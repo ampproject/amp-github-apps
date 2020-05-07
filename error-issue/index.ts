@@ -54,7 +54,7 @@ function errorReportFromJson({
   firstSeen?: string;
   dailyOccurrences?: string | number;
   stacktrace?: string;
-  seenInVersions?: Array<string>;
+  seenInVersions?: string | Array<string>;
 }): ErrorReport {
   if (firstSeen && dailyOccurrences && stacktrace && seenInVersions) {
     return {
@@ -62,7 +62,9 @@ function errorReportFromJson({
       firstSeen: new Date(firstSeen),
       dailyOccurrences: Number(dailyOccurrences),
       stacktrace,
-      seenInVersions,
+      seenInVersions: Array.isArray(seenInVersions)
+        ? seenInVersions
+        : [seenInVersions],
     };
   }
 
