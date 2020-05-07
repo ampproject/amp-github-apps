@@ -68,12 +68,10 @@ class OwnersRule {
    * files within its hierarchy; may be modified to test filetypes, globs,
    * special cases like package.json, etc.
    *
-   * TODO(Issue #278): Implement pattern matching.
-   *
    * @param {string} filePath relative path in repo to the file being checked.
    * @return {boolean} true if the rule applies to the file.
    */
-  matchesFile(filePath) {
+  matchesFile(unusedFilePath) {
     return true;
   }
 

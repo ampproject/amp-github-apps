@@ -76,7 +76,7 @@ class CheckRun {
       Object.assign(checkRun, {
         status: 'completed',
         conclusion: this.state,
-        completed_at: new Date(),
+        'completed_at': new Date(),
       });
     }
 
@@ -171,7 +171,7 @@ class OwnersCheck {
           `selection: \n${e}\nSkipping reviewer assignment.`;
       }
 
-      const reviewers = reviewSuggestions.map(([reviewer, files]) => reviewer);
+      const reviewers = reviewSuggestions.map(([reviewer]) => reviewer);
       const suggestionsText = reviewSuggestions.length
         ? this.buildReviewSuggestionsText(reviewSuggestions)
         : reviewerSelectionErrors;
@@ -212,8 +212,8 @@ class OwnersCheck {
    */
   _hasOwnersReview(filename, subtree, isApproved) {
     return Object.entries(this.reviewers)
-      .filter(([username, approved]) => approved === isApproved)
-      .map(([username, approved]) => username)
+      .filter(([, approved]) => approved === isApproved)
+      .map(([username]) => username)
       .some(approver => this.tree.fileHasOwner(filename, approver));
   }
 
@@ -287,7 +287,7 @@ class OwnersCheck {
    */
   _prHasReviewerSetApproval() {
     return Object.entries(this.reviewers)
-      .filter(([username, approved]) => approved)
+      .filter(([, approved]) => approved)
       .map(([username]) => username)
       .some(username =>
         this.tree.reviewerSetRule.owners.some(owner => owner.includes(username))
@@ -302,18 +302,16 @@ class OwnersCheck {
   buildCurrentCoverageText(fileTreeMap) {
     const allFilesText = Object.entries(fileTreeMap)
       .map(([filename, subtree]) => {
-        const reviewers = Object.entries(
-          this.reviewers
-        ).filter(([username, approved]) =>
+        const reviewers = Object.entries(this.reviewers).filter(([username]) =>
           this.tree.fileHasOwner(filename, username)
         );
 
         const approving = reviewers
-          .filter(([username, approved]) => approved)
-          .map(([username, approved]) => username);
+          .filter(([, approved]) => approved)
+          .map(([username]) => username);
         const pending = reviewers
-          .filter(([username, approved]) => !approved)
-          .map(([username, approved]) => username);
+          .filter(([, approved]) => !approved)
+          .map(([username]) => username);
         const missing = this._missingRequiredOwners(filename, subtree).map(
           owner => owner.name
         );

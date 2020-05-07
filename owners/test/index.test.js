@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Google Inc.
+ * * Copyright 2019 The AMP HTML Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -202,7 +202,7 @@ describe('GitHub app', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_sha: opened35.pull_request.head.sha,
+              'head_sha': opened35.pull_request.head.sha,
               status: 'completed',
               conclusion: 'action_required',
               output: {
@@ -368,7 +368,7 @@ describe('GitHub app', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_sha: opened35.pull_request.head.sha,
+              'head_sha': opened35.pull_request.head.sha,
               status: 'completed',
               conclusion: 'action_required',
               output: {
@@ -425,7 +425,7 @@ describe('GitHub app', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_sha: opened35.pull_request.head.sha,
+              'head_sha': opened35.pull_request.head.sha,
               status: 'completed',
               conclusion: 'success',
               output: {
@@ -473,7 +473,7 @@ describe('GitHub app', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_sha: opened36.pull_request.head.sha,
+              'head_sha': opened36.pull_request.head.sha,
               status: 'completed',
               conclusion: 'success',
               output: {
@@ -524,7 +524,7 @@ describe('GitHub app', () => {
           body => {
             expect(body).toMatchObject({
               name: 'ampproject/owners-check',
-              head_sha: opened35.pull_request.head.sha,
+              'head_sha': opened35.pull_request.head.sha,
               status: 'completed',
               conclusion: 'success',
               output: {
@@ -690,7 +690,7 @@ describe('GitHub app', () => {
     beforeEach(() => {
       sandbox.stub(OwnersBot.prototype, 'refreshTree');
       pullRequest = require('./fixtures/pulls/pull_request.35');
-      payload = {pull_request: pullRequest};
+      payload = {'pull_request': pullRequest};
     });
 
     it('does nothing for a non-merged PR', async done => {

@@ -24,7 +24,7 @@ const {OwnersBot} = require('../src/owners_bot');
 
 /* eslint-disable require-jsdoc */
 class FakeRepository extends Repository {
-  readFile(relativePath) {
+  readFile(unusedRelativePath) {
     return '';
   }
 
