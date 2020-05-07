@@ -1,13 +1,14 @@
 /**
- * Copyright 2019, the AMP HTML authors. All Rights Reserved
+ * Copyright 2019 The AMP HTML Authors. All Rights Reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an "AS-IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -103,7 +104,7 @@ function createReportedCheckParams(
   failed,
   travisJobUrl
 ) {
-  const {owner, repo, headSha} = pullRequestSnapshot;
+  const {owner, repo} = pullRequestSnapshot;
   const params = {
     owner,
     repo,
@@ -125,8 +126,7 @@ function createReportedCheckParams(
           'If you believe that this pull request was not the cause of this ' +
           'test breakage (i.e., this is a flaky test) error please try the ' +
           'following steps:\n' +
-          '1. Restart the failed ' +
-          (travisJobUrl ? `[Travis job](${travisJobUrl})\n` : 'Travis job\n') +
+          `1. Restart the failed [Travis job](${travisJobUrl})\n` +
           '2. Rebase your pull request on the latest `master` branch\n' +
           `3. Contact the weekly build cop (@${BUILD_COP_TEAM}), who can advise ` +
           'you how to proceed, or skip this test run for you.',
@@ -138,7 +138,9 @@ function createReportedCheckParams(
       output: {
         title: `${passed} test${passed != 1 ? 's' : ''} passed`,
         summary: `The ${type} tests (${subType}) finished running on Travis.`,
-        text: `* *${passed}* test${passed != 1 ? 's' : ''} PASSED`,
+        text:
+          `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n\n` +
+          `See related [Travis job](${travisJobUrl}) for more details.`,
       },
     });
   }
@@ -163,7 +165,7 @@ function createErroredCheckParams(
   checkRunId,
   travisJobUrl
 ) {
-  const {owner, repo, headSha} = pullRequestSnapshot;
+  const {owner, repo} = pullRequestSnapshot;
   return {
     owner,
     repo,
@@ -180,8 +182,7 @@ function createErroredCheckParams(
         'Please inspect the Travis build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
         'error, please try the following steps:\n' +
-        '1. Restart the failed ' +
-        (travisJobUrl ? `[Travis job](${travisJobUrl})\n` : 'Travis job\n') +
+        `1. Restart the failed [Travis job](${travisJobUrl})\n` +
         '2. Rebase your pull request on the latest `master` branch\n' +
         `3. Contact the weekly build cop (@${BUILD_COP_TEAM}), who can advise you ` +
         'how to proceed, or skip this test run for you.',
@@ -262,8 +263,7 @@ exports.installApiRouter = (app, db) => {
     '/:headSha/:type/:subType/report/:passed/:failed',
     async (request, response) => {
       const {headSha, type, subType, passed, failed} = request.params;
-      const travisJobUrl =
-        'travisJobUrl' in request.body ? request.body.travisJobUrl : null;
+      const {travisJobUrl} = request.body;
       app.log(
         `Reporting the results of the ${type} tests (${subType}) to the ` +
           `GitHub check for pull request with head commit SHA ${headSha}`
@@ -305,8 +305,7 @@ exports.installApiRouter = (app, db) => {
     '/:headSha/:type/:subType/report/errored',
     async (request, response) => {
       const {headSha, type, subType} = request.params;
-      const travisJobUrl =
-        'travisJobUrl' in request.body ? request.body.travisJobUrl : null;
+      const {travisJobUrl} = request.body;
       app.log(
         `Reporting that ${type} tests (${subType}) have errored to the ` +
           `GitHub check for pull request with head commit SHA ${headSha}`

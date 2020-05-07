@@ -1,13 +1,14 @@
 /**
- * Copyright 2019, the AMP HTML authors. All Rights Reserved
+ * Copyright 2019 The AMP HTML Authors. All Rights Reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an "AS-IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -21,6 +22,8 @@ const {Probot} = require('probot');
 const {setupDb} = require('../setup-db');
 
 const HEAD_SHA = '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa';
+const travisJobUrl =
+  'https://travis-ci.org/github/ampproject/amphtml/builds/123456789';
 
 jest.mock('../db-connect');
 jest.setTimeout(5000);
@@ -174,6 +177,7 @@ describe('test-status/api', () => {
 
       await request(probot.server)
         .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
+        .send({travisJobUrl})
         .expect(200);
 
       expect(await db('checks').select('*')).toMatchObject([
@@ -239,6 +243,7 @@ describe('test-status/api', () => {
 
       await request(probot.server)
         .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
+        .send({travisJobUrl})
         .expect(200);
 
       expect(await db('checks').select('*')).toMatchObject([
@@ -289,6 +294,7 @@ describe('test-status/api', () => {
 
     await request(probot.server)
       .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/errored`)
+      .send({travisJobUrl})
       .expect(200);
 
     expect(await db('checks').select('*')).toMatchObject([
@@ -305,11 +311,18 @@ describe('test-status/api', () => {
     nocks.done();
   });
 
-  test.each(['queued', 'started', 'skipped', 'report/5/0', 'report/errored'])(
+  test('404 for /queued action when pull request was not created', async () => {
+    await request(probot.server)
+      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/queued`)
+      .expect(404, new RegExp(HEAD_SHA));
+  });
+
+  test.each(['started', 'skipped', 'report/5/0', 'report/errored'])(
     '404 for /%s action when pull request was not created',
     async action => {
       await request(probot.server)
         .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
+        .send({travisJobUrl})
         .expect(404, new RegExp(HEAD_SHA));
     }
   );
