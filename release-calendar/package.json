@@ -24,7 +24,7 @@
     "setup": "npm run setup-build && npm run setup-serve",
     "setup-build": "webpack --config ./webpack.setup.config.js",
     "setup-serve": "node -r dotenv/config ./dist/bundle-setup.js",
-    "start": "npm run client-build-prod && npm run server",
+    "start": "npm run server-serve",
     "test": "jest --verbose=false"
   },
   "dependencies": {
