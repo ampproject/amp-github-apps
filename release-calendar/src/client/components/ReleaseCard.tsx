@@ -49,7 +49,7 @@ export class ReleaseCard extends React.Component<
   }
 
   async componentDidMount(): Promise<void> {
-    const release = await this.apiService.getReleaseDates(this.props.title);
+    const release = await this.apiService.getRelease(this.props.title);
     this.setState({releaseDates: release.promotions});
   }
 
@@ -128,7 +128,7 @@ export class ReleaseCard extends React.Component<
                 </div>
               </div>
               <h3 className='subtitle-row'>{'Release History'}</h3>
-              {this.state.releaseDates != null &&
+              {this.state.releaseDates &&
                 this.state.releaseDates.map((row) => {
                   const match = this.history[row.channel];
                   return (

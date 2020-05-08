@@ -48,7 +48,7 @@ export class App extends React.Component<{}, AppState> {
       : this.state.channels.filter((item) => channel !== item);
     this.setState({channels});
     this.handleSearchInput(null);
-    if (this.state.release != null) {
+    if (this.state.release) {
       this.setState({release: null});
     }
   };

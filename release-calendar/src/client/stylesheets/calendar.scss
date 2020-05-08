@@ -33,6 +33,10 @@
   @include off;
 }
 
+.fc-button-primary:disabled {
+  @include off;
+}
+
 .fc-unthemed td.fc-today {
   background-color: base.$amp-yellow;
 }

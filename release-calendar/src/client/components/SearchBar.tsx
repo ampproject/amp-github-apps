@@ -56,6 +56,10 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     this.setState({releaseNames});
   }
 
+  shouldComponentUpdate(nextProps: SearchBarProps): boolean {
+    return nextProps.input != this.props.input;
+  }
+
   onSubmit(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
   }
@@ -79,10 +83,10 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     }
   }
 
-  onInputChange(_event: React.ChangeEvent<{}>, input: string): void {
+  onInputChange(event: React.ChangeEvent<{}>, input: string): void {
     if (input != null) {
       this.props.handleSearchInput(input);
-      if (input.length == 0) {
+      if (input.length == 0 && event) {
         this.props.handleSelectedRelease(null, false);
       }
     }
@@ -119,6 +123,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
       <form onSubmit={this.onSubmit}>
         <Autocomplete
           freeSolo
+          value={this.props.input}
           id='release-autocomplete'
           onClose={this.onClose}
           onChange={this.onChange}
@@ -127,7 +132,6 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
           renderInput={(params: RenderInputParams): JSX.Element => (
             <TextField
               {...params}
-              value={this.props.input}
               size='small'
               error={this.isErrorDisplayed(this.props.input)}
               label={this.labelText(this.props.input)}
