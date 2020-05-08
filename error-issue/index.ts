@@ -33,6 +33,8 @@ const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
 const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
+const ALL_SERVICES = 'ALL SERVICES';
+const VALID_SERVICE_TYPES = [ALL_SERVICES].concat(Object.keys(ServiceName));
 
 const bot = new ErrorIssueBot(
   GITHUB_ACCESS_TOKEN,
@@ -143,20 +145,25 @@ function createErrorReportUrl(report: ErrorReport): string {
 }
 
 /** Provides monitor to list errors, optionally filtered by service type. */
-function getLister(optServiceType?: string): ErrorMonitor {
-  if (!optServiceType) {
-    return monitor;
-  }
+function getLister(
+  optServiceType?: string,
+  optThreshold?: number
+): ErrorMonitor {
+  let lister = monitor;
 
-  if (optServiceType in ServiceName) {
+  if (optServiceType && optServiceType !== ALL_SERVICES) {
+    if (!(optServiceType in ServiceName)) {
+      throw new Error(
+        `Invalid service group "${optServiceType}"; must be one of ` +
+          `"${VALID_SERVICE_TYPES.join('", "')}"`
+      );
+    }
+
     const serviceType: ServiceGroupType = optServiceType as ServiceGroupType;
-    return monitor.service(ServiceName[serviceType]);
+    lister = lister.service(ServiceName[serviceType]);
   }
 
-  throw new Error(
-    `Invalid service group "${optServiceType}"; must be one of ` +
-      `"${Object.keys(ServiceName).join('", "')}"`
-  );
+  return optThreshold ? lister.threshold(optThreshold) : lister;
 }
 
 /** Diagnostic endpoint to list new untracked errors. */
@@ -164,12 +171,13 @@ export async function errorList(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
+  const {threshold} = req.query;
   // If a valid serviceType param is provided, such as "nightly" or
   // "production", filter to that service group.
   const serviceType = (req.query.serviceType || '').toString().toUpperCase();
 
   try {
-    const lister = getLister(serviceType);
+    const lister = getLister(serviceType, Number(threshold));
     const reports = await lister.newErrorsToReport();
 
     res.json({
