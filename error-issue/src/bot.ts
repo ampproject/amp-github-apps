@@ -61,6 +61,8 @@ export class ErrorIssueBot {
   /** Creates an error report issue and returns the issue URL. */
   async report(errorReport: ErrorReport): Promise<string> {
     const issue = await this.buildErrorIssue(errorReport);
+    console.log(issue);
+    throw new Error();
     const {data} = await this.octokit.issues.create(issue);
     return data.html_url;
   }
