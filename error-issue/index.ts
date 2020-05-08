@@ -175,7 +175,7 @@ export async function errorList(
     res.json({
       serviceType: serviceType || 'ALL',
       serviceTypeThreshold: Math.ceil(lister.minFrequency),
-      normalizedThreshold: MIN_FREQUENCY,
+      normalizedThreshold: Math.ceil(lister.normalizedMinFrequency),
       errorReports: reports.map(report => {
         const createUrl = createErrorReportUrl(report);
         return {

@@ -73,6 +73,11 @@ export class ErrorMonitor {
     );
   }
 
+  /** Provides the frequency equivelent across all services. */
+  get normalizedMinFrequency(): number {
+    return this.minFrequency;
+  }
+
   /** Creates an error monitor with a different frequency threshold. */
   threshold(minFrequency: number): ErrorMonitor {
     return new ErrorMonitor(this.client, minFrequency, this.pageLimit);
@@ -181,6 +186,11 @@ export class ServiceErrorMonitor extends ErrorMonitor {
     pageLimit = 25
   ) {
     super(client, minFrequency, pageLimit);
+  }
+
+  /** Provides the frequency equivelent across all services. */
+  get normalizedMinFrequency(): number {
+    return this.minFrequency * scaleFactor(this.serviceName);
   }
 
   /** Finds top occurring errors in the service group. */
