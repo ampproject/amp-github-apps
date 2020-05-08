@@ -25,6 +25,7 @@ import {ErrorIssueBot} from './src/bot';
 import {ErrorReport, ServiceGroupType} from 'error-issue-bot';
 import {StackdriverApi} from './src/stackdriver_api';
 import express from 'express';
+import querystring from 'querystring';
 import statusCodes from 'http-status-codes';
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
@@ -54,7 +55,7 @@ function errorReportFromJson({
   firstSeen?: string;
   dailyOccurrences?: string | number;
   stacktrace?: string;
-  seenInVersions?: Array<string>;
+  seenInVersions?: string | Array<string>;
 }): ErrorReport {
   if (firstSeen && dailyOccurrences && stacktrace && seenInVersions) {
     return {
@@ -62,7 +63,9 @@ function errorReportFromJson({
       firstSeen: new Date(firstSeen),
       dailyOccurrences: Number(dailyOccurrences),
       stacktrace,
-      seenInVersions,
+      seenInVersions: Array.isArray(seenInVersions)
+        ? seenInVersions
+        : [seenInVersions],
     };
   }
 
@@ -132,10 +135,10 @@ export async function errorMonitor(
 }
 
 function createErrorReportUrl(report: ErrorReport): string {
-  const params = Object.entries(report)
-    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
-    .join('&');
-
+  const params = querystring.stringify({
+    ...report,
+    firstSeen: report.firstSeen.toString(),
+  });
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
 }
 

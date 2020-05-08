@@ -30,7 +30,8 @@
     "dotenv": "8.2.0",
     "google-auth-library": "6.0.0",
     "http-status-codes": "1.4.0",
-    "node-fetch": "2.6.0"
+    "node-fetch": "2.6.0",
+    "querystring": "0.2.0"
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "1.5.1",
