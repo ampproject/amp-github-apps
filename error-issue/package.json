@@ -10,7 +10,7 @@
   },
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "fix": "npm run list -- --fix",
+    "fix": "npm run lint -- --fix",
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
     "start": "functions-framework --target=app --source=dist",
