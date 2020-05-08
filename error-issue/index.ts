@@ -147,9 +147,12 @@ function createErrorReportUrl(report: ErrorReport): string {
 /** Provides monitor to list errors, optionally filtered by service type. */
 function getLister(
   optServiceType?: string,
-  optThreshold?: number
+  optThreshold?: number,
+  optNormalizedThreshold?: number
 ): ErrorMonitor {
-  let lister = monitor;
+  let lister = optNormalizedThreshold
+    ? monitor.threshold(optNormalizedThreshold)
+    : monitor;
 
   if (optServiceType && optServiceType !== ALL_SERVICES) {
     if (!(optServiceType in ServiceName)) {
@@ -171,17 +174,30 @@ export async function errorList(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
-  const {threshold} = req.query;
+  // The query may specify either an exact threshold (used as the actual value
+  // when filtering results) or a normalizedThreshold (which is adjusted based
+  // on the service type, if any). These allow two distinct use-cases:
+  // - end-user sets a standard threshold and it automatically adjusts across
+  //   service types
+  // - end-user sets an exact threshold for the view they are on, and that is
+  //   the value used to filter
+  // If both are specified, the exact threshold takes precedence.
+  const {threshold, normalizedThreshold} = req.query;
   // If a valid serviceType param is provided, such as "nightly" or
   // "production", filter to that service group.
-  const serviceType = (req.query.serviceType || '').toString().toUpperCase();
+  const serviceType = (req.query.serviceType || ALL_SERVICES)
+    .toString()
+    .toUpperCase();
 
   try {
-    const lister = getLister(serviceType, Number(threshold));
+    const lister = getLister(
+      serviceType,
+      Number(threshold),
+      Number(normalizedThreshold)
+    );
     const reports = await lister.newErrorsToReport();
-
     res.json({
-      serviceType: serviceType || 'ALL',
+      serviceType,
       serviceTypeThreshold: Math.ceil(lister.minFrequency),
       normalizedThreshold: Math.ceil(lister.normalizedMinFrequency),
       errorReports: reports.map(report => {
