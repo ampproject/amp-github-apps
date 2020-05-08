@@ -79,6 +79,7 @@ export class StackdriverApi {
   private async getGroups(opts: {
     pageSize?: number;
     groupId?: string;
+    'serviceFilter.service'?: string;
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
     const {errorGroupStats} = (await this.request('groupStats', 'GET', {
       'timeRange.period': 'PERIOD_1_DAY',
@@ -95,6 +96,18 @@ export class StackdriverApi {
   async listGroups(pageSize = 20): Promise<Array<Stackdriver.ErrorGroupStats>> {
     console.info(`Fetching first ${pageSize} error groups`);
     return this.getGroups({pageSize});
+  }
+
+  /** List groups of errors for a particular service group. */
+  async listServiceGroups(
+    serviceName: string,
+    pageSize = 20
+  ): Promise<Array<Stackdriver.ErrorGroupStats>> {
+    console.info(`Fetching first ${pageSize} error groups for ${serviceName}`);
+    return this.getGroups({
+      pageSize,
+      'serviceFilter.service': serviceName,
+    });
   }
 
   /** Get details about an error group. */

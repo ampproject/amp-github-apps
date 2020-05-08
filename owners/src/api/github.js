@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Google Inc.
+ * Copyright 2019 The AMP HTML Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,7 +205,7 @@ class GitHub {
    */
   async _paginate(target, options) {
     return await this.client.paginate(
-      target.endpoint.merge(Object.assign({per_page: MAX_PER_PAGE}, options))
+      target.endpoint.merge(Object.assign({'per_page': MAX_PER_PAGE}, options))
     );
   }
 
@@ -240,7 +240,7 @@ class GitHub {
     // This means you can drop any logic that requires looking up the numeric
     // team id.
     const memberList = await this._paginate(this.client.teams.listMembers, {
-      team_id: teamId,
+      'team_id': teamId,
     });
     this.logger.debug('[getTeamMembers]', teamId, memberList);
 
@@ -256,7 +256,7 @@ class GitHub {
   async getPullRequest(number) {
     const response = await this.client.pulls.get(
       this.repo({
-        pull_number: number,
+        'pull_number': number,
       })
     );
     return PullRequest.fromGitHubResponse(response.data);
@@ -273,7 +273,7 @@ class GitHub {
 
     const reviewList = await this._paginate(
       this.client.pulls.listReviews,
-      this.repo({pull_number: number})
+      this.repo({'pull_number': number})
     );
     this.logger.debug('[getReviews]', number, reviewList);
 
@@ -421,7 +421,7 @@ class GitHub {
     );
 
     const response = await this.client.gitdata.getBlob(
-      this.repo({file_sha: file.sha})
+      this.repo({'file_sha': file.sha})
     );
     this.logger.debug('[getFileContents]', file, response.data);
 
@@ -439,7 +439,7 @@ class GitHub {
 
     const files = await this._paginate(
       this.client.pulls.listFiles,
-      this.repo({pull_number: number})
+      this.repo({'pull_number': number})
     );
     this.logger.debug('[listFiles]', number, files);
 
@@ -483,7 +483,7 @@ class GitHub {
 
     return await this.client.checks.create(
       this.repo({
-        head_sha: sha,
+        'head_sha': sha,
         ...checkRun.json,
       })
     );
@@ -541,7 +541,7 @@ class GitHub {
 
     return await this.client.checks.update(
       this.repo({
-        check_run_id: id,
+        'check_run_id': id,
         ...checkRun.json,
       })
     );

@@ -30,8 +30,8 @@ const Repository = require('./repo');
  */
 async function runCommands(...commands) {
   return exec(commands.join(' && '))
-    .then(({stdout, stderr}) => stdout)
-    .catch(({stdout, stderr}) => {
+    .then(({stdout}) => stdout)
+    .catch(({stderr}) => {
       throw stderr;
     });
 }
