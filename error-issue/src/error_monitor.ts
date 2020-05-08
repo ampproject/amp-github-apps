@@ -52,6 +52,7 @@ export class ErrorMonitor {
 
   /** Creates a service monitor using the same settings as this monitor. */
   service(serviceName: ServiceName): ServiceErrorMonitor {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new ServiceErrorMonitor(
       this.client,
       serviceName,

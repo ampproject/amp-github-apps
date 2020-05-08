@@ -84,8 +84,7 @@ export class IssueBuilder {
     return [
       'Stacktrace',
       '---',
-      '<pre><code>',
-      this.message,
+      `<pre><code>${this.message}`,
       ...this.stack.map(indent).map(linkize),
       '</code></pre>',
     ].join('\n');
