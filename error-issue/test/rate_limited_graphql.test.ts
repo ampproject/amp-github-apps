@@ -48,13 +48,17 @@ describe('RateLimitedGraphQL', () => {
   });
 
   it('returns the query result', async () => {
-    nock('https://api.github.com').post('/graphql').reply(200, response);
+    nock('https://api.github.com')
+      .post('/graphql')
+      .reply(200, response);
 
     await expect(client.runQuery(query)).resolves.toEqual(response.data);
   });
 
   it('queues multiple queries and executes after delay', async () => {
-    nock('https://api.github.com').post('/graphql').reply(200, response);
+    nock('https://api.github.com')
+      .post('/graphql')
+      .reply(200, response);
 
     const firstQuery = client.runQuery(query);
     // If later queries execute before they are nocked, the test will fail.
@@ -63,11 +67,15 @@ describe('RateLimitedGraphQL', () => {
 
     await expect(firstQuery).resolves.toEqual(response.data);
 
-    nock('https://api.github.com').post('/graphql').reply(200, response);
+    nock('https://api.github.com')
+      .post('/graphql')
+      .reply(200, response);
     jest.advanceTimersByTime(1000);
     await expect(secondQuery).resolves.toEqual(response.data);
 
-    nock('https://api.github.com').post('/graphql').reply(200, response);
+    nock('https://api.github.com')
+      .post('/graphql')
+      .reply(200, response);
     jest.advanceTimersByTime(1000);
     await expect(thirdQuery).resolves.toEqual(response.data);
   });

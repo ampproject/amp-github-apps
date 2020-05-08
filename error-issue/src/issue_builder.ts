@@ -75,13 +75,19 @@ export class IssueBuilder {
 
   get bodyStacktrace(): string {
     const indent = (line: string): string => line.replace(/^\s*/, '    ');
+    const linkize = (line: string): string => {
+      return line.replace(
+        /https:\/\/[^\/]+\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/(?<ref>[^\/]+)\/(?<path>[^:]+):(?<line>\d+)/,
+        '<a href="https://github.com/$<owner>/$<repo>/blob/$<ref>/$<path>#L$<line>">$<path>:$<line></a>'
+      );
+    };
     return [
       'Stacktrace',
       '---',
-      '```',
+      '<pre><code>',
       this.message,
-      ...this.stack.map(indent),
-      '```',
+      ...this.stack.map(indent).map(linkize),
+      '</code></pre>',
     ].join('\n');
   }
 
