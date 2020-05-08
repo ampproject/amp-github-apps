@@ -57,7 +57,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
 
   async componentDidUpdate(prevProps: CalendarProps): Promise<void> {
     if (prevProps.singleRelease != this.props.singleRelease) {
-      if (this.props.singleRelease != null) {
+      if (this.props.singleRelease) {
         const promotionsOfSingleRelease = await this.apiService.getSinglePromotions(
           this.props.singleRelease,
         );
@@ -75,17 +75,13 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
 
   render(): JSX.Element {
     let displayEvents: ReleaseEventInput[] = [];
-    if (this.props.singleRelease != null) {
+    if (this.props.singleRelease) {
       displayEvents = this.state.singleEvents;
     } else {
       this.props.channels
         .filter((channel) => this.state.allEvents.has(channel))
-        .forEach(
-          (channel) =>
-            (displayEvents = [
-              ...displayEvents,
-              ...this.state.allEvents.get(channel),
-            ]),
+        .forEach((channel) =>
+          displayEvents.push(...this.state.allEvents.get(channel)),
         );
     }
 

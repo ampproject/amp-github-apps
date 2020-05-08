@@ -64,6 +64,13 @@ export class ChannelTable extends React.Component<
     this.setState({currentReleases: currentReleases.map});
   }
 
+  shouldComponentUpdate(nextProps: ChannelTableProps): boolean {
+    return (
+      !this.state.currentReleases.get(Channel.NIGHTLY) ||
+      nextProps.channels.length != this.props.channels.length
+    );
+  }
+
   handleChannelClick = (
     channel: Channel,
     event: React.ChangeEvent<HTMLInputElement>,

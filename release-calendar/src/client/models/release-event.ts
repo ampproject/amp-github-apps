@@ -25,7 +25,6 @@ export function getAllEvents(
     const channelEvents = eventInputs.get(event.channel) || [];
     eventInputs.set(event.channel, [...channelEvents, event]);
   });
-  console.log(eventInputs);
 
   return eventInputs;
 }

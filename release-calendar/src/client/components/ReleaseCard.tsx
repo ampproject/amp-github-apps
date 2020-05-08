@@ -128,7 +128,7 @@ export class ReleaseCard extends React.Component<
                 </div>
               </div>
               <h3 className='subtitle-row'>{'Release History'}</h3>
-              {this.state.releaseDates != null &&
+              {this.state.releaseDates &&
                 this.state.releaseDates.map((row) => {
                   const match = this.history[row.channel];
                   return (
