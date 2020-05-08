@@ -43,6 +43,19 @@ const SERVICE_GROUPS: Record<ServiceName, ServiceGroup> = {
   'CDN Nightly': {diversionPercent: 0.0005, throttleRate: 1},
 };
 
+/**
+ * Returns the scaling factor to normalize frequency for a service group against
+ * what it would be in production traffic.
+ */
+function scaleFactor(serviceName: ServiceName): number {
+  const {
+    diversionPercent: prodPercent,
+    throttleRate: prodThrottle,
+  } = SERVICE_GROUPS[ServiceName.PRODUCTION];
+  const {diversionPercent, throttleRate} = SERVICE_GROUPS[serviceName];
+  return (prodPercent * prodThrottle) / (diversionPercent * throttleRate);
+}
+
 export class ErrorMonitor {
   constructor(
     protected client: StackdriverApi,
@@ -55,7 +68,7 @@ export class ErrorMonitor {
     return new ServiceErrorMonitor(
       this.client,
       serviceName,
-      this.minFrequency,
+      this.minFrequency / scaleFactor(serviceName),
       this.pageLimit
     );
   }
@@ -153,19 +166,6 @@ export class ErrorMonitor {
   }
 }
 
-/**
- * Returns the scaling factor to normalize frequency for a service group against
- * what it would be in production traffic.
- */
-function scaleFactor(serviceName: ServiceName): number {
-  const {
-    diversionPercent: prodPercent,
-    throttleRate: prodThrottle,
-  } = SERVICE_GROUPS[ServiceName.PRODUCTION];
-  const {diversionPercent, throttleRate} = SERVICE_GROUPS[serviceName];
-  return (prodPercent * prodThrottle) / (diversionPercent * throttleRate);
-}
-
 export class ServiceErrorMonitor extends ErrorMonitor {
   // Note that minFrequency is relative to production traffic, and is scaled for
   // each diversion when thresholding.
@@ -175,7 +175,7 @@ export class ServiceErrorMonitor extends ErrorMonitor {
     minFrequency: number,
     pageLimit = 25
   ) {
-    super(client, minFrequency / scaleFactor(serviceName), pageLimit);
+    super(client, minFrequency, pageLimit);
   }
 
   /** Finds top occurring errors in the service group. */

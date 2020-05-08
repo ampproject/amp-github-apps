@@ -240,7 +240,7 @@ describe('ServiceErrorMonitor', () => {
     count: 200,
     timedCounts: [
       {
-        count: 4,
+        count: 200,
         startTime: new Date('Feb 25, 2020'),
         endTime: new Date('Feb 26, 2020'),
       },
@@ -282,13 +282,13 @@ describe('ServiceErrorMonitor', () => {
     monitor = new ServiceErrorMonitor(
       stackdriver,
       ServiceName.DEVELOPMENT,
-      5000
+      500
     );
     mocked(stackdriver.listServiceGroups).mockResolvedValue(errorGroups);
   });
 
   describe('newErrorsToReport', () => {
-    it('ignores infrequent errors, scaled for the service', async () => {
+    it('ignores infrequent errors', async () => {
       const newErrors = await monitor.newErrorsToReport();
       const newErrorIds = newErrors.map(({errorId}) => errorId);
       expect(newErrorIds).toEqual(['new_id']);
