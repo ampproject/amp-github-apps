@@ -77,8 +77,8 @@ export class IssueBuilder {
     const indent = (line: string): string => line.replace(/^\s*/, '    ');
     const linkify = (line: string): string =>
       line.replace(
-        /(https:\/\/raw\.githubusercontent\.com\/ampproject\/amphtml\/\d+\/)(.*?):(\d+)/,
-        '<a href="$1$2#L$3">$2:$3</a>'
+        /https:\/\/raw\.githubusercontent\.com\/ampproject\/amphtml\/(\d+)\/(.*?):(\d+)/,
+        '<a href="https://github.com/ampproject/amphtml/blob/$1/$2#L$3">$2:$3</a>'
       );
     return [
       'Stacktrace',
