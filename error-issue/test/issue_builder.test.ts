@@ -143,13 +143,19 @@ describe('IssueBuilder', () => {
   });
 
   describe('bodyStacktrace', () => {
-    it('renders the indented stacktrace in markdown', () => {
+    it('renders the indented stacktrace in linkified HTML', () => {
       expect(builder.bodyStacktrace).toContain(
-        '```\n' +
+        '<pre><code>\n' +
           "Error: null is not an object (evaluating 'b.acceleration.x')\n" +
-          '    at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)\n' +
-          '    at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)\n' +
-          '```'
+          '    at x (' +
+          '<a href="https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js#L421">' +
+          'extensions/amp-delight-player/0.1/amp-delight-player.js:421' +
+          '</a>:13)\n' +
+          '    at event (' +
+          '<a href="https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js#L58">' +
+          'src/event-helper-listen.js:58' +
+          '</a>:27)\n' +
+          '</code></pre>'
       );
     });
   });
