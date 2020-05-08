@@ -6,11 +6,11 @@ Details
 
 Stacktrace
 ---
-```
+<pre><code>
 Error: null is not an object (evaluating 'b.acceleration.x')
-    at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)
-    at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)
-```
+    at x (<a href="https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js#L421">extensions/amp-delight-player/0.1/amp-delight-player.js:421</a>:13)
+    at event (<a href="https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js#L58">src/event-helper-listen.js:58</a>:27)
+</code></pre>
 
 Notes
 ---
