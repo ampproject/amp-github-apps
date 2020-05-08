@@ -53,7 +53,7 @@ async function main(): Promise<void> {
     next();
   });
 
-  if (process.env.MODE == 'production') {
+  if (process.env.NODE_ENV == 'production') {
     const DIST_DIR = path.resolve('dist');
 
     app.use(express.static(DIST_DIR));
