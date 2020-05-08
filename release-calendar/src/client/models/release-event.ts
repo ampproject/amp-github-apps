@@ -14,35 +14,28 @@
  * limitations under the License.
  */
 
-import {Channel} from '../../types';
-import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
+import {Channel, Promotion} from '../../types';
 import {ReleaseEventInput} from './view-models';
 
-export function getAllPromotionEvents(
+export function getAllEvents(
   events: ReleaseEventInput[],
-): Map<Channel, EventSourceInput> {
+): Map<Channel, ReleaseEventInput[]> {
   const eventInputs = new Map<Channel, ReleaseEventInput[]>();
   events.forEach((event) => {
     const channelEvents = eventInputs.get(event.channel) || [];
     eventInputs.set(event.channel, [...channelEvents, event]);
   });
 
-  const eventSources = new Map<Channel, EventSourceInput>();
-  eventInputs.forEach((eventInput, channel) => {
-    eventSources.set(channel, {
-      events: eventInput,
-      textColor: 'white',
-    });
-  });
-  return eventSources;
+  return eventInputs;
 }
 
 export function getSingleReleaseEvents(
-  eventInputs: ReleaseEventInput[],
-): EventSourceInput[] {
-  return eventInputs.map(
-    (event: ReleaseEventInput): EventSourceInput => {
-      return {events: [event], textColor: 'white'};
-    },
-  );
+  promotions: Promotion[],
+  allReleases: Map<Channel, ReleaseEventInput[]>,
+): ReleaseEventInput[] {
+  return promotions.map((promotion: Promotion) => {
+    return allReleases.get(promotion.channel).find((event) => {
+      return event.start == promotion.date;
+    });
+  });
 }

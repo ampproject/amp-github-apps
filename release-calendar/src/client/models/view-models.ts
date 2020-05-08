@@ -18,12 +18,14 @@ import {Channel, Promotion} from '../../types';
 import {EventInput} from '@fullcalendar/core';
 
 export class ReleaseEventInput implements EventInput {
-  constructor(promotion: Promotion, endDate: Date) {
-    const dayPriorToEnd = new Date(endDate);
-    dayPriorToEnd.setDate(dayPriorToEnd.getDate() - 1);
+  constructor(promotion: Promotion, endDate?: Date) {
+    const calendarEnd = endDate ? new Date(endDate) : new Date();
+    if (endDate) {
+      calendarEnd.setDate(calendarEnd.getDate() - 1);
+    }
     this.title = promotion.releaseName;
     this.start = promotion.date;
-    this.end = dayPriorToEnd;
+    this.end = calendarEnd;
     this.className = promotion.channel;
     this.extendedProps = {
       channel: promotion.channel,

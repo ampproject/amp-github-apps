@@ -18,12 +18,9 @@ import '../stylesheets/calendar.scss';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
-import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
+import {ReleaseEventInput} from '../models/view-models';
 import {Tooltip} from './Tooltip';
-import {
-  getAllPromotionEvents,
-  getSingleReleaseEvents,
-} from '../models/release-event';
+import {getAllEvents, getSingleReleaseEvents} from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -37,8 +34,8 @@ export interface CalendarProps {
 }
 
 export interface CalendarState {
-  allEvents: Map<Channel, EventSourceInput>;
-  singleEvents: EventSourceInput[];
+  allEvents: Map<Channel, ReleaseEventInput[]>;
+  singleEvents: ReleaseEventInput[];
 }
 
 export class Calendar extends React.Component<CalendarProps, CalendarState> {
@@ -47,7 +44,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   constructor(props: Readonly<CalendarProps>) {
     super(props);
     this.state = {
-      allEvents: new Map<Channel, EventSourceInput>(),
+      allEvents: new Map<Channel, ReleaseEventInput[]>(),
       singleEvents: [],
     };
     this.apiService = new ApiService();
@@ -55,16 +52,21 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
 
   async componentDidMount(): Promise<void> {
     const promotions = await this.apiService.getPromotions();
-    this.setState({allEvents: getAllPromotionEvents(promotions)});
+    this.setState({allEvents: getAllEvents(promotions)});
   }
 
   async componentDidUpdate(prevProps: CalendarProps): Promise<void> {
     if (prevProps.singleRelease != this.props.singleRelease) {
-      if (this.props.singleRelease != null) {
-        const release = await this.apiService.getRelease(
+      if (this.props.singleRelease) {
+        const promotionsOfSingleRelease = await this.apiService.getSinglePromotions(
           this.props.singleRelease,
         );
-        this.setState({singleEvents: getSingleReleaseEvents(release)});
+        this.setState((prevState: CalendarState) => ({
+          singleEvents: getSingleReleaseEvents(
+            promotionsOfSingleRelease,
+            prevState.allEvents,
+          ),
+        }));
       } else {
         this.setState({singleEvents: []});
       }
@@ -72,12 +74,16 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   }
 
   render(): JSX.Element {
-    const displayEvents: EventSourceInput[] =
-      this.props.singleRelease != null
-        ? this.state.singleEvents
-        : this.props.channels
-            .filter((channel) => this.state.allEvents.has(channel))
-            .map((channel) => this.state.allEvents.get(channel));
+    let displayEvents: ReleaseEventInput[] = [];
+    if (this.props.singleRelease) {
+      displayEvents = this.state.singleEvents;
+    } else {
+      this.props.channels
+        .filter((channel) => this.state.allEvents.has(channel))
+        .forEach((channel) =>
+          displayEvents.push(...this.state.allEvents.get(channel)),
+        );
+    }
 
     return (
       <FullCalendar
@@ -88,7 +94,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
           right: 'dayGridMonth,timeGridWeek,listWeek',
         }}
         plugins={[dayGridPlugin, timeGridPlugin]}
-        eventSources={displayEvents}
+        eventSources={[{events: displayEvents, textColor: 'white'}]}
         contentHeight={CALENDAR_CONTENT_HEIGHT}
         fixedWeekCount={false}
         displayEventTime={false}

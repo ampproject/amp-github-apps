@@ -27,24 +27,15 @@ export class ApiService {
   private getReleaseRequest(url: string): Promise<Release> {
     return fetch(url).then((result) => result.json());
   }
-
   private getReleasesRequest(url: string): Promise<Release[]> {
     return fetch(url).then((result) => result.json());
   }
 
-  async getRelease(requestedRelease: string): Promise<ReleaseEventInput[]> {
+  async getSinglePromotions(requestedRelease: string): Promise<Promotion[]> {
     const release = await this.getReleaseRequest(
       `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
     );
-    return [
-      new ReleaseEventInput(release.promotions[0], new Date()),
-      ...release.promotions
-        .slice(1)
-        .map(
-          (promotion, i) =>
-            new ReleaseEventInput(promotion, release.promotions[i].date),
-        ),
-    ];
+    return release.promotions;
   }
 
   async getReleases(): Promise<string[]> {
@@ -62,7 +53,7 @@ export class ApiService {
     );
     const map = new Map<Channel, Date>();
     return allPromotions.map((promotion: Promotion) => {
-      const date = map.get(promotion.channel) || new Date();
+      const date = map.get(promotion.channel);
       map.set(promotion.channel, promotion.date);
       return new ReleaseEventInput(promotion, date);
     });
@@ -75,7 +66,7 @@ export class ApiService {
     return new CurrentReleases(currentReleases);
   }
 
-  async getReleaseDates(requestedRelease: string): Promise<Release> {
+  async getRelease(requestedRelease: string): Promise<Release> {
     return await this.getReleaseRequest(
       `${SERVER_ENDPOINT}/releases/${requestedRelease}`,
     );
