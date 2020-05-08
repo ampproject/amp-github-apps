@@ -73,6 +73,11 @@ export class ErrorMonitor {
     );
   }
 
+  /** Creates an error monitor with a different frequency threshold. */
+  threshold(minFrequency: number): ErrorMonitor {
+    return new ErrorMonitor(this.client, minFrequency, this.pageLimit);
+  }
+
   /** Tests if an error group already has an associated issue. */
   private hasTrackingIssue(group: Stackdriver.ErrorGroup): boolean {
     return !!group.trackingIssues;
@@ -181,5 +186,15 @@ export class ServiceErrorMonitor extends ErrorMonitor {
   /** Finds top occurring errors in the service group. */
   protected async newErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
     return this.client.listServiceGroups(this.serviceName, this.pageLimit);
+  }
+
+  /** Creates an error monitor with a different frequency threshold. */
+  threshold(minFrequency: number): ErrorMonitor {
+    return new ServiceErrorMonitor(
+      this.client,
+      this.serviceName,
+      minFrequency,
+      this.pageLimit
+    );
   }
 }
