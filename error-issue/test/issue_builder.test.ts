@@ -28,6 +28,12 @@ describe('IssueBuilder', () => {
     stacktrace: `Error: null is not an object (evaluating 'b.acceleration.x')
         at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)
         at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)`,
+    seenInVersions: [
+      '04-24 Beta (1234)',
+      '04-24 Experimental (1234)',
+      '04-24 Stable (1234)',
+      '+2 more',
+    ],
   };
   const oldReport = Object.assign({}, report, {
     firstSeen: new Date('Oct 1, 2017'),
@@ -55,7 +61,7 @@ describe('IssueBuilder', () => {
 
   beforeEach(() => {
     jest.spyOn(Date, 'now').mockReturnValue(now.valueOf());
-    builder = new IssueBuilder(report, blames);
+    builder = new IssueBuilder(report, blames, 'test_org/onduty-team');
   });
 
   describe('title', () => {
@@ -139,11 +145,11 @@ describe('IssueBuilder', () => {
   describe('bodyStacktrace', () => {
     it('renders the indented stacktrace in markdown', () => {
       expect(builder.bodyStacktrace).toContain(
-        '```\n' +
+        '<pre><code>\n' +
           "Error: null is not an object (evaluating 'b.acceleration.x')\n" +
-          '    at x (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421:13)\n' +
-          '    at event (https://raw.githubusercontent.com/ampproject/amphtml/2004030010070/src/event-helper-listen.js:58:27)\n' +
-          '```'
+          '    at x (<a href="https://github.com/ampproject/amphtml/blob/2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js#L421">extensions/amp-delight-player/0.1/amp-delight-player.js:421</a>:13)\n' +
+          '    at event (<a href="https://github.com/ampproject/amphtml/blob/2004030010070/src/event-helper-listen.js#L58">src/event-helper-listen.js:58</a>:27)\n' +
+          '</code></pre>'
       );
     });
   });
@@ -172,6 +178,32 @@ describe('IssueBuilder', () => {
     it('returns empty string when there is no blame info', () => {
       builder = new IssueBuilder(report, []);
       expect(builder.bodyNotes).toEqual('');
+    });
+
+    it('includes a list of versions the error is seen in', () => {
+      expect(builder.bodyNotes).toContain(
+        '**Seen in:**\n- 04-24 Beta (1234)\n- 04-24 Experimental (1234)\n' +
+          '- 04-24 Stable (1234)\n- +2 more'
+      );
+    });
+
+    it("doesn't try to list versions if none are provided", () => {
+      builder = new IssueBuilder(
+        Object.assign({}, report, {seenInVersions: []}),
+        blames
+      );
+      expect(builder.bodyNotes).not.toContain('**Seen in:**');
+    });
+  });
+
+  describe('bodyTag', () => {
+    it('CCs the release on-duty', () => {
+      expect(builder.bodyTag).toEqual('/cc @test_org/onduty-team');
+    });
+
+    it('is undefined when no onduty team is provided', () => {
+      builder = new IssueBuilder(report, blames);
+      expect(builder.bodyTag).toBeUndefined();
     });
   });
 

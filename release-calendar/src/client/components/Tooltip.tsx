@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 
-const express = require('express');
-const rateLimit = require('express-rate-limit');
-const path = require('path');
+import {EventApi, View} from '@fullcalendar/core';
+import {Hook} from './Hook';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-const app = express();
-const port = process.env.CLIENT_PORT;
+export const Tooltip = (arg: {
+  isMirror: boolean;
+  isStart: boolean;
+  isEnd: boolean;
+  event: EventApi;
+  el: HTMLElement;
+  view: View;
+}): void => {
+  const Content = (): JSX.Element => {
+    return (
+      <Hook title={arg.event.title} className={arg.event.classNames[0]}></Hook>
+    );
+  };
 
-const DIST_DIR = path.join(__dirname, 'dist');
-
-app.use(express.static(DIST_DIR));
-
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-  }),
-);
-
-app.get('*', async (req, res) => {
-  res.sendFile(path.join(DIST_DIR, 'index.html'));
-});
-
-app.listen(port, () => {
-  console.log(`Client server is listening on port: ${port}`);
-});
+  ReactDOM.render(<Content />, arg.el);
+};

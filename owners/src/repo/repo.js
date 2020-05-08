@@ -39,7 +39,7 @@ module.exports = class Repository {
    * @param {string} relativePath file to read.
    * @return {string} file contents.
    */
-  async readFile(relativePath) {}
+  async readFile(unusedRelativePath) {}
 
   /**
    * Finds all OWNERS files in the checked out repository.

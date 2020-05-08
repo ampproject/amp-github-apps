@@ -1,0 +1,4 @@
+runtime: nodejs
+env: flexible
+beta_settings:
+  cloud_sql_instances: amp-release-calendar:us-central1:amp-release-calendar=tcp:3306

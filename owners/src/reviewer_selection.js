@@ -51,7 +51,7 @@ class ReviewerSelection {
     );
 
     const deepRules = Object.entries(fileTreeMap)
-      .filter(([filename, subtree]) => subtree.depth === maxDepth)
+      .filter(([, subtree]) => subtree.depth === maxDepth)
       .map(([filename, subtree]) =>
         subtree.rules.filter(rule => rule.matchesFile(filename))
       )
@@ -117,7 +117,7 @@ class ReviewerSelection {
   static _filesOwnedByReviewer(fileTreeMap, reviewer) {
     return Object.entries(fileTreeMap)
       .filter(([filename, tree]) => tree.fileHasOwner(filename, reviewer))
-      .map(([filename, tree]) => filename);
+      .map(([filename]) => filename);
   }
 
   /**
@@ -133,7 +133,7 @@ class ReviewerSelection {
       ...Object.values(reviewerFilesMap).map(files => files.length)
     );
     return Object.entries(reviewerFilesMap).filter(
-      ([reviewer, files]) => files.length == mostFilesOwned
+      ([, files]) => files.length == mostFilesOwned
     );
   }
 

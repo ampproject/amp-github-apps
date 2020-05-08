@@ -19,6 +19,8 @@ import {RepositoryService} from './repository-service';
 import PromotionEntity from './entities/promotion';
 import ReleaseEntity from './entities/release';
 import express from 'express';
+import path from 'path';
+import rateLimit from 'express-rate-limit';
 
 async function main(): Promise<void> {
   const connection: Connection = await createConnection({
@@ -51,12 +53,25 @@ async function main(): Promise<void> {
     next();
   });
 
-  app.listen(port, () => {
-    console.log(`Express server is listening on port: ${port}`);
-  });
+  if (process.env.NODE_ENV == 'production') {
+    const DIST_DIR = path.resolve('dist');
 
-  app.get('/', async (req, res) => {
-    const releases = await repositoryService.getReleases();
+    app.use(express.static(DIST_DIR));
+    app.use(
+      '/',
+      rateLimit({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 100, // limit each IP to 100 requests per windowMs
+      }),
+    );
+
+    app.get('/', async (req, res) => {
+      res.sendFile(path.join(DIST_DIR, 'index.html'));
+    });
+  }
+
+  app.get('/promotions/', async (req, res) => {
+    const releases = await repositoryService.getPromotions();
     res.json(releases);
   });
 
@@ -65,9 +80,18 @@ async function main(): Promise<void> {
     res.json(release);
   });
 
-  app.get('/current-releases/', async (req, res) => {
-    const releases = await repositoryService.getCurrentReleases();
+  app.get('/current-promotions/', async (req, res) => {
+    const releases = await repositoryService.getCurrentPromotions();
     res.json(releases);
+  });
+
+  app.get('/releases/', async (req, res) => {
+    const releases = await repositoryService.getReleases();
+    res.json(releases);
+  });
+
+  app.listen(port, () => {
+    console.log(`App listening on port: ${port}`);
   });
 }
 main();

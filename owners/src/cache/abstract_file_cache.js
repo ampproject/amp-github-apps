@@ -25,7 +25,7 @@ module.exports = class AbstractFileCache {
    * @param {string} getContents function to get contents if file not in cache.
    * @return {string} file contents.
    */
-  async readFile(filename, getContents) {
+  async readFile(unusedFilename, unusedGetContents) {
     throw new Error('Not implemented');
   }
 
@@ -34,7 +34,7 @@ module.exports = class AbstractFileCache {
    *
    * @param {string} filename file to drop from the cache.
    */
-  async invalidate(filename) {
+  async invalidate(unusedFilename) {
     throw new Error('Not implemented');
   }
 };

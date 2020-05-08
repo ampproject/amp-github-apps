@@ -1,16 +1,20 @@
 //Channel Colors
-$lts: MidnightBlue;
-$stable: Crimson;
-$perc-beta: DarkOrchid;
-$perc-experimental: MediumSeaGreen;
-$opt-in-beta: PaleVioletRed;
-$opt-in-experimental: SteelBlue;
-$nightly: Tomato;
+$lts: rgb(61, 63, 206);
+$stable: rgb(216, 158, 83);
+$perc-beta: rgb(134, 62, 216);
+$perc-experimental: rgb(100, 204, 135);
+$opt-in-beta: rgb(200, 125, 207);
+$opt-in-experimental: rgb(70, 130, 180);
+$nightly: rgb(209, 36, 36);
+$amp-blue: rgb(33, 150, 243);
+$amp-off-blue: rgba(23, 93, 151, 0.596);
+$amp-yellow: rgba(255, 241, 152, 0.816);
+$text-color: rgb(36, 41, 46);
 
 body {
     font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
     font-size: 14px;
-    color: #24292e;
+    color: $text-color;
     margin: 0px;
     -webkit-appearance: none;
     -moz-appearance: none;

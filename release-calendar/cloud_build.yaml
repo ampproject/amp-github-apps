@@ -1,0 +1,51 @@
+steps:
+  # The first two steps are required to identify and inject un-redacted secrets.
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - install
+      - yaml
+
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - run
+      - replace-secrets
+      - --
+      - release-calendar
+    secretEnv:
+      - DB_USERNAME
+      - DB_PASSWORD
+
+  # Install node packages  
+  - name: gcr.io/cloud-builders/npm
+    dir: release-calendar
+    args:
+      - install
+
+  # Build the client bundle and index.html
+  - name: gcr.io/cloud-builders/npm
+    dir: release-calendar
+    args:
+      - run
+      - client-build-prod
+
+  # Build the server bundle
+  - name: gcr.io/cloud-builders/npm
+    dir: release-calendar
+    args:
+      - run
+      - server-build      
+
+  # Deploy the app
+- name: gcr.io/cloud-builders/gcloud
+  dir: release-calendar
+  args:
+      - app
+      - deploy
+
+# These secrets are the base64-encoded form of encrypted secret values. They are
+# automatically decrypted and added to the `.env` environment at build time.
+secrets:
+  - kmsKeyName: projects/amp-release-calendar/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+    secretEnv:
+      DB_USERNAME: CiQAvF4DHWDrMTBZvbCxwRpkA1AT9k+fRDNvKVFKFmvb9WsBtRQSLwDYFKiUQ+96PiBOialv1MC1VhgctciMC5T5xkOJtURbURyN/O0SgGpRlHm8SGB+
+      DB_PASSWORD: CiQAvF4DHVS/vkFxZQxF9AwHS0ELlfGYVSxPONmtfmVaK4PZx2ISLwDYFKiUJgUhlqEZRGNoPxcr27zigWXiZwibVrpLEcaklecTI48xCGvnmmkjwZkG

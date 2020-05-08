@@ -16,17 +16,23 @@
 
 require('dotenv').config();
 
-import {ERROR_ISSUE_ENDPOINT, ErrorMonitor} from './src/error_monitor';
+import {
+  ERROR_ISSUE_ENDPOINT,
+  ErrorMonitor,
+  ServiceName,
+} from './src/error_monitor';
 import {ErrorIssueBot} from './src/bot';
-import {ErrorReport} from 'error-issue-bot';
+import {ErrorReport, ServiceGroupType} from 'error-issue-bot';
 import {StackdriverApi} from './src/stackdriver_api';
 import express from 'express';
+import querystring from 'querystring';
 import statusCodes from 'http-status-codes';
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
+const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
 
 const bot = new ErrorIssueBot(
   GITHUB_ACCESS_TOKEN,
@@ -35,8 +41,36 @@ const bot = new ErrorIssueBot(
 );
 
 const stackdriver = new StackdriverApi(PROJECT_ID);
-const monitor = new ErrorMonitor(stackdriver);
-const lister = new ErrorMonitor(stackdriver, 2500, 40);
+const monitor = new ErrorMonitor(stackdriver, MIN_FREQUENCY, 40);
+
+/** Constructs an error report from JSON, fetching details via API if needed. */
+function errorReportFromJson({
+  errorId,
+  firstSeen,
+  dailyOccurrences,
+  stacktrace,
+  seenInVersions,
+}: {
+  errorId: string;
+  firstSeen?: string;
+  dailyOccurrences?: string | number;
+  stacktrace?: string;
+  seenInVersions?: string | Array<string>;
+}): ErrorReport {
+  if (firstSeen && dailyOccurrences && stacktrace && seenInVersions) {
+    return {
+      errorId,
+      firstSeen: new Date(firstSeen),
+      dailyOccurrences: Number(dailyOccurrences),
+      stacktrace,
+      seenInVersions: Array.isArray(seenInVersions)
+        ? seenInVersions
+        : [seenInVersions],
+    };
+  }
+
+  throw new Error('Missing error report params');
+}
 
 /** Endpoint to create a GitHub issue for an error report. */
 export async function errorIssue(
@@ -44,13 +78,7 @@ export async function errorIssue(
   res: express.Response
 ): Promise<unknown> {
   const errorReport = req.method === 'POST' ? req.body : req.query;
-  const {
-    errorId,
-    firstSeen,
-    dailyOccurrences,
-    stacktrace,
-    linkIssue,
-  } = errorReport;
+  const {errorId, linkIssue} = errorReport;
 
   if (!errorId) {
     res.status(statusCodes.BAD_REQUEST);
@@ -61,21 +89,12 @@ export async function errorIssue(
   const shouldLinkIssue = linkIssue === '1';
 
   let parsedReport: ErrorReport;
-  if (firstSeen && dailyOccurrences && stacktrace) {
-    parsedReport = {
-      errorId,
-      firstSeen: new Date(firstSeen),
-      dailyOccurrences: Number(dailyOccurrences),
-      stacktrace,
-    };
-  } else {
+  try {
+    parsedReport = errorReportFromJson(errorReport);
+  } catch {
     // If only an error ID is specified, fetch the details from the API.
-    const {
-      group,
-      timedCounts,
-      firstSeenTime,
-      representative,
-    } = await stackdriver.getGroup(errorId);
+    const groupStats = await stackdriver.getGroup(errorId);
+    const {group} = groupStats;
 
     if (group.trackingIssues) {
       // If the error is already tracked, redirect to the existing issue
@@ -85,12 +104,7 @@ export async function errorIssue(
       );
     }
 
-    parsedReport = {
-      errorId,
-      firstSeen: firstSeenTime,
-      dailyOccurrences: timedCounts[0].count,
-      stacktrace: representative.message,
-    };
+    parsedReport = monitor.reportFromGroupStats(groupStats);
   }
 
   try {
@@ -121,11 +135,28 @@ export async function errorMonitor(
 }
 
 function createErrorReportUrl(report: ErrorReport): string {
-  const params = Object.entries(report)
-    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
-    .join('&');
-
+  const params = querystring.stringify({
+    ...report,
+    firstSeen: report.firstSeen.toString(),
+  });
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
+}
+
+/** Provides monitor to list errors, optionally filtered by service type. */
+function getLister(optServiceType?: string): ErrorMonitor {
+  if (!optServiceType) {
+    return monitor;
+  }
+
+  if (optServiceType in ServiceName) {
+    const serviceType: ServiceGroupType = optServiceType as ServiceGroupType;
+    return monitor.service(ServiceName[serviceType]);
+  }
+
+  throw new Error(
+    `Invalid service group "${optServiceType}"; must be one of ` +
+      `"${Object.keys(ServiceName).join('", "')}"`
+  );
 }
 
 /** Diagnostic endpoint to list new untracked errors. */
@@ -133,9 +164,18 @@ export async function errorList(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
+  // If a valid serviceType param is provided, such as "nightly" or
+  // "production", filter to that service group.
+  const serviceType = (req.query.serviceType || '').toString().toUpperCase();
+
   try {
+    const lister = getLister(serviceType);
     const reports = await lister.newErrorsToReport();
+
     res.json({
+      serviceType: serviceType || 'ALL',
+      serviceTypeThreshold: Math.ceil(lister.minFrequency),
+      normalizedThreshold: MIN_FREQUENCY,
       errorReports: reports.map(report => {
         const createUrl = createErrorReportUrl(report);
         return {

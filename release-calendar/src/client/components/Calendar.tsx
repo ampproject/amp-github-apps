@@ -15,23 +15,20 @@
  */
 
 import '../stylesheets/calendar.scss';
-import 'tippy.js/dist/tippy.css';
 import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
-import {EventApi, View} from '@fullcalendar/core';
 import {EventSourceInput} from '@fullcalendar/core/structs/event-source';
+import {Tooltip} from './Tooltip';
 import {
-  getAllReleasesEvents,
+  getAllPromotionEvents,
   getSingleReleaseEvents,
 } from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
-import ReactDOM from 'react-dom';
-import Tippy from '@tippyjs/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
-const CALENDAR_CONTENT_HEIGHT = 480;
+const CALENDAR_CONTENT_HEIGHT = 610;
 const EVENT_LIMIT_DISPLAYED = 3;
 
 export interface CalendarProps {
@@ -59,8 +56,8 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   calendarReference = React.createRef<FullCalendar>();
 
   async componentDidMount(): Promise<void> {
-    const releases = await this.apiService.getReleases();
-    this.setState({allEvents: getAllReleasesEvents(releases)});
+    const promotions = await this.apiService.getPromotions();
+    this.setState({allEvents: getAllPromotionEvents(promotions)});
   }
 
   async componentDidUpdate(prevProps: CalendarProps): Promise<void> {
@@ -81,30 +78,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     const calendarApi = this.calendarReference.current.getApi();
     calendarApi.gotoDate(date);
   }
-
-  tooltip = (arg: {
-    isMirror: boolean;
-    isStart: boolean;
-    isEnd: boolean;
-    event: EventApi;
-    el: HTMLElement;
-    view: View;
-  }): void => {
-    const Content = (): JSX.Element => (
-      <Tippy
-        interactive={true}
-        trigger={'click'}
-        placement={'left'}
-        arrow={false}
-        offset={[0, 5]}
-        //TODO: decide on the content of each tooltip and create component for it
-        content={<div>{arg.event.classNames}</div>}>
-        <button className={'event-button'}>{arg.event.title}</button>
-      </Tippy>
-    );
-    ReactDOM.render(<Content />, arg.el);
-  };
-
+        
   render(): JSX.Element {
     const displayEvents: EventSourceInput[] =
       this.props.singleRelease != null
@@ -114,24 +88,22 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
             .map((channel) => this.state.allEvents.get(channel));
 
     return (
-      <div className='calendar'>
-        <FullCalendar
-          defaultView='dayGridMonth'
-          header={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek',
-          }}
-          ref={this.calendarReference}
-          plugins={[dayGridPlugin, timeGridPlugin]}
-          eventSources={displayEvents}
-          contentHeight={CALENDAR_CONTENT_HEIGHT}
-          fixedWeekCount={false}
-          displayEventTime={false}
-          views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
-          eventRender={this.tooltip}
-        />
-      </div>
+      <FullCalendar
+        defaultView='dayGridMonth'
+        header={{
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek',
+        }}
+        ref={this.calendarReference}
+        plugins={[dayGridPlugin, timeGridPlugin]}
+        eventSources={displayEvents}
+        contentHeight={CALENDAR_CONTENT_HEIGHT}
+        fixedWeekCount={false}
+        displayEventTime={false}
+        views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
+        eventRender={Tooltip}
+      />
     );
   }
 }
