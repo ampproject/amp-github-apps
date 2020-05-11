@@ -302,7 +302,7 @@ describe('ServiceErrorMonitor', () => {
       const newErrorIds = newErrors.map(({errorId}) => errorId);
       expect(newErrorIds).toEqual(['new_id']);
       expect(stackdriver.listServiceGroups).toHaveBeenCalledWith(
-        'CDN Development',
+        'CDN 1%',
         25
       );
     });
