@@ -26,7 +26,7 @@ export const ERROR_ISSUE_ENDPOINT =
 
 export enum ServiceName {
   PRODUCTION = 'CDN Production',
-  DEVELOPMENT = 'CDN Development',
+  DEVELOPMENT = 'CDN 1%',
   EXPERIMENTS = 'CDN Experiments',
   NIGHTLY = 'CDN Nightly',
 }
@@ -38,7 +38,7 @@ export enum ServiceName {
  */
 const SERVICE_GROUPS: Record<ServiceName, ServiceGroup> = {
   'CDN Production': {diversionPercent: 0.98, throttleRate: 0.1},
-  'CDN Development': {diversionPercent: 0.01, throttleRate: 1},
+  'CDN 1%': {diversionPercent: 0.01, throttleRate: 1},
   'CDN Experiments': {diversionPercent: 0.01, throttleRate: 1},
   'CDN Nightly': {diversionPercent: 0.0005, throttleRate: 1},
 };

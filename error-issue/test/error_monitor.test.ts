@@ -301,10 +301,7 @@ describe('ServiceErrorMonitor', () => {
       const newErrors = await monitor.newErrorsToReport();
       const newErrorIds = newErrors.map(({errorId}) => errorId);
       expect(newErrorIds).toEqual(['new_id']);
-      expect(stackdriver.listServiceGroups).toHaveBeenCalledWith(
-        'CDN Development',
-        25
-      );
+      expect(stackdriver.listServiceGroups).toHaveBeenCalledWith('CDN 1%', 25);
     });
   });
 
