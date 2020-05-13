@@ -22,9 +22,12 @@ import {
   ServiceName,
 } from './src/error_monitor';
 import {ErrorIssueBot} from './src/bot';
-import {ErrorReport, ServiceGroupType} from 'error-issue-bot';
+import {ErrorList, ErrorReport, ServiceGroupType} from 'error-issue-bot';
 import {StackdriverApi} from './src/stackdriver_api';
+import {formatDate, linkifySource} from './src/utils';
+import Mustache from 'mustache';
 import express from 'express';
+import fs from 'fs';
 import querystring from 'querystring';
 import statusCodes from 'http-status-codes';
 
@@ -35,6 +38,9 @@ const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
 const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
 const ALL_SERVICES = 'ALL SERVICES';
 const VALID_SERVICE_TYPES = [ALL_SERVICES].concat(Object.keys(ServiceName));
+const ERROR_LIST_TEMPLATE = fs
+  .readFileSync('./static/error-list.html')
+  .toString();
 
 const bot = new ErrorIssueBot(
   GITHUB_ACCESS_TOKEN,
@@ -169,6 +175,50 @@ function getLister(
   return optThreshold ? lister.threshold(optThreshold) : lister;
 }
 
+function viewData({
+  serviceType,
+  serviceTypeThreshold,
+  normalizedThreshold,
+  errorReports,
+}: ErrorList.JsonResponse): ErrorList.ViewData {
+  const serviceTypeList: Array<ErrorList.ServiceTypeView> = VALID_SERVICE_TYPES.map(
+    name => ({
+      name,
+      formattedName:
+        name === 'DEVELOPMENT'
+          ? '1% / Opt-In'
+          : name.charAt(0).toUpperCase() + name.substr(1).toLowerCase(),
+      selected: name === serviceType,
+    })
+  );
+
+  return {
+    serviceType,
+    serviceTypeThreshold,
+    normalizedThreshold,
+    currentServiceType: serviceTypeList.filter(({selected}) => selected)[0],
+    serviceTypeList,
+    errorReports: errorReports.map(
+      ({
+        errorId,
+        firstSeen,
+        dailyOccurrences,
+        stacktrace,
+        seenInVersions,
+      }: ErrorReport): ErrorList.ErrorReportView => ({
+        errorId,
+        firstSeen: formatDate(new Date(firstSeen)),
+        dailyOccurrences: dailyOccurrences.toLocaleString('en-US'),
+        stacktrace: stacktrace
+          .split('\n')
+          .map(linkifySource)
+          .join('\n'),
+        seenInVersions,
+      })
+    ),
+  };
+}
+
 /** Diagnostic endpoint to list new untracked errors. */
 export async function errorList(
   req: express.Request,
@@ -182,7 +232,7 @@ export async function errorList(
   // - end-user sets an exact threshold for the view they are on, and that is
   //   the value used to filter
   // If both are specified, the exact threshold takes precedence.
-  const {threshold, normalizedThreshold} = req.query;
+  const {json, threshold, normalizedThreshold} = req.query;
   // If a valid serviceType param is provided, such as "nightly" or
   // "production", filter to that service group.
   const serviceType = (req.query.serviceType || ALL_SERVICES)
@@ -196,7 +246,7 @@ export async function errorList(
       Number(normalizedThreshold)
     );
     const reports = await lister.newErrorsToReport();
-    res.json({
+    const errorList: ErrorList.JsonResponse = {
       serviceType,
       serviceTypeThreshold: Math.ceil(lister.minFrequency),
       normalizedThreshold: Math.ceil(lister.normalizedMinFrequency),
@@ -205,11 +255,19 @@ export async function errorList(
         return {
           createUrl,
           createAndLinkUrl: `${createUrl}&linkIssue=1`,
+          message: report.stacktrace.split('\n', 1)[0],
           ...report,
         };
       }),
-    });
+    };
+
+    if (json) {
+      res.json(errorList);
+    } else {
+      res.send(Mustache.render(ERROR_LIST_TEMPLATE, viewData(errorList)));
+    }
   } catch (error) {
+    console.error(error);
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
     res.json({error: error.toString()});
   }

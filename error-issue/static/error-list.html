@@ -137,7 +137,7 @@
     {{#serviceTypeList}}
     <a href="?serviceType={{name}}&normalizedThreshold={{normalizedThreshold}}"
       class="button-service"
-      {{selected}}>
+      {{#selected}}selected{{/selected}}>
       <button>{{formattedName}}</button>
     </a>
     {{/serviceTypeList}}

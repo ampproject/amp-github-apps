@@ -160,4 +160,41 @@ declare module 'error-issue-bot' {
       };
     }
   }
+
+  namespace ErrorList {
+    interface ErrorReportWithMeta extends ErrorReport {
+      createUrl: string;
+      createAndLinkUrl: string;
+      message: string;
+    }
+
+    interface ErrorReportView {
+      errorId: string;
+      firstSeen: string;
+      dailyOccurrences: string;
+      stacktrace: string;
+      seenInVersions: Array<string>;
+    }
+
+    interface JsonResponse {
+      serviceType: string;
+      serviceTypeThreshold: number;
+      normalizedThreshold: number;
+      errorReports: Array<ErrorReportWithMeta>;
+    }
+
+    interface ServiceTypeView {
+      name: string;
+      formattedName: string;
+      selected: boolean;
+    }
+    interface ViewData {
+      currentServiceType: ServiceTypeView;
+      serviceType: string;
+      serviceTypeList: Array<ServiceTypeView>;
+      serviceTypeThreshold: number;
+      normalizedThreshold: number;
+      errorReports: Array<ErrorReportView>;
+    }
+  }
 }
