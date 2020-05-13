@@ -64,3 +64,11 @@ export function parseStacktrace(stacktrace: string): Array<StackFrame> {
     .filter(Boolean)
     .map(({groups}) => parseSource(groups.source));
 }
+
+/** Creates links to GitHub view of source files in stacktrace. */
+export function linkifySource(line: string): string {
+  return line.replace(
+    /https:\/\/[^\/]+\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/(?<ref>[^\/]+)\/(?<path>[^:]+):(?<line>\d+)/,
+    '<a href="https://github.com/$<owner>/$<repo>/blob/$<ref>/$<path>#L$<line>">$<path>:$<line></a>'
+  );
+}

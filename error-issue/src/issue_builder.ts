@@ -15,7 +15,7 @@
  */
 
 import {BlameRange, ErrorReport} from 'error-issue-bot';
-import {formatDate} from './utils';
+import {formatDate, linkifySource} from './utils';
 
 const MAX_CHANGED_FILES = 40;
 const MAX_POSSIBLE_ASSIGNEES = 2;
@@ -75,17 +75,11 @@ export class IssueBuilder {
 
   get bodyStacktrace(): string {
     const indent = (line: string): string => line.replace(/^\s*/, '    ');
-    const linkize = (line: string): string => {
-      return line.replace(
-        /https:\/\/[^\/]+\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/(?<ref>[^\/]+)\/(?<path>[^:]+):(?<line>\d+)/,
-        '<a href="https://github.com/$<owner>/$<repo>/blob/$<ref>/$<path>#L$<line>">$<path>:$<line></a>'
-      );
-    };
     return [
       'Stacktrace',
       '---',
       `<pre><code>${this.message}`,
-      ...this.stack.map(indent).map(linkize),
+      ...this.stack.map(indent).map(linkifySource),
       '</code></pre>',
     ].join('\n');
   }
