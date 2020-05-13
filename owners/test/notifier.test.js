@@ -452,34 +452,5 @@ describe('notifier', () => {
 
       expect(notifies['rando']).toBeUndefined();
     });
-
-    describe('with existing reviewers', () => {
-      let notifier;
-
-      beforeEach(() => {
-        notifier = new OwnersNotifier(
-          pr,
-          {'current_approver': true, 'pending_reviewer': false},
-          tree,
-          ['baz/test.js']
-        );
-
-        sandbox
-          .stub(OwnersTree.prototype, 'getModifiedFileOwners')
-          .returns([
-            new UserOwner('current_approver'),
-            new UserOwner('pending_reviewer'),
-          ]);
-      });
-
-      it('excludes approving reviewers', () => {
-        const notifies = notifier.getOwnersToNotify();
-        expect(notifies['current_approver']).toBeUndefined();
-      });
-      it('excludes pending reviewers', () => {
-        const notifies = notifier.getOwnersToNotify();
-        expect(notifies['pending_reviewer']).toBeUndefined();
-      });
-    });
   });
 });
