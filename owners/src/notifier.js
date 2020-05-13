@@ -178,10 +178,6 @@ class OwnersNotifier {
         });
     });
 
-    Object.keys(this.currentReviewers).forEach(name => {
-      delete notifies[name];
-    });
-
     return notifies;
   }
 }
