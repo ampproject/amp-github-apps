@@ -147,6 +147,7 @@
     <section class="error-report">
       <h2>
         <a target="_blank"
+          rel="noopener noreferrer"
           href="http://go/ampe/{{errorId}}?project=amp-error-reporting"
           class="message">
           {{message}}
@@ -169,6 +170,7 @@
       <pre class="stacktrace"><code>{{& stacktrace}}</code></pre>
 
       <a target="_blank"
+        rel="noopener noreferrer"
         href="{{createAndLinkUrl}}"
         onclick="this.parentNode.classList.add('error-report-done')">
         <button class="button-blue button-create">Create issue</button>
