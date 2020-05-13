@@ -79,7 +79,7 @@ async function main(): Promise<void> {
       // authorization
       const authorization = req.header('authorization');
       const auth = authorization.split('Basic ')[1];
-      if (auth != process.env.BASIC) {
+      if (auth != process.env.BASIC_AUTH) {
         return res.status(401).json('Request is not authorized');
       }
 
