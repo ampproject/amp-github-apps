@@ -89,19 +89,18 @@ async function main(): Promise<void> {
         p.date = moment(p.time, _CTIME_FORMAT).toDate();
       });
 
-      const errors = {
-        createReleases: {},
-        createPromotions: {},
-      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errors: any[] = [];
+
       await repositoryService.createReleases(releases).catch((error) => {
-        errors.createReleases = error;
+        errors.push(error);
       });
       await repositoryService.createPromotions(promotions).catch((error) => {
-        errors.createPromotions = error;
+        errors.push(error);
       });
 
       // return database errors if any
-      if (errors.createReleases || errors.createPromotions) {
+      if (errors.length > 0) {
         return res.status(500).json(errors);
       }
 
