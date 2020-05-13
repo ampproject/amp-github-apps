@@ -24,8 +24,6 @@ import moment from 'moment';
 import path from 'path';
 import rateLimit from 'express-rate-limit';
 
-const _CTIME_FORMAT = 'ddd MMM D HH:mm:ss YYYY';
-
 async function main(): Promise<void> {
   const connection: Connection = await createConnection({
     type: 'mysql',
@@ -86,7 +84,7 @@ async function main(): Promise<void> {
       // parse ctime string into date
       const {releases, promotions} = req.body;
       promotions.forEach((p: {time: string; date: Date}) => {
-        p.date = moment(p.time, _CTIME_FORMAT).toDate();
+        p.date = moment(p.time).toDate();
       });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
