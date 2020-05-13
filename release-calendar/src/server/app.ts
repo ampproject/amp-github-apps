@@ -76,7 +76,7 @@ async function main(): Promise<void> {
     app.post('/insert/', async (req, res) => {
       // authorization
       const authorization = req.header('authorization');
-      const auth = authorization.split('Basic ')[1];
+      const auth = authorization.split(/Basic /i)[1];
       if (auth != process.env.BASIC_AUTH) {
         return res.status(401).json('Request is not authorized');
       }
