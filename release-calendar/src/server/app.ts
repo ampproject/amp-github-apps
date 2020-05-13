@@ -18,7 +18,9 @@ import {Connection, createConnection} from 'typeorm';
 import {RepositoryService} from './repository-service';
 import PromotionEntity from './entities/promotion';
 import ReleaseEntity from './entities/release';
+import bodyParser from 'body-parser';
 import express from 'express';
+import moment from 'moment';
 import path from 'path';
 import rateLimit from 'express-rate-limit';
 
@@ -53,6 +55,8 @@ async function main(): Promise<void> {
     next();
   });
 
+  app.use(bodyParser.json());
+
   if (process.env.NODE_ENV == 'production') {
     const DIST_DIR = path.resolve('dist');
 
@@ -67,6 +71,39 @@ async function main(): Promise<void> {
 
     app.get('/', async (req, res) => {
       res.sendFile(path.join(DIST_DIR, 'index.html'));
+    });
+
+    app.post('/insert/', async (req, res) => {
+      // authorization
+      const authorization = req.header('authorization');
+      const auth = authorization.split(/Basic /i)[1];
+      if (auth != process.env.BASIC_AUTH) {
+        return res.status(401).json('Request is not authorized');
+      }
+
+      // parse ctime string into date
+      const {releases, promotions} = req.body;
+      promotions.forEach((p: {time: string; date: Date}) => {
+        p.date = moment(p.time).toDate();
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errors: any[] = [];
+
+      await repositoryService.createReleases(releases).catch((error) => {
+        errors.push(error);
+      });
+      await repositoryService.createPromotions(promotions).catch((error) => {
+        errors.push(error);
+      });
+
+      // return database errors if any
+      if (errors.length > 0) {
+        return res.status(500).json(errors);
+      }
+
+      // return success
+      return res.status(200).json('Successfully updated the database');
     });
   }
 

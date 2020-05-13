@@ -73,4 +73,18 @@ export class RepositoryService {
       }),
     );
   }
+
+  async createReleases(releases: Release[]): Promise<void> {
+    await this.releaseRepository.save(releases).catch((error) => {
+      // a throw is required here due to bug typeorm/typeorm#5057
+      throw error;
+    });
+  }
+
+  async createPromotions(promotions: Promotion[]): Promise<void> {
+    await this.promotionRepository.save(promotions).catch((error) => {
+      // a throw is required here due to bug typeorm/typeorm#5057
+      throw error;
+    });
+  }
 }
