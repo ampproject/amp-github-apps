@@ -80,7 +80,7 @@ export async function errorIssue(
   res: express.Response
 ): Promise<unknown> {
   const errorReport = req.method === 'POST' ? req.body : req.query;
-  const {errorId, linkIssue} = errorReport;
+  const {errorId, linkIssue, preview} = errorReport;
 
   if (!errorId) {
     res.status(statusCodes.BAD_REQUEST);
@@ -110,16 +110,21 @@ export async function errorIssue(
   }
 
   try {
-    const issueUrl = await bot.report(parsedReport);
-    res.redirect(statusCodes.MOVED_TEMPORARILY, issueUrl);
-    if (shouldLinkIssue) {
-      stackdriver.setGroupIssue(errorId, issueUrl);
+    if (preview) {
+      res.status(statusCodes.BAD_REQUEST);
+      const issue = await bot.buildErrorIssue(parsedReport);
+      res.json(issue);
+    } else {
+      const issueUrl = await bot.report(parsedReport);
+      res.redirect(statusCodes.MOVED_TEMPORARILY, issueUrl);
+      if (shouldLinkIssue) {
+        stackdriver.setGroupIssue(errorId, issueUrl);
+      }
     }
   } catch (errResp) {
     console.warn(errResp);
     res.status(errResp.status || statusCodes.INTERNAL_SERVER_ERROR);
-    res.set('Content-Type', 'application/json');
-    res.send(JSON.stringify(errResp, null, 2));
+    res.json(errResp);
   }
 }
 
