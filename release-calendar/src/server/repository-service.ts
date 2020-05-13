@@ -73,4 +73,16 @@ export class RepositoryService {
       }),
     );
   }
+
+  async createReleases(releases: Release[]): Promise<void> {
+    await this.releaseRepository.save(releases).catch((error) => {
+      throw error;
+    });
+  }
+
+  async createPromotions(promotions: Promotion[]): Promise<void> {
+    await this.promotionRepository.save(promotions).catch((error) => {
+      throw error;
+    });
+  }
 }
