@@ -1,0 +1,186 @@
+<!doctype html>
+<html ⚡>
+<head>
+  <title>Top Errors in {{currentServiceType.formattedName}}</title>
+
+  <style>
+    body {
+      color: #333;
+      font-family: sans-serif;
+      line-height: 1.25em;
+      text-align: center;
+    }
+    header {
+      max-width: 900px;
+      margin: 50px auto 25px;
+    }
+    a {
+      text-decoration: none;
+      color: #339dff;
+    }
+    ul {
+      margin: 0;
+    }
+    button,
+    .threshold-form input[name=threshold]  {
+      background-color: #fff;
+      border: 2px solid #d9edff;
+      border-radius: 20px;
+      color: #339dff;
+      display: inline-block;
+      font-size: 16px;
+      margin: 5px;
+      padding: 10px 20px;
+    }
+    button {
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+    button:focus,
+    input:focus {
+      outline: none;
+    }
+    .onduty-guide {
+      text-align: left;
+      margin: 20px 100px;
+    }
+    .threshold-form {
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .threshold-form input[name=threshold] {
+      width: 75px;
+      text-align: center;
+    }
+    .threshold-form button[type=submit] {
+      border-radius: 0 20px 20px 0;
+      margin-left: -30px;
+    }
+    .error-report {
+      border: 2px solid #e7e7e7;
+      border-radius: 20px;
+      margin: 40px auto;
+      max-width: 800px;
+      padding: 15px 30px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .error-report-done {
+      opacity: 40%;
+      pointer-events: none;
+    }
+    .button-service[selected] {
+      pointer-events: none;
+    }
+    .button-service[selected] button,
+    .button-blue {
+      background-color: #339dff;
+      color: white;
+    }
+    .button-create {
+      display: block;
+      width: 100%;
+    }
+    .message {
+      font-family: monospace;
+      font-size: 1.25em;
+      line-height: 1.25em;
+    }
+    .stacktrace {
+      background-color: #f7f7f7;
+      border: 2px solid #e7e7e7;
+      border-radius: 5px;
+      line-height: 1.25em;
+      margin: 1.5em 0;
+      max-width: 100%;
+      overflow-x: auto;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="service-type">Top Errors in {{currentServiceType.formattedName}}</h1>
+    <em>
+      All listed errors occur at least {{serviceTypeThreshold}}x/day, which is the equivalent of {{normalizedThreshold}}x/day in production.
+    </em>
+
+    <h2>Instructions for Release On-duty:</h2>
+    <ol class='onduty-guide'>
+      <li>
+        Starting with <em>All services</em> and moving right, inspect each error in the list
+      </li>
+      <li>
+        Verify that no sensitive or personally identifying information is contained in the error message
+      </li>
+      <li>
+        Click the <strong>Create issue</strong> button below to file a
+        <a href="https://github.com/ampproject/amphtml/issues?q=is%3Aopen+is%3Aissue+label%3A%22Type%3A+Error+Report%22">Type: Error Report issue</a>
+        on GitHub.
+      </li>
+      <li>
+        Assign the created issue to a relevant developer or working group based on the stacktrace and PR history generated in the issue
+      </li>
+    </ol>
+
+    <strong>Frequency threshold:</strong>
+    <form method="GET" class="threshold-form">
+      <input type="number" name="threshold" value="{{serviceTypeThreshold}}">
+      <input type="hidden" name="serviceType" value="{{currentServiceType.name}}">
+      <button type="submit" class="button-blue">Update</button>
+    </form>
+    <a href="?serviceType={{currentServiceType.name}}"><button>Reset</button></a>
+    <br>
+
+    <strong>Other service types:</strong>
+    {{#serviceTypeList}}
+    <a href="?serviceType={{name}}&normalizedThreshold={{normalizedThreshold}}"
+      class="button-service"
+      {{#selected}}selected{{/selected}}>
+      <button>{{formattedName}}</button>
+    </a>
+    {{/serviceTypeList}}
+  </header>
+
+  {{#errorReports}}
+    <section class="error-report">
+      <h2>
+        <a target="_blank"
+          rel="noopener noreferrer"
+          href="http://go/ampe/{{errorId}}?project=amp-error-reporting"
+          class="message">
+          {{message}}
+        </a>
+      </h2>
+
+      <div>
+        <strong>First Seen:</strong> {{firstSeen}}
+        <br>
+        <strong>Daily Occurrences:</strong> {{dailyOccurrences}}
+        <br>
+        <strong>Seen in:</strong>
+        <ul class="seen-list">
+          {{#seenInVersions}}
+          <li>{{.}}</li>
+          {{/seenInVersions}}
+        </ul>
+      </div>
+
+      <pre class="stacktrace"><code>{{& stacktrace}}</code></pre>
+
+      <a target="_blank"
+        rel="noopener noreferrer"
+        href="{{createAndLinkUrl}}"
+        onclick="this.parentNode.classList.add('error-report-done')">
+        <button class="button-blue button-create">Create issue</button>
+      </a>
+    </section>
+  {{/errorReports}}
+  {{^errorReports}}
+    <h2>
+      There are no untracked errors occurring at least {{serviceTypeThreshold}}x/day in {{currentServiceType.formattedName}}
+    </h2>
+  {{/errorReports}}
+</body>
+</html>
