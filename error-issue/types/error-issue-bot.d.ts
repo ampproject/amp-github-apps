@@ -162,13 +162,14 @@ declare module 'error-issue-bot' {
   }
 
   namespace ErrorList {
-    interface ErrorReportWithMeta extends ErrorReport {
+    interface ErrorReportMeta {
       createUrl: string;
-      createAndLinkUrl: string;
       message: string;
     }
 
-    interface ErrorReportView {
+    type ErrorReportWithMeta = ErrorReport & ErrorReportMeta;
+
+    interface ErrorReportView extends ErrorReportMeta {
       errorId: string;
       firstSeen: string;
       dailyOccurrences: string;
