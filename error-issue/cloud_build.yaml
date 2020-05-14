@@ -29,13 +29,14 @@ steps:
     dir: error-issue
     args:
       - cp
-      - .env
+      - "{.env,package.json}"
       - dist/
   - name: ubuntu
     dir: error-issue
     args:
       - cp
-      - package.json
+      - -r
+      - static/
       - dist/
 
   # Deploy the apps.
