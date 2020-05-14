@@ -154,11 +154,8 @@ export async function errorMonitor(
   }
 }
 
-function createErrorReportUrl(report: ErrorReport): string {
-  const params = querystring.stringify({
-    ...report,
-    firstSeen: report.firstSeen.toString(),
-  });
+function createErrorReportUrl({errorId}: ErrorReport): string {
+  const params = querystring.stringify({errorId, linkIssue: 1});
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
 }
 
@@ -215,17 +212,21 @@ function viewData({
         errorId,
         firstSeen,
         dailyOccurrences,
+        message,
         stacktrace,
         seenInVersions,
-      }: ErrorReport): ErrorList.ErrorReportView => ({
+        createUrl,
+      }: ErrorList.ErrorReportWithMeta): ErrorList.ErrorReportView => ({
         errorId,
         firstSeen: formatDate(new Date(firstSeen)),
         dailyOccurrences: dailyOccurrences.toLocaleString('en-US'),
+        message,
         stacktrace: stacktrace
           .split('\n')
           .map(linkifySource)
           .join('\n'),
         seenInVersions,
+        createUrl,
       })
     ),
   };
@@ -263,10 +264,8 @@ export async function errorList(
       serviceTypeThreshold: Math.ceil(lister.minFrequency),
       normalizedThreshold: Math.ceil(lister.normalizedMinFrequency),
       errorReports: reports.map(report => {
-        const createUrl = createErrorReportUrl(report);
         return {
-          createUrl,
-          createAndLinkUrl: `${createUrl}&linkIssue=1`,
+          createUrl: createErrorReportUrl(report),
           message: report.stacktrace.split('\n', 1)[0],
           ...report,
         };

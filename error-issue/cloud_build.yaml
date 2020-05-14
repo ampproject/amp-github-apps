@@ -37,6 +37,13 @@ steps:
       - cp
       - package.json
       - dist/
+  - name: ubuntu
+    dir: error-issue
+    args:
+      - cp
+      - -r
+      - static/
+      - dist/
 
   # Deploy the apps.
   - name: gcr.io/cloud-builders/gcloud
