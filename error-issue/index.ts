@@ -39,10 +39,10 @@ const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
 const ALL_SERVICES = 'ALL SERVICES';
 const VALID_SERVICE_TYPES = [ALL_SERVICES].concat(Object.keys(ServiceName));
 
-let errorListTemplate = null;
+let errorListTemplate = '';
 /** Renders the error list UI. */
-function renderErrorList(viewData: ErrorList.ViewData) {
-  if (errorListTemplate === null) {
+function renderErrorList(viewData: ErrorList.ViewData): string {
+  if (!errorListTemplate) {
     errorListTemplate = fs.readFileSync('./static/error-list.html').toString();
   }
 
