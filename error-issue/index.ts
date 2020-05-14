@@ -38,9 +38,16 @@ const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
 const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
 const ALL_SERVICES = 'ALL SERVICES';
 const VALID_SERVICE_TYPES = [ALL_SERVICES].concat(Object.keys(ServiceName));
-const ERROR_LIST_TEMPLATE = fs
-  .readFileSync('./static/error-list.html')
-  .toString();
+
+let errorListTemplate = null;
+/** Renders the error list UI. */
+function renderErrorList(viewData: ErrorList.ViewData) {
+  if (errorListTemplate === null) {
+    errorListTemplate = fs.readFileSync('./static/error-list.html').toString();
+  }
+
+  return Mustache.render(errorListTemplate, viewData);
+}
 
 const bot = new ErrorIssueBot(
   GITHUB_ACCESS_TOKEN,
@@ -264,7 +271,7 @@ export async function errorList(
     if (json) {
       res.json(errorList);
     } else {
-      res.send(Mustache.render(ERROR_LIST_TEMPLATE, viewData(errorList)));
+      res.send(renderErrorList(viewData(errorList)));
     }
   } catch (error) {
     console.error(error);
