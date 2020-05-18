@@ -14,6 +14,7 @@ steps:
     secretEnv:
       - DB_USERNAME
       - DB_PASSWORD
+      - BASIC_AUTH
 
   # Install node packages  
   - name: gcr.io/cloud-builders/npm
