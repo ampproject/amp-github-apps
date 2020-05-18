@@ -37,9 +37,9 @@ steps:
       - server-build      
 
   # Deploy the app
-- name: gcr.io/cloud-builders/gcloud
-  dir: release-calendar
-  args:
+  - name: gcr.io/cloud-builders/gcloud
+    dir: release-calendar
+    args:
       - app
       - deploy
 
