@@ -22,7 +22,7 @@ import statusCodes from 'http-status-codes';
 
 export const ERROR_ISSUE_ENDPOINT =
   process.env.ERROR_ISSUE_ENDPOINT ||
-  'https://us-central1-amp-error-issue-bot.cloudfunctions.net/error-issue';
+  'https://amp-error-issue-bot.uc.r.appspot.com/error-issue';
 
 export enum ServiceName {
   PRODUCTION = 'CDN Production',
