@@ -32,8 +32,18 @@ export class BlameFinder {
     client: RateLimitedGraphQL,
     private logger: Logger = console
   ) {
-    this.graphql = async (query: string): Promise<GraphQLResponse> =>
-      client.runQuery(query);
+    this.graphql = async (
+      query: string,
+      retries = 0
+    ): Promise<GraphQLResponse> => {
+      let result = client.runQuery(query);
+      // The GitHub API sometimes times out, even for simple queries, but may
+      // then work fine when trying again soon after. This will auto-retry
+      // requests that error out. Rate limiting is handled by the API client.
+      for (let i = 0; i < retries; ++i) {
+        result = result.catch(async () => client.runQuery(query));
+      }
+    };
   }
 
   /** Fetches the blame info for a file. */
@@ -46,6 +56,7 @@ export class BlameFinder {
 
     const queryRef = async (ref: string): Promise<GraphQLResponse> => {
       this.logger.info(`Running blame query for \`${ref}:${path}\``);
+      const retries = ref === 'master' ? 0 : 3;
       return this.graphql(
         `{
           repository(owner: "${this.repoOwner}", name: "${this.repoName}") {
@@ -72,7 +83,8 @@ export class BlameFinder {
               }
             }
           }
-        }`
+        }`,
+        retries
       );
     };
 
@@ -103,7 +115,7 @@ export class BlameFinder {
 
   /** Fetches the blame range for a line of a file. */
   async blameForLine({rtv, path, line}: StackFrame): Promise<BlameRange> {
-    const ranges = await this.blameForFile(rtv, path);
+    const ranges = await this.blameForFile(rtv, path).catch(() => []);
     for (const range of ranges) {
       if (range.startingLine <= line && range.endingLine >= line) {
         return range;
