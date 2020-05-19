@@ -43,15 +43,30 @@ class ReviewerSelection {
    *
    * @private
    * @param {!FileTreeMap} fileTreeMap map from filenames to ownership subtrees.
+   * @param {?number} backoff steps to take up the tree.
    * @return {!Set<!OwnersRule>} a set of the most specific ownership rules.
    */
-  static _deepestOwnersRules(fileTreeMap) {
+  static _deepestOwnersRules(fileTreeMap, backoff = 0) {
     const maxDepth = Math.max(
       ...Object.values(fileTreeMap).map(tree => tree.depth)
     );
 
     const deepRules = Object.entries(fileTreeMap)
       .filter(([, subtree]) => subtree.depth === maxDepth)
+      .map(([filename, subtree]) => {
+        // Climb the tree by `backoff` steps.
+        for (let i = 0; i < backoff; ++i) {
+          subtree = subtree.parent;
+        }
+        // Keep climbing until we hit a node with rules
+        while (subtree && !subtree.rules.length) {
+          subtree = subtree.parent;
+        }
+
+        return [filename, subtree];
+      })
+      // Ignore climbs that passed the root
+      .filter(([, subtree]) => Boolean(subtree))
       .map(([filename, subtree]) =>
         subtree.rules.filter(rule => rule.matchesFile(filename))
       )
@@ -91,8 +106,6 @@ class ReviewerSelection {
    * @return {!Array<string>} list of reviewer usernames.
    */
   static _findPotentialReviewers(fileTreeMap) {
-    const deepestRules = this._deepestOwnersRules(fileTreeMap);
-
     let root = Object.values(fileTreeMap)[0];
     while (!root.isRoot) {
       root = root.parent;
@@ -101,7 +114,26 @@ class ReviewerSelection {
     const isAllowedReviewer = username =>
       reviewerSet.some(owner => owner.includes(username));
 
-    return this._reviewersForRules(deepestRules).filter(isAllowedReviewer);
+    // In rare cases, a PR may contain a file set in which all of the deepest
+    // rules contain users who are not members of the reviewer set. When this
+    // occurs, we climb up the tree from every leaf node until we reach a set of
+    // rules which yields possible reviewers. This will run once for each OWNERS
+    // file, starting at the leaf, which contains exclusively non-reviewers for
+    // all applicable rules. This will be exceedingly rare in practice,
+    // so the cost of this iteration and backoff is low.
+    let backoff = 0;
+    let potentialReviewers;
+    let deepestRules;
+    do {
+      deepestRules = this._deepestOwnersRules(fileTreeMap, backoff++);
+      potentialReviewers = this._reviewersForRules(deepestRules).filter(
+        isAllowedReviewer
+      );
+
+      if (potentialReviewers.length) {
+        return potentialReviewers;
+      }
+    } while (deepestRules.length);
   }
 
   /** Part 2 **/
