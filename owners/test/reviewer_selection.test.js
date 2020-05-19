@@ -236,6 +236,18 @@ describe('reviewer selection', () => {
       const reviewers = ReviewerSelection._findPotentialReviewers(fileTreeMap);
       expect(reviewers).toEqual(['kid']);
     });
+
+    it('handles non-reviewers at leaf nodes', () => {
+      fileTreeMap = ownersTree.buildFileTreeMap(['foo/bar/baz/other_file.js']);
+      const reviewerTeam = new Team(42, 'ampproject', 'reviewer-set');
+      reviewerTeam.members = ['reviewer', 'child', 'someone'];
+      ownersTree.addRule(
+        new ReviewerSetRule('OWNERS', [new TeamOwner(reviewerTeam)])
+      );
+
+      const reviewers = ReviewerSelection._findPotentialReviewers(fileTreeMap);
+      expect(reviewers).toEqual(['child']);
+    });
   });
 
   describe('filesOwnedByReviewer', () => {
