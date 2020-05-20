@@ -82,7 +82,7 @@ describe('review', () => {
 describe('team', () => {
   describe('toString', () => {
     it('prefixes the slug with the orginazation', () => {
-      const team = new Team(1337, 'ampproject', 'my_team');
+      const team = new Team('ampproject', 'my_team');
       expect(team.toString()).toEqual('ampproject/my_team');
     });
   });
@@ -90,12 +90,12 @@ describe('team', () => {
   describe('getMembers', () => {
     let sandbox;
     let team;
-    const fakeGithub = {getTeamMembers: unusedId => ['coder', 'githubuser']};
+    const fakeGithub = {getTeamMembers: unusedTeam => ['coder', 'githubuser']};
 
     beforeEach(() => {
       sandbox = sinon.createSandbox();
       sandbox.stub(fakeGithub, 'getTeamMembers').callThrough();
-      team = new Team(1337, 'ampproject', 'my_team');
+      team = new Team('ampproject', 'my_team');
     });
 
     afterEach(() => {
@@ -106,7 +106,7 @@ describe('team', () => {
       expect.assertions(1);
       await team.fetchMembers(fakeGithub);
 
-      sandbox.assert.calledWith(fakeGithub.getTeamMembers, 1337);
+      sandbox.assert.calledWith(fakeGithub.getTeamMembers, team);
       expect(team.members).toEqual(['coder', 'githubuser']);
     });
   });
@@ -220,13 +220,12 @@ describe('GitHub API', () => {
 
   describe('getTeams', () => {
     it('returns a list of team objects', async () => {
-      expect.assertions(3);
+      expect.assertions(2);
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?per_page=100')
-        .reply(200, [{id: 1337, slug: 'my_team'}]);
+        .reply(200, [{slug: 'my_team'}]);
       const teams = await github.getTeams();
 
-      expect(teams[0].id).toEqual(1337);
       expect(teams[0].org).toEqual('test_owner');
       expect(teams[0].slug).toEqual('my_team');
     });
@@ -235,13 +234,13 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?per_page=100')
-        .reply(200, Array(30).fill([{id: 1337, slug: 'my_team'}]), {
+        .reply(200, Array(30).fill([{slug: 'my_team'}]), {
           link:
             '<https://api.github.com/orgs/test_owner/teams?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?page=2&per_page=100')
-        .reply(200, Array(10).fill([{id: 1337, slug: 'my_team'}]));
+        .reply(200, Array(10).fill([{slug: 'my_team'}]));
       const teams = await github.getTeams();
 
       expect(teams.length).toEqual(40);
@@ -252,9 +251,10 @@ describe('GitHub API', () => {
     it('returns a list of team objects', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/teams/1337/members?per_page=100')
+        .get('/orgs/test_owner/teams/my_team/members?per_page=100')
         .reply(200, [{login: 'coder'}, {login: 'githubuser'}]);
-      const members = await github.getTeamMembers(1337);
+      const team = new Team('test_owner', 'my_team');
+      const members = await github.getTeamMembers(team);
 
       expect(members).toEqual(['coder', 'githubuser']);
     });
@@ -262,15 +262,16 @@ describe('GitHub API', () => {
     it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/teams/1337/members?per_page=100')
+        .get('/orgs/test_owner/teams/my_team/members?per_page=100')
         .reply(200, manyTeamsResponsePage1, {
           link:
-            '<https://api.github.com/teams/1337/members?page=2&per_page=100>; rel="next"',
+            '<https://api.github.com/orgs/test_owner/teams/my_team/members?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
-        .get('/teams/1337/members?page=2&per_page=100')
+        .get('/orgs/test_owner/teams/my_team/members?page=2&per_page=100')
         .reply(200, manyTeamsResponsePage2);
-      const members = await github.getTeamMembers(1337);
+      const team = new Team('test_owner', 'my_team');
+      const members = await github.getTeamMembers(team);
 
       expect(members.length).toEqual(40);
     });

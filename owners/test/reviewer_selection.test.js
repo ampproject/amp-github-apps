@@ -30,7 +30,7 @@ describe('reviewer selection', () => {
   const sandbox = sinon.createSandbox();
   let ownersTree;
 
-  const myTeam = new Team(42, 'ampproject', 'my_team');
+  const myTeam = new Team('ampproject', 'my_team');
   myTeam.members = ['child', 'kid'];
 
   const dirRules = {
@@ -227,7 +227,7 @@ describe('reviewer selection', () => {
     });
 
     it('ignores users who are not in the allowed reviewer set', () => {
-      const reviewerTeam = new Team(42, 'ampproject', 'reviewer-set');
+      const reviewerTeam = new Team('ampproject', 'reviewer-set');
       reviewerTeam.members = ['reviewer', 'kid', 'someone'];
       ownersTree.addRule(
         new ReviewerSetRule('OWNERS', [new TeamOwner(reviewerTeam)])

@@ -47,7 +47,7 @@ describe('owners tree', () => {
     new WildcardOwner(),
   ]);
 
-  const testerTeam = new Team(42, 'ampproject', 'testers');
+  const testerTeam = new Team('ampproject', 'testers');
   testerTeam.members.push('tester');
   const testFileRule = new PatternOwnersRule(
     'OWNERS',

@@ -101,12 +101,11 @@ class Team {
   /**
    * Constructor.
    *
-   * @param {number} id team ID.
    * @param {string} org GitHub organization the team belongs to.
    * @param {string} slug team name slug.
    */
-  constructor(id, org, slug) {
-    Object.assign(this, {id, org, slug, members: []});
+  constructor(org, slug) {
+    Object.assign(this, {org, slug, members: []});
   }
 
   /**
@@ -124,7 +123,7 @@ class Team {
    * @param {!GitHubAPI} github GitHub API client.
    */
   async fetchMembers(github) {
-    this.members = await github.getTeamMembers(this.id);
+    this.members = await github.getTeamMembers(this);
   }
 }
 
@@ -222,27 +221,26 @@ class GitHub {
     });
     this.logger.debug('[getTeams]', teamsList);
 
-    return teamsList.map(({id, slug}) => new Team(id, this.owner, slug));
+    return teamsList.map(({slug}) => new Team(this.owner, slug));
   }
 
   /**
    * Fetch all members of a team.
    *
-   * @param {number} teamId ID of team to find members for.
+   * @param {!Team} team team to find members for.
    * @return {!Array<string>} list of member usernames.
    */
-  async getTeamMembers(teamId) {
-    this.logger.info(`Fetching team members for team with ID ${teamId}`);
+  async getTeamMembers(team) {
+    this.logger.info(`Fetching team members for team ${team}`);
 
-    // TODO(#685): teams.listMembers is deprecated, replace this with
-    // teams.listMembersInOrg, which takes as argument an object with two
-    // fields: `org` (e.g., "ampproject") and team_name (e.g, "wg-infra").
-    // This means you can drop any logic that requires looking up the numeric
-    // team id.
-    const memberList = await this._paginate(this.client.teams.listMembers, {
-      'team_id': teamId,
-    });
-    this.logger.debug('[getTeamMembers]', teamId, memberList);
+    const memberList = await this._paginate(
+      this.client.teams.listMembersInOrg,
+      {
+        org: this.owner,
+        'team_slug': team.slug,
+      }
+    );
+    this.logger.debug('[getTeamMembers]', team, memberList);
 
     return memberList.map(({login}) => login.toLowerCase());
   }
