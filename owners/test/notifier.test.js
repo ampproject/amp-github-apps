@@ -303,6 +303,48 @@ describe('notifier', () => {
         done();
       });
     });
+
+    describe('when the PR contains many files', () => {
+      beforeEach(() => {
+        sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns({
+          'major_owner': [
+            'file1',
+            'file2',
+            'file3',
+            'file4',
+            'file5',
+            'file6',
+            'file7',
+            'file8',
+            'file9',
+            'file10',
+            'file11',
+            'file12',
+            'file13',
+            'file14',
+            'file15',
+          ],
+          'minor_owner': ['file1', 'file2'],
+        });
+      });
+
+      it('truncates long file lists', async done => {
+        await notifier.createNotificationComment(github);
+
+        sandbox.assert.calledOnce(github.createBotComment);
+        const [, comment] = github.createBotComment.getCall(0).args;
+        expect(comment).toContain(
+          'Hey @major_owner! These files were changed:\n```\n' +
+            'file1\nfile2\nfile3\nfile4\nfile5\nfile6\nfile7\nfile8\n' +
+            'file9\nfile10\nfile11\nfile12\n' +
+            '+3 more\n```'
+        );
+        expect(comment).toContain(
+          'Hey @minor_owner! These files were changed:\n```\nfile1\nfile2\n```'
+        );
+        done();
+      });
+    });
   });
 
   describe('getReviewersToRequest', () => {

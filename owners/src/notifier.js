@@ -17,6 +17,7 @@
 const {OWNER_MODIFIER} = require('./ownership/owner');
 const ADD_REVIEWERS_TAG = /#add-?owners/i;
 const DONT_ADD_REVIEWERS_TAG = /#no-?add-?owners/i;
+const FILE_LIST_MAX = process.env.COMMENT_FILE_LIST_MAX || 12;
 
 /**
  * Notifier for to tagging and requesting reviewers for a PR.
@@ -87,6 +88,12 @@ class OwnersNotifier {
 
     const filenameLists = {};
     Object.entries(notifies).forEach(([name, filenames]) => {
+      if (filenames.length > FILE_LIST_MAX) {
+        const extra = filenames.length - FILE_LIST_MAX;
+        filenames = filenames.slice(0, FILE_LIST_MAX);
+        filenames.push(`+${extra} more`);
+      }
+
       const list = ['```', ...filenames, '```'].join('\n');
       if (list in filenameLists) {
         filenameLists[list].push(name);
