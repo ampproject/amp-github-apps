@@ -90,7 +90,7 @@ describe('team', () => {
   describe('getMembers', () => {
     let sandbox;
     let team;
-    const fakeGithub = {getTeamMembers: unusedId => ['coder', 'githubuser']};
+    const fakeGithub = {getTeamMembers: unusedTeam => ['coder', 'githubuser']};
 
     beforeEach(() => {
       sandbox = sinon.createSandbox();
@@ -106,7 +106,7 @@ describe('team', () => {
       expect.assertions(1);
       await team.fetchMembers(fakeGithub);
 
-      sandbox.assert.calledWith(fakeGithub.getTeamMembers, 1337);
+      sandbox.assert.calledWith(fakeGithub.getTeamMembers, team);
       expect(team.members).toEqual(['coder', 'githubuser']);
     });
   });
@@ -254,7 +254,8 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/teams/1337/members?per_page=100')
         .reply(200, [{login: 'coder'}, {login: 'githubuser'}]);
-      const members = await github.getTeamMembers(1337);
+      const team = new Team(1337, 'ampproject', 'my_team');
+      const members = await github.getTeamMembers(team);
 
       expect(members).toEqual(['coder', 'githubuser']);
     });
@@ -270,7 +271,8 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/teams/1337/members?page=2&per_page=100')
         .reply(200, manyTeamsResponsePage2);
-      const members = await github.getTeamMembers(1337);
+      const team = new Team(1337, 'ampproject', 'my_team');
+      const members = await github.getTeamMembers(team);
 
       expect(members.length).toEqual(40);
     });

@@ -124,7 +124,7 @@ class Team {
    * @param {!GitHubAPI} github GitHub API client.
    */
   async fetchMembers(github) {
-    this.members = await github.getTeamMembers(this.id);
+    this.members = await github.getTeamMembers(this);
   }
 }
 
@@ -228,11 +228,11 @@ class GitHub {
   /**
    * Fetch all members of a team.
    *
-   * @param {number} teamId ID of team to find members for.
+   * @param {!Team} team team to find members for.
    * @return {!Array<string>} list of member usernames.
    */
-  async getTeamMembers(teamId) {
-    this.logger.info(`Fetching team members for team with ID ${teamId}`);
+  async getTeamMembers(team) {
+    this.logger.info(`Fetching team members for team ${team}`);
 
     // TODO(#685): teams.listMembers is deprecated, replace this with
     // teams.listMembersInOrg, which takes as argument an object with two
@@ -240,9 +240,9 @@ class GitHub {
     // This means you can drop any logic that requires looking up the numeric
     // team id.
     const memberList = await this._paginate(this.client.teams.listMembers, {
-      'team_id': teamId,
+      'team_id': team.id,
     });
-    this.logger.debug('[getTeamMembers]', teamId, memberList);
+    this.logger.debug('[getTeamMembers]', team, memberList);
 
     return memberList.map(({login}) => login.toLowerCase());
   }

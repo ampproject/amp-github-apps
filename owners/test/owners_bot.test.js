@@ -83,8 +83,8 @@ describe('owners bot', () => {
     it('fetches members for each team', async done => {
       await ownersBot.initTeams(github);
 
-      sandbox.assert.calledWith(github.getTeamMembers, 1337);
-      sandbox.assert.calledWith(github.getTeamMembers, 42);
+      sandbox.assert.calledWith(github.getTeamMembers, myTeam);
+      sandbox.assert.calledWith(github.getTeamMembers, otherTeam);
       done();
     });
   });
@@ -99,7 +99,7 @@ describe('owners bot', () => {
 
     it('fetches members for the team', async done => {
       await ownersBot.syncTeam(myTeam, github);
-      sandbox.assert.calledWith(github.getTeamMembers, 1337);
+      sandbox.assert.calledWith(github.getTeamMembers, myTeam);
       done();
     });
 
