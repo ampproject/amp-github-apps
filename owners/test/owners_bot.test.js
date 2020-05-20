@@ -65,8 +65,8 @@ describe('owners bot', () => {
     let otherTeam;
 
     beforeEach(() => {
-      myTeam = new Team(1337, 'ampproject', 'my_team');
-      otherTeam = new Team(42, 'ampproject', 'other_team');
+      myTeam = new Team('ampproject', 'my_team');
+      otherTeam = new Team('ampproject', 'other_team');
       sandbox.stub(GitHub.prototype, 'getTeams').returns([myTeam, otherTeam]);
       sandbox.stub(GitHub.prototype, 'getTeamMembers').returns([]);
     });
@@ -93,7 +93,7 @@ describe('owners bot', () => {
     let myTeam;
 
     beforeEach(() => {
-      myTeam = new Team(1337, 'ampproject', 'my_team');
+      myTeam = new Team('ampproject', 'my_team');
       sandbox.stub(GitHub.prototype, 'getTeamMembers').returns(['coder']);
     });
 

@@ -81,7 +81,7 @@ describe('owner user', () => {
 });
 
 describe('owner team', () => {
-  const myTeam = new Team(42, 'ampproject', 'my_team');
+  const myTeam = new Team('ampproject', 'my_team');
   myTeam.members = ['auser', 'anothermember'];
   const owner = new TeamOwner(myTeam);
 

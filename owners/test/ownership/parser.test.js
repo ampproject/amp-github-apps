@@ -55,13 +55,13 @@ describe('owners parser', () => {
   let repo;
   let parser;
   let myTeam;
-  const wgCool = new Team(1, 'ampproject', 'wg-cool-team');
-  const wgCaching = new Team(2, 'ampproject', 'wg-caching');
-  const wgInfra = new Team(3, 'ampproject', 'wg-infra');
-  const reviewerTeam = new Team(0, 'ampproject', 'reviewers-amphtml');
+  const wgCool = new Team('ampproject', 'wg-cool-team');
+  const wgCaching = new Team('ampproject', 'wg-caching');
+  const wgInfra = new Team('ampproject', 'wg-infra');
+  const reviewerTeam = new Team('ampproject', 'reviewers-amphtml');
 
   beforeEach(() => {
-    myTeam = new Team(1337, 'ampproject', 'my_team');
+    myTeam = new Team('ampproject', 'my_team');
     myTeam.members = ['team_member', 'other_member'];
 
     repo = new LocalRepository('path/to/repo');

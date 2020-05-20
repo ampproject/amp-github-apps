@@ -101,12 +101,11 @@ class Team {
   /**
    * Constructor.
    *
-   * @param {number} id team ID.
    * @param {string} org GitHub organization the team belongs to.
    * @param {string} slug team name slug.
    */
-  constructor(id, org, slug) {
-    Object.assign(this, {id, org, slug, members: []});
+  constructor(org, slug) {
+    Object.assign(this, {org, slug, members: []});
   }
 
   /**
@@ -222,7 +221,7 @@ class GitHub {
     });
     this.logger.debug('[getTeams]', teamsList);
 
-    return teamsList.map(({id, slug}) => new Team(id, this.owner, slug));
+    return teamsList.map(({slug}) => new Team(this.owner, slug));
   }
 
   /**

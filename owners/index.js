@@ -113,8 +113,8 @@ module.exports = app => {
       'membership.removed',
     ],
     async (github, payload) => {
-      const {id, slug} = payload.team;
-      await ownersBot.syncTeam(new Team(id, github.owner, slug), github);
+      const {slug} = payload.team;
+      await ownersBot.syncTeam(new Team(github.owner, slug), github);
     }
   );
 

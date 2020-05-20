@@ -306,7 +306,7 @@ describe('notifier', () => {
   });
 
   describe('getReviewersToRequest', () => {
-    const busyTeam = new Team(42, 'ampproject', 'busy_team');
+    const busyTeam = new Team('ampproject', 'busy_team');
     busyTeam.members = ['busy_member'];
     let notifier;
 
@@ -412,7 +412,7 @@ describe('notifier', () => {
   });
 
   describe('getOwnersToNotify', () => {
-    const relevantTeam = new Team(42, 'ampproject', 'relevant_team');
+    const relevantTeam = new Team('ampproject', 'relevant_team');
     relevantTeam.members = ['relevant_member'];
 
     beforeEach(() => {

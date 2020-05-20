@@ -36,7 +36,7 @@ class FakeRepository extends Repository {
 
 describe('server', () => {
   const repo = new FakeRepository();
-  const myTeam = new Team(42, 'test_owner', 'my-team');
+  const myTeam = new Team('test_owner', 'my-team');
   const github = new GitHub({}, 'test_owner', 'test_repo');
   const ownersBot = new OwnersBot(repo);
   ownersBot.teams[myTeam.toString()] = myTeam;

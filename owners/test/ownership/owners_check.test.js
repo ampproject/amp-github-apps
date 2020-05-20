@@ -123,7 +123,7 @@ describe('owners check', () => {
       new OwnersRule('extra/OWNERS', [new UserOwner('extra_reviewer')]),
     ].forEach(rule => ownersTree.addRule(rule));
 
-    reviewerTeam = new Team(0, 'ampproject', 'reviewers-amphtml');
+    reviewerTeam = new Team('ampproject', 'reviewers-amphtml');
     reviewerSetRule = new ReviewerSetRule('OWNERS', [
       new TeamOwner(reviewerTeam),
     ]);
@@ -407,7 +407,7 @@ describe('owners check', () => {
 
     describe('team owners', () => {
       it('fails if no member of the required team has approved', () => {
-        const team = new Team(0, 'ampproject', 'my_team');
+        const team = new Team('ampproject', 'my_team');
         team.members.push('required_reviewer');
 
         ownersTree.addRule(
@@ -424,7 +424,7 @@ describe('owners check', () => {
       });
 
       it('fails if a member of the required team is pending approval', () => {
-        const team = new Team(0, 'ampproject', 'my_team');
+        const team = new Team('ampproject', 'my_team');
         team.members.push('extra_reviewer');
 
         ownersTree.addRule(
@@ -441,7 +441,7 @@ describe('owners check', () => {
       });
 
       it('passes if any member of the required team is pending approval', () => {
-        const team = new Team(0, 'ampproject', 'my_team');
+        const team = new Team('ampproject', 'my_team');
         team.members.push('approver');
 
         ownersTree.addRule(
@@ -482,7 +482,7 @@ describe('owners check', () => {
       });
 
       it('passes if all required rules are satisfied', () => {
-        const team = new Team(0, 'ampproject', 'my_team');
+        const team = new Team('ampproject', 'my_team');
         team.members.push('other_approver');
 
         ownersTree.addRule(
@@ -667,7 +667,7 @@ describe('owners check', () => {
 
   describe('buildReviewerSetText', () => {
     it('displays review suggestions', () => {
-      const team = new Team(0, 'ampproject', 'my_team');
+      const team = new Team('ampproject', 'my_team');
       team.members.push('someone');
       const reviewers = [new UserOwner('coder'), new TeamOwner(team)];
 
