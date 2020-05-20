@@ -239,9 +239,13 @@ class GitHub {
     // fields: `org` (e.g., "ampproject") and team_name (e.g, "wg-infra").
     // This means you can drop any logic that requires looking up the numeric
     // team id.
-    const memberList = await this._paginate(this.client.teams.listMembers, {
-      'team_id': team.id,
-    });
+    const memberList = await this._paginate(
+      this.client.teams.listMembersInOrg,
+      {
+        org: this.owner,
+        'team_slug': team.slug,
+      }
+    );
     this.logger.debug('[getTeamMembers]', team, memberList);
 
     return memberList.map(({login}) => login.toLowerCase());

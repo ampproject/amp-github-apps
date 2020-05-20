@@ -252,9 +252,9 @@ describe('GitHub API', () => {
     it('returns a list of team objects', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/teams/1337/members?per_page=100')
+        .get('/orgs/test_owner/teams/my_team/members?per_page=100')
         .reply(200, [{login: 'coder'}, {login: 'githubuser'}]);
-      const team = new Team(1337, 'ampproject', 'my_team');
+      const team = new Team(1337, 'test_owner', 'my_team');
       const members = await github.getTeamMembers(team);
 
       expect(members).toEqual(['coder', 'githubuser']);
@@ -263,15 +263,15 @@ describe('GitHub API', () => {
     it('pages automatically', async () => {
       expect.assertions(1);
       nock('https://api.github.com')
-        .get('/teams/1337/members?per_page=100')
+        .get('/orgs/test_owner/teams/my_team/members?per_page=100')
         .reply(200, manyTeamsResponsePage1, {
           link:
-            '<https://api.github.com/teams/1337/members?page=2&per_page=100>; rel="next"',
+            '<https://api.github.com/orgs/test_owner/teams/my_team/members?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
-        .get('/teams/1337/members?page=2&per_page=100')
+        .get('/orgs/test_owner/teams/my_team/members?page=2&per_page=100')
         .reply(200, manyTeamsResponsePage2);
-      const team = new Team(1337, 'ampproject', 'my_team');
+      const team = new Team(1337, 'test_owner', 'my_team');
       const members = await github.getTeamMembers(team);
 
       expect(members.length).toEqual(40);
