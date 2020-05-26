@@ -85,7 +85,7 @@ export class StackdriverApi {
       'timeRange.period': 'PERIOD_1_DAY',
       timedCountDuration: `${SECONDS_IN_DAY}s`,
       ...opts,
-    })) as Record<string, Array<Stackdriver.SerializedErrorGroupStats>>;
+    })) as {errorGroupStats?: Array<Stackdriver.SerializedErrorGroupStats>};
 
     return errorGroupStats.map((stats: Stackdriver.SerializedErrorGroupStats) =>
       this.deserialize(stats)
