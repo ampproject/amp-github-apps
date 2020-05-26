@@ -81,7 +81,7 @@ export class StackdriverApi {
     groupId?: string;
     'serviceFilter.service'?: string;
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
-    const {errorGroupStats} = (await this.request('groupStats', 'GET', {
+    const {errorGroupStats = []} = (await this.request('groupStats', 'GET', {
       'timeRange.period': 'PERIOD_1_DAY',
       timedCountDuration: `${SECONDS_IN_DAY}s`,
       ...opts,
