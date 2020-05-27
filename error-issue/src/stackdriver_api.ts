@@ -22,11 +22,12 @@ import NodeCache from 'node-cache';
 const SERVICE = 'https://clouderrorreporting.googleapis.com';
 const SECONDS_IN_HOUR = 60 * 60;
 const SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
+const CACHE_TTL = SECONDS_IN_HOUR;
 const GAUTH_SCOPE = 'https://www.googleapis.com/auth/cloud-platform';
 
 export class StackdriverApi {
   private auth = new GoogleAuth({scopes: GAUTH_SCOPE});
-  private cache = new NodeCache({stdTTL: SECONDS_IN_HOUR});
+  private cache = new NodeCache({stdTTL: CACHE_TTL});
 
   constructor(private projectId: string) {}
 
