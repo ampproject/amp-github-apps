@@ -33,6 +33,7 @@
     "google-auth-library": "6.0.0",
     "http-status-codes": "1.4.0",
     "mustache": "4.0.1",
+    "node-cache": "5.1.0",
     "node-fetch": "2.6.0",
     "querystring": "0.2.0"
   },
