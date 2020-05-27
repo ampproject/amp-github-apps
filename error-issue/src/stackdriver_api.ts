@@ -86,24 +86,24 @@ export class StackdriverApi {
     'serviceFilter.service'?: string;
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
     const cacheKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
-    if (!this.cache.has(cacheKey)) {
+    let errorGroups:
+      | undefined
+      | Array<Stackdriver.ErrorGroupStats> = this.cache.get(cacheKey);
+
+    if (!errorGroups) {
       const {errorGroupStats = []} = (await this.request('groupStats', 'GET', {
         'timeRange.period': 'PERIOD_1_DAY',
         timedCountDuration: `${SECONDS_IN_DAY}s`,
         ...opts,
       })) as {errorGroupStats?: Array<Stackdriver.SerializedErrorGroupStats>};
 
-      this.cache.set(
-        cacheKey,
-        errorGroupStats.map((stats: Stackdriver.SerializedErrorGroupStats) =>
-          this.deserialize(stats)
-        )
-      );
+      errorGroups = errorGroupStats.map(this.deserialize, this);
+      this.cache.set(cacheKey, errorGroups);
     } else {
       console.info('Returning Stackdriver results from local cache');
     }
 
-    return this.cache.get(cacheKey);
+    return errorGroups;
   }
 
   /** List groups of errors. */
