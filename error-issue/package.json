@@ -6,15 +6,15 @@
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "A GitHub app which files issues for errors reported in AMP pages.",
   "engines": {
-    "node": "^12.13.1"
+    "node": ">=12"
   },
   "scripts": {
     "lint": "eslint . --ext .ts",
     "fix": "npm run lint -- --fix",
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
-    "start": "functions-framework --target=app --source=dist",
-    "dev": "nodemon",
+    "start": "node dist/app.js",
+    "dev": "functions-framework --target=app --source=dist",
     "deploy-tag-issue": "git tag 'deploy-error-issue-'`date --utc '+%Y%m%d%H%M%S'`",
     "deploy-tag-monitor": "git tag 'deploy-error-monitor-'`date --utc '+%Y%m%d%H%M%S'`",
     "deploy-tag-list": "git tag 'deploy-error-list-'`date --utc '+%Y%m%d%H%M%S'`",
@@ -27,8 +27,9 @@
     "@octokit/auth": "1.1.1",
     "@octokit/graphql": "4.3.1",
     "@octokit/rest": "16.43.1",
-    "@probot/serverless-gcf": "0.2.0",
+    "body-parser": "1.19.0",
     "dotenv": "8.2.0",
+    "express": "4.17.1",
     "google-auth-library": "6.0.0",
     "http-status-codes": "1.4.0",
     "mustache": "4.0.1",
