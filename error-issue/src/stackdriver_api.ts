@@ -17,13 +17,17 @@
 import {GaxiosOptions} from 'gaxios';
 import {GoogleAuth} from 'google-auth-library';
 import {Stackdriver} from 'error-issue-bot';
+import NodeCache from 'node-cache';
 
 const SERVICE = 'https://clouderrorreporting.googleapis.com';
-const SECONDS_IN_DAY = 60 * 60 * 24;
+const SECONDS_IN_HOUR = 60 * 60;
+const SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
+const CACHE_TTL = SECONDS_IN_HOUR;
 const GAUTH_SCOPE = 'https://www.googleapis.com/auth/cloud-platform';
 
 export class StackdriverApi {
   private auth = new GoogleAuth({scopes: GAUTH_SCOPE});
+  private cache = new NodeCache({stdTTL: CACHE_TTL});
 
   constructor(private projectId: string) {}
 
@@ -81,15 +85,25 @@ export class StackdriverApi {
     groupId?: string;
     'serviceFilter.service'?: string;
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
-    const {errorGroupStats = []} = (await this.request('groupStats', 'GET', {
-      'timeRange.period': 'PERIOD_1_DAY',
-      timedCountDuration: `${SECONDS_IN_DAY}s`,
-      ...opts,
-    })) as {errorGroupStats?: Array<Stackdriver.SerializedErrorGroupStats>};
+    const cacheKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
+    let errorGroups:
+      | undefined
+      | Array<Stackdriver.ErrorGroupStats> = this.cache.get(cacheKey);
 
-    return errorGroupStats.map((stats: Stackdriver.SerializedErrorGroupStats) =>
-      this.deserialize(stats)
-    );
+    if (!errorGroups) {
+      const {errorGroupStats = []} = (await this.request('groupStats', 'GET', {
+        'timeRange.period': 'PERIOD_1_DAY',
+        timedCountDuration: `${SECONDS_IN_DAY}s`,
+        ...opts,
+      })) as {errorGroupStats?: Array<Stackdriver.SerializedErrorGroupStats>};
+
+      errorGroups = errorGroupStats.map(this.deserialize, this);
+      this.cache.set(cacheKey, errorGroups);
+    } else {
+      console.info('Returning Stackdriver results from local cache');
+    }
+
+    return errorGroups;
   }
 
   /** List groups of errors. */
