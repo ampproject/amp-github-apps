@@ -74,8 +74,8 @@ export class RepositoryService {
     );
   }
 
-  async createReleases(releases: Release[]): Promise<void> {
-    await this.releaseRepository.save(releases).catch((error) => {
+  async createReleases(release: Release): Promise<void> {
+    await this.releaseRepository.save(release).catch((error) => {
       // a throw is required here due to bug typeorm/typeorm#5057
       throw error;
     });

@@ -82,14 +82,16 @@ async function main(): Promise<void> {
       }
 
       // parse ctime string into date
-      const {releases, promotions} = req.body;
+      const {release, promotions} = req.body;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const errors: any[] = [];
 
-      await repositoryService.createReleases(releases).catch((error) => {
-        errors.push(error);
-      });
+      if (release) {
+        await repositoryService.createReleases(release).catch((error) => {
+          errors.push(error);
+        });
+      }
 
       if (promotions) {
         promotions.forEach((p: {time: string; date: Date}) => {
