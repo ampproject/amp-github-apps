@@ -31,3 +31,7 @@ To lint: `npm run lint`
 2. Add a `.env` file to the root directory. See `.env.example` for the required variables and replace values with your own.
 3. Run `npm run server` to connect to the database and start the API server.
 4. In a different terminal, run `npm run client` to start the client.
+
+#### Deploy to production
+1. Create a tag: `git tag release-calendar-<date>` where `<date>` is in YYMMDDHHmmss
+2. Push the tag to remote: `git tag <remote> release-calendar-<date>` where `<remote>` is `git@github.com:ampproject/amp-github-apps.git` or an alias, likely `upstream`
