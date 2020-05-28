@@ -93,9 +93,11 @@ async function main(): Promise<void> {
       await repositoryService.createReleases(releases).catch((error) => {
         errors.push(error);
       });
-      await repositoryService.createPromotions(promotions).catch((error) => {
-        errors.push(error);
-      });
+      if (promotions && promotions.length > 0) {
+        await repositoryService.createPromotions(promotions).catch((error) => {
+          errors.push(error);
+        });
+      }
 
       // return database errors if any
       if (errors.length > 0) {
