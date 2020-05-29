@@ -22,7 +22,12 @@ import {
   ServiceName,
 } from './src/error_monitor';
 import {ErrorIssueBot} from './src/bot';
-import {ErrorList, ErrorReport, ServiceGroupType} from 'error-issue-bot';
+import {
+  ErrorList,
+  ErrorReport,
+  ServiceGroupType,
+  TopIssueView,
+} from 'error-issue-bot';
 import {StackdriverApi} from './src/stackdriver_api';
 import {formatDate, linkifySource} from './src/utils';
 import Mustache from 'mustache';
@@ -38,6 +43,7 @@ const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
 const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
 const ALL_SERVICES = 'ALL SERVICES';
 const VALID_SERVICE_TYPES = [ALL_SERVICES].concat(Object.keys(ServiceName));
+const MAX_TITLE_LENGTH = 80;
 
 let errorListTemplate = '';
 /** Renders the error list UI. */
@@ -47,6 +53,16 @@ function renderErrorList(viewData: ErrorList.ViewData): string {
   }
 
   return Mustache.render(errorListTemplate, viewData);
+}
+
+let topIssuesTemplate = '';
+/** Renders the top issue list. */
+function renderTopIssues(issues: Array<TopIssueView>): string {
+  if (!topIssuesTemplate) {
+    topIssuesTemplate = fs.readFileSync('./static/top-issues.html').toString();
+  }
+
+  return Mustache.render(topIssuesTemplate, {issues});
 }
 
 const bot = new ErrorIssueBot(
@@ -282,4 +298,35 @@ export async function errorList(
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
     res.json({error: error.toString()});
   }
+}
+
+/** List top N errors and their associated GitHub issues (for QA reports). */
+export async function topIssueList(
+  req: express.Request,
+  res: express.Response
+): Promise<void> {
+  const n = Number(req.query.n || 10);
+  const seenIssues = new Set();
+  const issues = (await monitor.newErrors())
+    .filter(({group}) => !!group.trackingIssues)
+    .map(({group: {groupId, trackingIssues}, representative: {message}}) => {
+      let [title] = message.split('\n');
+      if (title.length > MAX_TITLE_LENGTH) {
+        title = `${title.substr(0, MAX_TITLE_LENGTH - 1)}…`;
+      }
+      const issueUrl = trackingIssues[0].url;
+      const [, issue] = issueUrl.split('ampproject/amphtml/issues/');
+      const issueNumber = Number(issue);
+
+      if (!issueNumber || seenIssues.has(issueNumber)) {
+        return null;
+      }
+      seenIssues.add(issueNumber);
+
+      return {title, errorId: groupId, issueUrl, issueNumber};
+    })
+    .filter(Boolean)
+    .slice(0, n);
+
+  res.send(renderTopIssues(issues));
 }
