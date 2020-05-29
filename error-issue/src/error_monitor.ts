@@ -122,7 +122,7 @@ export class ErrorMonitor {
   }
 
   /** Finds top occurring errors. */
-  protected async newErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  async newErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
     return this.client.listGroups(this.pageLimit);
   }
 
@@ -195,7 +195,7 @@ export class ServiceErrorMonitor extends ErrorMonitor {
   }
 
   /** Finds top occurring errors in the service group. */
-  protected async newErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  async newErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
     return this.client.listServiceGroups(this.serviceName, this.pageLimit);
   }
 

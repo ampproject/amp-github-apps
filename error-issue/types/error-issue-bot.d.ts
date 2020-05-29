@@ -198,4 +198,11 @@ declare module 'error-issue-bot' {
       errorReports: Array<ErrorReportView>;
     }
   }
+
+  interface TopIssueView {
+    errorId: string;
+    title: string;
+    issueUrl: string;
+    issueNumber: number;
+  }
 }

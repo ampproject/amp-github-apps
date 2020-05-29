@@ -16,7 +16,7 @@
 
 require('dotenv').config();
 
-import {errorIssue, errorList} from '.';
+import {errorIssue, errorList, topIssueList} from '.';
 import {json, urlencoded} from 'body-parser';
 import express from 'express';
 
@@ -27,6 +27,7 @@ express()
   .use(urlencoded({extended: false}))
   .get('/error-issue', errorIssue)
   .get(['/', '/error-list'], errorList)
+  .get('/top-issues', topIssueList)
   .listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
   });
