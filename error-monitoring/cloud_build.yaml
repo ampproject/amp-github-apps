@@ -9,36 +9,36 @@ steps:
       - run
       - replace-secrets
       - --
-      - error-issue
+      - error-monitoring
     secretEnv:
       - GITHUB_ACCESS_TOKEN
 
   # Compile the app from Typescript into dist/.
   - name: gcr.io/cloud-builders/npm
-    dir: error-issue
+    dir: error-monitoring
     args:
       - install
   - name: gcr.io/cloud-builders/npm
-    dir: error-issue
+    dir: error-monitoring
     args:
       - run
       - build
 
   # Copy over the environment and package file.
   - name: ubuntu
-    dir: error-issue
+    dir: error-monitoring
     args:
       - cp
       - .env
       - dist/
   - name: ubuntu
-    dir: error-issue
+    dir: error-monitoring
     args:
       - cp
       - package.json
       - dist/
   - name: ubuntu
-    dir: error-issue
+    dir: error-monitoring
     args:
       - cp
       - -r
@@ -47,7 +47,7 @@ steps:
 
   # Deploy the apps.
   - name: gcr.io/cloud-builders/gcloud
-    dir: error-issue
+    dir: error-monitoring
     args:
       - app
       - deploy
