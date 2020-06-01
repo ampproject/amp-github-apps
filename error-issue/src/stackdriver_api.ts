@@ -87,7 +87,7 @@ export class StackdriverApi {
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
     const serviceKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
     const groupKey = opts.groupId || 'NO_GROUP';
-    const cacheKey = `${serviceKey}-{groupKey}`;
+    const cacheKey = `${serviceKey}-${groupKey}`;
     let errorGroups:
       | undefined
       | Array<Stackdriver.ErrorGroupStats> = this.cache.get(cacheKey);
@@ -102,7 +102,9 @@ export class StackdriverApi {
       errorGroups = errorGroupStats.map(this.deserialize, this);
       this.cache.set(cacheKey, errorGroups);
     } else {
-      console.info('Returning Stackdriver results from local cache');
+      console.info(
+        `Returning Stackdriver results from local cache for key "${cacheKey}"`
+      );
     }
 
     return errorGroups;
