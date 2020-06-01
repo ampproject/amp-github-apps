@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {BlameRange, ErrorReport} from 'error-issue-bot';
+import {BlameRange, ErrorReport} from 'error-monitoring';
 import {formatDate, linkifySource} from './utils';
 
 const MAX_CHANGED_FILES = 40;

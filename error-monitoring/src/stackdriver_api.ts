@@ -16,7 +16,7 @@
 
 import {GaxiosOptions} from 'gaxios';
 import {GoogleAuth} from 'google-auth-library';
-import {Stackdriver} from 'error-issue-bot';
+import {Stackdriver} from 'error-monitoring';
 import NodeCache from 'node-cache';
 
 const SERVICE = 'https://clouderrorreporting.googleapis.com';
@@ -85,7 +85,9 @@ export class StackdriverApi {
     groupId?: string;
     'serviceFilter.service'?: string;
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
-    const cacheKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
+    const serviceKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
+    const groupKey = opts.groupId || 'NO_GROUP';
+    const cacheKey = `${serviceKey}-${groupKey}`;
     let errorGroups:
       | undefined
       | Array<Stackdriver.ErrorGroupStats> = this.cache.get(cacheKey);
@@ -100,7 +102,9 @@ export class StackdriverApi {
       errorGroups = errorGroupStats.map(this.deserialize, this);
       this.cache.set(cacheKey, errorGroups);
     } else {
-      console.info('Returning Stackdriver results from local cache');
+      console.info(
+        `Returning Stackdriver results from local cache for key "${cacheKey}"`
+      );
     }
 
     return errorGroups;
@@ -126,7 +130,7 @@ export class StackdriverApi {
 
   /** Get details about an error group. */
   async getGroup(groupId: string): Promise<Stackdriver.ErrorGroupStats> {
-    console.info(`Fetching group stats for error gorup "${groupId}"`);
+    console.info(`Fetching group stats for error group "${groupId}"`);
     const errorGroupStats = await this.getGroups({groupId});
     return errorGroupStats[0];
   }

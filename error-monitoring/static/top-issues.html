@@ -1,0 +1,23 @@
+<!doctype html>
+<html ⚡>
+<head>
+  <title>Top {{issues.length}} Errors</title>
+</head>
+<body>
+  Top {{issues.length}} Errors of the Week
+  <ul>
+    {{#issues}}
+    <li>
+      <a target="_blank"
+        rel="noopener noreferrer"
+        href="http://go/ampe/{{errorId}}?project=amp-error-reporting">
+        {{title}}
+      </a>
+      (<a target="_blank"
+        rel="noopener noreferrer"
+        href="{{issueUrl}}">#{{issueNumber}}</a>)
+    </li>
+    {{/issues}}
+  </ul>
+</body>
+</html>

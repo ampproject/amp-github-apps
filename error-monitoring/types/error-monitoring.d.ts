@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-declare module 'error-issue-bot' {
+declare module 'error-monitoring' {
   /** A standard logging interface. */
   export interface Logger {
     debug(message: string, ...extraInfo: unknown[]): void;

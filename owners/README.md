@@ -91,7 +91,7 @@ Setup
    * The value for `GITHUB_ACCESS_TOKEN` is the token generated in step 6.
    * The value for `CLOUD_STORAGE_BUCKET` is the name of the Cloud Storage bucket created in Step 8
    * Update the remaining fields for the organization, repository, and bot for which you are running the app.
-11. Warm up the file cache with `npm run init`
+10. Warm up the file cache with `npm run init`
 
 If there are no errors after running the last command then the server is running
 locally on your machine.
@@ -114,9 +114,6 @@ After setting up the app locally, use `gcloud` to deploy the app and cron tasks:
 2. `gcloud app deploy app.yaml`
 3. `gcloud app deploy cron.yaml`
 
-
-Deployment
-----------
 
 This GitHub App is deployed on an AppEngine instance:
 https://ampproject-owners-bot.appspot.com/

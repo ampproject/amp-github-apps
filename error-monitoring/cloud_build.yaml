@@ -9,36 +9,36 @@ steps:
       - run
       - replace-secrets
       - --
-      - error-issue
+      - error-monitoring
     secretEnv:
       - GITHUB_ACCESS_TOKEN
 
   # Compile the app from Typescript into dist/.
   - name: gcr.io/cloud-builders/npm
-    dir: error-issue
+    dir: error-monitoring
     args:
       - install
   - name: gcr.io/cloud-builders/npm
-    dir: error-issue
+    dir: error-monitoring
     args:
       - run
       - build
 
   # Copy over the environment and package file.
   - name: ubuntu
-    dir: error-issue
+    dir: error-monitoring
     args:
       - cp
       - .env
       - dist/
   - name: ubuntu
-    dir: error-issue
+    dir: error-monitoring
     args:
       - cp
       - package.json
       - dist/
   - name: ubuntu
-    dir: error-issue
+    dir: error-monitoring
     args:
       - cp
       - -r
@@ -47,19 +47,14 @@ steps:
 
   # Deploy the apps.
   - name: gcr.io/cloud-builders/gcloud
-    dir: error-issue
+    dir: error-monitoring
     args:
-      - functions
+      - app
       - deploy
-      - $_FUNC_NAME
-      - --source
-      - dist/
-      - --entry-point
-      - $_FUNC_ENTRY
 
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
 secrets:
-  - kmsKeyName: projects/amp-error-issue-bot/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+  - kmsKeyName: projects/amp-error-monitoring/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
     secretEnv:
-      GITHUB_ACCESS_TOKEN: CiQA/MPS5RpHzYezd0CiQTIAMRswXKiAMJ6zDqZ6jKc6M4mM1sQSUQB8LNNhVeBROiKaLtWOBy7lfii72/r6r0Z2VnnCgkV1ze9xSSF1iJASnICcUdlzYMyDUslc7KJ5VHPkDz1t6ssGYUczmvgt1LK4BMVkorA/+Q==
+      GITHUB_ACCESS_TOKEN: CiQAyU85iSvJh8HsabAs7Mv5QXXlM1WZoFGw7z5ZLmMlg2ogwKYSUQAshvUdguq5dEzmti0H0dkogWNhg8yVGfRO5BdtF3rdt+/Zne0W7wo8Ytmsd6yKgnP1OBiqBXqETeXAEBBKvJXBiUMThUJSZVaejNeoaiFUMg==

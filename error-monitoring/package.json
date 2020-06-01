@@ -1,10 +1,10 @@
 {
-  "name": "amp-error-issue-bot",
+  "name": "amp-error-monitoring",
   "author": "The AMP HTML Authors",
   "version": "0.0.1",
   "private": true,
   "repository": "http://github.com/ampproject/amp-github-apps",
-  "description": "A GitHub app which files issues for errors reported in AMP pages.",
+  "description": "A GitHub app which monitors errors reported in AMP pages and files associated GitHub issues.",
   "engines": {
     "node": ">=12"
   },
@@ -15,9 +15,7 @@
     "build:watch": "tsc -w --p tsconfig.json",
     "start": "node dist/app.js",
     "dev": "functions-framework --target=app --source=dist",
-    "deploy-tag-issue": "git tag 'deploy-error-issue-'`date --utc '+%Y%m%d%H%M%S'`",
-    "deploy-tag-monitor": "git tag 'deploy-error-monitor-'`date --utc '+%Y%m%d%H%M%S'`",
-    "deploy-tag-list": "git tag 'deploy-error-list-'`date --utc '+%Y%m%d%H%M%S'`",
+    "deploy-tag": "git tag 'deploy-error-monitoring-'`date --utc '+%Y%m%d%H%M%S'`",
     "pretest": "npm run lint",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"

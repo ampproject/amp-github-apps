@@ -19,7 +19,7 @@ import {
   ServiceErrorMonitor,
   ServiceName,
 } from '../src/error_monitor';
-import {Stackdriver} from 'error-issue-bot';
+import {Stackdriver} from 'error-monitoring';
 import {StackdriverApi} from '../src/stackdriver_api';
 
 import {mocked} from 'ts-jest/utils';
@@ -134,7 +134,7 @@ describe('ErrorMonitor', () => {
 
   describe('reportError', () => {
     it('reports the error to the error-issue endpoint', async () => {
-      nock('https://amp-error-issue-bot.uc.r.appspot.com')
+      nock('https://amp-error-monitoring.uc.r.appspot.com')
         .post('/error-issue', body => {
           expect(body).toMatchObject({
             errorId: 'new_id',
@@ -150,7 +150,7 @@ describe('ErrorMonitor', () => {
     });
 
     it('returns the URL of the created issue', async () => {
-      nock('https://amp-error-issue-bot.uc.r.appspot.com')
+      nock('https://amp-error-monitoring.uc.r.appspot.com')
         .post('/error-issue')
         .reply(302, null, {Location: 'http://github.com.com/blah/blah'});
 
@@ -160,7 +160,7 @@ describe('ErrorMonitor', () => {
     });
 
     it('throws an error when error creation fails', async () => {
-      nock('https://amp-error-issue-bot.uc.r.appspot.com')
+      nock('https://amp-error-monitoring.uc.r.appspot.com')
         .post('/error-issue')
         .reply(400);
 
