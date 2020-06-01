@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {BlameRange, ErrorReport} from 'error-issue-bot';
+import {BlameRange, ErrorReport} from 'error-monitoring';
 import {IssueBuilder} from '../src/issue_builder';
 import {getFixtureFile} from './fixtures';
 

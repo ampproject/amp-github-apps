@@ -27,7 +27,7 @@ import {
   ErrorReport,
   ServiceGroupType,
   TopIssueView,
-} from 'error-issue-bot';
+} from 'error-monitoring';
 import {StackdriverApi} from './src/stackdriver_api';
 import {formatDate, linkifySource} from './src/utils';
 import Mustache from 'mustache';

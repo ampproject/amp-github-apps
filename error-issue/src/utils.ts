@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {StackFrame} from 'error-issue-bot';
+import {StackFrame} from 'error-monitoring';
 
 const SOURCE_PREFIX = 'https://raw.githubusercontent.com/ampproject/amphtml/';
 const SOURCE_PATTERN = /^(?<rtv>\d+)\/(?<path>[^:]+):(?<line>\d+)(?<column>:\d+)?$/;

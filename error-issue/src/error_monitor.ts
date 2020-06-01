@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {ErrorReport, ServiceGroup, Stackdriver} from 'error-issue-bot';
+import {ErrorReport, ServiceGroup, Stackdriver} from 'error-monitoring';
 import {StackdriverApi} from './stackdriver_api';
 
 import fetch from 'node-fetch';

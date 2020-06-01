@@ -16,7 +16,7 @@
 
 import {GaxiosOptions} from 'gaxios';
 import {GoogleAuth} from 'google-auth-library';
-import {Stackdriver} from 'error-issue-bot';
+import {Stackdriver} from 'error-monitoring';
 import NodeCache from 'node-cache';
 
 const SERVICE = 'https://clouderrorreporting.googleapis.com';

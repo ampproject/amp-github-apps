@@ -17,7 +17,7 @@
 import {Octokit} from '@octokit/rest';
 
 import {BlameFinder} from './blame_finder';
-import {ErrorReport} from 'error-issue-bot';
+import {ErrorReport} from 'error-monitoring';
 import {IssueBuilder} from './issue_builder';
 import {RateLimitedGraphQL} from './rate_limited_graphql';
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {GraphQLResponse} from 'error-issue-bot';
+import {GraphQLResponse} from 'error-monitoring';
 import fs from 'fs';
 import path from 'path';
 

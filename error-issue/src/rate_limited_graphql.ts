@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {GraphQLResponse} from 'error-issue-bot';
+import {GraphQLResponse} from 'error-monitoring';
 import {graphql} from '@octokit/graphql';
 
 const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;

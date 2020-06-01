@@ -19,7 +19,7 @@ import {
   ServiceErrorMonitor,
   ServiceName,
 } from '../src/error_monitor';
-import {Stackdriver} from 'error-issue-bot';
+import {Stackdriver} from 'error-monitoring';
 import {StackdriverApi} from '../src/stackdriver_api';
 
 import {mocked} from 'ts-jest/utils';

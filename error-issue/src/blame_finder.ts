@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import {BlameRange, GraphQLResponse, Logger, StackFrame} from 'error-issue-bot';
+import {
+  BlameRange,
+  GraphQLResponse,
+  Logger,
+  StackFrame,
+} from 'error-monitoring';
 import {RateLimitedGraphQL} from './rate_limited_graphql';
 import {parsePrNumber, parseStacktrace} from './utils';
 
