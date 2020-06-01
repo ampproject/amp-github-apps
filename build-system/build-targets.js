@@ -26,7 +26,7 @@ const {gitDiffNameOnlyMaster} = require('./git');
 const APPS_TO_TEST = [
   'bundle-size',
   'checklist',
-  'error-issue',
+  'error-monitoring',
   'invite',
   'onduty',
   'owners',
