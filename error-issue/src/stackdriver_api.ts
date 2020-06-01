@@ -85,7 +85,9 @@ export class StackdriverApi {
     groupId?: string;
     'serviceFilter.service'?: string;
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
-    const cacheKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
+    const serviceKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
+    const groupKey = opts.groupId || 'NO_GROUP';
+    const cacheKey = `${serviceKey}-{groupKey}`;
     let errorGroups:
       | undefined
       | Array<Stackdriver.ErrorGroupStats> = this.cache.get(cacheKey);
@@ -126,7 +128,7 @@ export class StackdriverApi {
 
   /** Get details about an error group. */
   async getGroup(groupId: string): Promise<Stackdriver.ErrorGroupStats> {
-    console.info(`Fetching group stats for error gorup "${groupId}"`);
+    console.info(`Fetching group stats for error group "${groupId}"`);
     const errorGroupStats = await this.getGroups({groupId});
     return errorGroupStats[0];
   }
