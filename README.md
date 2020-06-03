@@ -41,7 +41,7 @@ This GitHub App reports metrics for the repository and scores each metric on a c
 
 The app runs on an instance of [Google AppEngine](https://amp-project-metrics.appspot.com) and is installed exclusively on the [`ampproject/amphtml`](https://github.com/ampproject/amphtml) repository. It can be trivially deployed to other organizations and repositories.
 
-### [Release Calendar][release-calendar/README.md]
+### [Release Calendar](release-calendar/README.md)
 
 A ReactJS, Express and MySQL web app that displays AMPHTML release activity on a calendar.
 
