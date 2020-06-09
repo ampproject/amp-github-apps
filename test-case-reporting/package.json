@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "repository": "http://github.com/ampproject/amp-github-apps",
-  "description": "",
+  "description": "An app that tracks the pass/fail status of tests run in Travis builds",
   "engines": {
     "node": "^12.13.1"
   },
@@ -54,9 +54,6 @@
     ]
   },
   "jest": {
-    "modulePathIgnorePatterns": [
-      "<rootDir>/build/"
-    ],
     "preset": "ts-jest",
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
