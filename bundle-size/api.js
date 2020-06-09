@@ -21,6 +21,8 @@ const {formatBundleSizeDelta, getCheckFromDatabase} = require('./common');
 const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
 
+const DRAFT_TITLE_REGEX = /\b(wip|work in progress|do not (merge|submit|review))\b/i;
+
 /**
  * Returns an explanation on why the check failed when the bundle size is
  * increased.
@@ -237,6 +239,8 @@ exports.installApiRouter = (app, db, githubUtils) => {
       ...githubOptions,
     };
 
+    const {data: pullRequest} = await github.pulls.get(pullRequestOptions);
+
     let masterBundleSizes;
     try {
       app.log(
@@ -369,7 +373,11 @@ exports.installApiRouter = (app, db, githubUtils) => {
     }
     await github.checks.update(updatedCheckOptions);
 
-    if (requiresApproval) {
+    if (
+      requiresApproval &&
+      !pullRequest.draft &&
+      !DRAFT_TITLE_REGEX.test(pullRequest.title)
+    ) {
       await addReviewer_(github, pullRequestOptions, chosenApproverTeams);
     }
 
