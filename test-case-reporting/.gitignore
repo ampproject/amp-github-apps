@@ -1,0 +1,4 @@
+dist/
+*.js
+!.eslintrc.js
+*.env
