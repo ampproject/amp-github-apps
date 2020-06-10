@@ -153,6 +153,7 @@ describe('bundle-size api', () => {
 
   describe('/commit/:headSha/report', () => {
     let jsonPayload;
+    let pullRequestFixture;
 
     beforeEach(() => {
       jsonPayload = {
@@ -164,6 +165,15 @@ describe('bundle-size api', () => {
           'dist/v0/amp-ad-0.1.js': 4.56,
         },
       };
+
+      pullRequestFixture = getFixture('pulls.get.19603');
+      nock('https://api.github.com')
+        .persist()
+        .get('/repos/ampproject/amphtml/pulls/19603')
+        // Make the reply a callback function, because nock stringifies the
+        // body when calling .reply() on the nock scope, and we want tests to be
+        // able to modify pullRequestFixture.
+        .reply(200, () => pullRequestFixture);
     });
 
     test.each([
@@ -344,6 +354,80 @@ describe('bundle-size api', () => {
             return true;
           }
         )
+        .reply(200);
+
+      await request(probot.server)
+        .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
+        .send(jsonPayload)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(200);
+      nocks.done();
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+      });
+    });
+
+    test.each([
+      [
+        'draft = true',
+        pullRequest => {
+          pullRequest.draft = true;
+        },
+      ],
+      [
+        'title contains "WIP"',
+        pullRequest => {
+          pullRequest.title = `[WIP] ${pullRequest.title}`;
+        },
+      ],
+    ])('do not assign reviewers for a PR with %s', async (_, modify) => {
+      await db('checks').insert({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: null,
+      });
+
+      modify(pullRequestFixture);
+
+      const baseBundleSizeFixture = getFixture(
+        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+      );
+      baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
+        'base64'
+      );
+      const nocks = nock('https://api.github.com')
+        .get(
+          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+        )
+        .reply(200, baseBundleSizeFixture)
+        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+          expect(body).toMatchObject({
+            conclusion: 'action_required',
+            output: {
+              title:
+                'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
+            },
+          });
+          return true;
+        })
         .reply(200);
 
       await request(probot.server)
