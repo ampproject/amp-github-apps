@@ -116,6 +116,7 @@ describe('bundle-size webhooks', () => {
           installation_id: 123456,
           check_run_id: 555555,
           approving_teams: null,
+          report_markdown: null,
         },
       ]);
     });
@@ -129,6 +130,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 444444,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const payload = getFixture('pull_request.opened');
@@ -158,6 +160,7 @@ describe('bundle-size webhooks', () => {
           installation_id: 123456,
           check_run_id: 555555,
           approving_teams: null,
+          report_markdown: null,
         },
       ]);
     });
@@ -252,6 +255,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+        report_markdown: null,
       });
 
       const nocks = nock('https://api.github.com')
@@ -282,6 +286,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const nocks = nock('https://api.github.com')
@@ -311,6 +316,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       await probot.receive({name: 'pull_request_review', payload});
@@ -340,6 +346,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: '',
+        report_markdown: null,
       });
 
       await probot.receive({name: 'pull_request_review', payload});

@@ -108,6 +108,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const nocks = nock('https://api.github.com')
@@ -141,6 +142,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
     });
 
@@ -181,6 +183,7 @@ describe('bundle-size api', () => {
           installation_id: 123456,
           check_run_id: 555555,
           approving_teams: null,
+          report_markdown: null,
         });
 
         const baseBundleSizeFixture = getFixture(
@@ -227,6 +230,7 @@ describe('bundle-size api', () => {
           installation_id: 123456,
           check_run_id: 555555,
           approving_teams: null,
+          report_markdown: null,
         });
       }
     );
@@ -240,6 +244,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const baseBundleSizeFixture = getFixture(
@@ -291,6 +296,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
     });
 
@@ -303,6 +309,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const baseBundleSizeFixture = getFixture(
@@ -368,6 +375,12 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+        report_markdown:
+          '## Bundle size changes\n' +
+          '* `dist/v0.js`: Δ +0.34KB\n' +
+          '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
+          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
+          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
       });
     });
 
@@ -380,6 +393,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const baseBundleSizeFixture = getFixture(
@@ -433,6 +447,12 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+        report_markdown:
+          '## Bundle size changes\n' +
+          '* `dist/v0.js`: Δ +0.34KB\n' +
+          '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
+          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
+          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
       });
     });
 
@@ -445,6 +465,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const baseBundleSizeFixture = getFixture(
@@ -503,6 +524,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
     });
 
@@ -515,6 +537,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const baseBundleSizeFixture = getFixture(
@@ -592,6 +615,12 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+        report_markdown:
+          '## Bundle size changes\n' +
+          '* `dist/v0.js`: Δ +0.11KB\n' +
+          '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
+          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
+          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
       });
     });
 
@@ -604,6 +633,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const lastNetworkRequest = new Promise(resolve => {
@@ -671,6 +701,7 @@ describe('bundle-size api', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
     });
 
