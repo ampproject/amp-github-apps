@@ -22,6 +22,16 @@ app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
 
+app.get('/test-results/pr/:prNumber', (req, res) => {
+  const {prNumber} = req.params;
+  res.send(`List of test cases for PR number ${prNumber}`);
+});
+
+app.get('/test-results/history/:testCaseId', (req, res) => {
+  const {testCaseId} = req.params;
+  res.send(`Test history for test with name/ID ${testCaseId}`);
+});
+
 app.listen(PORT, () => {
   console.log(`Running at http://localhost:${PORT}`);
 });
