@@ -23,12 +23,12 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test-results/pr/:prNumber', (req, res) => {
-  const prNumber = req.params.prNumber;
+  const {prNumber} = req.params;
   res.send(`List of test cases for PR number ${prNumber}`);
 });
 
 app.get('/test-results/history/:testCaseId', (req, res) => {
-  const testCaseId = req.params.testCaseId;
+  const {testCaseId} = req.params;
   res.send(`Test history for test with name/ID ${testCaseId}`);
 });
 
