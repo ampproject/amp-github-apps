@@ -121,6 +121,11 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       approverTeams
     );
 
+    let summary = `The bundle size change(s) of this pull request were approved by @${approver}`;
+    if (check.report_markdown) {
+      summary += `\n\n${check.report_markdown}`;
+    }
+
     if (isApprover) {
       await context.github.checks.update({
         owner: check.owner,
@@ -130,9 +135,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
         completed_at: new Date().toISOString(),
         output: {
           title: `approved by @${approver}`,
-          summary:
-            'The bundle size change(s) of this pull request were approved by ' +
-            `@${approver}`,
+          summary,
         },
       });
     }

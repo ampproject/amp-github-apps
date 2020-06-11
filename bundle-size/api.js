@@ -29,25 +29,18 @@ const DRAFT_TITLE_REGEX = /\b(wip|work in progress|do not (merge|submit|review))
  *
  * @param {!Array<string>} approverTeams all teams that can approve this
  *   bundle size change.
- * @param {!Array<string>} otherBundleSizeDeltas text description of other
- *   bundle size changes.
- * @param {!Array<string>} missingBundleSizes text description of missing bundle
- *   sizes from other `master` or the pull request.
+ * @param {string} reportMarkdown text summarizing the bundle size changes and
+ *   any missing files from the report,
  * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
-function failedCheckOutput(
-  approverTeams,
-  otherBundleSizeDeltas,
-  missingBundleSizes
-) {
+function failedCheckOutput(approverTeams, reportMarkdown) {
   return {
     title: `approval required from one of [@${approverTeams.join(', @')}]`,
     summary:
       'This pull request has increased the bundle size (brotli compressed ' +
       'size) of the following files, and must be approved by a member of one ' +
-      `of the following teams: @${approverTeams.join(', @')}\n` +
-      extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes) +
-      '\n' +
+      `of the following teams: @${approverTeams.join(', @')}\n\n` +
+      `${reportMarkdown}\n` +
       'A randomly selected member from one of the above teams will be added ' +
       'automatically to review this PR. Only once the member approves this ' +
       'PR, can it be merged. If you do not receive a response feel free to ' +
@@ -59,19 +52,18 @@ function failedCheckOutput(
  * Returns an encouraging result summary when the bundle size is reduced.
  * Otherwise the summary is neutral, but not discouraging.
  *
- * @param {!Array<string>} otherBundleSizeDeltas text description of other
- *   bundle size changes.
- * @param {!Array<string>} missingBundleSizes text description of missing bundle
- *   sizes from other `master` or the pull request.
+ * @param {string} reportMarkdown text summarizing the bundle size changes and
+ *   any missing files from the report,
  * @return {!Octokit.ChecksCreateParamsOutput} check output.
  */
-function successfulCheckOutput(otherBundleSizeDeltas, missingBundleSizes) {
+function successfulCheckOutput(reportMarkdown) {
   return {
     title: `no approval necessary`,
     summary:
       'This pull request does not change any bundle size (brotli compressed ' +
       'size) by any significant amount, so no special approval is necessary.' +
-      extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes),
+      '\n\n' +
+      reportMarkdown,
   };
 }
 
@@ -104,17 +96,16 @@ function erroredCheckOutput(partialBaseSha) {
 /**
  * Return formatted extra changes to append to the check output summary.
  *
- * @param {!Array<string>} otherBundleSizeDeltas text description of other
- *   bundle size changes.
+ * @param {!Array<string>} bundleSizeDeltas text description of all bundle size
+ *   changes.
  * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
  * @return {string} formatted extra changes;
  */
-function extraBundleSizesSummary(otherBundleSizeDeltas, missingBundleSizes) {
+function extraBundleSizesSummary(bundleSizeDeltas, missingBundleSizes) {
   return (
-    '\n\n' +
     '## Bundle size changes\n' +
-    otherBundleSizeDeltas.concat(missingBundleSizes).join('\n')
+    bundleSizeDeltas.concat(missingBundleSizes).join('\n')
   );
 }
 
@@ -346,29 +337,30 @@ exports.installApiRouter = (app, db, githubUtils) => {
       );
     }
 
+    const reportMarkdown = extraBundleSizesSummary(
+      bundleSizeDeltas,
+      missingBundleSizes
+    );
     app.log(
       'Done pre-processing bundle-size changes for pull request ' +
-        `#${check.pull_request_id}:`
+        `#${check.pull_request_id}:\n${reportMarkdown}`
     );
-    app.log(`Deltas:\n${bundleSizeDeltas.join('\n')}`);
-    app.log(`Missing:\n${missingBundleSizes.join('\n')}`);
 
     if (requiresApproval) {
       await db('checks')
-        .update({approving_teams: chosenApproverTeams.join(',')})
+        .update({
+          approving_teams: chosenApproverTeams.join(','),
+          report_markdown: reportMarkdown,
+        })
         .where({head_sha: check.head_sha});
       Object.assign(updatedCheckOptions, {
         conclusion: 'action_required',
-        output: failedCheckOutput(
-          chosenApproverTeams,
-          bundleSizeDeltas,
-          missingBundleSizes
-        ),
+        output: failedCheckOutput(chosenApproverTeams, reportMarkdown),
       });
     } else {
       Object.assign(updatedCheckOptions, {
         conclusion: 'success',
-        output: successfulCheckOutput(bundleSizeDeltas, missingBundleSizes),
+        output: successfulCheckOutput(reportMarkdown),
       });
     }
     await github.checks.update(updatedCheckOptions);

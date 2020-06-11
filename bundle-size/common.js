@@ -31,7 +31,8 @@ exports.getCheckFromDatabase = async (db, headSha) => {
       'owner',
       'repo',
       'check_run_id',
-      'approving_teams'
+      'approving_teams',
+      'report_markdown'
     )
     .where('head_sha', headSha);
   if (results.length > 0) {

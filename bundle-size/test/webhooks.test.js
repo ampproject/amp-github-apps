@@ -116,6 +116,7 @@ describe('bundle-size webhooks', () => {
           installation_id: 123456,
           check_run_id: 555555,
           approving_teams: null,
+          report_markdown: null,
         },
       ]);
     });
@@ -129,6 +130,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 444444,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const payload = getFixture('pull_request.opened');
@@ -158,6 +160,7 @@ describe('bundle-size webhooks', () => {
           installation_id: 123456,
           check_run_id: 555555,
           approving_teams: null,
+          report_markdown: null,
         },
       ]);
     });
@@ -241,34 +244,45 @@ describe('bundle-size webhooks', () => {
   });
 
   describe('pull_request_review', () => {
-    test('mark a check as successful when a capable user approves the PR', async () => {
-      const payload = getFixture('pull_request_review.submitted');
+    test.each([
+      ['with no report_markdown', ''],
+      ['with a report_markdown', '* `dist/v0/amp-ad-0.1.js`: Δ +0.34KB'],
+    ])(
+      'mark a check as successful when a capable user approves the PR %s',
+      async (_, report_markdown) => {
+        const payload = getFixture('pull_request_review.submitted');
 
-      await db('checks').insert({
-        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
-        owner: 'ampproject',
-        repo: 'amphtml',
-        pull_request_id: 19603,
-        installation_id: 123456,
-        check_run_id: 555555,
-        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
-      });
+        await db('checks').insert({
+          head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          owner: 'ampproject',
+          repo: 'amphtml',
+          pull_request_id: 19603,
+          installation_id: 123456,
+          check_run_id: 555555,
+          approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+          report_markdown,
+        });
 
-      const nocks = nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'success',
-            output: {
-              title: 'approved by @choumx',
-            },
-          });
-          return true;
-        })
-        .reply(200);
+        const nocks = nock('https://api.github.com')
+          .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
+            expect(body).toMatchObject({
+              conclusion: 'success',
+              output: {
+                title: 'approved by @choumx',
+                summary: expect.stringContaining(
+                  'The bundle size change(s) of this pull request were approved by @choumx'
+                ),
+              },
+            });
+            expect(body.output.summary).toContain(report_markdown);
+            return true;
+          })
+          .reply(200);
 
-      await probot.receive({name: 'pull_request_review', payload});
-      nocks.done();
-    });
+        await probot.receive({name: 'pull_request_review', payload});
+        nocks.done();
+      }
+    );
 
     test('mark a preemptive approval check as successful when a super user approves the PR', async () => {
       const payload = getFixture('pull_request_review.submitted');
@@ -282,6 +296,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       const nocks = nock('https://api.github.com')
@@ -311,6 +326,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: null,
+        report_markdown: null,
       });
 
       await probot.receive({name: 'pull_request_review', payload});
@@ -340,6 +356,7 @@ describe('bundle-size webhooks', () => {
         installation_id: 123456,
         check_run_id: 555555,
         approving_teams: '',
+        report_markdown: null,
       });
 
       await probot.receive({name: 'pull_request_review', payload});
