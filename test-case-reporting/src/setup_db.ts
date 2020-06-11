@@ -27,13 +27,15 @@ export async function setupDb(db: Database): Promise<unknown> {
     })
     .createTable('jobs', table => {
       table.increments('id').primary();
-      table.foreign('build_id').references('builds.id');
+      table.integer('build_id').unsigned().notNullable();
       table.string('job_number');
       table.enu('type', ['unit', 'integration'], {
         useNative: true,
         enumName: 'job_type',
       });
       table.dateTime('started_at');
+
+      table.foreign('build_id').references('builds.id');
     })
     .createTable('test_cases', table => {
       table.increments('id').primary();
@@ -42,14 +44,17 @@ export async function setupDb(db: Database): Promise<unknown> {
     })
     .createTable('test_runs', table => {
       table.increments('id').primary();
-      table.foreign('job_id').references('jobs.id');
-      table.foreign('test_case_id').references('test_cases.id');
+      table.integer('job_id').unsigned().notNullable();
+      table.integer('test_case_id').unsigned().notNullable();
       table.enu('status', ['pass', 'fail', 'skip', 'error'], {
         useNative: true,
         enumName: 'test_status',
       });
       table.dateTime('timestamp');
       table.integer('duration_ms');
+
+      table.foreign('test_case_id').references('test_cases.id');
+      table.foreign('job_id').references('id').inTable('jobs');
     });
 }
 
