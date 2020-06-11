@@ -28,7 +28,7 @@ export async function setupDb(db: Database): Promise<unknown> {
     .createTable('jobs', table => {
       table.increments('id').primary();
       table.foreign('build_id').references('builds.id');
-      table.string('job_num');
+      table.string('job_number');
       table.enu('type', ['unit', 'integration'], {
         useNative: true,
         enumName: 'job_type',
@@ -44,12 +44,12 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.increments('id').primary();
       table.foreign('job_id').references('jobs.id');
       table.foreign('test_case_id').references('test_cases.id');
-      table.enu('status', ['pass', 'fail', 'skip', 'err'], {
+      table.enu('status', ['pass', 'fail', 'skip', 'error'], {
         useNative: true,
         enumName: 'test_status',
       });
       table.dateTime('timestamp');
-      table.integer('duration');
+      table.integer('duration_ms');
     });
 }
 
