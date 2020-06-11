@@ -2,3 +2,4 @@ dist/
 *.js
 !.eslintrc.js
 *.env
+!redacted.env
