@@ -34,7 +34,7 @@ function setupDb(db) {
       table.integer('installation_id');
       table.integer('check_run_id');
       table
-        .string('approving_teams')
+        .text('approving_teams')
         .comment(
           'Comma separated list of teams to that can approve a bundle-size increase, in the format `ampproject/wg-runtime,ampproject/wg-performance`'
         );
