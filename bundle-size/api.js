@@ -40,7 +40,7 @@ function failedCheckOutput(approverTeams, reportMarkdown) {
       'This pull request has increased the bundle size (brotli compressed ' +
       'size) of the following files, and must be approved by a member of one ' +
       `of the following teams: @${approverTeams.join(', @')}\n\n` +
-      `${reportMarkdown}\n` +
+      `${reportMarkdown}\n\n` +
       'A randomly selected member from one of the above teams will be added ' +
       'automatically to review this PR. Only once the member approves this ' +
       'PR, can it be merged. If you do not receive a response feel free to ' +
