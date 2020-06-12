@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+require('dotenv').config();
+
 import {Database, dbConnect} from './db';
 
 /** Set up the database table. */

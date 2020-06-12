@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-require('dotenv').config();
-
 import Knex from 'knex';
 
 export type Database = Knex;
