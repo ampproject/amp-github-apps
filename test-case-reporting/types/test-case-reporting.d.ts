@@ -16,27 +16,14 @@
 
 declare module 'test-case-reporting' {
   /**
-   * A standard logging interface.
-   */
-  export interface Logger {
-    debug(message: string, ...extraInfo: unknown[]): void;
-    warn(message: string, ...extraInfo: unknown[]): void;
-    error(message: string, ...extraInfo: unknown[]): void;
-    info(message: string, ...extraInfo: unknown[]): void;
-  }
-
-  /**
-   * Possible job types.
+   * Travis job types for which test results may be reported.
    */
   export type JobType = 'unit' | 'integration';
 
-  /**
-   * Possible test statuses
-   */
   export type TestStatus = 'pass' | 'fail' | 'skip' | 'error';
 
   /**
-   * One concrete Travis build
+   * A build on Travis.
    */
   export interface Build {
     username: string,
@@ -46,7 +33,7 @@ declare module 'test-case-reporting' {
   }
 
   /**
-   * One concrete job within a build
+   * A job within a Travis build
    */
   export interface Job {
     build: Build,
@@ -56,7 +43,7 @@ declare module 'test-case-reporting' {
   }
 
   /**
-   * One abstract kind of test case
+   * A single kind of test case, one `it` or `test` block
    */
   export interface TestCase {
     name: string,
@@ -64,7 +51,7 @@ declare module 'test-case-reporting' {
   }
 
   /**
-   * One concrete run, in a job, of some testcase
+   * An instance of a test being run, with results
    */
   export interface TestRun {
     job: Job,
