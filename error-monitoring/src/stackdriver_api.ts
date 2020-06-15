@@ -146,6 +146,7 @@ export class StackdriverApi {
     console.info(
       `Updating tracking issue for error group "${groupId}" to "${issueUrl}"`
     );
+    this.cache.flushAll();
     return this.request(`groups/${groupId}`, 'PUT', {
       trackingIssues: [{url: issueUrl}],
     }) as Promise<Stackdriver.ErrorGroup>;
