@@ -1,14 +1,14 @@
 AMP Release Calendar
 ===================
 
-:construction: under construction :construction: 
+:construction: under construction :construction:
 
 This project is split into two parts: a React client, and an Express and TypeORM server.
 
 To start: `cd release-calendar && npm install`
 
 To build and run the app for production: `npm run start`
-* This serves the client and backend on `ENV.SERVER_URL:ENV.SERVER_PORT`
+* This serves the client and backend on `ENV.SERVER_ENDPOINT`
 
 To build and serve the client for development: `npm run client`
 * Make sure to set `ENV.NODE_ENV` to anything but `production`
