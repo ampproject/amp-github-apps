@@ -22,9 +22,7 @@ declare module 'test-case-reporting' {
 
   export type TestStatus = 'pass' | 'fail' | 'skip' | 'error';
 
-  /**
-   * A build on Travis.
-   */
+  /** A build on Travis. */
   export interface Build {
     username: string,
     commitHash: string,
@@ -34,13 +32,11 @@ declare module 'test-case-reporting' {
     // The list of jobs we know are contained in the build.
     // When we create a build, we fill this with its jobs, but when
     // we get a build from a server, the jobs list may not be populated
-    // if it is more performant to omit them.
+    // if the jobs are not needed.
     jobs: Array<Job>,
   }
 
-  /**
-   * A job within a Travis build
-   */
+  /** A job within a Travis build. */
   export interface Job {
     jobNumber: string,
     type: JobType,
@@ -51,17 +47,13 @@ declare module 'test-case-reporting' {
     testRuns: Array<TestRun>,
   }
 
-  /**
-   * A single kind of test case, one `it` or `test` block
-   */
+  /** A single kind of test case, one `it` or `test` block. */
   export interface TestCase {
     name: string,
     createdAt: Date,
   }
 
-  /**
-   * An instance of a test being run, with results
-   */
+  /** An instance of a test being run, with results. */
   export interface TestRun {
     testCase: TestCase,
     status: TestStatus,
