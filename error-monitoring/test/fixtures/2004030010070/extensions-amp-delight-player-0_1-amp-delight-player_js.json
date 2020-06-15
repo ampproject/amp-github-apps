@@ -9,7 +9,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -23,7 +29,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -37,7 +49,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -51,7 +69,13 @@
                 "commit": {
                   "changedFiles": 9,
                   "committedDate": "2019-02-20T02:12:43Z",
-                  "messageHeadline": "✨Support <amp-delight-player dock> (#20913)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 20913
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "alanorozco"
@@ -65,7 +89,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -79,7 +109,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -93,7 +129,13 @@
                 "commit": {
                   "changedFiles": 9,
                   "committedDate": "2019-02-20T02:12:43Z",
-                  "messageHeadline": "✨Support <amp-delight-player dock> (#20913)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 20913
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "alanorozco"
@@ -107,7 +149,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -121,7 +169,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -135,7 +189,13 @@
                 "commit": {
                   "changedFiles": 184,
                   "committedDate": "2018-12-22T19:35:29Z",
-                  "messageHeadline": "Migrate user().assert to userAssert (#20047)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 20047
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "cramforce"
@@ -149,7 +209,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -163,7 +229,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -177,7 +249,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -191,7 +269,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -205,7 +289,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -219,7 +309,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -233,7 +329,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -247,7 +349,13 @@
                 "commit": {
                   "changedFiles": 75,
                   "committedDate": "2019-11-27T00:43:38Z",
-                  "messageHeadline": "Remove per-element Preconnect wrapper class (#25769)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 25769
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "choumx"
@@ -261,7 +369,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -275,7 +389,13 @@
                 "commit": {
                   "changedFiles": 184,
                   "committedDate": "2018-12-22T19:35:29Z",
-                  "messageHeadline": "Migrate user().assert to userAssert (#20047)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 20047
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "cramforce"
@@ -289,7 +409,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -303,7 +429,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -317,7 +449,13 @@
                 "commit": {
                   "changedFiles": 9,
                   "committedDate": "2019-02-20T02:12:43Z",
-                  "messageHeadline": "✨Support <amp-delight-player dock> (#20913)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 20913
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "alanorozco"
@@ -331,7 +469,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -345,7 +489,13 @@
                 "commit": {
                   "changedFiles": 9,
                   "committedDate": "2019-02-20T02:12:43Z",
-                  "messageHeadline": "✨Support <amp-delight-player dock> (#20913)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 20913
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "alanorozco"
@@ -359,7 +509,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -373,7 +529,13 @@
                 "commit": {
                   "changedFiles": 9,
                   "committedDate": "2019-02-20T02:12:43Z",
-                  "messageHeadline": "✨Support <amp-delight-player dock> (#20913)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 20913
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "alanorozco"
@@ -387,7 +549,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -401,7 +569,13 @@
                 "commit": {
                   "changedFiles": 9,
                   "committedDate": "2019-02-20T02:12:43Z",
-                  "messageHeadline": "✨Support <amp-delight-player dock> (#20913)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 20913
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "alanorozco"
@@ -415,7 +589,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -429,7 +609,13 @@
                 "commit": {
                   "changedFiles": 244,
                   "committedDate": "2019-04-10T19:16:07Z",
-                  "messageHeadline": "✨🏗 Upgrade closure compiler to v20190301 (#21618)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21618
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -443,7 +629,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -457,7 +649,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -471,7 +669,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -485,7 +689,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -499,7 +709,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -513,7 +729,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -527,7 +749,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -541,7 +769,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -555,7 +789,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -569,7 +809,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -583,7 +829,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -597,7 +849,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -611,7 +869,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -625,7 +889,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -639,7 +909,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -653,7 +929,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -667,7 +949,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -681,7 +969,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -695,7 +989,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -709,7 +1009,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -723,7 +1029,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -737,7 +1049,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -751,7 +1069,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -765,7 +1089,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -779,7 +1109,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -793,7 +1129,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -807,7 +1149,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -821,7 +1169,13 @@
                 "commit": {
                   "changedFiles": 1623,
                   "committedDate": "2019-05-16T14:59:15Z",
-                  "messageHeadline": "🏗✨ Adopt `prettier` for code formatting  (#21212)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21212
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -835,7 +1189,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -849,7 +1209,13 @@
                 "commit": {
                   "changedFiles": 244,
                   "committedDate": "2019-04-10T19:16:07Z",
-                  "messageHeadline": "✨🏗 Upgrade closure compiler to v20190301 (#21618)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 21618
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "rsimha"
@@ -863,7 +1229,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -877,7 +1249,13 @@
                 "commit": {
                   "changedFiles": 19,
                   "committedDate": "2019-01-03T21:41:46Z",
-                  "messageHeadline": "🏗✨ Add boilerplate for video `seekTo`, implement for `amp-video` (#19…",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 19893
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "alanorozco"
@@ -891,7 +1269,13 @@
                 "commit": {
                   "changedFiles": 2,
                   "committedDate": "2020-03-02T20:11:30Z",
-                  "messageHeadline": "✨amp-delight-player: Additional analytics support (#26631)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 26631
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"
@@ -905,7 +1289,13 @@
                 "commit": {
                   "changedFiles": 19,
                   "committedDate": "2019-01-03T21:41:46Z",
-                  "messageHeadline": "🏗✨ Add boilerplate for video `seekTo`, implement for `amp-video` (#19…",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 19893
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "alanorozco"
@@ -919,7 +1309,13 @@
                 "commit": {
                   "changedFiles": 15,
                   "committedDate": "2018-11-12T21:22:43Z",
-                  "messageHeadline": "✨ amp-delight-player (#17939)",
+                  "associatedPullRequests": {
+                    "nodes": [
+                      {
+                        "number": 17939
+                      }
+                    ]
+                  },
                   "author": {
                     "user": {
                       "login": "xymw"

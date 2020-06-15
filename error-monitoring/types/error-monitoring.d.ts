@@ -69,7 +69,9 @@ declare module 'error-monitoring' {
     interface Commit {
       changedFiles: number;
       committedDate: string;
-      messageHeadline: string;
+      associatedPullRequests: {
+        nodes: Array<{number: number}>;
+      };
       author: {
         name: string;
         user: null | User;

@@ -212,7 +212,7 @@ describe('BlameFinder', () => {
       ]);
     });
 
-    it('ignores commits without an associated GitHub user', async () => {
+    it('uses name for commits without an associated GitHub user', async () => {
       const stacktrace = `Error: Cannot read property 'getBoundingClientRect' of undefined
         at el (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:58)
         at getDimension (https://raw.githubusercontent.com/ampproject/amphtml/2004172112280/extensions/amp-base-carousel/0.1/dimensions.js:73)
@@ -248,6 +248,24 @@ describe('BlameFinder', () => {
           committedDate: new Date('2019-01-17T22:56:30Z'),
           changedFiles: 2,
           prNumber: 20389,
+        },
+        {
+          path: 'extensions/amp-base-carousel/0.1/dimensions.js',
+          startingLine: 87,
+          endingLine: 99,
+          author: 'Sepand Parhami',
+          committedDate: new Date('2019-11-07T20:28:53Z'),
+          changedFiles: 5,
+          prNumber: 24944,
+        },
+        {
+          path: 'extensions/amp-base-carousel/0.1/dimensions.js',
+          startingLine: 138,
+          endingLine: 158,
+          author: 'Sepand Parhami',
+          committedDate: new Date('2019-11-07T20:28:53Z'),
+          changedFiles: 5,
+          prNumber: 24944,
         },
       ]);
     });
