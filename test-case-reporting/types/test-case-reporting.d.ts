@@ -31,10 +31,10 @@ declare module 'test-case-reporting' {
     prNumber: number,
     startedAt: Date,
 
-    // The list of jobs we know are contained in the Build.
-    // When we create a Build, we fill this with its Jobs, but when
-    //   we get a build from a server, the jobs list may not be populated
-    //   if it is more performant to omit them.
+    // The list of jobs we know are contained in the build.
+    // When we create a build, we fill this with its jobs, but when
+    // we get a build from a server, the jobs list may not be populated
+    // if it is more performant to omit them.
     jobs: Array<Job>,
   }
 
