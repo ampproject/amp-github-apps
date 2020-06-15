@@ -17,7 +17,7 @@
 import {Channel, Promotion, Release} from '../types';
 import {CurrentReleases, ReleaseEventInput} from './models/view-models';
 import fetch from 'node-fetch';
-const SERVER_ENDPOINT = `${process.env.SERVER_URL}:${process.env.SERVER_PORT}`;
+const {SERVER_ENDPOINT} = process.env;
 
 export class ApiService {
   private getPromotionsRequest(url: string): Promise<Promotion[]> {
