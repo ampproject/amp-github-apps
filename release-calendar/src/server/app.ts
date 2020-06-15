@@ -41,7 +41,7 @@ async function main(): Promise<void> {
 
   const repositoryService = new RepositoryService(connection);
   const app = express();
-  const port = process.env.SERVER_PORT;
+  const port = process.env.PORT;
 
   app.use(function (req, res, next) {
     res.header(
