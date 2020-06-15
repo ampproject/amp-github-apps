@@ -30,16 +30,25 @@ declare module 'test-case-reporting' {
     commitHash: string,
     prNumber: number,
     startedAt: Date,
+
+    // The list of jobs we know are contained in the Build.
+    // When we create a Build, we fill this with its Jobs, but when
+    //   we get a build from a server, the jobs list may not be populated
+    //   if it is more performant to omit them.
+    jobs: Array<Job>,
   }
 
   /**
    * A job within a Travis build
    */
   export interface Job {
-    build: Build,
     jobNumber: string,
     type: JobType,
     startedAt: Date,
+
+    // This list is treated similarly to the `jobs` array of the `Build` type.
+    // Read the comment on `jobs` for info.
+    testRuns: Array<TestRun>,
   }
 
   /**
@@ -54,7 +63,6 @@ declare module 'test-case-reporting' {
    * An instance of a test being run, with results
    */
   export interface TestRun {
-    job: Job,
     testCase: TestCase,
     status: TestStatus,
     timestamp: Date,
