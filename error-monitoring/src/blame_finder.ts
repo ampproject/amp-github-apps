@@ -21,7 +21,7 @@ import {
   StackFrame,
 } from 'error-monitoring';
 import {RateLimitedGraphQL} from './rate_limited_graphql';
-import {parsePrNumber, parseStacktrace} from './utils';
+import {parseStacktrace} from './utils';
 
 /**
  * Service for looking up Git blame info for lines in a stacktrace.
@@ -63,7 +63,9 @@ export class BlameFinder {
                       commit {
                         changedFiles
                         committedDate
-                        messageHeadline
+                        associatedPullRequests(first: 1) {
+                          nodes { number }
+                        }
                         author {
                           name
                           user { login }
@@ -101,7 +103,7 @@ export class BlameFinder {
           : commit.author.name,
         committedDate: new Date(commit.committedDate),
         changedFiles: commit.changedFiles,
-        prNumber: parsePrNumber(commit.messageHeadline),
+        prNumber: (commit.associatedPullRequests.nodes[0] || {}).number,
       })
     ));
   }
