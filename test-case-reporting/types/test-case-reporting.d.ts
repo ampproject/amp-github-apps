@@ -60,4 +60,23 @@ declare module 'test-case-reporting' {
     timestamp: Date,
     durationMs: number,
   }
+
+  namespace KarmaReporter {
+    export interface TestResultReport {
+      browsers: BrowserResultSet,
+    }
+
+    export interface BrowserResultSet {
+      results: Array<TestResult>
+    }
+
+    export interface TestResult {
+      description: string,
+      suite: Array<string>,
+      success: boolean,
+      skipped: boolean,
+      pending: boolean,
+      time: number, // in milliseconds
+    }
+  }
 }
