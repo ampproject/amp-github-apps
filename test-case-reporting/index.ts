@@ -34,6 +34,10 @@ app.get('/test-results/history/:testCaseId', (req, res) => {
   res.send(`Test history for test with name/ID ${testCaseId}`);
 });
 
+app.post('/report', function (req, res) {
+  res.send(`Travis report! The request body is below.\n\n${req.body}`);
+});
+
 app.listen(PORT, () => {
   console.log(`Running at http://localhost:${PORT}`);
 });
