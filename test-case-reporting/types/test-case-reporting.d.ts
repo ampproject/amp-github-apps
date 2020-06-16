@@ -61,16 +61,27 @@ declare module 'test-case-reporting' {
     durationMs: number,
   }
 
-  export interface StructuredTestReport {
-    successCount: number,
-    failedCount: number,
-    skippedCount: number,
-    results: Array<TestResultReport>,
+  export interface TestResultReport {
+    summary: TrrSummary,
+    browsers: TrrBrowsers,
   }
 
-  export interface TestResultReport {
-    name: string,
-    status: TestStatus,
-    timeMs: number,
+  export interface TrrSummary {
+    success: number,
+    failed: number,
+    skipped: number,
+  }
+
+  export interface TrrBrowsers {
+    results: Array<TrrTestResult>
+  }
+
+  export interface TrrTestResult {
+    description: string,
+    suite: Array<string>,
+    success: boolean,
+    skipped: boolean,
+    pending: boolean,
+    time: number, // in milliseconds
   }
 }
