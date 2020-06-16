@@ -20,13 +20,13 @@ declare module 'test-case-reporting' {
    */
   export type JobType = 'unit' | 'integration';
 
-  export type TestStatus = 'pass' | 'fail' | 'skip' | 'error';
+  export type TestStatus = 'PASS' | 'FAIL' | 'SKIP' | 'ERROR';
 
   /** A build on Travis. */
   export interface Build {
     username: string,
     commitHash: string,
-    prNumber: number,
+    pullRequestNumber: number,
     startedAt: Date,
 
     // The list of jobs we know are contained in the build.
@@ -59,5 +59,43 @@ declare module 'test-case-reporting' {
     status: TestStatus,
     timestamp: Date,
     durationMs: number,
+  }
+
+  namespace DB {
+    export interface Build {
+      // `id` is nullable because is not set when uploading, it is only set
+      // when we get the build from the database.
+      // It is not nullable in the database.
+      id?: number,
+      commit_hash: string,
+      pull_request_number: number,
+      started_at: number,
+    }
+
+    export interface Job {
+      // See comment under `DB.Build.id`
+      id?: number,
+      buld_id: number,
+      job_number: string,
+      test_suite_type: string,
+      started_at: number,
+    }
+
+    export interface TestCase {
+      // See comment under `DB.Build.id`
+      id?: number,
+      name: string,
+      created_at: number,
+    }
+
+    export interface TestRun {
+      // See comment under `DB.Build.id`
+      id?: number,
+      job_id: number,
+      test_case_id: number,
+      status: TestStatus,
+      timestamp: number,
+      duration_ms: number,
+    }
   }
 }
