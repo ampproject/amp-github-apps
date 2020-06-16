@@ -61,27 +61,22 @@ declare module 'test-case-reporting' {
     durationMs: number,
   }
 
-  export interface TestResultReport {
-    summary: TrrSummary,
-    browsers: TrrBrowsers,
-  }
+  namespace KarmaReporter {
+    export interface TestResultReport {
+      browsers: BrowserResultSet,
+    }
 
-  export interface TrrSummary {
-    success: number,
-    failed: number,
-    skipped: number,
-  }
+    export interface BrowserResultSet {
+      results: Array<TestResult>
+    }
 
-  export interface BrowserResultSet {
-    results: Array<TrrTestResult>
-  }
-
-  export interface TestResult {
-    description: string,
-    suite: Array<string>,
-    success: boolean,
-    skipped: boolean,
-    pending: boolean,
-    time: number, // in milliseconds
+    export interface TestResult {
+      description: string,
+      suite: Array<string>,
+      success: boolean,
+      skipped: boolean,
+      pending: boolean,
+      time: number, // in milliseconds
+    }
   }
 }
