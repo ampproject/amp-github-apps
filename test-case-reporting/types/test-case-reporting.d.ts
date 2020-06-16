@@ -76,7 +76,7 @@ declare module 'test-case-reporting' {
     results: Array<TrrTestResult>
   }
 
-  export interface TrrTestResult {
+  export interface TestResult {
     description: string,
     suite: Array<string>,
     success: boolean,
