@@ -72,7 +72,7 @@ declare module 'test-case-reporting' {
     skipped: number,
   }
 
-  export interface TrrBrowsers {
+  export interface BrowserResultSet {
     results: Array<TrrTestResult>
   }
 
