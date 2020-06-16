@@ -24,35 +24,32 @@ export async function setupDb(db: Database): Promise<unknown> {
     .createTable('builds', table => {
       table.increments('id').primary();
       table.string('commit_hash', 40);
-      table.integer('pr_number');
-      table.dateTime('started_at');
+      table.integer('pull_request_number');
+      table.timestamp('started_at');
     })
     .createTable('jobs', table => {
       table.increments('id').primary();
       table.integer('build_id').unsigned().notNullable();
       table.string('job_number');
-      table.enu('type', ['unit', 'integration'], {
-        useNative: true,
-        enumName: 'job_type',
-      });
-      table.dateTime('started_at');
+      table.string('test_suite_type');
+      table.timestamp('started_at');
 
       table.foreign('build_id').references('builds.id');
     })
     .createTable('test_cases', table => {
       table.increments('id').primary();
       table.string('name');
-      table.dateTime('created_at');
+      table.timestamp('created_at');
     })
     .createTable('test_runs', table => {
       table.increments('id').primary();
       table.integer('job_id').unsigned().notNullable();
       table.integer('test_case_id').unsigned().notNullable();
-      table.enu('status', ['pass', 'fail', 'skip', 'error'], {
+      table.enu('status', ['PASS', 'FAIL', 'SKIP', 'ERROR'], {
         useNative: true,
         enumName: 'test_status',
       });
-      table.dateTime('timestamp');
+      table.timestamp('timestamp');
       table.integer('duration_ms');
 
       table.foreign('test_case_id').references('test_cases.id');
