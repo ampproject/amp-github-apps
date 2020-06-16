@@ -61,14 +61,14 @@ declare module 'test-case-reporting' {
     durationMs: number,
   }
 
-  export interface TravisReport {
+  export interface StructuredTestReport {
     successCount: number,
     failedCount: number,
     skippedCount: number,
-    results: Array<Result>,
+    results: Array<TestResultReport>,
   }
 
-  export interface Result {
+  export interface TestResultReport {
     name: string,
     status: TestStatus,
     timeMs: number,
