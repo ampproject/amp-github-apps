@@ -60,4 +60,17 @@ declare module 'test-case-reporting' {
     timestamp: Date,
     durationMs: number,
   }
+
+  export interface TravisReport {
+    successCount: number,
+    failedCount: number,
+    skippedCount: number,
+    results: Array<Result>,
+  }
+
+  export interface Result {
+    name: string,
+    status: TestStatus,
+    timeMs: number,
+  }
 }
