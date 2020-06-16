@@ -18,7 +18,7 @@ declare module 'test-case-reporting' {
   /**
    * Travis job types for which test results may be reported.
    */
-  export type JobType = 'unit' | 'integration';
+  export type TestSuiteType = 'unit' | 'integration';
 
   export type TestStatus = 'PASS' | 'FAIL' | 'SKIP' | 'ERROR';
 
@@ -39,7 +39,7 @@ declare module 'test-case-reporting' {
   /** A job within a Travis build. */
   export interface Job {
     jobNumber: string,
-    type: JobType,
+    testSuiteType: TestSuiteType, // e.g. unit, integration, etc.
     startedAt: Date,
 
     // This list is treated similarly to the `jobs` array of the `Build` type.
@@ -77,7 +77,7 @@ declare module 'test-case-reporting' {
       id?: number,
       buld_id: number,
       job_number: string,
-      test_suite_type: string,
+      test_suite_type: string, // e.g. unit, integration, etc.
       started_at: number,
     }
 
