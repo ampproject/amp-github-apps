@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-require('dotenv').config();
+import Knex from 'knex';
 
-import express from 'express';
-const app = express();
-const PORT = process.env.PORT || 8080;
+export type Database = Knex;
 
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
-
-app.get('/test-results/pr/:prNumber', (req, res) => {
-  const {prNumber} = req.params;
-  res.send(`List of test cases for PR number ${prNumber}`);
-});
-
-app.get('/test-results/history/:testCaseId', (req, res) => {
-  const {testCaseId} = req.params;
-  res.send(`Test history for test with name/ID ${testCaseId}`);
-});
-
-app.listen(PORT, () => {
-  console.log(`Running at http://localhost:${PORT}`);
-});
+export function dbConnect(): Database {
+  return Knex({
+    client: 'pg',
+    connection: {
+      host: process.env.DB_UNIX_SOCKET,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    },
+  });
+}
