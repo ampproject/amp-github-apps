@@ -61,6 +61,9 @@ declare module 'test-case-reporting' {
     durationMs: number;
   }
 
+  // Types in the DB namespace interface with the database which
+  // uses snake_case instead of camelCase.
+  /* eslint @typescript-eslint/camelcase: "off" */
   namespace DB {
     export interface Build {
       // `id` is nullable because is not set when uploading, it is only set
@@ -98,4 +101,5 @@ declare module 'test-case-reporting' {
       duration_ms: number;
     }
   }
+  /* eslint @typescript-eslint/camelcase: "error" */
 }
