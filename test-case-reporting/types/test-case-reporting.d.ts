@@ -24,41 +24,41 @@ declare module 'test-case-reporting' {
 
   /** A build on Travis. */
   export interface Build {
-    username: string,
-    commitHash: string,
-    pullRequestNumber: number,
-    startedAt: Date,
+    username: string;
+    commitHash: string;
+    prNumber: number;
+    startedAt: Date;
 
     // The list of jobs we know are contained in the build.
     // When we create a build, we fill this with its jobs, but when
     // we get a build from a server, the jobs list may not be populated
     // if the jobs are not needed.
-    jobs: Array<Job>,
+    jobs: Array<Job>;
   }
 
   /** A job within a Travis build. */
   export interface Job {
-    jobNumber: string,
-    testSuiteType: TestSuiteType, // e.g. unit, integration, etc.
-    startedAt: Date,
+    jobNumber: string;
+    testSuiteType: TestSuiteType;
+    startedAt: Date;
 
     // This list is treated similarly to the `jobs` array of the `Build` type.
     // Read the comment on `jobs` for info.
-    testRuns: Array<TestRun>,
+    testRuns: Array<TestRun>;
   }
 
   /** A single kind of test case, one `it` or `test` block. */
   export interface TestCase {
-    name: string,
-    createdAt: Date,
+    name: string;
+    createdAt: Date;
   }
 
   /** An instance of a test being run, with results. */
   export interface TestRun {
-    testCase: TestCase,
-    status: TestStatus,
-    timestamp: Date,
-    durationMs: number,
+    testCase: TestCase;
+    status: TestStatus;
+    timestamp: Date;
+    durationMs: number;
   }
 
   namespace DB {
@@ -66,36 +66,36 @@ declare module 'test-case-reporting' {
       // `id` is nullable because is not set when uploading, it is only set
       // when we get the build from the database.
       // It is not nullable in the database.
-      id?: number,
-      commit_hash: string,
-      pull_request_number: number,
-      started_at: number,
+      id?: number;
+      commit_hash: string;
+      pull_request_number: number;
+      started_at: number;
     }
 
     export interface Job {
       // See comment under `DB.Build.id`
-      id?: number,
-      buld_id: number,
-      job_number: string,
-      test_suite_type: string, // e.g. unit, integration, etc.
-      started_at: number,
+      id?: number;
+      buld_id: number;
+      job_number: string;
+      test_suite_type: string; // e.g. unit, integration, etc.
+      started_at: number;
     }
 
     export interface TestCase {
       // See comment under `DB.Build.id`
-      id?: number,
-      name: string,
-      created_at: number,
+      id?: number;
+      name: string;
+      created_at: number;
     }
 
     export interface TestRun {
       // See comment under `DB.Build.id`
-      id?: number,
-      job_id: number,
-      test_case_id: number,
-      status: TestStatus,
-      timestamp: number,
-      duration_ms: number,
+      id?: number;
+      job_id: number;
+      test_case_id: number;
+      status: TestStatus;
+      timestamp: number;
+      duration_ms: number;
     }
   }
 }
