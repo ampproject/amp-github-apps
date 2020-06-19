@@ -80,7 +80,7 @@ declare module 'test-case-reporting' {
       id?: number;
       buld_id: number;
       job_number: string;
-      test_suite_type: string; // e.g. unit, integration, etc.
+      test_suite_type: TestSuiteType;
       started_at: number;
     }
 
