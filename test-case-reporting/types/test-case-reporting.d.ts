@@ -116,7 +116,6 @@ declare module 'test-case-reporting' {
       suite: Array<string>;
       success: boolean;
       skipped: boolean;
-      pending: boolean;
       time: number; // in milliseconds
     }
   }
