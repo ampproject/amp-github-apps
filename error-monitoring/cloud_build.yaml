@@ -57,4 +57,4 @@ steps:
 secrets:
   - kmsKeyName: projects/amp-error-monitoring/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
     secretEnv:
-      GITHUB_ACCESS_TOKEN: CiQAyU85iSvJh8HsabAs7Mv5QXXlM1WZoFGw7z5ZLmMlg2ogwKYSUQAshvUdguq5dEzmti0H0dkogWNhg8yVGfRO5BdtF3rdt+/Zne0W7wo8Ytmsd6yKgnP1OBiqBXqETeXAEBBKvJXBiUMThUJSZVaejNeoaiFUMg==
+      GITHUB_ACCESS_TOKEN: CiQAyU85idwXUI0wLZVDaFPbBUJAnStezwswVKMgsRUTW0HrAqASUQAshvUdBJ48keEuxhAMEZSXR/v3QpBYYC4q/kTW3OnATE7HVvqa+F3zePjmIDg+vIrGwdrRK13woAtXX+EYB4/KjiKsLblSphle3LQCVUyR6w==
