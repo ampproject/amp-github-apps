@@ -21,6 +21,7 @@
     "./*",
     "src/**/*",
     "test/*",
-    "types/*"
+    "types/*",
+    "test/fixtures/*"
   ]
 }
