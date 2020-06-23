@@ -83,10 +83,16 @@ export class BlameFinder {
       );
     };
 
-    let {repository} = await queryRef(ref);
-    // Use blame from `master` if the RTV/ref provided was invalid.
-    if (!repository.ref) {
-      repository = (await queryRef('master')).repository;
+    let {repository} = await queryRef(ref).catch(() => ({} as GraphQLResponse));
+    try {
+      // Use blame from `master` if the RTV/ref provided was invalid.
+      if (!repository.ref) {
+        repository = (await queryRef('master')).repository;
+      }
+    } catch {
+      // TODO(rcebulko): fix this if/when GitHub addresses the timeout issue.
+      console.warn(`GitHub API timeout; skipping blame for ${path}`);
+      return [];
     }
 
     const {ranges} = repository.ref.target.blame;
