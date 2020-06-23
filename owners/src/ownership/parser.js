@@ -30,6 +30,12 @@ const {
 } = require('./owner');
 
 const GLOB_PATTERN = '**/';
+const OWNER_DEF_KEYS = new Set([
+  'name',
+  'notify',
+  'requestReviews',
+  'required',
+]);
 
 /**
  * An error encountered parsing an OWNERS file
@@ -127,6 +133,21 @@ class OwnersParser {
         new OwnersParserError(
           ownersPath,
           `Expected owner definition; got ${typeof ownerDef}`
+        )
+      );
+      return {errors};
+    }
+
+    // Ensure there are no unexpected properties in the definition.
+    const badKeys = Object.keys(ownerDef).filter(
+      key => !OWNER_DEF_KEYS.has(key)
+    );
+    if (badKeys.length) {
+      const badKeyList = badKeys.map(key => `"${key}"`).join(', ');
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Unexpected key(s) ${badKeyList} in owner definition`
         )
       );
       return {errors};
