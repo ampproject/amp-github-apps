@@ -104,7 +104,7 @@ describe('owners parser', () => {
           pattern: 'something.js', // This should be in the rule, not the owner
         });
         expect(errors[0].message).toEqual(
-          'Unexpected key "pattern" in owner definition'
+          'Unexpected key(s) "pattern" in owner definition'
         );
       });
 
@@ -253,6 +253,26 @@ describe('owners parser', () => {
 
       it('returns no result', () => {
         const {result} = parser._parseRuleDefinition('', 'NOT A RULE DEF');
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe('when an unexpected key is present', () => {
+      it('reports an error', () => {
+        const {errors} = parser._parseRuleDefinition('', {
+          owners: [{name: 'blah'}],
+          notify: true, // This should be in the owner, not the rule
+        });
+        expect(errors[0].message).toEqual(
+          'Unexpected key(s) "notify" in owner definition'
+        );
+      });
+
+      it('returns no result', () => {
+        const {result} = parser._parseRuleDefinition('', {
+          owners: [{name: 'blah'}],
+          notify: true, // This should be in the owner, not the rule
+        });
         expect(result).toBeUndefined();
       });
     });
