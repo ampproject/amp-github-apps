@@ -103,6 +103,7 @@ declare module 'test-case-reporting' {
   }
 
   namespace KarmaReporter {
+    // TODO(rafer45): Add job & build info to the karma report
     export interface TestResultReport {
       browsers: BrowserResultSet;
     }
