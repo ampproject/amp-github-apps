@@ -30,6 +30,13 @@ const {
 } = require('./owner');
 
 const GLOB_PATTERN = '**/';
+const RULE_DEF_KEYS = new Set(['owners', 'pattern']);
+const OWNER_DEF_KEYS = new Set([
+  'name',
+  'notify',
+  'requestReviews',
+  'required',
+]);
 
 /**
  * An error encountered parsing an OWNERS file
@@ -132,6 +139,21 @@ class OwnersParser {
       return {errors};
     }
 
+    // Ensure there are no unexpected properties in the definition.
+    const badKeys = Object.keys(ownerDef).filter(
+      key => !OWNER_DEF_KEYS.has(key)
+    );
+    if (badKeys.length) {
+      const badKeyList = badKeys.map(key => `"${key}"`).join(', ');
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Unexpected key(s) ${badKeyList} in owner definition`
+        )
+      );
+      return {errors};
+    }
+
     // Validate and sanitize the owner name.
     let ownerName = ownerDef.name;
     if (typeof ownerName !== 'string') {
@@ -196,7 +218,7 @@ class OwnersParser {
     const errors = [];
     const owners = [];
 
-    // Validate rule definition and parse owners list.
+    // Validate rule definition.
     if (typeof ruleDef !== 'object') {
       errors.push(
         new OwnersParserError(
@@ -204,22 +226,39 @@ class OwnersParser {
           `Expected rule definition; got ${typeof ruleDef}`
         )
       );
-    } else if (!(ruleDef.owners instanceof Array)) {
+      return {errors};
+    }
+
+    // Ensure there are no unexpected properties in the definition.
+    const badKeys = Object.keys(ruleDef).filter(key => !RULE_DEF_KEYS.has(key));
+    if (badKeys.length) {
+      const badKeyList = badKeys.map(key => `"${key}"`).join(', ');
+      errors.push(
+        new OwnersParserError(
+          ownersPath,
+          `Unexpected key(s) ${badKeyList} in rule definition`
+        )
+      );
+      return {errors};
+    }
+
+    if (!(ruleDef.owners instanceof Array)) {
       errors.push(
         new OwnersParserError(
           ownersPath,
           `Expected "owners" to be a list; got ${typeof ruleDef.owners}`
         )
       );
-    } else {
-      ruleDef.owners.forEach(ownerDef => {
-        const ownerParse = this._parseOwnerDefinition(ownersPath, ownerDef);
-        if (ownerParse.result) {
-          owners.push(ownerParse.result);
-        }
-        errors.push(...ownerParse.errors);
-      });
+      return {errors};
     }
+
+    ruleDef.owners.forEach(ownerDef => {
+      const ownerParse = this._parseOwnerDefinition(ownersPath, ownerDef);
+      if (ownerParse.result) {
+        owners.push(ownerParse.result);
+      }
+      errors.push(...ownerParse.errors);
+    });
 
     if (!owners.length) {
       errors.push(

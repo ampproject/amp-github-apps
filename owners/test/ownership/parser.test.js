@@ -97,6 +97,26 @@ describe('owners parser', () => {
       });
     });
 
+    describe('when an unexpected key is present', () => {
+      it('reports an error', () => {
+        const {errors} = parser._parseOwnerDefinition('', {
+          name: 'blah',
+          pattern: 'something.js', // This should be in the rule, not the owner
+        });
+        expect(errors[0].message).toEqual(
+          'Unexpected key(s) "pattern" in owner definition'
+        );
+      });
+
+      it('returns no result', () => {
+        const {result} = parser._parseOwnerDefinition('', {
+          name: 'blah',
+          pattern: 'something.js', // This should be in the rule, not the owner
+        });
+        expect(result).toBeUndefined();
+      });
+    });
+
     describe('for a non-string name', () => {
       it('reports an error', () => {
         const {errors} = parser._parseOwnerDefinition('', {name: {}});
@@ -233,6 +253,26 @@ describe('owners parser', () => {
 
       it('returns no result', () => {
         const {result} = parser._parseRuleDefinition('', 'NOT A RULE DEF');
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe('when an unexpected key is present', () => {
+      it('reports an error', () => {
+        const {errors} = parser._parseRuleDefinition('', {
+          owners: [{name: 'blah'}],
+          notify: true, // This should be in the owner, not the rule
+        });
+        expect(errors[0].message).toEqual(
+          'Unexpected key(s) "notify" in rule definition'
+        );
+      });
+
+      it('returns no result', () => {
+        const {result} = parser._parseRuleDefinition('', {
+          owners: [{name: 'blah'}],
+          notify: true, // This should be in the owner, not the rule
+        });
         expect(result).toBeUndefined();
       });
     });
