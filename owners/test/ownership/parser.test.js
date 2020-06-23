@@ -264,7 +264,7 @@ describe('owners parser', () => {
           notify: true, // This should be in the owner, not the rule
         });
         expect(errors[0].message).toEqual(
-          'Unexpected key(s) "notify" in owner definition'
+          'Unexpected key(s) "notify" in rule definition'
         );
       });
 
