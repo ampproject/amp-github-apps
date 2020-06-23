@@ -91,6 +91,7 @@ export class BlameFinder {
       }
     } catch {
       // TODO(rcebulko): fix this if/when GitHub addresses the timeout issue.
+      console.warn(`GitHub API timeout; skipping blame for ${path}`);
       return [];
     }
 
