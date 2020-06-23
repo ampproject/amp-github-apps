@@ -83,8 +83,8 @@ export class BlameFinder {
       );
     };
 
+    let {repository} = await queryRef(ref).catch(() => ({} as GraphQLResponse));
     try {
-      let {repository} = await queryRef(ref).catch(() => ({}));
       // Use blame from `master` if the RTV/ref provided was invalid.
       if (!repository.ref) {
         repository = (await queryRef('master')).repository;
