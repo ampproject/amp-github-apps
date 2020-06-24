@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import {KarmaReporter} from 'test-case-reporting';
 import fs from 'fs';
 import path from 'path';
 
