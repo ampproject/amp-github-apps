@@ -119,4 +119,20 @@ declare module 'test-case-reporting' {
       time: number; // in milliseconds
     }
   }
+
+  namespace Travis {
+    export interface Report {
+      job: Travis.Job;
+      build: Travis.Build;
+      result: KarmaReporter.TestResultReport;
+    }
+    export interface Build {
+      buildNumber: string;
+      commitHash: string;
+    }
+    export interface Job {
+      jobNumber: string;
+      testSuiteType: TestSuiteType;
+    }
+  }
 }
