@@ -18,7 +18,7 @@ import {KarmaReporter} from 'test-case-reporting';
 import fs from 'fs';
 import path from 'path';
 
-export function getFixtureAsString(name: string): string {
+function getFixtureAsString(name: string): string {
   return fs.readFileSync(path.join(__dirname, `${name}.json`)).toString('utf8');
 }
 

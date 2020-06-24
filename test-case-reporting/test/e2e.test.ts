@@ -19,7 +19,7 @@ import request from 'supertest';
 
 import {Database, dbConnect} from '../src/db';
 import {app} from '../index';
-import {getFixtureAsString} from './fixtures';
+import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
 
 jest.mock('../src/db', () => ({
@@ -55,7 +55,17 @@ describe('end-to-end', () => {
     it('updates the database if the post request is good', async () => {
       await request(app)
         .post('/report')
-        .send(getFixtureAsString('sample-karma-report.json'));
+        .send({
+          build: {
+            buildNumber: '413413',
+            commitHash: 'abcdefg123gomugomu',
+          },
+          job: {
+            jobNumber: '413413.612',
+            testSuiteType: 'unit',
+          },
+          results: getFixture('sample-karma-report.json'),
+        });
 
       // TODO(rafer45): Replace `db('table_name').select()` calls with more readable
       // functions for getting builds, jobs, and invites.
