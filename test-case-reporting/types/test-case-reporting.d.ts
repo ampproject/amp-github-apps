@@ -26,7 +26,7 @@ declare module 'test-case-reporting' {
   export interface Build {
     username: string;
     commitHash: string;
-    prNumber: number;
+    buildNumber: number;
     startedAt: Date;
 
     // The list of jobs we know are contained in the build.
@@ -71,7 +71,7 @@ declare module 'test-case-reporting' {
       // It is not nullable in the database.
       id?: number;
       commit_hash: string;
-      pull_request_number: number;
+      build_number: number;
       started_at: number;
     }
 

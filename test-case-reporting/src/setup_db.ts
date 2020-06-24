@@ -24,7 +24,7 @@ export async function setupDb(db: Database): Promise<unknown> {
     .createTable('builds', table => {
       table.increments('id').primary();
       table.string('commit_hash', 40);
-      table.integer('pull_request_number');
+      table.integer('build_number');
       table.timestamp('started_at');
     })
     .createTable('jobs', table => {
