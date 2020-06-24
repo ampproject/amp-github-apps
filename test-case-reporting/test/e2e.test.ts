@@ -45,10 +45,10 @@ describe('end-to-end', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-    db('builds').truncate();
-    db('jobs').truncate();
-    db('test_cases').truncate();
     db('test_runs').truncate();
+    db('test_cases').truncate();
+    db('jobs').truncate();
+    db('builds').truncate();
   });
 
   describe('when one post request is received', async () => {
