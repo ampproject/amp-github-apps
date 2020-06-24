@@ -25,6 +25,6 @@ function getFixtureAsString(name: string): string {
 /**
  * Get a JSON test fixture object.
  */
-export function getFixture(name: string): KarmaReporter.TestResultReport {
+export function getFixture(name: string): Record<string, unknown> {
   return JSON.parse(getFixtureAsString(name));
 }
