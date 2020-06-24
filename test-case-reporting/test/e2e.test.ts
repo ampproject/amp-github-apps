@@ -64,7 +64,7 @@ describe('end-to-end', () => {
             jobNumber: '413413.612',
             testSuiteType: 'unit',
           },
-          results: getFixture('sample-karma-report.json'),
+          results: getFixture('sample-karma-report'),
         });
 
       // TODO(rafer45): Replace `db('table_name').select()` calls with more readable
