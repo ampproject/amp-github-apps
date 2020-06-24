@@ -15,7 +15,6 @@
  */
 
 import Knex from 'knex';
-import nock from 'nock';
 import request from 'supertest';
 
 import {Database, dbConnect} from '../src/db';
@@ -36,21 +35,11 @@ describe('end-to-end', () => {
   let db: Database;
 
   beforeAll(async () => {
-    nock.disableNetConnect();
-    process.env = {
-      DB_UNIX_SOCKET: 'amp-test-cases/socket',
-      DB_USER: 'test_user',
-      DB_PASSWORD: 'test_password',
-      DB_NAME: 'test_results',
-      NODE_ENV: 'test',
-    };
-
     db = dbConnect();
     await setupDb(db);
   });
 
   afterAll(() => {
-    nock.enableNetConnect();
     db.destroy();
   });
 
@@ -60,12 +49,6 @@ describe('end-to-end', () => {
     db('jobs').truncate();
     db('test_cases').truncate();
     db('test_runs').truncate();
-
-    // Fail the test if there were unused nocks.
-    if (!nock.isDone()) {
-      nock.cleanAll();
-      throw new Error('Not all nock interceptors were used!');
-    }
   });
 
   describe('when one post request is received', async () => {
