@@ -101,6 +101,7 @@ declare module 'test-case-reporting' {
       duration_ms: number;
     }
   }
+  /* eslint @typescript-eslint/camelcase: "error" */
 
   namespace KarmaReporter {
     export interface TestResultReport {
