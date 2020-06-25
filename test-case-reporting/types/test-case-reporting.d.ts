@@ -24,7 +24,6 @@ declare module 'test-case-reporting' {
 
   /** A build on Travis. */
   export interface Build {
-    username: string;
     commitSha: string;
     buildNumber: number;
     startedAt: Date;
