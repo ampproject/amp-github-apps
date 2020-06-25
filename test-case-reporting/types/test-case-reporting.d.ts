@@ -77,7 +77,7 @@ declare module 'test-case-reporting' {
     export interface Job {
       // See comment under `DB.Build.id`
       id?: number;
-      buld_id: number;
+      build_id: number;
       job_number: string;
       test_suite_type: TestSuiteType;
       started_at: number;
