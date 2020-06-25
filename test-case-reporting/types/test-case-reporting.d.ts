@@ -25,7 +25,7 @@ declare module 'test-case-reporting' {
   /** A build on Travis. */
   export interface Build {
     username: string;
-    commitHash: string;
+    commitSha: string;
     buildNumber: number;
     startedAt: Date;
 
@@ -70,7 +70,7 @@ declare module 'test-case-reporting' {
       // when we get the build from the database.
       // It is not nullable in the database.
       id?: number;
-      commit_hash: string;
+      commit_sha: string;
       build_number: number;
       started_at: number;
     }
@@ -128,7 +128,7 @@ declare module 'test-case-reporting' {
     }
     export interface Build {
       buildNumber: string;
-      commitHash: string;
+      commitSha: string;
     }
     export interface Job {
       jobNumber: string;
