@@ -67,7 +67,7 @@ describe('end-to-end', () => {
           results: getFixture('sample-karma-report'),
         });
 
-      // TODO(rafer45): Replace `db('table_name').select()` calls with more readable
+      // TODO(#914): Replace `db('table_name').select()` calls with more readable
       // functions for getting builds, jobs, and invites.
       // See https://github.com/ampproject/amp-github-apps/blob/master/invite/src/invitation_record.ts
       // for an example of what I'm thinking of.
