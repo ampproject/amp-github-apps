@@ -58,7 +58,7 @@ describe('end-to-end', () => {
         .send({
           build: {
             buildNumber: '413413',
-            commitHash: 'abcdefg123gomugomu',
+            commitSha: 'abcdefg123gomugomu',
           },
           job: {
             jobNumber: '413413.612',
@@ -71,13 +71,13 @@ describe('end-to-end', () => {
       // functions for getting builds, jobs, and invites.
       // See https://github.com/ampproject/amp-github-apps/blob/master/invite/src/invitation_record.ts
       // for an example of what I'm thinking of.
-      const buildsLength = (await db('builds').select()).length;
-      const jobsLength = (await db('jobs').select()).length;
-      const testRunsLength = (await db('testRunsLength').select()).length;
+      const builds = await db('builds').select();
+      const jobs = await db('jobs').select();
+      const testRuns = await db('testRunsLength').select();
 
-      expect(buildsLength).toEqual(1);
-      expect(jobsLength).toEqual(1);
-      expect(testRunsLength).toEqual(3);
+      expect(builds).toHaveLength(1);
+      expect(jobs).toHaveLength(1);
+      expect(testRuns).toHaveLength(3);
     });
   });
 });
