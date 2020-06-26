@@ -39,5 +39,6 @@ declare module 'invite-bot' {
     issue_number: number;
     action: InviteAction;
     archived?: boolean;
+    created_at?: string;
   }
 }
