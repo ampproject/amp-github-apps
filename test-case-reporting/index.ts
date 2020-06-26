@@ -16,6 +16,7 @@
 
 require('dotenv').config();
 
+import {KarmaReporter} from 'test-case-reporting';
 import express from 'express';
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -34,6 +35,13 @@ app.get('/test-results/history/:testCaseId', (req, res) => {
   res.send(`Test history for test with name/ID ${testCaseId}`);
 });
 
+app.post('/report', function (req, res) {
+  const report: KarmaReporter.TestResultReport = req.body;
+  res.send(`Travis report! The request body is below.\n\n${report}`);
+});
+
 app.listen(PORT, () => {
   console.log(`Running at http://localhost:${PORT}`);
 });
+
+export {app};

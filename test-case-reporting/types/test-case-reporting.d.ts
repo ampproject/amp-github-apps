@@ -119,4 +119,6 @@ declare module 'test-case-reporting' {
       time: number; // in milliseconds
     }
   }
+
+  // TODO(rafer45): Add job & build info to the karma report
 }
