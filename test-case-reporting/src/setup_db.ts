@@ -16,7 +16,7 @@
 
 require('dotenv').config();
 
-import {Database, dbConnect} from './db';
+import {Database, dbConnect, TIMESTAMP_PRECISION} from './db';
 
 /** Set up the database table. */
 export async function setupDb(db: Database): Promise<unknown> {
@@ -25,35 +25,47 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.increments('id').primary();
       table.string('commit_sha', 40);
       table.integer('build_number');
-      table.timestamp('started_at');
+      table.timestamp('started_at', {precision: TIMESTAMP_PRECISION});
     })
     .createTable('jobs', table => {
       table.increments('id').primary();
-      table.integer('build_id').unsigned().notNullable();
+      table
+        .integer('build_id')
+        .unsigned()
+        .notNullable();
       table.string('job_number');
       table.string('test_suite_type');
-      table.timestamp('started_at');
+      table.timestamp('started_at', {precision: TIMESTAMP_PRECISION});
 
       table.foreign('build_id').references('builds.id');
     })
     .createTable('test_cases', table => {
       table.increments('id').primary();
       table.string('name');
-      table.timestamp('created_at');
+      table.timestamp('created_at', {precision: TIMESTAMP_PRECISION});
     })
     .createTable('test_runs', table => {
       table.increments('id').primary();
-      table.integer('job_id').unsigned().notNullable();
-      table.integer('test_case_id').unsigned().notNullable();
+      table
+        .integer('job_id')
+        .unsigned()
+        .notNullable();
+      table
+        .integer('test_case_id')
+        .unsigned()
+        .notNullable();
       table.enu('status', ['PASS', 'FAIL', 'SKIP', 'ERROR'], {
         useNative: true,
         enumName: 'test_status',
       });
-      table.timestamp('timestamp');
+      table.timestamp('timestamp', {precision: TIMESTAMP_PRECISION});
       table.integer('duration_ms');
 
       table.foreign('test_case_id').references('test_cases.id');
-      table.foreign('job_id').references('id').inTable('jobs');
+      table
+        .foreign('job_id')
+        .references('id')
+        .inTable('jobs');
     });
 }
 
