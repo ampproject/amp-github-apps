@@ -77,7 +77,7 @@ describe('end-to-end', () => {
 
       expect(builds).toHaveLength(1);
       expect(jobs).toHaveLength(1);
-      expect(testRuns).toHaveLength(3);
+      expect(testRuns).toHaveLength(4);
     });
   });
 });

@@ -1,13 +1,12 @@
 {
     "summary": {
-        "success": 1,
+        "success": 2,
         "failed": 1,
         "skipped": 1,
         "error": false,
         "disconnected": false,
         "exitCode": 1
     },
-
     "browsers": [
         {
             "browser": {
@@ -21,8 +20,8 @@
                     "success": 1,
                     "failed": 1,
                     "skipped": 1,
-                    "totalTime": 1950,
-                    "netTime": 1792,
+                    "totalTime": 2100,
+                    "netTime": 1915,
                     "error": false,
                     "disconnected": false
                 },
@@ -70,6 +69,19 @@
                     "assertionErrors": [],
                     "startTime": 1610,
                     "endTime": 2050
+                },
+                {
+                    "id": "",
+                    "description": "🤖 when passing test has emojis 🤖 / it passes 🎉",
+                    "suite": [],
+                    "success": true,
+                    "skipped": false,
+                    "pending": false,
+                    "time": 123,
+                    "log": [],
+                    "assertionErrors": [],
+                    "startTime": 2050,
+                    "endTime": 2200
                 }
             ]
         }
