@@ -425,9 +425,6 @@ describe('Invite Bot', () => {
               created_at: _daysAgo(1),
             },
           ]);
-        mocked(GitHub.prototype.inviteUser).mockImplementation(
-          async () => false
-        );
       });
 
       describe('if it is older than 7 days', () => {
@@ -443,6 +440,9 @@ describe('Invite Bot', () => {
                 created_at: _daysAgo(8),
               },
             ]);
+          mocked(GitHub.prototype.inviteUser).mockImplementation(
+            async () => false
+          );
         });
 
         it('retries inviting the user', async done => {
