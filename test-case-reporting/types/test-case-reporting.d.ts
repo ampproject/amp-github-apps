@@ -25,6 +25,8 @@ declare module 'test-case-reporting' {
   /** A build on Travis. */
   export interface Build {
     commitSha: string;
+    // Despite being a *Number, buildNumber is of type string for parity with
+    // jobNumber
     buildNumber: number;
     startedAt: Date;
 
@@ -37,6 +39,9 @@ declare module 'test-case-reporting' {
 
   /** A job within a Travis build. */
   export interface Job {
+    // Despite being a *Number, this is of type string because it includes periods.
+    // For the 456th job in the 123rd build,
+    // this looks like `123.456`
     jobNumber: string;
     testSuiteType: TestSuiteType;
     startedAt: Date;
@@ -70,7 +75,9 @@ declare module 'test-case-reporting' {
       // It is not nullable in the database.
       id?: number;
       commit_sha: string;
-      build_number: number;
+      // Despite being a *_number, build_number is of type string for parity with
+      // job_number
+      build_number: string;
       started_at: number;
     }
 
@@ -78,6 +85,9 @@ declare module 'test-case-reporting' {
       // See comment under `DB.Build.id`
       id?: number;
       build_id: number;
+      // Despite being a *_number, job_number is of type string because it includes periods.
+      // For the 456th job in the 123rd build,
+      // this looks like `123.456`
       job_number: string;
       test_suite_type: TestSuiteType;
       started_at: number;
