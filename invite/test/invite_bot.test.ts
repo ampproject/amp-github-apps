@@ -37,6 +37,10 @@ jest.mock('../src/db', () => {
   };
 });
 
+function _daysAgo(days: number): Date {
+  return new Date(Number(new Date()) - days * 24 * 60 * 60 * 1000);
+}
+
 describe('Invite Bot', () => {
   let inviteBot: InviteBot;
   const db = dbConnect();
@@ -418,8 +422,39 @@ describe('Invite Bot', () => {
               repo: 'test_repo',
               issue_number: 42,
               action: InviteAction.INVITE,
+              created_at: _daysAgo(1),
             },
           ]);
+        mocked(GitHub.prototype.inviteUser).mockImplementation(
+          async () => false
+        );
+      });
+
+      describe('if it is older than 7 days', () => {
+        beforeEach(() => {
+          jest
+            .spyOn(InvitationRecord.prototype, 'getInvites')
+            .mockImplementation(async () => [
+              {
+                username: 'oldInvitee',
+                repo: 'test_repo',
+                issue_number: 42,
+                action: InviteAction.INVITE,
+                created_at: _daysAgo(8),
+              },
+            ]);
+        });
+
+        it('retries inviting the user', async done => {
+          await inviteBot.tryInvite({
+            username: 'oldInvitee',
+            repo: 'test_repo',
+            issue_number: 1337,
+            action: InviteAction.INVITE,
+          });
+          expect(inviteBot.github.inviteUser).toBeCalledWith('oldInvitee');
+          done();
+        });
       });
 
       it('it does not attempt to send an invite', async done => {
