@@ -55,33 +55,33 @@ export class BlameFinder {
 
       return this.graphql(
         `{
-            repository(owner: "${this.repoOwner}", name: "${this.repoName}") {
-              ref(qualifiedName: "${ref}") {
-                target {
-                  # cast Target to a Commit
-                  ... on Commit {
-                    blame(path: "${path}") {
-                      ranges {
-                        commit {
-                          changedFiles
-                          committedDate
-                          associatedPullRequests(first: 1) {
-                            nodes { number }
-                          }
-                          author {
-                            name
-                            user { login }
-                          }
+          repository(owner: "${this.repoOwner}", name: "${this.repoName}") {
+            ref(qualifiedName: "${ref}") {
+              target {
+                # cast Target to a Commit
+                ... on Commit {
+                  blame(path: "${path}") {
+                    ranges {
+                      commit {
+                        changedFiles
+                        committedDate
+                        associatedPullRequests(first: 1) {
+                          nodes { number }
                         }
-                        startingLine
-                        endingLine
+                        author {
+                          name
+                          user { login }
+                        }
                       }
+                      startingLine
+                      endingLine
                     }
                   }
                 }
               }
             }
-          }`
+          }
+        }`
       )
         .then(({repository}) => repository.ref)
         .catch(() => null);
