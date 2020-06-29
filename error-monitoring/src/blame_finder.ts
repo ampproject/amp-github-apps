@@ -53,9 +53,8 @@ export class BlameFinder {
     const queryRef = async (ref: string): Promise<null | GraphQLRef> => {
       this.logger.info(`Running blame query for \`${ref}:${path}\``);
 
-      try {
-        const {repository}: GraphQLResponse = await this.graphql(
-          `{
+      return this.graphql(
+        `{
             repository(owner: "${this.repoOwner}", name: "${this.repoName}") {
               ref(qualifiedName: "${ref}") {
                 target {
@@ -83,11 +82,9 @@ export class BlameFinder {
               }
             }
           }`
-        );
-        return repository.ref;
-      } catch {
-        return null;
-      }
+      )
+        .then(({repository}) => repository.ref)
+        .catch(() => null);
     };
 
     // Use blame from `master` if the RTV/ref provided was invalid.
