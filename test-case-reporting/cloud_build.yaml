@@ -45,6 +45,7 @@ steps:
   - name: gcr.io/cloud-builders/gcloud
     dir: test-case-reporting
     args:
+      - app
       - deploy
 
 # These secrets are the base64-encoded form of encrypted secret values. They are
