@@ -50,7 +50,7 @@ steps:
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
 secrets:
-  - kmsKeyName: projects/ampproject-amp-test-cases/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+  - kmsKeyName: projects/amp-test-cases/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
     secretEnv:
       DB_USER: CiQAiHI2+ajn21rghdBbZMMJcYChZhv65A/diPd19/wcJamP+yISMQCFrcyaiiKqwzEPEtLPR9uOtgOSnh3Gsd9umRYL9bNisb/LWULypMX5qMnvHBOVXlw=
       DB_PASSWORD: CiQAiHI2+bsDOBpue3HkKrDmvHGLUqqdbCp5lAeiFHUTi6UgPFcSOQCFrcyaV48H5PWDdgRVadRWlXlXXBpX5hDUa0cPIgpCBA21C9NI/5HRH+pjNXlHljxy2r6pBUj0BQ==
