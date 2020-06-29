@@ -1,0 +1,56 @@
+steps:
+  # The first two steps are required to identify and inject un-redacted secrets.
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - install
+      - yaml
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - run
+      - replace-secrets
+      - --
+      - test-case-reporting
+    secretEnv:
+      - DB_PASSWORD
+      - DB_USER
+  
+  # Install app dependencies
+  - name: gcr.io/cloud-builders/npm
+    dir: test-case-reporting
+    args:
+      - install
+
+  # Compile the app from Typescript into dist/.
+  - name: gcr.io/cloud-builders/npm
+    dir: test-case-reporting
+    args:
+      - run
+      - build
+
+  # Copy over the environment and package file.
+  - name: ubuntu
+    dir: test-case-reporting
+    args:
+      - cp
+      - .env
+      - dist/
+  - name: ubuntu
+    dir: test-case-reporting
+    args:
+      - cp
+      - package.json
+      - dist/
+
+  # Deploy the app.
+  - name: gcr.io/cloud-builders/gcloud
+    dir: test-case-reporting
+    args:
+      - deploy
+
+# These secrets are the base64-encoded form of encrypted secret values. They are
+# automatically decrypted and added to the `.env` environment at build time.
+secrets:
+  - kmsKeyName: projects/ampproject-amp-test-cases/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+    secretEnv:
+      DB_USER: CiQAiHI2+ajn21rghdBbZMMJcYChZhv65A/diPd19/wcJamP+yISMQCFrcyaiiKqwzEPEtLPR9uOtgOSnh3Gsd9umRYL9bNisb/LWULypMX5qMnvHBOVXlw=
+      DB_PASSWORD: CiQAiHI2+bsDOBpue3HkKrDmvHGLUqqdbCp5lAeiFHUTi6UgPFcSOQCFrcyaV48H5PWDdgRVadRWlXlXXBpX5hDUa0cPIgpCBA21C9NI/5HRH+pjNXlHljxy2r6pBUj0BQ==
