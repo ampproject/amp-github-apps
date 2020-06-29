@@ -16,6 +16,7 @@
 
 import {
   BlameRange,
+  GraphQLRef,
   GraphQLResponse,
   Logger,
   StackFrame,
@@ -49,53 +50,55 @@ export class BlameFinder {
       return this.files[cacheKey];
     }
 
-    const queryRef = async (ref: string): Promise<GraphQLResponse> => {
+    const queryRef = async (ref: string): Promise<null | GraphQLRef> => {
       this.logger.info(`Running blame query for \`${ref}:${path}\``);
-      return this.graphql(
-        `{
-          repository(owner: "${this.repoOwner}", name: "${this.repoName}") {
-            ref(qualifiedName: "${ref}") {
-              target {
-                # cast Target to a Commit
-                ... on Commit {
-                  blame(path: "${path}") {
-                    ranges {
-                      commit {
-                        changedFiles
-                        committedDate
-                        associatedPullRequests(first: 1) {
-                          nodes { number }
+
+      try {
+        const {repository}: GraphQLResponse = await this.graphql(
+          `{
+            repository(owner: "${this.repoOwner}", name: "${this.repoName}") {
+              ref(qualifiedName: "${ref}") {
+                target {
+                  # cast Target to a Commit
+                  ... on Commit {
+                    blame(path: "${path}") {
+                      ranges {
+                        commit {
+                          changedFiles
+                          committedDate
+                          associatedPullRequests(first: 1) {
+                            nodes { number }
+                          }
+                          author {
+                            name
+                            user { login }
+                          }
                         }
-                        author {
-                          name
-                          user { login }
-                        }
+                        startingLine
+                        endingLine
                       }
-                      startingLine
-                      endingLine
                     }
                   }
                 }
               }
             }
-          }
-        }`
-      );
+          }`
+        );
+        return repository.ref;
+      } catch {
+        return null;
+      }
     };
 
-    let {repository} = await queryRef(ref).catch(() => ({} as GraphQLResponse));
-    try {
-      // Use blame from `master` if the RTV/ref provided was invalid.
-      if (!repository.ref) {
-        repository = (await queryRef('master')).repository;
-      }
-    } catch {
+    // Use blame from `master` if the RTV/ref provided was invalid.
+    const targetRef = (await queryRef(ref)) || (await queryRef('master'));
+    if (!targetRef) {
       // TODO(rcebulko): fix this if/when GitHub addresses the timeout issue.
       console.warn(`GitHub API timeout; skipping blame for ${path}`);
       return [];
     }
 
-    const {ranges} = repository.ref.target.blame;
+    const {ranges} = targetRef.target.blame;
     this.logger.debug(`Found ${ranges.length} blame ranges`);
 
     return (this.files[cacheKey] = ranges.map(
