@@ -20,6 +20,10 @@ import {BlameFinder} from '../src/blame_finder';
 import {RateLimitedGraphQL} from '../src/rate_limited_graphql';
 import {getGraphQLResponse} from './fixtures';
 
+process.on('unhandledRejection', reason => {
+  console.log('REJECTION', reason);
+});
+
 describe('BlameFinder', () => {
   let blameFinder: BlameFinder;
 
@@ -50,6 +54,16 @@ describe('BlameFinder', () => {
 
   describe('blameForFile', () => {
     const rtv = '2004030010070';
+
+    it('handles error responses from GitHub', async () => {
+      nock('https://api.github.com')
+        .post('/graphql')
+        .reply(500);
+
+      await expect(
+        blameFinder.blameForFile(rtv, 'not/a/file.js')
+      ).resolves.toEqual([]);
+    });
 
     it('issues a GraphQL query for the file the the specified ref', async () => {
       const path = 'extensions/amp-next-page/1.0/service.js';
