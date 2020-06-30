@@ -27,6 +27,11 @@ function getDateFromTimestamp(timestamp: number): Date {
 export class TestResultsRecords {
   constructor(private db: Database) {}
 
+  /**
+   * Gets a DB.Build from the database by its name.
+   * If there is no build, it returns undefined.
+   * @param buildNumber The number of the Travis build, as a string
+   */
   private async getDbBuild(buildNumber: string): Promise<DB.Build> {
     return this.db<DB.Build>('builds')
       .where('build_number', buildNumber)
