@@ -76,7 +76,7 @@ export class TestResultsRecords {
     };
   }
 
-  private async getBuild(buildNumber: string): Promise<Build> {
+  async getBuild(buildNumber: string): Promise<Build> {
     const build = await this.getBuildWithEmptyJobs(buildNumber);
     const joinOfEveryTable = await this.db('builds')
       .select([
