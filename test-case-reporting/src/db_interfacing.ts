@@ -16,19 +16,35 @@
 
 /* eslint-disable @typescript-eslint/camelcase */
 import {DB, Travis} from 'test-case-reporting';
-import {Database} from './db';
+import {Database, TIMESTAMP_PRECISION} from './db';
 import {getBuildStartTime} from './travis_api_utils';
+
+function fromMsToDatabasePrecision(milliseconds: number): number {
+  return Math.floor(milliseconds * Math.pow(10, TIMESTAMP_PRECISION - 3));
+}
 
 export class TestResultsRecords {
   constructor(private db: Database) {}
 
   async storeTravisReport({job, build, result}: Travis.Report): Promise<void> {
+    const buildStartTime = await getBuildStartTime(build.buildNumber);
+    const buildStartTimeMs = buildStartTime.getUTCMilliseconds();
     const dbBuild: DB.Build = {
       commit_sha: build.commitSha,
       build_number: build.buildNumber,
-      started_at: getBuildStartTime(build.buildNumber),
+      started_at: fromMsToDatabasePrecision(buildStartTimeMs),
     };
 
+    const buildId = await this.db('builds').insert(dbBuild);
+
+    const jobStartTime = await getJobStartTime(job.jobNumber);
+    const jobStartTimeMs = jobStartTime.getUTCMilliseconds();
+    const dbJob: DB.Job = {
+      build_id: buildId,
+      job_number: job.jobNumber,
+      test_suite_type: job.testSuiteType,
+      started_at: 
+    }
     // TODO: Finish this method.
   }
 }
