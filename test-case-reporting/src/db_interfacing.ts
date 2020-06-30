@@ -59,7 +59,6 @@ export class TestResultsRecords {
     };
   }
 
-  // I need help typechecking this
   /**
    * Helper method.
    * Takes a row of the join of every table.
