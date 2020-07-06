@@ -32,6 +32,7 @@ declare module 'test-case-reporting' {
 
   /** A job within a Travis build. */
   export interface Job {
+    build: Build;
     // Despite being a *Number, this is of type string because it includes periods.
     // For the 456th job in the 123rd build,
     // this looks like `123.456`
@@ -47,6 +48,7 @@ declare module 'test-case-reporting' {
 
   /** An instance of a test being run, with results. */
   export interface TestRun {
+    job: Job;
     testCase: TestCase;
     status: TestStatus;
     timestamp: Date;
