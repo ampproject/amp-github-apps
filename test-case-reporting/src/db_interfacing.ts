@@ -17,10 +17,11 @@
 import {Build, DB, Job, TestCase, TestRun} from 'test-case-reporting';
 import {Database, TIMESTAMP_PRECISION} from './db';
 
+const msConversionConstant: number = Math.pow(10, 3 - TIMESTAMP_PRECISION);
+
 // Types in the DB namespace interface use snake_case instead of camelCase.
 /* eslint @typescript-eslint/camelcase: "off" */
 function getDateFromTimestamp(timestamp: number): Date {
-  const msConversionConstant: number = Math.pow(10, 3 - TIMESTAMP_PRECISION);
   return new Date(timestamp * msConversionConstant);
 }
 
