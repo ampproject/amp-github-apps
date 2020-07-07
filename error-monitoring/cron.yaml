@@ -1,0 +1,13 @@
+cron:
+- description: "File issues for errors in production"
+  url: /_cron/monitor?serviceType=production
+  schedule: every day at 7:00am
+- description: "File issues for errors in 1%/opt-in"
+  url: /_cron/monitor?serviceType=development
+  schedule: every day at 7:02am
+- description: "File issues for errors in experiments"
+  url: /_cron/monitor?serviceType=experiments
+  schedule: every day at 7:04am
+- description: "File issues for errors in nightly"
+  url: /_cron/monitor?serviceType=nightly
+  schedule: every day at 7:06am
