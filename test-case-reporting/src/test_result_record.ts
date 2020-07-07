@@ -52,13 +52,17 @@ export class TestResultRecord {
     return success ? 'PASS' : 'FAIL';
   }
 
+  makeTestCaseName(description: string, suite: Array<string>): string {
+    return suite.concat([description]).join(' | ');
+  }
+
   async storeTravisReport({job, build, result}: Travis.Report): Promise<void> {
     const buildId = await this.insertTravisBuild(build);
     const jobId = await this.insertTravisJob(job, buildId);
 
     const formattedResults = result.browsers.results.map(result => {
       const {description, suite} = result;
-      const testCaseName = suite.concat([description]).join(' | ');
+      const testCaseName = this.makeTestCaseName(description, suite);
       return {
         ...result,
         testCaseId: md5(testCaseName),
