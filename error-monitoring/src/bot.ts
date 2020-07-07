@@ -33,7 +33,7 @@ export class ErrorIssueBot {
     token: string,
     private repoOwner: string,
     private repoName: string,
-    private issueRepoName: string | undefined
+    private issueRepoName?: string
   ) {
     this.octokit = new Octokit({auth: `token ${token}`});
     this.blameFinder = new BlameFinder(
