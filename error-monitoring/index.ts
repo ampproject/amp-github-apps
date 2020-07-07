@@ -159,19 +159,6 @@ export async function errorIssue(
   }
 }
 
-/** Endpoint to trigger a scan for new frequent errors. */
-export async function errorMonitor(
-  req: express.Request,
-  res: express.Response
-): Promise<void> {
-  try {
-    res.json({issueUrls: await monitor.monitorAndReport()});
-  } catch (error) {
-    res.status(statusCodes.INTERNAL_SERVER_ERROR);
-    res.json({error: error.toString()});
-  }
-}
-
 function createErrorReportUrl({errorId}: ErrorReport): string {
   const params = querystring.stringify({errorId, linkIssue: 1});
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
@@ -200,6 +187,20 @@ function getLister(
   }
 
   return optThreshold ? lister.threshold(optThreshold) : lister;
+}
+
+/** Endpoint to trigger a scan for new frequent errors. */
+export async function errorMonitor(
+  req: express.Request,
+  res: express.Response
+): Promise<void> {
+  try {
+    const serviceType = (req.query.serviceType || '').toString().toUpperCase();
+    res.json({issueUrls: await getLister(serviceType).monitorAndReport()});
+  } catch (error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR);
+    res.json({error: error.toString()});
+  }
 }
 
 function viewData({
