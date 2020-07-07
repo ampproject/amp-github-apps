@@ -39,10 +39,11 @@ export class RateLimitedGraphQL {
   }
 
   async runQuery(query: string): Promise<GraphQLResponse> {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       this.ready = this.ready
         .then(async () => this.execute(query))
         .then(resolve)
+        .catch(reject)
         .then(async () => sleep(this.frequencyMs));
     });
   }

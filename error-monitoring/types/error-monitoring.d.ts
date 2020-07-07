@@ -86,13 +86,16 @@ declare module 'error-monitoring' {
       }>;
     }
 
+    export interface Ref {
+      target: {blame: Blame};
+    }
+
     export interface QueryResponse {
-      repository: {
-        ref: null | {target: {blame: Blame}};
-      };
+      repository: {ref: null | Ref};
     }
   }
   export type GraphQLResponse = GraphQL.QueryResponse;
+  export type GraphQLRef = GraphQL.Ref;
 
   /** Information about a Pantheon error report. */
   export interface ErrorReport {
