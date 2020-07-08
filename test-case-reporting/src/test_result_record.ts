@@ -44,14 +44,26 @@ export class TestResultRecord {
     return jobId;
   }
 
-  testStatus(skipped: boolean, success: boolean): TestStatus {
+  testStatus({
+    skipped,
+    success,
+  }: {
+    skipped: boolean;
+    success: boolean;
+  }): TestStatus {
     if (skipped) {
       return 'SKIP';
     }
     return success ? 'PASS' : 'FAIL';
   }
 
-  makeTestCaseName(suite: Array<string>, description: string): string {
+  makeTestCaseName({
+    suite,
+    description,
+  }: {
+    suite: Array<string>;
+    description: string;
+  }): string {
     return suite.concat([description]).join(' | ');
   }
 
@@ -60,8 +72,7 @@ export class TestResultRecord {
     const jobId = await this.insertTravisJob(job, buildId);
 
     const formattedResults = result.browsers.results.map(result => {
-      const {suite, description} = result;
-      const testCaseName = this.makeTestCaseName(suite, description);
+      const testCaseName = this.makeTestCaseName(result);
       return {
         ...result,
         testCaseId: md5(testCaseName),
@@ -80,7 +91,7 @@ export class TestResultRecord {
       ({skipped, success, time, testCaseId}) => ({
         'job_id': jobId,
         'test_case_id': testCaseId,
-        status: this.testStatus(skipped, success),
+        status: this.testStatus({skipped, success}),
         'duration_ms': time,
       })
     );

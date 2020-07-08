@@ -109,15 +109,21 @@ describe('TestResultRecord', () => {
 
   describe('testStatus', () => {
     it('returns SKIP when the test was skipped', () => {
-      expect(testResultRecord.testStatus(true, false)).toEqual('SKIP');
+      expect(
+        testResultRecord.testStatus({skipped: true, success: false})
+      ).toEqual('SKIP');
     });
 
     it('returns PASS when the test passed', () => {
-      expect(testResultRecord.testStatus(false, true)).toEqual('PASS');
+      expect(
+        testResultRecord.testStatus({skipped: false, success: true})
+      ).toEqual('PASS');
     });
 
     it('returns FAIL when the test failed', () => {
-      expect(testResultRecord.testStatus(false, true)).toEqual('FAIL');
+      expect(
+        testResultRecord.testStatus({skipped: false, success: false})
+      ).toEqual('FAIL');
     });
   });
 
