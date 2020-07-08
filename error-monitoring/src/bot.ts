@@ -32,7 +32,8 @@ export class ErrorIssueBot {
   constructor(
     token: string,
     private repoOwner: string,
-    private repoName: string
+    private repoName: string,
+    private issueRepoName?: string
   ) {
     this.octokit = new Octokit({auth: `token ${token}`});
     this.blameFinder = new BlameFinder(
@@ -51,7 +52,7 @@ export class ErrorIssueBot {
     const builder = new IssueBuilder(errorReport, blameRanges, RELEASE_ONDUTY);
     return {
       owner: this.repoOwner,
-      repo: this.repoName,
+      repo: this.issueRepoName,
       title: builder.title,
       labels: builder.labels,
       body: builder.body,
