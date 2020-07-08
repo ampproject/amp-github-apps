@@ -33,8 +33,8 @@
             "results": [
                 {
                     "id": "",
-                    "description": "when test is good / it passes",
-                    "suite": [],
+                    "description": "it passes",
+                    "suite": ["when test is good"],
                     "success": true,
                     "skipped": false,
                     "pending": false,
@@ -46,8 +46,8 @@
                 },
                 {
                     "id": "",
-                    "description": "when test is bad / it fails",
-                    "suite": [],
+                    "description": "it fails",
+                    "suite": ["when test is bad"],
                     "success": false,
                     "skipped": false,
                     "pending": false,
@@ -59,8 +59,8 @@
                 },
                 {
                     "id": "",
-                    "description": "when test was skipped / it skipped",
-                    "suite": [],
+                    "description": "it skipped",
+                    "suite": ["when test was skipped"],
                     "success": false,
                     "skipped": true,
                     "pending": false,
@@ -72,8 +72,8 @@
                 },
                 {
                     "id": "",
-                    "description": "🤖 when passing test has emojis 🤖 / it passes 🎉",
-                    "suite": [],
+                    "description": "it passes 🎉",
+                    "suite": ["🤖 when passing test has emojis 🤖"],
                     "success": true,
                     "skipped": false,
                     "pending": false,
