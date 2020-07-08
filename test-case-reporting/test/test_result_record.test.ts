@@ -88,7 +88,7 @@ describe('TestResultRecord', () => {
       buildId = await testResultRecord.insertTravisBuild(sampleBuild);
     });
 
-    it('adds the job to the database if build id is good', () => {
+    it('adds the job to the database if the build exists in the DB', () => {
       testResultRecord.insertTravisJob(
         {
           jobNumber: '413413.612',
@@ -98,7 +98,7 @@ describe('TestResultRecord', () => {
       );
     });
 
-    it('fails to add the job to the database if build id is bad');
+    it("throws an error if the build doesn't exist");
   });
 
   describe('testStatus', () => {
