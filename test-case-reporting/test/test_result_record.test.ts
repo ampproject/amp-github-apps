@@ -76,8 +76,11 @@ describe('TestResultRecord', () => {
       const build = await db<DB.Build>('builds')
         .select()
         .first();
-      expect(build.commit_sha).toEqual(sampleBuild.commitSha);
-      expect(build.build_number).toEqual(sampleBuild.buildNumber);
+
+      expect(build).toMatchObject({
+        'build_number': 'abcdefg123gomugomu',
+        'commit_sha': '413413',
+      });
     });
   });
 
@@ -88,14 +91,17 @@ describe('TestResultRecord', () => {
       buildId = await testResultRecord.insertTravisBuild(sampleBuild);
     });
 
-    it('adds the job to the database if the build exists in the DB', () => {
-      testResultRecord.insertTravisJob(
-        {
-          jobNumber: '413413.612',
-          testSuiteType: 'unit',
-        },
-        buildId
-      );
+    it('adds the job to the database if the build exists in the DB', async () => {
+      await testResultRecord.insertTravisJob(sampleJob, buildId);
+
+      const job = await db<DB.Job>('jobs')
+        .select()
+        .first();
+
+      expect(job).toMatchObject({
+        'job_number': '413413.612',
+        'test_suite_type': 'unit',
+      });
     });
 
     it("throws an error if the build doesn't exist");
