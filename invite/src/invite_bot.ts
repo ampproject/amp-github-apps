@@ -35,11 +35,11 @@ const FULL_MACRO_REGEX = new RegExp(
   'ig'
 );
 // GitHub expires invitations after one week.
-const EXPIRATION_INTERVAL_MS = 7 * 24 * 60 * 60;
+const EXPIRATION_INTERVAL_SEC = 7 * 24 * 60 * 60;
 
 function expirationDate(): Date {
   const d = new Date();
-  d.setSeconds(d.getSeconds() - EXPIRATION_INTERVAL_MS);
+  d.setSeconds(d.getSeconds() - EXPIRATION_INTERVAL_SEC);
   return d;
 }
 
