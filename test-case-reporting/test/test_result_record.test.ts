@@ -157,11 +157,42 @@ describe('TestResultRecord', () => {
       expect(sampleTestCases).toMatchObject(testCases);
     });
 
-    it('inserts test results', () => {
-      // TODO: complete this
+    it('does not duplicate test cases', async () => {
+      testResultRecord.storeTravisReport({
+        job: sampleJob,
+        build: sampleBuild,
+        result: sampleKarmaReport,
+      });
+
+      testResultRecord.storeTravisReport({
+        job: sampleJob,
+        build: sampleBuild,
+        result: sampleKarmaReport,
+      });
+
+      const testCases: Array<DB.TestCase> = await db<DB.TestCase>(
+        'test_cases'
+      ).select();
+
+      const sampleTestCases: Array<DB.TestCase> = [
+        {
+          id: '8a3d71d66b2913bb981a8d4f2a2930db',
+          name: 'when test is bad | it fails',
+        },
+        {
+          id: 'c5cf7c15d50ec660c3b10b6c91bfe3f8',
+          name: 'when test was skipped | it skipped',
+        },
+        {
+          id: '36340965686c32694f88f06c6a3f71ac',
+          name: '🤖 when passing test has emojis 🤖 | it passes 🎉',
+        },
+      ];
+
+      expect(sampleTestCases).toMatchObject(testCases);
     });
 
-    it('handles existing test cases', () => {
+    it('inserts test results', () => {
       // TODO: complete this
     });
   });
