@@ -25,6 +25,7 @@ export async function setupDb(db: Database): Promise<unknown> {
     table.integer('issue_number');
     table.string('action');
     table.boolean('archived').defaultTo(false);
+    table.timestamp('created_at').notNullable().defaultTo(db.fn.now());
   });
 }
 

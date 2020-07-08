@@ -52,6 +52,8 @@ export class InvitationRecord {
     ).map(invite => {
       // PostgresQL stores booleans as TINYINT, so we cast it to boolean.
       invite.archived = !!invite.archived;
+      // PostgresQL returns timestamps as strings, so we wrap in a Date.
+      invite.created_at = new Date(invite.created_at);
       return invite;
     });
   }
