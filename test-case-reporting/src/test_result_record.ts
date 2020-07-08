@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/camelcase */
 import {DB, TestStatus, Travis} from 'test-case-reporting';
 import {Database} from './db';
 import md5 from 'md5';
@@ -25,8 +24,8 @@ export class TestResultRecord {
   async insertTravisBuild(build: Travis.Build): Promise<number> {
     const [buildId] = await this.db('builds')
       .insert({
-        commit_sha: build.commitSha,
-        build_number: build.buildNumber,
+        'commit_sha': build.commitSha,
+        'build_number': build.buildNumber,
       } as DB.Build)
       .returning('id');
 
@@ -36,9 +35,9 @@ export class TestResultRecord {
   async insertTravisJob(job: Travis.Job, buildId: number): Promise<number> {
     const [jobId] = await this.db('jobs')
       .insert({
-        build_id: buildId,
-        job_number: job.jobNumber,
-        test_suite_type: job.testSuiteType,
+        'build_id': buildId,
+        'job_number': job.jobNumber,
+        'test_suite_type': job.testSuiteType,
       } as DB.Job)
       .returning('id');
 
@@ -79,10 +78,10 @@ export class TestResultRecord {
 
     const testRuns: Array<DB.TestRun> = formattedResults.map(
       ({skipped, success, time, testCaseId}) => ({
-        job_id: jobId,
-        test_case_id: testCaseId,
+        'job_id': jobId,
+        'test_case_id': testCaseId,
         status: this.testStatus(skipped, success),
-        duration_ms: time,
+        'duration_ms': time,
       })
     );
 

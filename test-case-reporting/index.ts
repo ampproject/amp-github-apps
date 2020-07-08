@@ -35,7 +35,7 @@ app.get('/test-results/history/:testCaseId', (req, res) => {
   res.send(`Test history for test with name/ID ${testCaseId}`);
 });
 
-app.post('/report', function (req, res) {
+app.post('/report', (req, res) => {
   const report: KarmaReporter.TestResultReport = req.body;
   res.send(`Travis report! The request body is below.\n\n${report}`);
 });
