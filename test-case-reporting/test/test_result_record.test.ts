@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {AssertionError} from 'assert';
+
 import {DB, KarmaReporter, Travis} from 'test-case-reporting';
 import {Database, dbConnect} from '../src/db';
 import {TestResultRecord} from '../src/test_result_record';
@@ -23,7 +23,7 @@ import Knex from 'knex';
 import md5 from 'md5';
 
 jest.mock('../src/db', () => ({
-  dbConnect: () =>
+  dbConnect: (): Database =>
     Knex({
       client: 'sqlite3',
       connection: ':memory:',
@@ -74,7 +74,9 @@ describe('TestResultRecord', () => {
     it('adds the build to the database', async () => {
       await testResultRecord.insertTravisBuild(sampleBuild);
 
-      const build = await db<DB.Build>('builds').select().first();
+      const build = await db<DB.Build>('builds')
+        .select()
+        .first();
       expect(build.commit_sha).toEqual(sampleBuild.commitSha);
       expect(build.build_number).toEqual(sampleBuild.buildNumber);
     });

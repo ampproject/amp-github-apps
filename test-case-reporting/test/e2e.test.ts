@@ -23,7 +23,7 @@ import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
 
 jest.mock('../src/db', () => ({
-  dbConnect: () =>
+  dbConnect: (): Database =>
     Knex({
       client: 'sqlite3',
       connection: ':memory:',

@@ -29,7 +29,10 @@ export async function setupDb(db: Database): Promise<unknown> {
     })
     .createTable('jobs', table => {
       table.increments('id').primary();
-      table.integer('build_id').unsigned().notNullable();
+      table
+        .integer('build_id')
+        .unsigned()
+        .notNullable();
       table.string('job_number');
       table.string('test_suite_type');
       table.timestamp('started_at', {precision: TIMESTAMP_PRECISION});
@@ -45,8 +48,14 @@ export async function setupDb(db: Database): Promise<unknown> {
     })
     .createTable('test_runs', table => {
       table.increments('id').primary();
-      table.integer('job_id').unsigned().notNullable();
-      table.integer('test_case_id').unsigned().notNullable();
+      table
+        .integer('job_id')
+        .unsigned()
+        .notNullable();
+      table
+        .integer('test_case_id')
+        .unsigned()
+        .notNullable();
       table.enu('status', ['PASS', 'FAIL', 'SKIP', 'ERROR'], {
         useNative: true,
         enumName: 'test_status',
@@ -55,7 +64,10 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.integer('duration_ms');
 
       table.foreign('test_case_id').references('test_cases.id');
-      table.foreign('job_id').references('id').inTable('jobs');
+      table
+        .foreign('job_id')
+        .references('id')
+        .inTable('jobs');
     });
 }
 
