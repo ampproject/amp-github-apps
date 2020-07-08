@@ -34,8 +34,17 @@ jest.mock('../src/db', () => ({
 describe('TestResultRecord', () => {
   let db: Database;
   let testResultRecord: TestResultRecord;
-  let sampleBuild: Travis.Build;
-  let sampleJob: Travis.Job;
+
+  const sampleBuild: Travis.Build = {
+    buildNumber: '413413',
+    commitSha: 'abcdefg123gomugomu',
+  };
+
+  const sampleJob: Travis.Job = {
+    jobNumber: '413413.612',
+    testSuiteType: 'unit',
+  };
+
   let sampleKarmaReport: KarmaReporter.TestResultReport;
 
   beforeAll(async () => {
@@ -43,12 +52,6 @@ describe('TestResultRecord', () => {
     await setupDb(db);
 
     testResultRecord = new TestResultRecord(db);
-
-    sampleBuild = (getFixture(
-      'sample-travis-build'
-    ) as unknown) as Travis.Build;
-
-    sampleJob = (getFixture('sample-travis-job') as unknown) as Travis.Job;
 
     sampleKarmaReport = (getFixture(
       'sample-karma-report'
