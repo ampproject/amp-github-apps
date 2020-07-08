@@ -38,7 +38,9 @@ jest.mock('../src/db', () => {
 });
 
 function _daysAgo(days: number): Date {
-  return new Date(Number(new Date()) - days * 24 * 60 * 60 * 1000);
+  const d = new Date();
+  d.setSeconds(d.getSeconds() - days * 24 * 60 * 60);
+  return d;
 }
 
 describe('Invite Bot', () => {
