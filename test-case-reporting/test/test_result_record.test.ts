@@ -19,6 +19,7 @@ import {Database, dbConnect} from '../src/db';
 import {TestResultRecord} from '../src/test_result_record';
 import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
+import {truncateAll} from './testing_utils';
 import Knex from 'knex';
 import md5 from 'md5';
 
@@ -58,16 +59,14 @@ describe('TestResultRecord', () => {
     ) as unknown) as KarmaReporter.TestResultReport;
   });
 
-  afterAll(() => {
-    db.destroy();
+  afterAll(async () => {
+    await db.destroy();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.restoreAllMocks();
-    db('test_runs').truncate();
-    db('test_cases').truncate();
-    db('jobs').truncate();
-    db('builds').truncate();
+
+    await truncateAll(db);
   });
 
   describe('insertTravisBuild', () => {

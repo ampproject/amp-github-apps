@@ -21,6 +21,7 @@ import {Database, dbConnect} from '../src/db';
 import {app} from '../index';
 import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
+import {truncateAll} from './testing_utils';
 
 jest.mock('../src/db', () => ({
   dbConnect: (): Database =>
@@ -39,16 +40,13 @@ describe('end-to-end', () => {
     await setupDb(db);
   });
 
-  afterAll(() => {
-    db.destroy();
+  afterAll(async () => {
+    await db.destroy();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.restoreAllMocks();
-    db('test_runs').truncate();
-    db('test_cases').truncate();
-    db('jobs').truncate();
-    db('builds').truncate();
+    await truncateAll(db);
   });
 
   describe('when one post request is received', async () => {
