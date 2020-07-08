@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-import Knex from 'knex';
+import fs from 'fs';
+import path from 'path';
 
-export type Database = Knex;
+function getFixtureAsString(name: string): string {
+  return fs.readFileSync(path.join(__dirname, `${name}.json`)).toString('utf8');
+}
 
-export const TIMESTAMP_PRECISION = 3;
-
-export function dbConnect(): Database {
-  return Knex({
-    client: 'pg',
-    connection: {
-      host: process.env.DB_UNIX_SOCKET,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-    },
-  });
+/**
+ * Get a JSON test fixture object.
+ */
+export function getFixture(name: string): Record<string, unknown> {
+  return JSON.parse(getFixtureAsString(name));
 }

@@ -1,0 +1,89 @@
+{
+    "summary": {
+        "success": 2,
+        "failed": 1,
+        "skipped": 1,
+        "error": false,
+        "disconnected": false,
+        "exitCode": 1
+    },
+    "browsers": [
+        {
+            "browser": {
+                "id": "52060",
+                "fullName": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+                "name": "Chrome 83.0.4103.97 (Linux x86_64)",
+                "state": "DISCONNECTED",
+                "lastResult": {
+                    "startTime": 100,
+                    "total": 3,
+                    "success": 1,
+                    "failed": 1,
+                    "skipped": 1,
+                    "totalTime": 2100,
+                    "netTime": 1915,
+                    "error": false,
+                    "disconnected": false
+                },
+                "disconnectsCount": 0,
+                "noActivityTimeout": 120000,
+                "disconnectDelay": 120000
+            },
+            "errors": [],
+            "results": [
+                {
+                    "id": "",
+                    "description": "when test is good / it passes",
+                    "suite": [],
+                    "success": true,
+                    "skipped": false,
+                    "pending": false,
+                    "time": 42,
+                    "log": [],
+                    "assertionErrors": [],
+                    "startTime": 100,
+                    "endTime": 150
+                },
+                {
+                    "id": "",
+                    "description": "when test is bad / it fails",
+                    "suite": [],
+                    "success": false,
+                    "skipped": false,
+                    "pending": false,
+                    "time": 1337,
+                    "log": [],
+                    "assertionErrors": [],
+                    "startTime": 160,
+                    "endTime": 1600
+                },
+                {
+                    "id": "",
+                    "description": "when test was skipped / it skipped",
+                    "suite": [],
+                    "success": false,
+                    "skipped": true,
+                    "pending": false,
+                    "time": 413,
+                    "log": [],
+                    "assertionErrors": [],
+                    "startTime": 1610,
+                    "endTime": 2050
+                },
+                {
+                    "id": "",
+                    "description": "🤖 when passing test has emojis 🤖 / it passes 🎉",
+                    "suite": [],
+                    "success": true,
+                    "skipped": false,
+                    "pending": false,
+                    "time": 123,
+                    "log": [],
+                    "assertionErrors": [],
+                    "startTime": 2050,
+                    "endTime": 2200
+                }
+            ]
+        }
+    ]
+}

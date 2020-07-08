@@ -38,6 +38,7 @@ import statusCodes from 'http-status-codes';
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
+const ISSUE_REPO_NAME = process.env.ISSUE_REPO_NAME || 'amphtml';
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
 const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
@@ -68,7 +69,8 @@ function renderTopIssues(issues: Array<TopIssueView>): string {
 const bot = new ErrorIssueBot(
   GITHUB_ACCESS_TOKEN,
   GITHUB_REPO_OWNER,
-  GITHUB_REPO_NAME
+  GITHUB_REPO_NAME,
+  ISSUE_REPO_NAME
 );
 
 const stackdriver = new StackdriverApi(PROJECT_ID);
@@ -157,19 +159,6 @@ export async function errorIssue(
   }
 }
 
-/** Endpoint to trigger a scan for new frequent errors. */
-export async function errorMonitor(
-  req: express.Request,
-  res: express.Response
-): Promise<void> {
-  try {
-    res.json({issueUrls: await monitor.monitorAndReport()});
-  } catch (error) {
-    res.status(statusCodes.INTERNAL_SERVER_ERROR);
-    res.json({error: error.toString()});
-  }
-}
-
 function createErrorReportUrl({errorId}: ErrorReport): string {
   const params = querystring.stringify({errorId, linkIssue: 1});
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
@@ -198,6 +187,20 @@ function getLister(
   }
 
   return optThreshold ? lister.threshold(optThreshold) : lister;
+}
+
+/** Endpoint to trigger a scan for new frequent errors. */
+export async function errorMonitor(
+  req: express.Request,
+  res: express.Response
+): Promise<void> {
+  try {
+    const serviceType = (req.query.serviceType || '').toString().toUpperCase();
+    res.json({issueUrls: await getLister(serviceType).monitorAndReport()});
+  } catch (error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR);
+    res.json({error: error.toString()});
+  }
 }
 
 function viewData({
