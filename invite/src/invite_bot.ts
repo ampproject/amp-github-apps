@@ -39,7 +39,7 @@ const EXPIRATION_INTERVAL_MS = 7 * 24 * 60 * 60;
 
 function expirationDate(): Date {
   const d = new Date();
-  d.setSeconds(d.getSeconds() - EXPIRATION_INTERVAL_MS - 60 * 60);
+  d.setSeconds(d.getSeconds() - EXPIRATION_INTERVAL_MS);
   return d;
 }
 
