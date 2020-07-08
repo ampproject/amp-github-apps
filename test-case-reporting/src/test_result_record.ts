@@ -51,7 +51,7 @@ export class TestResultRecord {
     return success ? 'PASS' : 'FAIL';
   }
 
-  makeTestCaseName(description: string, suite: Array<string>): string {
+  makeTestCaseName(suite: Array<string>, description: string): string {
     return suite.concat([description]).join(' | ');
   }
 
@@ -60,8 +60,8 @@ export class TestResultRecord {
     const jobId = await this.insertTravisJob(job, buildId);
 
     const formattedResults = result.browsers.results.map(result => {
-      const {description, suite} = result;
-      const testCaseName = this.makeTestCaseName(description, suite);
+      const {suite, description} = result;
+      const testCaseName = this.makeTestCaseName(suite, description);
       return {
         ...result,
         testCaseId: md5(testCaseName),

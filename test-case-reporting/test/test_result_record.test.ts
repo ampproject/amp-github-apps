@@ -125,8 +125,8 @@ describe('TestResultRecord', () => {
 
       const sampleTestCases: Array<DB.TestCase> = sampleKarmaReport.browsers.results.map(
         result => {
-          const {description, suite} = result;
-          const name = testResultRecord.makeTestCaseName(description, suite);
+          const {suite, description} = result;
+          const name = testResultRecord.makeTestCaseName(suite, description);
           return {
             id: md5(name),
             name,
