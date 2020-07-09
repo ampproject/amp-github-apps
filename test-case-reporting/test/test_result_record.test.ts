@@ -214,6 +214,11 @@ describe('TestResultRecord', () => {
           id: '36340965686c32694f88f06c6a3f71ac',
           name: '🤖 when passing test has emojis 🤖 | it passes 🎉',
         },
+        {
+          id: 'e3c1257d76c0b4d0f0c1307161ab5424',
+          name:
+            'when the moon hits your eye | when i was a young boy | when the fires come | it skips',
+        },
       ];
 
       expect(sampleTestCases).toMatchObject(testCases);
@@ -253,12 +258,17 @@ describe('TestResultRecord', () => {
           id: '36340965686c32694f88f06c6a3f71ac',
           name: '🤖 when passing test has emojis 🤖 | it passes 🎉',
         },
+        {
+          id: 'e3c1257d76c0b4d0f0c1307161ab5424',
+          name:
+            'when the moon hits your eye | when i was a young boy | when the fires come | it skips',
+        },
       ];
 
       expect(sampleTestCases).toMatchObject(testCases);
     });
 
-    it('inserts test results', () => {
+    it('inserts test results', async () => {
       testResultRecord.storeTravisReport({
         job: sampleJob,
         build: sampleBuild,
@@ -292,6 +302,12 @@ describe('TestResultRecord', () => {
           'test_case_id': '36340965686c32694f88f06c6a3f71ac',
           status: 'PASS',
           'duration_ms': 123,
+          'job_id': 1,
+        },
+        {
+          'test_case_id': 'e3c1257d76c0b4d0f0c1307161ab5424',
+          'status': 'SKIP',
+          'duration_ms': 1234,
           'job_id': 1,
         },
       ];

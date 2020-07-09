@@ -20,8 +20,8 @@
                     "success": 1,
                     "failed": 1,
                     "skipped": 1,
-                    "totalTime": 2100,
-                    "netTime": 1915,
+                    "totalTime": 3334,
+                    "netTime": 3149,
                     "error": false,
                     "disconnected": false
                 },
@@ -82,6 +82,23 @@
                     "assertionErrors": [],
                     "startTime": 2050,
                     "endTime": 2200
+                },
+                {
+                    "id": "",
+                    "description": "it skips",
+                    "suite": [
+                        "when the moon hits your eye",
+                        "when i was a young boy",
+                        "when the fires come"
+                    ],
+                    "success": false,
+                    "skipped": true,
+                    "pending": false,
+                    "time": 1234,
+                    "log": [],
+                    "assertionErrors": [],
+                    "startTime": 2200,
+                    "endTime": 3434
                 }
             ]
         }
