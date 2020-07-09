@@ -49,6 +49,12 @@ describe('TestResultRecord', () => {
     'sample-karma-report'
   ) as unknown) as KarmaReporter.TestResultReport;
 
+  const sampleTravisReport: Travis.Report = {
+    job: sampleJob,
+    build: sampleBuild,
+    result: sampleKarmaReport,
+  }
+
   beforeAll(async () => {
     db = dbConnect();
     await setupDb(db);
@@ -158,11 +164,7 @@ describe('TestResultRecord', () => {
 
   describe('storeTravisResults', () => {
     it('inserts the build', async () => {
-      await testResultRecord.storeTravisReport({
-        job: sampleJob,
-        build: sampleBuild,
-        result: sampleKarmaReport,
-      });
+      await testResultRecord.storeTravisReport(sampleTravisReport);
 
       expect(testResultRecord.insertTravisBuild).toBeCalledWith({
         buildNumber: '413413',
@@ -171,11 +173,7 @@ describe('TestResultRecord', () => {
     });
 
     it('inserts the job', async () => {
-      await testResultRecord.storeTravisReport({
-        job: sampleJob,
-        build: sampleBuild,
-        result: sampleKarmaReport,
-      });
+      await testResultRecord.storeTravisReport(sampleTravisReport);
 
       expect(testResultRecord.insertTravisJob).toBeCalledWith(
         {
@@ -187,11 +185,7 @@ describe('TestResultRecord', () => {
     });
 
     it('inserts test cases', async () => {
-      await testResultRecord.storeTravisReport({
-        job: sampleJob,
-        build: sampleBuild,
-        result: sampleKarmaReport,
-      });
+      await testResultRecord.storeTravisReport(sampleTravisReport);
 
       const testCases: Array<DB.TestCase> = await db<DB.TestCase>(
         'test_cases'
@@ -225,17 +219,8 @@ describe('TestResultRecord', () => {
     });
 
     it('does not duplicate test cases', async () => {
-      await testResultRecord.storeTravisReport({
-        job: sampleJob,
-        build: sampleBuild,
-        result: sampleKarmaReport,
-      });
-
-      await testResultRecord.storeTravisReport({
-        job: sampleJob,
-        build: sampleBuild,
-        result: sampleKarmaReport,
-      });
+      await testResultRecord.storeTravisReport(sampleTravisReport);
+      await testResultRecord.storeTravisReport(sampleTravisReport);
 
       const testCases: Array<DB.TestCase> = await db<DB.TestCase>(
         'test_cases'
@@ -268,12 +253,8 @@ describe('TestResultRecord', () => {
       expect(testCases).toMatchObject(sampleTestCases);
     });
 
-    it('inserts test results', async () => {
-      await testResultRecord.storeTravisReport({
-        job: sampleJob,
-        build: sampleBuild,
-        result: sampleKarmaReport,
-      });
+    it('inserts test runs', async () => {
+      await testResultRecord.storeTravisReport(sampleTravisReport);
 
       const testRuns: Array<DB.TestRun> = await db<DB.TestRun>(
         'test_runs'
