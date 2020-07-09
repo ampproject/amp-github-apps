@@ -71,14 +71,16 @@ export class TestResultRecord {
     const buildId = await this.insertTravisBuild(build);
     const jobId = await this.insertTravisJob(job, buildId);
 
-    const formattedResults = result.browsers.results.map(result => {
-      const testCaseName = this.testCaseName(result);
-      return {
-        ...result,
-        testCaseId: md5(testCaseName),
-        testCaseName,
-      };
-    });
+    const formattedResults = result.browsers
+      .reduce((accumulator, {results}) => accumulator.concat(results), [])
+      .map(result => {
+        const testCaseName = this.testCaseName(result);
+        return {
+          ...result,
+          testCaseId: md5(testCaseName),
+          testCaseName,
+        };
+      });
 
     const testCases: Array<DB.TestCase> = formattedResults.map(
       ({testCaseId, testCaseName}) => ({

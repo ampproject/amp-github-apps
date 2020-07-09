@@ -53,7 +53,7 @@ describe('TestResultRecord', () => {
     job: sampleJob,
     build: sampleBuild,
     result: sampleKarmaReport,
-  }
+  };
 
   beforeAll(async () => {
     db = dbConnect();

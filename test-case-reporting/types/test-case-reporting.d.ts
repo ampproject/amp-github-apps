@@ -104,10 +104,10 @@ declare module 'test-case-reporting' {
   // isn't timeMs, for example.
   namespace KarmaReporter {
     export interface TestResultReport {
-      browsers: BrowserResultSet;
+      browsers: Array<BrowserResult>;
     }
 
-    export interface BrowserResultSet {
+    export interface BrowserResult {
       results: Array<TestResult>;
     }
 
