@@ -227,7 +227,44 @@ describe('TestResultRecord', () => {
     });
 
     it('inserts test results', () => {
-      // TODO: complete this
+      testResultRecord.storeTravisReport({
+        job: sampleJob,
+        build: sampleBuild,
+        result: sampleKarmaReport,
+      });
+
+      const testRuns: Array<DB.TestRun> = await db<DB.TestRun>(
+        'test_runs'
+      ).select();
+
+      const sampleTestRuns: Array<DB.TestRun> = [
+        {
+          'test_case_id': '8fd7659c797d5b46f64917937d4805f9',
+          status: 'PASS',
+          'duration_ms': 42,
+          'job_id': 1,
+        },
+        {
+          'test_case_id': '8a3d71d66b2913bb981a8d4f2a2930db',
+          status: 'FAIL',
+          'duration_ms': 1337,
+          'job_id': 1,
+        },
+        {
+          'test_case_id': 'c5cf7c15d50ec660c3b10b6c91bfe3f8',
+          status: 'SKIP',
+          'duration_ms': 413,
+          'job_id': 1,
+        },
+        {
+          'test_case_id': '36340965686c32694f88f06c6a3f71ac',
+          status: 'PASS',
+          'duration_ms': 123,
+          'job_id': 1,
+        },
+      ];
+
+      expect(sampleTestRuns).toMatchObject(testRuns);
     });
   });
 });
