@@ -98,7 +98,7 @@ export class TestResultRecord {
       })
     );
 
-    await this.db.raw(`? ON CONFLICT id DO NOTHING;`, [
+    await this.db.raw(`? ON CONFLICT DO NOTHING;`, [
       this.db('test_cases').insert(testCases),
     ]);
 
