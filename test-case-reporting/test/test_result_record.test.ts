@@ -124,6 +124,38 @@ describe('TestResultRecord', () => {
     });
   });
 
+  describe('testCaseName', () => {
+    it('handles small cases', () => {
+      expect(
+        testResultRecord.testCaseName({
+          suite: ['hello 🤖'],
+          description: 'world',
+        })
+      ).toEqual('hello | world');
+    });
+
+    it('handles larger cases', () => {
+      expect(
+        testResultRecord.testCaseName({
+          suite: ['hello', 'darkness', 'my', 'old'],
+          description: 'friend',
+        })
+      ).toEqual('hello | darkness | my | old | friend');
+    });
+
+    it('handles empty suites & keeps leading/trailing whitespace', () => {
+      expect(
+        testResultRecord.testCaseName({suite: [], description: ' gomu gomu  '})
+      ).toEqual(' gomugomu  ');
+    });
+
+    it('handles empty strings', () => {
+      expect(
+        testResultRecord.testCaseName({suite: ['', ''], description: 'ora ora'})
+      ).toEqual(' |  | ora ora');
+    });
+  });
+
   describe('storeTravisResults', () => {
     it('inserts the build', async () => {
       testResultRecord.storeTravisReport({
@@ -168,7 +200,7 @@ describe('TestResultRecord', () => {
       const sampleTestCases: Array<DB.TestCase> = [
         {
           id: '8fd7659c797d5b46f64917937d4805f9',
-          name: 'when test is good | it passes'
+          name: 'when test is good | it passes',
         },
         {
           id: '8a3d71d66b2913bb981a8d4f2a2930db',
@@ -207,7 +239,7 @@ describe('TestResultRecord', () => {
       const sampleTestCases: Array<DB.TestCase> = [
         {
           id: '8fd7659c797d5b46f64917937d4805f9',
-          name: 'when test is good | it passes'
+          name: 'when test is good | it passes',
         },
         {
           id: '8a3d71d66b2913bb981a8d4f2a2930db',
