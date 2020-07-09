@@ -81,8 +81,8 @@ describe('TestResultRecord', () => {
         .first();
 
       expect(build).toMatchObject({
-        'build_number': 'abcdefg123gomugomu',
-        'commit_sha': '413413',
+        'build_number': '413413',
+        'commit_sha': 'abcdefg123gomugomu',
       });
     });
   });
@@ -107,7 +107,7 @@ describe('TestResultRecord', () => {
       });
     });
 
-    it("throws an error if the build doesn't exist");
+    it.todo("throws an error if the build doesn't exist");
   });
 
   describe('testStatus', () => {
@@ -137,7 +137,7 @@ describe('TestResultRecord', () => {
           suite: ['hello 🤖'],
           description: 'world',
         })
-      ).toEqual('hello | world');
+      ).toEqual('hello 🤖 | world');
     });
 
     it('handles larger cases', () => {
@@ -152,7 +152,7 @@ describe('TestResultRecord', () => {
     it('handles empty suites & keeps leading/trailing whitespace', () => {
       expect(
         testResultRecord.testCaseName({suite: [], description: ' gomu gomu  '})
-      ).toEqual(' gomugomu  ');
+      ).toEqual(' gomu gomu  ');
     });
 
     it('handles empty strings', () => {
@@ -164,21 +164,23 @@ describe('TestResultRecord', () => {
 
   describe('storeTravisResults', () => {
     it('inserts the build', async () => {
+      const spy = jest.spyOn(testResultRecord, 'insertTravisBuild');
       await testResultRecord.storeTravisReport(sampleTravisReport);
 
-      expect(testResultRecord.insertTravisBuild).toBeCalledWith({
+      expect(spy).toBeCalledWith({
         buildNumber: '413413',
         commitSha: 'abcdefg123gomugomu',
       });
     });
 
     it('inserts the job', async () => {
+      const spy = jest.spyOn(testResultRecord, 'insertTravisJob');
       await testResultRecord.storeTravisReport(sampleTravisReport);
 
-      expect(testResultRecord.insertTravisJob).toBeCalledWith(
+      expect(spy).toBeCalledWith(
         {
-          'job_number': '413413.612',
-          'test_suite_type': 'unit',
+          'jobNumber': '413413.612',
+          'testSuiteType': 'unit',
         },
         1
       );
