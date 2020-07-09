@@ -21,7 +21,6 @@ import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
 import {truncateAll} from './testing_utils';
 import Knex from 'knex';
-import md5 from 'md5';
 
 jest.mock('../src/db', () => ({
   dbConnect: (): Database =>
@@ -46,17 +45,15 @@ describe('TestResultRecord', () => {
     testSuiteType: 'unit',
   };
 
-  let sampleKarmaReport: KarmaReporter.TestResultReport;
+  const sampleKarmaReport: KarmaReporter.TestResultReport = (getFixture(
+    'sample-karma-report'
+  ) as unknown) as KarmaReporter.TestResultReport;
 
   beforeAll(async () => {
     db = dbConnect();
     await setupDb(db);
 
     testResultRecord = new TestResultRecord(db);
-
-    sampleKarmaReport = (getFixture(
-      'sample-karma-report'
-    ) as unknown) as KarmaReporter.TestResultReport;
   });
 
   afterAll(async () => {
