@@ -32,7 +32,7 @@ jest.mock('../src/db', () => ({
     }),
 }));
 
-describe('end-to-end', () => {
+describe.skip('end-to-end', () => {
   let db: Database;
 
   beforeAll(async () => {
