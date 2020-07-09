@@ -158,7 +158,7 @@ describe('TestResultRecord', () => {
 
   describe('storeTravisResults', () => {
     it('inserts the build', async () => {
-      testResultRecord.storeTravisReport({
+      await testResultRecord.storeTravisReport({
         job: sampleJob,
         build: sampleBuild,
         result: sampleKarmaReport,
@@ -171,7 +171,7 @@ describe('TestResultRecord', () => {
     });
 
     it('inserts the job', async () => {
-      testResultRecord.storeTravisReport({
+      await testResultRecord.storeTravisReport({
         job: sampleJob,
         build: sampleBuild,
         result: sampleKarmaReport,
@@ -187,7 +187,7 @@ describe('TestResultRecord', () => {
     });
 
     it('inserts test cases', async () => {
-      testResultRecord.storeTravisReport({
+      await testResultRecord.storeTravisReport({
         job: sampleJob,
         build: sampleBuild,
         result: sampleKarmaReport,
@@ -225,13 +225,13 @@ describe('TestResultRecord', () => {
     });
 
     it('does not duplicate test cases', async () => {
-      testResultRecord.storeTravisReport({
+      await testResultRecord.storeTravisReport({
         job: sampleJob,
         build: sampleBuild,
         result: sampleKarmaReport,
       });
 
-      testResultRecord.storeTravisReport({
+      await testResultRecord.storeTravisReport({
         job: sampleJob,
         build: sampleBuild,
         result: sampleKarmaReport,
@@ -269,7 +269,7 @@ describe('TestResultRecord', () => {
     });
 
     it('inserts test results', async () => {
-      testResultRecord.storeTravisReport({
+      await testResultRecord.storeTravisReport({
         job: sampleJob,
         build: sampleBuild,
         result: sampleKarmaReport,
