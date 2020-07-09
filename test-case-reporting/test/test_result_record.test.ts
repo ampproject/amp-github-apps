@@ -221,7 +221,7 @@ describe('TestResultRecord', () => {
         },
       ];
 
-      expect(sampleTestCases).toMatchObject(testCases);
+      expect(testCases).toMatchObject(sampleTestCases);
     });
 
     it('does not duplicate test cases', async () => {
@@ -265,7 +265,7 @@ describe('TestResultRecord', () => {
         },
       ];
 
-      expect(sampleTestCases).toMatchObject(testCases);
+      expect(testCases).toMatchObject(sampleTestCases);
     });
 
     it('inserts test results', async () => {
@@ -312,7 +312,7 @@ describe('TestResultRecord', () => {
         },
       ];
 
-      expect(sampleTestRuns).toMatchObject(testRuns);
+      expect(testRuns).toMatchObject(sampleTestRuns);
     });
   });
 });
