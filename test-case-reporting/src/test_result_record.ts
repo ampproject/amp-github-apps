@@ -57,7 +57,7 @@ export class TestResultRecord {
     return success ? 'PASS' : 'FAIL';
   }
 
-  makeTestCaseName({
+  testCaseName({
     suite,
     description,
   }: {
@@ -72,7 +72,7 @@ export class TestResultRecord {
     const jobId = await this.insertTravisJob(job, buildId);
 
     const formattedResults = result.browsers.results.map(result => {
-      const testCaseName = this.makeTestCaseName(result);
+      const testCaseName = this.testCaseName(result);
       return {
         ...result,
         testCaseId: md5(testCaseName),
