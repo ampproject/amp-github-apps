@@ -125,6 +125,35 @@ describe('TestResultRecord', () => {
   });
 
   describe('storeTravisResults', () => {
+    it('inserts the build', async () => {
+      testResultRecord.storeTravisReport({
+        job: sampleJob,
+        build: sampleBuild,
+        result: sampleKarmaReport,
+      });
+
+      expect(testResultRecord.insertTravisBuild).toBeCalledWith({
+        buildNumber: '413413',
+        commitSha: 'abcdefg123gomugomu',
+      });
+    });
+
+    it('inserts the job', async () => {
+      testResultRecord.storeTravisReport({
+        job: sampleJob,
+        build: sampleBuild,
+        result: sampleKarmaReport,
+      });
+
+      expect(testResultRecord.insertTravisJob).toBeCalledWith(
+        {
+          'job_number': '413413.612',
+          'test_suite_type': 'unit',
+        },
+        expect.any(Number)
+      );
+    });
+
     it('inserts test cases', async () => {
       testResultRecord.storeTravisReport({
         job: sampleJob,
