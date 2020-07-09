@@ -150,7 +150,7 @@ describe('TestResultRecord', () => {
           'job_number': '413413.612',
           'test_suite_type': 'unit',
         },
-        expect.any(Number)
+        1
       );
     });
 
@@ -166,6 +166,10 @@ describe('TestResultRecord', () => {
       ).select();
 
       const sampleTestCases: Array<DB.TestCase> = [
+        {
+          id: '8fd7659c797d5b46f64917937d4805f9',
+          name: 'when test is good | it passes'
+        },
         {
           id: '8a3d71d66b2913bb981a8d4f2a2930db',
           name: 'when test is bad | it fails',
@@ -201,6 +205,10 @@ describe('TestResultRecord', () => {
       ).select();
 
       const sampleTestCases: Array<DB.TestCase> = [
+        {
+          id: '8fd7659c797d5b46f64917937d4805f9',
+          name: 'when test is good | it passes'
+        },
         {
           id: '8a3d71d66b2913bb981a8d4f2a2930db',
           name: 'when test is bad | it fails',
