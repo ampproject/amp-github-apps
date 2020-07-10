@@ -28,9 +28,6 @@ import md5 from 'md5';
 
 const msConversionConstant: number = Math.pow(10, 3 - TIMESTAMP_PRECISION);
 
-// Types in the DB namespace interface use snake_case instead of camelCase.
-/* eslint @typescript-eslint/camelcase: "off" */
-
 function getDateFromTimestamp(timestamp: number): Date {
   return new Date(timestamp * msConversionConstant);
 }
