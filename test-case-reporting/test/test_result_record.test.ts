@@ -58,7 +58,9 @@ describe('TestResultRecord', () => {
   beforeAll(async () => {
     db = dbConnect();
     await setupDb(db);
+  });
 
+  beforeEach(async () => {
     testResultRecord = new TestResultRecord(db);
   });
 
