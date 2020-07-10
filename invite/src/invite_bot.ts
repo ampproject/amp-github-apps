@@ -34,6 +34,14 @@ const FULL_MACRO_REGEX = new RegExp(
   `(?<!\\S)${MACRO_PATTERN} @${USERNAME_PATTERN}`,
   'ig'
 );
+// GitHub expires invitations after one week.
+const EXPIRATION_INTERVAL_SEC = 7 * 24 * 60 * 60;
+
+function expirationDate(): Date {
+  const d = new Date();
+  d.setSeconds(d.getSeconds() - EXPIRATION_INTERVAL_SEC);
+  return d;
+}
 
 /**
  * GitHub bot which can invite users to an organization and assign issues in
@@ -154,9 +162,12 @@ export class InviteBot {
   async tryInvite(invite: Invite): Promise<void> {
     this.logger.debug(`tryInvite: Trying to invite`, invite);
     const existingInvites = await this.record.getInvites(invite.username);
-    const pendingInvite = !!existingInvites.length;
+    const expiration = expirationDate();
+    const pendingInvites = existingInvites.filter(
+      ({created_at}) => created_at > expiration
+    );
 
-    if (pendingInvite) {
+    if (pendingInvites.length) {
       return await this.handlePendingInvite(invite);
     }
 
