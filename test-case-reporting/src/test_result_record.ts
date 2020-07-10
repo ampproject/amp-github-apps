@@ -72,7 +72,8 @@ export class TestResultRecord {
     const jobId = await this.insertTravisJob(job, buildId);
 
     const formattedResults = result.browsers
-      .reduce((accumulator, {results}) => accumulator.concat(results), [])
+      .map(({results}) => results)
+      .reduce((flattenedArray, array) => flattenedArray.concat(array), [])
       .map(result => {
         const testCaseName = this.testCaseName(result);
         return {
