@@ -49,6 +49,10 @@ describe('TestResultRecord', () => {
     'sample-karma-report'
   ) as unknown) as KarmaReporter.TestResultReport;
 
+  const smallerSampleKarmaReport: KarmaReporter.TestResultReport = (getFixture(
+    'sample-karma-report-smaller'
+  ) as unknown) as KarmaReporter.TestResultReport;
+
   const sampleTravisReport: Travis.Report = {
     job: sampleJob,
     build: sampleBuild,
@@ -223,10 +227,13 @@ describe('TestResultRecord', () => {
     });
 
     it('does not duplicate test cases', async () => {
-      await testResultRecord.storeTravisReport(sampleTravisReport);
-      await testResultRecord.storeTravisReport(sampleTravisReport);
+      await testResultRecord.storeTravisReport({
+        job: sampleJob,
+        build: sampleBuild,
+        result: smallerSampleKarmaReport,
+      });
 
-      const testCases: Array<DB.TestCase> = await db<DB.TestCase>(
+      let testCases: Array<DB.TestCase> = await db<DB.TestCase>(
         'test_cases'
       ).select();
 
@@ -243,6 +250,14 @@ describe('TestResultRecord', () => {
           id: 'c5cf7c15d50ec660c3b10b6c91bfe3f8',
           name: 'when test was skipped | it skipped',
         },
+      ];
+
+      expect(testCases).toMatchObject(sampleTestCases);
+
+      await testResultRecord.storeTravisReport(sampleTravisReport);
+      testCases = await db<DB.TestCase>('test_cases').select();
+
+      sampleTestCases.push(
         {
           id: '36340965686c32694f88f06c6a3f71ac',
           name: '🤖 when passing test has emojis 🤖 | it passes 🎉',
@@ -251,8 +266,8 @@ describe('TestResultRecord', () => {
           id: 'e3c1257d76c0b4d0f0c1307161ab5424',
           name:
             'when the moon hits your eye | when i was a young boy | when the fires come | it skips',
-        },
-      ];
+        }
+      );
 
       expect(testCases).toMatchObject(sampleTestCases);
     });
