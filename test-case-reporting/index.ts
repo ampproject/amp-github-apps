@@ -16,11 +16,8 @@
 
 require('dotenv').config();
 
-import {Database, dbConnect} from './src/db';
-import {TestResultRecord} from './src/test_result_record';
-import {Travis} from 'test-case-reporting';
+import {KarmaReporter} from 'test-case-reporting';
 import express from 'express';
-
 const app = express();
 const PORT = process.env.PORT || 8080;
 
@@ -38,14 +35,9 @@ app.get('/test-results/history/:testCaseId', (req, res) => {
   res.send(`Test history for test with name/ID ${testCaseId}`);
 });
 
-app.post('/report', async (req, res) => {
-  const db: Database = dbConnect();
-  const testResultRecord = new TestResultRecord(db);
-
-  const report: Travis.Report = req.body;
-
-  await testResultRecord.storeTravisReport(report);
-  res.send(`Travis report stored successfully!`);
+app.post('/report', (req, res) => {
+  const report: KarmaReporter.TestResultReport = req.body;
+  res.send(`Travis report! The request body is below.\n\n${report}`);
 });
 
 app.listen(PORT, () => {
