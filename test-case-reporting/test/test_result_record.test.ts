@@ -113,6 +113,7 @@ describe('TestResultRecord', () => {
       });
     });
 
+    // TODO(#926): Add more unhappy path unit tests
     it.todo("throws an error if the build doesn't exist");
   });
 
