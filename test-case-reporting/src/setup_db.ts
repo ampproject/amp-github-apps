@@ -41,7 +41,10 @@ export async function setupDb(db: Database): Promise<unknown> {
     })
     .createTable('test_cases', table => {
       // MD5 hash of the name
-      table.string('id', 32).primary();
+      table
+        .string('id', 32)
+        .primary()
+        .comment('MD5 hash of the name');
       table.string('name');
       table
         .timestamp('created_at', {precision: TIMESTAMP_PRECISION})
