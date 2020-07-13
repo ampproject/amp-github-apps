@@ -40,6 +40,7 @@
     ```
 
 7. Create the Cloud Build configuration file `cloud_build.yaml`
+    > In the following bullets, "steps" refers to YAML build steps, not to instruction steps
     - Use an existing configuration as a template
     - The first two steps must be installing `yaml` and replacing secrets
     - The remaining steps will parallel the manual deployment process, such as `npm install`, `gcloud app deploy`, etc.
