@@ -28,13 +28,6 @@ declare module 'test-case-reporting' {
     // Despite being a *Number, buildNumber is of type string for parity with
     // jobNumber
     buildNumber: number;
-    startedAt: Date;
-
-    // The list of jobs we know are contained in the build.
-    // When we create a build, we fill this with its jobs, but when
-    // we get a build from a server, the jobs list may not be populated
-    // if the jobs are not needed.
-    jobs: Array<Job>;
   }
 
   /** A job within a Travis build. */
@@ -44,11 +37,6 @@ declare module 'test-case-reporting' {
     // this looks like `123.456`
     jobNumber: string;
     testSuiteType: TestSuiteType;
-    startedAt: Date;
-
-    // This list is treated similarly to the `jobs` array of the `Build` type.
-    // Read the comment on `jobs` for info.
-    testRuns: Array<TestRun>;
   }
 
   /** A single kind of test case, one `it` or `test` block. */
@@ -78,7 +66,6 @@ declare module 'test-case-reporting' {
       // Despite being a *_number, build_number is of type string for parity with
       // job_number
       build_number: string;
-      started_at: number;
     }
 
     export interface Job {
@@ -90,23 +77,23 @@ declare module 'test-case-reporting' {
       // this looks like `123.456`
       job_number: string;
       test_suite_type: TestSuiteType;
-      started_at: number;
     }
 
     export interface TestCase {
-      // See comment under `DB.Build.id`
-      id?: number;
+      // MD5 hash of the test case name
+      id: string;
       name: string;
-      created_at: number;
+      // Defaults to now on the database
+      created_at?: number;
     }
 
     export interface TestRun {
       // See comment under `DB.Build.id`
       id?: number;
       job_id: number;
-      test_case_id: number;
+      test_case_id: string;
       status: TestStatus;
-      timestamp: number;
+      timestamp?: number;
       duration_ms: number;
     }
   }
@@ -117,10 +104,10 @@ declare module 'test-case-reporting' {
   // isn't timeMs, for example.
   namespace KarmaReporter {
     export interface TestResultReport {
-      browsers: BrowserResultSet;
+      browsers: Array<BrowserResult>;
     }
 
-    export interface BrowserResultSet {
+    export interface BrowserResult {
       results: Array<TestResult>;
     }
 

@@ -40,9 +40,15 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.foreign('build_id').references('builds.id');
     })
     .createTable('test_cases', table => {
-      table.increments('id').primary();
+      // MD5 hash of the name
+      table
+        .string('id', 32)
+        .primary()
+        .comment('MD5 hash of the name');
       table.string('name');
-      table.timestamp('created_at', {precision: TIMESTAMP_PRECISION});
+      table
+        .timestamp('created_at', {precision: TIMESTAMP_PRECISION})
+        .defaultTo(db.fn.now(TIMESTAMP_PRECISION));
     })
     .createTable('test_runs', table => {
       table.increments('id').primary();

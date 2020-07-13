@@ -20,8 +20,8 @@
                     "success": 1,
                     "failed": 1,
                     "skipped": 1,
-                    "totalTime": 3334,
-                    "netTime": 3149,
+                    "totalTime": 1950,
+                    "netTime": 1792,
                     "error": false,
                     "disconnected": false
                 },
@@ -69,36 +69,6 @@
                     "assertionErrors": [],
                     "startTime": 1610,
                     "endTime": 2050
-                },
-                {
-                    "id": "",
-                    "description": "it passes 🎉",
-                    "suite": ["🤖 when passing test has emojis 🤖"],
-                    "success": true,
-                    "skipped": false,
-                    "pending": false,
-                    "time": 123,
-                    "log": [],
-                    "assertionErrors": [],
-                    "startTime": 2050,
-                    "endTime": 2200
-                },
-                {
-                    "id": "",
-                    "description": "it skips",
-                    "suite": [
-                        "when the moon hits your eye",
-                        "when i was a young boy",
-                        "when the fires come"
-                    ],
-                    "success": false,
-                    "skipped": true,
-                    "pending": false,
-                    "time": 1234,
-                    "log": [],
-                    "assertionErrors": [],
-                    "startTime": 2200,
-                    "endTime": 3434
                 }
             ]
         }
