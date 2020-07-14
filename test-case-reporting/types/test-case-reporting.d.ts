@@ -24,6 +24,10 @@ declare module 'test-case-reporting' {
 
   export type TestStatus = 'PASS' | 'FAIL' | 'SKIP' | 'ERROR';
 
+  export type QueryFunction = (
+    q: QueryBuilder.QueryBuilder
+  ) => QueryBuilder.QueryBuilder;
+
   /** A build on Travis. */
   export interface Build {
     commitSha: string;
@@ -64,10 +68,6 @@ declare module 'test-case-reporting' {
     limit: number;
     offset: number;
   }
-
-  export type QueryFunction = (
-    q: QueryBuilder.QueryBuilder
-  ) => QueryBuilder.QueryBuilder;
 
   // Types in the DB namespace interface with the database which
   // uses snake_case instead of camelCase.
