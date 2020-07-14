@@ -197,7 +197,7 @@ export class TestResultRecord {
    * Gets a list of the test results belonging to a build
    * @param buildNumber The number of the Travis build whose test runs we want.
    */
-  private async getTestRunsOfBuild(
+  async getTestRunsOfBuild(
     buildNumber: string,
     {limit, offset}: PageInfo
   ): Promise<Array<TestRun>> {
@@ -214,7 +214,7 @@ export class TestResultRecord {
    * Gets a list of the runs of a certain test case, in chronological order.
    * @param testCaseName The name of the test case whose history we want.
    */
-  private async getTestCaseHistory(
+  async getTestCaseHistory(
     testCaseName: string,
     {limit, offset}: PageInfo
   ): Promise<Array<TestRun>> {
