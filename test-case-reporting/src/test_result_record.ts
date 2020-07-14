@@ -35,6 +35,11 @@ function getDateFromTimestamp(timestamp: number): Date {
 }
 
 /* eslint-disable @typescript-eslint/camelcase */
+/**
+ * Creates a TestRun object from a row of the join of all the tables.
+ * @param bigJoin A row of the join of all the tables. May have aliases
+ *    for certain columns to avoid collisions or to fit the DB.BigJoin interface.
+ */
 function getTestRunFromRow({
   build_number,
   commit_sha,
@@ -162,6 +167,12 @@ export class TestResultRecord {
     await this.db('test_runs').insert(testRuns);
   }
 
+  /**
+   * Runs a query on the join of all the tables,
+   * generating a list of test runs from the join rows.
+   * @param queryFunction A callback that does queries on the joined table query
+   * @param pageInfo object with the limit and the offset of the query
+   */
   private async bigJoinQuery(
     queryFunction: QueryFunction,
     {limit, offset}: PageInfo
@@ -196,6 +207,7 @@ export class TestResultRecord {
   /**
    * Gets a list of the test results belonging to a build
    * @param buildNumber The number of the Travis build whose test runs we want.
+   * @param pageInfo object with the limit and the offset of the query
    */
   async getTestRunsOfBuild(
     buildNumber: string,
@@ -210,6 +222,7 @@ export class TestResultRecord {
   /**
    * Gets a list of the runs of a certain test case, in chronological order.
    * @param testCaseName The name of the test case whose history we want.
+   * @param pageInfo object with the limit and the offset of the query
    */
   async getTestCaseHistory(
     testCaseName: string,
