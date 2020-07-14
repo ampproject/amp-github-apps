@@ -24,9 +24,7 @@ declare module 'test-case-reporting' {
 
   export type TestStatus = 'PASS' | 'FAIL' | 'SKIP' | 'ERROR';
 
-  export type QueryFunction = (
-    q: QueryBuilder.QueryBuilder
-  ) => QueryBuilder.QueryBuilder;
+  export type QueryFunction = (q: QueryBuilder) => QueryBuilder;
 
   /** A build on Travis. */
   export interface Build {

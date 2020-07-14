@@ -26,7 +26,6 @@ import {
   Travis,
 } from 'test-case-reporting';
 import {Database, TIMESTAMP_PRECISION} from './db';
-import QueryBuilder from 'knex';
 import md5 from 'md5';
 
 const msConversionConstant: number = Math.pow(10, 3 - TIMESTAMP_PRECISION);
@@ -202,7 +201,7 @@ export class TestResultRecord {
     buildNumber: string,
     pageInfo: PageInfo
   ): Promise<Array<TestRun>> {
-    const queryFunction: QueryFunction = (q: QueryBuilder.QueryBuilder) =>
+    const queryFunction: QueryFunction = q =>
       q.where('build_number', buildNumber);
 
     return this.bigJoinQuery(queryFunction, pageInfo);
@@ -216,7 +215,7 @@ export class TestResultRecord {
     testCaseName: string,
     {limit, offset}: PageInfo
   ): Promise<Array<TestRun>> {
-    const queryFunction: QueryFunction = (q: QueryBuilder.QueryBuilder) =>
+    const queryFunction: QueryFunction = q =>
       q
         .where('test_cases.name', testCaseName)
         .orderBy('test_runs.timestamp', 'DESC');
