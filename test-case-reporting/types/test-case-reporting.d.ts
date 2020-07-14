@@ -25,13 +25,16 @@ declare module 'test-case-reporting' {
   /** A build on Travis. */
   export interface Build {
     commitSha: string;
+
     // Despite being a *Number, buildNumber is of type string for parity with
     // jobNumber
-    buildNumber: number;
+    buildNumber: string;
   }
 
   /** A job within a Travis build. */
   export interface Job {
+    build: Build;
+
     // Despite being a *Number, this is of type string because it includes periods.
     // For the 456th job in the 123rd build,
     // this looks like `123.456`
@@ -47,6 +50,7 @@ declare module 'test-case-reporting' {
 
   /** An instance of a test being run, with results. */
   export interface TestRun {
+    job: Job;
     testCase: TestCase;
     status: TestStatus;
     timestamp: Date;
@@ -63,6 +67,7 @@ declare module 'test-case-reporting' {
       // It is not nullable in the database.
       id?: number;
       commit_sha: string;
+
       // Despite being a *_number, build_number is of type string for parity with
       // job_number
       build_number: string;
@@ -72,6 +77,7 @@ declare module 'test-case-reporting' {
       // See comment under `DB.Build.id`
       id?: number;
       build_id: number;
+
       // Despite being a *_number, job_number is of type string because it includes periods.
       // For the 456th job in the 123rd build,
       // this looks like `123.456`
@@ -96,6 +102,8 @@ declare module 'test-case-reporting' {
       timestamp?: number;
       duration_ms: number;
     }
+
+    export interface BigJoin extends Build, Job, TestCase, TestRun {}
   }
   /* eslint @typescript-eslint/camelcase: "error" */
 

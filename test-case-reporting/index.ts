@@ -22,7 +22,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.get('/', (req, res) => {
-  res.send('Hello, world!');
+  res.send('Hello, world, 2.0!');
 });
 
 app.get('/test-results/pr/:prNumber', (req, res) => {
