@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import {QueryBuilder} from 'knex';
+
 declare module 'test-case-reporting' {
   /**
    * Travis job types for which test results may be reported.
@@ -56,6 +58,16 @@ declare module 'test-case-reporting' {
     timestamp: Date;
     durationMs: number;
   }
+
+  /** Fields for the size and offset of a database query. Used for pagination. */
+  export interface PageInfo {
+    limit: number;
+    offset: number;
+  }
+
+  export type QueryFunction = (
+    q: QueryBuilder.QueryBuilder
+  ) => QueryBuilder.QueryBuilder;
 
   // Types in the DB namespace interface with the database which
   // uses snake_case instead of camelCase.
