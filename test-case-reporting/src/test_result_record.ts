@@ -35,6 +35,46 @@ function getDateFromTimestamp(timestamp: number): Date {
   return new Date(timestamp * msConversionConstant);
 }
 
+/* eslint-disable @typescript-eslint/camelcase */
+function getTestRunFromRow({
+  build_number,
+  commit_sha,
+  job_number,
+  test_suite_type,
+  name,
+  created_at,
+  status,
+  timestamp,
+  duration_ms,
+}: DB.BigJoin): TestRun {
+  const build: Build = {
+    buildNumber: build_number,
+    commitSha: commit_sha,
+  };
+
+  const job: Job = {
+    build,
+    jobNumber: job_number,
+    testSuiteType: test_suite_type,
+  };
+
+  const testCase: TestCase = {
+    name,
+    createdAt: getDateFromTimestamp(created_at),
+  };
+
+  const testRun: TestRun = {
+    job,
+    testCase,
+    status,
+    timestamp: getDateFromTimestamp(timestamp),
+    durationMs: duration_ms,
+  };
+
+  return testRun;
+}
+/* eslint-enable @typescript-eslint/camelcase */
+
 export class TestResultRecord {
   constructor(private db: Database) {}
 
@@ -123,45 +163,6 @@ export class TestResultRecord {
     await this.db('test_runs').insert(testRuns);
   }
 
-  /* eslint @typescript-eslint/camelcase: "off" */
-  private getTestRunFromRow({
-    build_number,
-    commit_sha,
-    job_number,
-    test_suite_type,
-    name,
-    created_at,
-    status,
-    timestamp,
-    duration_ms,
-  }: DB.BigJoin): TestRun {
-    const build: Build = {
-      buildNumber: build_number,
-      commitSha: commit_sha,
-    };
-
-    const job: Job = {
-      build,
-      jobNumber: job_number,
-      testSuiteType: test_suite_type,
-    };
-
-    const testCase: TestCase = {
-      name,
-      createdAt: getDateFromTimestamp(created_at),
-    };
-
-    const testRun: TestRun = {
-      job,
-      testCase,
-      status,
-      timestamp: getDateFromTimestamp(timestamp),
-      durationMs: duration_ms,
-    };
-
-    return testRun;
-  }
-
   private async bigJoinQuery(
     queryFunction: QueryFunction,
     {limit, offset}: PageInfo
@@ -190,7 +191,7 @@ export class TestResultRecord {
       'test_runs.duration_ms'
     );
 
-    return rows.map(this.getTestRunFromRow);
+    return rows.map(getTestRunFromRow);
   }
 
   /**
@@ -199,15 +200,12 @@ export class TestResultRecord {
    */
   async getTestRunsOfBuild(
     buildNumber: string,
-    {limit, offset}: PageInfo
+    pageInfo: PageInfo
   ): Promise<Array<TestRun>> {
     const queryFunction: QueryFunction = (q: QueryBuilder.QueryBuilder) =>
       q.where('build_number', buildNumber);
 
-    return this.bigJoinQuery(queryFunction, {
-      limit,
-      offset,
-    });
+    return this.bigJoinQuery(queryFunction, pageInfo);
   }
 
   /**
