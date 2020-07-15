@@ -82,7 +82,33 @@ function getTestRunFromRow({
 export class TestResultRecord {
   constructor(private db: Database) {}
 
+  /**
+   * Gets a DB.Build from the database by its build number.
+   * If there is no such build, it returns undefined.
+   * @param buildNumber The number of the Travis build, as a string.
+   */
+  private async getDbBuildFromBuildNumber(
+    buildNumber: string
+  ): Promise<DB.Build> {
+    return this.db<DB.Build>('builds')
+      .where('build_number', buildNumber)
+      .first();
+  }
+
+  /**
+   * Inserts a build, as reported by Travis, into the database.
+   * Does not insert duplicate builds, but still returns their ids.
+   * @param build The build we want to insert in the database.
+   * @returns The id of the build in the database.
+   */
   async insertTravisBuild(build: Travis.Build): Promise<number> {
+    const existingBuild = await this.getDbBuildFromBuildNumber(
+      build.buildNumber
+    );
+    if (existingBuild) {
+      return existingBuild.id;
+    }
+
     const [buildId] = await this.db('builds')
       .insert({
         'commit_sha': build.commitSha,
@@ -93,6 +119,11 @@ export class TestResultRecord {
     return buildId;
   }
 
+  /**
+   * Inserts a job, as reported by Travis, into the database.
+   * @param job The job we want to insert in the database.
+   * @param buildId The database id of the build of the job.
+   */
   async insertTravisJob(job: Travis.Job, buildId: number): Promise<number> {
     const [jobId] = await this.db('jobs')
       .insert({
@@ -105,6 +136,10 @@ export class TestResultRecord {
     return jobId;
   }
 
+  /**
+   * Helper that generates a test status string from the status booleans of the Karma report.
+   * @param statusObject test status booleans, `skipped` and `success`.
+   */
   testStatus({
     skipped,
     success,
@@ -118,6 +153,10 @@ export class TestResultRecord {
     return success ? 'PASS' : 'FAIL';
   }
 
+  /**
+   * Helper that generates the name of a test case from its suite and description.
+   * @param testCaseInfo contains the test suite in `suite` & the description in `description`
+   */
   testCaseName({
     suite,
     description,
@@ -128,6 +167,12 @@ export class TestResultRecord {
     return suite.concat([description]).join(' | ');
   }
 
+  /**
+   * Stores a travis report on the database. This involves inserting
+   * a job, a build, many test runs, and many test cases.
+   * Duplicate test cases and builds are not inserted.
+   * @param travisReport Travis report with job, build, and test run result info.
+   */
   async storeTravisReport({job, build, result}: Travis.Report): Promise<void> {
     const buildId = await this.insertTravisBuild(build);
     const jobId = await this.insertTravisJob(job, buildId);
