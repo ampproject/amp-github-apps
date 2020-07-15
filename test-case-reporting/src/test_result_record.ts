@@ -271,16 +271,13 @@ export class TestResultRecord {
    */
   async getTestCaseHistory(
     testCaseName: string,
-    {limit, offset}: PageInfo
+    pageInfo: PageInfo
   ): Promise<Array<TestRun>> {
     const queryFunction: QueryFunction = q =>
       q
         .where('test_cases.name', testCaseName)
         .orderBy('test_runs.timestamp', 'DESC');
 
-    return this.bigJoinQuery(queryFunction, {
-      limit,
-      offset,
-    });
+    return this.bigJoinQuery(queryFunction, pageInfo);
   }
 }
