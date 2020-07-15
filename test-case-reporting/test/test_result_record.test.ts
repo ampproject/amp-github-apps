@@ -322,10 +322,16 @@ describe('TestResultRecord', () => {
       await fillDatabase(db);
     });
 
-    it.todo('gets only the test runs of the build');
+    it.todo('only gets the test runs of one build');
+
+    it.todo('gets an empty list if build is not in the database');
   });
 
   describe('getTestCaseHistory', () => {
-    it.todo('gets the test case history in the right order');
+    it.todo(
+      'gets the test case history in reverse chronological order (most recent first)'
+    );
+
+    it.todo('gets an empty list if test case is not in the database');
   });
 });
