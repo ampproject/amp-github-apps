@@ -17,9 +17,9 @@
 import {DB, KarmaReporter, Travis} from 'test-case-reporting';
 import {Database, dbConnect} from '../src/db';
 import {TestResultRecord} from '../src/test_result_record';
+import {fillDatabase, truncateAll} from './testing_utils';
 import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
-import {truncateAll} from './testing_utils';
 import Knex from 'knex';
 
 jest.mock('../src/db', () => ({
@@ -318,6 +318,10 @@ describe('TestResultRecord', () => {
   });
 
   describe('getTestRunsOfBuild', () => {
+    beforeEach(async () => {
+      await fillDatabase(db);
+    });
+
     it.todo('gets only the test runs of the build');
   });
 
