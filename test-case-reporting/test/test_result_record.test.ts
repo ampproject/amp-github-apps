@@ -316,4 +316,12 @@ describe('TestResultRecord', () => {
       expect(testRuns).toMatchObject(sampleTestRuns);
     });
   });
+
+  describe('getTestRunsOfBuild', () => {
+    it.todo('gets only the test runs of the build');
+  });
+
+  describe('getTestCaseHistory', () => {
+    it.todo('gets the test case history in the right order');
+  });
 });
