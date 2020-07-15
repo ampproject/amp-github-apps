@@ -224,7 +224,7 @@ export class TestResultRecord {
   ): Promise<Array<TestRun>> {
     const baseQuery = this.db<DB.BigJoin>('builds')
       .join('jobs', 'jobs.build_id', 'builds.id')
-      .join('test_runs', 'tests_runs.job_id', 'jobs.id')
+      .join('test_runs', 'test_runs.job_id', 'jobs.id')
       .join('test_cases', 'test_cases.id', 'test_runs.test_case_id')
       .limit(limit)
       .offset(offset);
