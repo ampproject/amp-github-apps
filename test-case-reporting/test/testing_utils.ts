@@ -81,7 +81,7 @@ export async function fillDatabase(db: Database): Promise<void> {
   } as DB.Job);
   jobIds.push(jobId);
 
-  const testCaseIds: Array<string> = await this.db('test_cases')
+  const testCaseIds: Array<string> = await db('test_cases')
     .insert([
       {
         id: md5('case | 1'),
@@ -111,7 +111,7 @@ export async function fillDatabase(db: Database): Promise<void> {
     });
   });
 
-  await this.db('test_runs').insert(dbTestRuns);
+  await db('test_runs').insert(dbTestRuns);
 
   [buildId] = await db('builds')
     .insert({
@@ -126,7 +126,7 @@ export async function fillDatabase(db: Database): Promise<void> {
     'test_suite_type': 'unit',
   } as DB.Job);
 
-  await this.db('test_runs').insert({
+  await db('test_runs').insert({
     'job_id': jobId,
     'test_case_id': md5('case | 1'),
     status: 'SKIP',

@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import {DB, KarmaReporter, Travis} from 'test-case-reporting';
+import {
+  Build,
+  DB,
+  Job,
+  KarmaReporter,
+  TestRun,
+  Travis,
+} from 'test-case-reporting';
 import {Database, dbConnect} from '../src/db';
 import {TestResultRecord} from '../src/test_result_record';
 import {fillDatabase, truncateAll} from './testing_utils';
@@ -318,11 +325,76 @@ describe('TestResultRecord', () => {
   });
 
   describe('getTestRunsOfBuild', () => {
-    beforeEach(async () => {
+    beforeAll(async () => {
       await fillDatabase(db);
     });
 
-    it.todo('only gets the test runs of one build');
+    it('only gets the test runs of one build', async () => {
+      let testRuns: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
+        '12123434',
+        {offset: 0, limit: 999}
+      );
+      expect(testRuns).toHaveLength(15);
+
+      testRuns = await testResultRecord.getTestRunsOfBuild('12129999', {
+        offset: 0,
+        limit: 999,
+      });
+
+      expect(testRuns).toHaveLength(1);
+    });
+
+    it('gets correct items with pagination', async () => {
+      const testRuns: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
+        '12123434',
+        {offset: 6, limit: 3}
+      );
+      expect(testRuns).toHaveLength(3);
+
+      const build: Build = {
+        commitSha: 'deadbeefdeadbeef123123',
+        buildNumber: '12123434',
+      };
+
+      const job: Job = {
+        build,
+        jobNumber: '12123434.2',
+        testSuiteType: 'unit',
+      };
+
+      // Using expect.objectContaining to skip matching against the `createdAt` field
+      const testCases = [
+        expect.objectContaining({
+          name: 'case | 1',
+        }),
+        expect.objectContaining({
+          name: 'case | 2',
+        }),
+        expect.objectContaining({
+          name: 'case | 3',
+        }),
+      ];
+
+      expect(testRuns).toEqual([
+        // Using expect.objectContaining to skip matching against the `timestamp` field
+        expect.objectContaining({
+          job,
+          testCase: testCases[0],
+          status: 'PASS',
+          durationMs: 4242,
+        }),
+        expect.objectContaining({
+          job,
+          testCase: testCases[1],
+          status: 'PASS',
+        }),
+        expect.objectContaining({
+          job,
+          testCase: testCases[2],
+          status: 'PASS',
+        }),
+      ]);
+    });
 
     it.todo('gets an empty list if build is not in the database');
   });
