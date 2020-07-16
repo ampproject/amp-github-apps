@@ -19,6 +19,7 @@ import {
   DB,
   Job,
   KarmaReporter,
+  PageInfo,
   TestRun,
   Travis,
 } from 'test-case-reporting';
@@ -65,6 +66,8 @@ describe('TestResultRecord', () => {
     build: sampleBuild,
     result: sampleKarmaReport,
   };
+
+  const defaultPageInfo: PageInfo = {offset: 0, limit: 100};
 
   beforeAll(async () => {
     db = dbConnect();
@@ -332,14 +335,14 @@ describe('TestResultRecord', () => {
     it('only gets the test runs of one build', async () => {
       let testRuns: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
         '12123434',
-        {offset: 0, limit: 999}
+        defaultPageInfo
       );
       expect(testRuns).toHaveLength(15);
 
-      testRuns = await testResultRecord.getTestRunsOfBuild('12129999', {
-        offset: 0,
-        limit: 999,
-      });
+      testRuns = await testResultRecord.getTestRunsOfBuild(
+        '12129999',
+        defaultPageInfo
+      );
 
       expect(testRuns).toHaveLength(1);
     });
