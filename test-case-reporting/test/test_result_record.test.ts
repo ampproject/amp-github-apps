@@ -375,20 +375,26 @@ describe('TestResultRecord', () => {
   });
 
   describe('getTestCaseHistory', () => {
-    it.todo(
-      'gets the test case history in reverse chronological order (most recent first)'
-    );
+    it('gets the test case history in reverse chronological order (most recent first)', async () => {
+      const testRuns: Array<TestRun> = await testResultRecord.getTestCaseHistory(
+        'case | 1',
+        defaultPageInfo
+      );
 
-    it(
-      'gets an empty list if test case is not in the database',
-      async () => {
-        const testRuns: Array<TestRun> = await testResultRecord.getTestCaseHistory(
-          '404 | I do not exist',
-          defaultPageInfo
-        );
+      expect(testRuns).toHaveLength(2);
 
-        expect(testRuns).toEqual([]);
-      }
-    );
+      expect(testRuns[0].timestamp.getMilliseconds()).toBeGreaterThan(
+        testRuns[1].timestamp.getMilliseconds()
+      );
+    });
+
+    it('gets an empty list if test case is not in the database', async () => {
+      const testRuns: Array<TestRun> = await testResultRecord.getTestCaseHistory(
+        '404 | I do not exist',
+        defaultPageInfo
+      );
+
+      expect(testRuns).toEqual([]);
+    });
   });
 });
