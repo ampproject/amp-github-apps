@@ -90,8 +90,7 @@ export async function fillDatabase(db: Database): Promise<void> {
     .insert({
       'commit_sha': 'faefaefae99',
       'build_number': '12129999',
-    } as DB.Build)
-    .returning('id');
+    } as DB.Build);
 
   [jobId] = await db('jobs').insert({
     'build_id': buildId,

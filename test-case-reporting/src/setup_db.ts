@@ -25,7 +25,7 @@ export async function setupDb(db: Database): Promise<unknown> {
   return db.schema
     .createTable('builds', table => {
       table.increments('id').primary();
-      table.specificType('commit_sha', 'chat(40)');
+      table.string('commit_sha', 40);
       table.string('build_number');
       table.timestamp('started_at', {precision: TIMESTAMP_PRECISION});
     })
@@ -42,8 +42,11 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.foreign('build_id').references('builds.id');
     })
     .createTable('test_cases', table => {
-      // MD5 hash of the name
       table
+        // MD5 hash of the name
+        // table.string('id', 32) makes a varchar, which has poor performance when indexing.
+        // Source for the performance claim:
+        // https://dba.stackexchange.com/questions/2640/what-is-the-performance-impact-of-using-char-vs-varchar-on-a-fixed-size-field
         .specificType('id', 'char(32)')
         .notNullable()
         .primary()

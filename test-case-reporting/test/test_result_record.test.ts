@@ -151,7 +151,7 @@ describe('TestResultRecord', () => {
     });
 
     describe('testCaseName', () => {
-      it('handles small cases', () => {
+      it('handles single test suites', () => {
         expect(
           testResultRecord.testCaseName({
             suite: ['hello 🤖'],
@@ -160,7 +160,7 @@ describe('TestResultRecord', () => {
         ).toEqual('hello 🤖 | world');
       });
 
-      it('handles larger cases', () => {
+      it('handles nested test suites', () => {
         expect(
           testResultRecord.testCaseName({
             suite: ['hello', 'darkness', 'my', 'old'],
@@ -394,8 +394,8 @@ describe('TestResultRecord', () => {
 
         expect(testRuns).toHaveLength(7);
 
-        expect(testRuns[0].timestamp.getMilliseconds()).toBeGreaterThan(
-          testRuns[1].timestamp.getMilliseconds()
+        expect(testRuns[0].timestamp.getTime()).toBeGreaterThan(
+          testRuns[1].timestamp.getTime()
         );
       });
 
