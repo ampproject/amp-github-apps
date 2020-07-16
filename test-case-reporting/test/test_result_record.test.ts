@@ -364,7 +364,14 @@ describe('TestResultRecord', () => {
       expect(testRunsPage3[0].job.jobNumber).toEqual('12123434.2');
     });
 
-    it.todo('gets an empty list if build is not in the database');
+    it('gets an empty list if build is not in the database', async () => {
+      const testRuns: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
+        '404',
+        defaultPageInfo
+      );
+
+      expect(testRuns).toEqual([]);
+    });
   });
 
   describe('getTestCaseHistory', () => {
@@ -372,6 +379,16 @@ describe('TestResultRecord', () => {
       'gets the test case history in reverse chronological order (most recent first)'
     );
 
-    it.todo('gets an empty list if test case is not in the database');
+    it(
+      'gets an empty list if test case is not in the database',
+      async () => {
+        const testRuns: Array<TestRun> = await testResultRecord.getTestCaseHistory(
+          '404 | I do not exist',
+          defaultPageInfo
+        );
+
+        expect(testRuns).toEqual([]);
+      }
+    );
   });
 });
