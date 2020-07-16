@@ -25,7 +25,7 @@ export async function setupDb(db: Database): Promise<unknown> {
   return db.schema
     .createTable('builds', table => {
       table.increments('id').primary();
-      table.string('commit_sha', 40);
+      table.specificType('commit_sha', 'chat(40)');
       table.string('build_number');
       table.timestamp('started_at', {precision: TIMESTAMP_PRECISION});
     })
@@ -44,7 +44,8 @@ export async function setupDb(db: Database): Promise<unknown> {
     .createTable('test_cases', table => {
       // MD5 hash of the name
       table
-        .string('id', 32)
+        .specificType('id', 'char(32)')
+        .notNullable()
         .primary()
         .comment('MD5 hash of the name');
       table.string('name');
