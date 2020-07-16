@@ -31,8 +31,8 @@ export async function truncateAll(db: Database): Promise<void> {
 /**
  * Fills the database with builds, test cases, jobs, and test runs.
  * Stores 3 test cases.
- * Stores 2 builds: the first one has 5 jobs and
- * 15 test runs (one per (job, test case) pair).
+ * Stores 2 builds: the first one has 6 jobs and
+ * 18 test runs (one per (job, test case) pair).
  * The second one has 1 job and 1 test run.
  * @param db The database we want to fill.
  */
@@ -45,60 +45,32 @@ export async function fillDatabase(db: Database): Promise<void> {
     .returning('id');
 
   const jobIds: Array<number> = [];
+  let jobId;
 
-  let [jobId] = await db('jobs').insert({
-    'build_id': buildId,
-    'job_number': '12123434.1',
-    'test_suite_type': 'unit',
-  } as DB.Job);
-  jobIds.push(jobId);
+  for (let i = 1; i <= 3; i++) {
+    for (const suiteType of ['unit', 'integration']) {
+      [jobId] = await db('jobs').insert({
+        'build_id': buildId,
+        'job_number': `12123434.${i}`,
+        'test_suite_type': suiteType,
+      } as DB.Job);
 
-  [jobId] = await db('jobs').insert({
-    'build_id': buildId,
-    'job_number': '12123434.1',
-    'test_suite_type': 'integration',
-  } as DB.Job);
-  jobIds.push(jobId);
+      jobIds.push(jobId);
+    }
+  }
 
-  [jobId] = await db('jobs').insert({
-    'build_id': buildId,
-    'job_number': '12123434.2',
-    'test_suite_type': 'unit',
-  } as DB.Job);
-  jobIds.push(jobId);
+  const testCaseNames: Array<string> = ['case | 1', 'case | 2', 'case | 3'];
+  const testCases: Array<DB.TestCase> = testCaseNames.map(name => ({
+    id: md5(name),
+    name,
+  }));
+  const testCaseIds: Array<string> = testCases.map(({id}) => id);
 
-  [jobId] = await db('jobs').insert({
-    'build_id': buildId,
-    'job_number': '12123434.2',
-    'test_suite_type': 'integration',
-  } as DB.Job);
-  jobIds.push(jobId);
-
-  [jobId] = await db('jobs').insert({
-    'build_id': buildId,
-    'job_number': '12123434.3',
-    'test_suite_type': 'unit',
-  } as DB.Job);
-  jobIds.push(jobId);
-
-  const testCaseIds: Array<string> = await db('test_cases')
-    .insert([
-      {
-        id: md5('case | 1'),
-        name: 'case | 1',
-      },
-      {
-        id: md5('case | 2'),
-        name: 'case | 2',
-      },
-      {
-        id: md5('case | 3'),
-        name: 'case | 3',
-      },
-    ] as Array<DB.TestCase>)
-    .returning('id');
+  await db('test_cases').insert(testCases);
 
   const dbTestRuns: Array<DB.TestRun> = [];
+
+  const oneHourAgoMs = Date.now() - 60 * 60 * 1000;
 
   jobIds.forEach((jobId: number) => {
     testCaseIds.forEach((testCaseId: string) => {
@@ -107,6 +79,7 @@ export async function fillDatabase(db: Database): Promise<void> {
         'test_case_id': testCaseId,
         status: 'PASS',
         'duration_ms': 4242,
+        timestamp: oneHourAgoMs,
       });
     });
   });
