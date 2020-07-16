@@ -72,14 +72,14 @@ export async function fillDatabase(db: Database): Promise<void> {
 
   const oneHourAgoMs = Date.now() - 60 * 60 * 1000;
 
-  jobIds.forEach((jobId: number) => {
-    testCaseIds.forEach((testCaseId: string) => {
+  jobIds.forEach((jobId, index) => {
+    testCaseIds.forEach(testCaseId => {
       dbTestRuns.push({
         'job_id': jobId,
         'test_case_id': testCaseId,
         status: 'PASS',
         'duration_ms': 4242,
-        timestamp: oneHourAgoMs,
+        timestamp: oneHourAgoMs + index,
       });
     });
   });
@@ -104,5 +104,6 @@ export async function fillDatabase(db: Database): Promise<void> {
     'test_case_id': md5('case | 1'),
     status: 'SKIP',
     'duration_ms': 413,
+    timestamp: Date.now(),
   });
 }
