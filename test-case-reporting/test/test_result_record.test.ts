@@ -219,7 +219,7 @@ describe('TestResultRecord', () => {
           'test_cases'
         ).select();
 
-        const sampleTestCases: Array<DB.TestCase> = [
+        expect(testCases).toMatchObject([
           {
             id: '8fd7659c797d5b46f64917937d4805f9',
             name: 'when test is good | it passes',
@@ -241,9 +241,7 @@ describe('TestResultRecord', () => {
             name:
               'when the moon hits your eye | when i was a young boy | when the fires come | it skips',
           },
-        ];
-
-        expect(testCases).toMatchObject(sampleTestCases);
+        ]);
       });
 
       it('does not duplicate test cases', async () => {
@@ -299,7 +297,7 @@ describe('TestResultRecord', () => {
           'test_runs'
         ).select();
 
-        const sampleTestRuns: Array<DB.TestRun> = [
+        expect(testRuns).toMatchObject([
           {
             'test_case_id': '8fd7659c797d5b46f64917937d4805f9',
             status: 'PASS',
@@ -330,9 +328,7 @@ describe('TestResultRecord', () => {
             'duration_ms': 1234,
             'job_id': 1,
           },
-        ];
-
-        expect(testRuns).toMatchObject(sampleTestRuns);
+        ]);
       });
     });
   });
