@@ -219,11 +219,11 @@ export class TestResultRecord {
     const baseQuery = this.db<DB.BigJoin>('test_runs')
       .leftJoin('test_cases', 'test_cases.id', 'test_runs.test_case_id')
       .leftJoin('jobs', 'jobs.id', 'test_runs.job_id')
-      .leftJoin('builds', 'builds.id', 'jobs.build_id')
+      .leftJoin('builds', 'builds.id', 'jobs.build_id');
+
+    const fullQuery = queryFunction(baseQuery)
       .limit(limit)
       .offset(offset);
-
-    const fullQuery = queryFunction(baseQuery);
 
     const rows = await fullQuery.select(
       'builds.build_number',
