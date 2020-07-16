@@ -302,11 +302,11 @@ describe('TestResultRecord', () => {
   });
 
   describe('database fetching', () => {
-    describe('getTestRunsOfBuild', () => {
-      beforeAll(async () => {
-        await fillDatabase(db);
-      });
+    beforeAll(async () => {
+      await fillDatabase(db);
+    });
 
+    describe('getTestRunsOfBuild', () => {
       it('only gets the test runs of one build', async () => {
         let testRuns: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
           '12123434',
