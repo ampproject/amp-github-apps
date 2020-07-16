@@ -51,7 +51,7 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.string('name');
       table
         .timestamp('created_at', {precision: TIMESTAMP_PRECISION})
-        .defaultTo(db.fn.now(TIMESTAMP_PRECISION));
+        .defaultTo(db.fn.now());
     })
     .createTable('test_runs', table => {
       table.increments('id').primary();
