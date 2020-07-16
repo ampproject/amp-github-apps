@@ -348,55 +348,20 @@ describe('TestResultRecord', () => {
     });
 
     it('gets correct items with pagination', async () => {
-      const testRuns: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
+      const testRunsPage1: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
+        '12123434',
+        {offset: 0, limit: 3}
+      );
+
+      const testRunsPage3: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
         '12123434',
         {offset: 6, limit: 3}
       );
-      expect(testRuns).toHaveLength(3);
+      expect(testRunsPage1).toHaveLength(3);
+      expect(testRunsPage3).toHaveLength(3);
 
-      const build: Build = {
-        commitSha: 'deadbeefdeadbeef123123',
-        buildNumber: '12123434',
-      };
-
-      const job: Job = {
-        build,
-        jobNumber: '12123434.2',
-        testSuiteType: 'unit',
-      };
-
-      // Using expect.objectContaining to skip matching against the `createdAt` field
-      const testCases = [
-        expect.objectContaining({
-          name: 'case | 1',
-        }),
-        expect.objectContaining({
-          name: 'case | 2',
-        }),
-        expect.objectContaining({
-          name: 'case | 3',
-        }),
-      ];
-
-      expect(testRuns).toEqual([
-        // Using expect.objectContaining to skip matching against the `timestamp` field
-        expect.objectContaining({
-          job,
-          testCase: testCases[0],
-          status: 'PASS',
-          durationMs: 4242,
-        }),
-        expect.objectContaining({
-          job,
-          testCase: testCases[1],
-          status: 'PASS',
-        }),
-        expect.objectContaining({
-          job,
-          testCase: testCases[2],
-          status: 'PASS',
-        }),
-      ]);
+      expect(testRunsPage1[0].job.jobNumber).toEqual('12123434.1');
+      expect(testRunsPage3[0].job.jobNumber).toEqual('12123434.2');
     });
 
     it.todo('gets an empty list if build is not in the database');
