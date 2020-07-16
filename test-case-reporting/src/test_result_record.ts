@@ -119,8 +119,6 @@ export class TestResultRecord {
 
   /**
    * Inserts a job, as reported by Travis, into the database.
-   * @param job The job we want to insert in the database.
-   * @param buildId The database id of the build of the job.
    */
   async insertTravisJob(job: Travis.Job, buildId: number): Promise<number> {
     const [jobId] = await this.db('jobs')
@@ -136,7 +134,6 @@ export class TestResultRecord {
 
   /**
    * Helper that generates a test status string from the status booleans of the Karma report.
-   * @param statusObject test status booleans, `skipped` and `success`.
    */
   testStatus({
     skipped,
@@ -153,7 +150,6 @@ export class TestResultRecord {
 
   /**
    * Helper that generates the name of a test case from its suite and description.
-   * @param testCaseInfo contains the test suite in `suite` & the description in `description`
    */
   testCaseName({
     suite,
