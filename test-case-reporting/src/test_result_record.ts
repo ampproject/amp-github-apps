@@ -216,10 +216,10 @@ export class TestResultRecord {
     queryFunction: QueryFunction,
     {limit, offset}: PageInfo
   ): Promise<Array<TestRun>> {
-    const baseQuery = this.db<DB.BigJoin>('builds')
-      .join('jobs', 'jobs.build_id', 'builds.id')
-      .join('test_runs', 'test_runs.job_id', 'jobs.id')
-      .join('test_cases', 'test_cases.id', 'test_runs.test_case_id')
+    const baseQuery = this.db<DB.BigJoin>('test_runs')
+      .leftJoin('test_cases', 'test_cases.id', 'test_runs.test_case_id')
+      .leftJoin('jobs', 'jobs.id', 'test_runs.job_id')
+      .leftJoin('builds', 'builds.id', 'jobs.build_id')
       .limit(limit)
       .offset(offset);
 
