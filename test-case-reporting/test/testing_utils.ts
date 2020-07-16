@@ -30,10 +30,6 @@ export async function truncateAll(db: Database): Promise<void> {
 
 /**
  * Fills the database with builds, test cases, jobs, and test runs.
- * Stores 3 test cases.
- * Stores 2 builds: the first one has 6 jobs and
- * 18 test runs (one per (job, test case) pair).
- * The second one has 1 job and 1 test run.
  * @param db The database we want to fill.
  */
 export async function fillDatabase(db: Database): Promise<void> {
@@ -86,11 +82,10 @@ export async function fillDatabase(db: Database): Promise<void> {
 
   await db('test_runs').insert(dbTestRuns);
 
-  [buildId] = await db('builds')
-    .insert({
-      'commit_sha': 'faefaefae99',
-      'build_number': '12129999',
-    } as DB.Build);
+  [buildId] = await db('builds').insert({
+    'commit_sha': 'faefaefae99',
+    'build_number': '12129999',
+  } as DB.Build);
 
   [jobId] = await db('jobs').insert({
     'build_id': buildId,
