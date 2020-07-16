@@ -245,49 +245,17 @@ describe('TestResultRecord', () => {
       });
 
       it('does not duplicate test cases', async () => {
-        await testResultRecord.storeTravisReport({
+        const smallerReport: Travis.Report = {
           job: sampleJob,
           build: sampleBuild,
           result: smallerSampleKarmaReport,
-        });
+        };
 
-        let testCases: Array<DB.TestCase> = await db<DB.TestCase>(
-          'test_cases'
-        ).select();
-
-        const sampleTestCases: Array<DB.TestCase> = [
-          {
-            id: '8fd7659c797d5b46f64917937d4805f9',
-            name: 'when test is good | it passes',
-          },
-          {
-            id: '8a3d71d66b2913bb981a8d4f2a2930db',
-            name: 'when test is bad | it fails',
-          },
-          {
-            id: 'c5cf7c15d50ec660c3b10b6c91bfe3f8',
-            name: 'when test was skipped | it skipped',
-          },
-        ];
-
-        expect(testCases).toMatchObject(sampleTestCases);
+        await testResultRecord.storeTravisReport(smallerReport);
+        expect(db('test_cases').select()).resolves.toHaveLength(3);
 
         await testResultRecord.storeTravisReport(sampleTravisReport);
-        testCases = await db<DB.TestCase>('test_cases').select();
-
-        sampleTestCases.push(
-          {
-            id: '36340965686c32694f88f06c6a3f71ac',
-            name: '🤖 when passing test has emojis 🤖 | it passes 🎉',
-          },
-          {
-            id: 'e3c1257d76c0b4d0f0c1307161ab5424',
-            name:
-              'when the moon hits your eye | when i was a young boy | when the fires come | it skips',
-          }
-        );
-
-        expect(testCases).toMatchObject(sampleTestCases);
+        expect(db('test_cases').select()).resolves.toHaveLength(5);
       });
 
       it('inserts test runs', async () => {
