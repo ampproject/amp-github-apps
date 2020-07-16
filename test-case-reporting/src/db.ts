@@ -18,8 +18,6 @@ import Knex from 'knex';
 
 export type Database = Knex;
 
-export const TIMESTAMP_PRECISION = 3;
-
 export function dbConnect(): Database {
   return Knex({
     client: 'pg',

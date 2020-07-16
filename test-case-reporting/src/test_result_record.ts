@@ -25,13 +25,11 @@ import {
   TestStatus,
   Travis,
 } from 'test-case-reporting';
-import {Database, TIMESTAMP_PRECISION} from './db';
+import {Database} from './db';
 import md5 from 'md5';
 
-const msConversionConstant: number = Math.pow(10, 3 - TIMESTAMP_PRECISION);
-
 function getDateFromTimestamp(timestamp: number): Date {
-  return new Date(timestamp * msConversionConstant);
+  return new Date(timestamp);
 }
 
 /* eslint-disable @typescript-eslint/camelcase */

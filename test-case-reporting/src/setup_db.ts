@@ -16,7 +16,9 @@
 
 require('dotenv').config();
 
-import {Database, TIMESTAMP_PRECISION, dbConnect} from './db';
+import {Database, dbConnect} from './db';
+
+const TIMESTAMP_PRECISION = 3;
 
 /** Set up the database table. */
 export async function setupDb(db: Database): Promise<unknown> {
