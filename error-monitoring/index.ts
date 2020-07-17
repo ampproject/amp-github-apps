@@ -310,7 +310,7 @@ export async function topIssueList(
 ): Promise<void> {
   const n = Number(req.query.n || 10);
   const seenIssues = new Set();
-  const issues = (await monitor.newErrors())
+  const issues = (await monitor.topTrackedErrors())
     .filter(({group}) => !!group.trackingIssues)
     .map(({group: {groupId, trackingIssues}, representative: {message}}) => {
       let [title] = message.split('\n');

@@ -122,14 +122,27 @@ export class ErrorMonitor {
   }
 
   /** Finds top occurring errors. */
-  async newErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  protected async topErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
     return this.client.listGroups(this.pageLimit);
+  }
+
+  /** Finds top occurring errors with associated GitHub issues. */
+  async topTrackedErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+    return (await this.topErrors()).filter(({group}) =>
+      this.hasTrackingIssue(group)
+    );
+  }
+
+  /** Finds top occurring errors with associated GitHub issues. */
+  async topUntrackedErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+    return (await this.topErrors()).filter(
+      ({group}) => !this.hasTrackingIssue(group)
+    );
   }
 
   /** Finds frequent errors to create tracking issues for. */
   async newErrorsToReport(): Promise<Array<ErrorReport>> {
-    return (await this.newErrors())
-      .filter(({group}) => !this.hasTrackingIssue(group))
+    return (await this.topUntrackedErrors())
       .filter(groupStats => this.hasHighFrequency(groupStats))
       .map(groupStats => this.reportFromGroupStats(groupStats));
   }
@@ -195,7 +208,7 @@ export class ServiceErrorMonitor extends ErrorMonitor {
   }
 
   /** Finds top occurring errors in the service group. */
-  async newErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  protected async topErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
     return this.client.listServiceGroups(this.serviceName, this.pageLimit);
   }
 
