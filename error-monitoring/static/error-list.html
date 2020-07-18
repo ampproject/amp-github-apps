@@ -21,8 +21,11 @@
     ul {
       margin: 0;
     }
+    form input {
+      text-align: center;
+    }
     button,
-    .threshold-form input[name=threshold]  {
+    form input {
       background-color: #fff;
       border: 2px solid #d9edff;
       border-radius: 20px;
@@ -41,6 +44,7 @@
     input:focus {
       outline: none;
     }
+
     .onduty-guide {
       text-align: left;
       margin: 20px 100px;
@@ -49,14 +53,28 @@
       display: inline-block;
       margin-bottom: 10px;
     }
-    .threshold-form input[name=threshold] {
-      width: 75px;
-      text-align: center;
+    .button-service[selected] {
+      pointer-events: none;
     }
-    .threshold-form button[type=submit] {
+    .button-service[selected] button,
+    .button-blue {
+      background-color: #339dff;
+      color: white;
+    }
+
+    .split-input, .split-button {
+      width: 50%;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .split-input {
+      border-radius: 20px 0 0 20px;
+    }
+    .split-button {
       border-radius: 0 20px 20px 0;
       margin-left: -30px;
     }
+
     .error-report {
       border: 2px solid #e7e7e7;
       border-radius: 20px;
@@ -69,18 +87,6 @@
     .error-report-done {
       opacity: 40%;
       pointer-events: none;
-    }
-    .button-service[selected] {
-      pointer-events: none;
-    }
-    .button-service[selected] button,
-    .button-blue {
-      background-color: #339dff;
-      color: white;
-    }
-    .button-create {
-      display: block;
-      width: 100%;
     }
     .message {
       font-family: monospace;
@@ -96,6 +102,20 @@
       max-width: 100%;
       overflow-x: auto;
       padding: 20px;
+    }
+
+    .error-actions {
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+    .error-actions > * {
+      display: inline-block;
+      width: 48%;
+      margin: 0 1%;
+    }
+    .button-create {
+      width: 100%;
     }
   </style>
 </head>
@@ -128,10 +148,14 @@
     </ol>
 
     <strong>Frequency threshold:</strong>
-    <form method="GET" class="threshold-form">
-      <input type="number" name="threshold" value="{{serviceTypeThreshold}}">
+    <form method="GET" class="threshold-form split-input-button">
+      <input type="number"
+             name="threshold"
+             value="{{serviceTypeThreshold}}"
+             class="split-input"
+             required>
       <input type="hidden" name="serviceType" value="{{currentServiceType.name}}">
-      <button type="submit" class="button-blue">Update</button>
+      <button type="submit" class="button-blue split-button">Update</button>
     </form>
     <a href="?serviceType={{currentServiceType.name}}"><button>Reset</button></a>
     <br>
@@ -172,12 +196,37 @@
 
       <pre class="stacktrace"><code>{{& stacktrace}}</code></pre>
 
-      <a target="_blank"
-        rel="noopener noreferrer"
-        href="{{createUrl}}"
-        onclick="this.parentNode.classList.add('error-report-done')">
-        <button class="button-blue button-create">Create issue</button>
-      </a>
+      <div class="error-actions">
+        <a target="_blank"
+          rel="noopener noreferrer"
+          href="{{createUrl}}"
+          onclick="this.parentNode.classList.add('error-report-done')">
+          <button class="button-blue button-create">
+            Create new issue
+          </button>
+        </a><!--
+
+     --><form method="GET"
+              class="link-issue-form split-input-button"
+              action="/link-issue">
+          <input type="text"
+                 pattern="#?\d+"
+                 name="issueNumber"
+                 class="split-input"
+                 placeholder="#12345"
+                 required>
+          <input type="hidden" name="errorId" value="{{errorId}}">
+          <input type="hidden"
+                 name="serviceType"
+                 value="{{currentServiceType.name}}">
+          <input type="hidden"
+                 name="normalizedThreshold"
+                 value="{{normalizedThreshold}}">
+          <button type="submit" class="button-blue split-button">
+            Link existing issue
+          </button>
+        </form>
+      </div>
     </section>
   {{/errorReports}}
   {{^errorReports}}
