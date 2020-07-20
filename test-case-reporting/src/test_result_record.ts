@@ -28,10 +28,6 @@ import {
 import {Database} from './db';
 import md5 from 'md5';
 
-function getDateFromTimestamp(timestamp: number): Date {
-  return new Date(timestamp);
-}
-
 /* eslint-disable @typescript-eslint/camelcase */
 /**
  * Creates a TestRun object from a row of the join of all the tables.
@@ -62,14 +58,14 @@ function getTestRunFromRow({
 
   const testCase: TestCase = {
     name,
-    createdAt: getDateFromTimestamp(created_at),
+    createdAt: new Date(created_at),
   };
 
   const testRun: TestRun = {
     job,
     testCase,
     status,
-    timestamp: getDateFromTimestamp(timestamp),
+    timestamp: new Date(timestamp),
     durationMs: duration_ms,
   };
 
