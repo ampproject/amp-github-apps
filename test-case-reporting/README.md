@@ -24,7 +24,7 @@ Follow these setup instructions to start developing for this App locally:
 2. `npm install`
 3. Create a new Google Cloud project and switch to it with `gcloud config set project [PROJECT_NAME]`.
 4. Add an SQL database to the Google Cloud project. Choose a name for the database and store it in the `DB_NAME` field of .env.
-5. Initialize an App Engine app with `gcloud app create'.
+5. Initialize an App Engine app with `gcloud app create`.
 6. Run a local instance of PostgreSQL, or use the
    [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy)
    * While other database engines might work, this is developed using pg
