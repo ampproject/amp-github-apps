@@ -68,14 +68,14 @@ export async function fillDatabase(db: Database): Promise<void> {
 
   const oneHourAgoMs = Date.now() - 60 * 60 * 1000;
 
-  jobIds.forEach((jobId, index) => {
+  jobIds.forEach(jobId => {
     testCaseIds.forEach(testCaseId => {
       dbTestRuns.push({
         'job_id': jobId,
         'test_case_id': testCaseId,
         status: 'PASS',
         'duration_ms': 4242,
-        timestamp: oneHourAgoMs + index,
+        timestamp: oneHourAgoMs,
       });
     });
   });
