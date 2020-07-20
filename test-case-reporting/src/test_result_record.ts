@@ -19,14 +19,16 @@ import {
   DB,
   Job,
   PageInfo,
-  QueryFunction,
   TestCase,
   TestRun,
   TestStatus,
   Travis,
 } from 'test-case-reporting';
 import {Database} from './db';
+import {QueryBuilder} from 'knex';
 import md5 from 'md5';
+
+type QueryFunction = (q: QueryBuilder) => QueryBuilder;
 
 /* eslint-disable @typescript-eslint/camelcase */
 /**

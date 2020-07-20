@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import {QueryBuilder} from 'knex';
-
 declare module 'test-case-reporting' {
   /**
    * Travis job types for which test results may be reported.
@@ -23,8 +21,6 @@ declare module 'test-case-reporting' {
   export type TestSuiteType = 'unit' | 'integration';
 
   export type TestStatus = 'PASS' | 'FAIL' | 'SKIP' | 'ERROR';
-
-  export type QueryFunction = (q: QueryBuilder) => QueryBuilder;
 
   /** A build on Travis. */
   export interface Build {
