@@ -28,7 +28,8 @@ Follow these setup instructions to start developing for this App locally:
 6. Run a local instance of PostgreSQL, or use the
    [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy)
    * While other database engines might work, this is developed using pg
-7. Copy the `redacted.env` file to `.env` and modify the fields based on the username and password
+7. Run `npm run setup-db` to set up the database.
+8. Copy the `redacted.env` file to `.env` and modify the fields based on the username and password
    used for the database
 
 Local Development
