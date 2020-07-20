@@ -333,3 +333,29 @@ export async function topIssueList(
 
   res.send(renderTopIssues(issues));
 }
+
+/** Link an existing GitHub issue to an error report. */
+export async function linkIssue(
+  req: express.Request,
+  res: express.Response
+): Promise<void> {
+  const {errorId, serviceType, normalizedThreshold} = req.query;
+  let issueNumber = req.query.issueNumber.toString();
+
+  if (issueNumber.startsWith('#')) {
+    issueNumber = issueNumber.substr(1);
+  }
+
+  try {
+    await stackdriver.setGroupIssue(
+      errorId.toString(),
+      `https://github.com/${GITHUB_REPO_OWNER}/${ISSUE_REPO_NAME}/issues/${issueNumber}`
+    );
+  } catch (e) {
+    console.error(e);
+  } finally {
+    res.redirect(
+      `/?serviceType=${serviceType}&normalizedThreshold=${normalizedThreshold}`
+    );
+  }
+}
