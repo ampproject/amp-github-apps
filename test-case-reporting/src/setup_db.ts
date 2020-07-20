@@ -16,7 +16,9 @@
 
 require('dotenv').config();
 
-import {Database, TIMESTAMP_PRECISION, dbConnect} from './db';
+import {Database, dbConnect} from './db';
+
+const TIMESTAMP_PRECISION = 3;
 
 /** Set up the database table. */
 export async function setupDb(db: Database): Promise<unknown> {
@@ -40,15 +42,19 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.foreign('build_id').references('builds.id');
     })
     .createTable('test_cases', table => {
-      // MD5 hash of the name
       table
-        .string('id', 32)
+        // MD5 hash of the name
+        // table.string('id', 32) makes a varchar, which has poor performance when indexing.
+        // Source for the performance claim:
+        // https://dba.stackexchange.com/questions/2640/what-is-the-performance-impact-of-using-char-vs-varchar-on-a-fixed-size-field
+        .specificType('id', 'char(32)')
+        .notNullable()
         .primary()
         .comment('MD5 hash of the name');
       table.string('name');
       table
         .timestamp('created_at', {precision: TIMESTAMP_PRECISION})
-        .defaultTo(db.fn.now(TIMESTAMP_PRECISION));
+        .defaultTo(db.fn.now());
     })
     .createTable('test_runs', table => {
       table.increments('id').primary();

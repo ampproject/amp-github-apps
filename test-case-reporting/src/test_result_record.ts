@@ -18,24 +18,93 @@ import {
   Build,
   DB,
   Job,
+  PageInfo,
   TestCase,
   TestRun,
   TestStatus,
   Travis,
 } from 'test-case-reporting';
-import {Database, TIMESTAMP_PRECISION} from './db';
+import {Database} from './db';
+import {QueryBuilder} from 'knex';
 import md5 from 'md5';
 
-const msConversionConstant: number = Math.pow(10, 3 - TIMESTAMP_PRECISION);
+type QueryFunction = (q: QueryBuilder) => QueryBuilder;
 
-function getDateFromTimestamp(timestamp: number): Date {
-  return new Date(timestamp * msConversionConstant);
+/* eslint-disable @typescript-eslint/camelcase */
+/**
+ * Creates a TestRun object from a row of the join of all the tables.
+ * @param bigJoin A row of the join of all the tables. May have aliases
+ *    for certain columns to avoid collisions or to fit the DB.BigJoin interface.
+ */
+function getTestRunFromRow({
+  build_number,
+  commit_sha,
+  job_number,
+  test_suite_type,
+  name,
+  created_at,
+  status,
+  timestamp,
+  duration_ms,
+}: DB.BigJoin): TestRun {
+  const build: Build = {
+    buildNumber: build_number,
+    commitSha: commit_sha,
+  };
+
+  const job: Job = {
+    build,
+    jobNumber: job_number,
+    testSuiteType: test_suite_type,
+  };
+
+  const testCase: TestCase = {
+    name,
+    createdAt: new Date(created_at),
+  };
+
+  const testRun: TestRun = {
+    job,
+    testCase,
+    status,
+    timestamp: new Date(timestamp),
+    durationMs: duration_ms,
+  };
+
+  return testRun;
 }
+/* eslint-enable @typescript-eslint/camelcase */
 
 export class TestResultRecord {
   constructor(private db: Database) {}
 
+  /**
+   * Gets a DB.Build from the database by its build number.
+   * If there is no such build, it returns undefined.
+   * @param buildNumber The number of the Travis build, as a string.
+   */
+  private async getDbBuildFromBuildNumber(
+    buildNumber: string
+  ): Promise<DB.Build> {
+    return this.db<DB.Build>('builds')
+      .where('build_number', buildNumber)
+      .first();
+  }
+
+  /**
+   * Inserts a build, as reported by Travis, into the database.
+   * Does not insert duplicate builds, but still returns their ids.
+   * @param build The build we want to insert in the database.
+   * @returns The id of the build in the database.
+   */
   async insertTravisBuild(build: Travis.Build): Promise<number> {
+    const existingBuild = await this.getDbBuildFromBuildNumber(
+      build.buildNumber
+    );
+    if (existingBuild) {
+      return existingBuild.id;
+    }
+
     const [buildId] = await this.db('builds')
       .insert({
         'commit_sha': build.commitSha,
@@ -46,6 +115,9 @@ export class TestResultRecord {
     return buildId;
   }
 
+  /**
+   * Inserts a job, as reported by Travis, into the database.
+   */
   async insertTravisJob(job: Travis.Job, buildId: number): Promise<number> {
     const [jobId] = await this.db('jobs')
       .insert({
@@ -58,6 +130,9 @@ export class TestResultRecord {
     return jobId;
   }
 
+  /**
+   * Helper that generates a test status string from the status booleans of the Karma report.
+   */
   testStatus({
     skipped,
     success,
@@ -71,6 +146,9 @@ export class TestResultRecord {
     return success ? 'PASS' : 'FAIL';
   }
 
+  /**
+   * Helper that generates the name of a test case from its suite and description.
+   */
   testCaseName({
     suite,
     description,
@@ -81,6 +159,12 @@ export class TestResultRecord {
     return suite.concat([description]).join(' | ');
   }
 
+  /**
+   * Stores a travis report on the database. This involves inserting
+   * a job, a build, many test runs, and many test cases.
+   * Duplicate test cases and builds are not inserted.
+   * @param travisReport Travis report with job, build, and test run result info.
+   */
   async storeTravisReport({job, build, result}: Travis.Report): Promise<void> {
     const buildId = await this.insertTravisBuild(build);
     const jobId = await this.insertTravisJob(job, buildId);
@@ -121,88 +205,71 @@ export class TestResultRecord {
   }
 
   /**
-   * Gets a DB.Build from the database by its build number.
-   * If there is no such build, it returns undefined.
-   * @param buildNumber The number of the Travis build, as a string.
+   * Runs a query on the join of all the tables,
+   * generating a list of test runs from the join rows.
+   * @param queryFunction A callback that does queries on the joined table query
+   * @param pageInfo object with the limit and the offset of the query
    */
-  private async getDbBuildFromBuildNumber(
-    buildNumber: string
-  ): Promise<DB.Build> {
-    return this.db<DB.Build>('builds')
-      .where('build_number', buildNumber)
-      .first();
-  }
-
-  /**
-   * Makes a Build from a DB.Build.
-   * @param dbBuild A build as obtained from the database.
-   */
-  private getBuildFromDbBuild(dbBuild: DB.Build): Build {
-    return {
-      commitSha: dbBuild.commit_sha,
-      buildNumber: dbBuild.build_number,
-    };
-  }
-
-  /**
-   * Gets a Build from the database by its build number.
-   * If there is no such build, it returns undefined.
-   * @param buildNumber The number of the Travis build, as a string
-   */
-  private async getBuildFromBuildNumber(buildNumber: string): Promise<Build> {
-    const dbBuild = await this.getDbBuildFromBuildNumber(buildNumber);
-    return this.getBuildFromDbBuild(dbBuild);
-  }
-
-  private async getTestRunsOfBuild(
-    buildNumber: string
+  private async bigJoinQuery(
+    queryFunction: QueryFunction,
+    {limit, offset}: PageInfo
   ): Promise<Array<TestRun>> {
-    const build: Build = await this.getBuildFromBuildNumber(buildNumber);
+    const baseQuery = this.db<DB.BigJoin>('test_runs')
+      .leftJoin('test_cases', 'test_cases.id', 'test_runs.test_case_id')
+      .leftJoin('jobs', 'jobs.id', 'test_runs.job_id')
+      .leftJoin('builds', 'builds.id', 'jobs.build_id');
 
-    const dbJoins: Array<DB.BigJoin> = await this.db<DB.BigJoin>('builds')
-      .where('build_number', buildNumber)
-      .join('jobs', 'jobs.build_id', 'builds.id')
-      .join('test_runs', 'tests_runs.job_id', 'jobs.id')
-      .join('test_cases', 'test_cases.id', 'test_runs.test_case_id')
-      .select(
-        'jobs.job_number',
-        'jobs.test_suite_type',
+    const fullQuery = queryFunction(baseQuery)
+      .limit(limit)
+      .offset(offset);
 
-        'test_cases.name',
-        'test_cases.created_at',
+    const rows = await fullQuery.select(
+      'builds.build_number',
+      'builds.commit_sha',
 
-        'test_runs.status',
-        'test_runs.timestamp',
-        'test_runs.duration_ms'
-      );
+      'jobs.job_number',
+      'jobs.test_suite_type',
 
-    const testRuns: Array<TestRun> = dbJoins.map(
-      ({
-        job_number,
-        test_suite_type,
-        name,
-        created_at,
-        status,
-        timestamp,
-        duration_ms,
-      }: DB.BigJoin) => ({
-        job: {
-          build,
-          jobNumber: job_number,
-          testSuiteType: test_suite_type,
-        },
+      'test_cases.name',
+      'test_cases.created_at',
 
-        testCase: {
-          name,
-          createdAt: getDateFromTimestamp(created_at),
-        },
-
-        status,
-        timestamp: getDateFromTimestamp(timestamp),
-        durationMs: duration_ms,
-      })
+      'test_runs.status',
+      'test_runs.timestamp',
+      'test_runs.duration_ms'
     );
 
-    return testRuns;
+    return rows.map(getTestRunFromRow);
+  }
+
+  /**
+   * Gets a list of the test results belonging to a build
+   * @param buildNumber The number of the Travis build whose test runs we want.
+   * @param pageInfo object with the limit and the offset of the query
+   */
+  async getTestRunsOfBuild(
+    buildNumber: string,
+    pageInfo: PageInfo
+  ): Promise<Array<TestRun>> {
+    const queryFunction: QueryFunction = q =>
+      q.where('build_number', buildNumber);
+
+    return this.bigJoinQuery(queryFunction, pageInfo);
+  }
+
+  /**
+   * Gets a list of the runs of a certain test case, in chronological order.
+   * @param testCaseName The name of the test case whose history we want.
+   * @param pageInfo object with the limit and the offset of the query
+   */
+  async getTestCaseHistory(
+    testCaseName: string,
+    pageInfo: PageInfo
+  ): Promise<Array<TestRun>> {
+    const queryFunction: QueryFunction = q =>
+      q
+        .where('test_cases.name', testCaseName)
+        .orderBy('test_runs.timestamp', 'DESC');
+
+    return this.bigJoinQuery(queryFunction, pageInfo);
   }
 }

@@ -57,6 +57,12 @@ declare module 'test-case-reporting' {
     durationMs: number;
   }
 
+  /** Fields for the size and offset of a database query. Used for pagination. */
+  export interface PageInfo {
+    limit: number;
+    offset: number;
+  }
+
   // Types in the DB namespace interface with the database which
   // uses snake_case instead of camelCase.
   /* eslint @typescript-eslint/camelcase: "off" */
