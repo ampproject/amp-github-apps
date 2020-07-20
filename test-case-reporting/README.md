@@ -38,6 +38,9 @@ Local Development
 To compile the TypeScript to JavaScript, run `npm run build`.
 > To automatically compile as files are changed, run `npm run build:watch`.
 
+To run the app locally, run `npm run start`.
+> To automatically reload as files are changed, run `npm run dev`.
+
 To run tests, run `npm test`.
 
 Deployment
