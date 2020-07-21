@@ -16,8 +16,8 @@
 
 require('dotenv').config();
 
+import {KarmaReporter, TestRun, Travis} from 'test-case-reporting';
 import {TestResultRecord} from './src/test_result_record';
-import {Travis} from 'test-case-reporting';
 import {dbConnect} from './src/db';
 import express from 'express';
 import statusCodes from 'http-status-codes';
@@ -28,13 +28,34 @@ const PORT = process.env.PORT || 8080;
 const db = dbConnect();
 const record = new TestResultRecord(db);
 
+function renderTestRunList(testRuns: Array<TestRun>): string {
+  return `Rendering ${testRuns.length} test runs!`;
+}
+
 app.get('/', (req, res) => {
   res.send('Hello, world, 2.0!');
 });
 
-app.get('/test-results/pr/:prNumber', (req, res) => {
-  const {prNumber} = req.params;
-  res.send(`List of test cases for PR number ${prNumber}`);
+app.get('/test-results/build/:buildNumber', async (req, res) => {
+  const {buildNumber} = req.params;
+  const {json} = req.query;
+  const db = dbConnect();
+  const testResultRecord = new TestResultRecord(db);
+
+  const pageSize = 100;
+
+  const testRunJson = {
+    testRuns: await testResultRecord.getTestRunsOfBuild(buildNumber, {
+      limit: pageSize,
+      offset: 0,
+    }),
+  };
+
+  if (json) {
+    res.json(testRunJson);
+  } else {
+    res.send(renderTestRunList(testRunJson.testRuns));
+  }
 });
 
 app.get('/test-results/history/:testCaseId', (req, res) => {
