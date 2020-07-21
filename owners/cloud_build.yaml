@@ -27,6 +27,7 @@ steps:
     args:
       - app
       - deploy
+    timeout: 1600s
   - name: gcr.io/cloud-builders/gcloud
     dir: owners
     args:
