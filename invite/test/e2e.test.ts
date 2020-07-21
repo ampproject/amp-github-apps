@@ -125,8 +125,9 @@ describe('end-to-end', () => {
             expect(body).toEqual({
               body:
                 'An invitation to join `test_org` has been sent to ' +
-                '`@someone`. I will update this thread when the invitation ' +
-                'is accepted.',
+                '`@someone`. They can accept this invitation ' +
+                '[here](https://github.com/orgs/test_org/invitation). I ' +
+                'will update this thread when the invitation is accepted.',
             });
             return true;
           })
@@ -206,8 +207,9 @@ describe('end-to-end', () => {
             expect(body).toEqual({
               body:
                 'An invitation to join `test_org` has been sent to ' +
-                '`@someone`. I will update this thread when the invitation ' +
-                'is accepted.',
+                '`@someone`. They can accept this invitation ' +
+                '[here](https://github.com/orgs/test_org/invitation). I ' +
+                'will update this thread when the invitation is accepted.',
             });
             return true;
           })
