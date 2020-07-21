@@ -20,9 +20,13 @@ import {Database, dbConnect} from './src/db';
 import {TestResultRecord} from './src/test_result_record';
 import {Travis} from 'test-case-reporting';
 import express from 'express';
+import statusCodes from 'http-status-codes';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+const db: Database = dbConnect();
+const record = new TestResultRecord(db);
 
 app.get('/', (req, res) => {
   res.send('Hello, world, 2.0!');
@@ -39,16 +43,28 @@ app.get('/test-results/history/:testCaseId', (req, res) => {
 });
 
 app.post('/report', async (req, res) => {
-  const db: Database = dbConnect();
-  const testResultRecord = new TestResultRecord(db);
-
-  const report: Travis.Report = req.body;
-
   try {
-    await testResultRecord.storeTravisReport(report);
-    res.send(`Travis report stored successfully!`);
-  } catch (e) {
-    res.send(`Failed to send Travis report.`);
+    const report: Travis.Report = req.body;
+    const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'result'];
+
+    for (const key of topLevelKeys) {
+      if (!(report[key] as unknown)) {
+        throw new TypeError(`Report payload must include ${key} property`);
+      }
+    }
+
+    await record.storeTravisReport(report);
+    res.sendStatus(statusCodes.CREATED);
+  } catch (error) {
+    console.warn(error);
+    if (error instanceof TypeError) {
+      // Missing top-level keys from the report.
+      res.status(statusCodes.BAD_REQUEST);
+    } else {
+      res.status(statusCodes.INTERNAL_SERVER_ERROR);
+    }
+
+    res.json({error: error.toString()});
   }
 });
 
