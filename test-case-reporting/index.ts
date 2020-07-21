@@ -60,16 +60,23 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
 
 app.get('/test-results/history/:testCaseId', async (req, res) => {
   const {testCaseId} = req.params;
-  const {json} = req.query;
+  const {json, limitStr, offsetStr} = req.query;
   const db = dbConnect();
   const testResultRecord = new TestResultRecord(db);
 
-  const pageSize = 100;
+  let limit = parseInt(limitStr.toString(), 10);
+  const offset = parseInt(offsetStr.toString(), 10);
+  if (limit > 500) {
+    limit = 500;
+    console.warn(
+      'WARNING: Maximum query size exceeded. Showing only first 500 results.'
+    );
+  }
 
   const testRunJson = {
     testRuns: await testResultRecord.getTestCaseHistory(testCaseId, {
-      limit: pageSize,
-      offset: 0,
+      limit,
+      offset,
     }),
   };
 
