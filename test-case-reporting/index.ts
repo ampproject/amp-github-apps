@@ -58,9 +58,26 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
   }
 });
 
-app.get('/test-results/history/:testCaseId', (req, res) => {
+app.get('/test-results/history/:testCaseId', async (req, res) => {
   const {testCaseId} = req.params;
-  res.send(`Test history for test with name/ID ${testCaseId}`);
+  const {json} = req.query;
+  const db = dbConnect();
+  const testResultRecord = new TestResultRecord(db);
+
+  const pageSize = 100;
+
+  const testRunJson = {
+    testRuns: await testResultRecord.getTestCaseHistory(testCaseId, {
+      limit: pageSize,
+      offset: 0,
+    }),
+  };
+
+  if (json) {
+    res.json(testRunJson);
+  } else {
+    res.send(renderTestRunList(testRunJson.testRuns));
+  }
 });
 
 app.post('/report', async (req, res) => {
