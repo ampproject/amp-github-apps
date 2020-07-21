@@ -44,8 +44,12 @@ app.post('/report', async (req, res) => {
 
   const report: Travis.Report = req.body;
 
-  await testResultRecord.storeTravisReport(report);
-  res.send(`Travis report stored successfully!`);
+  try {
+    await testResultRecord.storeTravisReport(report);
+    res.send(`Travis report stored successfully!`);
+  } catch (e) {
+    res.send(`Failed to send Travis report.`);
+  }
 });
 
 app.listen(PORT, () => {
