@@ -79,6 +79,11 @@ export class InviteBot {
     this.logger.info(`InviteBot initialized for ${this.org}`);
   }
 
+  /** Provides a link for a user to accept an invitation. */
+  private get acceptInviteLink(): string {
+    return `https://github.com/orgs/${this.org}/invitation`;
+  }
+
   /** Process a comment by identifying and acting on any macros present. */
   async processComment(
     repo: string,
@@ -198,7 +203,8 @@ export class InviteBot {
       invite.repo,
       invite.issue_number,
       `You asked me to invite \`@${invite.username}\` to \`${this.org}\`, ` +
-        'but they already have an invitation pending! I will update this ' +
+        'but they already have an invitation pending! They can accept this ' +
+        `invitation [here](${this.acceptInviteLink}). I will update this ` +
         'thread when the invitation is accepted.'
     );
   }
@@ -220,8 +226,9 @@ export class InviteBot {
       invite.repo,
       invite.issue_number,
       `An invitation to join \`${this.org}\` has been sent to ` +
-        `\`@${invite.username}\`. I will update this thread when the ` +
-        'invitation is accepted.'
+        `\`@${invite.username}\`. They can accept this invitation ` +
+        `[here](${this.acceptInviteLink}). I will update this thread when ` +
+        'the invitation is accepted.'
     );
   }
 

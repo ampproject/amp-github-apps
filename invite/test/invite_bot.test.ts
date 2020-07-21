@@ -477,8 +477,9 @@ describe('Invite Bot', () => {
           'test_repo',
           1337,
           'You asked me to invite `@someone` to `test_org`, but they already ' +
-            'have an invitation pending! I will update this thread when the ' +
-            'invitation is accepted.'
+            'have an invitation pending! They can accept this invitation ' +
+            '[here](https://github.com/orgs/test_org/invitation). I will ' +
+            'update this thread when the invitation is accepted.'
         );
         done();
       });
@@ -539,7 +540,9 @@ describe('Invite Bot', () => {
         expect(inviteBot.github.addComment).toBeCalledWith(
           'test_repo',
           1337,
-          'An invitation to join `test_org` has been sent to `@someone`. I ' +
+          'An invitation to join `test_org` has been sent to `@someone`. ' +
+            'They can accept this invitation ' +
+            '[here](https://github.com/orgs/test_org/invitation). I ' +
             'will update this thread when the invitation is accepted.'
         );
         done();
