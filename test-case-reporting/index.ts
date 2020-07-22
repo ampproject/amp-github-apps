@@ -61,14 +61,15 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
 
 app.get('/test-results/history/:testCaseId', async (req, res) => {
   const {testCaseId} = req.params;
-  const {json, limitStr, offsetStr} = req.query;
+  const {json} = req.query;
+  const {limit, offset} = req.query;
   const db = dbConnect();
   const testResultRecord = new TestResultRecord(db);
 
-  let limit = parseInt(limitStr.toString(), 10);
-  const offset = parseInt(offsetStr.toString(), 10);
-  if (limit > MAX_PAGE_SIZE) {
-    limit = MAX_PAGE_SIZE;
+  let limitNum = parseInt(limit.toString(), 10);
+  const offsetNum = parseInt(offset.toString(), 10);
+  if (limitNum > MAX_PAGE_SIZE) {
+    limitNum = MAX_PAGE_SIZE;
     console.warn(
       `Maximum query size exceeded. Showing only first ${MAX_PAGE_SIZE} results.`
     );
@@ -76,8 +77,8 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
 
   const testRunJson = {
     testRuns: await testResultRecord.getTestCaseHistory(testCaseId, {
-      limit,
-      offset,
+      limit: limitNum,
+      offset: offsetNum,
     }),
   };
 
