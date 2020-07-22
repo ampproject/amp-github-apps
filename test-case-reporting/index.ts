@@ -16,16 +16,16 @@
 
 require('dotenv').config();
 
-import {Database, dbConnect} from './src/db';
 import {TestResultRecord} from './src/test_result_record';
 import {Travis} from 'test-case-reporting';
+import {dbConnect} from './src/db';
 import express from 'express';
 import statusCodes from 'http-status-codes';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const db: Database = dbConnect();
+const db = dbConnect();
 const record = new TestResultRecord(db);
 
 app.get('/', (req, res) => {
