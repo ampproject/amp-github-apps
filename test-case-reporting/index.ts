@@ -59,8 +59,6 @@ app.get('/', (req, res) => {
 app.get('/test-results/build/:buildNumber', async (req, res) => {
   const {buildNumber} = req.params;
   const {json} = req.query;
-  const db = dbConnect();
-  const testResultRecord = new TestResultRecord(db);
 
   const pageSize = 100;
 
@@ -79,8 +77,6 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
 app.get('/test-results/history/:testCaseId', async (req, res) => {
   const {testCaseId} = req.params;
   const {json} = req.query;
-  const db = dbConnect();
-  const testResultRecord = new TestResultRecord(db);
 
   const testRuns = await testResultRecord.getTestCaseHistory(
     testCaseId,
