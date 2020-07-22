@@ -22,10 +22,10 @@ import {dbConnect} from './src/db';
 import express from 'express';
 import statusCodes from 'http-status-codes';
 
-const app = express();
 const PORT = process.env.PORT || 8080;
 const MAX_PAGE_SIZE = 500;
 
+const app = express();
 const db = dbConnect();
 const record = new TestResultRecord(db);
 
@@ -60,12 +60,10 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
   const {buildNumber} = req.params;
   const {json} = req.query;
 
-  const pageSize = 100;
-
-  const testRuns = await testResultRecord.getTestRunsOfBuild(buildNumber, {
-    limit: pageSize,
-    offset: 0,
-  });
+  const testRuns = await testResultRecord.getTestRunsOfBuild(
+    buildNumber,
+    extractPageInfo(req)
+  );
 
   if (json) {
     res.json({testRuns});
