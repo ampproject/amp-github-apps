@@ -24,6 +24,7 @@ import statusCodes from 'http-status-codes';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+const MAX_PAGE_SIZE = 500;
 
 const db = dbConnect();
 const record = new TestResultRecord(db);
@@ -66,10 +67,10 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
 
   let limit = parseInt(limitStr.toString(), 10);
   const offset = parseInt(offsetStr.toString(), 10);
-  if (limit > 500) {
-    limit = 500;
+  if (limit > MAX_PAGE_SIZE) {
+    limit = MAX_PAGE_SIZE;
     console.warn(
-      'WARNING: Maximum query size exceeded. Showing only first 500 results.'
+      `Maximum query size exceeded. Showing only first ${MAX_PAGE_SIZE} results.`
     );
   }
 
