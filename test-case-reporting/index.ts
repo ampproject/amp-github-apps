@@ -16,7 +16,7 @@
 
 require('dotenv').config();
 
-import {KarmaReporter, TestRun, Travis} from 'test-case-reporting';
+import {PageInfo, TestRun, Travis} from 'test-case-reporting';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
 import express from 'express';
@@ -33,6 +33,25 @@ function renderTestRunList(testRuns: Array<TestRun>): string {
   return `Rendering ${testRuns.length} test runs!`;
 }
 
+function extractPageInfo(req: express.Request): PageInfo {
+  const {limit, offset} = req.query;
+
+  let limitNum = parseInt(limit.toString(), 10);
+  const offsetNum = parseInt(offset.toString(), 10);
+
+  if (limitNum > MAX_PAGE_SIZE) {
+    limitNum = MAX_PAGE_SIZE;
+    console.warn(
+      `Maximum query size exceeded. Showing only first ${MAX_PAGE_SIZE} results.`
+    );
+  }
+
+  return {
+    limit: limitNum,
+    offset: offsetNum,
+  };
+}
+
 app.get('/', (req, res) => {
   res.send('Hello, world, 2.0!');
 });
@@ -45,47 +64,33 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
 
   const pageSize = 100;
 
-  const testRunJson = {
-    testRuns: await testResultRecord.getTestRunsOfBuild(buildNumber, {
-      limit: pageSize,
-      offset: 0,
-    }),
-  };
+  const testRuns = await testResultRecord.getTestRunsOfBuild(buildNumber, {
+    limit: pageSize,
+    offset: 0,
+  });
 
   if (json) {
-    res.json(testRunJson);
+    res.json({testRuns});
   } else {
-    res.send(renderTestRunList(testRunJson.testRuns));
+    res.send(renderTestRunList(testRuns));
   }
 });
 
 app.get('/test-results/history/:testCaseId', async (req, res) => {
   const {testCaseId} = req.params;
   const {json} = req.query;
-  const {limit, offset} = req.query;
   const db = dbConnect();
   const testResultRecord = new TestResultRecord(db);
 
-  let limitNum = parseInt(limit.toString(), 10);
-  const offsetNum = parseInt(offset.toString(), 10);
-  if (limitNum > MAX_PAGE_SIZE) {
-    limitNum = MAX_PAGE_SIZE;
-    console.warn(
-      `Maximum query size exceeded. Showing only first ${MAX_PAGE_SIZE} results.`
-    );
-  }
-
-  const testRunJson = {
-    testRuns: await testResultRecord.getTestCaseHistory(testCaseId, {
-      limit: limitNum,
-      offset: offsetNum,
-    }),
-  };
+  const testRuns = await testResultRecord.getTestCaseHistory(
+    testCaseId,
+    extractPageInfo(req)
+  );
 
   if (json) {
-    res.json(testRunJson);
+    res.json({testRuns});
   } else {
-    res.send(renderTestRunList(testRunJson.testRuns));
+    res.send(renderTestRunList(testRuns));
   }
 });
 
