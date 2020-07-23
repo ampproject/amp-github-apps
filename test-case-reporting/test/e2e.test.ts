@@ -49,7 +49,7 @@ describe.skip('end-to-end', () => {
     await truncateAll(db);
   });
 
-  describe('when one post request is received', async () => {
+  describe('when one post request is received', () => {
     it('updates the database if the post request is good', async () => {
       await request(app)
         .post('/report')
@@ -62,7 +62,7 @@ describe.skip('end-to-end', () => {
             jobNumber: '413413.612',
             testSuiteType: 'unit',
           },
-          results: getFixture('sample-karma-report'),
+          result: getFixture('sample-karma-report'),
         });
 
       // TODO(#914): Replace `db('table_name').select()` calls with more readable
