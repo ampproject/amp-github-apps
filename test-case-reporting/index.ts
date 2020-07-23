@@ -60,7 +60,7 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
   const {buildNumber} = req.params;
   const {json} = req.query;
 
-  const testRuns = await testResultRecord.getTestRunsOfBuild(
+  const testRuns = await record.getTestRunsOfBuild(
     buildNumber,
     extractPageInfo(req)
   );
@@ -76,7 +76,7 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
   const {testCaseId} = req.params;
   const {json} = req.query;
 
-  const testRuns = await testResultRecord.getTestCaseHistory(
+  const testRuns = await record.getTestCaseHistory(
     testCaseId,
     extractPageInfo(req)
   );
