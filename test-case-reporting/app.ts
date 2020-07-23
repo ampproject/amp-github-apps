@@ -23,7 +23,6 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import statusCodes from 'http-status-codes';
 
-const PORT = process.env.PORT || 8080;
 const MAX_PAGE_SIZE = 500;
 
 const app = express();
@@ -117,10 +116,6 @@ app.post('/report', jsonParser, async (req, res) => {
 
     res.json({error: error.toString()});
   }
-});
-
-app.listen(PORT, () => {
-  console.log(`Running at http://localhost:${PORT}`);
 });
 
 export {app};
