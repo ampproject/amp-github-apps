@@ -19,6 +19,7 @@ require('dotenv').config();
 import {PageInfo, TestRun, Travis} from 'test-case-reporting';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
+import bodyParser from 'body-parser';
 import express from 'express';
 import statusCodes from 'http-status-codes';
 
@@ -26,6 +27,7 @@ const PORT = process.env.PORT || 8080;
 const MAX_PAGE_SIZE = 500;
 
 const app = express();
+const jsonParser = bodyParser.json();
 const db = dbConnect();
 const record = new TestResultRecord(db);
 
@@ -91,7 +93,7 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
   }
 });
 
-app.post('/report', async (req, res) => {
+app.post('/report', jsonParser, async (req, res) => {
   try {
     const report: Travis.Report = req.body;
     const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'result'];
