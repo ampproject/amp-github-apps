@@ -51,7 +51,9 @@ describe('end-to-end', () => {
 
   describe('when one post request is received', () => {
     it('updates the database if the post request is good', async () => {
-      await request(app)
+      let res;
+
+      res = await request(app)
         .post('/report')
         .send({
           build: {
@@ -65,13 +67,21 @@ describe('end-to-end', () => {
           result: getFixture('sample-karma-report'),
         });
 
+      expect(res.status).toBe(201);
+
       // TODO(#914): Replace `db('table_name').select()` calls with more readable
       // functions for getting builds, jobs, and invites.
       // See https://github.com/ampproject/amp-github-apps/blob/master/invite/src/invitation_record.ts
       // for an example of what I'm thinking of.
       const builds = await db('builds').select();
       const jobs = await db('jobs').select();
-      const testRuns = await db('testRunsLength').select();
+
+      res = await request(app)
+        .get('/test-results/build/413413')
+        .field('limit', '100')
+        .field('offset', '0');
+
+      const {testRuns} = res.body;
 
       expect(builds).toHaveLength(1);
       expect(jobs).toHaveLength(1);
