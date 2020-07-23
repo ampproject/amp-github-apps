@@ -18,7 +18,7 @@ import Knex from 'knex';
 import request from 'supertest';
 
 import {Database, dbConnect} from '../src/db';
-import {app} from '../index';
+import {app} from '../app';
 import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
 import {truncateAll} from './testing_utils';
