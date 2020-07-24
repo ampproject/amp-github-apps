@@ -36,6 +36,7 @@ function renderTestRunList(testRuns: Array<TestRun>): string {
 function extractPageInfo(req: express.Request): PageInfo {
   const {limit, offset} = req.query;
 
+  // TODO(#948): Add type errors for bad GET params
   let limitNum = parseInt(limit.toString(), 10);
   const offsetNum = parseInt(offset.toString(), 10);
 
@@ -57,6 +58,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test-results/build/:buildNumber', async (req, res) => {
+  // TODO(#949): Add error handling to GET endpoints
   const {buildNumber} = req.params;
   const {json} = req.query;
 
@@ -73,6 +75,7 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
 });
 
 app.get('/test-results/history/:testCaseId', async (req, res) => {
+  // TODO(#949): Add error handling to GET endpoints
   const {testCaseId} = req.params;
   const {json} = req.query;
 
