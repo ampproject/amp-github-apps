@@ -17,11 +17,6 @@
 import Knex from 'knex';
 import request from 'supertest';
 
-import {Database, dbConnect} from '../src/db';
-import {getFixture} from './fixtures';
-import {setupDb} from '../src/setup_db';
-import {truncateAll} from './testing_utils';
-
 jest.mock('../src/db', () => ({
   dbConnect: (): Database =>
     Knex({
@@ -30,6 +25,10 @@ jest.mock('../src/db', () => ({
       useNullAsDefault: true,
     }),
 }));
+import {Database, dbConnect} from '../src/db';
+import {getFixture} from './fixtures';
+import {setupDb} from '../src/setup_db';
+import {truncateAll} from './testing_utils';
 
 import {app} from '../app';
 
