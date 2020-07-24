@@ -16,30 +16,79 @@
 
 require('dotenv').config();
 
+import {PageInfo, TestRun, Travis} from 'test-case-reporting';
 import {TestResultRecord} from './src/test_result_record';
-import {Travis} from 'test-case-reporting';
 import {dbConnect} from './src/db';
 import express from 'express';
 import statusCodes from 'http-status-codes';
 
-const app = express();
 const PORT = process.env.PORT || 8080;
+const MAX_PAGE_SIZE = 500;
 
+const app = express();
 const db = dbConnect();
 const record = new TestResultRecord(db);
+
+function renderTestRunList(testRuns: Array<TestRun>): string {
+  return `Rendering ${testRuns.length} test runs!`;
+}
+
+function extractPageInfo(req: express.Request): PageInfo {
+  const {limit, offset} = req.query;
+
+  // TODO(#948): Add type errors for bad GET params
+  let limitNum = parseInt(limit.toString(), 10);
+  const offsetNum = parseInt(offset.toString(), 10);
+
+  if (limitNum > MAX_PAGE_SIZE) {
+    limitNum = MAX_PAGE_SIZE;
+    console.warn(
+      `Maximum query size exceeded. Showing only first ${MAX_PAGE_SIZE} results.`
+    );
+  }
+
+  return {
+    limit: limitNum,
+    offset: offsetNum,
+  };
+}
 
 app.get('/', (req, res) => {
   res.send('Hello, world, 2.0!');
 });
 
-app.get('/test-results/pr/:prNumber', (req, res) => {
-  const {prNumber} = req.params;
-  res.send(`List of test cases for PR number ${prNumber}`);
+app.get('/test-results/build/:buildNumber', async (req, res) => {
+  // TODO(#949): Add error handling to GET endpoints
+  const {buildNumber} = req.params;
+  const {json} = req.query;
+
+  const testRuns = await record.getTestRunsOfBuild(
+    buildNumber,
+    extractPageInfo(req)
+  );
+
+  if (json) {
+    res.json({testRuns});
+  } else {
+    res.send(renderTestRunList(testRuns));
+  }
 });
 
-app.get('/test-results/history/:testCaseId', (req, res) => {
+app.get('/test-results/history/:testCaseId', async (req, res) => {
+  // TODO(#949): Add error handling to GET endpoints
   const {testCaseId} = req.params;
-  res.send(`Test history for test with name/ID ${testCaseId}`);
+  const {json} = req.query;
+
+  const testRuns = await record.getTestCaseHistory(
+    testCaseId,
+    extractPageInfo(req)
+  );
+
+  if (json) {
+    res.json({testRuns});
+  } else {
+    res.send(renderTestRunList(testRuns));
+  }
 });
 
 app.post('/report', async (req, res) => {
