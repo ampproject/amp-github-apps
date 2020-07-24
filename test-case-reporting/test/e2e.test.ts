@@ -17,13 +17,14 @@
 import Knex from 'knex';
 import request from 'supertest';
 
+const sqliteDb = Knex({
+  client: 'sqlite3',
+  connection: ':memory:',
+  useNullAsDefault: true,
+});
+
 jest.mock('../src/db', () => ({
-  dbConnect: (): Database =>
-    Knex({
-      client: 'sqlite3',
-      connection: ':memory:',
-      useNullAsDefault: true,
-    }),
+  dbConnect: (): Database => sqliteDb,
 }));
 import {Database, dbConnect} from '../src/db';
 import {getFixture} from './fixtures';
