@@ -18,7 +18,6 @@ import Knex from 'knex';
 import request from 'supertest';
 
 import {Database, dbConnect} from '../src/db';
-import {app} from '../app';
 import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
 import {truncateAll} from './testing_utils';
@@ -31,6 +30,8 @@ jest.mock('../src/db', () => ({
       useNullAsDefault: true,
     }),
 }));
+
+import {app} from '../app';
 
 describe('end-to-end', () => {
   let db: Database;
@@ -76,10 +77,9 @@ describe('end-to-end', () => {
       const builds = await db('builds').select();
       const jobs = await db('jobs').select();
 
-      res = await request(app)
-        .get('/test-results/build/413413')
-        .field('limit', '100')
-        .field('offset', '0');
+      res = await request(app).get(
+        '/test-results/build/413413?limit=100&offset=0'
+      );
 
       const {testRuns} = res.body;
 
