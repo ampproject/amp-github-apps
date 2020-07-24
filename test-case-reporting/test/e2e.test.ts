@@ -78,14 +78,14 @@ describe('end-to-end', () => {
       const jobs = await db('jobs').select();
 
       res = await request(app).get(
-        '/test-results/build/413413?limit=100&offset=0'
+        '/test-results/build/413413?limit=100&offset=0&json=1'
       );
 
       const {testRuns} = res.body;
 
       expect(builds).toHaveLength(1);
       expect(jobs).toHaveLength(1);
-      expect(testRuns).toHaveLength(4);
+      expect(testRuns).toHaveLength(5);
     });
   });
 });
