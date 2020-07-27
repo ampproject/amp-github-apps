@@ -4,14 +4,14 @@
 </head>
 <body>
   <ul>
-    {{#errorReports}}
-    <li></li>
-    {{/errorReports}}
-    {{^errorReports}}
+    {{#testRuns}}
+    <li>Name is "{{testCase.name}}", job num is "{{job.jobNumber}}", status is {{status}}</li>
+    {{/testRuns}}
+    {{^testRuns}}
       <h2>
         There are no test runs.
       </h2>
-    {{/errorReports}}
+    {{/testRuns}}
   </ul>
 </body>
 </html>
