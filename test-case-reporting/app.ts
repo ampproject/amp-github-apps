@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-require('dotenv').config();
-
 import {PageInfo, TestRun, Travis} from 'test-case-reporting';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
