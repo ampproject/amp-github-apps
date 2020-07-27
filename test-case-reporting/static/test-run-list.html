@@ -5,9 +5,14 @@
 <body>
   <ul>
     {{#testRuns}}
-    <li>Name is "{{testCase.name}}", job num is "{{job.jobNumber}}", status is {{status}}</li>
-    {{/testRuns}}
-    {{^testRuns}}
+    <ul>
+      <li>Test case is <a href="/test-results/history/{{testCase.id}}">{{testCase.name}}</a></li>
+      <li>Job num is {{job.jobNumber}}</li>
+      <li>Build num is <a href="/test-results/build/{{job.build.buildNumber}}">{{job.build.buildNumber}}</a></li>
+      <li>Status is {{status}}</li>
+      {{/testRuns}}
+      {{^testRuns}}
+    </ul>
       <h2>
         There are no test runs.
       </h2>
