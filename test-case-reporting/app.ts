@@ -17,8 +17,10 @@
 import {PageInfo, TestRun, Travis} from 'test-case-reporting';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
+import Mustache from 'mustache';
 import bodyParser from 'body-parser';
 import express from 'express';
+import fs from 'fs';
 import statusCodes from 'http-status-codes';
 
 const MAX_PAGE_SIZE = 500;
@@ -28,8 +30,15 @@ const jsonParser = bodyParser.json();
 const db = dbConnect();
 const record = new TestResultRecord(db);
 
+let testRunListTemplate = '';
 function renderTestRunList(testRuns: Array<TestRun>): string {
-  return `Rendering ${testRuns.length} test runs!`;
+  if (!testRunListTemplate) {
+    testRunListTemplate = fs
+      .readFileSync('./static/test-run-list.html')
+      .toString();
+  }
+
+  return Mustache.render(testRunListTemplate, {testRuns});
 }
 
 function handleError(error: Error, res: express.Response): void {
