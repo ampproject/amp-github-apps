@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
+import {TestRun} from 'test-case-reporting';
 import Knex from 'knex';
 import request from 'supertest';
 
+const sqliteDb = Knex({
+  client: 'sqlite3',
+  connection: ':memory:',
+  useNullAsDefault: true,
+});
+
+jest.mock('../src/db', () => ({
+  dbConnect: (): Database => sqliteDb,
+}));
 import {Database, dbConnect} from '../src/db';
-import {app} from '../index';
 import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
 import {truncateAll} from './testing_utils';
 
-jest.mock('../src/db', () => ({
-  dbConnect: (): Database =>
-    Knex({
-      client: 'sqlite3',
-      connection: ':memory:',
-      useNullAsDefault: true,
-    }),
-}));
+import {app} from '../app';
 
-describe.skip('end-to-end', () => {
+describe('end-to-end', () => {
   let db: Database;
 
   beforeAll(async () => {
@@ -49,9 +51,9 @@ describe.skip('end-to-end', () => {
     await truncateAll(db);
   });
 
-  describe('when one post request is received', async () => {
+  describe('when one post request is received', () => {
     it('updates the database if the post request is good', async () => {
-      await request(app)
+      let res = await request(app)
         .post('/report')
         .send({
           build: {
@@ -62,20 +64,25 @@ describe.skip('end-to-end', () => {
             jobNumber: '413413.612',
             testSuiteType: 'unit',
           },
-          results: getFixture('sample-karma-report'),
+          result: getFixture('sample-karma-report'),
         });
+
+      expect(res.status).toBe(201);
 
       // TODO(#914): Replace `db('table_name').select()` calls with more readable
       // functions for getting builds, jobs, and invites.
       // See https://github.com/ampproject/amp-github-apps/blob/master/invite/src/invitation_record.ts
       // for an example of what I'm thinking of.
-      const builds = await db('builds').select();
-      const jobs = await db('jobs').select();
-      const testRuns = await db('testRunsLength').select();
 
-      expect(builds).toHaveLength(1);
-      expect(jobs).toHaveLength(1);
-      expect(testRuns).toHaveLength(4);
+      res = await request(app).get(
+        '/test-results/build/413413?limit=100&offset=0&json=1'
+      );
+
+      const {testRuns}: {testRuns: Array<TestRun>} = res.body;
+      expect(testRuns).toHaveLength(5);
+      testRuns.forEach(testRun =>
+        expect(testRun.job.build.buildNumber).toEqual('413413')
+      );
     });
   });
 });
