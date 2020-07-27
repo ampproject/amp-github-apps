@@ -6,7 +6,7 @@
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "An app that tracks the pass/fail status of tests run in Travis builds",
   "engines": {
-    "node": "12.13.1"
+    "node": "12.18.3"
   },
   "scripts": {
     "lint": "eslint **/*.ts",
@@ -25,34 +25,34 @@
   "dependencies": {
     "dotenv": "8.2.0",
     "express": "4.17.1",
-    "knex": "0.21.1",
+    "knex": "0.21.2",
     "md5": "2.2.1",
     "node-fetch": "2.6.0",
-    "pg": "8.2.1"
+    "pg": "8.3.0"
   },
   "devDependencies": {
-    "@types/express": "4.17.6",
+    "@types/express": "4.17.7",
     "@types/express-serve-static-core": "4.17.9",
-    "@types/jest": "25.1.2",
+    "@types/jest": "25.2.3",
     "@types/knex": "0.16.1",
     "@types/md5": "2.2.0",
-    "@types/node": "13.7.0",
+    "@types/node": "13.13.15",
     "@types/node-fetch": "2.5.7",
-    "@types/supertest": "2.0.9",
-    "@typescript-eslint/eslint-plugin": "2.19.2",
-    "@typescript-eslint/parser": "2.19.2",
+    "@types/supertest": "2.0.10",
+    "@typescript-eslint/eslint-plugin": "2.34.0",
+    "@typescript-eslint/parser": "2.34.0",
     "eslint": "6.8.0",
-    "eslint-config-prettier": "6.10.0",
-    "eslint-plugin-prettier": "3.1.2",
+    "eslint-config-prettier": "6.11.0",
+    "eslint-plugin-prettier": "3.1.4",
     "http-status-codes": "1.4.0",
-    "jest": "25.1.0",
-    "nodemon": "2.0.2",
+    "jest": "25.5.4",
+    "nodemon": "2.0.4",
     "prettier": "1.19.1",
     "sqlite3": "5.0.0",
     "supertest": "4.0.2",
-    "ts-jest": "25.2.0",
-    "ts-node": "8.6.2",
-    "typescript": "3.7.5"
+    "ts-jest": "25.5.1",
+    "ts-node": "8.10.2",
+    "typescript": "3.9.7"
   },
   "standard": {
     "env": [
