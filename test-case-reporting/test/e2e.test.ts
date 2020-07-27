@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import {TestRun} from 'test-case-reporting';
 import Knex from 'knex';
 import request from 'supertest';
 
@@ -72,18 +73,16 @@ describe('end-to-end', () => {
       // functions for getting builds, jobs, and invites.
       // See https://github.com/ampproject/amp-github-apps/blob/master/invite/src/invitation_record.ts
       // for an example of what I'm thinking of.
-      const builds = await db('builds').select();
-      const jobs = await db('jobs').select();
 
       res = await request(app).get(
         '/test-results/build/413413?limit=100&offset=0&json=1'
       );
 
-      const {testRuns} = res.body;
-
-      expect(builds).toHaveLength(1);
-      expect(jobs).toHaveLength(1);
+      const {testRuns}: {testRuns: Array<TestRun>} = res.body;
       expect(testRuns).toHaveLength(5);
+      testRuns.forEach(testRun =>
+        expect(testRun.job.build.buildNumber).toEqual('413413')
+      );
     });
   });
 });
