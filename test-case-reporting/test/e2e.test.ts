@@ -52,8 +52,7 @@ describe('end-to-end', () => {
 
   describe('when one post request is received', () => {
     it('updates the database if the post request is good', async () => {
-      let res;
-      res = await request(app)
+      let res = await request(app)
         .post('/report')
         .send({
           build: {
