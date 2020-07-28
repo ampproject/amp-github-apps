@@ -36,6 +36,13 @@ jest.mock('../src/db', () => ({
       client: 'sqlite3',
       connection: ':memory:',
       useNullAsDefault: true,
+
+      // Foreign keys are disabled by default in sqlite3 :(
+      // This enables them after creating the connection.
+      pool: {
+        afterCreate: (connection: any, callback: any): any =>
+          connection.run('PRAGMA foreign_keys = ON', callback),
+      },
     }),
 }));
 
@@ -126,8 +133,11 @@ describe('TestResultRecord', () => {
         });
       });
 
-      // TODO(#926): Add more unhappy path unit tests
-      it.todo("throws an error if the build doesn't exist");
+      it("throws an error if the build doesn't exist", async () => {
+        await expect(
+          testResultRecord.insertTravisJob(sampleJob, 404)
+        ).rejects.toThrow();
+      });
     });
 
     describe('testStatus', () => {

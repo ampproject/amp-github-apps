@@ -24,6 +24,9 @@ const sqliteDb = Knex({
   useNullAsDefault: true,
 });
 
+// We create sqliteDb outside because each call to Knex
+// with a memory connection creates a new database.
+// (We want all calls to refer to the same database).
 jest.mock('../src/db', () => ({
   dbConnect: (): Database => sqliteDb,
 }));
