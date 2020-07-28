@@ -127,7 +127,11 @@ describe('TestResultRecord', () => {
       });
 
       // TODO(#926): Add more unhappy path unit tests
-      it.todo("throws an error if the build doesn't exist");
+      it("throws an error if the build doesn't exist", async () => {
+        await expect(
+          testResultRecord.insertTravisJob(sampleJob, 404)
+        ).rejects.toThrow();
+      });
     });
 
     describe('testStatus', () => {
