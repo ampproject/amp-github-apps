@@ -131,12 +131,6 @@ describe('TestResultRecord', () => {
       });
 
       it("throws an error if the build doesn't exist", async () => {
-        await testResultRecord.insertTravisJob(sampleJob, 404);
-
-        const jobs = await db<DB.Job>('jobs')
-          .select();
-        expect(jobs).toHaveLength(0);
-
         await expect(
           testResultRecord.insertTravisJob(sampleJob, 404)
         ).rejects.toThrow();
