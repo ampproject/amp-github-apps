@@ -39,7 +39,7 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.string('test_suite_type');
       table.timestamp('started_at', {precision: TIMESTAMP_PRECISION});
 
-      table.foreign('build_id').references('builds.id');
+      table.foreign('build_id').references('id').inTable('builds');
     })
     .createTable('test_cases', table => {
       table
@@ -63,8 +63,7 @@ export async function setupDb(db: Database): Promise<unknown> {
         .unsigned()
         .notNullable();
       table
-        .integer('test_case_id')
-        .unsigned()
+        .specificType('test_case_id', 'char(32)')
         .notNullable();
       table.enu('status', ['PASS', 'FAIL', 'SKIP', 'ERROR'], {
         useNative: true,
@@ -73,7 +72,7 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.timestamp('timestamp', {precision: TIMESTAMP_PRECISION});
       table.integer('duration_ms');
 
-      table.foreign('test_case_id').references('test_cases.id');
+      table.foreign('test_case_id').references('id').inTable('test_cases');
       table
         .foreign('job_id')
         .references('id')
