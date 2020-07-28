@@ -36,6 +36,10 @@ jest.mock('../src/db', () => ({
       client: 'sqlite3',
       connection: ':memory:',
       useNullAsDefault: true,
+      pool: {
+        afterCreate: (connection: any, callback: any): any =>
+          connection.run('PRAGMA foreign_keys = ON', callback),
+      },
     }),
 }));
 
