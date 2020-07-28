@@ -68,10 +68,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test-results/build/:buildNumber', async (req, res) => {
-  try {
-    const {buildNumber} = req.params;
-    const {json} = req.query;
+  const {buildNumber} = req.params;
+  const {json} = req.query;
 
+  try {
     const testRuns = await record.getTestRunsOfBuild(
       buildNumber,
       extractPageInfo(req)
@@ -88,10 +88,10 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
 });
 
 app.get('/test-results/history/:testCaseId', async (req, res) => {
-  try {
-    const {testCaseId} = req.params;
-    const {json} = req.query;
+  const {testCaseId} = req.params;
+  const {json} = req.query;
 
+  try {
     const testRuns = await record.getTestCaseHistory(
       testCaseId,
       extractPageInfo(req)
@@ -108,10 +108,10 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
 });
 
 app.post('/report', jsonParser, async (req, res) => {
-  try {
-    const report: Travis.Report = req.body;
-    const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'result'];
+  const report: Travis.Report = req.body;
+  const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'result'];
 
+  try {
     for (const key of topLevelKeys) {
       if (!(report[key] as unknown)) {
         throw new TypeError(`Report payload must include ${key} property`);
