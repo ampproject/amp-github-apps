@@ -32,10 +32,21 @@ function renderTestRunList(testRuns: Array<TestRun>): string {
   return `Rendering ${testRuns.length} test runs!`;
 }
 
+function handleError(error: Error, res: express.Response): void {
+  console.warn(error);
+  if (error instanceof TypeError) {
+    // Request params are undefined or the wrong type
+    res.status(statusCodes.BAD_REQUEST);
+  } else {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR);
+  }
+
+  res.json({error: error.toString()});
+}
+
 function extractPageInfo(req: express.Request): PageInfo {
   const {limit, offset} = req.query;
 
-  // TODO(#948): Add type errors for bad GET params
   let limitNum = parseInt(limit.toString(), 10);
   const offsetNum = parseInt(offset.toString(), 10);
 
@@ -57,44 +68,50 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test-results/build/:buildNumber', async (req, res) => {
-  // TODO(#949): Add error handling to GET endpoints
   const {buildNumber} = req.params;
   const {json} = req.query;
 
-  const testRuns = await record.getTestRunsOfBuild(
-    buildNumber,
-    extractPageInfo(req)
-  );
+  try {
+    const testRuns = await record.getTestRunsOfBuild(
+      buildNumber,
+      extractPageInfo(req)
+    );
 
-  if (json) {
-    res.json({testRuns});
-  } else {
-    res.send(renderTestRunList(testRuns));
+    if (json) {
+      res.json({testRuns});
+    } else {
+      res.send(renderTestRunList(testRuns));
+    }
+  } catch (error) {
+    handleError(error, res);
   }
 });
 
 app.get('/test-results/history/:testCaseId', async (req, res) => {
-  // TODO(#949): Add error handling to GET endpoints
   const {testCaseId} = req.params;
   const {json} = req.query;
 
-  const testRuns = await record.getTestCaseHistory(
-    testCaseId,
-    extractPageInfo(req)
-  );
+  try {
+    const testRuns = await record.getTestCaseHistory(
+      testCaseId,
+      extractPageInfo(req)
+    );
 
-  if (json) {
-    res.json({testRuns});
-  } else {
-    res.send(renderTestRunList(testRuns));
+    if (json) {
+      res.json({testRuns});
+    } else {
+      res.send(renderTestRunList(testRuns));
+    }
+  } catch (error) {
+    handleError(error, res);
   }
 });
 
 app.post('/report', jsonParser, async (req, res) => {
-  try {
-    const report: Travis.Report = req.body;
-    const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'result'];
+  const report: Travis.Report = req.body;
+  const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'result'];
 
+  try {
     for (const key of topLevelKeys) {
       if (!(report[key] as unknown)) {
         throw new TypeError(`Report payload must include ${key} property`);
@@ -104,15 +121,7 @@ app.post('/report', jsonParser, async (req, res) => {
     await record.storeTravisReport(report);
     res.sendStatus(statusCodes.CREATED);
   } catch (error) {
-    console.warn(error);
-    if (error instanceof TypeError) {
-      // Missing top-level keys from the report.
-      res.status(statusCodes.BAD_REQUEST);
-    } else {
-      res.status(statusCodes.INTERNAL_SERVER_ERROR);
-    }
-
-    res.json({error: error.toString()});
+    handleError(error, res);
   }
 });
 
