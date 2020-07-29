@@ -165,11 +165,11 @@ export class TestResultRecord {
    * Duplicate test cases and builds are not inserted.
    * @param travisReport Travis report with job, build, and test run result info.
    */
-  async storeTravisReport({job, build, result}: Travis.Report): Promise<void> {
+  async storeTravisReport({job, build, results}: Travis.Report): Promise<void> {
     const buildId = await this.insertTravisBuild(build);
     const jobId = await this.insertTravisJob(job, buildId);
 
-    const formattedResults = result.browsers
+    const formattedResults = results.browsers
       .map(({results}) => results)
       .reduce((flattenedArray, array) => flattenedArray.concat(array), [])
       .map(result => {

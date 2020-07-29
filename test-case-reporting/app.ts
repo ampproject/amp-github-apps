@@ -109,7 +109,7 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
 
 app.post('/report', jsonParser, async (req, res) => {
   const report: Travis.Report = req.body;
-  const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'result'];
+  const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'results'];
 
   try {
     for (const key of topLevelKeys) {
