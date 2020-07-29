@@ -45,6 +45,12 @@ const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
 const ALL_SERVICES = 'ALL SERVICES';
 const VALID_SERVICE_TYPES = [ALL_SERVICES].concat(Object.keys(ServiceName));
 const MAX_TITLE_LENGTH = 80;
+// In shifting from one repo to another for reporting error issues, linking an
+// existing issue to a new error introduces some ambiguity. Rather than require
+// the engineer to include which repo they are linking from (which, eventually,
+// will almost always be the new one), we can make an intelligent inference
+// about which repo the issue belongs to based on the issue number.
+const LEGACY_ISSUE_REPO_START = 20000;
 
 let errorListTemplate = '';
 /** Renders the error list UI. */
@@ -318,7 +324,7 @@ export async function topIssueList(
         title = `${title.substr(0, MAX_TITLE_LENGTH - 1)}…`;
       }
       const issueUrl = trackingIssues[0].url;
-      const [, issue] = issueUrl.split('ampproject/amphtml/issues/');
+      const [, issue] = issueUrl.split(/ampproject\/[\w-]+\/issues\//);
       const issueNumber = Number(issue);
 
       if (!issueNumber || seenIssues.has(issueNumber)) {
@@ -347,9 +353,13 @@ export async function linkIssue(
   }
 
   try {
+    const issueRepo =
+      issueNumber >= LEGACY_ISSUE_REPO_START
+        ? GITHUB_REPO_NAME
+        : ISSUE_REPO_NAME;
     await stackdriver.setGroupIssue(
       errorId.toString(),
-      `https://github.com/${GITHUB_REPO_OWNER}/${ISSUE_REPO_NAME}/issues/${issueNumber}`
+      `https://github.com/${GITHUB_REPO_OWNER}/${issueRepo}/issues/${issueNumber}`
     );
   } catch (e) {
     console.error(e);
