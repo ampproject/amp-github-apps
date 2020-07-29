@@ -6,4 +6,5 @@ automatic_scaling:
   max_num_instances: 1
 
 beta_settings:
-  cloud_sql_instances: ${DB_INSTANCE_CONNECTION_NAME}
+  # Should be set to environment variable for DB_INSTANCE_CONNECTION_NAME
+  cloud_sql_instances: amp-test-cases:us-central1:amp-test-results
