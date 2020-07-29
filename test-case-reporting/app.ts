@@ -24,7 +24,7 @@ import statusCodes from 'http-status-codes';
 const MAX_PAGE_SIZE = 500;
 
 const app = express();
-const jsonParser = bodyParser.json();
+const jsonParser = bodyParser.json({limit: '15mb'});
 const db = dbConnect();
 const record = new TestResultRecord(db);
 
