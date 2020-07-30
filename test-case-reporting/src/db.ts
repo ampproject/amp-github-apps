@@ -22,7 +22,7 @@ export function dbConnect(): Database {
   return Knex({
     client: 'pg',
     connection: {
-      host: process.env.DB_UNIX_SOCKET,
+      host: `${process.env.DB_SOCKET_PATH}/${process.env.DB_INSTANCE_CONNECTION_NAME}`,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,

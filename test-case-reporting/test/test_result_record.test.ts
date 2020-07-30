@@ -71,7 +71,7 @@ describe('TestResultRecord', () => {
   const sampleTravisReport: Travis.Report = {
     job: sampleJob,
     build: sampleBuild,
-    result: sampleKarmaReport,
+    results: sampleKarmaReport,
   };
 
   const defaultPageInfo: PageInfo = {offset: 0, limit: 100};
@@ -258,7 +258,7 @@ describe('TestResultRecord', () => {
         const smallerReport: Travis.Report = {
           job: sampleJob,
           build: sampleBuild,
-          result: smallerSampleKarmaReport,
+          results: smallerSampleKarmaReport,
         };
 
         await testResultRecord.storeTravisReport(smallerReport);

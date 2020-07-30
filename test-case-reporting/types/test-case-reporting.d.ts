@@ -140,7 +140,7 @@ declare module 'test-case-reporting' {
     export interface Report {
       job: Travis.Job;
       build: Travis.Build;
-      result: KarmaReporter.TestResultReport;
+      results: KarmaReporter.TestResultReport;
     }
     export interface Build {
       buildNumber: string;

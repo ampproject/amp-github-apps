@@ -24,7 +24,7 @@ import statusCodes from 'http-status-codes';
 const MAX_PAGE_SIZE = 500;
 
 const app = express();
-const jsonParser = bodyParser.json();
+const jsonParser = bodyParser.json({limit: '15mb'});
 const db = dbConnect();
 const record = new TestResultRecord(db);
 
@@ -109,7 +109,7 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
 
 app.post('/report', jsonParser, async (req, res) => {
   const report: Travis.Report = req.body;
-  const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'result'];
+  const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'results'];
 
   try {
     for (const key of topLevelKeys) {

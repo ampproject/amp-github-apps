@@ -67,7 +67,7 @@ describe('end-to-end', () => {
             jobNumber: '413413.612',
             testSuiteType: 'unit',
           },
-          result: getFixture('sample-karma-report'),
+          results: getFixture('sample-karma-report'),
         });
 
       expect(res.status).toBe(201);
