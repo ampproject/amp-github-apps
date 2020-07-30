@@ -29,6 +29,7 @@ import {fillDatabase, truncateAll} from './testing_utils';
 import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
 import Knex from 'knex';
+import md5 from 'md5';
 
 jest.mock('../src/db', () => ({
   dbConnect: (): Database =>
@@ -362,7 +363,7 @@ describe('TestResultRecord', () => {
     describe('getTestCaseHistory', () => {
       it('gets the test case history in reverse chronological order (most recent first)', async () => {
         const testRuns: Array<TestRun> = await testResultRecord.getTestCaseHistory(
-          'case | 1',
+          md5('case | 1'),
           defaultPageInfo
         );
 
@@ -375,7 +376,7 @@ describe('TestResultRecord', () => {
 
       it('gets an empty list if test case is not in the database', async () => {
         const testRuns: Array<TestRun> = await testResultRecord.getTestCaseHistory(
-          '404 | I do not exist',
+          md5('404 | I do not exist'),
           defaultPageInfo
         );
 
