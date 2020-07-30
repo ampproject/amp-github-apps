@@ -24,6 +24,7 @@ import fs from 'fs';
 import statusCodes from 'http-status-codes';
 
 const MAX_PAGE_SIZE = 500;
+const DEFAULT_PAGE_SIZE = 100;
 
 const app = express();
 const jsonParser = bodyParser.json();
@@ -56,8 +57,8 @@ function handleError(error: Error, res: express.Response): void {
 function extractPageInfo(req: express.Request): PageInfo {
   const {limit, offset} = req.query;
 
-  let limitNum = parseInt(limit.toString(), 10);
-  const offsetNum = parseInt(offset.toString(), 10);
+  let limitNum = limit ? parseInt(limit.toString(), 10) : DEFAULT_PAGE_SIZE;
+  const offsetNum = offset ? parseInt(offset.toString(), 10) : 0;
 
   if (limitNum > MAX_PAGE_SIZE) {
     limitNum = MAX_PAGE_SIZE;
