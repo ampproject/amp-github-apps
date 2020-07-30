@@ -27,7 +27,10 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.increments('id').primary();
       table.string('commit_sha', 40);
       table.string('build_number');
-      table.timestamp('started_at', {precision: TIMESTAMP_PRECISION});
+      table
+        .timestamp('started_at', {precision: TIMESTAMP_PRECISION})
+        .defaultTo(db.fn.now())
+        .notNullable();
     })
     .createTable('jobs', table => {
       table.increments('id').primary();
@@ -37,9 +40,15 @@ export async function setupDb(db: Database): Promise<unknown> {
         .notNullable();
       table.string('job_number');
       table.string('test_suite_type');
-      table.timestamp('started_at', {precision: TIMESTAMP_PRECISION});
+      table
+        .timestamp('started_at', {precision: TIMESTAMP_PRECISION})
+        .defaultTo(db.fn.now())
+        .notNullable();
 
-      table.foreign('build_id').references('id').inTable('builds');
+      table
+        .foreign('build_id')
+        .references('id')
+        .inTable('builds');
     })
     .createTable('test_cases', table => {
       table
@@ -51,10 +60,11 @@ export async function setupDb(db: Database): Promise<unknown> {
         .notNullable()
         .primary()
         .comment('MD5 hash of the name');
-      table.string('name');
+      table.text('name');
       table
         .timestamp('created_at', {precision: TIMESTAMP_PRECISION})
-        .defaultTo(db.fn.now());
+        .defaultTo(db.fn.now())
+        .notNullable();
     })
     .createTable('test_runs', table => {
       table.increments('id').primary();
@@ -62,17 +72,21 @@ export async function setupDb(db: Database): Promise<unknown> {
         .integer('job_id')
         .unsigned()
         .notNullable();
-      table
-        .specificType('test_case_id', 'char(32)')
-        .notNullable();
+      table.specificType('test_case_id', 'char(32)').notNullable();
       table.enu('status', ['PASS', 'FAIL', 'SKIP', 'ERROR'], {
         useNative: true,
         enumName: 'test_status',
       });
-      table.timestamp('timestamp', {precision: TIMESTAMP_PRECISION});
+      table
+        .timestamp('timestamp', {precision: TIMESTAMP_PRECISION})
+        .defaultTo(db.fn.now())
+        .notNullable();
       table.integer('duration_ms');
 
-      table.foreign('test_case_id').references('id').inTable('test_cases');
+      table
+        .foreign('test_case_id')
+        .references('id')
+        .inTable('test_cases');
       table
         .foreign('job_id')
         .references('id')
