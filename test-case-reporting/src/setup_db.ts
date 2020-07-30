@@ -60,7 +60,7 @@ export async function setupDb(db: Database): Promise<unknown> {
         .notNullable()
         .primary()
         .comment('MD5 hash of the name');
-      table.string('name');
+      table.text('name');
       table
         .timestamp('created_at', {precision: TIMESTAMP_PRECISION})
         .defaultTo(db.fn.now())
