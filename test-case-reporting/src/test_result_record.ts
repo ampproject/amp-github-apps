@@ -59,6 +59,7 @@ function getTestRunFromRow({
   };
 
   const testCase: TestCase = {
+    id: md5(name),
     name,
     createdAt: new Date(created_at),
   };
