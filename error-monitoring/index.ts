@@ -50,7 +50,7 @@ const MAX_TITLE_LENGTH = 80;
 // the engineer to include which repo they are linking from (which, eventually,
 // will almost always be the new one), we can make an intelligent inference
 // about which repo the issue belongs to based on the issue number.
-const LEGACY_ISSUE_REPO_START = 20000;
+const LEGACY_ISSUE_REPO_START = 10000;
 
 let errorListTemplate = '';
 /** Renders the error list UI. */
