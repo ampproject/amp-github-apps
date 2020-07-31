@@ -17,19 +17,29 @@
 import {PageInfo, TestRun, Travis} from 'test-case-reporting';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
+import Mustache from 'mustache';
 import bodyParser from 'body-parser';
 import express from 'express';
+import fs from 'fs';
 import statusCodes from 'http-status-codes';
 
 const MAX_PAGE_SIZE = 500;
+const DEFAULT_PAGE_SIZE = 100;
 
 const app = express();
 const jsonParser = bodyParser.json({limit: '15mb'});
 const db = dbConnect();
 const record = new TestResultRecord(db);
 
+let testRunListTemplate = '';
 function renderTestRunList(testRuns: Array<TestRun>): string {
-  return `Rendering ${testRuns.length} test runs!`;
+  if (!testRunListTemplate) {
+    testRunListTemplate = fs
+      .readFileSync('./static/test-run-list.html')
+      .toString();
+  }
+
+  return Mustache.render(testRunListTemplate, {testRuns});
 }
 
 function handleError(error: Error, res: express.Response): void {
@@ -47,15 +57,10 @@ function handleError(error: Error, res: express.Response): void {
 function extractPageInfo(req: express.Request): PageInfo {
   const {limit, offset} = req.query;
 
-  let limitNum = parseInt(limit.toString(), 10);
-  const offsetNum = parseInt(offset.toString(), 10);
-
-  if (limitNum > MAX_PAGE_SIZE) {
-    limitNum = MAX_PAGE_SIZE;
-    console.warn(
-      `Maximum query size exceeded. Showing only first ${MAX_PAGE_SIZE} results.`
-    );
-  }
+  const limitNum = limit
+    ? Math.min(parseInt(limit.toString()), MAX_PAGE_SIZE)
+    : DEFAULT_PAGE_SIZE;
+  const offsetNum = offset ? parseInt(offset.toString()) : 0;
 
   return {
     limit: limitNum,

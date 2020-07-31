@@ -44,6 +44,8 @@ declare module 'test-case-reporting' {
 
   /** A single kind of test case, one `it` or `test` block. */
   export interface TestCase {
+    // MD5 hash of the test case name
+    id: string;
     name: string;
     createdAt: Date;
   }

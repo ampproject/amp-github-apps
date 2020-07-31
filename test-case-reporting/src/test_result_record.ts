@@ -59,6 +59,7 @@ function getTestRunFromRow({
   };
 
   const testCase: TestCase = {
+    id: md5(name),
     name,
     createdAt: new Date(created_at),
   };
@@ -262,12 +263,12 @@ export class TestResultRecord {
    * @param pageInfo object with the limit and the offset of the query
    */
   async getTestCaseHistory(
-    testCaseName: string,
+    testCaseId: string,
     pageInfo: PageInfo
   ): Promise<Array<TestRun>> {
     const queryFunction: QueryFunction = q =>
       q
-        .where('test_cases.name', testCaseName)
+        .where('test_cases.id', testCaseId)
         .orderBy('test_runs.timestamp', 'DESC');
 
     return this.bigJoinQuery(queryFunction, pageInfo);
