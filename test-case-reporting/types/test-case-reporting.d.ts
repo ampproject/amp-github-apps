@@ -70,19 +70,20 @@ declare module 'test-case-reporting' {
   /* eslint @typescript-eslint/camelcase: "off" */
   namespace DB {
     export interface Build {
-      // `id` is nullable because is not set when uploading, it is only set
-      // when we get the build from the database.
-      // It is not nullable in the database.
+      // Nullable because it is not set when uploading. Not nullable in the database.
       id?: number;
       commit_sha: string;
 
       // Despite being a *_number, build_number is of type string for parity with
       // job_number
       build_number: string;
+
+      // Nullable because it is not set when uploading. Not nullable in the database.
+      started_at?: number;
     }
 
     export interface Job {
-      // See comment under `DB.Build.id`
+      // Nullable because it is not set when uploading. Not nullable in the database.
       id?: number;
       build_id: number;
 
@@ -91,6 +92,9 @@ declare module 'test-case-reporting' {
       // this looks like `123.456`
       job_number: string;
       test_suite_type: TestSuiteType;
+
+      // Nullable because it is not set when uploading. Not nullable in the database.
+      started_at?: number;
     }
 
     export interface TestCase {
@@ -102,7 +106,7 @@ declare module 'test-case-reporting' {
     }
 
     export interface TestRun {
-      // See comment under `DB.Build.id`
+      // Nullable because it is not set when uploading. Not nullable in the database.
       id?: number;
       job_id: number;
       test_case_id: string;
