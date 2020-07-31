@@ -31,6 +31,18 @@ import md5 from 'md5';
 type QueryFunction = (q: QueryBuilder) => QueryBuilder;
 
 /* eslint-disable @typescript-eslint/camelcase */
+
+/**
+ * Creates a Build object from a build row of the build table.
+ * @param dbBuild A build row of the build table
+ */
+function getBuildFromDbBuild({commit_sha, build_number}: DB.Build): Build {
+  return {
+    commitSha: commit_sha,
+    buildNumber: build_number,
+  };
+}
+
 /**
  * Creates a TestRun object from a row of the join of all the tables.
  * @param bigJoin A row of the join of all the tables. May have aliases
@@ -47,10 +59,7 @@ function getTestRunFromRow({
   timestamp,
   duration_ms,
 }: DB.BigJoin): TestRun {
-  const build: Build = {
-    buildNumber: build_number,
-    commitSha: commit_sha,
-  };
+  const build: Build = getBuildFromDbBuild({build_number, commit_sha});
 
   const job: Job = {
     build,
@@ -227,6 +236,7 @@ export class TestResultRecord {
     const rows = await fullQuery.select(
       'builds.build_number',
       'builds.commit_sha',
+      'builds.started_at as build_started_at',
 
       'jobs.job_number',
       'jobs.test_suite_type',
@@ -272,5 +282,18 @@ export class TestResultRecord {
         .orderBy('test_runs.timestamp', 'DESC');
 
     return this.bigJoinQuery(queryFunction, pageInfo);
+  }
+
+  /**
+   * Gets a list of the most recently uploaded builds
+   * @param pageInfo object with the limit and the offset of the query
+   */
+  async getRecentBuilds({limit, offset}: PageInfo): Promise<Array<Build>> {
+    const dbBuilds = await this.db<DB.Build>('builds')
+      .orderBy('started_at', 'DESC')
+      .limit(limit)
+      .offset(offset);
+
+    return dbBuilds.map(getBuildFromDbBuild);
   }
 }
