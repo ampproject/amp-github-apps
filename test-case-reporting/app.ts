@@ -23,32 +23,26 @@ import express from 'express';
 import fs from 'fs';
 import statusCodes from 'http-status-codes';
 
+type Renderable = {builds: Array<Build>} | {testRuns: Array<TestRun>};
+
 const MAX_PAGE_SIZE = 500;
 const DEFAULT_PAGE_SIZE = 100;
+const TEMPLATE_DIR = './static';
 
 const app = express();
 const jsonParser = bodyParser.json({limit: '15mb'});
 const db = dbConnect();
 const record = new TestResultRecord(db);
 
-let testRunListTemplate = '';
-function renderTestRunList(testRuns: Array<TestRun>): string {
-  if (!testRunListTemplate) {
-    testRunListTemplate = fs
-      .readFileSync('./static/test-run-list.html')
+const templateCache: Record<string, string> = {};
+function render(templateName: string, data: Renderable): string {
+  if (!templateCache[templateName]) {
+    templateCache[templateName] = fs
+      .readFileSync(`${TEMPLATE_DIR}/${templateName}.html`)
       .toString();
   }
 
-  return Mustache.render(testRunListTemplate, {testRuns});
-}
-
-let buildListTemplate = '';
-function renderBuildList(builds: Array<Build>): string {
-  if (!buildListTemplate) {
-    buildListTemplate = fs.readFileSync('./static/build-list.html').toString();
-  }
-
-  return Mustache.render(buildListTemplate, {builds});
+  return Mustache.render(templateCache[templateName], data);
 }
 
 function handleError(error: Error, res: express.Response): void {
@@ -86,7 +80,7 @@ app.get('/', async (req, res) => {
     if (json) {
       res.json({builds});
     } else {
-      res.send(renderBuildList(builds));
+      res.send(render('build-list', {builds}));
     }
   } catch (error) {
     handleError(error, res);
@@ -106,7 +100,7 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
     if (json) {
       res.json({testRuns});
     } else {
-      res.send(renderTestRunList(testRuns));
+      res.send(render('test-run-list', {testRuns}));
     }
   } catch (error) {
     handleError(error, res);
@@ -126,7 +120,7 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
     if (json) {
       res.json({testRuns});
     } else {
-      res.send(renderTestRunList(testRuns));
+      res.send(render('test-run-list', {testRuns}));
     }
   } catch (error) {
     handleError(error, res);
