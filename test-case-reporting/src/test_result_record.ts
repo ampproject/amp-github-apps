@@ -31,18 +31,6 @@ import md5 from 'md5';
 type QueryFunction = (q: QueryBuilder) => QueryBuilder;
 
 /* eslint-disable @typescript-eslint/camelcase */
-
-/**
- * Creates a Build object from a build row of the build table.
- * @param dbBuild A build row of the build table
- */
-function getBuildFromDbBuild({commit_sha, build_number}: DB.Build): Build {
-  return {
-    commitSha: commit_sha,
-    buildNumber: build_number,
-  };
-}
-
 /**
  * Creates a TestRun object from a row of the join of all the tables.
  * @param bigJoin A row of the join of all the tables. May have aliases
@@ -59,7 +47,10 @@ function getTestRunFromRow({
   timestamp,
   duration_ms,
 }: DB.BigJoin): TestRun {
-  const build: Build = getBuildFromDbBuild({build_number, commit_sha});
+  const build: Build = {
+    buildNumber: build_number,
+    commitSha: commit_sha,
+  };
 
   const job: Job = {
     build,
@@ -294,6 +285,11 @@ export class TestResultRecord {
       .limit(limit)
       .offset(offset);
 
-    return dbBuilds.map(getBuildFromDbBuild);
+    /* eslint-disable @typescript-eslint/camelcase */
+    return dbBuilds.map(({commit_sha, build_number}) => ({
+      commitSha: commit_sha,
+      buildNumber: build_number,
+    }));
+    /* eslint-enable @typescript-eslint/camelcase */
   }
 }
