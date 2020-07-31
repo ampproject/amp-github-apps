@@ -7,11 +7,11 @@
   {{#testRuns}}
   <li>Test case is <a href="/test-results/history/{{testCase.id}}">{{testCase.name}}</a></li>
   <ul>
-      <li>Job num is {{job.jobNumber}}</li>
-      <li>Build num is <a href="/test-results/build/{{job.build.buildNumber}}">{{job.build.buildNumber}}</a></li>
-      <li>Status is {{status}}</li>
-    </ul>
-    {{/testRuns}}
+    <li>Job num is {{job.jobNumber}}</li>
+    <li>Build num is <a href="/test-results/build/{{job.build.buildNumber}}">{{job.build.buildNumber}}</a></li>
+    <li>Status is {{status}}</li>
+  </ul>
+  {{/testRuns}}
   {{^testRuns}}
   <h2>
     There are no test runs.
