@@ -68,22 +68,20 @@ declare module 'test-case-reporting' {
   // Types in the DB namespace interface with the database which
   // uses snake_case instead of camelCase.
   /* eslint @typescript-eslint/camelcase: "off" */
+  // Nullable fields in this namespace are nullable because they are not set when uploading.
+  // They are not nullable columns in the database.
   namespace DB {
     export interface Build {
-      // Nullable because it is not set when uploading. Not nullable in the database.
       id?: number;
       commit_sha: string;
 
       // Despite being a *_number, build_number is of type string for parity with
       // job_number
       build_number: string;
-
-      // Nullable because it is not set when uploading. Not nullable in the database.
       started_at?: number;
     }
 
     export interface Job {
-      // Nullable because it is not set when uploading. Not nullable in the database.
       id?: number;
       build_id: number;
 
@@ -92,8 +90,6 @@ declare module 'test-case-reporting' {
       // this looks like `123.456`
       job_number: string;
       test_suite_type: TestSuiteType;
-
-      // Nullable because it is not set when uploading. Not nullable in the database.
       started_at?: number;
     }
 
@@ -106,7 +102,6 @@ declare module 'test-case-reporting' {
     }
 
     export interface TestRun {
-      // Nullable because it is not set when uploading. Not nullable in the database.
       id?: number;
       job_id: number;
       test_case_id: string;
