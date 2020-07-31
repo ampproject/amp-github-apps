@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {PageInfo, TestRun, Travis} from 'test-case-reporting';
+import {Build, PageInfo, TestRun, Travis} from 'test-case-reporting';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
 import Mustache from 'mustache';
@@ -40,6 +40,15 @@ function renderTestRunList(testRuns: Array<TestRun>): string {
   }
 
   return Mustache.render(testRunListTemplate, {testRuns});
+}
+
+let buildListTemplate = '';
+function renderBuildList(builds: Array<Build>): string {
+  if (!buildListTemplate) {
+    buildListTemplate = fs.readFileSync('./static/build-list.html').toString();
+  }
+
+  return Mustache.render(buildListTemplate, {builds});
 }
 
 function handleError(error: Error, res: express.Response): void {
@@ -68,8 +77,20 @@ function extractPageInfo(req: express.Request): PageInfo {
   };
 }
 
-app.get('/', (req, res) => {
-  res.send('Hello, world, 2.0!');
+app.get('/', async (req, res) => {
+  const {json} = req.query;
+
+  try {
+    const builds = await record.getRecentBuilds(extractPageInfo(req));
+
+    if (json) {
+      res.json({builds});
+    } else {
+      res.send(renderBuildList(builds));
+    }
+  } catch (error) {
+    handleError(error, res);
+  }
 });
 
 app.get('/test-results/build/:buildNumber', async (req, res) => {
