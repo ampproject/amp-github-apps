@@ -55,12 +55,13 @@ function handleError(error: Error, res: express.Response): void {
 }
 
 function extractPageInfo(req: express.Request): PageInfo {
-  const {limit, offset} = req.query;
+  const {limit = DEFAULT_PAGE_SIZE, offset = 0} = req.query;
 
-  const limitNum = limit
-    ? Math.min(parseInt(limit.toString()), MAX_PAGE_SIZE)
-    : DEFAULT_PAGE_SIZE;
-  const offsetNum = offset ? parseInt(offset.toString()) : 0;
+  // This may look odd because the default limit/offset values are uselessly
+  // turned from ints, to strings, back into ints; however, we need the
+  // toString because query parameters aren't strings.
+  const limitNum = Math.min(parseInt(limit.toString()), MAX_PAGE_SIZE);
+  const offsetNum = parseInt(offset.toString());
 
   return {
     limit: limitNum,
