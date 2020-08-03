@@ -227,6 +227,7 @@ export class TestResultRecord {
     const rows = await fullQuery.select(
       'builds.build_number',
       'builds.commit_sha',
+      'builds.started_at as build_started_at',
 
       'jobs.job_number',
       'jobs.test_suite_type',
@@ -272,5 +273,23 @@ export class TestResultRecord {
         .orderBy('test_runs.timestamp', 'DESC');
 
     return this.bigJoinQuery(queryFunction, pageInfo);
+  }
+
+  /**
+   * Gets a list of the most recently uploaded builds
+   * @param pageInfo object with the limit and the offset of the query
+   */
+  async getRecentBuilds({limit, offset}: PageInfo): Promise<Array<Build>> {
+    const dbBuilds = await this.db<DB.Build>('builds')
+      .orderBy('started_at', 'DESC')
+      .limit(limit)
+      .offset(offset);
+
+    /* eslint-disable @typescript-eslint/camelcase */
+    return dbBuilds.map(({commit_sha, build_number}) => ({
+      commitSha: commit_sha,
+      buildNumber: build_number,
+    }));
+    /* eslint-enable @typescript-eslint/camelcase */
   }
 }

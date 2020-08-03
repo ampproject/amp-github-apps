@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {PageInfo, TestRun, Travis} from 'test-case-reporting';
+import {Build, PageInfo, TestRun, Travis} from 'test-case-reporting';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
 import Mustache from 'mustache';
@@ -25,21 +25,22 @@ import statusCodes from 'http-status-codes';
 
 const MAX_PAGE_SIZE = 500;
 const DEFAULT_PAGE_SIZE = 100;
+const TEMPLATE_DIR = './static';
 
 const app = express();
 const jsonParser = bodyParser.json({limit: '15mb'});
 const db = dbConnect();
 const record = new TestResultRecord(db);
 
-let testRunListTemplate = '';
-function renderTestRunList(testRuns: Array<TestRun>): string {
-  if (!testRunListTemplate) {
-    testRunListTemplate = fs
-      .readFileSync('./static/test-run-list.html')
+const templateCache: Record<string, string> = {};
+function render(templateName: string, data: Record<string, unknown>): string {
+  if (!templateCache[templateName]) {
+    templateCache[templateName] = fs
+      .readFileSync(`${TEMPLATE_DIR}/${templateName}.html`)
       .toString();
   }
 
-  return Mustache.render(testRunListTemplate, {testRuns});
+  return Mustache.render(templateCache[templateName], data);
 }
 
 function handleError(error: Error, res: express.Response): void {
@@ -66,8 +67,20 @@ function extractPageInfo(req: express.Request): PageInfo {
   };
 }
 
-app.get('/', (req, res) => {
-  res.send('Hello, world, 2.0!');
+app.get(['/', '/builds'], async (req, res) => {
+  const {json} = req.query;
+
+  try {
+    const builds = await record.getRecentBuilds(extractPageInfo(req));
+
+    if (json) {
+      res.json({builds});
+    } else {
+      res.send(render('build-list', {title: 'Latest Builds', builds}));
+    }
+  } catch (error) {
+    handleError(error, res);
+  }
 });
 
 app.get('/test-results/build/:buildNumber', async (req, res) => {
@@ -83,7 +96,7 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
     if (json) {
       res.json({testRuns});
     } else {
-      res.send(renderTestRunList(testRuns));
+      res.send(render('test-run-list', {testRuns}));
     }
   } catch (error) {
     handleError(error, res);
@@ -103,7 +116,7 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
     if (json) {
       res.json({testRuns});
     } else {
-      res.send(renderTestRunList(testRuns));
+      res.send(render('test-run-list', {testRuns}));
     }
   } catch (error) {
     handleError(error, res);

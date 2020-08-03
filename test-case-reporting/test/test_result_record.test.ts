@@ -383,5 +383,12 @@ describe('TestResultRecord', () => {
         expect(testRuns).toEqual([]);
       });
     });
+
+    describe('getRecentBuilds', () => {
+      // TODO(#958): Add unit tests for getRecentBuilds
+      it.todo(
+        'gets the recent builds in reverse chronological order(most recent first)'
+      );
+    });
   });
 });
