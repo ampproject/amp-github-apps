@@ -69,7 +69,7 @@ function extractPageInfo(req: express.Request): PageInfo {
   };
 }
 
-app.get('/', async (req, res) => {
+app.get(['/', '/builds'], async (req, res) => {
   const {json} = req.query;
 
   try {
