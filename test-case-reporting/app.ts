@@ -78,7 +78,7 @@ app.get(['/', '/builds'], async (req, res) => {
     if (json) {
       res.json({builds});
     } else {
-      res.send(render('build-list', {builds}));
+      res.send(render('build-list', {title: 'Latest Builds', builds}));
     }
   } catch (error) {
     handleError(error, res);
