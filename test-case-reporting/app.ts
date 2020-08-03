@@ -23,8 +23,6 @@ import express from 'express';
 import fs from 'fs';
 import statusCodes from 'http-status-codes';
 
-type Renderable = {builds: Array<Build>} | {testRuns: Array<TestRun>};
-
 const MAX_PAGE_SIZE = 500;
 const DEFAULT_PAGE_SIZE = 100;
 const TEMPLATE_DIR = './static';
@@ -35,7 +33,7 @@ const db = dbConnect();
 const record = new TestResultRecord(db);
 
 const templateCache: Record<string, string> = {};
-function render(templateName: string, data: Renderable): string {
+function render(templateName: string, data: Record<string, unknown>): string {
   if (!templateCache[templateName]) {
     templateCache[templateName] = fs
       .readFileSync(`${TEMPLATE_DIR}/${templateName}.html`)
