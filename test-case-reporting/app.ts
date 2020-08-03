@@ -132,7 +132,11 @@ app.post('/report', jsonParser, async (req, res) => {
 
 app.get('/_cron/compute-stats', async (req, res) => {
   const {count} = req.query;
-  res.send(`Computing pass/fail % for past ${count} runs`);
+
+  const message = `Computing pass/fail % for past ${count} runs`;
+  res.send(message);
+
+  console.log(message);
 });
 
 export {app};
