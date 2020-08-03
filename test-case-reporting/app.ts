@@ -130,4 +130,9 @@ app.post('/report', jsonParser, async (req, res) => {
   }
 });
 
+app.get('/_cron/compute-stats', async (req, res) => {
+  const {count} = req.query;
+  res.send(`Computing pass/fail % for past ${count} runs`);
+});
+
 export {app};
