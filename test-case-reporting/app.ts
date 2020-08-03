@@ -55,12 +55,10 @@ function handleError(error: Error, res: express.Response): void {
 }
 
 function extractPageInfo(req: express.Request): PageInfo {
-  const {limit, offset} = req.query;
+  const {limit = DEFAULT_PAGE_SIZE, offset = 0} = req.query;
 
-  const limitNum = limit
-    ? Math.min(parseInt(limit.toString()), MAX_PAGE_SIZE)
-    : DEFAULT_PAGE_SIZE;
-  const offsetNum = offset ? parseInt(offset.toString()) : 0;
+  const limitNum = Math.min(parseInt(limit.toString()), MAX_PAGE_SIZE);
+  const offsetNum = parseInt(offset.toString());
 
   return {
     limit: limitNum,
