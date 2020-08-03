@@ -4,14 +4,16 @@
 </head>
 <body>
   <ul>
-  {{#builds}}
-  <li><a href="/test-results/build/{{buildNumber}}">Build {{buildNumber}}</a></li>
-  {{/builds}}
-  {{^builds}}
-  <h2>
-    There are no builds.
-  </h2>
-  {{/builds}}
+    {{#builds}}
+      <li>
+        <a href="/test-results/build/{{buildNumber}}">Build {{buildNumber}}</a>
+      </li>
+    {{/builds}}
+    {{^builds}}
+      <h2>
+        There are no builds.
+      </h2>
+    {{/builds}}
   </ul>
 </body>
 </html>
