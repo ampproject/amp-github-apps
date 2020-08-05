@@ -96,7 +96,12 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
     if (json) {
       res.json({testRuns});
     } else {
-      res.send(render('test-run-list', {testRuns}));
+      res.send(
+        render('test-run-list', {
+          title: `Test Runs for Build #${buildNumber}`,
+          testRuns,
+        })
+      );
     }
   } catch (error) {
     handleError(error, res);
@@ -113,10 +118,17 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
       extractPageInfo(req)
     );
 
+    const testCaseName = testRuns ? testRuns[0].testCase.name : '';
+
     if (json) {
       res.json({testRuns});
     } else {
-      res.send(render('test-run-list', {testRuns}));
+      res.send(
+        render('test-run-list', {
+          title: `Test Runs for test case "${testCaseName}"`,
+          testRuns,
+        })
+      );
     }
   } catch (error) {
     handleError(error, res);

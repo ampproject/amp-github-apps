@@ -4,6 +4,7 @@
   <title>{{title}}</title>
 </head>
 <body>
+  <h1>{{title}}</h1>
   <ul>
     {{#builds}}
       <li>
@@ -11,9 +12,9 @@
       </li>
     {{/builds}}
     {{^builds}}
-      <h2>
+      <li>
         There are no builds.
-      </h2>
+      </li>
     {{/builds}}
   </ul>
 </body>
