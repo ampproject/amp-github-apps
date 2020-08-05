@@ -39,4 +39,4 @@ After setting up the app locally, use `gcloud` to deploy the app:
 2. Deploy the function for the first time: `gcloud app deploy`
 3. To configure Cloud Build auto-deployment, follow [this guide](https://github.com/ampproject/amp-github-apps/blob/master/DEPLOYMENT.md)
 
-This GitHub App is deployed as a [Google Cloud Function](https://cloud.google.com/functions/docs/) at the endpoint: https://amp-error-monitoring.uc.r.apspot.com/
+This GitHub App is deployed as a [Google Cloud Function](https://cloud.google.com/functions/docs/) at the endpoint: https://amp-error-monitoring.appspot.com/
