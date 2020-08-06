@@ -13,11 +13,11 @@
         <h1>{{title}}</h1>
         {{#testRuns}}
           <div class="collapsible-wrap card no-pad">
-            <input type="checkbox" id="collapsible-{{testCase.id}}-{{build.buildNumber}}">
-            <label for="collapsible-{{testCase.id}}-{{build.buildNumber}}"><a href="/test-results/history/{{testCase.id}}">{{testCase.name}}</a>&nbsp;had status {{status}}</label>
-            <div class="collapsible-{{testCase.id}}-{{build.buildNumber}}-area">
+            <input type="checkbox" id="collapsible-{{index}}">
+            <label for="collapsible-{{index}}"><a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>&nbsp;had status {{testRun.status}}</label>
+            <div class="collapsible-{{index}}-area">
               <p>Job num is {{job.jobNumber}}</p>
-              <p>Build num is <a href="/test-results/build/{{job.build.buildNumber}}">{{job.build.buildNumber}}</a></p>
+              <p>Build num is <a href="/test-results/build/{{testRun.job.build.buildNumber}}">{{testRun.job.build.buildNumber}}</a></p>
             </div>
           </div>
         {{/testRuns}}

@@ -90,10 +90,12 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
   const {json} = req.query;
 
   try {
-    const testRuns = await record.getTestRunsOfBuild(
-      buildNumber,
-      extractPageInfo(req)
-    );
+    const testRuns = (
+      await record.getTestRunsOfBuild(buildNumber, extractPageInfo(req))
+    ).map((testRun, index) => ({
+      testRun,
+      index,
+    }));
 
     if (json) {
       res.json({testRuns});
@@ -115,12 +117,14 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
   const {json} = req.query;
 
   try {
-    const testRuns = await record.getTestCaseHistory(
-      testCaseId,
-      extractPageInfo(req)
-    );
+    const testRuns = (
+      await record.getTestCaseHistory(testCaseId, extractPageInfo(req))
+    ).map((testRun, index) => ({
+      testRun,
+      index,
+    }));
 
-    const testCaseName = testRuns ? testRuns[0].testCase.name : '';
+    const testCaseName = testRuns ? testRuns[0].testRun.testCase.name : '';
 
     if (json) {
       res.json({testRuns});
