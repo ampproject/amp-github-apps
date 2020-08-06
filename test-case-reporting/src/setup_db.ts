@@ -34,10 +34,7 @@ export async function setupDb(db: Database): Promise<unknown> {
     })
     .createTable('jobs', table => {
       table.increments('id').primary();
-      table
-        .integer('build_id')
-        .unsigned()
-        .notNullable();
+      table.integer('build_id').unsigned().notNullable();
       table.string('job_number');
       table.string('test_suite_type');
       table
@@ -45,10 +42,7 @@ export async function setupDb(db: Database): Promise<unknown> {
         .defaultTo(db.fn.now())
         .notNullable();
 
-      table
-        .foreign('build_id')
-        .references('id')
-        .inTable('builds');
+      table.foreign('build_id').references('id').inTable('builds');
     })
     .createTable('test_cases', table => {
       table
@@ -68,10 +62,7 @@ export async function setupDb(db: Database): Promise<unknown> {
     })
     .createTable('test_runs', table => {
       table.increments('id').primary();
-      table
-        .integer('job_id')
-        .unsigned()
-        .notNullable();
+      table.integer('job_id').unsigned().notNullable();
       table.specificType('test_case_id', 'char(32)').notNullable();
       table.enu('status', ['PASS', 'FAIL', 'SKIP', 'ERROR'], {
         useNative: true,
@@ -83,14 +74,21 @@ export async function setupDb(db: Database): Promise<unknown> {
         .notNullable();
       table.integer('duration_ms');
 
-      table
-        .foreign('test_case_id')
-        .references('id')
-        .inTable('test_cases');
-      table
-        .foreign('job_id')
-        .references('id')
-        .inTable('jobs');
+      table.foreign('test_case_id').references('id').inTable('test_cases');
+      table.foreign('job_id').references('id').inTable('jobs');
+    })
+
+    .createTable('test_case_stats', table => {
+      table.increments('id').primary();
+      table.specificType('test_case_id', 'char(32)').notNullable();
+      table.integer('sample_size').unsigned().notNullable();
+      table.integer('passed').unsigned().notNullable().defaultTo(0);
+      table.integer('failed').unsigned().notNullable().defaultTo(0);
+      table.integer('skipped').unsigned().notNullable().defaultTo(0);
+      table.integer('errored').unsigned().notNullable().defaultTo(0);
+      table.boolean('dirty').defaultTo(false);
+
+      table.foreign('test_case_id').references('id').inTable('test_cases');
     });
 }
 
