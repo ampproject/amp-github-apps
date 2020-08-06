@@ -22,6 +22,7 @@ import md5 from 'md5';
 // because they need to be truncated in this order
 // due to foreign key constraints
 export async function truncateAll(db: Database): Promise<void> {
+  await db('test_case_stats').truncate();
   await db('test_runs').truncate();
   await db('test_cases').truncate();
   await db('jobs').truncate();
@@ -42,6 +43,8 @@ export async function fillDatabase(db: Database): Promise<void> {
 
   const jobIds: Array<number> = [];
   let jobId;
+  const hoursAgoMs = (hours: number): number =>
+    Date.now() - hours * 60 * 60 * 1000;
 
   for (let i = 1; i <= 3; i++) {
     for (const suiteType of ['unit', 'integration']) {
@@ -49,6 +52,7 @@ export async function fillDatabase(db: Database): Promise<void> {
         'build_id': buildId,
         'job_number': `12123434.${i}`,
         'test_suite_type': suiteType,
+        'started_at': hoursAgoMs(i),
       } as DB.Job);
 
       jobIds.push(jobId);
@@ -66,19 +70,17 @@ export async function fillDatabase(db: Database): Promise<void> {
 
   const dbTestRuns: Array<DB.TestRun> = [];
 
-  const oneHourAgoMs = Date.now() - 60 * 60 * 1000;
-
-  jobIds.forEach(jobId => {
+  for (let i = 0; i < jobIds.length; ++i) {
     testCaseIds.forEach(testCaseId => {
       dbTestRuns.push({
-        'job_id': jobId,
+        'job_id': jobIds[i],
         'test_case_id': testCaseId,
         status: 'PASS',
         'duration_ms': 4242,
-        timestamp: oneHourAgoMs,
+        timestamp: hoursAgoMs(i + 1),
       });
     });
-  });
+  }
 
   await db('test_runs').insert(dbTestRuns);
 
@@ -91,6 +93,7 @@ export async function fillDatabase(db: Database): Promise<void> {
     'build_id': buildId,
     'job_number': '12129999.1',
     'test_suite_type': 'unit',
+    'started_at': Date.now(),
   } as DB.Job);
 
   await db('test_runs').insert({
