@@ -90,12 +90,10 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
   const {json} = req.query;
 
   try {
-    const testRuns = (
-      await record.getTestRunsOfBuild(buildNumber, extractPageInfo(req))
-    ).map((testRun, index) => ({
-      testRun,
-      index,
-    }));
+    const testRuns = await record.getTestRunsOfBuild(
+      buildNumber,
+      extractPageInfo(req)
+    );
 
     if (json) {
       res.json({testRuns});
@@ -103,7 +101,10 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
       res.send(
         render('test-run-list', {
           title: `Test Runs for Build #${buildNumber}`,
-          testRuns,
+          testRuns: testRuns.map((testRun, index) => ({
+            testRun,
+            index,
+          })),
         })
       );
     }
@@ -117,14 +118,12 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
   const {json} = req.query;
 
   try {
-    const testRuns = (
-      await record.getTestCaseHistory(testCaseId, extractPageInfo(req))
-    ).map((testRun, index) => ({
-      testRun,
-      index,
-    }));
+    const testRuns = await record.getTestCaseHistory(
+      testCaseId,
+      extractPageInfo(req)
+    );
 
-    const testCaseName = testRuns ? testRuns[0].testRun.testCase.name : '';
+    const testCaseName = testRuns ? testRuns[0].testCase.name : '';
 
     if (json) {
       res.json({testRuns});
@@ -132,7 +131,10 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
       res.send(
         render('test-run-list', {
           title: `Test Runs for test case "${testCaseName}"`,
-          testRuns,
+          testRuns: testRuns.map((testRun, index) => ({
+            testRun,
+            index,
+          })),
         })
       );
     }
