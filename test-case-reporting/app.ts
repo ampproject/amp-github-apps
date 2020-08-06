@@ -67,6 +67,15 @@ function extractPageInfo(req: express.Request): PageInfo {
   };
 }
 
+// We need the testRun index in mustache to give each collapsable
+// its own id.
+function enumerateTestRun(
+  testRun: TestRun,
+  index: number
+): {testRun: TestRun; index: number} {
+  return {testRun, index};
+}
+
 app.use(express.static('static/css'));
 
 app.get(['/', '/builds'], async (req, res) => {
@@ -101,10 +110,7 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
       res.send(
         render('test-run-list', {
           title: `Test Runs for Build #${buildNumber}`,
-          testRuns: testRuns.map((testRun, index) => ({
-            testRun,
-            index,
-          })),
+          testRuns: testRuns.map(enumerateTestRun),
         })
       );
     }
@@ -131,10 +137,7 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
       res.send(
         render('test-run-list', {
           title: `Test Runs for test case "${testCaseName}"`,
-          testRuns: testRuns.map((testRun, index) => ({
-            testRun,
-            index,
-          })),
+          testRuns: testRuns.map(enumerateTestRun),
         })
       );
     }
