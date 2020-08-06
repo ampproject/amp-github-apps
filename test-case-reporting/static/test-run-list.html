@@ -16,7 +16,7 @@
             <input type="checkbox" id="collapsible-{{index}}">
             <label for="collapsible-{{index}}"><a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>&nbsp;had status {{testRun.status}}</label>
             <div class="collapsible-{{index}}-area">
-              <p>Job num is {{job.jobNumber}}</p>
+              <p>Job num is {{testRun.job.jobNumber}}</p>
               <p>Build num is <a href="/test-results/build/{{testRun.job.build.buildNumber}}">{{testRun.job.build.buildNumber}}</a></p>
             </div>
           </div>
