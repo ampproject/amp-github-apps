@@ -67,7 +67,7 @@ function extractPageInfo(req: express.Request): PageInfo {
   };
 }
 
-app.use(express.static('static'));
+app.use(express.static('static/css'));
 
 app.get(['/', '/builds'], async (req, res) => {
   const {json} = req.query;
