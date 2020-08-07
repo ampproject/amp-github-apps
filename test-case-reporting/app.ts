@@ -76,6 +76,13 @@ function enumerateTestRun(
   return {testRun, index};
 }
 
+function lowerCaseStatus({status, ...rest}: TestRun): any {
+  return {
+    status: status.toLowerCase(),
+    ...rest,
+  };
+}
+
 app.use(express.static('static/css'));
 
 app.get(['/', '/builds'], async (req, res) => {
@@ -110,7 +117,7 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
       res.send(
         render('test-run-list', {
           title: `Test Runs for Build #${buildNumber}`,
-          testRuns: testRuns.map(enumerateTestRun),
+          testRuns: testRuns.map(lowerCaseStatus).map(enumerateTestRun),
         })
       );
     }
@@ -137,7 +144,7 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
       res.send(
         render('test-run-list', {
           title: `Test Runs for test case "${testCaseName}"`,
-          testRuns: testRuns.map(enumerateTestRun),
+          testRuns: testRuns.map(lowerCaseStatus).map(enumerateTestRun),
         })
       );
     }
