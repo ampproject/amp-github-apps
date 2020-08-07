@@ -15,6 +15,7 @@
  */
 
 import {Build, PageInfo, TestRun, Travis} from 'test-case-reporting';
+import {TestCaseStats} from './src/test_case_stats';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
 import Mustache from 'mustache';
@@ -142,12 +143,19 @@ app.post('/report', jsonParser, async (req, res) => {
 });
 
 app.get('/_cron/compute-stats', async (req, res) => {
+  const testCaseStats = new TestCaseStats(db);
   const {count} = req.query;
 
-  const message = `Computing pass/fail % for past ${count} runs`;
-  res.send(message);
+  try {
+    const sampleSize = parseInt(count.toString());
+    await testCaseStats.updateStats(sampleSize);
 
-  console.log(message);
+    const message = `Computed pass/fail % for past ${count} runs`;
+    res.send(message);
+    console.log(message);
+  } catch (error) {
+    handleError(error, res);
+  }
 });
 
 export {app};
