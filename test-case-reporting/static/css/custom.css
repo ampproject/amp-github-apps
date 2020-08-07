@@ -20,6 +20,9 @@
   font-family: sans-serif;
   font-variant: small-caps;
   color: white;
+  margin-right: 10px;
+  text-align: center;
+  font-weight: bold;
 }
 .status-pass { background-color: green; }
 .status-fail { background-color: orange; }

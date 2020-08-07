@@ -15,8 +15,10 @@
         {{#testRuns}}
           <div class="collapsible-wrap card no-pad">
             <input type="checkbox" id="collapsible-{{index}}">
-            <span class='status-badge status-{{testRun.status}}'>{{testRun.status}}</span>
-            <label for="collapsible-{{index}}"><a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>&nbsp;had status {{testRun.status}}</label>
+            <label for="collapsible-{{index}}">
+              <span class='status-badge status-{{testRun.status}}'>{{testRun.status}}</span>&nbsp;
+              <a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>
+            </label>
             <div class="collapsible-{{index}}-area">
               <p>Job num is {{testRun.job.jobNumber}}</p>
               <p>Build num is <a href="/test-results/build/{{testRun.job.build.buildNumber}}">{{testRun.job.build.buildNumber}}</a></p>
