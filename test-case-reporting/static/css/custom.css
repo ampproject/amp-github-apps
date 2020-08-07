@@ -21,7 +21,7 @@
   font-variant: small-caps;
   color: white;
 }
-.status-pass { background: #e0ffe1; }
-.status-fail { background: #ffd0cc; }
-.status-skip { background: #d8d7d7; }
-.status-error { background: #e2d19f; }
+.status-pass { background-color: green; }
+.status-fail { background-color: orange; }
+.status-skip { background-color: gray; }
+.status-error { background-color: red; }
