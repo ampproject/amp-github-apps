@@ -148,6 +148,11 @@ app.get('/_cron/compute-stats', async (req, res) => {
 
   try {
     const sampleSize = parseInt(count.toString());
+
+    if (Number.isNaN(sampleSize)) {
+      throw new TypeError('sampleSize is not a number');
+    }
+
     await testCaseStats.updateStats(sampleSize);
 
     const message = `Computed pass/fail % for past ${count} runs`;
