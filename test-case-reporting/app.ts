@@ -153,7 +153,7 @@ app.get('/_cron/compute-stats', async (req, res) => {
       throw new Error('Attempted external request to a cron endpoint');
     }
 
-    const sampleSize = parseInt(count.toString());
+    const sampleSize = Number(count);
 
     if (Number.isNaN(sampleSize)) {
       throw new TypeError('sampleSize is not a number');
