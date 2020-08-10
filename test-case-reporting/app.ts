@@ -15,6 +15,7 @@
  */
 
 import {Build, PageInfo, TestRun, Travis} from 'test-case-reporting';
+import {TestCaseStats} from './src/test_case_stats';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
 import Mustache from 'mustache';
@@ -30,6 +31,7 @@ const TEMPLATE_DIR = './static';
 const app = express();
 const jsonParser = bodyParser.json({limit: '15mb'});
 const db = dbConnect();
+const testCaseStats = new TestCaseStats(db);
 const record = new TestResultRecord(db);
 
 const templateCache: Record<string, string> = {};
@@ -144,10 +146,26 @@ app.post('/report', jsonParser, async (req, res) => {
 app.get('/_cron/compute-stats', async (req, res) => {
   const {count} = req.query;
 
-  const message = `Computing pass/fail % for past ${count} runs`;
-  res.send(message);
+  try {
+    // This header is set by App Engine when running cron tasks, and is
+    // stripped out of external requests.
+    if (!req.header('X-Appengine-Cron') && process.env.NODE_ENV !== 'dev') {
+      throw new Error('Attempted external request to a cron endpoint');
+    }
 
-  console.log(message);
+    const sampleSize = Number(count);
+
+    if (Number.isNaN(sampleSize)) {
+      throw new TypeError('sampleSize is not a number');
+    }
+
+    await testCaseStats.updateStats(sampleSize);
+
+    res.sendStatus(statusCodes.OK);
+    console.log(`Computed pass/fail % for past ${count} runs`);
+  } catch (error) {
+    handleError(error, res);
+  }
 });
 
 export {app};
