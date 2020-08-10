@@ -31,6 +31,7 @@ const TEMPLATE_DIR = './static';
 const app = express();
 const jsonParser = bodyParser.json({limit: '15mb'});
 const db = dbConnect();
+const testCaseStats = new TestCaseStats(db);
 const record = new TestResultRecord(db);
 
 const templateCache: Record<string, string> = {};
@@ -143,7 +144,6 @@ app.post('/report', jsonParser, async (req, res) => {
 });
 
 app.get('/_cron/compute-stats', async (req, res) => {
-  const testCaseStats = new TestCaseStats(db);
   const {count} = req.query;
 
   try {
