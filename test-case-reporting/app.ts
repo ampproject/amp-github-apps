@@ -161,9 +161,8 @@ app.get('/_cron/compute-stats', async (req, res) => {
 
     await testCaseStats.updateStats(sampleSize);
 
-    const message = `Computed pass/fail % for past ${count} runs`;
-    res.send(message);
-    console.log(message);
+    res.sendStatus(statusCodes.OK);
+    console.log(`Computed pass/fail % for past ${count} runs`);
   } catch (error) {
     handleError(error, res);
   }
