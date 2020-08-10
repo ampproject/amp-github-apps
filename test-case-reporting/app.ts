@@ -147,6 +147,12 @@ app.get('/_cron/compute-stats', async (req, res) => {
   const {count} = req.query;
 
   try {
+    // This header is set by App Engine when running cron tasks, and is
+    // stripped out of external requests.
+    if (!req.header('X-Appengine-Cron') && process.env.NODE_ENV !== 'dev') {
+      throw new Error('Attempted external request to a cron endpoint');
+    }
+
     const sampleSize = parseInt(count.toString());
 
     if (Number.isNaN(sampleSize)) {
