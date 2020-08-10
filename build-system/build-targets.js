@@ -32,6 +32,7 @@ const APPS_TO_TEST = [
   'owners',
   'pr-deploy',
   'release-calendar',
+  'test-case-reporting',
   'test-status',
 ];
 
