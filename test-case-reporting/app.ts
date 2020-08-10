@@ -69,6 +69,24 @@ function extractPageInfo(req: express.Request): PageInfo {
   };
 }
 
+// We need the testRun index in mustache to give each collapsable
+// its own id.
+function enumerateTestRun(
+  testRun: TestRun,
+  index: number
+): {testRun: TestRun; index: number} {
+  return {testRun, index};
+}
+
+function lowerCaseStatus({status, ...rest}: TestRun): any {
+  return {
+    status: status.toLowerCase(),
+    ...rest,
+  };
+}
+
+app.use(express.static('static/css'));
+
 app.get(['/', '/builds'], async (req, res) => {
   const {json} = req.query;
 
@@ -98,7 +116,12 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
     if (json) {
       res.json({testRuns});
     } else {
-      res.send(render('test-run-list', {testRuns}));
+      res.send(
+        render('test-run-list', {
+          title: `Test Runs for Build #${buildNumber}`,
+          testRuns: testRuns.map(lowerCaseStatus).map(enumerateTestRun),
+        })
+      );
     }
   } catch (error) {
     handleError(error, res);
@@ -115,10 +138,17 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
       extractPageInfo(req)
     );
 
+    const testCaseName = testRuns ? testRuns[0].testCase.name : '';
+
     if (json) {
       res.json({testRuns});
     } else {
-      res.send(render('test-run-list', {testRuns}));
+      res.send(
+        render('test-run-list', {
+          title: `Test Runs for test case "${testCaseName}"`,
+          testRuns: testRuns.map(lowerCaseStatus).map(enumerateTestRun),
+        })
+      );
     }
   } catch (error) {
     handleError(error, res);

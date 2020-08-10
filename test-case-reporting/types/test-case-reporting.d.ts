@@ -29,6 +29,7 @@ declare module 'test-case-reporting' {
     // Despite being a *Number, buildNumber is of type string for parity with
     // jobNumber
     buildNumber: string;
+    startedAt: Date;
   }
 
   /** A job within a Travis build. */
@@ -110,7 +111,9 @@ declare module 'test-case-reporting' {
       duration_ms: number;
     }
 
-    export interface BigJoin extends Build, Job, TestCase, TestRun {}
+    export interface BigJoin extends Build, Job, TestCase, TestRun {
+      build_started_at: number;
+    }
   }
   /* eslint @typescript-eslint/camelcase: "error" */
 

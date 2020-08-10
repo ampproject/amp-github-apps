@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
   <title>{{title}}</title>
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+  <!-- Surface style taken from https://github.com/niutech/amp-surface -->
+  <link rel="stylesheet" type="text/css" href="/surface.min.css"/>
 </head>
 <body>
-  <ul>
-    {{#builds}}
-      <li>
-        <a href="/test-results/build/{{buildNumber}}">Build {{buildNumber}}</a>
-      </li>
-    {{/builds}}
-    {{^builds}}
-      <h2>
-        There are no builds.
-      </h2>
-    {{/builds}}
-  </ul>
+  <div class="g--10 m--1">
+    <div class="g--8 g-s--12 center">
+      <h1>{{title}}</h1>
+      {{#builds}}
+        <div class="tile">
+          <a href="/test-results/build/{{buildNumber}}">Build {{buildNumber}}</a>, started at {{startedAt}}
+        </div>
+      {{/builds}}
+      {{^builds}}
+          There are no builds.
+      {{/builds}}
+    </div>
+  </div>
 </body>
 </html>

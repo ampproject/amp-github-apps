@@ -38,6 +38,7 @@ type QueryFunction = (q: QueryBuilder) => QueryBuilder;
  */
 function getTestRunFromRow({
   build_number,
+  build_started_at,
   commit_sha,
   job_number,
   test_suite_type,
@@ -50,6 +51,7 @@ function getTestRunFromRow({
   const build: Build = {
     buildNumber: build_number,
     commitSha: commit_sha,
+    startedAt: new Date(build_started_at),
   };
 
   const job: Job = {
@@ -286,9 +288,10 @@ export class TestResultRecord {
       .offset(offset);
 
     /* eslint-disable @typescript-eslint/camelcase */
-    return dbBuilds.map(({commit_sha, build_number}) => ({
+    return dbBuilds.map(({commit_sha, build_number, started_at}) => ({
       commitSha: commit_sha,
       buildNumber: build_number,
+      startedAt: new Date(started_at),
     }));
     /* eslint-enable @typescript-eslint/camelcase */
   }

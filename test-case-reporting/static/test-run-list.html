@@ -1,23 +1,36 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Test runs</title>
-</head>
-<body>
-  <ul>
-    {{#testRuns}}
-      <li>Test case is <a href="/test-results/history/{{testCase.id}}">{{testCase.name}}</a></li>
-      <ul>
-        <li>Job num is {{job.jobNumber}}</li>
-        <li>Build num is <a href="/test-results/build/{{job.build.buildNumber}}">{{job.build.buildNumber}}</a></li>
-        <li>Status is {{status}}</li>
-      </ul>
-    {{/testRuns}}
-    {{^testRuns}}
-      <h2>
-        There are no test runs.
-      </h2>
-    {{/testRuns}}
-  </ul>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+    <!-- Surface style taken from https://github.com/niutech/amp-surface -->
+    <link rel="stylesheet" type="text/css" href="/surface.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/custom.css"/>
+  </head>
+  <body>
+    <div class="g--10 m--1">
+      <div class="g--8 g-s--12 center">
+        <h1>{{title}}</h1>
+        {{#testRuns}}
+          <div class="collapsible-wrap card no-pad">
+            <input type="checkbox" id="collapsible-{{index}}">
+            <label for="collapsible-{{index}}">
+              <span class='status-badge status-{{testRun.status}}'>{{testRun.status}}</span>&nbsp;
+              <a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>
+            </label>
+            <div class="collapsible-{{index}}-area">
+              <p>Job: {{testRun.job.jobNumber}}</p>
+              <p>Build: <a href="/test-results/build/{{testRun.job.build.buildNumber}}">{{testRun.job.build.buildNumber}}</a></p>
+            </div>
+          </div>
+        {{/testRuns}}
+        {{^testRuns}}
+          <h2>
+            There are no test runs.
+          </h2>
+        {{/testRuns}}
+      </div>
+    </div>
+  </body>
 </html>
