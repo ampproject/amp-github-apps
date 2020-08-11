@@ -111,7 +111,11 @@ declare module 'test-case-reporting' {
       duration_ms: number;
     }
 
-    export interface BigJoin extends Build, Job, TestCase, TestRun {
+    export interface TestRunWithJobAndBuild
+      extends Build,
+        Job,
+        TestCase,
+        TestRun {
       build_started_at: number;
     }
   }

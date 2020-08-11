@@ -47,7 +47,7 @@ function getTestRunFromRow({
   status,
   timestamp,
   duration_ms,
-}: DB.BigJoin): TestRun {
+}: DB.TestRunWithJobAndBuild): TestRun {
   const build: Build = {
     buildNumber: build_number,
     commitSha: commit_sha,
@@ -217,7 +217,7 @@ export class TestResultRecord {
     queryFunction: QueryFunction,
     {limit, offset}: PageInfo
   ): Promise<Array<TestRun>> {
-    const baseQuery = this.db<DB.BigJoin>('test_runs')
+    const baseQuery = this.db<DB.TestRunWithJobAndBuild>('test_runs')
       .leftJoin('test_cases', 'test_cases.id', 'test_runs.test_case_id')
       .leftJoin('jobs', 'jobs.id', 'test_runs.job_id')
       .leftJoin('builds', 'builds.id', 'jobs.build_id');
