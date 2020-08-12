@@ -395,7 +395,7 @@ describe('TestResultRecord', () => {
       // TODO(#975): Add unit tests for getTestCasesSortedByStat
       it.todo('gets the test cases, sorted by skipped percentage');
 
-      it("doesn't allow for bad columns", async () => {
+      it('rejects attempts to sort by illegal columns', async () => {
         await expect(
           testResultRecord.getTestCasesSortedByStat(
             10,

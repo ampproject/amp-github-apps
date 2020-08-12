@@ -308,7 +308,7 @@ export class TestResultRecord {
     {limit, offset}: PageInfo
   ): Promise<Array<TestCase>> {
     if (!['passed', 'failed', 'skipped', 'errored'].includes(stat)) {
-      throw new TypeError('Bad stat used for sorting test cases');
+      throw new TypeError(`Bad stat used for sorting test cases: "${stat}"`);
     }
 
     const dbTestCases: Array<DB.TestCase> = await this.db('test_case_stats')
