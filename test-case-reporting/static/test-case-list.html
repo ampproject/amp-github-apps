@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{title}}</title>
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+  <!-- Surface style taken from https://github.com/niutech/amp-surface -->
+  <link rel="stylesheet" type="text/css" href="/surface.min.css"/>
+</head>
+<body>
+  <div class="g--10 m--1">
+    <div class="g--8 g-s--12 center">
+      <h1>{{title}}</h1>
+      {{#testCases}}
+        <div class="tile">
+          <a href="/test-results/history/{{id}}">Test case {{name}}</a>. More info soon.</div>
+      {{/testCases}}
+      {{^testCases}}
+          There are no test cases.
+      {{/testCases}}
+    </div>
+  </div>
+</body>
+</html>
