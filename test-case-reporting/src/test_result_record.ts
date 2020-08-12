@@ -299,16 +299,16 @@ export class TestResultRecord {
   /**
    * Gets a list of the test cases with highest fail/pass/skip/error percentage
    * @param pageInfo Object with the limit and the offset of the query
-   * @param column Which test status we want to sort by
+   * @param stat Which test status we want to sort by
    * @param sampleSize The sample size of the computed stats we want
    */
-  async getTestCasesSortedByStatColumn(
-    {limit, offset}: PageInfo,
-    column: string,
-    sampleSize: number
+  async getTestCasesSortedByStat(
+    sampleSize: number,
+    stat: string,
+    {limit, offset}: PageInfo
   ): Promise<Array<TestCase>> {
-    if (!['passed', 'failed', 'skipped', 'errored'].includes(column)) {
-      throw new TypeError('Bad column used for sorting test cases');
+    if (!['passed', 'failed', 'skipped', 'errored'].includes(stat)) {
+      throw new TypeError('Bad stat used for sorting test cases');
     }
 
     const dbTestCases: Array<DB.TestCase> = await this.db('test_case_stats')
@@ -316,9 +316,9 @@ export class TestResultRecord {
       .join('test_cases', 'test_cases.id', 'test_case_stats.test_case_id')
       .select<Array<DB.TestCase>>(
         this.db.raw('passed + failed + skipped + errored AS total'),
-        this.db.raw(`${column} / total AS ${column}_percent`)
+        this.db.raw(`${stat} / total AS ${stat}_percent`)
       )
-      .orderBy(`${column}_percent`, 'DESC')
+      .orderBy(`${stat}_percent`, 'DESC')
       .limit(limit)
       .offset(offset);
 
