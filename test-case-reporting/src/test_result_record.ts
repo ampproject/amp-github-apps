@@ -315,8 +315,15 @@ export class TestResultRecord {
       .where('test_case_stats.sample_size', sampleSize)
       .join('test_cases', 'test_cases.id', 'test_case_stats.test_case_id')
       .select<Array<DB.TestCase>>(
-        this.db.raw('passed + failed + skipped + errored AS total'),
-        this.db.raw(`${stat} / total AS ${stat}_percent`)
+        this.db.raw('?? / (?? + ?? + ?? + ??) AS ??', [
+          stat,
+          'passed',
+          'failed',
+          'skipped',
+          'errored',
+          `${stat}_percent`,
+        ]),
+        this.db.raw('*')
       )
       .orderBy(`${stat}_percent`, 'DESC')
       .limit(limit)
