@@ -304,9 +304,13 @@ export class TestResultRecord {
    */
   async getTestCasesSortedByStatColumn(
     {limit, offset}: PageInfo,
-    column: 'passed' | 'failed' | 'skipped' | 'errored',
+    column: string,
     sampleSize: number
   ): Promise<Array<TestCase>> {
+    if (!['passed', 'failed', 'skipped', 'errored'].includes(column)) {
+      throw new TypeError('Bad column used for sorting test cases');
+    }
+
     const dbTestCases: Array<DB.TestCase> = await this.db('test_case_stats')
       .where('test_case_stats.sample_size', sampleSize)
       .join('test_cases', 'test_cases.id', 'test_case_stats.test_case_id')
