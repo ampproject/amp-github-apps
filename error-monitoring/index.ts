@@ -354,7 +354,7 @@ export async function linkIssue(
 
   try {
     const issueRepo =
-      issueNumber >= LEGACY_ISSUE_REPO_START
+      Number(issueNumber) >= LEGACY_ISSUE_REPO_START
         ? GITHUB_REPO_NAME
         : ISSUE_REPO_NAME;
     await stackdriver.setGroupIssue(
