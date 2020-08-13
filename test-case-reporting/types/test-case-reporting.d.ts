@@ -118,6 +118,17 @@ declare module 'test-case-reporting' {
         TestRun {
       build_started_at: number;
     }
+
+    export interface TestCaseStats {
+      id?: number;
+      test_case_id: string;
+      sample_size: number;
+      passed: number;
+      failed: number;
+      skipped: number;
+      errored: number;
+      dirty?: boolean;
+    }
   }
   /* eslint @typescript-eslint/camelcase: "error" */
 

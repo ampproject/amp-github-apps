@@ -390,5 +390,20 @@ describe('TestResultRecord', () => {
         'gets the recent builds in reverse chronological order(most recent first)'
       );
     });
+
+    describe('getTestCasesSortedByStat', () => {
+      // TODO(#975): Add unit tests for getTestCasesSortedByStat
+      it.todo('gets the test cases, sorted by skipped percentage');
+
+      it('rejects attempts to sort by illegal columns', async () => {
+        await expect(
+          testResultRecord.getTestCasesSortedByStat(
+            10,
+            "Robert'); DROP TABLE Students;--",
+            defaultPageInfo
+          )
+        ).rejects.toBeInstanceOf(TypeError);
+      });
+    });
   });
 });

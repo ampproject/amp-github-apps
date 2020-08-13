@@ -295,4 +295,46 @@ export class TestResultRecord {
     }));
     /* eslint-enable @typescript-eslint/camelcase */
   }
+
+  /**
+   * Gets a list of the test cases with highest fail/pass/skip/error percentage
+   * @param pageInfo Object with the limit and the offset of the query
+   * @param stat Which test status we want to sort by
+   * @param sampleSize The sample size of the computed stats we want
+   */
+  async getTestCasesSortedByStat(
+    sampleSize: number,
+    stat: string,
+    {limit, offset}: PageInfo
+  ): Promise<Array<TestCase>> {
+    if (!['passed', 'failed', 'skipped', 'errored'].includes(stat)) {
+      throw new TypeError(`Bad stat used for sorting test cases: "${stat}"`);
+    }
+
+    const dbTestCases: Array<DB.TestCase> = await this.db('test_case_stats')
+      .where('test_case_stats.sample_size', sampleSize)
+      .join('test_cases', 'test_cases.id', 'test_case_stats.test_case_id')
+      .select<Array<DB.TestCase>>(
+        this.db.raw('?? / (?? + ?? + ?? + ??) AS ??', [
+          stat,
+          'passed',
+          'failed',
+          'skipped',
+          'errored',
+          `${stat}_percent`,
+        ]),
+        '*'
+      )
+      .orderBy(`${stat}_percent`, 'DESC')
+      .limit(limit)
+      .offset(offset);
+
+    /* eslint-disable @typescript-eslint/camelcase */
+    return dbTestCases.map(({id, name, created_at}) => ({
+      id,
+      name,
+      createdAt: new Date(created_at),
+    }));
+    /* eslint-enable @typescript-eslint/camelcase */
+  }
 }
