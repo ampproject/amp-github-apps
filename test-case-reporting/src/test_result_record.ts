@@ -323,7 +323,7 @@ export class TestResultRecord {
           'errored',
           `${stat}_percent`,
         ]),
-        this.db.raw('*')
+        '*'
       )
       .orderBy(`${stat}_percent`, 'DESC')
       .limit(limit)
