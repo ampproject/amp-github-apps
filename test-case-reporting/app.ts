@@ -136,7 +136,9 @@ app.get('/test-cases/stats/:stat', async (req, res) => {
     const sampleSize = Number(count);
 
     if (Number.isNaN(sampleSize)) {
-      throw new TypeError('sampleSize is not a number');
+      throw new TypeError(
+        `Expected a number for parameter 'count'; got ${count}`
+      );
     }
 
     const testCases = await record.getTestCasesSortedByStat(
