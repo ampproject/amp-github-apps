@@ -128,6 +128,40 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
   }
 });
 
+app.get('/test-cases/stats/:stat', async (req, res) => {
+  const {stat} = req.params;
+  const {json, count = 10} = req.query;
+
+  try {
+    const sampleSize = Number(count);
+
+    if (Number.isNaN(sampleSize)) {
+      throw new TypeError(
+        `Expected a number for parameter 'count'; got ${count}`
+      );
+    }
+
+    const testCases = await record.getTestCasesSortedByStat(
+      sampleSize,
+      stat,
+      extractPageInfo(req)
+    );
+
+    if (json) {
+      res.json({testCases});
+    } else {
+      res.send(
+        render('test-case-list', {
+          title: `Test cases with highest "${stat}"% in the past ${sampleSize} runs`,
+          testCases,
+        })
+      );
+    }
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
 app.get('/test-results/history/:testCaseId', async (req, res) => {
   const {testCaseId} = req.params;
   const {json} = req.query;
