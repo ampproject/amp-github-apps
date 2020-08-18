@@ -21,6 +21,7 @@ const MAX_CHANGED_FILES = 40;
 const MAX_POSSIBLE_ASSIGNEES = 2;
 const ERROR_HANDLING_FILES = ['src/error.js', 'src/log.js'];
 const ONE_YEAR_MS = 1000 * 60 * 60 * 24 * 365;
+const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 
 /**
  * Builds a GitHub issue for a reported error.
@@ -94,7 +95,7 @@ export class IssueBuilder {
   }: BlameRange): string {
     return (
       `\`${author}\` modified \`${path}:${startingLine}-${endingLine}\`` +
-      ` in #${prNumber} (${formatDate(committedDate)})`
+      ` in ${GITHUB_REPO}#${prNumber} (${formatDate(committedDate)})`
     );
   }
 
