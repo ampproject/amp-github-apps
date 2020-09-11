@@ -18,7 +18,7 @@ declare module 'test-case-reporting' {
   /**
    * Travis job types for which test results may be reported.
    */
-  export type TestSuiteType = 'unit' | 'integration';
+  export type TestSuiteType = 'unit' | 'integration' | 'e2e';
 
   export type TestStatus = 'PASS' | 'FAIL' | 'SKIP' | 'ERROR';
 
