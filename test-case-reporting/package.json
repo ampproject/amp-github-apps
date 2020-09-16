@@ -6,7 +6,7 @@
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "An app that tracks the pass/fail status of tests run in Travis builds",
   "engines": {
-    "node": "12.18.3"
+    "node": "12.18.4"
   },
   "scripts": {
     "lint": "eslint **/*.ts",
@@ -27,20 +27,20 @@
     "dotenv": "8.2.0",
     "express": "4.17.1",
     "http-status-codes": "1.4.0",
-    "knex": "0.21.2",
-    "md5": "2.2.1",
+    "knex": "0.21.5",
+    "md5": "2.3.0",
     "mustache": "4.0.1",
-    "node-fetch": "2.6.0",
-    "pg": "8.3.0"
+    "node-fetch": "2.6.1",
+    "pg": "8.3.3"
   },
   "devDependencies": {
-    "@types/express": "4.17.7",
-    "@types/express-serve-static-core": "4.17.9",
+    "@types/express": "4.17.8",
+    "@types/express-serve-static-core": "4.17.12",
     "@types/jest": "25.2.3",
     "@types/knex": "0.16.1",
     "@types/md5": "2.2.0",
     "@types/mustache": "4.0.1",
-    "@types/node": "13.13.15",
+    "@types/node": "13.13.20",
     "@types/node-fetch": "2.5.7",
     "@types/supertest": "2.0.10",
     "@typescript-eslint/eslint-plugin": "2.34.0",
