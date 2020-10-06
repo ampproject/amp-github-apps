@@ -49,6 +49,15 @@ declare module 'test-case-reporting' {
     id: string;
     name: string;
     createdAt: Date;
+    stats?: TestCaseStats;
+  }
+
+  export interface TestCaseStats {
+    sampleSize: number;
+    passed: number;
+    failed: number;
+    skipped: number;
+    errored: number;
   }
 
   /** An instance of a test being run, with results. */

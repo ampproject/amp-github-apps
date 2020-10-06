@@ -222,9 +222,7 @@ export class TestResultRecord {
       .leftJoin('jobs', 'jobs.id', 'test_runs.job_id')
       .leftJoin('builds', 'builds.id', 'jobs.build_id');
 
-    const fullQuery = queryFunction(baseQuery)
-      .limit(limit)
-      .offset(offset);
+    const fullQuery = queryFunction(baseQuery).limit(limit).offset(offset);
 
     const rows = await fullQuery.select(
       'builds.build_number',
@@ -311,10 +309,12 @@ export class TestResultRecord {
       throw new TypeError(`Bad stat used for sorting test cases: "${stat}"`);
     }
 
-    const dbTestCases: Array<DB.TestCase> = await this.db('test_case_stats')
+    const dbTestCases: Array<DB.TestCase & DB.TestCaseStats> = await this.db(
+      'test_case_stats'
+    )
       .where('test_case_stats.sample_size', sampleSize)
       .join('test_cases', 'test_cases.id', 'test_case_stats.test_case_id')
-      .select<Array<DB.TestCase>>(
+      .select<Array<DB.TestCase & DB.TestCaseStats>>(
         this.db.raw('?? / (?? + ?? + ?? + ??) AS ??', [
           stat,
           'passed',
@@ -330,11 +330,29 @@ export class TestResultRecord {
       .offset(offset);
 
     /* eslint-disable @typescript-eslint/camelcase */
-    return dbTestCases.map(({id, name, created_at}) => ({
-      id,
-      name,
-      createdAt: new Date(created_at),
-    }));
+    return dbTestCases.map(
+      ({
+        id,
+        name,
+        created_at,
+        sample_size,
+        passed,
+        failed,
+        skipped,
+        errored,
+      }) => ({
+        id,
+        name,
+        createdAt: new Date(created_at),
+        stats: {
+          sampleSize: sample_size,
+          passed,
+          failed,
+          skipped,
+          errored,
+        },
+      })
+    );
     /* eslint-enable @typescript-eslint/camelcase */
   }
 }
