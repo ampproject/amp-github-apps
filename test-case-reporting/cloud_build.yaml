@@ -13,7 +13,7 @@ steps:
     secretEnv:
       - DB_PASSWORD
       - DB_USER
-  
+
   # Install app dependencies
   - name: gcr.io/cloud-builders/npm
     dir: test-case-reporting
@@ -47,6 +47,13 @@ steps:
     args:
       - app
       - deploy
+    timeout: 1600s
+  - name: gcr.io/cloud-builders/gcloud
+    dir: test-case-reporting
+    args:
+      - app
+      - deploy
+      - cron.yaml
 
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
