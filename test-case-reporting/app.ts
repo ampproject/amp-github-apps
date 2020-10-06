@@ -162,6 +162,7 @@ app.get('/test-cases/stats/:stat', async (req, res) => {
             return {
               id,
               name,
+              nameParts: name.split(' | ').filter(Boolean),
               createdAt,
               stats: {
                 ...stats,
