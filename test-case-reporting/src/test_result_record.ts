@@ -313,9 +313,10 @@ export class TestResultRecord {
       'test_case_stats'
     )
       .where('test_case_stats.sample_size', sampleSize)
+      .where(stat, '>', 0)
       .join('test_cases', 'test_cases.id', 'test_case_stats.test_case_id')
       .select<Array<DB.TestCase & DB.TestCaseStats>>(
-        this.db.raw('?? / (?? + ?? + ?? + ??) AS ??', [
+        this.db.raw('CAST(?? AS DECIMAL) / (?? + ?? + ?? + ??) AS ??', [
           stat,
           'passed',
           'failed',
