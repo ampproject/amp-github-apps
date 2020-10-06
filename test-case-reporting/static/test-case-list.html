@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
   <!-- Surface style taken from https://github.com/niutech/amp-surface -->
   <link rel="stylesheet" type="text/css" href="/surface.min.css"/>
+  <link rel="stylesheet" type="text/css" href="/custom.css"/>
 </head>
 <body>
   <div class="g--10 m--1">
@@ -13,8 +14,35 @@
       <h1>{{title}}</h1>
       {{#testCases}}
         <div class="tile">
-          <a href="/test-results/history/{{id}}">Test case {{name}}</a>. More info soon.</div>
+        {{#stats}}
+          <span class='status-badge status-pass'
+                title='{{passed}}/{{total}} (last {{sampleSize}} jobs)'>
+            {{passedPercent}}%
+          </span>
+
+          <span class='status-badge status-fail'
+                title='{{failed}}/{{total}} (last {{sampleSize}} jobs)'>
+            {{failedPercent}}%
+          </span>
+
+          <span class='status-badge status-error'
+                title='{{errored}}/{{total}} (last {{sampleSize}} jobs)'>
+            {{erroredPercent}}%
+          </span>
+
+          <span class='status-badge status-skip'
+                title='{{skipped}}/{{total}} (last {{sampleSize}} jobs)'>
+            {{skippedPercent}}%
+          </span>
+        {{/stats}}
+
+          <br>
+          <a href="/test-results/history/{{id}}" title="{{name}}">
+            {{name}}
+          </a>
+        </div>
       {{/testCases}}
+
       {{^testCases}}
           There are no test cases.
       {{/testCases}}
