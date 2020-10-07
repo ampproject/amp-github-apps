@@ -173,10 +173,12 @@ declare module 'test-case-reporting' {
     export interface Build {
       buildNumber: string;
       commitSha: string;
+      url: string;
     }
     export interface Job {
       jobNumber: string;
       testSuiteType: TestSuiteType;
+      url: string;
     }
   }
 }

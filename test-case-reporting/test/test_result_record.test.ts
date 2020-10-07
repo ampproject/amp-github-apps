@@ -54,11 +54,13 @@ describe('TestResultRecord', () => {
   const sampleBuild: Travis.Build = {
     buildNumber: '413413',
     commitSha: 'abcdefg123gomugomu',
+    url: 'http://travis.org/build/413413',
   };
 
   const sampleJob: Travis.Job = {
     jobNumber: '413413.612',
     testSuiteType: 'unit',
+    url: 'http://travis.org/job/413413.612',
   };
 
   const sampleKarmaReport: KarmaReporter.TestResultReport = (getFixture(
@@ -103,9 +105,7 @@ describe('TestResultRecord', () => {
       it('adds the build to the database', async () => {
         await testResultRecord.insertTravisBuild(sampleBuild);
 
-        const build = await db<DB.Build>('builds')
-          .select()
-          .first();
+        const build = await db<DB.Build>('builds').select().first();
 
         expect(build).toMatchObject({
           'build_number': '413413',
@@ -124,9 +124,7 @@ describe('TestResultRecord', () => {
       it('adds the job to the database if the build exists in the DB', async () => {
         await testResultRecord.insertTravisJob(sampleJob, buildId);
 
-        const job = await db<DB.Job>('jobs')
-          .select()
-          .first();
+        const job = await db<DB.Job>('jobs').select().first();
 
         expect(job).toMatchObject({
           'job_number': '413413.612',
