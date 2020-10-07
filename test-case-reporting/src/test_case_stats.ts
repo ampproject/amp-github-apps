@@ -78,7 +78,7 @@ export class TestCaseStats {
     sampleSize: number
   ): Promise<void> {
     await trx('test_case_stats')
-      .where({sample_size: sampleSize, dirty: true})
+      .where({'sample_size': sampleSize, dirty: true})
       .delete();
   }
 
