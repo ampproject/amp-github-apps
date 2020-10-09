@@ -20,8 +20,22 @@
               <a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>
             </label>
             <div class="collapsible-{{index}}-area">
-              <p>Job: {{testRun.job.jobNumber}}</p>
-              <p>Build: <a href="/test-results/build/{{testRun.job.build.buildNumber}}">{{testRun.job.build.buildNumber}}</a></p>
+              {{#testRun.job}}
+              <p>
+                Job: {{jobNumber}}
+                {{#url}}(<a href="{{.}}">Travis</a>){{/url}}
+              </p>
+
+              <p>
+                {{#build}}
+                Build:
+                <a href="/test-results/build/{{build.buildNumber}}">
+                  {{buildNumber}}
+                </a>
+                {{#url}}(<a href="{{.}}">Travis</a>){{/url}}
+                {{/build}}
+              </p>
+              {{/testRun.job}}
             </div>
           </div>
         {{/testRuns}}
