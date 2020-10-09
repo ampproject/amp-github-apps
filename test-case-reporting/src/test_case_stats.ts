@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// require('dotenv').config();
-// const pg = require('pg');
-// pg.types.setTypeParser(20, 'text', parseInt);
-// const db = dbConnect();
-// const limit = 10;
+
 import {Database} from './db';
 import {TestStatus} from 'test-case-reporting';
 import Knex from 'knex';
@@ -64,7 +60,7 @@ export class TestCaseStats {
     sampleSize: number
   ): Promise<void> {
     await trx('test_case_stats')
-      .where({sample_size: sampleSize})
+      .where({'sample_size': sampleSize})
       .update({dirty: true});
   }
 
@@ -99,7 +95,7 @@ export class TestCaseStats {
     // because selecting the first N of a group-by clause is very inefficient,
     // but the subquery here using the jobs table as a proxy has the same effect
     // but with better query performance.
-    const lastNBuilds = this.db('buids')
+    const lastNBuilds = this.db('builds')
       .orderBy('started_at', 'DESC')
       .limit(sampleSize)
       .select('id');
