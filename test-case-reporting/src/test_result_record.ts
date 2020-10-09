@@ -163,6 +163,19 @@ export class TestResultRecord {
   }
 
   /**
+   * Helper that isolates the test case name when the error is reported in the
+   * before/after each hook, allowing proper grouping by name.
+   */
+  maybeUnwrapHookMessage(result: {description: string}): void {
+    const matches = result.description.match(
+      /^"(?before|after) each" hook for "(.*)"$/
+    );
+    if (matches) {
+      result.description = matches[1];
+    }
+  }
+
+  /**
    * Stores a travis report on the database. This involves inserting
    * a job, a build, many test runs, and many test cases.
    * Duplicate test cases and builds are not inserted.
@@ -176,6 +189,7 @@ export class TestResultRecord {
       .map(({results}) => results)
       .reduce((flattenedArray, array) => flattenedArray.concat(array), [])
       .map(result => {
+        this.maybeUnwrapHookMessage(result);
         const testCaseName = this.testCaseName(result);
         return {
           ...result,
