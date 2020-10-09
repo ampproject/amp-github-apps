@@ -26,25 +26,33 @@
       {{#testCases}}
         <div class="tile">
         {{#stats}}
-          <span class="status-badge status-pass"
-                title="Passed: {{passed}}/{{total}} (last {{sampleSize}} builds)">
-            {{passedPercent}}%
-          </span>
+          <a href="/test-cases/stats/pass">
+            <span class="status-badge status-pass"
+                  title="Passed: {{pass}}/{{total}} (last {{sampleSize}} builds)">
+              {{passPercent}}%
+            </span>
+          </a>
 
-          <span class="status-badge status-fail"
-                title="Failed: {{failed}}/{{total}} (last {{sampleSize}} builds)">
-            {{failedPercent}}%
-          </span>
+          <a href="/test-cases/stats/fail">
+            <span class="status-badge status-fail"
+                  title="Failed: {{fail}}/{{total}} (last {{sampleSize}} builds)">
+              {{failPercent}}%
+            </span>
+          </a>
 
-          <span class="status-badge status-error"
-                title="Errored: {{errored}}/{{total}} (last {{sampleSize}} builds)">
-            {{erroredPercent}}%
-          </span>
+          <a href="/test-cases/stats/error">
+            <span class="status-badge status-error"
+                  title="Errored: {{error}}/{{total}} (last {{sampleSize}} builds)">
+              {{errorPercent}}%
+            </span>
+          </a>
 
-          <span class="status-badge status-skip"
-                title="Skipped: {{skipped}}/{{total}} (last {{sampleSize}} builds)">
-            {{skippedPercent}}%
-          </span>
+          <a href="/test-cases/stats/skip">
+            <span class="status-badge status-skip"
+                  title="Skipped: {{skip}}/{{total}} (last {{sampleSize}} builds)">
+              {{skipPercent}}%
+            </span>
+          </a>
         {{/stats}}
 
           <br>
