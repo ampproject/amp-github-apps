@@ -152,7 +152,7 @@ app.get('/test-cases/stats/:stat', async (req, res) => {
     } else {
       res.send(
         render('test-case-list', {
-          title: `Test cases with highest "${stat}"% in the past ${sampleSize} runs`,
+          title: `Test cases with highest "${stat}"% in the past ${sampleSize} builds`,
           testCases: testCases.map(({id, name, createdAt, stats}) => {
             const {passed, failed, skipped, errored} = stats;
             const total = passed + failed + skipped + errored;

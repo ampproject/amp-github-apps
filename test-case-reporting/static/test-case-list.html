@@ -27,22 +27,22 @@
         <div class="tile">
         {{#stats}}
           <span class="status-badge status-pass"
-                title="Passed: {{passed}}/{{total}} (last {{sampleSize}} jobs)">
+                title="Passed: {{passed}}/{{total}} (last {{sampleSize}} builds)">
             {{passedPercent}}%
           </span>
 
           <span class="status-badge status-fail"
-                title="Failed: {{failed}}/{{total}} (last {{sampleSize}} jobs)">
+                title="Failed: {{failed}}/{{total}} (last {{sampleSize}} builds)">
             {{failedPercent}}%
           </span>
 
           <span class="status-badge status-error"
-                title="Errored: {{errored}}/{{total}} (last {{sampleSize}} jobs)">
+                title="Errored: {{errored}}/{{total}} (last {{sampleSize}} builds)">
             {{erroredPercent}}%
           </span>
 
           <span class="status-badge status-skip"
-                title="Skipped: {{skipped}}/{{total}} (last {{sampleSize}} jobs)">
+                title="Skipped: {{skipped}}/{{total}} (last {{sampleSize}} builds)">
             {{skippedPercent}}%
           </span>
         {{/stats}}
