@@ -112,6 +112,7 @@ export class TestResultRecord {
       .insert({
         'commit_sha': build.commitSha,
         'build_number': build.buildNumber,
+        'url': build.url,
       } as DB.Build)
       .returning('id');
 
@@ -126,6 +127,7 @@ export class TestResultRecord {
       .insert({
         'build_id': buildId,
         'job_number': job.jobNumber,
+        'url': job.url,
         'test_suite_type': job.testSuiteType,
       } as DB.Job)
       .returning('id');
