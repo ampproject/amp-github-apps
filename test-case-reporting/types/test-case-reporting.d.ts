@@ -56,10 +56,10 @@ declare module 'test-case-reporting' {
 
   export interface TestCaseStats {
     sampleSize: number;
-    passed: number;
-    failed: number;
-    skipped: number;
-    errored: number;
+    pass: number;
+    fail: number;
+    skip: number;
+    error: number;
   }
 
   /** An instance of a test being run, with results. */
@@ -134,10 +134,10 @@ declare module 'test-case-reporting' {
       id?: number;
       test_case_id: string;
       sample_size: number;
-      passed: number;
-      failed: number;
-      skipped: number;
-      errored: number;
+      pass: number;
+      fail: number;
+      skip: number;
+      error: number;
       dirty?: boolean;
     }
   }

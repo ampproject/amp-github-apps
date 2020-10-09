@@ -84,10 +84,10 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.increments('id').primary();
       table.specificType('test_case_id', 'char(32)').notNullable();
       table.integer('sample_size').unsigned().notNullable();
-      table.integer('passed').unsigned().notNullable().defaultTo(0);
-      table.integer('failed').unsigned().notNullable().defaultTo(0);
-      table.integer('skipped').unsigned().notNullable().defaultTo(0);
-      table.integer('errored').unsigned().notNullable().defaultTo(0);
+      table.integer('pass').unsigned().notNullable().defaultTo(0);
+      table.integer('fail').unsigned().notNullable().defaultTo(0);
+      table.integer('skip').unsigned().notNullable().defaultTo(0);
+      table.integer('error').unsigned().notNullable().defaultTo(0);
       table.boolean('dirty').defaultTo(false);
 
       table.foreign('test_case_id').references('id').inTable('test_cases');

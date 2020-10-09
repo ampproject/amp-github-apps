@@ -16,7 +16,9 @@
           <div class="collapsible-wrap card no-pad">
             <input type="checkbox" id="collapsible-{{index}}">
             <label for="collapsible-{{index}}">
-              <span class='status-badge status-{{testRun.status}}'>{{testRun.status}}</span>&nbsp;
+              <a href="/test-cases/stats/{{testRun.status}}">
+                <span class='status-badge status-{{testRun.status}}'>{{testRun.status}}</span>&nbsp;
+              </a>
               <a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>
             </label>
             <div class="collapsible-{{index}}-area">

@@ -154,8 +154,8 @@ app.get('/test-cases/stats/:stat', async (req, res) => {
         render('test-case-list', {
           title: `Test cases with highest "${stat}"% in the past ${sampleSize} builds`,
           testCases: testCases.map(({id, name, createdAt, stats}) => {
-            const {passed, failed, skipped, errored} = stats;
-            const total = passed + failed + skipped + errored;
+            const {pass, fail, skip, error} = stats;
+            const total = pass + fail + skip + error;
             const statPercent = (stat: number): string =>
               ((100 * stat) / total).toFixed(0);
 
@@ -167,10 +167,10 @@ app.get('/test-cases/stats/:stat', async (req, res) => {
               stats: {
                 ...stats,
                 total,
-                passedPercent: statPercent(passed),
-                failedPercent: statPercent(failed),
-                skippedPercent: statPercent(skipped),
-                erroredPercent: statPercent(errored),
+                passPercent: statPercent(pass),
+                failPercent: statPercent(fail),
+                skippPercent: statPercent(skip),
+                errorPercent: statPercent(error),
               },
             };
           }),
