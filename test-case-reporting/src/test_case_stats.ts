@@ -128,10 +128,10 @@ export class TestCaseStats {
           'test_case_stats',
           'test_case_id',
           'sample_size',
-          'passed',
-          'failed',
-          'skipped',
-          'errored',
+          'pass',
+          'fail',
+          'skip',
+          'error',
         ])
       )
       .insert(function () {

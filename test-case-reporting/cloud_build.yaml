@@ -47,7 +47,7 @@ steps:
     args:
       - app
       - deploy
-    timeout: 1600s
+    timeout: 3600s
   - name: gcr.io/cloud-builders/gcloud
     dir: test-case-reporting
     args:

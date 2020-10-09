@@ -319,7 +319,7 @@ export class TestResultRecord {
     stat: string,
     {limit, offset}: PageInfo
   ): Promise<Array<TestCase>> {
-    if (!['passed', 'failed', 'skipped', 'errored'].includes(stat)) {
+    if (!['pass', 'fail', 'skip', 'error'].includes(stat)) {
       throw new TypeError(`Bad stat used for sorting test cases: "${stat}"`);
     }
 
@@ -332,10 +332,10 @@ export class TestResultRecord {
       .select<Array<DB.TestCase & DB.TestCaseStats>>(
         this.db.raw('CAST(?? AS DECIMAL) / (?? + ?? + ?? + ??) AS ??', [
           stat,
-          'passed',
-          'failed',
-          'skipped',
-          'errored',
+          'pass',
+          'fail',
+          'skip',
+          'error',
           `${stat}_percent`,
         ]),
         '*'
@@ -346,25 +346,16 @@ export class TestResultRecord {
 
     /* eslint-disable @typescript-eslint/camelcase */
     return dbTestCases.map(
-      ({
-        id,
-        name,
-        created_at,
-        sample_size,
-        passed,
-        failed,
-        skipped,
-        errored,
-      }) => ({
+      ({id, name, created_at, sample_size, pass, fail, skip, error}) => ({
         id,
         name,
         createdAt: new Date(created_at),
         stats: {
           sampleSize: sample_size,
-          passed,
-          failed,
-          skipped,
-          errored,
+          pass,
+          fail,
+          skip,
+          error,
         },
       })
     );
