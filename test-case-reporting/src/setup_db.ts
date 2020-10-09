@@ -27,6 +27,7 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.increments('id').primary();
       table.string('commit_sha', 40);
       table.string('build_number');
+      table.string('url');
       table
         .timestamp('started_at', {precision: TIMESTAMP_PRECISION})
         .defaultTo(db.fn.now())
@@ -36,6 +37,7 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.increments('id').primary();
       table.integer('build_id').unsigned().notNullable();
       table.string('job_number');
+      table.string('url');
       table.string('test_suite_type');
       table
         .timestamp('started_at', {precision: TIMESTAMP_PRECISION})
