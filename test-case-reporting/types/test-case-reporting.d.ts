@@ -29,6 +29,7 @@ declare module 'test-case-reporting' {
     // Despite being a *Number, buildNumber is of type string for parity with
     // jobNumber
     buildNumber: string;
+    url?: string;
     startedAt: Date;
   }
 
@@ -40,6 +41,7 @@ declare module 'test-case-reporting' {
     // For the 456th job in the 123rd build,
     // this looks like `123.456`
     jobNumber: string;
+    url?: string;
     testSuiteType: TestSuiteType;
   }
 
