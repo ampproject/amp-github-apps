@@ -30,29 +30,29 @@
             <span class="status-badge status-pass"
                   title="Passed: {{pass}}/{{total}} (last {{sampleSize}} builds)">
               {{passPercent}}%
-            </span>
-          </a>
+            </span><!--
+       --></a>
 
           <a href="/test-cases/stats/fail">
             <span class="status-badge status-fail"
                   title="Failed: {{fail}}/{{total}} (last {{sampleSize}} builds)">
               {{failPercent}}%
-            </span>
-          </a>
+            </span><!--
+       --></a>
 
           <a href="/test-cases/stats/error">
             <span class="status-badge status-error"
                   title="Errored: {{error}}/{{total}} (last {{sampleSize}} builds)">
               {{errorPercent}}%
-            </span>
-          </a>
+            </span><!--
+       --></a>
 
           <a href="/test-cases/stats/skip">
             <span class="status-badge status-skip"
                   title="Skipped: {{skip}}/{{total}} (last {{sampleSize}} builds)">
               {{skipPercent}}%
-            </span>
-          </a>
+            </span><!--
+       --></a>
         {{/stats}}
 
           <br>

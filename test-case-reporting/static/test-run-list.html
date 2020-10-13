@@ -18,8 +18,10 @@
           <tr class="test-run-name">
             <td colspan="2">
               <a href="/test-cases/stats/{{testRun.status}}">
-                <span class='status-badge status-{{testRun.status}}'>{{testRun.status}}</span>&nbsp;
-              </a>
+                <span class='status-badge status-{{testRun.status}}'>
+                  {{testRun.status}}
+                </span><!--
+           --></a>
               <a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>
             </td>
           </tr>
