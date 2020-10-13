@@ -38,9 +38,11 @@ type QueryFunction = (q: QueryBuilder) => QueryBuilder;
  */
 function getTestRunFromRow({
   build_number,
+  build_url,
   build_started_at,
   commit_sha,
   job_number,
+  job_url,
   test_suite_type,
   name,
   created_at,
@@ -52,11 +54,13 @@ function getTestRunFromRow({
     buildNumber: build_number,
     commitSha: commit_sha,
     startedAt: new Date(build_started_at),
+    url: build_url,
   };
 
   const job: Job = {
     build,
     jobNumber: job_number,
+    url: job_url,
     testSuiteType: test_suite_type,
   };
 
@@ -240,10 +244,12 @@ export class TestResultRecord {
 
     const rows = await fullQuery.select(
       'builds.build_number',
+      'builds.url AS build_url',
       'builds.commit_sha',
-      'builds.started_at as build_started_at',
+      'builds.started_at AS build_started_at',
 
       'jobs.job_number',
+      'jobs.url AS job_url',
       'jobs.test_suite_type',
 
       'test_cases.name',

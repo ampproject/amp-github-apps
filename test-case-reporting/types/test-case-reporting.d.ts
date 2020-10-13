@@ -86,6 +86,7 @@ declare module 'test-case-reporting' {
     export interface Build {
       id?: number;
       commit_sha: string;
+      url?: string;
 
       // Despite being a *_number, build_number is of type string for parity with
       // job_number
@@ -96,6 +97,7 @@ declare module 'test-case-reporting' {
     export interface Job {
       id?: number;
       build_id: number;
+      url?: string;
 
       // Despite being a *_number, job_number is of type string because it includes periods.
       // For the 456th job in the 123rd build,
@@ -128,6 +130,8 @@ declare module 'test-case-reporting' {
         TestCase,
         TestRun {
       build_started_at: number;
+      build_url: string;
+      job_url: string;
     }
 
     export interface TestCaseStats {
