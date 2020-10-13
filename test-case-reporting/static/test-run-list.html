@@ -12,22 +12,28 @@
     <div class="g--10 m--1">
       <div class="g--8 g-s--12 center">
         <h1>{{title}}</h1>
-        {{#testRuns}}
-          <div class="card">
-            <a href="/test-cases/stats/{{testRun.status}}">
-              <span class='status-badge status-{{testRun.status}}'>{{testRun.status}}</span>&nbsp;
-            </a>
-            <a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>
 
-            <div class="test-run-info">
+        <table class="card">
+          {{#testRuns}}
+          <tr class="test-run-name">
+            <td colspan="2">
+              <a href="/test-cases/stats/{{testRun.status}}">
+                <span class='status-badge status-{{testRun.status}}'>{{testRun.status}}</span>&nbsp;
+              </a>
+              <a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
               {{#testRun.job}}
 
               Job: {{jobNumber}}
               {{#url}}(<a href="{{.}}">Travis</a>){{/url}}
-
-              <br>
+            </td>
 
               {{#build}}
+            <td>
               Build:
               <a href="/test-results/build/{{build.buildNumber}}">
                 {{buildNumber}}
@@ -36,9 +42,10 @@
               {{/build}}
 
               {{/testRun.job}}
-            </div>
-          </div>
-        {{/testRuns}}
+            </td>
+          </tr>
+          {{/testRuns}}
+        </table>
         {{^testRuns}}
           <h2>
             There are no test runs.
