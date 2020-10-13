@@ -60,7 +60,7 @@ describe('TestResultRecord', () => {
   const sampleJob: Travis.Job = {
     jobNumber: '413413.612',
     testSuiteType: 'unit',
-    url: 'http://travis.org/job/413413.612',
+    url: 'http://travis.org/job/413413.6',
   };
 
   const sampleKarmaReport: KarmaReporter.TestResultReport = (getFixture(
@@ -110,6 +110,7 @@ describe('TestResultRecord', () => {
         expect(build).toMatchObject({
           'build_number': '413413',
           'commit_sha': 'abcdefg123gomugomu',
+          url: 'http://travis.org/build/413413',
         });
       });
     });
@@ -129,6 +130,7 @@ describe('TestResultRecord', () => {
         expect(job).toMatchObject({
           'job_number': '413413.612',
           'test_suite_type': 'unit',
+          url: 'http://travis.org/job/413413.6',
         });
       });
 
@@ -205,6 +207,7 @@ describe('TestResultRecord', () => {
         expect(spy).toBeCalledWith({
           buildNumber: '413413',
           commitSha: 'abcdefg123gomugomu',
+          url: 'http://travis.org/build/413413',
         });
       });
 
@@ -216,6 +219,7 @@ describe('TestResultRecord', () => {
           {
             'jobNumber': '413413.612',
             'testSuiteType': 'unit',
+            url: 'http://travis.org/job/413413.6',
           },
           1
         );
