@@ -28,3 +28,7 @@
 .status-fail { background-color: orange; }
 .status-skip { background-color: gray; }
 .status-error { background-color: red; }
+
+.test-run-info {
+  margin: 0.5em 2em 0, 2em;
+}
