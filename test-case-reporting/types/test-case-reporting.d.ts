@@ -29,6 +29,7 @@ declare module 'test-case-reporting' {
     // Despite being a *Number, buildNumber is of type string for parity with
     // jobNumber
     buildNumber: string;
+    url?: string;
     startedAt: Date;
   }
 
@@ -40,6 +41,7 @@ declare module 'test-case-reporting' {
     // For the 456th job in the 123rd build,
     // this looks like `123.456`
     jobNumber: string;
+    url?: string;
     testSuiteType: TestSuiteType;
   }
 
@@ -49,6 +51,15 @@ declare module 'test-case-reporting' {
     id: string;
     name: string;
     createdAt: Date;
+    stats?: TestCaseStats;
+  }
+
+  export interface TestCaseStats {
+    sampleSize: number;
+    pass: number;
+    fail: number;
+    skip: number;
+    error: number;
   }
 
   /** An instance of a test being run, with results. */
@@ -75,6 +86,7 @@ declare module 'test-case-reporting' {
     export interface Build {
       id?: number;
       commit_sha: string;
+      url?: string;
 
       // Despite being a *_number, build_number is of type string for parity with
       // job_number
@@ -85,6 +97,7 @@ declare module 'test-case-reporting' {
     export interface Job {
       id?: number;
       build_id: number;
+      url?: string;
 
       // Despite being a *_number, job_number is of type string because it includes periods.
       // For the 456th job in the 123rd build,
@@ -117,16 +130,18 @@ declare module 'test-case-reporting' {
         TestCase,
         TestRun {
       build_started_at: number;
+      build_url: string;
+      job_url: string;
     }
 
     export interface TestCaseStats {
       id?: number;
       test_case_id: string;
       sample_size: number;
-      passed: number;
-      failed: number;
-      skipped: number;
-      errored: number;
+      pass: number;
+      fail: number;
+      skip: number;
+      error: number;
       dirty?: boolean;
     }
   }
@@ -164,10 +179,12 @@ declare module 'test-case-reporting' {
     export interface Build {
       buildNumber: string;
       commitSha: string;
+      url: string;
     }
     export interface Job {
       jobNumber: string;
       testSuiteType: TestSuiteType;
+      url: string;
     }
   }
 }

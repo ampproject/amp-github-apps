@@ -12,19 +12,42 @@
     <div class="g--10 m--1">
       <div class="g--8 g-s--12 center">
         <h1>{{title}}</h1>
-        {{#testRuns}}
-          <div class="collapsible-wrap card no-pad">
-            <input type="checkbox" id="collapsible-{{index}}">
-            <label for="collapsible-{{index}}">
-              <span class='status-badge status-{{testRun.status}}'>{{testRun.status}}</span>&nbsp;
+
+        <table class="card">
+          {{#testRuns}}
+          <tr class="test-run-name">
+            <td colspan="2">
+              <a href="/test-cases/stats/{{testRun.status}}">
+                <span class='status-badge status-{{testRun.status}}'>
+                  {{testRun.status}}
+                </span><!--
+           --></a>
               <a href="/test-results/history/{{testRun.testCase.id}}">{{testRun.testCase.name}}</a>
-            </label>
-            <div class="collapsible-{{index}}-area">
-              <p>Job: {{testRun.job.jobNumber}}</p>
-              <p>Build: <a href="/test-results/build/{{testRun.job.build.buildNumber}}">{{testRun.job.build.buildNumber}}</a></p>
-            </div>
-          </div>
-        {{/testRuns}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              {{#testRun.job}}
+
+              Job: {{jobNumber}}
+              {{#url}}(<a href="{{.}}">Travis</a>){{/url}}
+            </td>
+
+              {{#build}}
+            <td>
+              Build:
+              <a href="/test-results/build/{{build.buildNumber}}">
+                {{buildNumber}}
+              </a>
+              {{#url}}(<a href="{{.}}">Travis</a>){{/url}}
+              {{/build}}
+
+              {{/testRun.job}}
+            </td>
+          </tr>
+          {{/testRuns}}
+        </table>
         {{^testRuns}}
           <h2>
             There are no test runs.

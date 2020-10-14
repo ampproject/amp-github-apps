@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// require('dotenv').config();
-// const pg = require('pg');
-// pg.types.setTypeParser(20, 'text', parseInt);
-// const db = dbConnect();
-// const limit = 10;
+
 import {Database} from './db';
 import {TestStatus} from 'test-case-reporting';
 import Knex from 'knex';
@@ -64,7 +60,7 @@ export class TestCaseStats {
     sampleSize: number
   ): Promise<void> {
     await trx('test_case_stats')
-      .where({sample_size: sampleSize})
+      .where({'sample_size': sampleSize})
       .update({dirty: true});
   }
 
@@ -78,7 +74,7 @@ export class TestCaseStats {
     sampleSize: number
   ): Promise<void> {
     await trx('test_case_stats')
-      .where({sample_size: sampleSize, dirty: true})
+      .where({'sample_size': sampleSize, dirty: true})
       .delete();
   }
 
@@ -99,13 +95,14 @@ export class TestCaseStats {
     // because selecting the first N of a group-by clause is very inefficient,
     // but the subquery here using the jobs table as a proxy has the same effect
     // but with better query performance.
-    const lastNJobs = this.db('jobs')
+    const lastNBuilds = this.db('builds')
       .orderBy('started_at', 'DESC')
       .limit(sampleSize)
       .select('id');
-    const testRunsFromLastNJobs = this.db('test_runs')
+    const testRunsFromLastNBuilds = this.db('test_runs')
+      .join('jobs', 'test_runs.job_id', 'jobs.id')
       .select()
-      .whereIn('job_id', lastNJobs);
+      .whereIn('jobs.build_id', lastNBuilds);
 
     // Create new boolean column indicating if the test run has a given status.
     const hasStatus = (status: TestStatus): Knex.Raw =>
@@ -115,7 +112,7 @@ export class TestCaseStats {
       );
     // Construct a subquery table containing test case IDs along with boolean
     // columns indicating which status the run has
-    const testRunsWithMeta = testRunsFromLastNJobs
+    const testRunsWithMeta = testRunsFromLastNBuilds
       .as('latest_runs')
       .select('test_case_id', ...TEST_STATUSES.map(hasStatus));
 
@@ -131,10 +128,10 @@ export class TestCaseStats {
           'test_case_stats',
           'test_case_id',
           'sample_size',
-          'passed',
-          'failed',
-          'skipped',
-          'errored',
+          'pass',
+          'fail',
+          'skip',
+          'error',
         ])
       )
       .insert(function () {

@@ -38,9 +38,11 @@ type QueryFunction = (q: QueryBuilder) => QueryBuilder;
  */
 function getTestRunFromRow({
   build_number,
+  build_url,
   build_started_at,
   commit_sha,
   job_number,
+  job_url,
   test_suite_type,
   name,
   created_at,
@@ -52,11 +54,13 @@ function getTestRunFromRow({
     buildNumber: build_number,
     commitSha: commit_sha,
     startedAt: new Date(build_started_at),
+    url: build_url,
   };
 
   const job: Job = {
     build,
     jobNumber: job_number,
+    url: job_url,
     testSuiteType: test_suite_type,
   };
 
@@ -112,6 +116,7 @@ export class TestResultRecord {
       .insert({
         'commit_sha': build.commitSha,
         'build_number': build.buildNumber,
+        'url': build.url,
       } as DB.Build)
       .returning('id');
 
@@ -126,6 +131,7 @@ export class TestResultRecord {
       .insert({
         'build_id': buildId,
         'job_number': job.jobNumber,
+        'url': job.url,
         'test_suite_type': job.testSuiteType,
       } as DB.Job)
       .returning('id');
@@ -163,6 +169,17 @@ export class TestResultRecord {
   }
 
   /**
+   * Helper that isolates the test case name when the error is reported in the
+   * before/after each hook, allowing proper grouping by name.
+   */
+  maybeUnwrapHookMessage(result: {description: string}): void {
+    result.description = result.description.replace(
+      /"(?:before|after) each" hook for "(.*)"$/,
+      '$1'
+    );
+  }
+
+  /**
    * Stores a travis report on the database. This involves inserting
    * a job, a build, many test runs, and many test cases.
    * Duplicate test cases and builds are not inserted.
@@ -176,6 +193,7 @@ export class TestResultRecord {
       .map(({results}) => results)
       .reduce((flattenedArray, array) => flattenedArray.concat(array), [])
       .map(result => {
+        this.maybeUnwrapHookMessage(result);
         const testCaseName = this.testCaseName(result);
         return {
           ...result,
@@ -222,16 +240,16 @@ export class TestResultRecord {
       .leftJoin('jobs', 'jobs.id', 'test_runs.job_id')
       .leftJoin('builds', 'builds.id', 'jobs.build_id');
 
-    const fullQuery = queryFunction(baseQuery)
-      .limit(limit)
-      .offset(offset);
+    const fullQuery = queryFunction(baseQuery).limit(limit).offset(offset);
 
     const rows = await fullQuery.select(
       'builds.build_number',
+      'builds.url AS build_url',
       'builds.commit_sha',
-      'builds.started_at as build_started_at',
+      'builds.started_at AS build_started_at',
 
       'jobs.job_number',
+      'jobs.url AS job_url',
       'jobs.test_suite_type',
 
       'test_cases.name',
@@ -307,20 +325,23 @@ export class TestResultRecord {
     stat: string,
     {limit, offset}: PageInfo
   ): Promise<Array<TestCase>> {
-    if (!['passed', 'failed', 'skipped', 'errored'].includes(stat)) {
+    if (!['pass', 'fail', 'skip', 'error'].includes(stat)) {
       throw new TypeError(`Bad stat used for sorting test cases: "${stat}"`);
     }
 
-    const dbTestCases: Array<DB.TestCase> = await this.db('test_case_stats')
+    const dbTestCases: Array<DB.TestCase & DB.TestCaseStats> = await this.db(
+      'test_case_stats'
+    )
       .where('test_case_stats.sample_size', sampleSize)
+      .where(stat, '>', 0)
       .join('test_cases', 'test_cases.id', 'test_case_stats.test_case_id')
-      .select<Array<DB.TestCase>>(
-        this.db.raw('?? / (?? + ?? + ?? + ??) AS ??', [
+      .select<Array<DB.TestCase & DB.TestCaseStats>>(
+        this.db.raw('CAST(?? AS DECIMAL) / (?? + ?? + ?? + ??) AS ??', [
           stat,
-          'passed',
-          'failed',
-          'skipped',
-          'errored',
+          'pass',
+          'fail',
+          'skip',
+          'error',
           `${stat}_percent`,
         ]),
         '*'
@@ -330,11 +351,20 @@ export class TestResultRecord {
       .offset(offset);
 
     /* eslint-disable @typescript-eslint/camelcase */
-    return dbTestCases.map(({id, name, created_at}) => ({
-      id,
-      name,
-      createdAt: new Date(created_at),
-    }));
+    return dbTestCases.map(
+      ({id, name, created_at, sample_size, pass, fail, skip, error}) => ({
+        id,
+        name,
+        createdAt: new Date(created_at),
+        stats: {
+          sampleSize: sample_size,
+          pass,
+          fail,
+          skip,
+          error,
+        },
+      })
+    );
     /* eslint-enable @typescript-eslint/camelcase */
   }
 }

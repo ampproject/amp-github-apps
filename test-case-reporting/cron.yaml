@@ -1,7 +1,7 @@
 cron:
 - description: "Compute pass/fail % for past 10 runs of each test"
   url: /_cron/compute-stats?count=10
-  schedule: every hour
+  schedule: every 5 mins
 - description: "Compute pass/fail % for past 100 runs of each test"
   url: /_cron/compute-stats?count=100
-  schedule: every hour
+  schedule: every 15 mins

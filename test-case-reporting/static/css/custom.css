@@ -20,7 +20,6 @@
   font-family: sans-serif;
   font-variant: small-caps;
   color: white;
-  margin-right: 10px;
   text-align: center;
   font-weight: bold;
 }
@@ -28,3 +27,10 @@
 .status-fail { background-color: orange; }
 .status-skip { background-color: gray; }
 .status-error { background-color: red; }
+
+.test-run-name {
+  line-height: 1.25em;
+}
+.test-run-name td {
+  padding: 0.5em;
+}

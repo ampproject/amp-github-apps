@@ -27,6 +27,7 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.increments('id').primary();
       table.string('commit_sha', 40);
       table.string('build_number');
+      table.string('url');
       table
         .timestamp('started_at', {precision: TIMESTAMP_PRECISION})
         .defaultTo(db.fn.now())
@@ -36,6 +37,7 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.increments('id').primary();
       table.integer('build_id').unsigned().notNullable();
       table.string('job_number');
+      table.string('url');
       table.string('test_suite_type');
       table
         .timestamp('started_at', {precision: TIMESTAMP_PRECISION})
@@ -82,10 +84,10 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.increments('id').primary();
       table.specificType('test_case_id', 'char(32)').notNullable();
       table.integer('sample_size').unsigned().notNullable();
-      table.integer('passed').unsigned().notNullable().defaultTo(0);
-      table.integer('failed').unsigned().notNullable().defaultTo(0);
-      table.integer('skipped').unsigned().notNullable().defaultTo(0);
-      table.integer('errored').unsigned().notNullable().defaultTo(0);
+      table.integer('pass').unsigned().notNullable().defaultTo(0);
+      table.integer('fail').unsigned().notNullable().defaultTo(0);
+      table.integer('skip').unsigned().notNullable().defaultTo(0);
+      table.integer('error').unsigned().notNullable().defaultTo(0);
       table.boolean('dirty').defaultTo(false);
 
       table.foreign('test_case_id').references('id').inTable('test_cases');
