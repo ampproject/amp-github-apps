@@ -18,6 +18,8 @@ import {
   Build,
   DB,
   Job,
+  KarmaReporter,
+  MochaReporter,
   PageInfo,
   TestCase,
   TestRun,
@@ -29,6 +31,10 @@ import {QueryBuilder} from 'knex';
 import md5 from 'md5';
 
 type QueryFunction = (q: QueryBuilder) => QueryBuilder;
+interface FormattedResult extends KarmaReporter.TestResult {
+  testCaseId: string;
+  testCaseName: string;
+}
 
 /* eslint-disable @typescript-eslint/camelcase */
 /**
@@ -172,17 +178,24 @@ export class TestResultRecord {
     const buildId = await this.insertTravisBuild(build);
     const jobId = await this.insertTravisJob(job, buildId);
 
-    const formattedResults = results.browsers
-      .map(({results}) => results)
-      .reduce((flattenedArray, array) => flattenedArray.concat(array), [])
-      .map(result => {
-        const testCaseName = this.testCaseName(result);
-        return {
-          ...result,
-          testCaseId: md5(testCaseName),
-          testCaseName,
-        };
-      });
+    let resultList: Array<KarmaReporter.TestResult>;
+
+    if (job.testSuiteType === 'e2e') {
+      resultList = (results as MochaReporter.TestResultReport).testResults;
+    } else {
+      resultList = (results as KarmaReporter.TestResultReport).browsers
+        .map(({results}) => results)
+        .reduce((flattenedArray, array) => flattenedArray.concat(array), []);
+    }
+
+    const formattedResults: Array<FormattedResult> = resultList.map(result => {
+      const testCaseName = this.testCaseName(result);
+      return {
+        ...result,
+        testCaseId: md5(testCaseName),
+        testCaseName,
+      };
+    });
 
     const testCases: Array<DB.TestCase> = formattedResults.map(
       ({testCaseId, testCaseName}) => ({
