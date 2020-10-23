@@ -40,7 +40,7 @@ class TravisApi(agithub_base.API):
     }
 
     props = agithub_base.ConnectionProperties(
-        api_url='api.travis-ci.org',
+        api_url='api.travis-ci.com',
         secure_http=True,
         extra_headers=extra_headers)
     self.setClient(agithub_base.Client(*args, **kwargs))
