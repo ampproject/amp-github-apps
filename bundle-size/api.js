@@ -257,7 +257,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
         app.log.error(
           'Unexpected error when trying to retrieve the bundle size of ' +
             `${partialHeadSha} (PR #${check.pull_request_id}) with branch ` +
-            `point ${partialBaseSha} from GitHub:]n`,
+            `point ${partialBaseSha} from GitHub:\n`,
           error
         );
         throw error;
