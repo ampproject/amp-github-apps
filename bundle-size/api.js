@@ -172,11 +172,11 @@ exports.installApiRouter = (app, db, githubUtils) => {
    * size change.
    *
    * @param {!Octokit} github an authenticated GitHub API object.
-   * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
+   * @param {!Octokit.PullslistRequestedReviewersParams} pullRequest GitHub Pull
    *   Request params.
    * @param {!Array<string>} approverTeams list of all the teams whose members
    *   can approve the bundle-size change of this pull request.
-   * @return {!Octokit.Response<Octokit.PullsCreateReviewRequestResponse>}
+   * @return {!Octokit.Response<Octokit.PullsrequestReviewersResponse>}
    *   response from GitHub API.
    */
   async function addReviewer_(github, pullRequest, approverTeams) {
@@ -188,7 +188,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
       try {
         // Choose a random capable username and add them as a reviewer to the pull
         // request.
-        return await github.pulls.createReviewRequest({
+        return await github.pulls.requestReviewers({
           reviewers: [newReviewer],
           ...pullRequest,
         });

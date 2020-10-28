@@ -47,16 +47,16 @@ describe('bundle-size api', () => {
         update: jest.fn(),
       },
       pulls: {
-        createReviewRequest: jest.fn(),
         get: jest.fn(),
-        listReviewRequests: jest
+        listRequestedReviewers: jest
           .fn()
           .mockResolvedValue({data: getFixture('requested_reviewers')}),
         listReviews: jest.fn().mockResolvedValue({data: getFixture('reviews')}),
+        requestReviewers: jest.fn(),
       },
       repos: {
-        createOrUpdateFile: jest.fn(),
-        getContents: jest.fn().mockImplementation(params => {
+        createOrUpdateFileContents: jest.fn(),
+        getContent: jest.fn().mockImplementation(params => {
           const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
           return Promise.resolve({data: getFixture(fixture)});
         }),
@@ -175,7 +175,7 @@ describe('bundle-size api', () => {
       baseBundleSizeFixture = getFixture(
         '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
       );
-      github.repos.getContents.mockImplementation(params => {
+      github.repos.getContent.mockImplementation(params => {
         if (
           params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
         ) {
@@ -355,13 +355,13 @@ describe('bundle-size api', () => {
           },
         })
       );
-      expect(github.pulls.listReviewRequests).toHaveBeenCalledWith(
+      expect(github.pulls.listRequestedReviewers).toHaveBeenCalledWith(
         expect.objectContaining({pull_number: 19603})
       );
       expect(github.pulls.listReviews).toHaveBeenCalledWith(
         expect.objectContaining({pull_number: 19603})
       );
-      expect(github.pulls.createReviewRequest).toHaveBeenCalledWith(
+      expect(github.pulls.requestReviewers).toHaveBeenCalledWith(
         expect.objectContaining({
           pull_number: 19603,
           reviewers: [
@@ -486,9 +486,9 @@ describe('bundle-size api', () => {
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
       });
 
-      expect(github.pulls.listReviewRequests).toHaveBeenCalled();
+      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
       expect(github.pulls.listReviews).toHaveBeenCalled();
-      expect(github.pulls.createReviewRequest).not.toHaveBeenCalled();
+      expect(github.pulls.requestReviewers).not.toHaveBeenCalled();
       expect(github.checks.update).toHaveBeenCalled();
     });
 
@@ -509,7 +509,7 @@ describe('bundle-size api', () => {
       ).toString('base64');
 
       let notFoundCount = 2;
-      github.repos.getContents.mockImplementation(params => {
+      github.repos.getContent.mockImplementation(params => {
         if (
           params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
         ) {
@@ -547,9 +547,9 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      expect(github.pulls.listReviewRequests).not.toHaveBeenCalled();
+      expect(github.pulls.listRequestedReviewers).not.toHaveBeenCalled();
       expect(github.pulls.listReviews).not.toHaveBeenCalled();
-      expect(github.pulls.createReviewRequest).not.toHaveBeenCalled();
+      expect(github.pulls.requestReviewers).not.toHaveBeenCalled();
       expect(github.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'success',
@@ -577,7 +577,7 @@ describe('bundle-size api', () => {
       ).toString('base64');
 
       let notFoundCount = 2;
-      github.repos.getContents.mockImplementation(params => {
+      github.repos.getContent.mockImplementation(params => {
         if (
           params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
         ) {
@@ -620,9 +620,9 @@ describe('bundle-size api', () => {
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
       });
 
-      expect(github.pulls.listReviewRequests).toHaveBeenCalled();
+      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
       expect(github.pulls.listReviews).toHaveBeenCalled();
-      expect(github.pulls.createReviewRequest).toHaveBeenCalled();
+      expect(github.pulls.requestReviewers).toHaveBeenCalled();
       expect(github.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'action_required',
@@ -646,7 +646,7 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      github.repos.getContents.mockImplementation(params => {
+      github.repos.getContent.mockImplementation(params => {
         if (
           params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
         ) {
@@ -680,9 +680,9 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      expect(github.pulls.listReviewRequests).toHaveBeenCalled();
+      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
       expect(github.pulls.listReviews).toHaveBeenCalled();
-      expect(github.pulls.createReviewRequest).toHaveBeenCalledWith(
+      expect(github.pulls.requestReviewers).toHaveBeenCalledWith(
         expect.objectContaining({
           pull_number: 19603,
           reviewers: [
@@ -770,7 +770,7 @@ describe('bundle-size api', () => {
     });
 
     test('store new bundle-size', async () => {
-      github.repos.getContents.mockRejectedValue({status: 404});
+      github.repos.getContent.mockRejectedValue({status: 404});
 
       await request(probot.server)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
@@ -779,8 +779,8 @@ describe('bundle-size api', () => {
         .set('Accept', 'application/json')
         .expect(200);
 
-      expect(github.repos.getContents).toHaveBeenCalledTimes(1);
-      expect(github.repos.createOrUpdateFile).toHaveBeenCalledWith(
+      expect(github.repos.getContent).toHaveBeenCalledTimes(1);
+      expect(github.repos.createOrUpdateFileContents).toHaveBeenCalledWith(
         expect.objectContaining({
           message: 'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
           content: Buffer.from(
@@ -798,13 +798,13 @@ describe('bundle-size api', () => {
         .set('Accept', 'application/json')
         .expect(200);
 
-      expect(github.repos.getContents).toHaveBeenCalledTimes(1);
-      expect(github.repos.createOrUpdateFile).not.toHaveBeenCalled();
+      expect(github.repos.getContent).toHaveBeenCalledTimes(1);
+      expect(github.repos.createOrUpdateFileContents).not.toHaveBeenCalled();
     });
 
     test('show error when failed to store bundle-size', async () => {
-      github.repos.getContents.mockRejectedValue({status: 404});
-      github.repos.createOrUpdateFile.mockRejectedValue(
+      github.repos.getContent.mockRejectedValue({status: 404});
+      github.repos.createOrUpdateFileContents.mockRejectedValue(
         new Error('I am a tea pot')
       );
 
@@ -824,8 +824,8 @@ describe('bundle-size api', () => {
         ),
         expect.any(Error)
       );
-      expect(github.repos.getContents).toHaveBeenCalledTimes(1);
-      expect(github.repos.createOrUpdateFile).toHaveBeenCalledTimes(1);
+      expect(github.repos.getContent).toHaveBeenCalledTimes(1);
+      expect(github.repos.createOrUpdateFileContents).toHaveBeenCalledTimes(1);
     });
 
     test('fail on non-numeric values when called to store bundle-size', async () => {

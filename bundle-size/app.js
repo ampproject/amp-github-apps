@@ -15,7 +15,6 @@
  */
 'use strict';
 
-const {createTokenAuth} = require('@octokit/auth');
 const {dbConnect} = require('./db');
 const {GitHubUtils} = require('./github-utils');
 const {installApiRouter} = require('./api');
@@ -31,8 +30,7 @@ const db = dbConnect();
  */
 module.exports = app => {
   const userBasedGithub = new Octokit({
-    authStrategy: createTokenAuth,
-    auth: process.env.ACCESS_TOKEN,
+    auth: `token ${process.env.ACCESS_TOKEN}`,
   });
 
   const githubUtils = new GitHubUtils(userBasedGithub, app.log);
