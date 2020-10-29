@@ -15,9 +15,9 @@
  */
 
 import {Octokit} from '@octokit/rest';
+import {ReposListCommitsResponseData} from '@octokit/types';
 import {Storage} from '@google-cloud/storage';
 import {createObjectCsvStringifier} from 'csv-writer';
-import {createTokenAuth} from '@octokit/auth';
 import dotenv from 'dotenv';
 import express from 'express';
 import process from 'process';
@@ -57,8 +57,7 @@ app.get('/_cron', async (request, response) => {
   console.log(`Finding bundle sizes until ${earliestCommitDateString}`);
 
   const github = new Octokit({
-    authStrategy: createTokenAuth,
-    auth: process.env.ACCESS_TOKEN,
+    auth: `token ${process.env.ACCESS_TOKEN}`,
   });
 
   const masterCommits: Array<{sha: string; message: string; date: string}> = [];
@@ -68,7 +67,7 @@ app.get('/_cron', async (request, response) => {
     sha: 'master',
   });
   for await (const commitsList of github.paginate.iterator(options)) {
-    commitsList.data.forEach((commit: Octokit.ReposListCommitsResponseItem) => {
+    (commitsList.data as ReposListCommitsResponseData).forEach(commit => {
       masterCommits.push({
         sha: commit.sha,
         message: commit.commit.message.split('\n')[0],
@@ -91,15 +90,13 @@ app.get('/_cron', async (request, response) => {
   const skippedShas: Array<string> = [];
   for (const masterCommit of masterCommits) {
     try {
-      const contents = await github.repos.getContents({
+      const contents = await github.repos.getContent({
         owner: 'ampproject',
         repo: 'amphtml-build-artifacts',
         path: `bundle-size/${masterCommit.sha}.json`,
       });
-      // For reasons that are beyond me, despite the fact that `content` is a
-      // property of Octokit.ReposGetContentsResponse, it doesn't compile :(
       const bundleSizes = JSON.parse(
-        Buffer.from((contents.data as unknown).content, 'base64').toString()
+        Buffer.from(contents.data.content, 'base64').toString()
       );
 
       records.push(Object.assign({}, masterCommit, bundleSizes));
