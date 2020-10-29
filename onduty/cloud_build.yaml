@@ -49,6 +49,7 @@ steps:
       - dist/
       - --entry-point
       - refreshRotation
+    timeout: 1200s
 
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
