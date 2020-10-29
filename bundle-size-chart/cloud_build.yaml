@@ -25,6 +25,7 @@ steps:
     args:
       - app
       - deploy
+    timeout: 1200s
   - name: gcr.io/cloud-builders/gcloud
     dir: bundle-size-chart
     args:
