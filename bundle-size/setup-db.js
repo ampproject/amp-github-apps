@@ -39,7 +39,7 @@ function setupDb(db) {
           'Comma separated list of teams to that can approve a bundle-size increase, in the format `ampproject/wg-runtime,ampproject/wg-performance`'
         );
       table
-        .string('report_markdown')
+        .text('report_markdown')
         .comment('Markdown of the bundle size changes/missing files report');
     })
     .createTable('merges', table => {

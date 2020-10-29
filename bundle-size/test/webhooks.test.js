@@ -16,12 +16,10 @@
 
 const nock = require('nock');
 const NodeCache = require('node-cache');
-const {createTokenAuth} = require('@octokit/auth');
 const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
 const {GitHubUtils} = require('../github-utils');
 const {installGitHubWebhooks} = require('../webhooks');
-const {Octokit} = require('@octokit/rest');
 const {Probot} = require('probot');
 const {setupDb} = require('../setup-db');
 
@@ -30,12 +28,55 @@ nock.enableNetConnect('127.0.0.1');
 jest.mock('../db');
 
 describe('bundle-size webhooks', () => {
+  let github;
   let probot;
   let app;
   const db = dbConnect();
   const nodeCache = new NodeCache();
 
   beforeAll(async () => {
+    await setupDb(db);
+  });
+
+  beforeEach(async () => {
+    github = {
+      checks: {
+        create: jest.fn().mockResolvedValue({data: {id: 555555}}),
+        update: jest.fn(),
+      },
+      teams: {
+        listMembersInOrg: jest.fn().mockImplementation(params => {
+          const fixture = `teams.listMembersInOrg.${params.team_slug}`;
+          return Promise.resolve({data: getFixture(fixture)});
+        }),
+      },
+    };
+
+    class Octokit {
+      constructor() {}
+
+      static defaults() {
+        return this;
+      }
+
+      get checks() {
+        return github.checks;
+      }
+
+      get teams() {
+        return github.teams;
+      }
+    }
+
+    probot = new Probot({Octokit});
+    app = probot.load(app => {
+      const githubUtils = new GitHubUtils(github, app.log, nodeCache);
+      installGitHubWebhooks(app, db, githubUtils);
+    });
+    app.auth = () => github;
+
+    nodeCache.flushAll();
+
     process.env = {
       DISABLE_WEBHOOK_EVENT_CHECK: 'true',
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
@@ -43,43 +84,9 @@ describe('bundle-size webhooks', () => {
         'ampproject/wg-runtime,ampproject/wg-performance',
       SUPER_USER_TEAMS: 'ampproject/wg-infra',
     };
-
-    await setupDb(db);
-
-    probot = new Probot({});
-    app = probot.load(app => {
-      const githubUtils = new GitHubUtils(
-        new Octokit({authStrategy: createTokenAuth, auth: '_TOKEN_'}),
-        app.log,
-        nodeCache
-      );
-      installGitHubWebhooks(app, db, githubUtils);
-    });
-
-    // Return a test token.
-    app.app = {
-      getInstallationAccessToken: () => Promise.resolve('test'),
-    };
-  });
-
-  beforeEach(async () => {
-    nodeCache.flushAll();
-
-    nock('https://api.github.com')
-      .post('/app/installations/123456/access_tokens')
-      .reply(200, {token: 'test'});
-
-    nock('https://api.github.com')
-      .get('/orgs/ampproject/teams/wg-infra/members')
-      .reply(200, getFixture('teams.listMembersInOrg.wg-infra'))
-      .get('/orgs/ampproject/teams/wg-performance/members')
-      .reply(200, getFixture('teams.listMembersInOrg.wg-performance'))
-      .get('/orgs/ampproject/teams/wg-runtime/members')
-      .reply(200, getFixture('teams.listMembersInOrg.wg-runtime'));
   });
 
   afterEach(async () => {
-    nock.cleanAll();
     await db('checks').truncate();
   });
 
@@ -91,21 +98,7 @@ describe('bundle-size webhooks', () => {
     test('create a new pending check when a pull request is opened', async () => {
       const payload = getFixture('pull_request.opened');
 
-      const nocks = nock('https://api.github.com')
-        .post('/repos/ampproject/amphtml/check-runs', body => {
-          expect(body).toMatchObject({
-            head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
-            name: 'ampproject/bundle-size',
-            output: {
-              title: 'Calculating new bundle size for this PR…',
-            },
-          });
-          return true;
-        })
-        .reply(200, {id: 555555});
-
       await probot.receive({name: 'pull_request', payload});
-      nocks.done();
 
       expect(await db('checks').select('*')).toEqual([
         {
@@ -119,6 +112,16 @@ describe('bundle-size webhooks', () => {
           report_markdown: null,
         },
       ]);
+
+      expect(github.checks.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
+          name: 'ampproject/bundle-size',
+          output: {
+            title: 'Calculating new bundle size for this PR…',
+          },
+        })
+      );
     });
 
     test('update a pending check when a pull request is synced', async () => {
@@ -135,21 +138,7 @@ describe('bundle-size webhooks', () => {
 
       const payload = getFixture('pull_request.opened');
 
-      const nocks = nock('https://api.github.com')
-        .post('/repos/ampproject/amphtml/check-runs', body => {
-          expect(body).toMatchObject({
-            head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
-            name: 'ampproject/bundle-size',
-            output: {
-              title: 'Calculating new bundle size for this PR…',
-            },
-          });
-          return true;
-        })
-        .reply(200, {id: 555555});
-
       await probot.receive({name: 'pull_request', payload});
-      nocks.done();
 
       expect(await db('checks').select('*')).toEqual([
         {
@@ -163,6 +152,16 @@ describe('bundle-size webhooks', () => {
           report_markdown: null,
         },
       ]);
+
+      expect(github.checks.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
+          name: 'ampproject/bundle-size',
+          output: {
+            title: 'Calculating new bundle size for this PR…',
+          },
+        })
+      );
     });
 
     test('ignore closed (not merged) pull request', async () => {
@@ -178,6 +177,8 @@ describe('bundle-size webhooks', () => {
       const checkRunPayload = getFixture('check_run.created');
 
       await probot.receive({name: 'check_run', payload: checkRunPayload});
+
+      expect(github.checks.create).not.toHaveBeenCalled();
     });
 
     test('skip the check on a merged pull request', async () => {
@@ -197,21 +198,18 @@ describe('bundle-size webhooks', () => {
 
       const checkRunPayload = getFixture('check_run.created');
 
-      const nocks = nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/68609861', body => {
-          expect(body).toMatchObject({
-            conclusion: 'neutral',
-            output: {
-              title: 'Check skipped because this is a merged commit',
-            },
-          });
-          return true;
-        })
-        .reply(200);
-
       await probot.receive({name: 'check_run', payload: checkRunPayload});
       expect(await db('merges').select('*')).toEqual([]);
-      nocks.done();
+
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          check_run_id: 68609861,
+          conclusion: 'neutral',
+          output: {
+            title: 'Check skipped because this is a merged commit',
+          },
+        })
+      );
     });
 
     test('fail when a pull request is reported as merged twice', async () => {
@@ -226,10 +224,6 @@ describe('bundle-size webhooks', () => {
         payload: pullRequestPayload,
       });
 
-      // Silence expected error messages during testing.
-      const logLevel = probot.logger.level();
-      probot.logger.level('fatal');
-
       try {
         await probot.receive({
           name: 'pull_request',
@@ -238,8 +232,6 @@ describe('bundle-size webhooks', () => {
       } catch (e) {
         expect(e.message).toContain('UNIQUE constraint failed');
       }
-
-      probot.logger.level(logLevel);
     });
   });
 
@@ -263,24 +255,26 @@ describe('bundle-size webhooks', () => {
           report_markdown,
         });
 
-        const nocks = nock('https://api.github.com')
-          .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-            expect(body).toMatchObject({
-              conclusion: 'success',
-              output: {
-                title: 'approved by @choumx',
-                summary: expect.stringContaining(
-                  'The bundle size change(s) of this pull request were approved by @choumx'
-                ),
-              },
-            });
-            expect(body.output.summary).toContain(report_markdown);
-            return true;
-          })
-          .reply(200);
-
         await probot.receive({name: 'pull_request_review', payload});
-        nocks.done();
+
+        expect(github.checks.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            conclusion: 'success',
+            output: {
+              title: 'approved by @choumx',
+              summary: expect.stringContaining(
+                'The bundle size change(s) of this pull request were approved by @choumx'
+              ),
+            },
+          })
+        );
+        expect(github.checks.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            output: {
+              summary: expect.stringContaining(report_markdown),
+            },
+          })
+        );
       }
     );
 
@@ -299,20 +293,16 @@ describe('bundle-size webhooks', () => {
         report_markdown: null,
       });
 
-      const nocks = nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'success',
-            output: {
-              title: 'approved by @rsimha',
-            },
-          });
-          return true;
-        })
-        .reply(200);
-
       await probot.receive({name: 'pull_request_review', payload});
-      nocks.done();
+
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: {
+            title: 'approved by @rsimha',
+          },
+        })
+      );
     });
 
     test('ignore a preemptive approval', async () => {
@@ -330,12 +320,16 @@ describe('bundle-size webhooks', () => {
       });
 
       await probot.receive({name: 'pull_request_review', payload});
+
+      expect(github.checks.update).not.toHaveBeenCalled();
     });
 
     test('ignore an approved review by a non-capable reviewer', async () => {
       const payload = getFixture('pull_request_review.submitted');
 
       await probot.receive({name: 'pull_request_review', payload});
+
+      expect(github.checks.update).not.toHaveBeenCalled();
     });
 
     test('ignore a "changes requested" review', async () => {
@@ -343,6 +337,8 @@ describe('bundle-size webhooks', () => {
       payload.state = 'changes_requested';
 
       await probot.receive({name: 'pull_request_review', payload});
+
+      expect(github.checks.update).not.toHaveBeenCalled();
     });
 
     test('ignore an approved review by a capable reviewer for small delta', async () => {
@@ -360,12 +356,16 @@ describe('bundle-size webhooks', () => {
       });
 
       await probot.receive({name: 'pull_request_review', payload});
+
+      expect(github.checks.update).not.toHaveBeenCalled();
     });
 
     test('ignore an approved review by a capable reviewer for unknown PRs', async () => {
       const payload = getFixture('pull_request_review.submitted');
 
       await probot.receive({name: 'pull_request_review', payload});
+
+      expect(github.checks.update).not.toHaveBeenCalled();
     });
   });
 });

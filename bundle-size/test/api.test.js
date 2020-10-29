@@ -17,12 +17,10 @@
 const nock = require('nock');
 const NodeCache = require('node-cache');
 const request = require('supertest');
-const {createTokenAuth} = require('@octokit/auth');
 const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
 const {GitHubUtils} = require('../github-utils');
 const {installApiRouter} = require('../api');
-const {Octokit} = require('@octokit/rest');
 const {Probot} = require('probot');
 const {setupDb} = require('../setup-db');
 
@@ -32,35 +30,56 @@ jest.mock('../db');
 jest.mock('sleep-promise', () => () => Promise.resolve());
 
 describe('bundle-size api', () => {
+  let github;
   let probot;
   let app;
   const db = dbConnect();
-  let nodeCache;
+  const nodeCache = new NodeCache();
   let logWarnSpy;
 
   beforeAll(async () => {
     await setupDb(db);
-
-    probot = new Probot({});
-    app = probot.load(app => {
-      const githubUtils = new GitHubUtils(
-        new Octokit({authStrategy: createTokenAuth, auth: '_TOKEN_'}),
-        app.log,
-        nodeCache
-      );
-      installApiRouter(app, db, githubUtils);
-    });
-    // Stub app.log.warn to silence test log noise
-    logWarnSpy = jest.spyOn(app.log, 'warn').mockImplementation();
-
-    // Return a test token.
-    app.app = {
-      getInstallationAccessToken: () => Promise.resolve('test'),
-    };
   });
 
   beforeEach(() => {
-    nodeCache = new NodeCache();
+    github = {
+      checks: {
+        update: jest.fn(),
+      },
+      pulls: {
+        get: jest.fn(),
+        listRequestedReviewers: jest
+          .fn()
+          .mockResolvedValue({data: getFixture('requested_reviewers')}),
+        listReviews: jest.fn().mockResolvedValue({data: getFixture('reviews')}),
+        requestReviewers: jest.fn(),
+      },
+      repos: {
+        createOrUpdateFileContents: jest.fn(),
+        getContent: jest.fn().mockImplementation(params => {
+          const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
+          return Promise.resolve({data: getFixture(fixture)});
+        }),
+      },
+      teams: {
+        listMembersInOrg: jest.fn().mockImplementation(params => {
+          const fixture = `teams.listMembersInOrg.${params.team_slug}`;
+          return Promise.resolve({data: getFixture(fixture)});
+        }),
+      },
+    };
+
+    probot = new Probot({});
+    app = probot.load(app => {
+      const githubUtils = new GitHubUtils(github, app.log, nodeCache);
+      installApiRouter(app, db, githubUtils);
+    });
+    app.auth = () => github;
+
+    // Stub app.log.warn to silence test log noise
+    logWarnSpy = jest.spyOn(app.log, 'warn').mockImplementation();
+
+    nodeCache.flushAll();
 
     process.env = {
       TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
@@ -68,27 +87,9 @@ describe('bundle-size api', () => {
         'ampproject/wg-runtime,ampproject/wg-performance',
       SUPER_USER_TEAMS: 'ampproject/wg-infra',
     };
-
-    nock('https://api.github.com')
-      .post('/app/installations/123456/access_tokens')
-      .reply(200, {token: 'test'});
-
-    nock('https://api.github.com')
-      .get(
-        '/repos/ampproject/amphtml/contents/build-system/tasks/bundle-size/APPROVERS.json'
-      )
-      .reply(200, getFixture('APPROVERS.json'))
-      .get('/orgs/ampproject/teams/wg-infra/members')
-      .reply(200, getFixture('teams.listMembersInOrg.wg-infra'))
-      .get('/orgs/ampproject/teams/wg-performance/members')
-      .reply(200, getFixture('teams.listMembersInOrg.wg-performance'))
-      .get('/orgs/ampproject/teams/wg-runtime/members')
-      .reply(200, getFixture('teams.listMembersInOrg.wg-runtime'));
   });
 
   afterEach(async () => {
-    nodeCache.close();
-    nock.cleanAll();
     await db('checks').truncate();
   });
 
@@ -111,22 +112,9 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      const nocks = nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'neutral',
-            output: {
-              title: 'check skipped because PR contains no runtime changes',
-            },
-          });
-          return true;
-        })
-        .reply(200);
-
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
         .expect(200);
-      nocks.done();
 
       await expect(
         db('checks')
@@ -144,18 +132,31 @@ describe('bundle-size api', () => {
         approving_teams: null,
         report_markdown: null,
       });
+
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          check_run_id: 555555,
+          conclusion: 'neutral',
+          output: {
+            title: 'check skipped because PR contains no runtime changes',
+          },
+        })
+      );
     });
 
     test('ignore marking a check "skipped" for a missing head SHA', async () => {
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
         .expect(404);
+
+      expect(github.checks.update).not.toHaveBeenCalled();
     });
   });
 
   describe('/commit/:headSha/report', () => {
     let jsonPayload;
     let pullRequestFixture;
+    let baseBundleSizeFixture;
 
     beforeEach(() => {
       jsonPayload = {
@@ -169,13 +170,20 @@ describe('bundle-size api', () => {
       };
 
       pullRequestFixture = getFixture('pulls.get.19603');
-      nock('https://api.github.com')
-        .persist()
-        .get('/repos/ampproject/amphtml/pulls/19603')
-        // Make the reply a callback function, because nock stringifies the
-        // body when calling .reply() on the nock scope, and we want tests to be
-        // able to modify pullRequestFixture.
-        .reply(200, () => pullRequestFixture);
+      github.pulls.get.mockResolvedValue({data: pullRequestFixture});
+
+      baseBundleSizeFixture = getFixture(
+        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
+      );
+      github.repos.getContent.mockImplementation(params => {
+        if (
+          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
+        ) {
+          return Promise.resolve({data: baseBundleSizeFixture});
+        }
+        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
+        return Promise.resolve({data: getFixture(fixture)});
+      });
     });
 
     test.each([
@@ -196,27 +204,9 @@ describe('bundle-size api', () => {
           report_markdown: null,
         });
 
-        const baseBundleSizeFixture = getFixture(
-          '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-        );
         baseBundleSizeFixture.content = Buffer.from(
           `{"dist/v0.js":${baseSize}}`
         ).toString('base64');
-        const nocks = nock('https://api.github.com')
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-          )
-          .reply(200, baseBundleSizeFixture)
-          .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-            expect(body).toMatchObject({
-              conclusion: 'success',
-              output: {
-                title: message,
-              },
-            });
-            return true;
-          })
-          .reply(200);
 
         await request(probot.server)
           .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -224,7 +214,6 @@ describe('bundle-size api', () => {
           .set('Content-Type', 'application/json')
           .set('Accept', 'application/json')
           .expect(200);
-        nocks.done();
 
         await expect(
           db('checks')
@@ -242,6 +231,16 @@ describe('bundle-size api', () => {
           approving_teams: null,
           report_markdown: null,
         });
+
+        expect(github.checks.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            check_run_id: 555555,
+            conclusion: 'success',
+            output: {
+              title: message,
+            },
+          })
+        );
       }
     );
 
@@ -257,32 +256,9 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-      );
       baseBundleSizeFixture.content = Buffer.from(
         '{"dist/v0.js":12.34,"dist/v0/amp-accordion-0.1.js":1.11,"dist/v0/amp-ad-0.1.js":4.53,"dist/v0/amp-anim-0.1.js":5.65}'
       ).toString('base64');
-      const nocks = nock('https://api.github.com')
-        .get(
-          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-        )
-        .reply(200, baseBundleSizeFixture)
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'success',
-            output: {
-              title: 'no approval necessary',
-              summary: expect.stringContaining(
-                '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
-                  '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
-                  '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`'
-              ),
-            },
-          });
-          return true;
-        })
-        .reply(200);
 
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -290,7 +266,6 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
-      nocks.done();
 
       await expect(
         db('checks')
@@ -308,6 +283,21 @@ describe('bundle-size api', () => {
         approving_teams: null,
         report_markdown: null,
       });
+
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          check_run_id: 555555,
+          conclusion: 'success',
+          output: {
+            title: 'no approval necessary',
+            summary: expect.stringContaining(
+              '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
+                '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
+                '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`'
+            ),
+          },
+        })
+      );
     });
 
     test('update a check on bundle-size report with no approvers (report/base = 12.34KB/12.00KB)', async () => {
@@ -322,46 +312,9 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-      );
       baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
         'base64'
       );
-      const nocks = nock('https://api.github.com')
-        .get(
-          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-        )
-        .reply(200, baseBundleSizeFixture)
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'action_required',
-            output: {
-              title:
-                'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
-            },
-          });
-          return true;
-        })
-        .reply(200)
-        .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
-        .reply(200, getFixture('requested_reviewers'))
-        .get('/repos/ampproject/amphtml/pulls/19603/reviews')
-        .reply(200, getFixture('reviews'))
-        .post(
-          '/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
-          body => {
-            expect(body).toMatchObject({
-              reviewers: [
-                expect.stringMatching(
-                  /kristoferbaxter|jridgewell|alanorozco|erwinmombay|kevinkimball|choumx/
-                ),
-              ],
-            });
-            return true;
-          }
-        )
-        .reply(200);
 
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -369,7 +322,6 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
-      nocks.done();
 
       await expect(
         db('checks')
@@ -392,6 +344,33 @@ describe('bundle-size api', () => {
           '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
       });
+
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          check_run_id: 555555,
+          conclusion: 'action_required',
+          output: {
+            title:
+              'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
+          },
+        })
+      );
+      expect(github.pulls.listRequestedReviewers).toHaveBeenCalledWith(
+        expect.objectContaining({pull_number: 19603})
+      );
+      expect(github.pulls.listReviews).toHaveBeenCalledWith(
+        expect.objectContaining({pull_number: 19603})
+      );
+      expect(github.pulls.requestReviewers).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pull_number: 19603,
+          reviewers: [
+            expect.stringMatching(
+              /kristoferbaxter|jridgewell|alanorozco|erwinmombay|kevinkimball|choumx/
+            ),
+          ],
+        })
+      );
     });
 
     test.each([
@@ -420,28 +399,9 @@ describe('bundle-size api', () => {
 
       modify(pullRequestFixture);
 
-      const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-      );
       baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
         'base64'
       );
-      const nocks = nock('https://api.github.com')
-        .get(
-          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-        )
-        .reply(200, baseBundleSizeFixture)
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'action_required',
-            output: {
-              title:
-                'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
-            },
-          });
-          return true;
-        })
-        .reply(200);
 
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -449,7 +409,6 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
-      nocks.done();
 
       await expect(
         db('checks')
@@ -466,6 +425,17 @@ describe('bundle-size api', () => {
         check_run_id: 555555,
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
       });
+
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          check_run_id: 555555,
+          conclusion: 'action_required',
+          output: {
+            title:
+              'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
+          },
+        })
+      );
     });
 
     test('update a check on bundle-size report with an existing approver (report/base = 12.34KB/12.00KB)', async () => {
@@ -480,34 +450,12 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-      );
       baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
         'base64'
       );
       const reviews = getFixture('reviews');
       reviews[0].user.login = 'choumx';
-      const nocks = nock('https://api.github.com')
-        .get(
-          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-        )
-        .reply(200, baseBundleSizeFixture)
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            conclusion: 'action_required',
-            output: {
-              title:
-                'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
-            },
-          });
-          return true;
-        })
-        .reply(200)
-        .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
-        .reply(200, getFixture('requested_reviewers'))
-        .get('/repos/ampproject/amphtml/pulls/19603/reviews')
-        .reply(200, reviews);
+      github.pulls.listReviews.mockResolvedValue({data: reviews});
 
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -515,7 +463,6 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
-      nocks.done();
 
       await expect(
         db('checks')
@@ -538,6 +485,11 @@ describe('bundle-size api', () => {
           '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
       });
+
+      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
+      expect(github.pulls.listReviews).toHaveBeenCalled();
+      expect(github.pulls.requestReviewers).not.toHaveBeenCalled();
+      expect(github.checks.update).toHaveBeenCalled();
     });
 
     test('update check on bundle-size report (report/_delayed_-base = 12.34KB/12.34KB)', async () => {
@@ -552,37 +504,23 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-      );
       baseBundleSizeFixture.content = Buffer.from(
         '{"dist/v0.js":12.34}'
       ).toString('base64');
-      const lastNetworkRequest = new Promise(resolve => {
-        const nocks = nock('https://api.github.com')
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-          )
-          .times(2)
-          .reply(404)
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-          )
-          .reply(200, baseBundleSizeFixture)
-          .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-            expect(body).toMatchObject({
-              conclusion: 'success',
-              output: {
-                title: 'no approval necessary',
-              },
-            });
-            return true;
-          })
-          .reply(200, () => {
-            setTimeout(() => {
-              resolve(nocks);
-            });
-          });
+
+      let notFoundCount = 2;
+      github.repos.getContent.mockImplementation(params => {
+        if (
+          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
+        ) {
+          if (notFoundCount > 0) {
+            notFoundCount--;
+            return Promise.reject({status: 404});
+          }
+          return Promise.resolve({data: baseBundleSizeFixture});
+        }
+        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
+        return Promise.resolve({data: getFixture(fixture)});
       });
 
       await request(probot.server)
@@ -591,8 +529,6 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(202);
-      const nocks = await lastNetworkRequest;
-      nocks.done();
 
       await expect(
         db('checks')
@@ -610,6 +546,18 @@ describe('bundle-size api', () => {
         approving_teams: null,
         report_markdown: null,
       });
+
+      expect(github.pulls.listRequestedReviewers).not.toHaveBeenCalled();
+      expect(github.pulls.listReviews).not.toHaveBeenCalled();
+      expect(github.pulls.requestReviewers).not.toHaveBeenCalled();
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: {
+            title: 'no approval necessary',
+          },
+        })
+      );
     });
 
     test('update check on bundle-size report (report/_delayed_-base = 12.34KB/12.23KB)', async () => {
@@ -624,56 +572,23 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      const baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-      );
       baseBundleSizeFixture.content = Buffer.from(
         '{"dist/v0.js":12.23}'
       ).toString('base64');
-      const lastNetworkRequest = new Promise(resolve => {
-        const nocks = nock('https://api.github.com')
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-          )
-          .times(2)
-          .reply(404)
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-          )
-          .reply(200, baseBundleSizeFixture)
-          .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-            expect(body).toMatchObject({
-              conclusion: 'action_required',
-              output: {
-                title:
-                  'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
-              },
-            });
-            return true;
-          })
-          .reply(200)
-          .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
-          .reply(200, getFixture('requested_reviewers'))
-          .get('/repos/ampproject/amphtml/pulls/19603/reviews')
-          .reply(200, getFixture('reviews'))
-          .post(
-            '/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
-            body => {
-              expect(body).toMatchObject({
-                reviewers: [
-                  expect.stringMatching(
-                    /kristoferbaxter|jridgewell|alanorozco|erwinmombay|kevinkimball|choumx/
-                  ),
-                ],
-              });
-              return true;
-            }
-          )
-          .reply(200, () => {
-            setTimeout(() => {
-              resolve(nocks);
-            });
-          });
+
+      let notFoundCount = 2;
+      github.repos.getContent.mockImplementation(params => {
+        if (
+          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
+        ) {
+          if (notFoundCount > 0) {
+            notFoundCount--;
+            return Promise.reject({status: 404});
+          }
+          return Promise.resolve({data: baseBundleSizeFixture});
+        }
+        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
+        return Promise.resolve({data: getFixture(fixture)});
       });
 
       await request(probot.server)
@@ -682,8 +597,6 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(202);
-      const nocks = await lastNetworkRequest;
-      nocks.done();
 
       await expect(
         db('checks')
@@ -706,6 +619,19 @@ describe('bundle-size api', () => {
           '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
       });
+
+      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
+      expect(github.pulls.listReviews).toHaveBeenCalled();
+      expect(github.pulls.requestReviewers).toHaveBeenCalled();
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'action_required',
+          output: {
+            title:
+              'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
+          },
+        })
+      );
     });
 
     test('update check on bundle-size report on missing base size', async () => {
@@ -720,46 +646,14 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      const lastNetworkRequest = new Promise(resolve => {
-        const nocks = nock('https://api.github.com')
-          .get(
-            '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-          )
-          .times(60)
-          .reply(404)
-          .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-            expect(body).toMatchObject({
-              conclusion: 'action_required',
-              output: {
-                title:
-                  'Failed to retrieve the bundle size of branch point 5f27002',
-              },
-            });
-            return true;
-          })
-          .reply(200)
-          .get('/repos/ampproject/amphtml/pulls/19603/requested_reviewers')
-          .reply(200, getFixture('requested_reviewers'))
-          .get('/repos/ampproject/amphtml/pulls/19603/reviews')
-          .reply(200, getFixture('reviews'))
-          .post(
-            '/repos/ampproject/amphtml/pulls/19603/requested_reviewers',
-            body => {
-              expect(body).toMatchObject({
-                reviewers: [
-                  expect.stringMatching(
-                    /danielrozenberg|rcebulko|rsimha|estherkim/
-                  ),
-                ],
-              });
-              return true;
-            }
-          )
-          .reply(200, () => {
-            setTimeout(() => {
-              resolve(nocks);
-            });
-          });
+      github.repos.getContent.mockImplementation(params => {
+        if (
+          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
+        ) {
+          return Promise.reject({status: 404});
+        }
+        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
+        return Promise.resolve({data: getFixture(fixture)});
       });
 
       await request(probot.server)
@@ -768,8 +662,6 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(202);
-      const nocks = await lastNetworkRequest;
-      nocks.done();
 
       await expect(
         db('checks')
@@ -787,6 +679,25 @@ describe('bundle-size api', () => {
         approving_teams: null,
         report_markdown: null,
       });
+
+      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
+      expect(github.pulls.listReviews).toHaveBeenCalled();
+      expect(github.pulls.requestReviewers).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pull_number: 19603,
+          reviewers: [
+            expect.stringMatching(/danielrozenberg|rcebulko|rsimha|estherkim/),
+          ],
+        })
+      );
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'action_required',
+          output: {
+            title: 'Failed to retrieve the bundle size of branch point 5f27002',
+          },
+        })
+      );
     });
 
     test('ignore bundle-size report for a missing head SHA', async () => {
@@ -859,22 +770,7 @@ describe('bundle-size api', () => {
     });
 
     test('store new bundle-size', async () => {
-      const nocks = nock('https://api.github.com')
-        .get(
-          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-        )
-        .reply(404)
-        .put(
-          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
-          {
-            message:
-              'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
-            content: Buffer.from(
-              JSON.stringify(jsonPayload.bundleSizes)
-            ).toString('base64'),
-          }
-        )
-        .reply(201);
+      github.repos.getContent.mockRejectedValue({status: 404});
 
       await request(probot.server)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
@@ -882,45 +778,35 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
-      nocks.done();
+
+      expect(github.repos.getContent).toHaveBeenCalledTimes(1);
+      expect(github.repos.createOrUpdateFileContents).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
+          content: Buffer.from(
+            JSON.stringify(jsonPayload.bundleSizes)
+          ).toString('base64'),
+        })
+      );
     });
 
     test('ignore already existing bundle-size when called to store', async () => {
-      const nocks = nock('https://api.github.com')
-        .get(
-          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-        )
-        .reply(
-          200,
-          getFixture('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
-        );
-
       await request(probot.server)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
-      nocks.done();
+
+      expect(github.repos.getContent).toHaveBeenCalledTimes(1);
+      expect(github.repos.createOrUpdateFileContents).not.toHaveBeenCalled();
     });
 
     test('show error when failed to store bundle-size', async () => {
-      const nocks = nock('https://api.github.com')
-        .get(
-          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-        )
-        .reply(404)
-        .put(
-          '/repos/ampproject/amphtml-build-artifacts/contents/bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
-          {
-            message:
-              'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
-            content: Buffer.from(
-              JSON.stringify(jsonPayload.bundleSizes)
-            ).toString('base64'),
-          }
-        )
-        .reply(418, 'I am a tea pot');
+      github.repos.getContent.mockRejectedValue({status: 404});
+      github.repos.createOrUpdateFileContents.mockRejectedValue(
+        new Error('I am a tea pot')
+      );
 
       // Stub app.log.error to silence test log noise for expected errors
       const logErrorSpy = jest.spyOn(app.log, 'error').mockImplementation();
@@ -931,7 +817,6 @@ describe('bundle-size api', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(500, /I am a tea pot/);
-      nocks.done();
 
       expect(logErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining(
@@ -939,6 +824,8 @@ describe('bundle-size api', () => {
         ),
         expect.any(Error)
       );
+      expect(github.repos.getContent).toHaveBeenCalledTimes(1);
+      expect(github.repos.createOrUpdateFileContents).toHaveBeenCalledTimes(1);
     });
 
     test('fail on non-numeric values when called to store bundle-size', async () => {

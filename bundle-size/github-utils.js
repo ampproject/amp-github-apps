@@ -62,7 +62,7 @@ class GitHubUtils {
    */
   async getBuildArtifactsFile(filename) {
     return await this.github.repos
-      .getContents(getBuildArtifactsFileParams_(filename))
+      .getContent(getBuildArtifactsFileParams_(filename))
       .then(result => Buffer.from(result.data.content, 'base64').toString());
   }
 
@@ -74,7 +74,7 @@ class GitHubUtils {
    * @param {string} contents text contents of the file.
    */
   async storeBuildArtifactsFile(filename, contents) {
-    await this.github.repos.createOrUpdateFile({
+    await this.github.repos.createOrUpdateFileContents({
       ...getBuildArtifactsFileParams_(filename),
       message: `bundle-size: ${filename}`,
       content: Buffer.from(contents).toString('base64'),
@@ -94,7 +94,7 @@ class GitHubUtils {
         `Cache miss for ${CACHE_APPROVERS_KEY}. Fetching from GitHub...`
       );
       approvers = await this.github.repos
-        .getContents({
+        .getContent({
           owner: 'ampproject',
           repo: 'amphtml',
           path: 'build-system/tasks/bundle-size/APPROVERS.json',
@@ -175,7 +175,7 @@ class GitHubUtils {
   /**
    * Choose a bundle size reviewer to add to the pull request.
    *
-   * @param {!Octokit.PullsListReviewRequestsParams} pullRequest GitHub Pull
+   * @param {!Octokit.PullslistRequestedReviewersParams} pullRequest GitHub Pull
    *   Request params.
    * @param {!Array<string>} approverTeams list of all the teams whose members
    *   can approve the bundle-size change of this pull request.
@@ -183,7 +183,7 @@ class GitHubUtils {
    *   there is already a reviewer.
    */
   async chooseReviewer(pullRequest, approverTeams) {
-    const requestedReviewersResponse = await this.github.pulls.listReviewRequests(
+    const requestedReviewersResponse = await this.github.pulls.listRequestedReviewers(
       pullRequest
     );
     const reviewsResponse = await this.github.pulls.listReviews(pullRequest);
