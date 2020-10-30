@@ -31,28 +31,40 @@ nock.disableNetConnect();
 nock.enableNetConnect('127.0.0.1');
 
 describe('test-status/api', () => {
+  let github;
   let probot;
   let app;
   const db = dbConnect();
 
   beforeAll(async () => {
     await setupDb(db);
+  });
 
-    probot = new Probot({});
+  beforeEach(() => {
+    github = {
+      checks: {
+        create: jest.fn(),
+        update: jest.fn(),
+      },
+    };
+
+    class Octokit {
+      constructor() {}
+
+      static defaults() {
+        return this;
+      }
+
+      get checks() {
+        return github.checks;
+      }
+    }
+
+    probot = new Probot({Octokit});
     app = probot.load(app => {
       installApiRouter(app, db);
     });
-
-    // Return a test token.
-    app.app = {
-      getInstallationAccessToken: () => Promise.resolve('test'),
-    };
-  });
-
-  beforeEach(async () => {
-    nock('https://api.github.com')
-      .post('/app/installations/123456/access_tokens')
-      .reply(200, {token: 'test'});
+    app.auth = () => github;
   });
 
   afterEach(async () => {
@@ -76,19 +88,7 @@ describe('test-status/api', () => {
       installationId: 123456,
     });
 
-    const nocks = nock('https://api.github.com')
-      .post('/repos/ampproject/amphtml/check-runs', body => {
-        expect(body).toMatchObject({
-          name: 'ampproject/tests/unit (saucelabs)',
-          'head_sha': HEAD_SHA,
-          status,
-          output: {
-            title,
-          },
-        });
-        return true;
-      })
-      .reply(200, {id: 555555});
+    github.checks.create.mockResolvedValue({data: {id: 555555}});
 
     await request(probot.server)
       .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
@@ -105,7 +105,17 @@ describe('test-status/api', () => {
         errored: null,
       },
     ]);
-    nocks.done();
+
+    expect(github.checks.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'ampproject/tests/unit (saucelabs)',
+        head_sha: HEAD_SHA,
+        status,
+        output: {
+          title,
+        },
+      })
+    );
   });
 
   test('Update an existing check with /started action', async () => {
@@ -123,23 +133,19 @@ describe('test-status/api', () => {
       checkRunId: 555555,
     });
 
-    const nocks = nock('https://api.github.com')
-      .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-        expect(body).toMatchObject({
-          'head_sha': HEAD_SHA,
-          status: 'in_progress',
-          output: {
-            title: 'Tests are running on Travis',
-          },
-        });
-        return true;
-      })
-      .reply(200);
-
     await request(probot.server)
       .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/started`)
       .expect(200);
-    nocks.done();
+
+    expect(github.checks.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        head_sha: HEAD_SHA,
+        status: 'in_progress',
+        output: {
+          title: 'Tests are running on Travis',
+        },
+      })
+    );
   });
 
   test.each([
@@ -162,19 +168,6 @@ describe('test-status/api', () => {
         checkRunId: 555555,
       });
 
-      const nocks = nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            status: 'completed',
-            conclusion: 'success',
-            output: {
-              title,
-            },
-          });
-          return true;
-        })
-        .reply(200);
-
       await request(probot.server)
         .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
         .send({travisJobUrl})
@@ -191,7 +184,16 @@ describe('test-status/api', () => {
           errored: 0,
         },
       ]);
-      nocks.done();
+
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'completed',
+          conclusion: 'success',
+          output: {
+            title,
+          },
+        })
+      );
     }
   );
 
@@ -225,22 +227,6 @@ describe('test-status/api', () => {
         checkRunId: 555555,
       });
 
-      const nocks = nock('https://api.github.com')
-        .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-          expect(body).toMatchObject({
-            status: 'completed',
-            conclusion: 'action_required',
-            output: {
-              title,
-            },
-          });
-          expect(body.output.text).toContain(
-            'Contact the weekly build cop (@ampproject/build-cop)'
-          );
-          return true;
-        })
-        .reply(200);
-
       await request(probot.server)
         .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
         .send({travisJobUrl})
@@ -257,7 +243,19 @@ describe('test-status/api', () => {
           errored: 0,
         },
       ]);
-      nocks.done();
+
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'completed',
+          conclusion: 'action_required',
+          output: {
+            title,
+            text: expect.stringContaining(
+              'Contact the weekly build cop (@ampproject/build-cop)'
+            ),
+          },
+        })
+      );
     }
   );
 
@@ -276,22 +274,6 @@ describe('test-status/api', () => {
       checkRunId: 555555,
     });
 
-    const nocks = nock('https://api.github.com')
-      .patch('/repos/ampproject/amphtml/check-runs/555555', body => {
-        expect(body).toMatchObject({
-          status: 'completed',
-          conclusion: 'action_required',
-          output: {
-            title: 'Tests have errored',
-          },
-        });
-        expect(body.output.text).toContain(
-          'Contact the weekly build cop (@ampproject/build-cop)'
-        );
-        return true;
-      })
-      .reply(200);
-
     await request(probot.server)
       .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/errored`)
       .send({travisJobUrl})
@@ -308,7 +290,19 @@ describe('test-status/api', () => {
         errored: 1,
       },
     ]);
-    nocks.done();
+
+    expect(github.checks.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'completed',
+        conclusion: 'action_required',
+        output: {
+          title: 'Tests have errored',
+          text: expect.stringContaining(
+            'Contact the weekly build cop (@ampproject/build-cop)'
+          ),
+        },
+      })
+    );
   });
 
   test('404 for /queued action when pull request was not created', async () => {

@@ -44,24 +44,25 @@ describe('test-status/webhooks', () => {
   const db = dbConnect();
 
   beforeAll(async () => {
-    process.env.DISABLE_WEBHOOK_EVENT_CHECK = 'true';
     await setupDb(db);
+  });
 
-    probot = new Probot({});
+  beforeEach(() => {
+    process.env.DISABLE_WEBHOOK_EVENT_CHECK = 'true';
+
+    class Octokit {
+      constructor() {}
+
+      static defaults() {
+        return this;
+      }
+    }
+
+    probot = new Probot({Octokit});
     app = probot.load(app => {
       installGitHubWebhooks(app, db);
     });
-
-    // Return a test token.
-    app.app = {
-      getInstallationAccessToken: () => Promise.resolve('test'),
-    };
-  });
-
-  beforeEach(async () => {
-    nock('https://api.github.com')
-      .post('/app/installations/123456/access_tokens')
-      .reply(200, {token: 'test'});
+    app.auth = () => undefined;
   });
 
   afterEach(async () => {
