@@ -47,7 +47,7 @@ describe('test-status/webhooks', () => {
     await setupDb(db);
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     process.env.DISABLE_WEBHOOK_EVENT_CHECK = 'true';
 
     class Octokit {

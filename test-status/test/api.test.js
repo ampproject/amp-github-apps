@@ -40,7 +40,7 @@ describe('test-status/api', () => {
     await setupDb(db);
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     github = {
       checks: {
         create: jest.fn(),
