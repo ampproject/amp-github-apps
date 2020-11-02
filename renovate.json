@@ -5,9 +5,108 @@
   "node": {
     "supportPolicy": ["lts_latest"]
   },
+
+  "commitMessagePrefix": "📦",
+  "timezone": "America/Los_Angeles",
+  "schedule": "after 9pm on sunday",
+  "dependencyDashboard": true,
+
   "packageRules": [{
     "packagePatterns": [".*"],
-    "groupName": "packages",
-    "schedule": ["after 9pm on sunday"]
+    "groupName": "core packages",
+  }, {
+    "paths": ["bundle-size/**"],
+    "labels": ["Category: Bundle Size"],
+    "groupName": "bundle-size packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "bundle-size-"
+    }
+  }, {
+    "paths": ["bundle-size-chart/**"],
+    "labels": ["Category: Bundle Size Chart"],
+    "groupName": "bundle-size-chart packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "bundle-size-chart-"
+    }
+  }, {
+    "paths": ["checklist/**"],
+    "groupName": "checklist packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "checklist-"
+    }
+  }, {
+    "paths": ["error-monitoring/**"],
+    "labels": ["Category: Error Monitoring"],
+    "groupName": "error-monitoring packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "error-monitoring-"
+    }
+  }, {
+    "paths": ["invite/**"],
+    "labels": ["Category: Invite"],
+    "groupName": "invite packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "invite-"
+    }
+  }, {
+    "paths": ["onduty/**"],
+    "groupName": "onduty packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "onduty-"
+    }
+  }, {
+    "paths": ["owners/**"],
+    "labels": ["Category: Owners"],
+    "groupName": "owners packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "owners-"
+    }
+  }, {
+    "paths": ["pr-deploy/**"],
+    "labels": ["Category: PR Deploy"],
+    "groupName": "pr-deploy packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "pr-deploy-"
+    }
+  }, {
+    "paths": ["project-metrics/**"],
+    "labels": ["Category: Project Metrics"],
+    "groupName": "project-metrics packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "project-metrics-"
+    }
+  }, {
+    "paths": ["release-calendar/**"],
+    "labels": ["Category: Release Calendar"],
+    "groupName": "release-calendar packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "release-calendar-"
+    }
+  }, {
+    "paths": ["test-case-reporting/**"],
+    "labels": ["Category: Test Cases"],
+    "groupName": "test-case-reporting packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "test-case-reporting-"
+    }
+  }, {
+    "paths": ["test-status/**"],
+    "labels": ["Category: Test Status"],
+    "groupName": "test-status packages",
+    "major": {
+      "groupName": null,
+      "additionalBranchPrefix": "test-status-"
+    }
   }]
 }
