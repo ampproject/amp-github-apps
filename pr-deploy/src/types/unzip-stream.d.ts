@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 declare module 'unzip-stream' {
-  import stream = require('stream');
+  import stream from 'stream';
 
-  export function Extract(options: { path: string }): NodeJS.WritableStream;
+  export function Extract(options: { path: string }): stream.Writable;
 
-  export function Parse(): NodeJS.WritableStream;
+  export function Parse(): stream.Writable;
 
   export interface Entry extends stream.PassThrough {
     path: string;
