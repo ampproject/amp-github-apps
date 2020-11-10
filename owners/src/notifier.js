@@ -173,9 +173,22 @@ class OwnersNotifier {
    */
   getOwnersToNotify() {
     const notifies = {};
+
+    function notifyOrRequired(subtree, filename) {
+      const notifyOwners = subtree.getModifiedFileOwners(
+        filename,
+        OWNER_MODIFIER.NOTIFY
+      );
+      const requiredOwners = subtree.getModifiedFileOwners(
+        filename,
+        OWNER_MODIFIER.REQUIRE
+      );
+
+      return Array.from(new Set([...notifyOwners, ...requiredOwners]));
+    }
+
     Object.entries(this.fileTreeMap).forEach(([filename, subtree]) => {
-      subtree
-        .getModifiedFileOwners(filename, OWNER_MODIFIER.NOTIFY)
+      notifyOrRequired(subtree, filename)
         .map(owner => owner.name)
         .forEach(name => {
           if (!notifies[name]) {

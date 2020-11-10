@@ -494,5 +494,21 @@ describe('notifier', () => {
 
       expect(notifies['rando']).toBeUndefined();
     });
+
+    it('includes owners with the required modifier', () => {
+      const requiredTeam = new Team('ampproject', 'required_team');
+      requiredTeam.members = ['required_member'];
+      tree.addRule(
+        new OwnersRule('bar/OWNERS', [
+          new TeamOwner(requiredTeam, OWNER_MODIFIER.REQUIRE),
+        ])
+      );
+
+      const notifier = new OwnersNotifier(pr, {}, tree, ['bar/script.js']);
+      const notifies = notifier.getOwnersToNotify();
+
+      expect(notifies['ampproject/relevant_team']).toContain('bar/script.js');
+      expect(notifies['ampproject/required_team']).toContain('bar/script.js');
+    });
   });
 });
