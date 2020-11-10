@@ -184,7 +184,7 @@ class OwnersNotifier {
         OWNER_MODIFIER.REQUIRE
       );
 
-      return Array.from(new Set(notifyOwners.concat(requiredOwners)));
+      return Array.from(new Set([...notifyOwners, ...requiredOwners]));
     }
 
     Object.entries(this.fileTreeMap).forEach(([filename, subtree]) => {
