@@ -85,18 +85,17 @@ function initializeDeployment(app: Application) {
       (context.github as unknown) as Octokit,
       context.payload.check_run.head_sha
     );
-    await pr.deploymentInProgress();
-    const travisBuild = await pr.getTravisBuildNumber();
-    await unzipAndMove(travisBuild)
-      .then(async bucketUrl => {
-        await pr.deploymentCompleted(
-          bucketUrl,
-          `${BASE_URL}amp_dist_${travisBuild}/`
-        );
-      })
-      .catch(async e => {
-        await pr.deploymentErrored(e);
-      });
+    try {
+      await pr.deploymentInProgress();
+      const travisBuild = await pr.getTravisBuildNumber();
+      const bucketUrl = await unzipAndMove(travisBuild);
+      await pr.deploymentCompleted(
+        bucketUrl,
+        `${BASE_URL}amp_dist_${travisBuild}/`
+      );
+    } catch (e) {
+      await pr.deploymentErrored(e);
+    };
   });
 }
 
