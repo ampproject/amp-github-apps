@@ -88,14 +88,14 @@ function initializeDeployment(app: Application) {
     await pr.deploymentInProgress();
     const travisBuild = await pr.getTravisBuildNumber();
     await unzipAndMove(travisBuild)
-      .then(bucketUrl => {
-        pr.deploymentCompleted(
+      .then(async bucketUrl => {
+        await pr.deploymentCompleted(
           bucketUrl,
           `${BASE_URL}amp_dist_${travisBuild}/`
         );
       })
-      .catch(e => {
-        pr.deploymentErrored(e);
+      .catch(async e => {
+        await pr.deploymentErrored(e);
       });
   });
 }

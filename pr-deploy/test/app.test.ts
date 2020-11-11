@@ -41,7 +41,6 @@ describe('test pr deploy app', () => {
 
   beforeEach(() => {
     nock.disableNetConnect();
-    nock.enableNetConnect('127.0.0.1');
     probot = new Probot({
       id: 1,
       githubToken: 'test',
@@ -122,9 +121,9 @@ describe('test pr deploy app', () => {
 
   test('deploys the PR check when action is triggered', async() => {
     nock(apiUrl)
-      .get('/repos/test-owner/test-repo/commits/' +
-    'abcde/check-runs?check_name=test-check')
-      .times(2)
+      .persist()
+      .get('/repos/test-owner/test-repo/commits/abcde/' +
+      'check-runs?check_name=test-check')
       .reply(200, {
         total_count: 1,
         check_runs: [
@@ -140,12 +139,8 @@ describe('test pr deploy app', () => {
         return true;
       })
       .reply(200)
-      .patch('/repos/test-owner/test-repo/check-runs/12345', body => {
-        expect(body).toMatchObject({
-          'status': 'in_progress',
-        });
-        return true;
-      }).reply(201);
+      .patch('/repos/test-owner/test-repo/check-runs/12345')
+      .reply(201);
 
     const requestedActionEvent: Webhooks.WebhookEvent<
     Webhooks.EventPayloads.WebhookPayloadCheckRun> = {
