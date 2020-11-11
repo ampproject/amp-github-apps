@@ -54,6 +54,7 @@ describe('test pr deploy app', () => {
   });
 
   afterEach(() => {
+    expect(nock.isDone()).toBeTruthy();
     nock.cleanAll();
     nock.enableNetConnect();
   });
@@ -121,25 +122,17 @@ describe('test pr deploy app', () => {
 
   test('deploys the PR check when action is triggered', async() => {
     nock(apiUrl)
-      .persist()
       .get('/repos/test-owner/test-repo/commits/abcde/' +
       'check-runs?check_name=test-check')
+      .times(3)
       .reply(200, {
         total_count: 1,
         check_runs: [
           {id: 12345, output: {text: 'Travis build number: 3'}},
         ],
       }) // make sure a check already exists
-      .post('/repos/test-owner/test-repo/check-runs', body => {
-        expect(body).toMatchObject({
-          'head_sha': 'abcde',
-          'name': 'test-check',
-          'status': 'queued',
-        });
-        return true;
-      })
-      .reply(200)
       .patch('/repos/test-owner/test-repo/check-runs/12345')
+      .times(2)
       .reply(201);
 
     const requestedActionEvent: Webhooks.WebhookEvent<

@@ -46,7 +46,7 @@ export class PullRequest {
   private headSha: string;
 
   constructor(github: Octokit, headSha: string) {
-    this.github = github as Octokit;
+    this.github = github;
     this.headSha = headSha;
   }
 

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 declare module 'unzip-stream' {
-  import stream from 'stream';
+  import {PassThrough, Writable} from 'stream';
 
-  export function Extract(options: { path: string }): stream.Writable;
+  export function Extract(options: { path: string }): Writable;
 
-  export function Parse(): stream.Writable;
+  export function Parse(): Writable;
 
-  export interface Entry extends stream.PassThrough {
+  export interface Entry extends PassThrough {
     path: string;
     type: 'Directory' | 'File';
     size: number;
