@@ -17,115 +17,138 @@
 // mock unzipAndMove dependency before importing '../src/app'
 jest.mock('../src/zipper', () => {
   return {
-    unzipAndMove: jest.fn().mockReturnValue(Promise.resolve('gs://serving-bucket/travisBuildNumber')),
+    unzipAndMove: jest
+      .fn()
+      .mockReturnValue(
+        Promise.resolve('gs://serving-bucket/travisBuildNumber')
+      ),
   };
 });
 
-import {Application} from 'probot';
+process.env.GH_CHECK = 'test-check';
+process.env.GH_OWNER = 'test-owner';
+process.env.GH_REPO = 'test-repo';
+
+import nock from 'nock';
 import prDeployAppFn from '../src/app';
-import express from 'express';
-import request from 'supertest';
-import Webhooks, {
-  WebhookPayloadPullRequest,
-  WebhookPayloadCheckRun} from '@octokit/webhooks';
+import Webhooks from '@octokit/webhooks';
+import {Probot, ProbotOctokit} from 'probot';
+
+const apiUrl = 'https://api.github.com';
 
 describe('test pr deploy app', () => {
-  let app: Application;
-  let github: any;
-  let server: express.Application;
+  let probot: Probot;
 
   beforeEach(() => {
-    process.env.DISABLE_WEBHOOK_EVENT_CHECK = 'true';
+    nock.disableNetConnect();
+    probot = new Probot({
+      id: 1,
+      githubToken: 'test',
+      // Disable throttling & retrying requests for easier testing
+      Octokit: ProbotOctokit.defaults({
+        retry: {enabled: false},
+        throttle: {enabled: false},
+      }),
+    });
+    probot.load(prDeployAppFn);
+  });
 
-    github = {
-      checks: {
-        create: jest.fn().mockReturnValue(Promise.resolve()),
-        update: jest.fn().mockReturnValue(Promise.resolve()),
-        listForRef: jest.fn(),
-      },
-    };
-
-    app = new Application();
-    app.load(prDeployAppFn);
-    app.auth = async() => Promise.resolve(github);
-
-    server = express();
-    server.use(app.router);
+  afterEach(() => {
+    expect(nock.isDone()).toBeTruthy();
+    nock.cleanAll();
+    nock.enableNetConnect();
   });
 
   test('creates a check when a pull request is opened', async() => {
-    // make sure no checks already exist
-    github.checks.listForRef.mockReturnValue(null);
-
-    const prOpenedEvent: Webhooks.WebhookEvent<WebhookPayloadPullRequest> = {
+    const prOpenedEvent: Webhooks.WebhookEvent<
+    Webhooks.EventPayloads.WebhookPayloadPullRequest> = {
       id: 'prId',
       name: 'pull_request.opened',
       payload: {
         pull_request: {head: {sha: 'abcde'}},
-        repository: {owner: {name: 'repoOwner'},name: 'newRepo'},
-      } as WebhookPayloadPullRequest,
+        repository: {
+          owner: {name: 'test-owner'},
+          name: 'test-repo',
+        },
+      } as Webhooks.EventPayloads.WebhookPayloadPullRequest,
     };
 
-    await app.receive(prOpenedEvent);
-    expect(github.checks.create).toHaveBeenCalled();
-    expect(github.checks.update).not.toHaveBeenCalled();
+    nock(apiUrl)
+      .get('/repos/test-owner/test-repo/commits/' +
+      'abcde/check-runs?check_name=test-check')
+      .reply(200, null) // make sure no checks already exist
+      .post('/repos/test-owner/test-repo/check-runs', body => {
+        expect(body).toMatchObject({
+          'head_sha': 'abcde',
+          'name': 'test-check',
+          'status': 'queued',
+        });
+        return true;
+      })
+      .reply(200);
+
+    await probot.receive(prOpenedEvent);
   });
 
-  test('refreshes the check when a pull request is synchronized or reopened',
-    async() => {
-      // make sure a check already exists
-      github.checks.listForRef.mockReturnValue(
-        {data: {total_count: 1, check_runs: [{id: 12345}]}}
-      );
+  test('refreshes the check when a pull request is ' +
+  'synchronized or reopened', async() => {
+    nock(apiUrl)
+      .get('/repos/test-owner/test-repo/commits/' +
+      'abcde/check-runs?check_name=test-check')
+      .reply(200, {data: {total_count: 1, check_runs: [{id: 12345}]},
+      }) // make sure a check already exists
+      .post('/repos/test-owner/test-repo/check-runs', body => {
+        expect(body).toMatchObject({
+          'head_sha': 'abcde',
+          'name': 'test-check',
+          'status': 'queued',
+        });
+        return true;
+      })
+      .reply(200);
 
-      const prSynchronizedEvent:
-      Webhooks.WebhookEvent<WebhookPayloadPullRequest> = {
-        id: 'prId',
-        name: 'pull_request.synchronize',
-        payload: {
-          pull_request: {head: {sha: 'abcde'}},
-          repository: {owner: {name: 'repoOwner'},name: 'existingRepo'},
-        } as WebhookPayloadPullRequest,
-      };
+    const prSynchronizedEvent: Webhooks.WebhookEvent<
+    Webhooks.EventPayloads.WebhookPayloadPullRequest> = {
+      id: 'prId',
+      name: 'pull_request.synchronize',
+      payload: {
+        pull_request: {head: {sha: 'abcde'}},
+        repository: {owner: {name: 'test-owner'}, name: 'test-repo'},
+      } as Webhooks.EventPayloads.WebhookPayloadPullRequest,
+    };
 
-      await app.receive(prSynchronizedEvent);
-      expect(github.checks.update).toHaveBeenCalled();
-      expect(github.checks.create).not.toHaveBeenCalled();
-    });
-
-  test('enables deployment action when post is received', async done => {
-    // make sure a check already exists
-    github.checks.listForRef.mockReturnValue(
-      {data: {total_count: 1, check_runs: [{id: 12345}]}}
-    );
-
-    request(server)
-      .post('/v0/pr-deploy/travisbuilds/1/headshas/3/success')
-      .expect(() => { expect(github.checks.update).toHaveBeenCalledTimes(1);})
-      .expect(200, done);
+    await probot.receive(prSynchronizedEvent);
   });
 
   test('deploys the PR check when action is triggered', async() => {
-    // make sure a check already exists
-    github.checks.listForRef.mockReturnValue(
-      {data: {total_count: 1, check_runs: [
-        {id: 12345, output: {text: 'Travis build number: 3'}},
-      ]}}
-    );
+    nock(apiUrl)
+      .get('/repos/test-owner/test-repo/commits/abcde/' +
+      'check-runs?check_name=test-check')
+      .times(3)
+      .reply(200, {
+        total_count: 1,
+        check_runs: [
+          {id: 12345, output: {text: 'Travis build number: 3'}},
+        ],
+      }) // make sure a check already exists
+      .patch('/repos/test-owner/test-repo/check-runs/12345')
+      .times(2)
+      .reply(201);
 
-    const requestedActionEvent:
-    Webhooks.WebhookEvent<WebhookPayloadCheckRun> = {
+    const requestedActionEvent: Webhooks.WebhookEvent<
+    Webhooks.EventPayloads.WebhookPayloadCheckRun> = {
       id: 'prId',
       name: 'check_run.requested_action',
       payload: {
         action: 'deploy-me-action',
-        check_run: {head_sha: 'abcde', pull_requests: [{head: {sha: 'abcde'}}]},
-        repository: {owner: {name: 'repoOwner'}, name: 'existingRepo'},
-      } as WebhookPayloadCheckRun,
+        check_run: {
+          name: 'test-check',
+          head_sha: 'abcde',
+          pull_requests: [{head: {sha: 'abcde'}}]},
+        repository: {owner: {name: 'test-owner'}, name: 'test-repo'},
+      } as Webhooks.EventPayloads.WebhookPayloadCheckRun,
     };
 
-    await app.receive(requestedActionEvent);
-    expect(github.checks.update).toHaveBeenCalledTimes(2);
+    await probot.receive(requestedActionEvent);
   });
 });
-

@@ -18,6 +18,7 @@ import {Application} from 'probot';
 import express, {IRouter} from 'express';
 import {PullRequest} from './github';
 import {unzipAndMove} from './zipper';
+import {Octokit} from '@octokit/rest';
 
 const BASE_URL = `https://storage.googleapis.com/${process.env.SERVE_BUCKET}/`;
 
@@ -32,8 +33,8 @@ function initializeCheck(app: Application) {
     'pull_request.reopened',
   ], async context => {
     const pr = new PullRequest(
-      context.github,
-      context.payload.pull_request.head.sha,
+      (context.github as unknown) as Octokit,
+      context.payload.pull_request.head.sha
     );
     return pr.createOrResetCheck();
   });
@@ -50,7 +51,9 @@ function initializeRouter(app: Application) {
   router.post('/travisbuilds/:travisBuild/headshas/:headSha/:result',
     async(request, response) => {
       const {travisBuild, headSha, result} = request.params;
-      const github = await app.auth(Number(process.env.INSTALLATION_ID));
+      const github = ((await app.auth(
+        Number(process.env.INSTALLATION_ID)
+      )) as unknown) as Octokit;
       const pr = new PullRequest(github, headSha);
       switch (result) {
         case 'success':
@@ -79,21 +82,20 @@ function initializeDeployment(app: Application) {
     }
 
     const pr = new PullRequest(
-      context.github,
-      context.payload.check_run.head_sha,
+      (context.github as unknown) as Octokit,
+      context.payload.check_run.head_sha
     );
-    await pr.deploymentInProgress();
-    const travisBuild = await pr.getTravisBuildNumber();
-    await unzipAndMove(travisBuild)
-      .then(bucketUrl => {
-        pr.deploymentCompleted(
-          bucketUrl,
-          `${BASE_URL}amp_dist_${travisBuild}/`
-        );
-      })
-      .catch(e => {
-        pr.deploymentErrored(e);
-      });
+    try {
+      await pr.deploymentInProgress();
+      const travisBuild = await pr.getTravisBuildNumber();
+      const bucketUrl = await unzipAndMove(travisBuild);
+      await pr.deploymentCompleted(
+        bucketUrl,
+        `${BASE_URL}amp_dist_${travisBuild}/`
+      );
+    } catch (e) {
+      await pr.deploymentErrored(e);
+    };
   });
 }
 
