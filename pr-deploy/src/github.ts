@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-import {GetResponseTypeFromEndpointMethod as GetType} from '@octokit/types';
-import {Octokit} from '@octokit/rest';
+import {Octokit, RestEndpointMethodTypes as Types} from '@octokit/rest';
 
-const octokit = new Octokit();
-type ChecksCreateParams = GetType<typeof octokit.ChecksCreateParams>;
-type ChecksListForRefResponseCheckRunsItem = GetType<
-  typeof octokit.ChecksListForRefResponseCheckRunsItem
->;
-type ChecksListForRefResponseCheckRunsItemOutput = GetType<
-  typeof octokit.ChecksListForRefResponseCheckRunsItemOutput
->;
-type ChecksListForRefParams = GetType<typeof octokit.ChecksListForRefParams>;
-type ChecksUpdateParams = GetType<typeof octokit.ChecksUpdateParams>;
-type ChecksUpdateParamsActions = GetType<
-  typeof octokit.ChecksUpdateParamsActions
->;
+type ChecksCreateParams = Types['checks']['create']['parameters'];
+type ChecksGetResponseData = Types['checks']['get']['response']['data'];
+type ChecksListForRefParams = Types['checks']['listForRef']['parameters'];
+type ChecksUpdateParams = Types['checks']['update']['parameters'];
 
-const ACTION: ChecksUpdateParamsActions = {
+const ACTIONS: ChecksUpdateParams['actions'] = [{
   label: 'Create a test site',
   description: 'Serves the minified output of this PR.',
   identifier: 'deploy-me-action',
-};
+}];
 
 const check_name = process.env.GH_CHECK;
 const owner = process.env.GH_OWNER;
@@ -131,7 +121,7 @@ export class PullRequest {
         summary: 'There was an error creating a test site.',
         text: error.message,
       },
-      actions: [ACTION],
+      actions: ACTIONS,
     };
 
     return this.github.checks.update(params);
@@ -157,7 +147,7 @@ export class PullRequest {
           '`examples/` and `test/manual/`. It should only take a minute.',
         text: `Travis build number: ${id}`,
       },
-      actions: [ACTION],
+      actions: ACTIONS,
     };
 
     return this.github.checks.update(params);
@@ -245,8 +235,8 @@ export class PullRequest {
   /**
    * Reset the check and set it to 'queued'.
    */
-  private async resetCheck_(check: ChecksListForRefResponseCheckRunsItem) {
-    let output: ChecksListForRefResponseCheckRunsItemOutput;
+  private async resetCheck_(check: ChecksGetResponseData) {
+    let output: ChecksUpdateParams['output'];
     if (
       check.status == 'completed' &&
       check.conclusion == 'success' &&
@@ -257,7 +247,7 @@ export class PullRequest {
         summary:
           `To view the existing test site, visit ${check.output.text} ` +
           'This site will be overwritten if you recreate the test site.',
-      } as ChecksListForRefResponseCheckRunsItemOutput;
+      };
     }
 
     const params: ChecksUpdateParams = {
