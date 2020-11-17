@@ -50,6 +50,8 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     this.apiService = new ApiService();
   }
 
+  calendarReference = React.createRef<FullCalendar>();
+
   async componentDidMount(): Promise<void> {
     const promotions = await this.apiService.getPromotions();
     this.setState({allEvents: getAllEvents(promotions)});
@@ -61,6 +63,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
         const promotionsOfSingleRelease = await this.apiService.getSinglePromotions(
           this.props.singleRelease,
         );
+        this.gotoDate(promotionsOfSingleRelease[0].date);
         this.setState((prevState: CalendarState) => ({
           singleEvents: getSingleReleaseEvents(
             promotionsOfSingleRelease,
@@ -71,6 +74,11 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
         this.setState({singleEvents: []});
       }
     }
+  }
+
+  gotoDate(date: Date): void {
+    const calendarApi = this.calendarReference.current.getApi();
+    calendarApi.gotoDate(date);
   }
 
   render(): JSX.Element {
@@ -89,10 +97,11 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
       <FullCalendar
         defaultView='dayGridMonth'
         header={{
-          left: 'prev,next',
+          left: 'prev,next today',
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,listWeek',
         }}
+        ref={this.calendarReference}
         plugins={[dayGridPlugin, timeGridPlugin]}
         eventSources={[{events: displayEvents, textColor: 'white'}]}
         contentHeight={CALENDAR_CONTENT_HEIGHT}
