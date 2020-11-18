@@ -409,7 +409,7 @@ describe('owners parser', () => {
 
       expect(result).toEqual([]);
       expect(errors[0].message).toEqual(
-        'Failed to parse file; top-level "rules" key must contain a list'
+        "`OWNERS` should have required property 'rules'"
       );
     });
 
@@ -521,11 +521,13 @@ describe('owners parser', () => {
     });
 
     describe('reviewer team', () => {
+      const rules = [{owners: [{name: 'someone'}]}];
+
       describe('in the repository root OWNERS file', () => {
         it('records the reviewer set from "reviewerTeam', () => {
           const fileDef = {
+            rules,
             reviewerTeam: 'ampproject/reviewers-amphtml',
-            rules: [],
           };
           const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
 
@@ -537,8 +539,8 @@ describe('owners parser', () => {
 
       describe('specified outside the repository root OWNERS file', () => {
         const fileDef = {
+          rules,
           reviewerTeam: 'ampproject/reviewers-amphtml',
-          rules: [],
         };
 
         it('reports an error', () => {
@@ -556,33 +558,33 @@ describe('owners parser', () => {
             'src/OWNERS',
             fileDef
           );
-          expect(result.length).toEqual(0);
+          expect(result.length).toEqual(1);
         });
       });
 
       describe('for a non-string "reviewerTeam" property', () => {
         const fileDef = {
+          rules,
           reviewerTeam: {name: 'ampproject/reviewers-amphtml'},
-          rules: [],
         };
 
         it('reports an error', () => {
           const {errors} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
           expect(errors[0].message).toEqual(
-            'Expected "reviewerTeam" to be a string; got object'
+            '`OWNERS.reviewerTeam` should be string'
           );
         });
 
         it('does not produce a reviewer set rule', () => {
           const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
-          expect(result.length).toEqual(0);
+          expect(result.length).toEqual(1);
         });
       });
 
       describe('for an unknown team name', () => {
         const fileDef = {
+          rules,
           reviewerTeam: 'ampproject/unknown-team',
-          rules: [],
         };
 
         it('reports an error', () => {
@@ -594,7 +596,7 @@ describe('owners parser', () => {
 
         it('does not produce a reviewer set rule', () => {
           const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
-          expect(result.length).toEqual(0);
+          expect(result.length).toEqual(1);
         });
       });
     });

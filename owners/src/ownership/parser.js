@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+const Ajv = require('ajv');
 const JSON5 = require('json5');
 const OwnersTree = require('./tree');
 const {
@@ -37,6 +38,9 @@ const OWNER_DEF_KEYS = new Set([
   'requestReviews',
   'required',
 ]);
+
+const SCHEMA = require('./schema');
+const validate = new Ajv({allErrors: true}).compile(SCHEMA);
 
 /**
  * An error encountered parsing an OWNERS file
@@ -340,6 +344,15 @@ class OwnersParser {
   parseOwnersFileDefinition(ownersPath, fileDef) {
     const rules = [];
     const errors = [];
+
+    validate(fileDef);
+    if (validate.errors) {
+      validate.errors.forEach(({dataPath, message}) =>
+        errors.push(
+          new OwnersParserError(ownersPath, `\`OWNERS${dataPath}\` ${message}`)
+        )
+      );
+    }
 
     if (typeof fileDef.reviewerTeam === 'string') {
       const reviewerTeam = this.teamMap[fileDef.reviewerTeam];
