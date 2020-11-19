@@ -19,11 +19,15 @@
   "definitions": {
     "User": {
       "type": "string",
-      "pattern": "^[a-zA-Z][a-zA-Z-]{2,}[a-zA-Z]$"
+      "pattern": "[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]"
     },
     "Team": {
       "type": "string",
-      "pattern": "^ampproject/[a-zA-Z][a-zA-Z-]{2,}[a-zA-Z]$"
+      "pattern": "[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]/[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]"
+    },
+    "Wildcard": {
+      "type": "string",
+      "const": "*"
     },
 
     "Rule": {
@@ -54,7 +58,8 @@
         "name": {
           "oneOf": [
             {"$ref": "#/definitions/User"},
-            {"$ref": "#/definitions/Team"}
+            {"$ref": "#/definitions/Team"},
+            {"$ref": "#/definitions/Wildcard"}
           ]
         }
       },
