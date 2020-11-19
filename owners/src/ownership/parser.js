@@ -17,6 +17,7 @@
 const Ajv = require('ajv');
 const JSON5 = require('json5');
 const OwnersTree = require('./tree');
+const SCHEMA = require('./schema');
 const {
   OwnersRule,
   PatternOwnersRule,
@@ -31,16 +32,7 @@ const {
 } = require('./owner');
 
 const GLOB_PATTERN = '**/';
-const RULE_DEF_KEYS = new Set(['owners', 'pattern']);
-const OWNER_DEF_KEYS = new Set([
-  'name',
-  'notify',
-  'requestReviews',
-  'required',
-]);
-
-const SCHEMA = require('./schema');
-const validate = new Ajv({allErrors: true}).compile(SCHEMA);
+const GITHUB_ID_PATTERN = '[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]';
 
 /**
  * An error encountered parsing an OWNERS file
@@ -80,6 +72,10 @@ class OwnersParser {
   constructor(repo, teamMap) {
     this.repo = repo;
     this.teamMap = teamMap;
+    this.validate = new Ajv({allErrors: true})
+      .addFormat('username', `^${GITHUB_ID_PATTERN}$`)
+      .addFormat('team-name', `^${GITHUB_ID_PATTERN}/${GITHUB_ID_PATTERN}$`)
+      .compile(SCHEMA);
   }
 
   /**
@@ -102,16 +98,7 @@ class OwnersParser {
     );
     ownerDef = Object.assign(defaultOptions, ownerDef);
 
-    if (setOpts.length > 1) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          'Cannot specify more than one of ' +
-            `(${setOpts.join(', ')}); ` +
-            'ignoring modifiers'
-        )
-      );
-    } else if (ownerDef.notify) {
+    if (ownerDef.notify) {
       modifier = OWNER_MODIFIER.NOTIFY;
     } else if (!ownerDef.requestReviews) {
       modifier = OWNER_MODIFIER.SILENT;
@@ -131,55 +118,7 @@ class OwnersParser {
    */
   _parseOwnerDefinition(ownersPath, ownerDef) {
     const errors = [];
-
-    // Validate the owner definition itself.
-    if (typeof ownerDef !== 'object') {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Expected owner definition; got ${typeof ownerDef}`
-        )
-      );
-      return {errors};
-    }
-
-    // Ensure there are no unexpected properties in the definition.
-    const badKeys = Object.keys(ownerDef).filter(
-      key => !OWNER_DEF_KEYS.has(key)
-    );
-    if (badKeys.length) {
-      const badKeyList = badKeys.map(key => `"${key}"`).join(', ');
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Unexpected key(s) ${badKeyList} in owner definition`
-        )
-      );
-      return {errors};
-    }
-
-    // Validate and sanitize the owner name.
-    let ownerName = ownerDef.name;
-    if (typeof ownerName !== 'string') {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Expected "name" to be a string; got ${typeof ownerName}`
-        )
-      );
-      return {errors};
-    }
-    ownerName = ownerName.toLowerCase();
-
-    if (ownerName.startsWith('@')) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Ignoring unnecessary '@' in '${ownerName}'`
-        )
-      );
-      ownerName = ownerName.slice(1);
-    }
+    const ownerName = ownerDef.name.toLowerCase();
 
     // Validate and determine modifier.
     const modParse = this._parseOwnerDefinitionModifier(ownersPath, ownerDef);
@@ -222,40 +161,6 @@ class OwnersParser {
     const errors = [];
     const owners = [];
 
-    // Validate rule definition.
-    if (typeof ruleDef !== 'object') {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Expected rule definition; got ${typeof ruleDef}`
-        )
-      );
-      return {errors};
-    }
-
-    // Ensure there are no unexpected properties in the definition.
-    const badKeys = Object.keys(ruleDef).filter(key => !RULE_DEF_KEYS.has(key));
-    if (badKeys.length) {
-      const badKeyList = badKeys.map(key => `"${key}"`).join(', ');
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Unexpected key(s) ${badKeyList} in rule definition`
-        )
-      );
-      return {errors};
-    }
-
-    if (!(ruleDef.owners instanceof Array)) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Expected "owners" to be a list; got ${typeof ruleDef.owners}`
-        )
-      );
-      return {errors};
-    }
-
     ruleDef.owners.forEach(ownerDef => {
       const ownerParse = this._parseOwnerDefinition(ownersPath, ownerDef);
       if (ownerParse.result) {
@@ -264,28 +169,8 @@ class OwnersParser {
       errors.push(...ownerParse.errors);
     });
 
-    if (!owners.length) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          'No valid owners found; skipping rule'
-        )
-      );
-      return {errors};
-    }
-
     // Validate rule pattern, if present.
     let pattern = ruleDef.pattern;
-    if (pattern && typeof pattern !== 'string') {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          `Expected "pattern" to be a string; got ${typeof pattern}`
-        )
-      );
-      return {errors};
-    }
-
     const isRecursive = pattern && pattern.startsWith(GLOB_PATTERN);
     if (pattern) {
       if (isRecursive) {
@@ -345,16 +230,17 @@ class OwnersParser {
     const rules = [];
     const errors = [];
 
-    validate(fileDef);
-    if (validate.errors) {
-      validate.errors.forEach(({dataPath, message}) =>
+    this.validate(fileDef);
+    if (this.validate.errors) {
+      this.validate.errors.forEach(({dataPath, message}) =>
         errors.push(
           new OwnersParserError(ownersPath, `\`OWNERS${dataPath}\` ${message}`)
         )
       );
+      return {result: rules, errors};
     }
 
-    if (typeof fileDef.reviewerTeam === 'string') {
+    if (fileDef.reviewerTeam) {
       const reviewerTeam = this.teamMap[fileDef.reviewerTeam];
 
       if (!reviewerTeam) {
@@ -373,32 +259,15 @@ class OwnersParser {
           errors.push(new OwnersParserError(ownersPath, error.message));
         }
       }
-    } else if (fileDef.reviewerTeam !== undefined) {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          'Expected "reviewerTeam" to be a string; ' +
-            `got ${typeof fileDef.reviewerTeam}`
-        )
-      );
     }
 
-    if (fileDef.rules instanceof Array) {
-      fileDef.rules.forEach(ruleDef => {
-        const ruleParse = this._parseRuleDefinition(ownersPath, ruleDef);
-        if (ruleParse.result) {
-          rules.push(ruleParse.result);
-        }
-        errors.push(...ruleParse.errors);
-      });
-    } else {
-      errors.push(
-        new OwnersParserError(
-          ownersPath,
-          'Failed to parse file; top-level "rules" key must contain a list'
-        )
-      );
-    }
+    fileDef.rules.forEach(ruleDef => {
+      const ruleParse = this._parseRuleDefinition(ownersPath, ruleDef);
+      if (ruleParse.result) {
+        rules.push(ruleParse.result);
+      }
+      errors.push(...ruleParse.errors);
+    });
 
     return {result: rules, errors};
   }
