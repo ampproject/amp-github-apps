@@ -54,9 +54,9 @@
         // Each owner must contain a `name` key containing a GitHub username.
         { name: "someuser" },
 
-        // Usernames should not be prefixed with "@"; this will raise a parsing
-        // error.
-        { name: "@dontdothis" },
+        // Usernames should not be prefixed with "@"; this will raise a
+        // validation error.
+        // { name: "@dontdothis" },
 
         // GitHub teams are also supported as owners. When a team is declared as
         // an owner, it is treated the same as if all members of the team were
@@ -76,9 +76,9 @@
         // these PRs to notify the owners.
         { name: "rcebulko", notify: true },
 
-        // Note that these options may not be combined; both will be ignored for
-        // the owner below.
-        { name: "rando", notify: true, requestReviews: false },
+        // Note that these options may not be combined; both will result in a
+        // validation error.
+        // { name: "rando", notify: true, requestReviews: false },
       ]
     },
 
