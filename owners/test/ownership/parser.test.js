@@ -129,7 +129,7 @@ describe('owners parser', () => {
       });
     });
 
-    describe('for a non-string namyname', () => {
+    describe('for a non-string name', () => {
       it('reports an error', () => {
         const {errors} = parseOwnerDefinition({name: {}});
         expect(errors[0].message).toEqual(
