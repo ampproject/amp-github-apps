@@ -61,7 +61,7 @@ describe('owners parser', () => {
   const reviewerTeam = new Team('ampproject', 'reviewers-amphtml');
 
   function parseRuleDefinition(ruleDef) {
-    const {result, errors} = parser.parseOwnersFileDefinition('', {
+    const {result, errors} = parser.parseOwnersFileDefinition('OWNERS', {
       rules: [ruleDef],
     });
     return {rule: result && result[0], errors};
@@ -147,7 +147,7 @@ describe('owners parser', () => {
       it('reports an error', () => {
         const {errors} = parseOwnerDefinition({name: '@myname'});
         expect(errors[0].message).toContain(
-          '`OWNERS.rules[0].owners[0].name` should match format'
+          '`OWNERS.rules[0].owners[0].name` should match pattern'
         );
       });
 
@@ -328,7 +328,7 @@ describe('owners parser', () => {
       const {rule} = parseRuleDefinition({
         owners: [{name: 'coder'}],
       });
-      expect(rule).toEqual(new OwnersRule('', [new UserOwner('coder')]));
+      expect(rule).toEqual(new OwnersRule('OWNERS', [new UserOwner('coder')]));
     });
 
     describe('when a pattern is specified', () => {
@@ -398,7 +398,11 @@ describe('owners parser', () => {
           owners: [{name: 'coder'}],
         });
         expect(rule).toEqual(
-          new SameDirPatternOwnersRule('', [new UserOwner('coder')], '*.js')
+          new SameDirPatternOwnersRule(
+            'OWNERS',
+            [new UserOwner('coder')],
+            '*.js'
+          )
         );
       });
 
@@ -408,7 +412,7 @@ describe('owners parser', () => {
           owners: [{name: 'coder'}],
         });
         expect(rule).toEqual(
-          new PatternOwnersRule('', [new UserOwner('coder')], '*.js')
+          new PatternOwnersRule('OWNERS', [new UserOwner('coder')], '*.js')
         );
       });
     });

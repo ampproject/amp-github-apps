@@ -32,7 +32,7 @@ const {
 } = require('./owner');
 
 const GLOB_PATTERN = '**/';
-const GITHUB_ID_PATTERN = '[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]';
+const validate = new Ajv({allErrors: true}).compile(SCHEMA);
 
 /**
  * An error encountered parsing an OWNERS file
@@ -72,10 +72,6 @@ class OwnersParser {
   constructor(repo, teamMap) {
     this.repo = repo;
     this.teamMap = teamMap;
-    this.validate = new Ajv({allErrors: true})
-      .addFormat('username', `^${GITHUB_ID_PATTERN}$`)
-      .addFormat('team-name', `^${GITHUB_ID_PATTERN}/${GITHUB_ID_PATTERN}$`)
-      .compile(SCHEMA);
   }
 
   /**
@@ -93,9 +89,6 @@ class OwnersParser {
       requestReviews: true,
       required: false,
     };
-    const setOpts = Object.keys(ownerDef).filter(
-      opt => defaultOptions[opt] !== undefined
-    );
     ownerDef = Object.assign(defaultOptions, ownerDef);
 
     if (ownerDef.notify) {
@@ -230,11 +223,14 @@ class OwnersParser {
     const rules = [];
     const errors = [];
 
-    this.validate(fileDef);
-    if (this.validate.errors) {
-      this.validate.errors.forEach(({dataPath, message}) =>
+    validate(fileDef);
+    if (validate.errors) {
+      validate.errors.forEach(({dataPath, message}) =>
         errors.push(
-          new OwnersParserError(ownersPath, `\`OWNERS${dataPath}\` ${message}`)
+          new OwnersParserError(
+            ownersPath,
+            `\`${ownersPath}${dataPath}\` ${message}`
+          )
         )
       );
       return {result: rules, errors};
