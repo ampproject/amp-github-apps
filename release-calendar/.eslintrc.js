@@ -53,7 +53,6 @@ module.exports = {
   },
   'rules': {
     '@typescript-eslint/await-thenable': 'error',
-    '@typescript-eslint/camelcase': ['error', { 'properties': 'always' }],
     '@typescript-eslint/type-annotation-spacing': 'error',
     '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/semi': 'error',
@@ -71,7 +70,7 @@ module.exports = {
     'no-useless-concat': 'error',
     'no-unused-expressions': 'error',
     'no-unused-vars': 'off', //off for @typescript-eslint rule
-    'no-undef': 'error',
+    'no-undef': 'off', // covered by TS
     'no-var': 'error',
     'notice/notice': [
       'error',
@@ -86,6 +85,8 @@ module.exports = {
     'object-shorthand': 'error',
     'prettier/prettier': 'error',
     'prefer-const': 'error',
+    'react/jsx-uses-react': 'off',
+    'react/react-in-jsx-scope': 'off',    
     'semi': 'off', //off for @typescript-eslint rule
     'sort-imports-es6-autofix/sort-imports-es6': [
       'error',
