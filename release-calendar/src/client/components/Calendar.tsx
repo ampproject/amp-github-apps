@@ -87,8 +87,8 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
 
     return (
       <FullCalendar
-        defaultView='dayGridMonth'
-        header={{
+        initialView='dayGridMonth'
+        headerToolbar={{
           left: 'prev,next',
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,listWeek',
@@ -99,7 +99,7 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
         fixedWeekCount={false}
         displayEventTime={false}
         views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
-        eventRender={Tooltip}
+        eventContent={Tooltip}
       />
     );
   }

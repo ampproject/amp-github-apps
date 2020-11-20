@@ -16,7 +16,9 @@
 
 import * as React from 'react';
 import {ApiService} from '../api-service';
-import Autocomplete, {RenderInputParams} from '@material-ui/lab/Autocomplete';
+import Autocomplete, {
+  AutocompleteRenderInputParams,
+} from '@material-ui/lab/Autocomplete';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SearchIcon from '@material-ui/icons/Search';
@@ -64,7 +66,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     event.preventDefault();
   }
 
-  onClose(_event: React.ChangeEvent<{}>, reason: string): void {
+  onClose(_event: React.ChangeEvent<unknown>, reason: string): void {
     switch (reason) {
       case 'select-option': {
         this.setState({validSearch: true});
@@ -77,13 +79,13 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     }
   }
 
-  onChange(_event: React.ChangeEvent<{}>, newValue: string | null): void {
+  onChange(_event: React.ChangeEvent<unknown>, newValue: string | null): void {
     if (this.state.releaseNames.includes(newValue)) {
       this.props.handleSelectedRelease(newValue, false);
     }
   }
 
-  onInputChange(event: React.ChangeEvent<{}>, input: string): void {
+  onInputChange(event: React.ChangeEvent<unknown>, input: string): void {
     if (input != null) {
       this.props.handleSearchInput(input);
       if (input.length == 0 && event) {
@@ -129,7 +131,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
           onChange={this.onChange}
           onInputChange={this.onInputChange}
           options={this.state.releaseNames}
-          renderInput={(params: RenderInputParams): JSX.Element => (
+          renderInput={(params: AutocompleteRenderInputParams): JSX.Element => (
             <TextField
               {...params}
               size='small'

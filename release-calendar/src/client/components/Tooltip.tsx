@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {EventApi, View} from '@fullcalendar/core';
+import {EventApi, ViewApi} from '@fullcalendar/core';
 import {Hook} from './Hook';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -25,7 +25,7 @@ export const Tooltip = (arg: {
   isEnd: boolean;
   event: EventApi;
   el: HTMLElement;
-  view: View;
+  view: ViewApi;
 }): void => {
   const Content = (): JSX.Element => {
     return (
