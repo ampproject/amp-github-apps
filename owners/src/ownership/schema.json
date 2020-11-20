@@ -1,0 +1,72 @@
+{
+  "$id": "https://ampproject-owners-bot.appspot.com/owners.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Owners File",
+
+  "type": "object",
+  "required": ["rules"],
+  "additionalProperties": false,
+
+  "properties": {
+    "reviewerTeam": {"$ref": "#/definitions/Team"},
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/definitions/Rule"}
+    }
+  },
+
+  "definitions": {
+    "User": {
+      "type": "string",
+      "pattern": "^[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]$"
+    },
+    "Team": {
+      "type": "string",
+      "pattern": "^[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]/[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]$"
+    },
+    "Wildcard": {
+      "type": "string",
+      "const": "*"
+    },
+
+    "Rule": {
+      "type": "object",
+      "required": ["owners"],
+      "additionalProperties": false,
+
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owners": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/definitions/Owner"}
+        }
+      }
+    },
+
+    "Owner": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "maxProperties": 2,
+
+      "properties": {
+        "name": {
+          "oneOf": [
+            {"$ref": "#/definitions/User"},
+            {"$ref": "#/definitions/Team"},
+            {"$ref": "#/definitions/Wildcard"}
+          ]
+        }
+      },
+
+      "patternProperties": {
+        "requestReviews|notify|required": {"type": "boolean"}
+      }
+    }
+  }
+}

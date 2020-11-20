@@ -60,6 +60,18 @@ describe('owners parser', () => {
   const wgInfra = new Team('ampproject', 'wg-infra');
   const reviewerTeam = new Team('ampproject', 'reviewers-amphtml');
 
+  function parseRuleDefinition(ruleDef) {
+    const {result, errors} = parser.parseOwnersFileDefinition('OWNERS', {
+      rules: [ruleDef],
+    });
+    return {rule: result && result[0], errors};
+  }
+
+  function parseOwnerDefinition(ownerDef) {
+    const {rule, errors} = parseRuleDefinition({owners: [ownerDef]});
+    return {owner: rule && rule.owners[0], errors};
+  }
+
   beforeEach(() => {
     myTeam = new Team('ampproject', 'my_team');
     myTeam.members = ['team_member', 'other_member'];
@@ -85,156 +97,158 @@ describe('owners parser', () => {
   describe('parseOwnerDefinition', () => {
     describe('when given something not an owner definition', () => {
       it('reports an error', () => {
-        const {errors} = parser._parseOwnerDefinition('', 'HELLO!');
+        const {errors} = parseOwnerDefinition('HELLO!');
         expect(errors[0].message).toEqual(
-          'Expected owner definition; got string'
+          '`OWNERS.rules[0].owners[0]` should be object'
         );
       });
 
       it('returns no result', () => {
-        const {result} = parser._parseOwnerDefinition('', 'HELLO!');
-        expect(result).toBeUndefined();
+        const {owner} = parseOwnerDefinition('HELLO!');
+        expect(owner).toBeUndefined();
       });
     });
 
     describe('when an unexpected key is present', () => {
       it('reports an error', () => {
-        const {errors} = parser._parseOwnerDefinition('', {
+        const {errors} = parseOwnerDefinition({
           name: 'blah',
           pattern: 'something.js', // This should be in the rule, not the owner
         });
         expect(errors[0].message).toEqual(
-          'Unexpected key(s) "pattern" in owner definition'
+          '`OWNERS.rules[0].owners[0]` should NOT have additional properties'
         );
       });
 
       it('returns no result', () => {
-        const {result} = parser._parseOwnerDefinition('', {
+        const {owner} = parseOwnerDefinition({
           name: 'blah',
           pattern: 'something.js', // This should be in the rule, not the owner
         });
-        expect(result).toBeUndefined();
+        expect(owner).toBeUndefined();
       });
     });
 
     describe('for a non-string name', () => {
       it('reports an error', () => {
-        const {errors} = parser._parseOwnerDefinition('', {name: {}});
+        const {errors} = parseOwnerDefinition({name: {}});
         expect(errors[0].message).toEqual(
-          'Expected "name" to be a string; got object'
+          '`OWNERS.rules[0].owners[0].name` should be string'
         );
       });
 
       it('returns no result', () => {
-        const {result} = parser._parseOwnerDefinition('', {name: {}});
-        expect(result).toBeUndefined();
+        const {owner} = parseOwnerDefinition({name: {}});
+        expect(owner).toBeUndefined();
       });
     });
 
     describe('for a name with a leading "@"', () => {
       it('reports an error', () => {
-        const {errors} = parser._parseOwnerDefinition('', {name: '@me'});
-        expect(errors[0].message).toEqual("Ignoring unnecessary '@' in '@me'");
+        const {errors} = parseOwnerDefinition({name: '@myname'});
+        expect(errors[0].message).toContain(
+          '`OWNERS.rules[0].owners[0].name` should match pattern'
+        );
       });
 
-      it('ignores the "@"', () => {
-        const {result} = parser._parseOwnerDefinition('', {name: '@me'});
-        expect(result).toEqual(new UserOwner('me'));
+      it('returns no the "@"', () => {
+        const {owner} = parseOwnerDefinition({name: '@myname'});
+        expect(owner).toBeUndefined();
       });
     });
 
     describe('modifiers', () => {
       describe('when multiple options are specified', () => {
         it('reports an error', () => {
-          const {errors} = parser._parseOwnerDefinition('', {
-            name: 'me',
+          const {errors} = parseOwnerDefinition({
+            name: 'myname',
             notify: true,
             requestReviews: false,
           });
           expect(errors[0].message).toContain(
-            'Cannot specify more than one of (notify, requestReviews)'
+            '`OWNERS.rules[0].owners[0]` should NOT have more than 2 properties'
           );
         });
 
-        it('ignores the options', () => {
-          const {result} = parser._parseOwnerDefinition('', {
-            name: 'me',
+        it('returns no result', () => {
+          const {owner} = parseOwnerDefinition({
+            name: 'myname',
             notify: true,
             required: true,
           });
-          expect(result.modifier).toBe(OWNER_MODIFIER.NONE);
+          expect(owner).toBeUndefined();
         });
       });
 
       it('defaults to no modifier', () => {
-        const {result} = parser._parseOwnerDefinition('', {name: 'me'});
-        expect(result.modifier).toEqual(OWNER_MODIFIER.NONE);
+        const {owner} = parseOwnerDefinition({name: 'myname'});
+        expect(owner.modifier).toEqual(OWNER_MODIFIER.NONE);
       });
 
       it('selects always-notify modifier when "notify" is true', () => {
-        const {result} = parser._parseOwnerDefinition('', {
-          name: 'me',
+        const {owner} = parseOwnerDefinition({
+          name: 'myname',
           notify: true,
         });
-        expect(result.modifier).toEqual(OWNER_MODIFIER.NOTIFY);
+        expect(owner.modifier).toEqual(OWNER_MODIFIER.NOTIFY);
       });
 
       it('selects never-notify modifier when "requestReviews" is false', () => {
-        const {result} = parser._parseOwnerDefinition('', {
-          name: 'me',
+        const {owner} = parseOwnerDefinition({
+          name: 'myname',
           requestReviews: false,
         });
-        expect(result.modifier).toEqual(OWNER_MODIFIER.SILENT);
+        expect(owner.modifier).toEqual(OWNER_MODIFIER.SILENT);
       });
 
       it('selects require-review modifier when "required" is true', () => {
-        const {result} = parser._parseOwnerDefinition('', {
-          name: 'me',
+        const {owner} = parseOwnerDefinition({
+          name: 'myname',
           required: true,
         });
-        expect(result.modifier).toEqual(OWNER_MODIFIER.REQUIRE);
+        expect(owner.modifier).toEqual(OWNER_MODIFIER.REQUIRE);
       });
     });
 
     describe('team owner declarations', () => {
       it('returns a team owner', () => {
-        const {result} = parser._parseOwnerDefinition('', {
+        const {owner} = parseOwnerDefinition({
           name: 'ampproject/my_team',
         });
-        expect(result).toEqual(new TeamOwner(myTeam));
+        expect(owner).toEqual(new TeamOwner(myTeam));
       });
 
       describe('when the team is unknown', () => {
         it('reports an error', () => {
-          const {errors} = parser._parseOwnerDefinition('', {
-            name: 'ampproject/other_team',
+          const {errors} = parseOwnerDefinition({
+            name: 'ampproject/other-team',
           });
-          expect(errors[0].message).toEqual(
-            "Unrecognized team: 'ampproject/other_team'"
+          expect(errors[0].message).toContain(
+            "Unrecognized team: 'ampproject/other-team'"
           );
         });
 
         it('returns no result', () => {
-          const {result} = parser._parseOwnerDefinition('', {
-            name: 'ampproject/other_team',
+          const {owner} = parseOwnerDefinition({
+            name: 'ampproject/other-team',
           });
-          expect(result).toBeUndefined();
+          expect(owner).toBeUndefined();
         });
       });
     });
 
     describe('wildcard owner declarations', () => {
       it('parses a wildcard owner', () => {
-        const {result} = parser._parseOwnerDefinition('', {name: '*'});
-        expect(result).toEqual(new WildcardOwner());
+        const {owner} = parseOwnerDefinition({name: '*'});
+        expect(owner).toEqual(new WildcardOwner());
       });
 
       it('ignores modifiers', () => {
-        const {result, errors} = parser._parseOwnerDefinition('', {
+        const {owner, errors} = parseOwnerDefinition({
           name: '*',
           notify: true,
         });
-        expect(result).toEqual(new WildcardOwner());
+        expect(owner).toEqual(new WildcardOwner());
         expect(errors[0].message).toEqual(
           'Modifiers not supported on wildcard `*` owner'
         );
@@ -245,105 +259,102 @@ describe('owners parser', () => {
   describe('parseRuleDefinition', () => {
     describe('when given something not a rule definition', () => {
       it('reports an error', () => {
-        const {errors} = parser._parseRuleDefinition('', 'NOT A RULE DEF');
-        expect(errors[0].message).toEqual(
-          'Expected rule definition; got string'
-        );
+        const {errors} = parseRuleDefinition('NOT A RULE DEF');
+        expect(errors[0].message).toEqual('`OWNERS.rules[0]` should be object');
       });
 
       it('returns no result', () => {
-        const {result} = parser._parseRuleDefinition('', 'NOT A RULE DEF');
-        expect(result).toBeUndefined();
+        const {rule} = parseRuleDefinition('NOT A RULE DEF');
+        expect(rule).toBeUndefined();
       });
     });
 
     describe('when an unexpected key is present', () => {
       it('reports an error', () => {
-        const {errors} = parser._parseRuleDefinition('', {
+        const {errors} = parseRuleDefinition({
           owners: [{name: 'blah'}],
           notify: true, // This should be in the owner, not the rule
         });
         expect(errors[0].message).toEqual(
-          'Unexpected key(s) "notify" in rule definition'
+          '`OWNERS.rules[0]` should NOT have additional properties'
         );
       });
 
       it('returns no result', () => {
-        const {result} = parser._parseRuleDefinition('', {
+        const {rule} = parseRuleDefinition({
           owners: [{name: 'blah'}],
           notify: true, // This should be in the owner, not the rule
         });
-        expect(result).toBeUndefined();
+        expect(rule).toBeUndefined();
       });
     });
 
     describe('for a non-list owners property', () => {
       it('reports an error', () => {
-        const {errors} = parser._parseRuleDefinition('', {owners: 1337});
+        const {errors} = parseRuleDefinition({owners: 1337});
         expect(errors[0].message).toEqual(
-          'Expected "owners" to be a list; got number'
+          '`OWNERS.rules[0].owners` should be array'
         );
       });
 
       it('returns no result', () => {
-        const {result} = parser._parseRuleDefinition('', {owners: 1337});
-        expect(result).toBeUndefined();
+        const {rule} = parseRuleDefinition({owners: 1337});
+        expect(rule).toBeUndefined();
       });
     });
 
     describe('for a rule with no valid owners', () => {
       it('reports an error', () => {
-        const {errors} = parser._parseRuleDefinition('', {
+        const {errors} = parseRuleDefinition({
           owners: ['NOT AN OWNER DEF', 24],
         });
         const errorMessages = errors.map(({message}) => message);
 
         expect(errorMessages).toEqual([
-          'Expected owner definition; got string',
-          'Expected owner definition; got number',
-          'No valid owners found; skipping rule',
+          '`OWNERS.rules[0].owners[0]` should be object',
+          '`OWNERS.rules[0].owners[1]` should be object',
         ]);
       });
 
       it('returns no result', () => {
-        const {result} = parser._parseRuleDefinition('', {
+        const {rule} = parseRuleDefinition({
           owners: ['NOT AN OWNER DEF', 24],
         });
-        expect(result).toBeUndefined();
+        expect(rule).toBeUndefined();
       });
     });
 
     it('creates an owners rule', () => {
-      const {result} = parser._parseRuleDefinition('', {
+      const {rule} = parseRuleDefinition({
         owners: [{name: 'coder'}],
       });
-      expect(result).toEqual(new OwnersRule('', [new UserOwner('coder')]));
+      expect(rule).toEqual(new OwnersRule('OWNERS', [new UserOwner('coder')]));
     });
 
     describe('when a pattern is specified', () => {
       describe('for a non-string pattern', () => {
         it('reports an error', () => {
-          const {errors} = parser._parseRuleDefinition('', {
+          const {errors} = parseRuleDefinition({
             pattern: {},
             owners: [{name: 'coder'}],
           });
           expect(errors[0].message).toEqual(
-            'Expected "pattern" to be a string; got object'
+            '`OWNERS.rules[0].pattern` should be string'
           );
         });
 
         it('returns no result', () => {
-          const {result} = parser._parseRuleDefinition('', {
+          const {rule} = parseRuleDefinition({
             pattern: {},
             owners: [{name: 'coder'}],
           });
-          expect(result).toBeUndefined();
+          expect(rule).toBeUndefined();
         });
       });
 
       describe('for a singleton pattern in braces', () => {
         it('reports an error', () => {
-          const {errors} = parser._parseRuleDefinition('', {
+          const {errors} = parseRuleDefinition({
             pattern: '{amp-story-*}.js',
             owners: [{name: 'coder'}],
           });
@@ -353,17 +364,17 @@ describe('owners parser', () => {
         });
 
         it('returns no result', () => {
-          const {result} = parser._parseRuleDefinition('', {
+          const {rule} = parseRuleDefinition({
             pattern: '{amp-story-*}.js',
             owners: [{name: 'coder'}],
           });
-          expect(result).toBeUndefined();
+          expect(rule).toBeUndefined();
         });
       });
 
       describe('for a directory glob pattern', () => {
         it('reports an error', () => {
-          const {errors} = parser._parseRuleDefinition('', {
+          const {errors} = parseRuleDefinition({
             pattern: 'foo-*/*.js',
             owners: [{name: 'coder'}],
           });
@@ -373,31 +384,35 @@ describe('owners parser', () => {
         });
 
         it('returns no result', () => {
-          const {result} = parser._parseRuleDefinition('', {
+          const {rule} = parseRuleDefinition({
             pattern: 'foo-*/*.js',
             owners: [{name: 'coder'}],
           });
-          expect(result).toBeUndefined();
+          expect(rule).toBeUndefined();
         });
       });
 
       it('creates a same-directory rule', () => {
-        const {result} = parser._parseRuleDefinition('', {
+        const {rule} = parseRuleDefinition({
           pattern: '*.js',
           owners: [{name: 'coder'}],
         });
-        expect(result).toEqual(
-          new SameDirPatternOwnersRule('', [new UserOwner('coder')], '*.js')
+        expect(rule).toEqual(
+          new SameDirPatternOwnersRule(
+            'OWNERS',
+            [new UserOwner('coder')],
+            '*.js'
+          )
         );
       });
 
       it('creates a recursive rule for a pattern starting with **/', () => {
-        const {result} = parser._parseRuleDefinition('', {
+        const {rule} = parseRuleDefinition({
           pattern: '**/*.js',
           owners: [{name: 'coder'}],
         });
-        expect(result).toEqual(
-          new PatternOwnersRule('', [new UserOwner('coder')], '*.js')
+        expect(rule).toEqual(
+          new PatternOwnersRule('OWNERS', [new UserOwner('coder')], '*.js')
         );
       });
     });
@@ -409,7 +424,7 @@ describe('owners parser', () => {
 
       expect(result).toEqual([]);
       expect(errors[0].message).toEqual(
-        'Failed to parse file; top-level "rules" key must contain a list'
+        "`OWNERS` should have required property 'rules'"
       );
     });
 
@@ -455,17 +470,14 @@ describe('owners parser', () => {
         beforeEach(() => {
           Object.assign(owners, {
             user: rules.basic.owners[0],
-            atSign: rules.basic.owners[1],
-            team: rules.basic.owners[2],
-            noReview: rules.basic.owners[3],
-            notify: rules.basic.owners[4],
-            doubleModifier: rules.basic.owners[5],
+            team: rules.basic.owners[1],
+            noReview: rules.basic.owners[2],
+            notify: rules.basic.owners[3],
           });
         });
 
         it('parses user owners', () => {
           expect(owners.user.name).toEqual('someuser');
-          expect(owners.atSign.name).toEqual('dontdothis');
         });
 
         it('parses team owners', () => {
@@ -476,7 +488,6 @@ describe('owners parser', () => {
           expect(owners.user.modifier).toEqual(OWNER_MODIFIER.NONE);
           expect(owners.noReview.modifier).toEqual(OWNER_MODIFIER.SILENT);
           expect(owners.notify.modifier).toEqual(OWNER_MODIFIER.NOTIFY);
-          expect(owners.doubleModifier.modifier).toEqual(OWNER_MODIFIER.NONE);
         });
       });
 
@@ -521,11 +532,13 @@ describe('owners parser', () => {
     });
 
     describe('reviewer team', () => {
+      const rules = [{owners: [{name: 'someone'}]}];
+
       describe('in the repository root OWNERS file', () => {
         it('records the reviewer set from "reviewerTeam', () => {
           const fileDef = {
+            rules,
             reviewerTeam: 'ampproject/reviewers-amphtml',
-            rules: [],
           };
           const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
 
@@ -537,8 +550,8 @@ describe('owners parser', () => {
 
       describe('specified outside the repository root OWNERS file', () => {
         const fileDef = {
+          rules,
           reviewerTeam: 'ampproject/reviewers-amphtml',
-          rules: [],
         };
 
         it('reports an error', () => {
@@ -556,33 +569,33 @@ describe('owners parser', () => {
             'src/OWNERS',
             fileDef
           );
-          expect(result.length).toEqual(0);
+          expect(result.length).toEqual(1);
         });
       });
 
       describe('for a non-string "reviewerTeam" property', () => {
         const fileDef = {
+          rules,
           reviewerTeam: {name: 'ampproject/reviewers-amphtml'},
-          rules: [],
         };
 
         it('reports an error', () => {
           const {errors} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
           expect(errors[0].message).toEqual(
-            'Expected "reviewerTeam" to be a string; got object'
+            '`OWNERS.reviewerTeam` should be string'
           );
         });
 
-        it('does not produce a reviewer set rule', () => {
+        it('does not produce a result', () => {
           const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
-          expect(result.length).toEqual(0);
+          expect(result).toEqual([]);
         });
       });
 
-      describe('for an unknown team name', () => {
+      describe('for an unknown team namyname', () => {
         const fileDef = {
+          rules,
           reviewerTeam: 'ampproject/unknown-team',
-          rules: [],
         };
 
         it('reports an error', () => {
@@ -594,7 +607,7 @@ describe('owners parser', () => {
 
         it('does not produce a reviewer set rule', () => {
           const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
-          expect(result.length).toEqual(0);
+          expect(result.length).toEqual(1);
         });
       });
     });

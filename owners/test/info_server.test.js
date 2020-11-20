@@ -47,7 +47,6 @@ describe('server', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    // sandbox.stub(console);
   });
 
   afterEach(() => {
@@ -92,7 +91,7 @@ describe('server', () => {
       expect.assertions(1);
       const response = await checkFile({});
       expect(response.fileErrors[0]).toContain(
-        'top-level "rules" key must contain a list'
+        "`OWNERS` should have required property 'rules'"
       );
     });
 

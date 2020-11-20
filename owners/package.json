@@ -24,6 +24,7 @@
     "@google-cloud/storage": "4.7.0",
     "@octokit/auth": "2.0.0",
     "@octokit/rest": "16.43.2",
+    "ajv": "6.12.6",
     "express": "4.17.1",
     "highlight": "0.2.4",
     "json5": "2.1.3",
