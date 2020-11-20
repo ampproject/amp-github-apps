@@ -53,7 +53,6 @@ module.exports = {
   },
   'rules': {
     '@typescript-eslint/await-thenable': 'error',
-    '@typescript-eslint/camelcase': ['error', { 'properties': 'always' }],
     '@typescript-eslint/type-annotation-spacing': 'error',
     '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/semi': 'error',

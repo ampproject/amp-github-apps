@@ -21,7 +21,7 @@ export interface HeaderProps {
   title: string;
 }
 
-export class Header extends React.Component<HeaderProps, {}> {
+export class Header extends React.Component<HeaderProps, unknown> {
   render(): JSX.Element {
     return <h1 className='header'>{this.props.title}</h1>;
     //TODO: add help/about icon which links to a different amp page

@@ -28,7 +28,7 @@ interface AppState {
   input: string;
 }
 
-export class App extends React.Component<{}, AppState> {
+export class App extends React.Component<unknown, AppState> {
   constructor(props: unknown) {
     super(props);
     this.state = {
