@@ -13,6 +13,9 @@
   "separateMinorPatch": true,
   "prBodyColumns": ["Package", "Update", "Type", "Change", "Package file"],
   "reviewersSampleSize": 1,
+  "prBodyNotes": [
+    "See all other Renovate PRs on the [Dependency Dashboard](https://github.com/ampproject/amp-github-apps/issues/1019)"
+  ],
 
   "packageRules": [{
     "packagePatterns": [".*"],
