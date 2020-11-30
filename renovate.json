@@ -13,7 +13,7 @@
 
   "packageRules": [{
     "packagePatterns": [".*"],
-    "groupName": "core packages",
+    "groupName": "core packages"
   }, {
     "paths": ["bundle-size/**"],
     "labels": ["Category: Bundle Size"],
