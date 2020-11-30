@@ -38,7 +38,7 @@ import statusCodes from 'http-status-codes';
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
-const ISSUE_REPO_NAME = process.env.ISSUE_REPO_NAME || 'amphtml';
+const ISSUE_REPO_NAME = process.env.ISSUE_REPO_NAME || GITHUB_REPO_NAME;
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
 const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
@@ -351,16 +351,21 @@ export async function linkIssue(
   if (issueNumber.startsWith('#')) {
     issueNumber = issueNumber.substr(1);
   }
+  issueNumber = Number(issueNumber);
 
   try {
     const issueRepo =
-      Number(issueNumber) >= LEGACY_ISSUE_REPO_START
+      issueNumber >= LEGACY_ISSUE_REPO_START
         ? GITHUB_REPO_NAME
         : ISSUE_REPO_NAME;
-    await stackdriver.setGroupIssue(
-      errorId.toString(),
-      `https://github.com/${GITHUB_REPO_OWNER}/${issueRepo}/issues/${issueNumber}`
-    );
+
+    await Promise.all([
+      bot.commentWithDupe(errorId.toString(), issueNumber),
+      stackdriver.setGroupIssue(
+        errorId.toString(),
+        `https://github.com/${GITHUB_REPO_OWNER}/${issueRepo}/issues/${issueNumber}`
+      ),
+    ]);
   } catch (e) {
     console.error(e);
   } finally {

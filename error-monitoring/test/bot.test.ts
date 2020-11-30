@@ -114,6 +114,19 @@ describe('ErrorIssueBot', () => {
     });
   });
 
+  describe('commentWithDupe', () => {
+    it('creates a comment linking to the duplicate error report', async () => {
+      nock('https://api.github.com')
+        .post('/repos/test_org/issue_repo/issues/1337/comments', body => {
+          expect(body.body).toContain('([link](http://go/ampe/a1b2c3d4e5))');
+          return true;
+        })
+        .reply(201);
+
+      await bot.commentWithDupe('a1b2c3d4e5', 1337);
+    });
+  });
+
   describe('report', () => {
     const issueUrl = 'https://github.com/ampproject/amphtml/issues/1337';
 

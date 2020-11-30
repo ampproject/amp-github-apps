@@ -36,6 +36,7 @@ export class ErrorIssueBot {
     private issueRepoName?: string
   ) {
     this.octokit = new Octokit({auth: `token ${token}`});
+    this.issueRepoName = issueRepoName || repoName;
     this.blameFinder = new BlameFinder(
       repoOwner,
       repoName,
@@ -57,6 +58,16 @@ export class ErrorIssueBot {
       labels: builder.labels,
       body: builder.body,
     };
+  }
+
+  /** Comments on an existing issue to link a duplicate error. */
+  async commentWithDupe(errorId: string, issueNumber: number) {
+    await this.octokit.issues.createComment({
+      owner: this.repoOwner,
+      repo: this.issueRepoName,
+      'issue_number': issueNumber,
+      body: `A duplicate error report was linked to this issue ([link](http://go/ampe/${errorId}))`,
+    });
   }
 
   /** Creates an error report issue and returns the issue URL. */
