@@ -12,7 +12,7 @@
   "dependencyDashboard": true,
   "separateMinorPatch": true,
   "prBodyColumns": ["Package", "Update", "Type", "Change", "Package file"],
-  "assigneesSampleSize": 1,
+  "reviewersSampleSize": 1,
 
   "packageRules": [{
     "packagePatterns": [".*"],
@@ -21,7 +21,7 @@
     "paths": ["bundle-size/**"],
     "labels": ["Category: Bundle Size"],
     "groupName": "bundle-size packages",
-    "assignees": ["danielrozenberg"],
+    "reviewers": ["danielrozenberg"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "bundle-size-"
@@ -30,7 +30,7 @@
     "paths": ["bundle-size-chart/**"],
     "labels": ["Category: Bundle Size Chart"],
     "groupName": "bundle-size-chart packages",
-    "assignees": ["danielrozenberg"],
+    "reviewers": ["danielrozenberg"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "bundle-size-chart-"
@@ -38,7 +38,7 @@
   }, {
     "paths": ["checklist/**"],
     "groupName": "checklist packages",
-    "assignees": ["danielrozenberg", "estherkim", "rcebulko"],
+    "reviewers": ["danielrozenberg", "estherkim", "rcebulko"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "checklist-"
@@ -47,7 +47,7 @@
     "paths": ["error-monitoring/**"],
     "labels": ["Category: Error Monitoring"],
     "groupName": "error-monitoring packages",
-    "assignees": ["rcebulko"],
+    "reviewers": ["rcebulko"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "error-monitoring-"
@@ -56,7 +56,7 @@
     "paths": ["invite/**"],
     "labels": ["Category: Invite"],
     "groupName": "invite packages",
-    "assignees": ["rcebulko"],
+    "reviewers": ["rcebulko"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "invite-"
@@ -64,7 +64,7 @@
   }, {
     "paths": ["onduty/**"],
     "groupName": "onduty packages",
-    "assignees": ["rcebulko"],
+    "reviewers": ["rcebulko"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "onduty-"
@@ -73,7 +73,7 @@
     "paths": ["owners/**"],
     "labels": ["Category: Owners"],
     "groupName": "owners packages",
-    "assignees": ["rcebulko"],
+    "reviewers": ["rcebulko"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "owners-"
@@ -82,7 +82,7 @@
     "paths": ["pr-deploy/**"],
     "labels": ["Category: PR Deploy"],
     "groupName": "pr-deploy packages",
-    "assignees": ["estherkim"],
+    "reviewers": ["estherkim"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "pr-deploy-"
@@ -91,7 +91,7 @@
     "paths": ["project-metrics/**"],
     "labels": ["Category: Project Metrics"],
     "groupName": "project-metrics packages",
-    "assignees": ["rcebulko"],
+    "reviewers": ["rcebulko"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "project-metrics-"
@@ -100,7 +100,7 @@
     "paths": ["release-calendar/**"],
     "labels": ["Category: Release Calendar"],
     "groupName": "release-calendar packages",
-    "assignees": ["estherkim"],
+    "reviewers": ["estherkim"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "release-calendar-"
@@ -109,7 +109,7 @@
     "paths": ["test-case-reporting/**"],
     "labels": ["Category: Test Cases"],
     "groupName": "test-case-reporting packages",
-    "assignees": ["rcebulko"],
+    "reviewers": ["rcebulko"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "test-case-reporting-"
@@ -118,7 +118,7 @@
     "paths": ["test-status/**"],
     "labels": ["Category: Test Status"],
     "groupName": "test-status packages",
-    "assignees": ["danielrozenberg"],
+    "reviewers": ["danielrozenberg"],
     "major": {
       "groupName": null,
       "additionalBranchPrefix": "test-status-"
