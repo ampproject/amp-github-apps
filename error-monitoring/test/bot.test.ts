@@ -118,7 +118,6 @@ describe('ErrorIssueBot', () => {
     it('creates a comment linking to the duplicate error report', async () => {
       nock('https://api.github.com')
         .post('/repos/test_org/issue_repo/issues/1337/comments', body => {
-          expect(body.issue);
           expect(body.body).toContain('([link](http://go/ampe/a1b2c3d4e5))');
           return true;
         })
