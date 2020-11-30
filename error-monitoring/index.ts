@@ -351,16 +351,21 @@ export async function linkIssue(
   if (issueNumber.startsWith('#')) {
     issueNumber = issueNumber.substr(1);
   }
+  issueNumber = Number(issueNumber);
 
   try {
     const issueRepo =
-      Number(issueNumber) >= LEGACY_ISSUE_REPO_START
+      issueNumber >= LEGACY_ISSUE_REPO_START
         ? GITHUB_REPO_NAME
         : ISSUE_REPO_NAME;
-    await stackdriver.setGroupIssue(
-      errorId.toString(),
-      `https://github.com/${GITHUB_REPO_OWNER}/${issueRepo}/issues/${issueNumber}`
-    );
+
+    await Promise.all([
+      bot.commentWithDupe(errorId.toString(), issueNumber),
+      stackdriver.setGroupIssue(
+        errorId.toString(),
+        `https://github.com/${GITHUB_REPO_OWNER}/${issueRepo}/issues/${issueNumber}`
+      ),
+    ]);
   } catch (e) {
     console.error(e);
   } finally {
