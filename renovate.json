@@ -10,6 +10,8 @@
   "timezone": "America/Los_Angeles",
   "schedule": "after 9pm on sunday",
   "dependencyDashboard": true,
+  "separateMinorPatch": true,
+  "prBodyColumns": ["Package", "Update", "Type", "Change", "Package file"],
 
   "packageRules": [{
     "packagePatterns": [".*"],
