@@ -40,7 +40,7 @@
     "@types/knex": "0.16.1",
     "@types/md5": "2.2.1",
     "@types/mustache": "4.0.1",
-    "@types/node": "13.13.33",
+    "@types/node": "13.13.34",
     "@types/node-fetch": "2.5.7",
     "@types/supertest": "2.0.10",
     "@typescript-eslint/eslint-plugin": "2.34.0",
