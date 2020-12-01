@@ -61,13 +61,15 @@ export class ErrorIssueBot {
   }
 
   /** Comments on an existing issue to link a duplicate error. */
-  async commentWithDupe(errorId: string, issueNumber: number) {
-    await this.octokit.issues.createComment({
-      owner: this.repoOwner,
-      repo: this.issueRepoName,
-      'issue_number': issueNumber,
-      body: `A duplicate error report was linked to this issue ([link](http://go/ampe/${errorId}))`,
-    });
+  async commentWithDupe(errorId: string, issueNumber: number): Promise<void> {
+    await this.octokit.issues
+      .createComment({
+        owner: this.repoOwner,
+        repo: this.issueRepoName,
+        'issue_number': issueNumber,
+        body: `A duplicate error report was linked to this issue ([link](http://go/ampe/${errorId}))`,
+      })
+      .then(console.log);
   }
 
   /** Creates an error report issue and returns the issue URL. */
