@@ -61,11 +61,15 @@ export class ErrorIssueBot {
   }
 
   /** Comments on an existing issue to link a duplicate error. */
-  async commentWithDupe(errorId: string, issueNumber: number): Promise<void> {
+  async commentWithDupe(
+    errorId: string,
+    repo: string,
+    issueNumber: number
+  ): Promise<void> {
     await this.octokit.issues
       .createComment({
         owner: this.repoOwner,
-        repo: this.issueRepoName,
+        repo,
         'issue_number': issueNumber,
         body: `A duplicate error report was linked to this issue ([link](http://go/ampe/${errorId}))`,
       })

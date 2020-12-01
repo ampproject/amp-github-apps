@@ -360,7 +360,7 @@ export async function linkIssue(
         : ISSUE_REPO_NAME;
 
     await Promise.all([
-      bot.commentWithDupe(errorId.toString(), issueNumber),
+      bot.commentWithDupe(errorId.toString(), issueRepo, issueNumber),
       stackdriver.setGroupIssue(
         errorId.toString(),
         `https://github.com/${GITHUB_REPO_OWNER}/${issueRepo}/issues/${issueNumber}`

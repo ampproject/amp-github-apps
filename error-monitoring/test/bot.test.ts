@@ -123,7 +123,7 @@ describe('ErrorIssueBot', () => {
         })
         .reply(201);
 
-      await bot.commentWithDupe('a1b2c3d4e5', 1337);
+      await bot.commentWithDupe('a1b2c3d4e5', 'issue_repo', 1337);
     });
   });
 
