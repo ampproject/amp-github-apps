@@ -346,12 +346,12 @@ export async function linkIssue(
   res: express.Response
 ): Promise<void> {
   const {errorId, serviceType, normalizedThreshold} = req.query;
-  let issueNumber = req.query.issueNumber.toString();
+  let issueNumberText = req.query.issueNumber.toString();
 
-  if (issueNumber.startsWith('#')) {
-    issueNumber = issueNumber.substr(1);
+  if (issueNumberText.startsWith('#')) {
+    issueNumberText = issueNumberText.substr(1);
   }
-  issueNumber = Number(issueNumber);
+  const issueNumber = Number(issueNumber);
 
   try {
     const issueRepo =
