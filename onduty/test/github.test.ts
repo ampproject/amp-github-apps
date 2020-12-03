@@ -34,8 +34,10 @@ describe('GitHub', () => {
         listMembersInOrg: jest.fn().mockResolvedValue({
           data: [{login: 'aUser'}, {login: 'someone'}],
         }),
-        addOrUpdateMembershipInOrg: jest.fn().mockResolvedValue(undefined),
-        removeMembershipInOrg: jest.fn().mockResolvedValue(undefined),
+        addOrUpdateMembershipForUserInOrg: jest
+          .fn()
+          .mockResolvedValue(undefined),
+        removeMembershipForUserInOrg: jest.fn().mockResolvedValue(undefined),
       },
     } as unknown) as Octokit;
     github = new GitHub(octokit, 'test_org', fakeConsole);
@@ -61,7 +63,9 @@ describe('GitHub', () => {
   describe('addToTeam', () => {
     it('adds the user to the team', async () => {
       await github.addToTeam('test_team', 'newbie');
-      expect(octokit.teams.addOrUpdateMembershipInOrg).toHaveBeenCalledWith({
+      expect(
+        octokit.teams.addOrUpdateMembershipForUserInOrg
+      ).toHaveBeenCalledWith({
         org: 'test_org',
         'team_slug': 'test_team',
         username: 'newbie',
@@ -72,7 +76,7 @@ describe('GitHub', () => {
   describe('removeFromTeam', () => {
     it('removes the user from the team', async () => {
       await github.removeFromTeam('test_team', 'someone');
-      expect(octokit.teams.removeMembershipInOrg).toHaveBeenCalledWith({
+      expect(octokit.teams.removeMembershipForUserInOrg).toHaveBeenCalledWith({
         org: 'test_org',
         'team_slug': 'test_team',
         username: 'someone',
