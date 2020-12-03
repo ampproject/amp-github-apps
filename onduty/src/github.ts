@@ -34,7 +34,9 @@ export class GitHub {
       org: this.org,
       'team_slug': teamName,
     });
-    const usernames = data.map(({login}) => login.toLowerCase());
+    const usernames = data.map(({login}: {login: string}) =>
+      login.toLowerCase()
+    );
     this.logger.debug(
       `[getTeamMembers] Found members: ${usernames.join(', ')}`
     );
@@ -46,7 +48,7 @@ export class GitHub {
   async addToTeam(teamName: string, username: string): Promise<void> {
     this.logger.info(`[addToTeam] Adding ${username} to team "${teamName}"`);
 
-    await this.client.teams.addOrUpdateMembershipInOrg({
+    await this.client.teams.addOrUpdateMembershipForUserInOrg({
       org: this.org,
       'team_slug': teamName,
       username,
@@ -59,7 +61,7 @@ export class GitHub {
       `[removeFromTeam] Removing ${username} from team "${teamName}"`
     );
 
-    await this.client.teams.removeMembershipInOrg({
+    await this.client.teams.removeMembershipForUserInOrg({
       org: this.org,
       'team_slug': teamName,
       username,
