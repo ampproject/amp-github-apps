@@ -310,7 +310,9 @@ class GitHub {
       `Requesting review for PR #${number} from: ${reviewers.join(', ')}`
     );
 
-    await this.client.pulls.createReviewRequest(this.repo({number, reviewers}));
+    await this.client.pulls.requestReviewers(
+      this.repo({'pull_number': number, reviewers})
+    );
   }
 
   /**
@@ -322,8 +324,8 @@ class GitHub {
   async getReviewRequests(number) {
     this.logger.info(`Fetching review requests for PR #${number}`);
 
-    const response = await this.client.pulls.listReviewRequests(
-      this.repo({number})
+    const response = await this.client.pulls.listRequestedReviewers(
+      this.repo({'pull_number': number})
     );
     this.logger.debug('[getReviewRequests]', number, response.data);
 
@@ -344,7 +346,7 @@ class GitHub {
 
     const comments = await this._paginate(
       this.client.issues.listComments,
-      this.repo({number})
+      this.repo({'issue_number': number})
     );
     this.logger.debug('[getBotComments]', number, comments);
 
@@ -418,7 +420,7 @@ class GitHub {
       `Fetching contents of file ${file.filename} at ref ${file.sha}`
     );
 
-    const response = await this.client.gitdata.getBlob(
+    const response = await this.client.git.getBlob(
       this.repo({'file_sha': file.sha})
     );
     this.logger.debug('[getFileContents]', file, response.data);

@@ -23,7 +23,7 @@ const {OwnersCheck} = require('./src/ownership/owners_check');
 const NO_REQUEST_OWNERS_REGEX = /\b(WIP|work in progress|DO NOT (MERGE|SUBMIT|REVIEW))\b/i;
 
 module.exports = app => {
-  const {github, ownersBot, initialized} = bootstrap(app.log);
+  const {github, ownersBot, initialized} = bootstrap();
 
   /**
    * Listen for webhooks and provide handlers with a GitHub interface and the

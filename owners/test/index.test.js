@@ -108,14 +108,11 @@ describe('GitHub app', () => {
       .post('/app/installations/588033/access_tokens')
       .reply(200, {token: 'test'});
 
-    probot = new Probot({});
-    const app = probot.load(owners);
-
-    // Return a test token.
-    app.app = {
-      getInstallationAccessToken: () => Promise.resolve('test'),
-      getSignedJsonWebToken: () => Promise.resolve('test'),
-    };
+    probot = new Probot({
+      githubToken: 'test',
+      id: 1,
+    });
+    probot.load(owners);
   });
 
   afterEach(() => {
