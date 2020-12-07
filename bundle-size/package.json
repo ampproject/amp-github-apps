@@ -24,7 +24,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@octokit/rest": "18.0.9",
+    "@octokit/rest": "18.0.12",
     "knex": "0.21.12",
     "node-cache": "5.1.2",
     "pg": "8.3.3",
