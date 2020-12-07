@@ -29,7 +29,7 @@
     "http-status-codes": "2.1.4",
     "knex": "0.21.12",
     "md5": "2.3.0",
-    "mustache": "4.0.1",
+    "mustache": "4.1.0",
     "node-fetch": "2.6.1",
     "pg": "8.5.1"
   },
@@ -39,7 +39,7 @@
     "@types/jest": "26.0.16",
     "@types/knex": "0.16.1",
     "@types/md5": "2.2.1",
-    "@types/mustache": "4.0.1",
+    "@types/mustache": "4.1.0",
     "@types/node": "13.13.34",
     "@types/node-fetch": "2.5.7",
     "@types/supertest": "2.0.10",
