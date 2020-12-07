@@ -30,7 +30,6 @@
 require('dotenv').config();
 
 const sleep = require('sleep-promise');
-const {createTokenAuth} = require('@octokit/auth');
 const {Octokit} = require('@octokit/rest');
 
 const CompoundCache = require('../src//cache/compound_cache');
@@ -47,7 +46,7 @@ const {
 const CACHE_HIT_INTERVAL = 3000;
 
 const github = new GitHub(
-  new Octokit({authStrategy: createTokenAuth, auth: GITHUB_ACCESS_TOKEN}),
+  new Octokit({auth: GITHUB_ACCESS_TOKEN}),
   GITHUB_OWNER,
   GITHUB_REPOSITORY,
   console

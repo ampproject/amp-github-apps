@@ -39,7 +39,6 @@ function bootstrap(logger = console) {
     const CompoundCache = require('./src/cache/compound_cache');
     const sleep = require('sleep-promise');
     const VirtualRepository = require('./src/repo/virtual_repo');
-    const {createTokenAuth} = require('@octokit/auth');
     const {GitHub} = require('./src/api/github');
     const {Octokit} = require('@octokit/rest');
     const {OwnersBot} = require('./src/owners_bot');
@@ -53,7 +52,6 @@ function bootstrap(logger = console) {
 
     const github = new GitHub(
       new Octokit({
-        authStrategy: createTokenAuth,
         auth: GITHUB_ACCESS_TOKEN,
         // hellcat-preview allows team member listings to include nested teams.
         previews: ['hellcat-preview'],

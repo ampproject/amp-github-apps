@@ -16,7 +16,6 @@
 
 const nock = require('nock');
 const sinon = require('sinon');
-const {createTokenAuth} = require('@octokit/auth');
 const {Octokit} = require('@octokit/rest');
 
 const {CheckRun, CheckRunState} = require('../../src/ownership/owners_check');
@@ -130,10 +129,9 @@ describe('GitHub API', () => {
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
 
     githubClient = new Octokit({
-      authStrategy: createTokenAuth,
       auth: '_TOKEN_',
     });
-    github = new GitHub(githubClient, 'test_owner', 'test_repo');
+    github = new GitHub(githubClient, 'test_owner', 'test_repo', console);
   });
 
   afterEach(() => {
