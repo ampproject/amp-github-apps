@@ -30,7 +30,7 @@
     "lodash": "4.17.20",
     "minimatch": "3.0.4",
     "probot": "10.17.3",
-    "sleep-promise": "8.0.1"
+    "sleep-promise": "9.0.0"
   },
   "devDependencies": {
     "eslint": "6.8.0",
