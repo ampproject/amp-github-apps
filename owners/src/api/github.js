@@ -155,7 +155,7 @@ class GitHub {
    */
   static fromContext(context) {
     const {repo, owner} = context.repo();
-    return new GitHub(context.github, owner, repo, context.log);
+    return new GitHub(context.octokit, owner, repo, context.log);
   }
 
   /**
