@@ -40,14 +40,12 @@ module.exports = {
   },
   'rules': {
     '@typescript-eslint/await-thenable': 'error',
-    '@typescript-eslint/camelcase': ['error', { 'properties': 'always' }],
     '@typescript-eslint/promise-function-async': 'error',
     '@typescript-eslint/type-annotation-spacing': 'error',
     '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/semi': 'error',
+    // TODO(#1103): Migrate to @typescript-eslint/naming-convention option
 
-    // Off for @typescript-eslint rule
-    'camelcase': 'off',
     'indent': 'off',
     'no-unused-vars': 'off',
     'semi': 'off',
