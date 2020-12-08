@@ -29,7 +29,7 @@
     "node-cache": "5.1.2",
     "pg": "8.3.3",
     "probot": "10.8.1",
-    "sleep-promise": "8.0.1"
+    "sleep-promise": "9.0.0"
   },
   "devDependencies": {
     "eslint": "7.10.0",
