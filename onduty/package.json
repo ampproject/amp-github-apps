@@ -22,7 +22,6 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@octokit/auth": "2.0.1",
     "@octokit/rest": "18.0.12",
     "@probot/serverless-gcf": "0.2.0",
     "dotenv": "8.2.0",
