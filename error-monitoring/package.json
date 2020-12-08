@@ -38,7 +38,7 @@
   "devDependencies": {
     "@google-cloud/functions-framework": "1.7.1",
     "@types/express": "4.17.9",
-    "@types/jest": "26.0.16",
+    "@types/jest": "26.0.17",
     "@types/mustache": "4.1.0",
     "@types/node": "13.13.34",
     "@types/node-fetch": "2.5.7",
