@@ -22,7 +22,7 @@ const {OwnersCheck} = require('./src/ownership/owners_check');
 
 const NO_REQUEST_OWNERS_REGEX = /\b(WIP|work in progress|DO NOT (MERGE|SUBMIT|REVIEW))\b/i;
 
-module.exports = app => {
+module.exports = ({app, getRouter}) => {
   const {github, ownersBot, initialized} = bootstrap();
 
   /**
@@ -135,12 +135,12 @@ module.exports = app => {
   });
 
   if (process.env.NODE_ENV !== 'test') {
-    new InfoServer(ownersBot, github, app.route(), app.log);
+    new InfoServer(ownersBot, github, getRouter(), app.log);
   }
 
   // Since this endpoint triggers a ton of GitHub API requests, there is a risk
   // of it being spammed; so it is not exposed through the info server.
-  app.route('/admin').get('/check/:prNumber', async (req, res) => {
+  getRouter('/admin').get('/check/:prNumber', async (req, res) => {
     const pr = await github.getPullRequest(req.params.prNumber);
     const {changedFiles, reviewers} = await ownersBot.initPr(github, pr);
     const {checkRun} = new OwnersCheck(

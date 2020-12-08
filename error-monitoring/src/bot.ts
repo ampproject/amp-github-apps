@@ -61,7 +61,7 @@ export class ErrorIssueBot {
   }
 
   /** Comments on an existing issue to link a duplicate error. */
-  async commentWithDupe(errorId: string, issueNumber: number) {
+  async commentWithDupe(errorId: string, issueNumber: number): Promise<void> {
     await this.octokit.issues.createComment({
       owner: this.repoOwner,
       repo: this.issueRepoName,

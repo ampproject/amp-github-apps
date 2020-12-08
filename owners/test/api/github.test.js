@@ -145,7 +145,7 @@ describe('GitHub API', () => {
         repo: () => {
           return {repo: 'test_repo', owner: 'test_owner'};
         },
-        github: githubClient,
+        octokit: githubClient,
         log: logStub,
       });
 

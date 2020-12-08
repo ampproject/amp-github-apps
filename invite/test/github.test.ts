@@ -15,17 +15,13 @@
  */
 
 import {Octokit} from '@octokit/rest';
-import {createTokenAuth} from '@octokit/auth';
 import nock from 'nock';
 
 import {GitHub} from '../src/github';
 import {getFixture} from './fixtures';
 
 describe('GitHub interface', () => {
-  const githubClient: Octokit = new Octokit({
-    authStrategy: createTokenAuth,
-    auth: '_TOKEN_',
-  });
+  const githubClient: Octokit = new Octokit({auth: '_TOKEN_'});
   let github: GitHub;
 
   beforeAll(() => {

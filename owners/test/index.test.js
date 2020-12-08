@@ -110,7 +110,7 @@ describe('GitHub app', () => {
 
     probot = new Probot({
       githubToken: 'test',
-      id: 1,
+      appId: 1,
     });
     probot.load(owners);
   });
