@@ -30,7 +30,7 @@ import md5 from 'md5';
 
 type QueryFunction = (q: QueryBuilder) => QueryBuilder;
 
-/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable camelcase */
 /**
  * Creates a TestRun object from a row of the join of all the tables.
  * @param bigJoin A row of the join of all the tables. May have aliases
@@ -80,7 +80,7 @@ function getTestRunFromRow({
 
   return testRun;
 }
-/* eslint-enable @typescript-eslint/camelcase */
+/* eslint-enable camelcase */
 
 export class TestResultRecord {
   constructor(private db: Database) {}
@@ -305,13 +305,13 @@ export class TestResultRecord {
       .limit(limit)
       .offset(offset);
 
-    /* eslint-disable @typescript-eslint/camelcase */
+    /* eslint-disable camelcase */
     return dbBuilds.map(({commit_sha, build_number, started_at}) => ({
       commitSha: commit_sha,
       buildNumber: build_number,
       startedAt: new Date(started_at),
     }));
-    /* eslint-enable @typescript-eslint/camelcase */
+    /* eslint-enable camelcase */
   }
 
   /**
@@ -350,7 +350,7 @@ export class TestResultRecord {
       .limit(limit)
       .offset(offset);
 
-    /* eslint-disable @typescript-eslint/camelcase */
+    /* eslint-disable camelcase */
     return dbTestCases.map(
       ({id, name, created_at, sample_size, pass, fail, skip, error}) => ({
         id,
@@ -365,6 +365,6 @@ export class TestResultRecord {
         },
       })
     );
-    /* eslint-enable @typescript-eslint/camelcase */
+    /* eslint-enable camelcase */
   }
 }
