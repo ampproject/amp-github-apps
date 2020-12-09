@@ -246,10 +246,7 @@ function viewData({
         firstSeen: formatDate(new Date(firstSeen)),
         dailyOccurrences: dailyOccurrences.toLocaleString('en-US'),
         message,
-        stacktrace: stacktrace
-          .split('\n')
-          .map(linkifySource)
-          .join('\n'),
+        stacktrace: stacktrace.split('\n').map(linkifySource).join('\n'),
         seenInVersions,
         createUrl,
       })
