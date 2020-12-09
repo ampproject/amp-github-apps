@@ -44,7 +44,9 @@ module.exports = {
     '@typescript-eslint/type-annotation-spacing': 'error',
     '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/semi': 'error',
+
     // TODO(#1103): Migrate to @typescript-eslint/naming-convention option
+    '@typescript-eslint/camelcase': 'off',
 
     'indent': 'off',
     'no-unused-vars': 'off',
