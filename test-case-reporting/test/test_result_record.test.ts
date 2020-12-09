@@ -41,8 +41,9 @@ jest.mock('../src/db', () => ({
       // Foreign keys are disabled by default in sqlite3 :(
       // This enables them after creating the connection.
       pool: {
-        afterCreate: (connection: any, callback: any): any =>
-          connection.run('PRAGMA foreign_keys = ON', callback),
+        afterCreate: (connection: unknown, callback: unknown): unknown =>
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+          (connection as any).run('PRAGMA foreign_keys = ON', callback),
       },
     }),
 }));

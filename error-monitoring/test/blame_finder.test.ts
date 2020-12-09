@@ -56,9 +56,7 @@ describe('BlameFinder', () => {
     const rtv = '2004030010070';
 
     it('handles error responses from GitHub', async () => {
-      nock('https://api.github.com')
-        .post('/graphql')
-        .reply(500);
+      nock('https://api.github.com').post('/graphql').reply(500);
 
       await expect(
         blameFinder.blameForFile(rtv, 'not/a/file.js')
