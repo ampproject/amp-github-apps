@@ -26,6 +26,6 @@ module.exports = {
   // instead of the camel-case equivalent. Snake-case is also required for
   // object parameters passed to Octokit invocations.
   "rules": {
-    "@typescript-eslint/camelcase": "off"
+    "camelcase": "off"
   }
 };
