@@ -38,7 +38,7 @@
     "nock": "13.0.5",
     "sinon": "9.2.1",
     "smee-client": "1.2.2",
-    "supertest": "4.0.2"
+    "supertest": "6.0.1"
   },
   "standard": {
     "env": [
