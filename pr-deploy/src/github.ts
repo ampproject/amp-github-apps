@@ -145,7 +145,7 @@ export class PullRequest {
           'Please click the `Create a test site` button above to ' +
           'deploy the minified build of this PR along with examples from ' +
           '`examples/` and `test/manual/`. It should only take a minute.',
-        text: `Travis build number: ${id}`,
+        text: `CI build number: ${id}`,
       },
       actions: ACTIONS,
     };
@@ -169,7 +169,7 @@ export class PullRequest {
         title: 'Build error.',
         summary:
           'A test site cannot be created because this PR ' +
-          'failed to build. Please check the Travis logs for more information.',
+          'failed to build. Please check the CI logs for more information.',
       },
     };
 
@@ -192,16 +192,16 @@ export class PullRequest {
         title: 'Build skipped.',
         summary:
           'A test site cannot be created because the ' +
-          'compilation step was skipped in Travis. This happens when ' +
+          'compilation step was skipped during CI. This happens when ' +
           'a PR only includes non-code changes, such as documentation. ' +
-          'Please check the Travis logs for more information.',
+          'Please check the CI logs for more information.',
       },
     };
 
     return this.github.checks.update(params);
   }
 
-  async getTravisBuildNumber() {
+  async getCiBuildNumber() {
     const check = await this.getCheck_();
 
     if (!check.output || !check.output.text) {
@@ -224,7 +224,7 @@ export class PullRequest {
       output: {
         title: 'Waiting for the build to finish...',
         summary:
-          'When Travis is finished compiling this PR, ' +
+          'When CI has finished compiling this PR, ' +
           'a "Create a test site!" button will appear here.',
       },
     };
