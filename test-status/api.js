@@ -39,10 +39,10 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
       Object.assign(params, {
         status: 'queued',
         output: {
-          title: 'Tests are queued on Travis',
+          title: 'Tests are queued',
           summary:
-            `The ${type} tests (${subType}) are queued to run on ` +
-            'Travis. Watch this space for results in a few minutes!',
+            `The ${type} tests (${subType}) are queued. ` +
+            'Watch this space for results in a few minutes!',
         },
       });
       break;
@@ -52,9 +52,9 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
         status: 'in_progress',
         'started_at': new Date().toISOString(),
         output: {
-          title: 'Tests are running on Travis',
+          title: 'Tests are running',
           summary:
-            `The ${type} tests (${subType}) are running on Travis. ` +
+            `The ${type} tests (${subType}) are running. ` +
             'Watch this space for results in a few minutes!',
         },
       });
@@ -92,7 +92,7 @@ function createNewCheckParams(pullRequestSnapshot, type, subType, status) {
  * @param {number} checkRunId the existing check run ID.
  * @param {number} passed number of tests that passed.
  * @param {number} failed number of tests that failed.
- * @param {string?} travisJobUrl optional Travis job URL.
+ * @param {string?} ciJobUrl optional CI job URL.
  * @return {!object} a parameters object for github.checks.update.
  */
 function createReportedCheckParams(
@@ -102,7 +102,7 @@ function createReportedCheckParams(
   checkRunId,
   passed,
   failed,
-  travisJobUrl
+  ciJobUrl
 ) {
   const {owner, repo} = pullRequestSnapshot;
   const params = {
@@ -117,19 +117,19 @@ function createReportedCheckParams(
       conclusion: 'action_required',
       output: {
         title: `${failed} test${failed != 1 ? 's' : ''} failed`,
-        summary: `The ${type} tests (${subType}) finished running on Travis.`,
+        summary: `The ${type} tests (${subType}) finished running.`,
         text:
           `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n` +
           `* *${failed}* test${failed != 1 ? 's' : ''} FAILED\n\n` +
-          'Please inspect the Travis build and fix any code changes that ' +
+          'Please inspect the CI build logs and fix any code changes that ' +
           'resulted in test breakage or fix the broken tests.\n\n' +
           'If you believe that this pull request was not the cause of this ' +
           'test breakage (i.e., this is a flaky test) error please try the ' +
           'following steps:\n' +
-          `1. Restart the failed [Travis job](${travisJobUrl})\n` +
+          `1. Restart the failed [CI job](${ciJobUrl})\n` +
           '2. Rebase your pull request on the latest `master` branch\n' +
           `3. Contact the weekly build cop (@${BUILD_COP_TEAM}), who can advise ` +
-          'you how to proceed, or skip this test run for you.',
+          'you on how to proceed, or skip this test run for you.',
       },
     });
   } else {
@@ -137,10 +137,10 @@ function createReportedCheckParams(
       conclusion: 'success',
       output: {
         title: `${passed} test${passed != 1 ? 's' : ''} passed`,
-        summary: `The ${type} tests (${subType}) finished running on Travis.`,
+        summary: `The ${type} tests (${subType}) finished running.`,
         text:
           `* *${passed}* test${passed != 1 ? 's' : ''} PASSED\n\n` +
-          `See related [Travis job](${travisJobUrl}) for more details.`,
+          `See related [CI job](${ciJobUrl}) for more details.`,
       },
     });
   }
@@ -155,7 +155,7 @@ function createReportedCheckParams(
  * @param {string} type major tests type slug (e.g., unit, integration).
  * @param {string} subType sub tests type slug (e.g., saucelabs, single-pass).
  * @param {number} checkRunId the existing check run ID.
- * @param {string?} travisJobUrl optional Travis job URL.
+ * @param {string?} ciJobUrl optional CI job URL.
  * @return {!object} a parameters object for github.checks.update.
  */
 function createErroredCheckParams(
@@ -163,7 +163,7 @@ function createErroredCheckParams(
   type,
   subType,
   checkRunId,
-  travisJobUrl
+  ciJobUrl
 ) {
   const {owner, repo} = pullRequestSnapshot;
   return {
@@ -179,10 +179,10 @@ function createErroredCheckParams(
         `An unexpected error occurred while running ${type} ` +
         `tests (${subType}).`,
       text:
-        'Please inspect the Travis build for the details.\n\n' +
+        'Please inspect the CI build for the details.\n\n' +
         'If you believe that this pull request was not the cause of this ' +
         'error, please try the following steps:\n' +
-        `1. Restart the failed [Travis job](${travisJobUrl})\n` +
+        `1. Restart the failed [CI job](${ciJobUrl})\n` +
         '2. Rebase your pull request on the latest `master` branch\n' +
         `3. Contact the weekly build cop (@${BUILD_COP_TEAM}), who can advise you ` +
         'how to proceed, or skip this test run for you.',
@@ -195,15 +195,7 @@ exports.installApiRouter = (app, db) => {
   tests.use(require('express').json());
   tests.use((request, response, next) => {
     request.app.set('trust proxy', true);
-    if (
-      'TRAVIS_IP_ADDRESSES' in process.env &&
-      !process.env.TRAVIS_IP_ADDRESSES.includes(request.ip)
-    ) {
-      app.log(`Refused a request to ${request.originalUrl} from ${request.ip}`);
-      response.status(403).end('You are not Travis!');
-    } else {
-      next();
-    }
+    next();
   });
 
   tests.post(
@@ -263,7 +255,13 @@ exports.installApiRouter = (app, db) => {
     '/:headSha/:type/:subType/report/:passed/:failed',
     async (request, response) => {
       const {headSha, type, subType, passed, failed} = request.params;
-      const {travisJobUrl} = request.body;
+
+      // TODO(rsimha, #1111): Remove travisJobUrl once amphtml has been updated.
+      let {ciJobUrl} = request.body;
+      if (!ciJobUrl) {
+        ({travisJobUrl: ciJobUrl} = request.body);
+      }
+
       app.log(
         `Reporting the results of the ${type} tests (${subType}) to the ` +
           `GitHub check for pull request with head commit SHA ${headSha}`
@@ -288,7 +286,7 @@ exports.installApiRouter = (app, db) => {
         checkRunId,
         passed,
         failed,
-        travisJobUrl
+        ciJobUrl
       );
       const github = await app.auth(pullRequestSnapshot.installationId);
       await github.checks.update(params);
@@ -305,7 +303,13 @@ exports.installApiRouter = (app, db) => {
     '/:headSha/:type/:subType/report/errored',
     async (request, response) => {
       const {headSha, type, subType} = request.params;
-      const {travisJobUrl} = request.body;
+
+      // TODO(rsimha, #1111): Remove travisJobUrl once amphtml has been updated.
+      let {ciJobUrl} = request.body;
+      if (!ciJobUrl) {
+        ({travisJobUrl: ciJobUrl} = request.body);
+      }
+
       app.log(
         `Reporting that ${type} tests (${subType}) have errored to the ` +
           `GitHub check for pull request with head commit SHA ${headSha}`
@@ -327,7 +331,7 @@ exports.installApiRouter = (app, db) => {
         type,
         subType,
         checkRunId,
-        travisJobUrl
+        ciJobUrl
       );
       const github = await app.auth(pullRequestSnapshot.installationId);
       await github.checks.update(params);

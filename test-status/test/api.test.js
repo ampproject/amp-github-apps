@@ -22,8 +22,8 @@ const {Probot} = require('probot');
 const {setupDb} = require('../setup-db');
 
 const HEAD_SHA = '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa';
-const travisJobUrl =
-  'https://travis-ci.org/github/ampproject/amphtml/builds/123456789';
+const ciJobUrl =
+  'https://app.circleci.com/pipelines/github/ampproject/amphtml/12345/workflows/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/jobs/12345';
 
 jest.mock('../db-connect');
 jest.setTimeout(5000);
@@ -77,7 +77,7 @@ describe('test-status/api', () => {
   });
 
   test.each([
-    ['queued', 'queued', 'Tests are queued on Travis'],
+    ['queued', 'queued', 'Tests are queued'],
     ['skipped', 'completed', 'Tests were not required'],
   ])('Create a new check with /%s action', async (action, status, title) => {
     await db('pullRequestSnapshots').insert({
@@ -91,14 +91,14 @@ describe('test-status/api', () => {
     github.checks.create.mockResolvedValue({data: {id: 555555}});
 
     await request(probot.server)
-      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
+      .post(`/v0/tests/${HEAD_SHA}/unit/local/${action}`)
       .expect(200);
 
     expect(await db('checks').select('*')).toMatchObject([
       {
         headSha: HEAD_SHA,
         type: 'unit',
-        subType: 'saucelabs',
+        subType: 'local',
         checkRunId: 555555,
         passed: null,
         failed: null,
@@ -108,7 +108,7 @@ describe('test-status/api', () => {
 
     expect(github.checks.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        name: 'ampproject/tests/unit (saucelabs)',
+        name: 'ampproject/tests/unit (local)',
         head_sha: HEAD_SHA,
         status,
         output: {
@@ -129,12 +129,12 @@ describe('test-status/api', () => {
     await db('checks').insert({
       headSha: HEAD_SHA,
       type: 'unit',
-      subType: 'saucelabs',
+      subType: 'local',
       checkRunId: 555555,
     });
 
     await request(probot.server)
-      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/started`)
+      .post(`/v0/tests/${HEAD_SHA}/unit/local/started`)
       .expect(200);
 
     expect(github.checks.update).toHaveBeenCalledWith(
@@ -142,7 +142,7 @@ describe('test-status/api', () => {
         head_sha: HEAD_SHA,
         status: 'in_progress',
         output: {
-          title: 'Tests are running on Travis',
+          title: 'Tests are running',
         },
       })
     );
@@ -164,20 +164,20 @@ describe('test-status/api', () => {
       await db('checks').insert({
         headSha: HEAD_SHA,
         type: 'unit',
-        subType: 'saucelabs',
+        subType: 'local',
         checkRunId: 555555,
       });
 
       await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
-        .send({travisJobUrl})
+        .post(`/v0/tests/${HEAD_SHA}/unit/local/report/${passed}/${failed}`)
+        .send({ciJobUrl})
         .expect(200);
 
       expect(await db('checks').select('*')).toMatchObject([
         {
           headSha: HEAD_SHA,
           type: 'unit',
-          subType: 'saucelabs',
+          subType: 'local',
           checkRunId: 555555,
           passed,
           failed,
@@ -202,13 +202,13 @@ describe('test-status/api', () => {
       5,
       5,
       '5 tests failed',
-      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`,
+      `http://localhost:3000/tests/${HEAD_SHA}/unit/local/status`,
     ],
     [
       0,
       1,
       '1 test failed',
-      `http://localhost:3000/tests/${HEAD_SHA}/unit/saucelabs/status`,
+      `http://localhost:3000/tests/${HEAD_SHA}/unit/local/status`,
     ],
   ])(
     'Update a failed existing check with /report/%d/%d action',
@@ -223,20 +223,20 @@ describe('test-status/api', () => {
       await db('checks').insert({
         headSha: HEAD_SHA,
         type: 'unit',
-        subType: 'saucelabs',
+        subType: 'local',
         checkRunId: 555555,
       });
 
       await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/${passed}/${failed}`)
-        .send({travisJobUrl})
+        .post(`/v0/tests/${HEAD_SHA}/unit/local/report/${passed}/${failed}`)
+        .send({ciJobUrl})
         .expect(200);
 
       expect(await db('checks').select('*')).toMatchObject([
         {
           headSha: HEAD_SHA,
           type: 'unit',
-          subType: 'saucelabs',
+          subType: 'local',
           checkRunId: 555555,
           passed,
           failed,
@@ -270,20 +270,20 @@ describe('test-status/api', () => {
     await db('checks').insert({
       headSha: HEAD_SHA,
       type: 'unit',
-      subType: 'saucelabs',
+      subType: 'local',
       checkRunId: 555555,
     });
 
     await request(probot.server)
-      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/report/errored`)
-      .send({travisJobUrl})
+      .post(`/v0/tests/${HEAD_SHA}/unit/local/report/errored`)
+      .send({ciJobUrl})
       .expect(200);
 
     expect(await db('checks').select('*')).toMatchObject([
       {
         headSha: HEAD_SHA,
         type: 'unit',
-        subType: 'saucelabs',
+        subType: 'local',
         checkRunId: 555555,
         passed: null,
         failed: null,
@@ -307,7 +307,7 @@ describe('test-status/api', () => {
 
   test('404 for /queued action when pull request was not created', async () => {
     await request(probot.server)
-      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/queued`)
+      .post(`/v0/tests/${HEAD_SHA}/unit/local/queued`)
       .expect(404, new RegExp(HEAD_SHA));
   });
 
@@ -315,16 +315,9 @@ describe('test-status/api', () => {
     '404 for /%s action when pull request was not created',
     async action => {
       await request(probot.server)
-        .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/${action}`)
-        .send({travisJobUrl})
+        .post(`/v0/tests/${HEAD_SHA}/unit/local/${action}`)
+        .send({ciJobUrl})
         .expect(404, new RegExp(HEAD_SHA));
     }
   );
-
-  test('reject non-Travis IP addresses', async () => {
-    process.env['TRAVIS_IP_ADDRESSES'] = '999.999.999.999,123.456.789.012';
-    await request(probot.server)
-      .post(`/v0/tests/${HEAD_SHA}/unit/saucelabs/queued`)
-      .expect(403, 'You are not Travis!');
-  });
 });

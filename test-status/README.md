@@ -19,11 +19,9 @@ The App subscribes to the following GitHub Webhooks:
   (`opened` and `synchronize` actions)
   * Records the head SHA to enable creating checks on the pull request
 
-### API for Travis
+### API for CI Runs
 
-The App has the following API points, which are to be triggered from Travis CI
-runs. If the `TRAVIS_IP_ADDRESSES` environment variable is set, only requests
-from this comma separated list of IP addresses will be processed.
+The App has the following API points, which are to be triggered from CI runs.
 
 * `POST /v0/tests/:headSha/:type/:subType/:status(queued|started|skipped)`
   * Creates a new check on the supplied head commit (for `status` = `queued` or
