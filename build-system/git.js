@@ -20,7 +20,7 @@
  */
 
 const {getStdout} = require('./exec');
-const {isTravisBuild} = require('./travis');
+const {isCiBuild} = require('./ci');
 
 /**
  * Returns the merge base of HEAD off of a given ref.
@@ -33,13 +33,12 @@ function gitMergeBase(ref) {
 }
 
 /**
- * Returns the `master` parent of the merge commit (current HEAD) on Travis.
- * Note: This is not the same as origin/master (a moving target), since new
- * commits can be merged while a Travis build is in progress.
- * See https://travis-ci.community/t/origin-master-moving-forward-between-build-stages/4189/6
+ * Returns the `master` parent of the merge commit (current HEAD) during CI
+ * builds. This is not the same as origin/master (a moving target), since
+ * new commits can be merged while a CI build is in progress.
  * @return {string}
  */
-function gitTravisMasterBaseline() {
+function gitCiMasterBaseline() {
   return gitMergeBase('origin/master');
 }
 
@@ -57,9 +56,7 @@ function gitMergeBaseLocalMaster() {
  * @return {string}
  */
 function gitMasterBaseline() {
-  return isTravisBuild()
-    ? gitTravisMasterBaseline()
-    : gitMergeBaseLocalMaster();
+  return isCiBuild() ? gitCiMasterBaseline() : gitMergeBaseLocalMaster();
 }
 
 /**
