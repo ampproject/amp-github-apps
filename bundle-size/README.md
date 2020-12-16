@@ -23,9 +23,8 @@ The App subscribes to the following GitHub Webhooks:
     the PR has increased the bundle size by more than the allowed amount, this
     Webhook will mark the above created check as approved
 
-The App also has the following API points, which are to be triggered from the
-Travis CI tests. If the `TRAVIS_IP_ADDRESSES` environment variable is set, only
-requests from this comma separated list of IP addresses will be processed.
+The App also has the following API points, which are to be triggered during CI
+builds.
 
 * `/v0/commit/:headSha/skip`
   * Marks the check on the supplied head commit as skipped, for when the pull
@@ -81,12 +80,12 @@ Follow these setup instructions to start developing for this App locally:
      command line
    * The value for the `ACCESS_TOKEN` field is the personal access token from
      the precending step
-   * The value for the `TRAVIS_PUSH_BUILD_TOKEN` should be a unique identifier.
+   * The value for the `CI_PUSH_BUILD_TOKEN` should be a unique identifier.
      This token can be any string, and must be passed as a `token` field to
      verify that requests to `/commit/:headSha/store` are coming from push
-     builds and not from pull requests. On Travis, set this as an push-build
-     only environment variable and treat this like you would any other access
-     token.
+     builds and not from pull requests. Set this as an push-build only
+     environment variable on your CI service and treat this like you would any
+     other access token.
 10. `npm run dev`
    * This will reload the App on every file change. Quit the server with
      `<Ctrl> + C` or `<Cmd> + C`

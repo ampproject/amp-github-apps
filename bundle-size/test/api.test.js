@@ -82,7 +82,7 @@ describe('bundle-size api', () => {
     nodeCache.flushAll();
 
     process.env = {
-      TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
+      CI_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
       FALLBACK_APPROVER_TEAMS:
         'ampproject/wg-runtime,ampproject/wg-performance',
       SUPER_USER_TEAMS: 'ampproject/wg-infra',
@@ -856,7 +856,7 @@ describe('bundle-size api', () => {
         );
     });
 
-    test('rejects calls to store without the Travis token', async () => {
+    test('rejects calls to store without the CI token', async () => {
       jsonPayload.token = 'wrong token';
 
       await request(probot.server)
@@ -864,14 +864,7 @@ describe('bundle-size api', () => {
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
-        .expect(403, 'You are not Travis!');
+        .expect(403, 'This is not a CI build!');
     });
-  });
-
-  test('reject non-Travis IP addresses', async () => {
-    process.env['TRAVIS_IP_ADDRESSES'] = '999.999.999.999,123.456.789.012';
-    await request(probot.server)
-      .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
-      .expect(403, 'You are not Travis!');
   });
 });

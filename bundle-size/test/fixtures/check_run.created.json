@@ -14,7 +14,7 @@
     "completed_at": null,
     "output": {
       "title": "Calculating new bundle size for this PR…",
-      "summary": "The bundle size (brotli compressed size of `v0.js`) of this pull request is being calculated on Travis. Look for the shard that contains \"Bundle Size\" in its title.",
+      "summary": "The bundle size (brotli compressed size of `v0.js`) of this pull request is being calculated. Look for the shard that contains \"Bundle Size\" in its title.",
       "text": null,
       "annotations_count": 0,
       "annotations_url": "https://api.github.com/repos/ampproject/amphtml/check-runs/68609861/annotations"
