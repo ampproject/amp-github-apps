@@ -43,10 +43,10 @@ The app provides cron endpoints (reachable only via [Google App Engine Cron Jobs
 * `/_cron/refreshTree`: Re-fetches the list of OWNERS files, updates any caches, and re-parses the ownership tree
 * `/_cron/refreshTeams`: Re-fetches the list of teams and team members
 
-Travis API
-----------
+CI Testing API
+--------------
 
-The app has an API endpoint which may be called from Travis CI tests.
+The app has an API endpoint which may be called from CI builds while testing owners files.
 
 * `/v0/syntax`
   * Accepts a payload with a `path` to an owners file and the `contents` of the file, and responds with `{requestErrors, fileErrors, rules}` results from parsing the OWNERS file being checked.
