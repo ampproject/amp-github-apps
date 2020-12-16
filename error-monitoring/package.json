@@ -15,7 +15,7 @@
     "build:watch": "tsc -w --p tsconfig.json",
     "start": "node dist/app.js",
     "dev": "functions-framework --target=app --source=dist",
-    "deploy-tag": "git tag 'deploy-error-monitoring-'`date --utc '+%Y%m%d%H%M%S'`",
+    "deploy-tag": "git tag 'deploy-error-monitoring-'`date -u '+%Y%m%d%H%M%S'`",
     "pretest": "npm run lint",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"

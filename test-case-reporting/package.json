@@ -19,7 +19,7 @@
     "dev": "nodemon",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change",
-    "deploy-tag": "git tag 'deploy-test-case-reporting-'`date --utc '+%Y%m%d%H%M%S'`"
+    "deploy-tag": "git tag 'deploy-test-case-reporting-'`date -u '+%Y%m%d%H%M%S'`"
   },
   "license": "Apache-2.0",
   "dependencies": {
