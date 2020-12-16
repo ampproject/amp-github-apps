@@ -15,7 +15,7 @@
     "build:watch": "tsc -w --p tsconfig.json",
     "start": "functions-framework --target=dist/app",
     "dev": "nodemon",
-    "deploy-tag": "git tag 'deploy-onduty-'`date --utc '+%Y%m%d%H%M%S'`",
+    "deploy-tag": "git tag 'deploy-onduty-'`date -u '+%Y%m%d%H%M%S'`",
     "pretest": "npm run lint",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"

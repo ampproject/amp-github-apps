@@ -16,7 +16,7 @@
     "setup-db": "node dist/src/setup_db.js",
     "start": "probot run dist/app.js",
     "dev": "nodemon",
-    "deploy-tag": "git tag 'deploy-invite-'`date --utc '+%Y%m%d%H%M%S'`",
+    "deploy-tag": "git tag 'deploy-invite-'`date -u '+%Y%m%d%H%M%S'`",
     "pretest": "npm run lint",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change"

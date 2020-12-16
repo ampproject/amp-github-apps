@@ -16,7 +16,7 @@
     "build:watch": "tsc -w --p tsconfig.json",
     "start": "probot run ./dist/app.js",
     "dev": "nodemon",
-    "deploy-tag": "git tag 'deploy-checklist-'`date --utc '+%Y%m%d%H%M%S'`",
+    "deploy-tag": "git tag 'deploy-checklist-'`date -u '+%Y%m%d%H%M%S'`",
     "test": "echo No tests defined for this app!",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },

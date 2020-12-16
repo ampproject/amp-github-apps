@@ -68,7 +68,7 @@
     - Under _Build Configuration_, select _Cloud Build configuration file_ and provide the path to your Cloud Build file, ex. `bundle-size/cloud_build.yaml`
 
 10. Add the NPM script `deploy-tag`, which creates a git tag in the proper tag format for your app
-    - Ex. ``git tag 'deploy-your-app-name-'`date --utc '+%Y%m%d%H%M%S'` ``
+    - Ex. ``git tag 'deploy-your-app-name-'`date -u '+%Y%m%d%H%M%S'` ``
 
 ## To store an encrypted secret
 
