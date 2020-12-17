@@ -85,7 +85,7 @@ function erroredCheckOutput(partialBaseSha) {
       'the `master` commit that this pull request was compared against) was ' +
       'not found in the ' +
       '`https://github.com/ampproject/amphtml-build-artifacts` ' +
-      'repository. This can happen due to failed or delayed Travis builds on ' +
+      'repository. This can happen due to failed or delayed CI builds on ' +
       'said `master` commit.\n' +
       `A member of [${superUserTeams}] will be added automatically to review ` +
       'this PR. Only once the member approves this PR, can it be merged. If ' +
@@ -379,17 +379,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
   const v0 = app.route('/v0');
   v0.use((request, response, next) => {
     request.app.set('trust proxy', true);
-    if (
-      'TRAVIS_IP_ADDRESSES' in process.env &&
-      !process.env['TRAVIS_IP_ADDRESSES'].includes(request.ip)
-    ) {
-      app.log.warn(
-        `Refused a request to ${request.originalUrl} from ${request.ip}`
-      );
-      response.status(403).end('You are not Travis!');
-    } else {
-      next();
-    }
+    next();
   });
   v0.use(require('express').json());
 
@@ -482,8 +472,8 @@ exports.installApiRouter = (app, db, githubUtils) => {
     const {headSha} = request.params;
     const {bundleSizes} = request.body;
 
-    if (request.body['token'] !== process.env.TRAVIS_PUSH_BUILD_TOKEN) {
-      return response.status(403).end('You are not Travis!');
+    if (request.body['token'] !== process.env.CI_PUSH_BUILD_TOKEN) {
+      return response.status(403).end('This is not a CI build!');
     }
     if (
       !bundleSizes ||

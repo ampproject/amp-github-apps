@@ -79,7 +79,7 @@ describe('bundle-size webhooks', () => {
 
     process.env = {
       DISABLE_WEBHOOK_EVENT_CHECK: 'true',
-      TRAVIS_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
+      CI_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
       FALLBACK_APPROVER_TEAMS:
         'ampproject/wg-runtime,ampproject/wg-performance',
       SUPER_USER_TEAMS: 'ampproject/wg-infra',

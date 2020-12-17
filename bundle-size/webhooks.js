@@ -36,7 +36,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
         title: 'Calculating new bundle size for this PR…',
         summary:
           'The bundle size (brotli compressed size of `v0.js`) ' +
-          'of this pull request is being calculated on Travis. Look for the ' +
+          'of this pull request is being calculated. Look for the ' +
           'shard that contains "Bundle Size" in its title.',
       },
     });
