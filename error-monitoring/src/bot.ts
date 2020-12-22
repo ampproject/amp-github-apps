@@ -66,7 +66,9 @@ export class ErrorIssueBot {
       owner: this.repoOwner,
       repo: this.issueRepoName,
       'issue_number': issueNumber,
-      body: `A duplicate error report was linked to this issue ([link](http://go/ampe/${errorId}))`,
+      body:
+        'A duplicate error report was linked to this issue ' +
+        `([link](http://go/ampe/${errorId}?project=${process.env.PROJECT_ID}))`,
     });
   }
 
