@@ -103,6 +103,12 @@ describe('owners tree', () => {
       expect(tree.rules).not.toContain(reviewerSetRule);
       expect(tree.reviewerSetRule).toEqual(reviewerSetRule);
     });
+
+    it('handles broken/invalid paths', () => {
+      const invalidRule = new OwnersRule('/OWNERS', [new UserOwner('coder')]);
+      tree.addRule(invalidRule);
+      expect(tree.rules).not.toContain(invalidRule);
+    });
   });
 
   describe('depth', () => {
