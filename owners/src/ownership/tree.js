@@ -72,10 +72,15 @@ module.exports = class OwnersTree {
     const nextDir = rule.dirPath.split(path.sep)[this.depth];
 
     if (!this.get(nextDir)) {
-      this.children[nextDir] = new OwnersTree(
-        path.join(this.dirPath, nextDir),
-        this
-      );
+      try {
+        this.children[nextDir] = new OwnersTree(
+          path.join(this.dirPath, nextDir),
+          this
+        );
+      } catch (e) {
+        console.error(`Error parsing rule path "${rule}"`, e);
+        return this;
+      }
     }
 
     return this.get(nextDir).addRule(rule);
