@@ -20,7 +20,7 @@ import {Storage} from '@google-cloud/storage';
 
 /**
  * Takes the minified build and test fixtures from the
- * AMP Travis Build Storage bucket, unzips and writes to
+ * AMP CI Build Storage bucket, unzips and writes to
  * a test website bucket that serves the files publicly.
  */
 export async function unzipAndMove(id: number): Promise<string> {

@@ -9,11 +9,11 @@ This app runs on an instance of Google AppEngine and is installed exclusively on
 How the app works
 ----------------
 1. A commit is pushed to a new or existing pull request on ampproject/amphtml.
-2. Travis compiles your changes and uploads the build artifacts and example pages as `amp_dist_<Travis build number>.zip` to a remote storage location. During this step, a check called `ampproject/pr-deploy` is set to `pending`.
-3. a) If there was a compilation error, Travis tells the AMP PR Deploy Bot that there's nothing left to do until the error is fixed. <br>
-   b) If there were no errors, Travis tells the AMP PR Deploy Bot that a test site is ready to be deployed. `ampproject/pr-deploy` is now `netural`
-4. A test site is deployed by clicking the 'Deploy Me' button in the details page of `ampproject/pr-deploy`. The app unzips and writes `amp_dist_<Travis build number>.zip` to the public Google Cloud Storage bucket.
-5. `ampproject/pr-deploy` completes with the website URL. `https://console.cloud.google.com/storage/browser/amp-test-website-1/amp_dist_<Travis build number>`
+2. A CI build compiles your changes and uploads the build artifacts and example pages as `amp_dist_<CI build number>.zip` to a remote storage location. During this step, a check called `ampproject/pr-deploy` is set to `pending`.
+3. a) If there was a compilation error, the CI build tells the AMP PR Deploy Bot that there's nothing left to do until the error is fixed. <br>
+   b) If there were no errors, the CI build tells the AMP PR Deploy Bot that a test site is ready to be deployed. `ampproject/pr-deploy` is now `netural`
+4. A test site is deployed by clicking the 'Deploy Me' button in the details page of `ampproject/pr-deploy`. The app unzips and writes `amp_dist_<CI build number>.zip` to the public Google Cloud Storage bucket.
+5. `ampproject/pr-deploy` completes with the website URL. `https://console.cloud.google.com/storage/browser/amp-test-website-1/amp_dist_<CI build number>`
 
 Here's a quick [demo](https://github.com/ampproject/amphtml/pull/24274) on how to create a test site.
 
