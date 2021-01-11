@@ -55,20 +55,20 @@ describe('end-to-end', () => {
   });
 
   describe('when one post request is received', () => {
+    const build = {
+      buildNumber: '413413',
+      commitSha: 'abcdefg123gomugomu',
+    };
+    const job = {
+      jobNumber: '413413.612',
+      testSuiteType: 'unit',
+    };
+    const results = getFixture('sample-karma-report');
+
     it('updates the database if the post request is good', async () => {
       let res = await request(app)
         .post('/report')
-        .send({
-          build: {
-            buildNumber: '413413',
-            commitSha: 'abcdefg123gomugomu',
-          },
-          job: {
-            jobNumber: '413413.612',
-            testSuiteType: 'unit',
-          },
-          results: getFixture('sample-karma-report'),
-        });
+        .send({build, job, results, repository: 'test-owner/test-repo'});
 
       expect(res.status).toBe(201);
 
@@ -86,6 +86,21 @@ describe('end-to-end', () => {
       testRuns.forEach(testRun =>
         expect(testRun.job.build.buildNumber).toEqual('413413')
       );
+    });
+
+    it('rejects reports from other repositories', async () => {
+      let res = await request(app)
+        .post('/report')
+        .send({build, job, results, repository: 'other-owner/test-repo'});
+
+      expect(res.status).toBe(500);
+
+      res = await request(app).get(
+        '/test-results/build/413413?limit=100&offset=0&json=1'
+      );
+
+      const {testRuns}: {testRuns: Array<TestRun>} = res.body;
+      expect(testRuns).toHaveLength(0);
     });
   });
 });

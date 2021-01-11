@@ -175,6 +175,7 @@ declare module 'test-case-reporting' {
       job: Travis.Job;
       build: Travis.Build;
       results: KarmaReporter.TestResultReport;
+      repository: string;
     }
     export interface Build {
       buildNumber: string;
