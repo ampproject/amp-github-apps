@@ -211,13 +211,24 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
 
 app.post('/report', jsonParser, async (req, res) => {
   const report: Travis.Report = req.body;
-  const topLevelKeys: Array<keyof Travis.Report> = ['job', 'build', 'results'];
+  const topLevelKeys: Array<keyof Travis.Report> = [
+    'job',
+    'build',
+    'results',
+    'repository',
+  ];
 
   try {
     for (const key of topLevelKeys) {
       if (!(report[key] as unknown)) {
         throw new TypeError(`Report payload must include ${key} property`);
       }
+    }
+
+    if (report.repository !== process.env.GITHUB_REPOSITORY) {
+      throw new Error(
+        `Attempted to report results from a repository other than ${process.env.GITHUB_REPOSITORY}; ignoring report`
+      );
     }
 
     await record.storeTravisReport(report);
