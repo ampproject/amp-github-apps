@@ -76,6 +76,7 @@ describe('TestResultRecord', () => {
     job: sampleJob,
     build: sampleBuild,
     results: sampleKarmaReport,
+    repository: 'test-owner/test-repo',
   };
 
   const defaultPageInfo: PageInfo = {offset: 0, limit: 100};
@@ -263,6 +264,7 @@ describe('TestResultRecord', () => {
           job: sampleJob,
           build: sampleBuild,
           results: smallerSampleKarmaReport,
+          repository: 'test-owner/test-repo',
         };
 
         await testResultRecord.storeTravisReport(smallerReport);
