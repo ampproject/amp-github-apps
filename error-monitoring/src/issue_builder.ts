@@ -41,6 +41,7 @@ export class IssueBuilder {
       stacktrace,
       seenInVersions,
     }: ErrorReport,
+    private sourceRepo: string,
     private blames: Array<BlameRange>,
     private releaseOnduty?: string
   ) {
@@ -84,6 +85,13 @@ export class IssueBuilder {
     ].join('\n');
   }
 
+  private prLink(prNumber: number): string {
+    return (
+      `[#${prNumber}]` +
+      `(https://github.com/${this.sourceRepo}/pulls/${prNumber})`
+    );
+  }
+
   private blameMessage({
     path,
     startingLine,
@@ -93,8 +101,8 @@ export class IssueBuilder {
     prNumber,
   }: BlameRange): string {
     return (
-      `\`${author}\` modified \`${path}:${startingLine}-${endingLine}\`` +
-      ` in #${prNumber} (${formatDate(committedDate)})`
+      `\`${author}\` modified \`${path}:${startingLine}-${endingLine}\` in ` +
+      `${this.prLink(prNumber)} (${formatDate(committedDate)})`
     );
   }
 
