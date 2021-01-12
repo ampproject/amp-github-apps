@@ -20,6 +20,7 @@ import {getFixtureFile} from './fixtures';
 
 describe('IssueBuilder', () => {
   let builder: IssueBuilder;
+  const sourceRepo = 'test_org/test_repo';
   const now = new Date('Mar 1, 2020');
   const report: ErrorReport = {
     errorId: 'CL6chqbN2-bzBA',
@@ -61,7 +62,12 @@ describe('IssueBuilder', () => {
 
   beforeEach(() => {
     jest.spyOn(Date, 'now').mockReturnValue(now.valueOf());
-    builder = new IssueBuilder(report, blames, 'test_org/onduty-team');
+    builder = new IssueBuilder(
+      report,
+      sourceRepo,
+      blames,
+      'test_org/onduty-team'
+    );
   });
 
   describe('title', () => {
@@ -120,7 +126,7 @@ describe('IssueBuilder', () => {
     ];
 
     it('returns authors of most recent relevant PRs sorted by recency', () => {
-      builder = new IssueBuilder(report, blames);
+      builder = new IssueBuilder(report, sourceRepo, blames);
       expect(builder.possibleAssignees(3)).toEqual([
         '@relevant_author',
         '@older_author',
@@ -129,7 +135,7 @@ describe('IssueBuilder', () => {
     });
 
     it('limits the number of suggestions', () => {
-      builder = new IssueBuilder(report, blames);
+      builder = new IssueBuilder(report, sourceRepo, blames);
       expect(builder.possibleAssignees()).toEqual([
         '@relevant_author',
         '@older_author',
@@ -137,7 +143,7 @@ describe('IssueBuilder', () => {
     });
 
     it('does not try to assign very old errors', () => {
-      builder = new IssueBuilder(oldReport, blames);
+      builder = new IssueBuilder(oldReport, sourceRepo, blames);
       expect(builder.possibleAssignees()).toEqual([]);
     });
   });
@@ -172,12 +178,12 @@ describe('IssueBuilder', () => {
     it('suggests possible assignees, if known', () => {
       expect(builder.bodyNotes).toContain('**Possible assignees:** `@xymw`');
 
-      builder = new IssueBuilder(oldReport, blames);
+      builder = new IssueBuilder(oldReport, sourceRepo, blames);
       expect(builder.bodyNotes).not.toContain('Possible assignees:');
     });
 
     it('returns empty string when there is no blame info', () => {
-      builder = new IssueBuilder(report, []);
+      builder = new IssueBuilder(report, sourceRepo, []);
       expect(builder.bodyNotes).toEqual('');
     });
 
@@ -191,6 +197,7 @@ describe('IssueBuilder', () => {
     it("doesn't try to list versions if none are provided", () => {
       builder = new IssueBuilder(
         Object.assign({}, report, {seenInVersions: []}),
+        sourceRepo,
         blames
       );
       expect(builder.bodyNotes).not.toContain('**Seen in:**');
@@ -203,7 +210,7 @@ describe('IssueBuilder', () => {
     });
 
     it('is undefined when no onduty team is provided', () => {
-      builder = new IssueBuilder(report, blames);
+      builder = new IssueBuilder(report, sourceRepo, blames);
       expect(builder.bodyTag).toBeUndefined();
     });
   });

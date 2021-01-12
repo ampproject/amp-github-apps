@@ -50,7 +50,12 @@ export class ErrorIssueBot {
   ): Promise<Octokit.IssuesCreateParams> {
     const {stacktrace} = errorReport;
     const blameRanges = await this.blameFinder.blameForStacktrace(stacktrace);
-    const builder = new IssueBuilder(errorReport, blameRanges, RELEASE_ONDUTY);
+    const builder = new IssueBuilder(
+      errorReport,
+      `${this.repoOwner}/${this.repoName}`,
+      blameRanges,
+      RELEASE_ONDUTY
+    );
     return {
       owner: this.repoOwner,
       repo: this.issueRepoName,

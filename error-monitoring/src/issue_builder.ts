@@ -41,6 +41,7 @@ export class IssueBuilder {
       stacktrace,
       seenInVersions,
     }: ErrorReport,
+    private sourceRepo: string,
     private blames: Array<BlameRange>,
     private releaseOnduty?: string
   ) {
