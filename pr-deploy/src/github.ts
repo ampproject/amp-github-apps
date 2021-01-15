@@ -130,7 +130,7 @@ export class PullRequest {
   /**
    * Set check to 'completed' to enable the 'Deploy Me' action.
    */
-  async buildCompleted(id: number) {
+  async buildCompleted(id: string) {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
@@ -145,7 +145,7 @@ export class PullRequest {
           'Please click the `Create a test site` button above to ' +
           'deploy the minified build of this PR along with examples from ' +
           '`examples/` and `test/manual/`. It should only take a minute.',
-        text: `CI build number: ${id}`,
+        text: `CI build ID: ${id}`,
       },
       actions: ACTIONS,
     };
@@ -201,14 +201,12 @@ export class PullRequest {
     return this.github.checks.update(params);
   }
 
-  async getCiBuildNumber() {
+  async getCiBuildId() {
     const check = await this.getCheck_();
-
     if (!check.output || !check.output.text) {
-      return -1;
+      return '';
     }
-
-    return Number(check.output.text.replace(/\D/g, ''));
+    return check.output.text;
   }
 
   /**
