@@ -16,12 +16,12 @@
 
 import {
   Build,
+  CI,
   DB,
   Job,
   KarmaReporter,
   PageInfo,
   TestRun,
-  Travis,
 } from 'test-case-reporting';
 import {Database, dbConnect} from '../src/db';
 import {TestResultRecord} from '../src/test_result_record';
@@ -52,14 +52,14 @@ describe('TestResultRecord', () => {
   let db: Database;
   let testResultRecord: TestResultRecord;
 
-  const sampleBuild: Travis.Build = {
-    buildNumber: '413413',
+  const sampleBuild: CI.Build = {
+    buildId: '413413',
     commitSha: 'abcdefg123gomugomu',
     url: 'http://travis.org/build/413413',
   };
 
-  const sampleJob: Travis.Job = {
-    jobNumber: '413413.612',
+  const sampleJob: CI.Job = {
+    jobId: '413413.612',
     testSuiteType: 'unit',
     url: 'http://travis.org/job/413413.6',
   };
@@ -72,7 +72,7 @@ describe('TestResultRecord', () => {
     'sample-karma-report-smaller'
   ) as unknown) as KarmaReporter.TestResultReport;
 
-  const sampleTravisReport: Travis.Report = {
+  const sampleCiReport: CI.Report = {
     job: sampleJob,
     build: sampleBuild,
     results: sampleKarmaReport,
@@ -103,34 +103,34 @@ describe('TestResultRecord', () => {
       await truncateAll(db);
     });
 
-    describe('insertTravisBuild', () => {
+    describe('insertCiBuild', () => {
       it('adds the build to the database', async () => {
-        await testResultRecord.insertTravisBuild(sampleBuild);
+        await testResultRecord.insertCiBuild(sampleBuild);
 
         const build = await db<DB.Build>('builds').select().first();
 
         expect(build).toMatchObject({
-          'build_number': '413413',
+          'build_id': '413413',
           'commit_sha': 'abcdefg123gomugomu',
           url: 'http://travis.org/build/413413',
         });
       });
     });
 
-    describe('insertTravisJob', () => {
+    describe('insertCiJob', () => {
       let buildId: number;
 
       beforeEach(async () => {
-        buildId = await testResultRecord.insertTravisBuild(sampleBuild);
+        buildId = await testResultRecord.insertCiBuild(sampleBuild);
       });
 
       it('adds the job to the database if the build exists in the DB', async () => {
-        await testResultRecord.insertTravisJob(sampleJob, buildId);
+        await testResultRecord.insertCiJob(sampleJob, buildId);
 
         const job = await db<DB.Job>('jobs').select().first();
 
         expect(job).toMatchObject({
-          'job_number': '413413.612',
+          'job_id': '413413.612',
           'test_suite_type': 'unit',
           url: 'http://travis.org/job/413413.6',
         });
@@ -138,7 +138,7 @@ describe('TestResultRecord', () => {
 
       it("throws an error if the build doesn't exist", async () => {
         await expect(
-          testResultRecord.insertTravisJob(sampleJob, 404)
+          testResultRecord.insertCiJob(sampleJob, 404)
         ).rejects.toThrow();
       });
     });
@@ -201,25 +201,25 @@ describe('TestResultRecord', () => {
       });
     });
 
-    describe('storeTravisResults', () => {
+    describe('storeCiResults', () => {
       it('inserts the build', async () => {
-        const spy = jest.spyOn(testResultRecord, 'insertTravisBuild');
-        await testResultRecord.storeTravisReport(sampleTravisReport);
+        const spy = jest.spyOn(testResultRecord, 'insertCiBuild');
+        await testResultRecord.storeCiReport(sampleCiReport);
 
         expect(spy).toBeCalledWith({
-          buildNumber: '413413',
+          buildId: '413413',
           commitSha: 'abcdefg123gomugomu',
           url: 'http://travis.org/build/413413',
         });
       });
 
       it('inserts the job', async () => {
-        const spy = jest.spyOn(testResultRecord, 'insertTravisJob');
-        await testResultRecord.storeTravisReport(sampleTravisReport);
+        const spy = jest.spyOn(testResultRecord, 'insertCiJob');
+        await testResultRecord.storeCiReport(sampleCiReport);
 
         expect(spy).toBeCalledWith(
           {
-            'jobNumber': '413413.612',
+            'jobId': '413413.612',
             'testSuiteType': 'unit',
             url: 'http://travis.org/job/413413.6',
           },
@@ -228,7 +228,7 @@ describe('TestResultRecord', () => {
       });
 
       it('inserts test cases', async () => {
-        await testResultRecord.storeTravisReport(sampleTravisReport);
+        await testResultRecord.storeCiReport(sampleCiReport);
 
         const testCases: Array<DB.TestCase> = await db<DB.TestCase>(
           'test_cases'
@@ -260,22 +260,22 @@ describe('TestResultRecord', () => {
       });
 
       it('does not duplicate test cases', async () => {
-        const smallerReport: Travis.Report = {
+        const smallerReport: CI.Report = {
           job: sampleJob,
           build: sampleBuild,
           results: smallerSampleKarmaReport,
           repository: 'test-owner/test-repo',
         };
 
-        await testResultRecord.storeTravisReport(smallerReport);
+        await testResultRecord.storeCiReport(smallerReport);
         expect(db('test_cases').select()).resolves.toHaveLength(3);
 
-        await testResultRecord.storeTravisReport(sampleTravisReport);
+        await testResultRecord.storeCiReport(sampleCiReport);
         expect(db('test_cases').select()).resolves.toHaveLength(5);
       });
 
       it('inserts test runs', async () => {
-        await testResultRecord.storeTravisReport(sampleTravisReport);
+        await testResultRecord.storeCiReport(sampleCiReport);
 
         const testRuns: Array<DB.TestRun> = await db<DB.TestRun>(
           'test_runs'
@@ -351,8 +351,8 @@ describe('TestResultRecord', () => {
         expect(testRunsPage1).toHaveLength(3);
         expect(testRunsPage3).toHaveLength(3);
 
-        expect(testRunsPage1[0].job.jobNumber).toEqual('12123434.1');
-        expect(testRunsPage3[0].job.jobNumber).toEqual('12123434.2');
+        expect(testRunsPage1[0].job.jobId).toEqual('12123434.1');
+        expect(testRunsPage3[0].job.jobId).toEqual('12123434.2');
       });
 
       it('gets an empty list if build is not in the database', async () => {

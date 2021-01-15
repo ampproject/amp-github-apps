@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "repository": "http://github.com/ampproject/amp-github-apps",
-  "description": "An app that tracks the pass/fail status of tests run in Travis builds",
+  "description": "An app that tracks the pass/fail status of tests run in CI builds",
   "engines": {
     "node": "12.20.0"
   },

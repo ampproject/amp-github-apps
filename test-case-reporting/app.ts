@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Build, PageInfo, TestRun, Travis} from 'test-case-reporting';
+import {Build, CI, PageInfo, TestRun} from 'test-case-reporting';
 import {TestCaseStats} from './src/test_case_stats';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
@@ -104,12 +104,12 @@ app.get(['/', '/builds'], async (req, res) => {
 });
 
 app.get('/test-results/build/:buildNumber', async (req, res) => {
-  const {buildNumber} = req.params;
+  const {buildId} = req.params;
   const {json} = req.query;
 
   try {
     const testRuns = await record.getTestRunsOfBuild(
-      buildNumber,
+      buildId,
       extractPageInfo(req)
     );
 
@@ -118,7 +118,7 @@ app.get('/test-results/build/:buildNumber', async (req, res) => {
     } else {
       res.send(
         render('test-run-list', {
-          title: `Test Runs for Build #${buildNumber}`,
+          title: `Test Runs for Build #${buildId}`,
           testRuns: testRuns.map(lowerCaseStatus).map(enumerateTestRun),
         })
       );
@@ -210,8 +210,8 @@ app.get('/test-results/history/:testCaseId', async (req, res) => {
 });
 
 app.post('/report', jsonParser, async (req, res) => {
-  const report: Travis.Report = req.body;
-  const topLevelKeys: Array<keyof Travis.Report> = [
+  const report: CI.Report = req.body;
+  const topLevelKeys: Array<keyof CI.Report> = [
     'job',
     'build',
     'results',
@@ -231,7 +231,7 @@ app.post('/report', jsonParser, async (req, res) => {
       );
     }
 
-    await record.storeTravisReport(report);
+    await record.storeCiReport(report);
     res.sendStatus(statusCodes.CREATED);
   } catch (error) {
     handleError(error, res);

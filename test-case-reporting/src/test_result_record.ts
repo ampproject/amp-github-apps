@@ -16,13 +16,13 @@
 
 import {
   Build,
+  CI,
   DB,
   Job,
   PageInfo,
   TestCase,
   TestRun,
   TestStatus,
-  Travis,
 } from 'test-case-reporting';
 import {Database} from './db';
 import {QueryBuilder} from 'knex';
@@ -37,11 +37,11 @@ type QueryFunction = (q: QueryBuilder) => QueryBuilder;
  *    for certain columns to avoid collisions or to fit the DB.BigJoin interface.
  */
 function getTestRunFromRow({
-  build_number,
+  build_id,
   build_url,
   build_started_at,
   commit_sha,
-  job_number,
+  job_id,
   job_url,
   test_suite_type,
   name,
@@ -51,7 +51,7 @@ function getTestRunFromRow({
   duration_ms,
 }: DB.TestRunWithJobAndBuild): TestRun {
   const build: Build = {
-    buildNumber: build_number,
+    buildId: build_id,
     commitSha: commit_sha,
     startedAt: new Date(build_started_at),
     url: build_url,
@@ -59,7 +59,7 @@ function getTestRunFromRow({
 
   const job: Job = {
     build,
-    jobNumber: job_number,
+    jobId: job_id,
     url: job_url,
     testSuiteType: test_suite_type,
   };
@@ -88,26 +88,20 @@ export class TestResultRecord {
   /**
    * Gets a DB.Build from the database by its build number.
    * If there is no such build, it returns undefined.
-   * @param buildNumber The number of the Travis build, as a string.
+   * @param buildId The ID of the CI build, as a string.
    */
-  private async getDbBuildFromBuildNumber(
-    buildNumber: string
-  ): Promise<DB.Build> {
-    return this.db<DB.Build>('builds')
-      .where('build_number', buildNumber)
-      .first();
+  private async getDbBuildFromBuildId(buildId: string): Promise<DB.Build> {
+    return this.db<DB.Build>('builds').where('build_id', buildId).first();
   }
 
   /**
-   * Inserts a build, as reported by Travis, into the database.
+   * Inserts a build, as reported during CI, into the database.
    * Does not insert duplicate builds, but still returns their ids.
    * @param build The build we want to insert in the database.
    * @returns The id of the build in the database.
    */
-  async insertTravisBuild(build: Travis.Build): Promise<number> {
-    const existingBuild = await this.getDbBuildFromBuildNumber(
-      build.buildNumber
-    );
+  async insertCiBuild(build: CI.Build): Promise<number> {
+    const existingBuild = await this.getDbBuildFromBuildId(build.buildId);
     if (existingBuild) {
       return existingBuild.id;
     }
@@ -115,7 +109,7 @@ export class TestResultRecord {
     const [buildId] = await this.db('builds')
       .insert({
         'commit_sha': build.commitSha,
-        'build_number': build.buildNumber,
+        'build_id': build.buildId,
         'url': build.url,
       } as DB.Build)
       .returning('id');
@@ -124,13 +118,13 @@ export class TestResultRecord {
   }
 
   /**
-   * Inserts a job, as reported by Travis, into the database.
+   * Inserts a job, as reported by CI, into the database.
    */
-  async insertTravisJob(job: Travis.Job, buildId: number): Promise<number> {
+  async insertCiJob(job: CI.Job, buildId: number): Promise<number> {
     const [jobId] = await this.db('jobs')
       .insert({
         'build_id': buildId,
-        'job_number': job.jobNumber,
+        'job_id': job.jobId,
         'url': job.url,
         'test_suite_type': job.testSuiteType,
       } as DB.Job)
@@ -183,11 +177,11 @@ export class TestResultRecord {
    * Stores a travis report on the database. This involves inserting
    * a job, a build, many test runs, and many test cases.
    * Duplicate test cases and builds are not inserted.
-   * @param travisReport Travis report with job, build, and test run result info.
+   * @param ciReport CI report with job, build, and test run result info.
    */
-  async storeTravisReport({job, build, results}: Travis.Report): Promise<void> {
-    const buildId = await this.insertTravisBuild(build);
-    const jobId = await this.insertTravisJob(job, buildId);
+  async storeCiReport({job, build, results}: CI.Report): Promise<void> {
+    const buildId = await this.insertCiBuild(build);
+    const jobId = await this.insertCiJob(job, buildId);
 
     const formattedResults = results.browsers
       .map(({results}) => results)
@@ -243,12 +237,12 @@ export class TestResultRecord {
     const fullQuery = queryFunction(baseQuery).limit(limit).offset(offset);
 
     const rows = await fullQuery.select(
-      'builds.build_number',
+      'builds.build_id',
       'builds.url AS build_url',
       'builds.commit_sha',
       'builds.started_at AS build_started_at',
 
-      'jobs.job_number',
+      'jobs.job_id',
       'jobs.url AS job_url',
       'jobs.test_suite_type',
 
@@ -265,15 +259,14 @@ export class TestResultRecord {
 
   /**
    * Gets a list of the test results belonging to a build
-   * @param buildNumber The number of the Travis build whose test runs we want.
+   * @param buildId The ID of the CI build whose test runs we want.
    * @param pageInfo object with the limit and the offset of the query
    */
   async getTestRunsOfBuild(
-    buildNumber: string,
+    buildId: string,
     pageInfo: PageInfo
   ): Promise<Array<TestRun>> {
-    const queryFunction: QueryFunction = q =>
-      q.where('build_number', buildNumber);
+    const queryFunction: QueryFunction = q => q.where('build_id', buildId);
 
     return this.bigJoinQuery(queryFunction, pageInfo);
   }
@@ -306,9 +299,9 @@ export class TestResultRecord {
       .offset(offset);
 
     /* eslint-disable camelcase */
-    return dbBuilds.map(({commit_sha, build_number, started_at}) => ({
+    return dbBuilds.map(({commit_sha, build_id, started_at}) => ({
       commitSha: commit_sha,
-      buildNumber: build_number,
+      buildId: build_id,
       startedAt: new Date(started_at),
     }));
     /* eslint-enable camelcase */

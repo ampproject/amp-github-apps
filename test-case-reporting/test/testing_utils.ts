@@ -37,7 +37,7 @@ export async function fillDatabase(db: Database): Promise<void> {
   let [buildId] = await db('builds')
     .insert({
       'commit_sha': 'deadbeefdeadbeef123123',
-      'build_number': '12123434',
+      'build_id': '12123434',
     } as DB.Build)
     .returning('id');
 
@@ -50,7 +50,7 @@ export async function fillDatabase(db: Database): Promise<void> {
     for (const suiteType of ['unit', 'integration']) {
       [jobId] = await db('jobs').insert({
         'build_id': buildId,
-        'job_number': `12123434.${i}`,
+        'job_id': `12123434.${i}`,
         'test_suite_type': suiteType,
         'started_at': hoursAgoMs(i),
       } as DB.Job);
@@ -86,12 +86,12 @@ export async function fillDatabase(db: Database): Promise<void> {
 
   [buildId] = await db('builds').insert({
     'commit_sha': 'faefaefae99',
-    'build_number': '12129999',
+    'build_id': '12129999',
   } as DB.Build);
 
   [jobId] = await db('jobs').insert({
     'build_id': buildId,
-    'job_number': '12129999.1',
+    'job_id': '12129999.1',
     'test_suite_type': 'unit',
     'started_at': Date.now(),
   } as DB.Job);

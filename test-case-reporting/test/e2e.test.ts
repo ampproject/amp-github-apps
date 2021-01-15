@@ -56,11 +56,11 @@ describe('end-to-end', () => {
 
   describe('when one post request is received', () => {
     const build = {
-      buildNumber: '413413',
+      buildId: '413413',
       commitSha: 'abcdefg123gomugomu',
     };
     const job = {
-      jobNumber: '413413.612',
+      jobId: '413413.612',
       testSuiteType: 'unit',
     };
     const results = getFixture('sample-karma-report');
@@ -84,7 +84,7 @@ describe('end-to-end', () => {
       const {testRuns}: {testRuns: Array<TestRun>} = res.body;
       expect(testRuns).toHaveLength(5);
       testRuns.forEach(testRun =>
-        expect(testRun.job.build.buildNumber).toEqual('413413')
+        expect(testRun.job.build.buildId).toEqual('413413')
       );
     });
 

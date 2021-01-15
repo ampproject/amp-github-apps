@@ -30,17 +30,17 @@
             <td>
               {{#testRun.job}}
 
-              Job: {{jobNumber}}
-              {{#url}}(<a href="{{.}}">Travis</a>){{/url}}
+              Job: {{jobId}}
+              {{#url}}(<a href="{{.}}">CI</a>){{/url}}
             </td>
 
               {{#build}}
             <td>
               Build:
-              <a href="/test-results/build/{{build.buildNumber}}">
-                {{buildNumber}}
+              <a href="/test-results/build/{{build.buildId}}">
+                {{buildId}}
               </a>
-              {{#url}}(<a href="{{.}}">Travis</a>){{/url}}
+              {{#url}}(<a href="{{.}}">CI</a>){{/url}}
               {{/build}}
 
               {{/testRun.job}}

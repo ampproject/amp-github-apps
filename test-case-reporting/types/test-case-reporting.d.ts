@@ -16,31 +16,24 @@
 
 declare module 'test-case-reporting' {
   /**
-   * Travis job types for which test results may be reported.
+   * CI job types for which test results may be reported.
    */
   export type TestSuiteType = 'unit' | 'integration' | 'e2e';
 
   export type TestStatus = 'PASS' | 'FAIL' | 'SKIP' | 'ERROR';
 
-  /** A build on Travis. */
+  /** A CI build. */
   export interface Build {
     commitSha: string;
-
-    // Despite being a *Number, buildNumber is of type string for parity with
-    // jobNumber
-    buildNumber: string;
+    buildId: string;
     url?: string;
     startedAt: Date;
   }
 
-  /** A job within a Travis build. */
+  /** A job within a CI build. */
   export interface Job {
     build: Build;
-
-    // Despite being a *Number, this is of type string because it includes periods.
-    // For the 456th job in the 123rd build,
-    // this looks like `123.456`
-    jobNumber: string;
+    jobId: string;
     url?: string;
     testSuiteType: TestSuiteType;
   }
@@ -87,10 +80,7 @@ declare module 'test-case-reporting' {
       id?: number;
       commit_sha: string;
       url?: string;
-
-      // Despite being a *_number, build_number is of type string for parity with
-      // job_number
-      build_number: string;
+      build_id: string;
       started_at?: number;
     }
 
@@ -98,11 +88,7 @@ declare module 'test-case-reporting' {
       id?: number;
       build_id: number;
       url?: string;
-
-      // Despite being a *_number, job_number is of type string because it includes periods.
-      // For the 456th job in the 123rd build,
-      // this looks like `123.456`
-      job_number: string;
+      job_id: string;
       test_suite_type: TestSuiteType;
       started_at?: number;
     }
@@ -168,22 +154,22 @@ declare module 'test-case-reporting' {
     }
   }
 
-  // Types for the JSON reports POSTed by Travis
+  // Types for the JSON reports POSTed during CI
   // Supposed to match the reports exactly.
-  namespace Travis {
+  namespace CI {
     export interface Report {
-      job: Travis.Job;
-      build: Travis.Build;
+      job: CI.Job;
+      build: CI.Build;
       results: KarmaReporter.TestResultReport;
       repository: string;
     }
     export interface Build {
-      buildNumber: string;
+      buildId: string;
       commitSha: string;
       url: string;
     }
     export interface Job {
-      jobNumber: string;
+      jobId: string;
       testSuiteType: TestSuiteType;
       url: string;
     }

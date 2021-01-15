@@ -1,19 +1,19 @@
 AMP Test Case Reporting Bot
 ==============
 
-A Google Cloud app that stores the results of tests run by Travis. Used to track flaky tests.
+A Google Cloud app that stores the results of tests run during CI. Used to track flaky tests.
 
 This app runs as a [[something]].
 
 Interface
 ---------
-### API for Travis
+### API for CI
 
-The App has the following API endpoints, which are to be triggered from Travis CI
+The App has the following API endpoints, which are to be triggered during CI
 runs.
 
 * `POST /report`
-  * Accepts a JSON object representing a test result report from Travis. Has 3 fields: `build`, `job`, and `results`, representing build information, job information, and test run information respectively. For the full structure of the object, see [the type declaration module](types/test-case-reporting.d.ts).
+  * Accepts a JSON object representing a test result report from a CI build. Has 3 fields: `build`, `job`, and `results`, representing build information, job information, and test run information respectively. For the full structure of the object, see [the type declaration module](types/test-case-reporting.d.ts).
 
 Setup
 -----
