@@ -231,6 +231,11 @@ app.post('/report', jsonParser, async (req, res) => {
       );
     }
 
+    // TODO(https://github.com/ampproject/amphtml/issues/31996): Migrate types
+    // and database schema if necessary.
+    report.job.jobNumber = report.job.jobNumber || report.job.jobId;
+    report.build.buildNumber = report.build.buildNumber || report.build.buildId;
+
     await record.storeTravisReport(report);
     res.sendStatus(statusCodes.CREATED);
   } catch (error) {
