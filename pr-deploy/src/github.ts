@@ -206,7 +206,7 @@ export class PullRequest {
     if (!check.output || !check.output.text) {
       return '';
     }
-    return check.output.text;
+    return check.output.text.replace(/CI build ID\:\ /g, '')
   }
 
   /**
