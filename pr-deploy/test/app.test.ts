@@ -20,7 +20,7 @@ jest.mock('../src/zipper', () => {
     unzipAndMove: jest
       .fn()
       .mockReturnValue(
-        Promise.resolve('gs://serving-bucket/ciBuildNumber')
+        Promise.resolve('gs://serving-bucket/ciBuildId')
       ),
   };
 });
@@ -128,7 +128,7 @@ describe('test pr deploy app', () => {
       .reply(200, {
         total_count: 1,
         check_runs: [
-          {id: 12345, output: {text: 'CI build number: 3'}},
+          {id: 12345, output: {text: 'CI build ID: abc'}},
         ],
       }) // make sure a check already exists
       .patch('/repos/test-owner/test-repo/check-runs/12345')

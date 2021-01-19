@@ -57,7 +57,7 @@ function initializeRouter(app: Application) {
     const pr = new PullRequest(github, headSha);
     switch (result) {
       case 'success':
-        await pr.buildCompleted(Number(ciBuild));
+        await pr.buildCompleted(ciBuild);
         break;
       case 'errored':
         await pr.buildErrored();
@@ -71,8 +71,6 @@ function initializeRouter(app: Application) {
   };
 
   router.post('/cibuilds/:ciBuild/headshas/:headSha/:result', initialize);
-  // TODO(rsimha, #1110): Clean this up once amphtml stops using `/travisBuilds/`
-  router.post('/travisbuilds/:ciBuild/headshas/:headSha/:result', initialize);
 }
 
 /**
@@ -91,11 +89,11 @@ function initializeDeployment(app: Application) {
     );
     try {
       await pr.deploymentInProgress();
-      const ciBuild = await pr.getCiBuildNumber();
-      const bucketUrl = await unzipAndMove(ciBuild);
+      const ciBuildId = await pr.getCiBuildId();
+      const bucketUrl = await unzipAndMove(ciBuildId);
       await pr.deploymentCompleted(
         bucketUrl,
-        `${BASE_URL}amp_dist_${ciBuild}/`
+        `${BASE_URL}amp_nomodule_${ciBuildId}/`
       );
     } catch (e) {
       await pr.deploymentErrored(e);
