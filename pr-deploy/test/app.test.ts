@@ -128,7 +128,7 @@ describe('test pr deploy app', () => {
       .reply(200, {
         total_count: 1,
         check_runs: [
-          {id: 12345, output: {text: 'CI build ID: abc'}},
+          {id: 12345, output: {text: 'Commit SHA: abcdefa'}},
         ],
       }) // make sure a check already exists
       .patch('/repos/test-owner/test-repo/check-runs/12345')

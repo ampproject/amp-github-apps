@@ -57,7 +57,7 @@ function initializeRouter(app: Application) {
     const pr = new PullRequest(github, headSha);
     switch (result) {
       case 'success':
-        await pr.buildCompleted(ciBuild);
+        await pr.buildCompleted(headSha);
         break;
       case 'errored':
         await pr.buildErrored();
@@ -89,11 +89,11 @@ function initializeDeployment(app: Application) {
     );
     try {
       await pr.deploymentInProgress();
-      const ciBuildId = await pr.getCiBuildId();
-      const bucketUrl = await unzipAndMove(ciBuildId);
+      const commitSha = await pr.getCommitSha();
+      const bucketUrl = await unzipAndMove(commitSha);
       await pr.deploymentCompleted(
         bucketUrl,
-        `${BASE_URL}amp_nomodule_${ciBuildId}/`
+        `${BASE_URL}amp_nomodule_${commitSha}/`
       );
     } catch (e) {
       await pr.deploymentErrored(e);
