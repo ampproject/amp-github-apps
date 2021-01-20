@@ -50,7 +50,7 @@ function initializeRouter(app: Application) {
   router.use(express.json());
 
   const initialize = async(request, response) => {
-    const {ciBuild, headSha, result} = request.params;
+    const {headSha, result} = request.params;
     const github = ((await app.auth(
       Number(process.env.INSTALLATION_ID)
     )) as unknown) as Octokit;
