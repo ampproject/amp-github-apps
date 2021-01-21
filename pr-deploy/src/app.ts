@@ -41,23 +41,23 @@ function initializeCheck(app: Application) {
 }
 
 /**
- * Listens to the HTTP post route from CI to know when dist upload is complete.
- * When received, updates the PR check status to 'complete'
- * so that the check run action to deploy site is enabled.
+ * Listens to the HTTP post route from CI to know when binary upload is
+ * complete. When received, updates the PR check status to 'complete' so that
+ * the check run action to deploy site is enabled.
  */
 function initializeRouter(app: Application) {
   const router: IRouter = app.route('/v0/pr-deploy');
   router.use(express.json());
 
   const initialize = async(request, response) => {
-    const {ciBuild, headSha, result} = request.params;
+    const {headSha, result} = request.params;
     const github = ((await app.auth(
       Number(process.env.INSTALLATION_ID)
     )) as unknown) as Octokit;
     const pr = new PullRequest(github, headSha);
     switch (result) {
       case 'success':
-        await pr.buildCompleted(ciBuild);
+        await pr.buildCompleted(headSha);
         break;
       case 'errored':
         await pr.buildErrored();
@@ -70,7 +70,7 @@ function initializeRouter(app: Application) {
     response.send({status: 200});
   };
 
-  router.post('/cibuilds/:ciBuild/headshas/:headSha/:result', initialize);
+  router.post('/headshas/:headSha/:result', initialize);
 }
 
 /**
@@ -89,11 +89,11 @@ function initializeDeployment(app: Application) {
     );
     try {
       await pr.deploymentInProgress();
-      const ciBuildId = await pr.getCiBuildId();
-      const bucketUrl = await unzipAndMove(ciBuildId);
+      const commitSha = await pr.getCommitSha();
+      const bucketUrl = await unzipAndMove(commitSha);
       await pr.deploymentCompleted(
         bucketUrl,
-        `${BASE_URL}amp_nomodule_${ciBuildId}/`
+        `${BASE_URL}amp_nomodule_${commitSha}/`
       );
     } catch (e) {
       await pr.deploymentErrored(e);
