@@ -20,7 +20,7 @@ jest.mock('../src/zipper', () => {
     unzipAndMove: jest
       .fn()
       .mockReturnValue(
-        Promise.resolve('gs://serving-bucket/ciBuildId')
+        Promise.resolve('gs://serving-bucket/headSha')
       ),
   };
 });
