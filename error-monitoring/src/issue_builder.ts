@@ -88,7 +88,7 @@ export class IssueBuilder {
   private prLink(prNumber: number): string {
     return (
       `[#${prNumber}]` +
-      `(https://github.com/${this.sourceRepo}/pulls/${prNumber})`
+      `(https://github.com/${this.sourceRepo}/pull/${prNumber})`
     );
   }
 
