@@ -166,12 +166,12 @@ describe('IssueBuilder', () => {
       expect(notes).toContain(
         '`@xymw` modified ' +
           '`extensions/amp-delight-player/0.1/amp-delight-player.js:396-439` ' +
-          'in [#17939](https://github.com/test_org/test_repo/pulls/17939) ' +
+          'in [#17939](https://github.com/test_org/test_repo/pull/17939) ' +
           '(Nov 12, 2018)'
       );
       expect(notes).toContain(
         '`@rsimha` modified `src/event-helper-listen.js:57-59` in ' +
-          '[#12450](https://github.com/test_org/test_repo/pulls/12450) ' +
+          '[#12450](https://github.com/test_org/test_repo/pull/12450) ' +
           '(Dec 13, 2017)'
       );
     });
