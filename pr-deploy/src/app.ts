@@ -57,7 +57,7 @@ function initializeRouter(app: Application) {
     const pr = new PullRequest(github, headSha);
     switch (result) {
       case 'success':
-        await pr.buildCompleted(headSha);
+        await pr.buildCompleted();
         break;
       case 'errored':
         await pr.buildErrored();
@@ -89,11 +89,10 @@ function initializeDeployment(app: Application) {
     );
     try {
       await pr.deploymentInProgress();
-      const commitSha = await pr.getCommitSha();
-      const bucketUrl = await unzipAndMove(commitSha);
+      const bucketUrl = await unzipAndMove(pr.headSha);
       await pr.deploymentCompleted(
         bucketUrl,
-        `${BASE_URL}amp_nomodule_${commitSha}/`
+        `${BASE_URL}amp_nomodule_${pr.headSha}/`
       );
     } catch (e) {
       await pr.deploymentErrored(e);
