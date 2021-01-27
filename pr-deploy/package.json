@@ -19,7 +19,7 @@
     "dev": "nodemon",
     "start": "probot run ./src/app.js",
     "pretest": "npm run build",
-    "test": "jest --verbose=false",
+    "test": "jest --verbose=true",
     "deploy-tag": "git tag 'deploy-pr-deploy-'`date -u '+%Y%m%d%H%M%S'`"
   },
   "dependencies": {

@@ -124,11 +124,11 @@ describe('test pr deploy app', () => {
     nock(apiUrl)
       .get('/repos/test-owner/test-repo/commits/abcde/' +
       'check-runs?check_name=test-check')
-      .times(3)
+      .times(2)
       .reply(200, {
         total_count: 1,
         check_runs: [
-          {id: 12345, output: {text: 'Commit SHA: abcdefa'}},
+          {id: 12345, head_sha: 'abcde'},
         ],
       }) // make sure a check already exists
       .patch('/repos/test-owner/test-repo/check-runs/12345')
