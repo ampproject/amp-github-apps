@@ -26,8 +26,8 @@
     "test": "echo No tests defined for this app"
   },
   "dependencies": {
-    "@google-cloud/storage": "5.7.2",
-    "@octokit/rest": "18.0.14",
+    "@google-cloud/storage": "5.7.3",
+    "@octokit/rest": "18.0.15",
     "@octokit/types": "6.1.2",
     "@types/express": "4.17.11",
     "@types/node": "12.19.15",
