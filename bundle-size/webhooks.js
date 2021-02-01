@@ -40,7 +40,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
           'shard that contains "Bundle Size" in its title.',
       },
     });
-    const check = await context.github.checks.create(params);
+    const check = await context.octokit.checks.create(params);
 
     const checkRunId = check.data.id;
     await db.transaction(trx => {
@@ -127,7 +127,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
     }
 
     if (isApprover) {
-      await context.github.checks.update({
+      await context.octokit.checks.update({
         owner: check.owner,
         repo: check.repo,
         check_run_id: check.check_run_id,
@@ -148,7 +148,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       .del()
       .where({merge_commit_sha: mergeCommitSha});
     if (numDeleted > 0) {
-      await context.github.checks.update(
+      await context.octokit.checks.update(
         context.repo({
           check_run_id: context.payload.check_run.id,
           conclusion: 'neutral',
