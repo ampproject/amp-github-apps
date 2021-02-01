@@ -111,9 +111,9 @@ describe('test-status/api', () => {
         name: 'ampproject/tests/unit (local)',
         head_sha: HEAD_SHA,
         status,
-        output: {
+        output: expect.objectContaining({
           title,
-        },
+        }),
       })
     );
   });
@@ -141,9 +141,9 @@ describe('test-status/api', () => {
       expect.objectContaining({
         head_sha: HEAD_SHA,
         status: 'in_progress',
-        output: {
+        output: expect.objectContaining({
           title: 'Tests are running',
-        },
+        }),
       })
     );
   });
@@ -189,9 +189,9 @@ describe('test-status/api', () => {
         expect.objectContaining({
           status: 'completed',
           conclusion: 'success',
-          output: {
+          output: expect.objectContaining({
             title,
-          },
+          }),
         })
       );
     }
@@ -248,12 +248,12 @@ describe('test-status/api', () => {
         expect.objectContaining({
           status: 'completed',
           conclusion: 'action_required',
-          output: {
+          output: expect.objectContaining({
             title,
             text: expect.stringContaining(
               'Contact the weekly build cop (@ampproject/build-cop)'
             ),
-          },
+          }),
         })
       );
     }
@@ -295,12 +295,12 @@ describe('test-status/api', () => {
       expect.objectContaining({
         status: 'completed',
         conclusion: 'action_required',
-        output: {
+        output: expect.objectContaining({
           title: 'Tests have errored',
           text: expect.stringContaining(
             'Contact the weekly build cop (@ampproject/build-cop)'
           ),
-        },
+        }),
       })
     );
   });
