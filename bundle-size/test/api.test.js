@@ -70,9 +70,9 @@ describe('bundle-size api', () => {
     };
 
     probot = new Probot({});
-    app = probot.load(app => {
+    app = probot.load((app, {getRouter}) => {
       const githubUtils = new GitHubUtils(github, app.log, nodeCache);
-      installApiRouter(app, db, githubUtils);
+      installApiRouter(app, getRouter('/v0'), db, githubUtils);
     });
     app.auth = () => github;
 
@@ -137,9 +137,9 @@ describe('bundle-size api', () => {
         expect.objectContaining({
           check_run_id: 555555,
           conclusion: 'neutral',
-          output: {
+          output: expect.objectContaining({
             title: 'check skipped because PR contains no runtime changes',
-          },
+          }),
         })
       );
     });
@@ -236,9 +236,9 @@ describe('bundle-size api', () => {
           expect.objectContaining({
             check_run_id: 555555,
             conclusion: 'success',
-            output: {
+            output: expect.objectContaining({
               title: message,
-            },
+            }),
           })
         );
       }
@@ -288,14 +288,14 @@ describe('bundle-size api', () => {
         expect.objectContaining({
           check_run_id: 555555,
           conclusion: 'success',
-          output: {
+          output: expect.objectContaining({
             title: 'no approval necessary',
             summary: expect.stringContaining(
               '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
                 '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
                 '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`'
             ),
-          },
+          }),
         })
       );
     });
@@ -349,10 +349,10 @@ describe('bundle-size api', () => {
         expect.objectContaining({
           check_run_id: 555555,
           conclusion: 'action_required',
-          output: {
+          output: expect.objectContaining({
             title:
               'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
-          },
+          }),
         })
       );
       expect(github.pulls.listRequestedReviewers).toHaveBeenCalledWith(
@@ -430,10 +430,10 @@ describe('bundle-size api', () => {
         expect.objectContaining({
           check_run_id: 555555,
           conclusion: 'action_required',
-          output: {
+          output: expect.objectContaining({
             title:
               'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
-          },
+          }),
         })
       );
     });
@@ -553,9 +553,9 @@ describe('bundle-size api', () => {
       expect(github.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'success',
-          output: {
+          output: expect.objectContaining({
             title: 'no approval necessary',
-          },
+          }),
         })
       );
     });
@@ -626,10 +626,10 @@ describe('bundle-size api', () => {
       expect(github.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'action_required',
-          output: {
+          output: expect.objectContaining({
             title:
               'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
-          },
+          }),
         })
       );
     });
@@ -693,9 +693,9 @@ describe('bundle-size api', () => {
       expect(github.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'action_required',
-          output: {
+          output: expect.objectContaining({
             title: 'Failed to retrieve the bundle size of branch point 5f27002',
-          },
+          }),
         })
       );
     });

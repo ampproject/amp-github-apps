@@ -66,6 +66,10 @@ describe('bundle-size webhooks', () => {
       get teams() {
         return github.teams;
       }
+
+      auth() {
+        return github;
+      }
     }
 
     probot = new Probot({Octokit});
@@ -117,9 +121,9 @@ describe('bundle-size webhooks', () => {
         expect.objectContaining({
           head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
           name: 'ampproject/bundle-size',
-          output: {
+          output: expect.objectContaining({
             title: 'Calculating new bundle size for this PR…',
-          },
+          }),
         })
       );
     });
@@ -157,9 +161,9 @@ describe('bundle-size webhooks', () => {
         expect.objectContaining({
           head_sha: '39f787c8132f9ccc956ed465c0af8bc33f641404',
           name: 'ampproject/bundle-size',
-          output: {
+          output: expect.objectContaining({
             title: 'Calculating new bundle size for this PR…',
-          },
+          }),
         })
       );
     });
@@ -205,9 +209,9 @@ describe('bundle-size webhooks', () => {
         expect.objectContaining({
           check_run_id: 68609861,
           conclusion: 'neutral',
-          output: {
+          output: expect.objectContaining({
             title: 'Check skipped because this is a merged commit',
-          },
+          }),
         })
       );
     });
@@ -260,19 +264,19 @@ describe('bundle-size webhooks', () => {
         expect(github.checks.update).toHaveBeenCalledWith(
           expect.objectContaining({
             conclusion: 'success',
-            output: {
+            output: expect.objectContaining({
               title: 'approved by @choumx',
               summary: expect.stringContaining(
                 'The bundle size change(s) of this pull request were approved by @choumx'
               ),
-            },
+            }),
           })
         );
         expect(github.checks.update).toHaveBeenCalledWith(
           expect.objectContaining({
-            output: {
+            output: expect.objectContaining({
               summary: expect.stringContaining(report_markdown),
-            },
+            }),
           })
         );
       }
@@ -298,9 +302,9 @@ describe('bundle-size webhooks', () => {
       expect(github.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'success',
-          output: {
+          output: expect.objectContaining({
             title: 'approved by @rsimha',
-          },
+          }),
         })
       );
     });
