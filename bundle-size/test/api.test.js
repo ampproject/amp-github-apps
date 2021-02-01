@@ -70,9 +70,9 @@ describe('bundle-size api', () => {
     };
 
     probot = new Probot({});
-    app = probot.load(app => {
+    app = probot.load((app, {getRouter}) => {
       const githubUtils = new GitHubUtils(github, app.log, nodeCache);
-      installApiRouter(app, db, githubUtils);
+      installApiRouter(app, getRouter('/v0'), db, githubUtils);
     });
     app.auth = () => github;
 

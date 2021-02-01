@@ -161,10 +161,11 @@ function choosePotentialApproverTeams(
  * Install the API router on the Probot application.
  *
  * @param {!Probot.Application} app Probot application.
+ * @param {!express.Router} router Express server router.
  * @param {!Knex} db database connection.
  * @param {!GitHubUtils} githubUtils GitHubUtils instance.
  */
-exports.installApiRouter = (app, db, githubUtils) => {
+exports.installApiRouter = (app, router, db, githubUtils) => {
   /**
    * Add a bundle size reviewer to add to the pull request.
    *
@@ -376,14 +377,13 @@ exports.installApiRouter = (app, db, githubUtils) => {
     return true;
   }
 
-  const v0 = app.route('/v0');
-  v0.use((request, response, next) => {
+  router.use((request, response, next) => {
     request.app.set('trust proxy', true);
     next();
   });
-  v0.use(require('express').json());
+  router.use(require('express').json());
 
-  v0.post('/commit/:headSha/skip', async (request, response) => {
+  router.post('/commit/:headSha/skip', async (request, response) => {
     const {headSha} = request.params;
     app.log(`Marking SHA ${headSha} for skip`);
 
@@ -415,7 +415,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
     response.end();
   });
 
-  v0.post('/commit/:headSha/report', async (request, response) => {
+  router.post('/commit/:headSha/report', async (request, response) => {
     const {headSha} = request.params;
     const {baseSha, bundleSizes} = request.body;
 
@@ -468,7 +468,7 @@ exports.installApiRouter = (app, db, githubUtils) => {
     }
   });
 
-  v0.post('/commit/:headSha/store', async (request, response) => {
+  router.post('/commit/:headSha/store', async (request, response) => {
     const {headSha} = request.params;
     const {bundleSizes} = request.body;
 

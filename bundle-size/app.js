@@ -27,8 +27,9 @@ const db = dbConnect();
  * Set up Probot application.
  *
  * @param {!Probot.Application} app base Probot Application.
+ * @param {function} getRouter returns an Express Router.
  */
-module.exports = app => {
+module.exports = (app, {getRouter}) => {
   const userBasedGithub = new Octokit({
     auth: `token ${process.env.ACCESS_TOKEN}`,
   });
@@ -36,5 +37,5 @@ module.exports = app => {
   const githubUtils = new GitHubUtils(userBasedGithub, app.log);
 
   installGitHubWebhooks(app, db, githubUtils);
-  installApiRouter(app, db, githubUtils);
+  installApiRouter(app, getRouter('/v0'), db, githubUtils);
 };

@@ -66,6 +66,10 @@ describe('bundle-size webhooks', () => {
       get teams() {
         return github.teams;
       }
+
+      auth() {
+        return github;
+      }
     }
 
     probot = new Probot({Octokit});
