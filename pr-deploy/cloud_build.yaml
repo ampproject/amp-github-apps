@@ -40,6 +40,9 @@ steps:
       - app
       - deploy
 
+# Overall cloud build timeout
+timeout: 1800s
+
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
 secrets:
