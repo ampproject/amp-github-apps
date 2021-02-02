@@ -25,13 +25,15 @@ steps:
     args:
       - app
       - deploy
-    timeout: 1200s
   - name: gcr.io/cloud-builders/gcloud
     dir: bundle-size-chart
     args:
       - app
       - deploy
       - cron.yaml
+
+# Overall cloud build timeout
+timeout: 1800s
 
 # These secrets are the base64-encoded form of encrypted secret values. They are
 # automatically decrypted and added to the `.env` environment at build time.
