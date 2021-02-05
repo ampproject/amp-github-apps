@@ -227,6 +227,8 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
    * @return {boolean} true if succeeded; false otherwise.
    */
   async function tryReport(check, baseSha, prBundleSizes, lastAttempt = false) {
+    const partialHeadSha = check.head_sha.substr(0, 7);
+    const partialBaseSha = baseSha.substr(0, 7);
     const github = await app.auth(check.installation_id);
     const githubOptions = {
       owner: check.owner,
@@ -256,8 +258,6 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
       );
     } catch (error) {
       const fileNotFound = 'status' in error && error.status === 404;
-      const partialHeadSha = check.head_sha.substr(0, 7);
-      const partialBaseSha = baseSha.substr(0, 7);
 
       if (fileNotFound) {
         app.log.warn(
@@ -351,8 +351,8 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     }
 
     const reportMarkdown = extraBundleSizesSummary(
-      check.head_sha,
-      baseSha,
+      partialHeadSha,
+      partialBaseSha,
       bundleSizeDeltas,
       missingBundleSizes
     );

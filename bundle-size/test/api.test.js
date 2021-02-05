@@ -339,9 +339,9 @@ describe('bundle-size api', () => {
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
         report_markdown:
           '## Commit details\n' +
-          '**Head commit:** 26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa\n' +
-          '**Base commit:** 5f27002526a808c5c1ad5d0f1ab1cec471af0a33\n' +
-          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002526a808c5c1ad5d0f1ab1cec471af0a33..26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa\n' +
+          '**Head commit:** 26ddec3\n' +
+          '**Base commit:** 5f27002\n' +
+          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n' +
           '## Bundle size changes\n' +
           '* `dist/v0.js`: Δ +0.34KB\n' +
           '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
@@ -484,9 +484,9 @@ describe('bundle-size api', () => {
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
         report_markdown:
           '## Commit details\n' +
-          '**Head commit:** 26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa\n' +
-          '**Base commit:** 5f27002526a808c5c1ad5d0f1ab1cec471af0a33\n' +
-          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002526a808c5c1ad5d0f1ab1cec471af0a33..26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa\n' +
+          '**Head commit:** 26ddec3\n' +
+          '**Base commit:** 5f27002\n' +
+          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n' +
           '## Bundle size changes\n' +
           '* `dist/v0.js`: Δ +0.34KB\n' +
           '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
@@ -622,9 +622,9 @@ describe('bundle-size api', () => {
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
         report_markdown:
           '## Commit details\n' +
-          '**Head commit:** 26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa\n' +
-          '**Base commit:** 5f27002526a808c5c1ad5d0f1ab1cec471af0a33\n' +
-          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002526a808c5c1ad5d0f1ab1cec471af0a33..26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa\n' +
+          '**Head commit:** 26ddec3\n' +
+          '**Base commit:** 5f27002\n' +
+          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n' +
           '## Bundle size changes\n' +
           '* `dist/v0.js`: Δ +0.11KB\n' +
           '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
