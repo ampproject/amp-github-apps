@@ -35,7 +35,7 @@ const DRAFT_TITLE_REGEX = /\b(wip|work in progress|do not (merge|submit|review))
  */
 function failedCheckOutput(approverTeams, reportMarkdown) {
   return {
-    title: `approval required from one of [@${approverTeams.join(', @')}]`,
+    title: `Approval required from one of [@${approverTeams.join(', @')}]`,
     summary:
       'This pull request has increased the bundle size (brotli compressed ' +
       'size) of the following files, and must be approved by a member of one ' +
@@ -58,7 +58,7 @@ function failedCheckOutput(approverTeams, reportMarkdown) {
  */
 function successfulCheckOutput(reportMarkdown) {
   return {
-    title: `no approval necessary`,
+    title: `No approval necessary`,
     summary:
       'This pull request does not change any bundle size (brotli compressed ' +
       'size) by any significant amount, so no special approval is necessary.' +
@@ -94,16 +94,28 @@ function erroredCheckOutput(partialBaseSha) {
 }
 
 /**
- * Return formatted extra changes to append to the check output summary.
+ * Return formatted commit info and extra changes to append to the check output
+ * summary.
  *
+ * @param {string} headSha commit being checked
+ * @param {string} baseSha baseline commit for comparison
  * @param {!Array<string>} bundleSizeDeltas text description of all bundle size
  *   changes.
  * @param {!Array<string>} missingBundleSizes text description of missing bundle
  *   sizes from other `master` or the pull request.
  * @return {string} formatted extra changes;
  */
-function extraBundleSizesSummary(bundleSizeDeltas, missingBundleSizes) {
+function extraBundleSizesSummary(
+  headSha,
+  baseSha,
+  bundleSizeDeltas,
+  missingBundleSizes
+) {
   return (
+    '## Commit details\n' +
+    `**Head commit:** ${headSha}\n` +
+    `**Base commit:** ${baseSha}\n` +
+    `**Code changes:** https://github.com/ampproject/amphtml/compare/${baseSha}..${headSha}\n` +
     '## Bundle size changes\n' +
     bundleSizeDeltas.concat(missingBundleSizes).join('\n')
   );
@@ -215,6 +227,8 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
    * @return {boolean} true if succeeded; false otherwise.
    */
   async function tryReport(check, baseSha, prBundleSizes, lastAttempt = false) {
+    const partialHeadSha = check.head_sha.substr(0, 7);
+    const partialBaseSha = baseSha.substr(0, 7);
     const github = await app.auth(check.installation_id);
     const githubOptions = {
       owner: check.owner,
@@ -244,8 +258,6 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
       );
     } catch (error) {
       const fileNotFound = 'status' in error && error.status === 404;
-      const partialHeadSha = check.head_sha.substr(0, 7);
-      const partialBaseSha = baseSha.substr(0, 7);
 
       if (fileNotFound) {
         app.log.warn(
@@ -339,6 +351,8 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     }
 
     const reportMarkdown = extraBundleSizesSummary(
+      partialHeadSha,
+      partialBaseSha,
       bundleSizeDeltas,
       missingBundleSizes
     );
@@ -404,7 +418,7 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
       conclusion: 'neutral',
       completed_at: new Date().toISOString(),
       output: {
-        title: 'check skipped because PR contains no runtime changes',
+        title: 'Check skipped because PR contains no runtime changes',
         summary:
           'An automated check has determined that the bundle size ' +
           '(brotli compressed size of `v0.js`) could not be affected by ' +

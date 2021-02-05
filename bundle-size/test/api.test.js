@@ -138,7 +138,7 @@ describe('bundle-size api', () => {
           check_run_id: 555555,
           conclusion: 'neutral',
           output: expect.objectContaining({
-            title: 'check skipped because PR contains no runtime changes',
+            title: 'Check skipped because PR contains no runtime changes',
           }),
         })
       );
@@ -187,9 +187,9 @@ describe('bundle-size api', () => {
     });
 
     test.each([
-      [12.44, 'no approval necessary'],
-      [12.34, 'no approval necessary'],
-      [12.24, 'no approval necessary'],
+      [12.44, 'No approval necessary'],
+      [12.34, 'No approval necessary'],
+      [12.24, 'No approval necessary'],
     ])(
       'update a check on bundle-size report (report/base = 12.34KB/%dKB)',
       async (baseSize, message) => {
@@ -289,7 +289,7 @@ describe('bundle-size api', () => {
           check_run_id: 555555,
           conclusion: 'success',
           output: expect.objectContaining({
-            title: 'no approval necessary',
+            title: 'No approval necessary',
             summary: expect.stringContaining(
               '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
                 '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
@@ -338,6 +338,10 @@ describe('bundle-size api', () => {
         check_run_id: 555555,
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
         report_markdown:
+          '## Commit details\n' +
+          '**Head commit:** 26ddec3\n' +
+          '**Base commit:** 5f27002\n' +
+          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n' +
           '## Bundle size changes\n' +
           '* `dist/v0.js`: Δ +0.34KB\n' +
           '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
@@ -351,7 +355,7 @@ describe('bundle-size api', () => {
           conclusion: 'action_required',
           output: expect.objectContaining({
             title:
-              'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
+              'Approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
           }),
         })
       );
@@ -432,7 +436,7 @@ describe('bundle-size api', () => {
           conclusion: 'action_required',
           output: expect.objectContaining({
             title:
-              'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
+              'Approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
           }),
         })
       );
@@ -479,6 +483,10 @@ describe('bundle-size api', () => {
         check_run_id: 555555,
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
         report_markdown:
+          '## Commit details\n' +
+          '**Head commit:** 26ddec3\n' +
+          '**Base commit:** 5f27002\n' +
+          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n' +
           '## Bundle size changes\n' +
           '* `dist/v0.js`: Δ +0.34KB\n' +
           '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
@@ -554,7 +562,7 @@ describe('bundle-size api', () => {
         expect.objectContaining({
           conclusion: 'success',
           output: expect.objectContaining({
-            title: 'no approval necessary',
+            title: 'No approval necessary',
           }),
         })
       );
@@ -613,6 +621,10 @@ describe('bundle-size api', () => {
         check_run_id: 555555,
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
         report_markdown:
+          '## Commit details\n' +
+          '**Head commit:** 26ddec3\n' +
+          '**Base commit:** 5f27002\n' +
+          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n' +
           '## Bundle size changes\n' +
           '* `dist/v0.js`: Δ +0.11KB\n' +
           '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
@@ -628,7 +640,7 @@ describe('bundle-size api', () => {
           conclusion: 'action_required',
           output: expect.objectContaining({
             title:
-              'approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
+              'Approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
           }),
         })
       );
