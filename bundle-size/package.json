@@ -26,6 +26,7 @@
   "dependencies": {
     "@octokit/rest": "18.0.15",
     "knex": "0.21.17",
+    "minimatch": "3.0.4",
     "node-cache": "5.1.2",
     "pg": "8.5.1",
     "probot": "10.19.0",

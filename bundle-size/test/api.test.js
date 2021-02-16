@@ -712,6 +712,51 @@ describe('bundle-size api', () => {
       );
     });
 
+    test('match glob patterns in APPROVERS.json', async () => {
+      await db('checks').insert({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: null,
+        report_markdown: null,
+      });
+
+      baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
+        'base64'
+      );
+
+      github.repos.getContent.returnValue = {
+        'dist/v0.*': {approvers: ['ampproject/wg-performance'], threshold: 0.1},
+      };
+
+      await request(probot.server)
+        .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
+        .send(jsonPayload)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(200);
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+        report_markdown: expect.stringContaining('* `dist/v0.js`: Δ +0.34KB'),
+      });
+    });
+
     test('ignore bundle-size report for a missing head SHA', async () => {
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
