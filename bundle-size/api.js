@@ -15,6 +15,7 @@
  */
 'use strict';
 
+const minimatch = require('minimatch');
 const sleep = require('sleep-promise');
 const {formatBundleSizeDelta, getCheckFromDatabase} = require('./common');
 
@@ -317,14 +318,14 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
         );
       }
 
-      if (
-        file in fileApprovers &&
-        bundleSizeDelta >= fileApprovers[file].threshold
-      ) {
+      const fileGlob = Object.keys(fileApprovers).find(fileGlob =>
+        minimatch(file, fileGlob)
+      );
+      if (fileGlob && bundleSizeDelta >= fileApprovers[fileGlob].threshold) {
         // Since `.approvers` is an array, it must be stringified to maintain
         // the Set uniqueness property.
         allPotentialApproverTeams.add(
-          JSON.stringify(fileApprovers[file].approvers)
+          JSON.stringify(fileApprovers[fileGlob].approvers)
         );
       }
     }
