@@ -19,10 +19,10 @@ To build the client for production: `npn run client-build-prod`
 * Make sure to set `ENV.NODE_ENV` to `production`
 * This uses React's production build
 
-To generate test data: `npm run setup`
-To build the server: `npm run server-build`
-To serve the server: `npm run server-serve`
-To build and serve the server: `npm run server`
+To generate test data: `npm run setup`  
+To build the server: `npm run server-build`  
+To serve the server: `npm run server-serve`  
+To build and serve the server: `npm run server`  
 
 To run tests: `npm run test`
 To lint: `npm run lint`
