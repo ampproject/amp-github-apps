@@ -13,6 +13,7 @@
     "node": "14.15.4"
   },
   "scripts": {
+    "deploy-tag": "git tag 'deploy-release-calendar-'`date -u '+%Y%m%d%H%M%S'`",
     "lint": "eslint . --quiet --ext .ts,.tsx ",
     "fix": "npm lint -- --fix",
     "client": "webpack-dev-server --mode development --open --hot --config webpack.client.dev.config.js",

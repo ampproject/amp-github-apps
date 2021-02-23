@@ -19,7 +19,7 @@ import * as React from 'react';
 import {ApiService} from '../api-service';
 import {Channel} from '../../types';
 import {ReleaseEventInput} from '../models/view-models';
-import {Tooltip} from './Tooltip';
+//import {Tooltip} from './Tooltip';
 import {getAllEvents, getSingleReleaseEvents} from '../models/release-event';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -99,7 +99,8 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
         fixedWeekCount={false}
         displayEventTime={false}
         views={{month: {eventLimit: EVENT_LIMIT_DISPLAYED}}}
-        eventContent={Tooltip}
+        //TODO(estherkim): reinstate once fixed for react-popper v2
+        //eventContent={Tooltip}
       />
     );
   }
