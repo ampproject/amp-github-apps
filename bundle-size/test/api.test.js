@@ -291,7 +291,9 @@ describe('bundle-size api', () => {
           output: expect.objectContaining({
             title: 'No approval necessary',
             summary: expect.stringContaining(
-              '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
+              '## Auto-approved bundle size changes\n' +
+                '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
+                '## Bundle sizes missing from this PR\n' +
                 '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
                 '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`'
             ),
@@ -341,9 +343,10 @@ describe('bundle-size api', () => {
           '## Commit details\n' +
           '**Head commit:** 26ddec3\n' +
           '**Base commit:** 5f27002\n' +
-          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n' +
-          '## Bundle size changes\n' +
+          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n\n' +
+          '## Bundle size changes that require approval\n' +
           '* `dist/v0.js`: Δ +0.34KB\n' +
+          '## Bundle sizes missing from this PR\n' +
           '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
           '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
@@ -486,9 +489,10 @@ describe('bundle-size api', () => {
           '## Commit details\n' +
           '**Head commit:** 26ddec3\n' +
           '**Base commit:** 5f27002\n' +
-          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n' +
-          '## Bundle size changes\n' +
+          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n\n' +
+          '## Bundle size changes that require approval\n' +
           '* `dist/v0.js`: Δ +0.34KB\n' +
+          '## Bundle sizes missing from this PR\n' +
           '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
           '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
@@ -624,9 +628,10 @@ describe('bundle-size api', () => {
           '## Commit details\n' +
           '**Head commit:** 26ddec3\n' +
           '**Base commit:** 5f27002\n' +
-          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n' +
-          '## Bundle size changes\n' +
+          '**Code changes:** https://github.com/ampproject/amphtml/compare/5f27002..26ddec3\n\n' +
+          '## Bundle size changes that require approval\n' +
           '* `dist/v0.js`: Δ +0.11KB\n' +
+          '## Bundle sizes missing from this PR\n' +
           '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
           '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
