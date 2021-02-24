@@ -17,17 +17,18 @@
 import {Channel, Promotion, Release} from '../types';
 import {CurrentReleases, ReleaseEventInput} from './models/view-models';
 import fetch from 'node-fetch';
+const endpoint = process.env.SERVER_ENDPOINT;
 
 export class ApiService {
   private getPromotionsRequest(url: string): Promise<Promotion[]> {
-    return fetch(url).then((result) => result.json());
+    return fetch(`${endpoint}/${url}`).then((result) => result.json());
   }
 
   private getReleaseRequest(url: string): Promise<Release> {
-    return fetch(url).then((result) => result.json());
+    return fetch(`${endpoint}/${url}`).then((result) => result.json());
   }
   private getReleasesRequest(url: string): Promise<Release[]> {
-    return fetch(url).then((result) => result.json());
+    return fetch(`${endpoint}/${url}`).then((result) => result.json());
   }
 
   async getSinglePromotions(requestedRelease: string): Promise<Promotion[]> {

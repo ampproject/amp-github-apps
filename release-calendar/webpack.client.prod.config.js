@@ -25,7 +25,7 @@ module.exports = {
   target: 'web',
   devtool: 'source-map',
   devServer: {
-    port: 9000,
+    port: 8080,
   },
   entry: './src/client/index.tsx',
   resolve: {

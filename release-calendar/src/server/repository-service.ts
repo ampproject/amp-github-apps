@@ -64,10 +64,9 @@ export class RepositoryService {
       ].map((channel) => {
         return this.promotionRepository
           .createQueryBuilder('promotion')
-          .where('promotion.channel = :channel', {channel})
           .select('promotion.releaseName')
-          .groupBy('promotion.releaseName')
           .addSelect('promotion.channel')
+          .where('promotion.channel = :channel', {channel})
           .orderBy('promotion.date', 'DESC')
           .getOne();
       }),
