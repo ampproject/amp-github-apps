@@ -87,10 +87,11 @@ function erroredCheckOutput(partialBaseSha) {
       'not found in the ' +
       '`https://github.com/ampproject/amphtml-build-artifacts` ' +
       'repository. This can happen due to failed or delayed CI builds on ' +
-      'said `master` commit.\n' +
-      `A member of [${superUserTeams}] will be added automatically to review ` +
-      'this PR. Only once the member approves this PR, can it be merged. If ' +
-      'you do not receive a response feel free to tag another team member.',
+      'said `master` commit.\n\n' +
+      'Possible solutions:\n' +
+      '* Restart the `Bundle Size` job on CircleCI\n' +
+      '* Rebase this PR on the latest `master` commit\n' +
+      `* Notify ${superUserTeams}, who can override this failed check`,
   };
 }
 
@@ -284,11 +285,6 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
           output: erroredCheckOutput(partialBaseSha),
         });
         await github.checks.update(updatedCheckOptions);
-        await addReviewer_(
-          github,
-          pullRequestOptions,
-          process.env.SUPER_USER_TEAMS.split(',')
-        );
       }
       return false;
     }

@@ -692,16 +692,9 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
-      expect(github.pulls.listReviews).toHaveBeenCalled();
-      expect(github.pulls.requestReviewers).toHaveBeenCalledWith(
-        expect.objectContaining({
-          pull_number: 19603,
-          reviewers: [
-            expect.stringMatching(/danielrozenberg|rcebulko|rsimha|estherkim/),
-          ],
-        })
-      );
+      expect(github.pulls.listRequestedReviewers).not.toHaveBeenCalled();
+      expect(github.pulls.listReviews).not.toHaveBeenCalled();
+      expect(github.pulls.requestReviewers).not.toHaveBeenCalled();
       expect(github.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'action_required',
