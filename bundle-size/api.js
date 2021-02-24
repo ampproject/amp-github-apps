@@ -110,17 +110,42 @@ function erroredCheckOutput(partialBaseSha) {
 function extraBundleSizesSummary(
   headSha,
   baseSha,
-  bundleSizeDeltas,
+  bundleSizeDeltasRequireApproval,
+  bundleSizeDeltasAutoApproved,
   missingBundleSizes
 ) {
-  return (
+  let output =
     '## Commit details\n' +
     `**Head commit:** ${headSha}\n` +
     `**Base commit:** ${baseSha}\n` +
-    `**Code changes:** https://github.com/ampproject/amphtml/compare/${baseSha}..${headSha}\n` +
-    '## Bundle size changes\n' +
-    bundleSizeDeltas.concat(missingBundleSizes).join('\n')
-  );
+    `**Code changes:** https://github.com/ampproject/amphtml/compare/${baseSha}..${headSha}\n`;
+
+  if (bundleSizeDeltasRequireApproval.length) {
+    output +=
+      '\n## Bundle size changes that require approval\n' +
+      bundleSizeDeltasRequireApproval.join('\n');
+  }
+  if (bundleSizeDeltasAutoApproved.length) {
+    output +=
+      '\n## Auto-approved bundle size changes\n' +
+      bundleSizeDeltasAutoApproved.join('\n');
+  }
+  if (missingBundleSizes.length) {
+    output +=
+      '\n## Bundle sizes missing from this PR\n' +
+      missingBundleSizes.join('\n');
+  }
+
+  if (
+    bundleSizeDeltasRequireApproval.length +
+      bundleSizeDeltasAutoApproved.length +
+      missingBundleSizes.length ===
+    0
+  ) {
+    output += '\n**No bundle size changes were reported for this PR**';
+  }
+
+  return output;
 }
 
 /**
@@ -298,7 +323,8 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     // Calculate and collect all (non-zero) bundle size deltas and list all dist
     // files that are missing either from master or from this pull request, and
     // all the potential teams that can approve above-threshold deltas.
-    const bundleSizeDeltas = [];
+    const bundleSizeDeltasRequireApproval = [];
+    const bundleSizeDeltasAutoApproved = [];
     const missingBundleSizes = [];
     const allPotentialApproverTeams = new Set();
     for (const [file, baseBundleSize] of Object.entries(masterBundleSizes)) {
@@ -307,22 +333,27 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
         continue;
       }
 
-      const bundleSizeDelta = prBundleSizes[file] - baseBundleSize;
-      if (bundleSizeDelta !== 0) {
-        bundleSizeDeltas.push(
-          `* \`${file}\`: ${formatBundleSizeDelta(bundleSizeDelta)}`
-        );
-      }
-
       const fileGlob = Object.keys(fileApprovers).find(fileGlob =>
         minimatch(file, fileGlob)
       );
-      if (fileGlob && bundleSizeDelta >= fileApprovers[fileGlob].threshold) {
-        // Since `.approvers` is an array, it must be stringified to maintain
-        // the Set uniqueness property.
-        allPotentialApproverTeams.add(
-          JSON.stringify(fileApprovers[fileGlob].approvers)
-        );
+
+      const bundleSizeDelta = prBundleSizes[file] - baseBundleSize;
+      if (bundleSizeDelta !== 0) {
+        if (fileGlob && bundleSizeDelta >= fileApprovers[fileGlob].threshold) {
+          bundleSizeDeltasRequireApproval.push(
+            `* \`${file}\`: ${formatBundleSizeDelta(bundleSizeDelta)}`
+          );
+
+          // Since `.approvers` is an array, it must be stringified to maintain
+          // the Set uniqueness property.
+          allPotentialApproverTeams.add(
+            JSON.stringify(fileApprovers[fileGlob].approvers)
+          );
+        } else {
+          bundleSizeDeltasAutoApproved.push(
+            `* \`${file}\`: ${formatBundleSizeDelta(bundleSizeDelta)}`
+          );
+        }
       }
     }
 
@@ -341,16 +372,11 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     );
     const requiresApproval = Boolean(chosenApproverTeams.length);
 
-    if (bundleSizeDeltas.length === 0) {
-      bundleSizeDeltas.push(
-        '* No bundle size changes reported in this pull request'
-      );
-    }
-
     const reportMarkdown = extraBundleSizesSummary(
       partialHeadSha,
       partialBaseSha,
-      bundleSizeDeltas,
+      bundleSizeDeltasRequireApproval,
+      bundleSizeDeltasAutoApproved,
       missingBundleSizes
     );
     app.log(
