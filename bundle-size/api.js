@@ -87,10 +87,10 @@ function erroredCheckOutput(partialBaseSha) {
       'not found in the ' +
       '`https://github.com/ampproject/amphtml-build-artifacts` ' +
       'repository. This can happen due to failed or delayed CI builds on ' +
-      'said `master` commit.\n' +
+      'said `master` commit.\n\n' +
       'Possible solutions:\n' +
-      '* Restart the `Bundle Size` job on CircleCI' +
-      '* Rebase this PR on the latest `master` commit' +
+      '* Restart the `Bundle Size` job on CircleCI\n' +
+      '* Rebase this PR on the latest `master` commit\n' +
       `* Notify ${superUserTeams}, who can override this failed check`,
   };
 }
