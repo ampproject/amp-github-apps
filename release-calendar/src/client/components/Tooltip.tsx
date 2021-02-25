@@ -17,21 +17,16 @@
 import {EventApi, ViewApi} from '@fullcalendar/core';
 import {Hook} from './Hook';
 import React from 'react';
-import ReactDOM from 'react-dom';
 
-export const Tooltip = (arg: {
+export function Tooltip(arg: {
   isMirror: boolean;
   isStart: boolean;
   isEnd: boolean;
   event: EventApi;
   el: HTMLElement;
   view: ViewApi;
-}): void => {
-  const Content = (): JSX.Element => {
-    return (
-      <Hook title={arg.event.title} className={arg.event.classNames[0]}></Hook>
-    );
-  };
-
-  ReactDOM.render(<Content />, arg.el);
-};
+}): JSX.Element {
+  return (
+    <Hook title={arg.event.title} className={arg.event.classNames[0]}></Hook>
+  );
+}
