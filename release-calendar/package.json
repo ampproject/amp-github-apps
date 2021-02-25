@@ -16,7 +16,7 @@
     "deploy-tag": "git tag 'deploy-release-calendar-'`date -u '+%Y%m%d%H%M%S'`",
     "lint": "eslint . --quiet --ext .ts,.tsx ",
     "fix": "npm lint -- --fix",
-    "client": "webpack-dev-server --mode development --open --hot --config webpack.client.dev.config.js",
+    "client": "webpack serve --mode development --open --hot --config webpack.client.dev.config.js",
     "client-build-prod": "webpack --config webpack.client.prod.config.js",
     "pretest": "npm run lint",
     "server": "npm run server-build && npm run server-serve",
