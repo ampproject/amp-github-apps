@@ -485,9 +485,27 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
         );
     }
 
-    let reportSuccess;
     try {
-      reportSuccess = await tryReport(check, baseSha, bundleSizes);
+      let reportSuccess = await tryReport(check, baseSha, bundleSizes);
+      if (reportSuccess) {
+        response.end();
+      } else {
+        response.status(202).end();
+        let retriesLeft = RETRY_TIMES - 1;
+        do {
+          app.log(
+            `Will retry ${retriesLeft} more time(s) in ${RETRY_MILLIS} ms`
+          );
+          await sleep(RETRY_MILLIS);
+          retriesLeft--;
+          reportSuccess = await tryReport(
+            check,
+            baseSha,
+            bundleSizes,
+            /* lastAttempt */ retriesLeft == 0
+          );
+        } while (retriesLeft > 0 && !reportSuccess);
+      }
     } catch (error) {
       const superUserTeams =
         '@' + process.env.SUPER_USER_TEAMS.replace(/,/g, ', @');
@@ -498,24 +516,6 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
             `Contact ${superUserTeams} for help.`
         );
       return;
-    }
-
-    if (reportSuccess) {
-      response.end();
-    } else {
-      response.status(202).end();
-      let retriesLeft = RETRY_TIMES - 1;
-      do {
-        app.log(`Will retry ${retriesLeft} more time(s) in ${RETRY_MILLIS} ms`);
-        await sleep(RETRY_MILLIS);
-        retriesLeft--;
-        reportSuccess = await tryReport(
-          check,
-          baseSha,
-          bundleSizes,
-          /* lastAttempt */ retriesLeft == 0
-        );
-      } while (retriesLeft > 0 && !reportSuccess);
     }
   });
 
