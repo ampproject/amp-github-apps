@@ -485,23 +485,37 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
         );
     }
 
-    let reportSuccess = await tryReport(check, baseSha, bundleSizes);
-    if (reportSuccess) {
-      response.end();
-    } else {
-      response.status(202).end();
-      let retriesLeft = RETRY_TIMES - 1;
-      do {
-        app.log(`Will retry ${retriesLeft} more time(s) in ${RETRY_MILLIS} ms`);
-        await sleep(RETRY_MILLIS);
-        retriesLeft--;
-        reportSuccess = await tryReport(
-          check,
-          baseSha,
-          bundleSizes,
-          /* lastAttempt */ retriesLeft == 0
+    try {
+      let reportSuccess = await tryReport(check, baseSha, bundleSizes);
+      if (reportSuccess) {
+        response.end();
+      } else {
+        response.status(202).end();
+        let retriesLeft = RETRY_TIMES - 1;
+        do {
+          app.log(
+            `Will retry ${retriesLeft} more time(s) in ${RETRY_MILLIS} ms`
+          );
+          await sleep(RETRY_MILLIS);
+          retriesLeft--;
+          reportSuccess = await tryReport(
+            check,
+            baseSha,
+            bundleSizes,
+            /* lastAttempt */ retriesLeft == 0
+          );
+        } while (retriesLeft > 0 && !reportSuccess);
+      }
+    } catch (error) {
+      const superUserTeams =
+        '@' + process.env.SUPER_USER_TEAMS.replace(/,/g, ', @');
+      response
+        .status(500)
+        .end(
+          `The bundle-size bot encountered a server-side error: ${error}\n` +
+            `Contact ${superUserTeams} for help.`
         );
-      } while (retriesLeft > 0 && !reportSuccess);
+      return;
     }
   });
 
