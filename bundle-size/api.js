@@ -485,7 +485,21 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
         );
     }
 
-    let reportSuccess = await tryReport(check, baseSha, bundleSizes);
+    let reportSuccess;
+    try {
+      reportSuccess = await tryReport(check, baseSha, bundleSizes);
+    } catch (error) {
+      const superUserTeams =
+        '@' + process.env.SUPER_USER_TEAMS.replace(/,/g, ', @');
+      response
+        .status(500)
+        .end(
+          `The bundle-size bot encountered a server-side error: ${error}\n` +
+            `Contact ${superUserTeams} for help.`
+        );
+      return;
+    }
+
     if (reportSuccess) {
       response.end();
     } else {
