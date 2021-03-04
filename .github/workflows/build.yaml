@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    if: github.repository == 'ampproject/amphtml'
+    if: github.repository == 'ampproject/amp-github-apps'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
