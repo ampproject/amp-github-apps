@@ -20,3 +20,5 @@ jobs:
         run: npm ci
       - name: Build and test
         run: node build-system/pr-check.js
+        env:
+          LOG_LEVEL: warn
