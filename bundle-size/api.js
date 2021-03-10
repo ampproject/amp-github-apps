@@ -116,14 +116,14 @@ function extraBundleSizesSummary(
   bundleSizeDeltasAutoApproved,
   missingBundleSizes
 ) {
-  const compareUrl =
-    mergeSha ||
-    `https://github.com/ampproject/amphtml/compare/${baseSha}..${headSha}`;
   let output =
     '## Commit details\n' +
     `**Head commit:** ${headSha}\n` +
     `**Base commit:** ${baseSha}\n` +
-    `**Code changes:** ${compareUrl}\n`;
+    `**Code changes:** ${
+      mergeSha ||
+      `https://github.com/ampproject/amphtml/compare/${baseSha}..${headSha}`
+    }\n`;
 
   if (bundleSizeDeltasRequireApproval.length) {
     output +=
