@@ -651,6 +651,88 @@ describe('bundle-size api', () => {
       );
     });
 
+    test('update check on bundle-size report with mergeSha (report/_delayed_-base = 12.34KB/12.23KB)', async () => {
+      await db('checks').insert({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: null,
+        report_markdown: null,
+      });
+
+      baseBundleSizeFixture.content = Buffer.from(
+        '{"dist/v0.js":12.23}'
+      ).toString('base64');
+
+      let notFoundCount = 2;
+      github.repos.getContent.mockImplementation(params => {
+        if (
+          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
+        ) {
+          if (notFoundCount > 0) {
+            notFoundCount--;
+            return Promise.reject({status: 404});
+          }
+          return Promise.resolve({data: baseBundleSizeFixture});
+        }
+        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
+        return Promise.resolve({data: getFixture(fixture)});
+      });
+
+      await request(probot.server)
+        .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
+        .send({
+          ...jsonPayload,
+          mergeSha: '9f6fd877fc27c679ad318699ac25a3fb4e228fca',
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(202);
+
+      await expect(
+        db('checks')
+          .where({
+            head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+          })
+          .first()
+      ).resolves.toMatchObject({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+        report_markdown:
+          '## Commit details\n' +
+          '**Head commit:** 26ddec3\n' +
+          '**Base commit:** 5f27002\n' +
+          '**Code changes:** 9f6fd87\n\n' +
+          '## Bundle size changes that require approval\n' +
+          '* `dist/v0.js`: Δ +0.11KB\n' +
+          '## Bundle sizes missing from this PR\n' +
+          '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
+          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
+          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
+      });
+
+      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
+      expect(github.pulls.listReviews).toHaveBeenCalled();
+      expect(github.pulls.requestReviewers).toHaveBeenCalled();
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'action_required',
+          output: expect.objectContaining({
+            title:
+              'Approval required from one of [@ampproject/wg-performance, @ampproject/wg-runtime]',
+          }),
+        })
+      );
+    });
+
     test('update check on bundle-size report on missing base size', async () => {
       await db('checks').insert({
         head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
