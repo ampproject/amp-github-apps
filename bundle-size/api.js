@@ -101,6 +101,7 @@ function erroredCheckOutput(partialBaseSha) {
  *
  * @param {string} headSha commit being checked
  * @param {string} baseSha baseline commit for comparison
+ * @param {string} mergeSha merge commit combining the head and base
  * @param {!Array<string>} bundleSizeDeltas text description of all bundle size
  *   changes.
  * @param {!Array<string>} missingBundleSizes text description of missing bundle
@@ -110,6 +111,7 @@ function erroredCheckOutput(partialBaseSha) {
 function extraBundleSizesSummary(
   headSha,
   baseSha,
+  mergeSha,
   bundleSizeDeltasRequireApproval,
   bundleSizeDeltasAutoApproved,
   missingBundleSizes
@@ -118,7 +120,10 @@ function extraBundleSizesSummary(
     '## Commit details\n' +
     `**Head commit:** ${headSha}\n` +
     `**Base commit:** ${baseSha}\n` +
-    `**Code changes:** https://github.com/ampproject/amphtml/compare/${baseSha}..${headSha}\n`;
+    `**Code changes:** ${
+      mergeSha ||
+      `https://github.com/ampproject/amphtml/compare/${baseSha}..${headSha}`
+    }\n`;
 
   if (bundleSizeDeltasRequireApproval.length) {
     output +=
@@ -248,14 +253,22 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
    *
    * @param {!object} check GitHub Check database object.
    * @param {string} baseSha commit SHA of the base commit being compared to.
+   * @param {string} mergeSha commit SHA of the merge commit that combines the head and base.
    * @param {!Map<string, number>} prBundleSizes the bundle sizes of various
    *   dist files in the pull request in KB.
    * @param {boolean} lastAttempt true if this is the last retry.
    * @return {boolean} true if succeeded; false otherwise.
    */
-  async function tryReport(check, baseSha, prBundleSizes, lastAttempt = false) {
+  async function tryReport(
+    check,
+    baseSha,
+    mergeSha,
+    prBundleSizes,
+    lastAttempt = false
+  ) {
     const partialHeadSha = check.head_sha.substr(0, 7);
     const partialBaseSha = baseSha.substr(0, 7);
+    const partialMergeSha = mergeSha.substr(0, 7);
     const github = await app.auth(check.installation_id);
     const githubOptions = {
       owner: check.owner,
@@ -375,6 +388,7 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     const reportMarkdown = extraBundleSizesSummary(
       partialHeadSha,
       partialBaseSha,
+      partialMergeSha,
       bundleSizeDeltasRequireApproval,
       bundleSizeDeltasAutoApproved,
       missingBundleSizes
@@ -454,12 +468,21 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
 
   router.post('/commit/:headSha/report', async (request, response) => {
     const {headSha} = request.params;
-    const {baseSha, bundleSizes} = request.body;
+    // mergeSha is new, and not all reports will have it.
+    // TODO(@danielrozenberg): make this required in a month or so
+    const {baseSha, mergeSha = '', bundleSizes} = request.body;
 
     if (typeof baseSha !== 'string' || !/^[0-9a-f]{40}$/.test(baseSha)) {
       return response
         .status(400)
         .end('POST request to /report must have commit SHA field "baseSha"');
+    }
+    if (typeof mergeSha !== 'string' || !/^[0-9a-f]{40}$|^$/.test(mergeSha)) {
+      return response
+        .status(400)
+        .end(
+          'POST request to /report with "mergeSha" field must be a valid commit SHA'
+        );
     }
     if (
       !bundleSizes ||
@@ -486,7 +509,12 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     }
 
     try {
-      let reportSuccess = await tryReport(check, baseSha, bundleSizes);
+      let reportSuccess = await tryReport(
+        check,
+        baseSha,
+        mergeSha,
+        bundleSizes
+      );
       if (reportSuccess) {
         response.end();
       } else {
@@ -501,6 +529,7 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
           reportSuccess = await tryReport(
             check,
             baseSha,
+            mergeSha,
             bundleSizes,
             /* lastAttempt */ retriesLeft == 0
           );
