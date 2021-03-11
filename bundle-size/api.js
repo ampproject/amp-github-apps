@@ -469,6 +469,7 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
   router.post('/commit/:headSha/report', async (request, response) => {
     const {headSha} = request.params;
     // mergeSha is new, and not all reports will have it.
+    // TODO(@danielrozenberg): make this required in a month or so
     const {baseSha, mergeSha = '', bundleSizes} = request.body;
 
     if (typeof baseSha !== 'string' || !/^[0-9a-f]{40}$/.test(baseSha)) {
