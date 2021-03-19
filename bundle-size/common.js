@@ -20,11 +20,11 @@
  *
  * @param {!Knex} db database connection.
  * @param {string} headSha commit SHA of the head commit of a pull request.
- * @return {!object} GitHub Check object.
+ * @return {?object} GitHub Check object.
  */
 exports.getCheckFromDatabase = async (db, headSha) => {
-  const results = await db('checks')
-    .select(
+  const check = await db('checks')
+    .first(
       'head_sha',
       'pull_request_id',
       'installation_id',
@@ -35,11 +35,10 @@ exports.getCheckFromDatabase = async (db, headSha) => {
       'report_markdown'
     )
     .where('head_sha', headSha);
-  if (results.length > 0) {
-    return results[0];
-  } else {
-    return null;
+  if (check) {
+    check.check_run_id = Number(check.check_run_id);
   }
+  return check;
 };
 
 /**
