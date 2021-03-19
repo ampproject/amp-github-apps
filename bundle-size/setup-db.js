@@ -32,7 +32,7 @@ function setupDb(db) {
       table.string('repo');
       table.integer('pull_request_id');
       table.integer('installation_id');
-      table.integer('check_run_id');
+      table.bigInteger('check_run_id');
       table
         .text('approving_teams')
         .comment(
