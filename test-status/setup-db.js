@@ -44,7 +44,7 @@ function setupDb(db) {
       table.string('headSha', 40);
       table.string('type', 255);
       table.string('subType', 255);
-      table.integer('checkRunId');
+      table.bigInteger('checkRunId');
       table.integer('passed');
       table.integer('failed');
       table.boolean('errored');
