@@ -45,7 +45,7 @@ exports.getCheckRunId = async (db, headSha, type, subType) => {
   if (existingCheck === undefined) {
     return null;
   } else {
-    return existingCheck.checkRunId;
+    return Number(existingCheck.checkRunId);
   }
 };
 
@@ -88,6 +88,9 @@ exports.getCheckRunResults = async (db, headSha, type, subType) => {
   } else {
     if (typeof existingCheck.errored === 'number') {
       existingCheck.errored = Boolean(existingCheck.errored);
+    }
+    if (typeof existingCheck.checkRunId === 'string') {
+      existingCheck.checkRunId = Number(existingCheck.checkRunId);
     }
     return existingCheck;
   }
