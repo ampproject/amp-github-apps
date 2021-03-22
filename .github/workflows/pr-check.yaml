@@ -8,7 +8,7 @@ on:
       - master
 
 jobs:
-  build:
+  pr_check:
     if: github.repository == 'ampproject/amp-github-apps'
     runs-on: ubuntu-latest
     steps:
@@ -18,15 +18,16 @@ jobs:
           fetch-depth: 50
       - name: Setup Node
         uses: actions/setup-node@v2
-      - name: Get npm cache directory
+      - name: Cache NPM Directory
         uses: actions/cache@v2
         with:
           path: ~/.npm
           key: node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: node-
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
-      - name: Build and test
+      - name: Run PR Check
         run: node build-system/pr-check.js
         env:
           LOG_LEVEL: warn
+          FORCE_COLOR: 1
