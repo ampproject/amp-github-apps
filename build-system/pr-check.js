@@ -15,13 +15,13 @@
  */
 'use strict';
 
+const argv = require('minimist')(process.argv.slice(2));
 const colors = require('ansi-colors');
+const fs = require('fs');
 const log = require('fancy-log');
 const {APPS_TO_TEST, determineBuildTargets} = require('./build-targets');
 const {execOrDie} = require('./exec');
 const {isPushBuild} = require('./ci');
-
-const FILENAME = 'pr-check.js';
 
 /**
  * Execute a command, surrounded by start/end time logs.
@@ -60,8 +60,18 @@ function main() {
   if (isPushBuild()) {
     log.info('Push build; running all tests');
   } else {
-    buildTargets = determineBuildTargets(FILENAME);
-    log.info(`Detected build targets: ${Array.from(buildTargets).join(', ')}`);
+    const changedFiles = JSON.parse(
+      fs.readFileSync(argv.changed_files, {
+        encoding: 'utf8',
+      })
+    );
+
+    console.log(
+      'Files changed in this pull request:\n',
+      ...changedFiles.map(changedFile => `* ${colors.cyan(changedFile)}\n`)
+    );
+
+    buildTargets = determineBuildTargets(changedFiles);
   }
 
   APPS_TO_TEST.filter(buildTargets.has, buildTargets).forEach(runAppTests);

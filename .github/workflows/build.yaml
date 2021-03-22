@@ -24,7 +24,11 @@ jobs:
           restore-keys: node-
       - name: Install dependencies
         run: npm ci
+      - name: Get changed files
+        uses: lots0logs/gh-action-get-changed-files@2.1.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and test
-        run: node build-system/pr-check.js
+        run: node build-system/pr-check.js --changed_files=$HOME/files.json
         env:
           LOG_LEVEL: warn
