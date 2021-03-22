@@ -48,10 +48,10 @@ function timedExecOrDie(cmd) {
  * @param {string} appName
  */
 function runAppTests(appName) {
-  log(`Running tests for "${appName}" app`);
-  timedExecOrDie(`cd ${appName} && npm ci`);
+  log('Testing the', cyan(appName), 'app...');
+  timedExecOrDie(`cd ${appName} && npm ci --silent`);
   timedExecOrDie(`cd ${appName} && npm test -u`);
-  log(`Done running "${appName}" tests`);
+  log('Done testing', cyan(appName));
 }
 
 /**

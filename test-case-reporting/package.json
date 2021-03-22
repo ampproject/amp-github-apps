@@ -5,9 +5,6 @@
   "private": true,
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "An app that tracks the pass/fail status of tests run in Travis builds",
-  "engines": {
-    "node": "12.20.0"
-  },
   "scripts": {
     "lint": "eslint **/*.ts",
     "fix": "eslint **/*.ts --fix",
@@ -17,7 +14,7 @@
     "setup-db": "node dist/src/setup_db.js",
     "start": "node dist/index.js",
     "dev": "nodemon",
-    "test": "jest",
+    "test": "jest --reporters=jest-silent-reporter",
     "test:watch": "jest --watch --notify --notifyMode=change",
     "deploy-tag": "git tag 'deploy-test-case-reporting-'`date -u '+%Y%m%d%H%M%S'`"
   },
@@ -49,6 +46,7 @@
     "eslint-config-prettier": "7.0.0",
     "eslint-plugin-prettier": "3.2.0",
     "jest": "26.6.3",
+    "jest-silent-reporter": "0.5.0",
     "nodemon": "2.0.6",
     "prettier": "2.2.1",
     "sqlite3": "5.0.0",
