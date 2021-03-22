@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 50
       - name: Setup Node
         uses: actions/setup-node@v2
       - name: Get npm cache directory
