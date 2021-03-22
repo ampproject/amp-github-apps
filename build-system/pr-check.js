@@ -15,58 +15,58 @@
  */
 'use strict';
 
-const colors = require('ansi-colors');
-const log = require('fancy-log');
 const {APPS_TO_TEST, determineBuildTargets} = require('./build-targets');
+const {cyan, green} = require('kleur/colors');
 const {execOrDie} = require('./exec');
 const {isPushBuild} = require('./ci');
-
-const FILENAME = 'pr-check.js';
+const {log} = require('./log');
 
 /**
- * Execute a command, surrounded by start/end time logs.
+ * Execute a command and prints the time it took to run.
  *
  * @param {string} cmd command to execute.
  */
 function timedExecOrDie(cmd) {
-  log.info('Running', colors.cyan(cmd), '...');
+  log('Running', cyan(cmd) + '...');
+  const startTime = Date.now();
   execOrDie(cmd);
-  log.info('Done running', colors.cyan(cmd), '...');
+  const endTime = Date.now();
+  const executionTime = endTime - startTime;
+  const mins = Math.floor(executionTime / 60000);
+  const secs = Math.floor((executionTime % 60000) / 1000);
+  log(
+    'Done running',
+    cyan(cmd),
+    'Total time:',
+    green(mins + 'm ' + secs + 's')
+  );
 }
 
 /**
  * Set up and execute tests for an app.
  *
- * TODO(#608): Replace this with gulp tasks.
- * TODO(#607): Adopt same logging standards as `amphtml`.
- *
  * @param {string} appName
  */
 function runAppTests(appName) {
-  log.info(`Running tests for "${appName}" app`);
+  log(`Running tests for "${appName}" app`);
   timedExecOrDie(`cd ${appName} && npm ci`);
   timedExecOrDie(`cd ${appName} && npm test -u`);
-  log.info(`Done running "${appName}" tests`);
+  log(`Done running "${appName}" tests`);
 }
 
 /**
- * Runs the checks.
- *
- * @return {number} process exit code.
+ * Runs CI for AMP's github apps. For push builds, test all apps. For PR builds,
+ * test only the apps that changed.
  */
 function main() {
-  let buildTargets = new Set(APPS_TO_TEST);
-
   if (isPushBuild()) {
-    log.info('Push build; running all tests');
+    log('Running all tests because this is a push build...');
+    APPS_TO_TEST.forEach(runAppTests);
   } else {
-    buildTargets = determineBuildTargets(FILENAME);
-    log.info(`Detected build targets: ${Array.from(buildTargets).join(', ')}`);
+    const buildTargets = determineBuildTargets();
+    log(`Detected build targets: ${cyan(Array.from(buildTargets).join(', '))}`);
+    APPS_TO_TEST.filter(buildTargets.has, buildTargets).forEach(runAppTests);
   }
-
-  APPS_TO_TEST.filter(buildTargets.has, buildTargets).forEach(runAppTests);
-
-  return 0;
 }
 
-process.exit(main());
+main();
