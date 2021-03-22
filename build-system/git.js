@@ -16,47 +16,17 @@
 'use strict';
 
 /**
- * @fileoverview Provides functions for executing various git commands.
+ * @fileoverview Provides functions that execute git commands.
  */
 
 const {getStdout} = require('./exec');
-const {isCiBuild} = require('./ci');
 
 /**
- * Returns the merge base of HEAD off of a given ref.
- *
- * @param {string} ref
+ * Returns the merge base of the PR branch and master.
  * @return {string}
  */
-function gitMergeBase(ref) {
-  return getStdout(`git merge-base ${ref} HEAD`).trim();
-}
-
-/**
- * Returns the `master` parent of the merge commit (current HEAD) during CI
- * builds. This is not the same as origin/master (a moving target), since
- * new commits can be merged while a CI build is in progress.
- * @return {string}
- */
-function gitCiMasterBaseline() {
-  return gitMergeBase('origin/master');
-}
-
-/**
- * Returns the merge base of the current branch off of master when running on
- * a local workspace.
- * @return {string}
- */
-function gitMergeBaseLocalMaster() {
-  return gitMergeBase('master');
-}
-
-/**
- * Returns the master baseline commit, regardless of running environment.
- * @return {string}
- */
-function gitMasterBaseline() {
-  return isCiBuild() ? gitCiMasterBaseline() : gitMergeBaseLocalMaster();
+function gitMergeBaseMaster() {
+  return getStdout('git merge-base master HEAD').trim();
 }
 
 /**
@@ -65,7 +35,7 @@ function gitMasterBaseline() {
  * @return {!Array<string>}
  */
 function gitDiffNameOnlyMaster() {
-  const masterBaseline = gitMasterBaseline();
+  const masterBaseline = gitMergeBaseMaster();
   return getStdout(`git diff --name-only ${masterBaseline}`).trim().split('\n');
 }
 
