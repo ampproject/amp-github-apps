@@ -67,7 +67,7 @@ function determineBuildTargets() {
   }
 
   const targetList = Array.from(buildTargets).sort().join(', ');
-  log('Detected build targets:', cyan(targetList));
+  log('Detected build targets:', cyan(targetList), '\n\n');
 
   return buildTargets;
 }

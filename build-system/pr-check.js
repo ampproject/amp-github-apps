@@ -29,7 +29,9 @@ const {log} = require('./log');
 function timedExecOrDie(cmd) {
   log('Running', cyan(cmd) + '...');
   const startTime = Date.now();
+  console.log(`::group::${cmd}`);
   execOrDie(cmd);
+  console.log('::endgroup::');
   const endTime = Date.now();
   const executionTime = endTime - startTime;
   const mins = Math.floor(executionTime / 60000);
@@ -51,7 +53,7 @@ function runAppTests(appName) {
   log('Testing the', cyan(appName), 'app...');
   timedExecOrDie(`cd ${appName} && npm ci --silent`);
   timedExecOrDie(`cd ${appName} && npm test -u`);
-  log('Done testing', cyan(appName));
+  log('Done testing', cyan(appName), '\n\n');
 }
 
 /**
@@ -64,7 +66,6 @@ function main() {
     APPS_TO_TEST.forEach(runAppTests);
   } else {
     const buildTargets = determineBuildTargets();
-    log(`Detected build targets: ${cyan(Array.from(buildTargets).join(', '))}`);
     APPS_TO_TEST.filter(buildTargets.has, buildTargets).forEach(runAppTests);
   }
 }
