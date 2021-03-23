@@ -8,27 +8,26 @@ on:
       - master
 
 jobs:
-  build:
+  pr_check:
     if: github.repository == 'ampproject/amp-github-apps'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 50
       - name: Setup Node
         uses: actions/setup-node@v2
-      - name: Get npm cache directory
+      - name: Cache NPM Directory
         uses: actions/cache@v2
         with:
           path: ~/.npm
           key: node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: node-
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
-      - name: Get changed files
-        uses: lots0logs/gh-action-get-changed-files@2.1.4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and test
-        run: node build-system/pr-check.js --changed_files=$HOME/files.json
+      - name: Run PR Check
+        run: node build-system/pr-check.js
         env:
           LOG_LEVEL: warn
+          FORCE_COLOR: 1

@@ -16,12 +16,10 @@
 'use strict';
 
 /**
- * @fileoverview Provides various kinds of CI state.
+ * @fileoverview Provides CI state. (Only GH Actions until more is needed.)
  *
  * References:
- * Travis: https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
  * GitHub Actions: https://docs.github.com/en/free-pro-team@latest/actions/reference/environment-variables#default-environment-variables
- * CircleCI: https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
  */
 
 /**
@@ -34,56 +32,11 @@ function env(key) {
 }
 
 /**
- * Returns true if this is a CI build.
- * @return {boolean}
- */
-function isCiBuild() {
-  return !!env('CI');
-}
-
-/**
- * Returns true if this is a Travis build.
- * @return {boolean}
- */
-function isTravisBuild() {
-  return !!env('TRAVIS');
-}
-
-/**
- * Returns true if this is a GitHub Actions build.
- * @return {boolean}
- */
-function isGithubActionsBuild() {
-  return !!env('GITHUB_ACTIONS');
-}
-
-/**
- * Returns true if this is a CircleCI build.
- * @return {boolean}
- */
-function isCircleciBuild() {
-  return !!env('CIRCLECI');
-}
-
-/**
- * Constants for reduced code size.
- */
-const isTravis = isTravisBuild();
-const isGithubActions = isGithubActionsBuild();
-const isCircleci = isCircleciBuild();
-
-/**
  * Returns true if this is a PR build.
  * @return {boolean}
  */
 function isPullRequestBuild() {
-  return isTravis
-    ? env('TRAVIS_EVENT_TYPE') === 'pull_request'
-    : isGithubActions
-    ? env('GITHUB_EVENT_NAME') === 'pull_request'
-    : isCircleci
-    ? !!env('CIRCLE_PULL_REQUEST')
-    : false;
+  return env('GITHUB_EVENT_NAME') === 'pull_request';
 }
 
 /**
@@ -91,17 +44,10 @@ function isPullRequestBuild() {
  * @return {boolean}
  */
 function isPushBuild() {
-  return isTravis
-    ? env('TRAVIS_EVENT_TYPE') === 'push'
-    : isGithubActions
-    ? env('GITHUB_EVENT_NAME') === 'push'
-    : isCircleci
-    ? !env('CIRCLE_PULL_REQUEST')
-    : false;
+  return env('GITHUB_EVENT_NAME') === 'push';
 }
 
 module.exports = {
-  isCiBuild,
   isPullRequestBuild,
   isPushBuild,
 };

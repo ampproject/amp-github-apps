@@ -9,9 +9,6 @@
     "type": "git",
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
-  "engines": {
-    "node": "^12.13.1"
-  },
   "scripts": {
     "start": "node build-system/pr-check.js",
     "lint": "eslint . --ext .ts,.tsx",
@@ -22,18 +19,17 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
-    "ansi-colors": "4.1.1",
     "babel-eslint": "10.1.0",
     "eslint": "6.8.0",
     "eslint-config-google": "0.14.0",
-    "eslint-plugin-notice": "0.9.10",
     "eslint-config-prettier": "6.15.0",
+    "eslint-plugin-notice": "0.9.10",
     "eslint-plugin-prettier": "3.3.1",
     "eslint-plugin-react": "7.22.0",
-    "eslint-plugin-sort-requires": "2.1.0",
     "eslint-plugin-sort-imports-es6-autofix": "0.5.0",
+    "eslint-plugin-sort-requires": "2.1.0",
     "fancy-log": "1.3.3",
-    "minimist": "1.2.5",
+    "kleur": "4.1.4",
     "prettier": "2.2.1",
     "typescript": "3.9.9",
     "yaml": "1.10.0"

@@ -9,9 +9,6 @@
     "type": "git",
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
-  "engines": {
-    "node": "^12.13.1"
-  },
   "main": "dist/app.js",
   "scripts": {
     "lint": "eslint src --ext .js,.ts",

@@ -5,9 +5,6 @@
   "private": true,
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "A GitHub app which posts checklists on pull requests.",
-  "engines": {
-    "node": "^12.13.1"
-  },
   "scripts": {
     "lint": "eslint . --ext .ts",
     "fix": "npm run -- --fix",

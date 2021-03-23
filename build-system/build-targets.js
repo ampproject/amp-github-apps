@@ -20,7 +20,9 @@
  * This script sets the build targets for our PR check, where the build targets
  * determine which tasks are required to run for pull request builds.
  */
-const {cyan} = require('ansi-colors');
+const {cyan} = require('kleur/colors');
+const {gitDiffNameOnlyMaster} = require('./git');
+const {log} = require('./log');
 
 const APPS_TO_TEST = [
   'bundle-size',
@@ -47,10 +49,10 @@ const targetMatchers = APPS_TO_TEST.map(app => ({
  * Populates buildTargets with a set of build targets contained in a PR after
  * making sure they are valid. Used to determine which checks to perform / tests
  * to run during PR builds.
- * @param {Array<string>} changedFiles
  * @return {Set<string>}
  */
-function determineBuildTargets(filesChanged) {
+function determineBuildTargets() {
+  const filesChanged = gitDiffNameOnlyMaster();
   const buildTargets = new Set();
 
   targetMatchers
@@ -61,14 +63,11 @@ function determineBuildTargets(filesChanged) {
 
   if (buildTargets.size === 0) {
     // Default to running all test targets if no other targets are matched.
-    console.log(
-      'No specific build targets were found. Running for all build targets.'
-    );
     APPS_TO_TEST.forEach(buildTargets.add, buildTargets);
-  } else {
-    const targetList = Array.from(buildTargets).sort().join(', ');
-    console.log('Detected build targets:', cyan(targetList));
   }
+
+  const targetList = Array.from(buildTargets).sort().join(', ');
+  log('Detected build targets:', cyan(targetList), '\n\n');
 
   return buildTargets;
 }
