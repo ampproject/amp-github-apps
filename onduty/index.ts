@@ -26,12 +26,12 @@ import statusCodes from 'http-status-codes';
 const {
   GITHUB_ACCESS_TOKEN,
   GITHUB_ORG,
-  RELEASE_ONDUTY_TEAM,
+  RELEASE_ON_DUTY_TEAM,
   BUILD_ON_DUTY_TEAM,
 } = process.env;
 
 const ROTATION_TEAMS: RotationTeamMap = {
-  'release-on-duty': RELEASE_ONDUTY_TEAM,
+  'release-on-duty': RELEASE_ON_DUTY_TEAM,
   'build-on-duty': BUILD_ON_DUTY_TEAM,
 };
 
