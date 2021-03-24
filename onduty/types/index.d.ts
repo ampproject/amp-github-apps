@@ -28,7 +28,7 @@ declare module 'onduty' {
     secondary: null | string;
   }
 
-  export type RotationType = 'build-cop' | 'release-on-duty';
+  export type RotationType = 'build-on-duty' | 'release-on-duty';
   export type RotationUpdate = Record<RotationType, Rotation>;
   export type RotationTeamMap = Record<RotationType, string>;
 

@@ -1,7 +1,7 @@
 AMP On-Duty Bot
 ==============
 
-A GitHub App that updates the teams `@ampproject/release-onduty` and `@ampproject/build-cop` according to the current rotation.
+A GitHub App that updates the teams `@ampproject/release-onduty` and `@ampproject/build-on-duty` according to the current rotation.
 
 This app runs as a Google Cloud Functions deployment.
 
@@ -14,7 +14,7 @@ The bot receives reports of the form:
 
 ```
 {
-  "build-cop": {
+  "build-on-duty": {
     "primary": "<username>",
     "secondary": "<username>"|null
   },

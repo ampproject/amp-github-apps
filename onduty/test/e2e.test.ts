@@ -69,7 +69,7 @@ describe('On-Duty Bot', () => {
 
     await refreshRotation(
       request({
-        'build-cop': {
+        'build-on-duty': {
           primary: 'builder-primary',
           secondary: 'builder-secondary',
         },
@@ -88,7 +88,7 @@ describe('On-Duty Bot', () => {
   it('returns 401 Unauthorized for an invalid token', async () => {
     await refreshRotation(
       request({
-        'build-cop': {
+        'build-on-duty': {
           primary: 'builder-primary',
           secondary: 'builder-secondary',
         },
@@ -111,7 +111,7 @@ describe('On-Duty Bot', () => {
 
     await refreshRotation(
       request({
-        'build-cop': {
+        'build-on-duty': {
           primary: 'builder-primary',
           secondary: 'builder-secondary',
         },

@@ -31,11 +31,11 @@ describe('OndutyBot', () => {
 
   let bot: OndutyBot;
   const rotationTeams: RotationTeamMap = {
-    'build-cop': 'build-team',
+    'build-on-duty': 'build-team',
     'release-on-duty': 'release-team',
   };
   const rotations: RotationUpdate = {
-    'build-cop': {
+    'build-on-duty': {
       primary: 'builder-primary',
       secondary: 'builder-secondary',
     },
@@ -63,12 +63,12 @@ describe('OndutyBot', () => {
     });
 
     it('fetches current team members', async () => {
-      await bot.updateRotation('build-cop', rotations['build-cop']);
+      await bot.updateRotation('build-on-duty', rotations['build-on-duty']);
       expect(github.getTeamMembers).toHaveBeenCalledWith('build-team');
     });
 
     it('adds new team members', async () => {
-      await bot.updateRotation('build-cop', rotations['build-cop']);
+      await bot.updateRotation('build-on-duty', rotations['build-on-duty']);
       expect(github.addToTeam).toHaveBeenCalledWith(
         'build-team',
         'builder-secondary'
@@ -76,7 +76,7 @@ describe('OndutyBot', () => {
     });
 
     it('removes old team members', async () => {
-      await bot.updateRotation('build-cop', rotations['build-cop']);
+      await bot.updateRotation('build-on-duty', rotations['build-on-duty']);
       expect(github.removeFromTeam).toHaveBeenCalledWith(
         'build-team',
         'builder-old-primary'
@@ -84,7 +84,7 @@ describe('OndutyBot', () => {
     });
 
     it('ignores the bot user', async () => {
-      await bot.updateRotation('build-cop', rotations['build-cop']);
+      await bot.updateRotation('build-on-duty', rotations['build-on-duty']);
       expect(github.removeFromTeam).not.toHaveBeenCalledWith(
         'build-team',
         'bot-user'
@@ -103,7 +103,7 @@ describe('OndutyBot', () => {
       jest.spyOn(bot, 'updateRotation');
       await bot.handleUpdate(rotations);
 
-      expect(bot.updateRotation).toHaveBeenCalledWith('build-cop', {
+      expect(bot.updateRotation).toHaveBeenCalledWith('build-on-duty', {
         primary: 'builder-primary',
         secondary: 'builder-secondary',
       });
