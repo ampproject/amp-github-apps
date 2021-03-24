@@ -27,12 +27,12 @@ const {
   GITHUB_ACCESS_TOKEN,
   GITHUB_ORG,
   RELEASE_ONDUTY_TEAM,
-  BUILD_COP_TEAM,
+  BUILD_ON_DUTY_TEAM,
 } = process.env;
 
 const ROTATION_TEAMS: RotationTeamMap = {
   'release-on-duty': RELEASE_ONDUTY_TEAM,
-  'build-cop': BUILD_COP_TEAM,
+  'build-on-duty': BUILD_ON_DUTY_TEAM,
 };
 
 const octokit = new Octokit({auth: `token ${GITHUB_ACCESS_TOKEN}`});
