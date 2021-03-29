@@ -7,7 +7,7 @@
       "pull_request_review_id": 356093298,
       "id": 377182876,
       "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDM3NzE4Mjg3Ng==",
-      "diff_hunk": "@@ -47,1337 +47,5 @@ The app runs on an instance of [Google AppEngine](https://amp-project-metrics.ap\n This GitHub App reports the status of different test types on the AMPHTML repository, and allows the build cop to skip flaky tests.\n \n The app runs on an instance of Google AppEngine and is installed exclusively on the [`ampproject/amphtml`](https://github.com/ampproject/amphtml) repository.\n+\n+Test change to README.md",
+      "diff_hunk": "@@ -47,1337 +47,5 @@ The app runs on an instance of [Google AppEngine](https://amp-project-metrics.ap\n This GitHub App reports the status of different test types on the AMPHTML repository, and allows the build on-duty to skip flaky tests.\n \n The app runs on an instance of Google AppEngine and is installed exclusively on the [`ampproject/amphtml`](https://github.com/ampproject/amphtml) repository.\n+\n+Test change to README.md",
       "path": "README.md",
       "position": 5,
       "original_position": 5,
