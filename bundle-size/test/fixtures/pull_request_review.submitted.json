@@ -243,12 +243,12 @@
         "forks": 0,
         "open_issues": 0,
         "watchers": 2,
-        "default_branch": "master"
+        "default_branch": "main"
       }
     },
     "base": {
-      "label": "ampproject:master",
-      "ref": "master",
+      "label": "ampproject:main",
+      "ref": "main",
       "sha": "5f27002526a808c5c1ad5d0f1ab1cec471af0a33",
       "user": {
         "login": "ampproject",
@@ -367,7 +367,7 @@
         "forks": 2721,
         "open_issues": 1561,
         "watchers": 12224,
-        "default_branch": "master"
+        "default_branch": "main"
       }
     },
     "_links": {
@@ -495,7 +495,7 @@
     "forks": 2721,
     "open_issues": 1561,
     "watchers": 12224,
-    "default_branch": "master"
+    "default_branch": "main"
   },
   "organization": {
     "login": "ampproject",

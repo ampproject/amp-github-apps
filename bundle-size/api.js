@@ -38,14 +38,13 @@ function failedCheckOutput(approverTeams, reportMarkdown) {
   return {
     title: `Approval required from one of [@${approverTeams.join(', @')}]`,
     summary:
-      'This pull request has increased the bundle size (brotli compressed ' +
-      'size) of the following files, and must be approved by a member of one ' +
-      `of the following teams: @${approverTeams.join(', @')}\n\n` +
+      'This pull request has increased the brotli bundle size of the ' +
+      'following files, and must be approved by a member of one of the ' +
+      `following teams: @${approverTeams.join(', @')}\n\n` +
       `${reportMarkdown}\n\n` +
-      'A randomly selected member from one of the above teams will be added ' +
-      'automatically to review this PR. Only once the member approves this ' +
-      'PR, can it be merged. If you do not receive a response feel free to ' +
-      'tag another team member.',
+      'A randomly selected member of one of the above teams will be added ' +
+      'as a reviewer of this PR. It can be merged once they approve it. ' +
+      'If you do not receive a response, feel free to tag another team member.',
   };
 }
 
@@ -61,8 +60,8 @@ function successfulCheckOutput(reportMarkdown) {
   return {
     title: `No approval necessary`,
     summary:
-      'This pull request does not change any bundle size (brotli compressed ' +
-      'size) by any significant amount, so no special approval is necessary.' +
+      'This pull request does not change any brotli bundle sizes by a ' +
+      'significant amount, so no special approval is necessary.' +
       '\n\n' +
       reportMarkdown,
   };
@@ -81,16 +80,15 @@ function erroredCheckOutput(partialBaseSha) {
   return {
     title: `Failed to retrieve the bundle size of branch point ${partialBaseSha}`,
     summary:
-      'The bundle size (brotli compressed size) of this pull request could ' +
-      'not be determined because the base size (that is, the bundle sizes of ' +
-      'the `master` commit that this pull request was compared against) was ' +
-      'not found in the ' +
+      'The brotli bundle sizes for this pull request could not be determined ' +
+      'because the sizes for the baseline commit on the main branch were not ' +
+      'found in the ' +
       '`https://github.com/ampproject/amphtml-build-artifacts` ' +
-      'repository. This can happen due to failed or delayed CI builds on ' +
-      'said `master` commit.\n\n' +
+      'repository. This can happen due to failed or delayed CI builds for ' +
+      'the main branch commit.\n\n' +
       'Possible solutions:\n' +
       '* Restart the `Bundle Size` job on CircleCI\n' +
-      '* Rebase this PR on the latest `master` commit\n' +
+      '* Rebase this PR on the latest main branch commit\n' +
       `* Notify ${superUserTeams}, who can override this failed check`,
   };
 }
@@ -104,8 +102,8 @@ function erroredCheckOutput(partialBaseSha) {
  * @param {string} mergeSha merge commit combining the head and base
  * @param {!Array<string>} bundleSizeDeltas text description of all bundle size
  *   changes.
- * @param {!Array<string>} missingBundleSizes text description of missing bundle
- *   sizes from other `master` or the pull request.
+ * @param {!Array<string>} missingBundleSizes text description of bundle
+ *   sizes missing from the main branch.
  * @return {string} formatted extra changes;
  */
 function extraBundleSizesSummary(
@@ -287,13 +285,13 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
 
     const {data: pullRequest} = await github.pulls.get(pullRequestOptions);
 
-    let masterBundleSizes;
+    let mainBundleSizes;
     try {
       app.log(
-        `Fetching master bundle-sizes on base commit ${baseSha} for pull ` +
-          `request #${check.pull_request_id}`
+        `Fetching main branch bundle-sizes on base commit ${baseSha} for ` +
+          `pull request #${check.pull_request_id}`
       );
-      masterBundleSizes = JSON.parse(
+      mainBundleSizes = JSON.parse(
         await githubUtils.getBuildArtifactsFile(`${baseSha}.json`)
       );
     } catch (error) {
@@ -334,13 +332,14 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     const fileApprovers = await githubUtils.getFileApprovalsMapping();
 
     // Calculate and collect all (non-zero) bundle size deltas and list all dist
-    // files that are missing either from master or from this pull request, and
-    // all the potential teams that can approve above-threshold deltas.
+    // files that are missing either from the main branch or from this pull
+    // request, and all the potential teams that can approve above-threshold
+    // deltas.
     const bundleSizeDeltasRequireApproval = [];
     const bundleSizeDeltasAutoApproved = [];
     const missingBundleSizes = [];
     const allPotentialApproverTeams = new Set();
-    for (const [file, baseBundleSize] of Object.entries(masterBundleSizes)) {
+    for (const [file, baseBundleSize] of Object.entries(mainBundleSizes)) {
       if (!(file in prBundleSizes)) {
         missingBundleSizes.push(`* \`${file}\`: missing in pull request`);
         continue;
@@ -371,9 +370,9 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     }
 
     for (const [file, prBundleSize] of Object.entries(prBundleSizes)) {
-      if (!(file in masterBundleSizes)) {
+      if (!(file in mainBundleSizes)) {
         missingBundleSizes.push(
-          `* \`${file}\`: (${prBundleSize} KB) missing in \`master\``
+          `* \`${file}\`: (${prBundleSize} KB) missing on the main branch`
         );
       }
     }
@@ -444,7 +443,7 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
         .status(404)
         .end(
           `${headSha} was not found in bundle-size database; try to rebase ` +
-            'this pull request on the latest commit in the `master` to fix this'
+            'this pull request on the main branch to fix this'
         );
     }
     const github = await app.auth(check.installation_id);
@@ -457,10 +456,9 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
       output: {
         title: 'Check skipped because PR contains no runtime changes',
         summary:
-          'An automated check has determined that the bundle size ' +
-          '(brotli compressed size of `v0.js`) could not be affected by ' +
-          'the files that this pull request modifies, so this check was ' +
-          'marked as skipped.',
+          'An automated check has determined that the brotli bundle size of ' +
+          '`v0.js` could not be affected by the files modified by this this ' +
+          'pull request, so this check was marked as skipped.',
       },
     });
     response.end();
@@ -504,7 +502,7 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
         .status(404)
         .end(
           `${headSha} was not found in bundle-size database; try to rebase ` +
-            'this pull request on the latest commit in the `master` to fix this'
+            'this pull request on the main branch to fix this'
         );
     }
 

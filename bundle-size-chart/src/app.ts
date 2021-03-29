@@ -60,25 +60,25 @@ app.get('/_cron', async (request, response) => {
     auth: `token ${process.env.ACCESS_TOKEN}`,
   });
 
-  const masterCommits: Array<{sha: string; message: string; date: string}> = [];
+  const mainCommits: Array<{sha: string; message: string; date: string}> = [];
   const options = github.repos.listCommits.endpoint.merge({
     owner: 'ampproject',
     repo: 'amphtml',
-    sha: 'master',
+    sha: 'master', // TODO(rsimha, ampproject/amphtml#32195): Change this to main.
   });
   for await (const commitsList of github.paginate.iterator(options)) {
     (commitsList.data as ReposListCommitsResponseData).forEach(commit => {
-      masterCommits.push({
+      mainCommits.push({
         sha: commit.sha,
         message: commit.commit.message.split('\n')[0],
         date: commit.commit.committer.date,
       });
     });
 
-    const latestCommit = masterCommits[masterCommits.length - 1];
+    const latestCommit = mainCommits[mainCommits.length - 1];
     if (latestCommit.date < earliestCommitDateString) {
-      console.log(`Retrieved ${masterCommits.length} commits.`);
-      console.log(`First: ${masterCommits[0].sha}`);
+      console.log(`Retrieved ${mainCommits.length} commits.`);
+      console.log(`First: ${mainCommits[0].sha}`);
       console.log(`Last: ${latestCommit.sha}`);
       break;
     }
@@ -88,23 +88,23 @@ app.get('/_cron', async (request, response) => {
   const files = new Set<string>();
   const records: Array<{[key: string]: string | number}> = [];
   const skippedShas: Array<string> = [];
-  for (const masterCommit of masterCommits) {
+  for (const mainCommit of mainCommits) {
     try {
       const contents = await github.repos.getContent({
         owner: 'ampproject',
         repo: 'amphtml-build-artifacts',
-        path: `bundle-size/${masterCommit.sha}.json`,
+        path: `bundle-size/${mainCommit.sha}.json`,
       });
       const bundleSizes = JSON.parse(
         Buffer.from(contents.data.content, 'base64').toString()
       );
 
-      records.push(Object.assign({}, masterCommit, bundleSizes));
+      records.push(Object.assign({}, mainCommit, bundleSizes));
       Object.keys(bundleSizes).forEach(file => {
         files.add(file);
       });
     } catch (e) {
-      skippedShas.push(masterCommit.sha);
+      skippedShas.push(mainCommit.sha);
       continue;
     }
   }

@@ -222,12 +222,12 @@
           "forks": 0,
           "open_issues": 2,
           "watchers": 0,
-          "default_branch": "master"
+          "default_branch": "main"
         }
       },
       "base": {
-        "label": "test_org:master",
-        "ref": "master",
+        "label": "test_org:main",
+        "ref": "main",
         "sha": "36655076d170794fd72c35cbc03baad45882e4bd",
         "user": {
           "login": "test_org",
@@ -347,7 +347,7 @@
           "forks": 0,
           "open_issues": 2,
           "watchers": 0,
-          "default_branch": "master"
+          "default_branch": "main"
         }
       },
       "_links": {
@@ -476,7 +476,7 @@
       "forks": 0,
       "open_issues": 2,
       "watchers": 0,
-      "default_branch": "master"
+      "default_branch": "main"
     },
     "organization": {
       "login": "test_org",

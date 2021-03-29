@@ -35,7 +35,7 @@ describe('parsePrNumber', () => {
   });
 
   it('returns 0 when the commit message contains no PR number', () => {
-    const prNumber = parsePrNumber('Direct commit to master branch');
+    const prNumber = parsePrNumber('Direct commit to main branch');
     expect(prNumber).toEqual(0);
   });
 });

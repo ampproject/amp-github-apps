@@ -45,7 +45,7 @@
             }
           },
           "base": {
-            "ref": "master",
+            "ref": "main",
             "sha": "86f2e28d87cccdec5fb2993fdba2c63cd8545658",
             "repo": {
               "id": 43843790,
@@ -133,7 +133,7 @@
           }
         },
         "base": {
-          "ref": "master",
+          "ref": "main",
           "sha": "86f2e28d87cccdec5fb2993fdba2c63cd8545658",
           "repo": {
             "id": 43843790,
@@ -241,7 +241,7 @@
     "forks": 0,
     "open_issues": 11,
     "watchers": 0,
-    "default_branch": "master"
+    "default_branch": "main"
   },
   "sender": {
     "login": "githubuser",
