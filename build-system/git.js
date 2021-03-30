@@ -22,23 +22,28 @@
 const {getStdout} = require('./exec');
 
 /**
- * Returns the merge base of the PR branch and master.
+ * TODO(rsimha, ampproject/amphtml#32195): Change this to main.
+ */
+const mainBranch = 'master';
+
+/**
+ * Returns the merge base of the PR branch and the main branch.
  * @return {string}
  */
-function gitMergeBaseMaster() {
-  return getStdout('git merge-base master HEAD').trim();
+function gitMergeBaseMain() {
+  return getStdout(`git merge-base ${mainBranch} HEAD`).trim();
 }
 
 /**
- * Returns the list of files changed relative to the branch point off of master,
- * one on each line.
+ * Returns the list of files changed relative to the branch point off of the
+ * main branch, one on each line.
  * @return {!Array<string>}
  */
-function gitDiffNameOnlyMaster() {
-  const masterBaseline = gitMergeBaseMaster();
-  return getStdout(`git diff --name-only ${masterBaseline}`).trim().split('\n');
+function gitDiffNameOnlyMain() {
+  const mainBaseline = gitMergeBaseMain();
+  return getStdout(`git diff --name-only ${mainBaseline}`).trim().split('\n');
 }
 
 module.exports = {
-  gitDiffNameOnlyMaster,
+  gitDiffNameOnlyMain,
 };

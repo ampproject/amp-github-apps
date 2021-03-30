@@ -201,12 +201,12 @@
       "forks": 0,
       "open_issues": 0,
       "watchers": 3,
-      "default_branch": "master"
+      "default_branch": "main"
     }
   },
   "base": {
-    "label": "ampproject:master",
-    "ref": "master",
+    "label": "ampproject:main",
+    "ref": "main",
     "sha": "5f27002526a808c5c1ad5d0f1ab1cec471af0a33",
     "user": {
       "login": "ampproject",
@@ -326,7 +326,7 @@
       "forks": 3507,
       "open_issues": 2005,
       "watchers": 13656,
-      "default_branch": "master"
+      "default_branch": "main"
     }
   },
   "_links": {

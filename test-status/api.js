@@ -128,7 +128,7 @@ function createReportedCheckParams(
           'test breakage (i.e., this is a flaky test) error please try the ' +
           'following steps:\n' +
           `1. Restart the failed [CI job](${ciJobUrl})\n` +
-          '2. Rebase your pull request on the latest `master` branch\n' +
+          '2. Rebase your pull request on the main branch\n' +
           `3. Contact the weekly build on-duty (@${BUILD_ON_DUTY_TEAM}), who can advise ` +
           'you on how to proceed, or skip this test run for you.',
       },
@@ -185,8 +185,8 @@ function createErroredCheckParams(
         'error, please try the following steps:\n' +
         `1. Restart the failed [CI job](${ciJobUrl})\n` +
         '2. Rebase your pull request on the latest `master` branch\n' +
-        `3. Contact the weekly build on-duty (@${BUILD_ON_DUTY_TEAM}), who can advise you ` +
-        'how to proceed, or skip this test run for you.',
+        `3. Contact the weekly build on-duty (@${BUILD_ON_DUTY_TEAM}), who can ` +
+        'advise you on how to proceed.',
     },
   };
 }

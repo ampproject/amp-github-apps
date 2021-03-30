@@ -21,7 +21,7 @@
  * determine which tasks are required to run for pull request builds.
  */
 const {cyan} = require('kleur/colors');
-const {gitDiffNameOnlyMaster} = require('./git');
+const {gitDiffNameOnlyMain} = require('./git');
 const {log} = require('./log');
 
 const APPS_TO_TEST = [
@@ -52,7 +52,7 @@ const targetMatchers = APPS_TO_TEST.map(app => ({
  * @return {Set<string>}
  */
 function determineBuildTargets() {
-  const filesChanged = gitDiffNameOnlyMaster();
+  const filesChanged = gitDiffNameOnlyMain();
   const buildTargets = new Set();
 
   targetMatchers

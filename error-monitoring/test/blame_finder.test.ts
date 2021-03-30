@@ -90,7 +90,8 @@ describe('BlameFinder', () => {
       await blameFinder.blameForFile(rtv, path);
     });
 
-    it('queries `master` if the ref is invalid', async () => {
+    // TODO(rsimha, ampproject/amphtml#32195): Change master to main.
+    it('queries main branch if the ref is invalid', async () => {
       const path = 'src/log.js';
 
       nock('https://api.github.com')

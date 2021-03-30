@@ -25,6 +25,11 @@ import {RateLimitedGraphQL} from './rate_limited_graphql';
 import {parseStacktrace} from './utils';
 
 /**
+ * TODO(rsimha, ampproject/amphtml#32195): Change this to main.
+ */
+const mainBranch = 'master';
+
+/**
  * Service for looking up Git blame info for lines in a stacktrace.
  */
 export class BlameFinder {
@@ -87,8 +92,8 @@ export class BlameFinder {
         .catch(() => null);
     };
 
-    // Use blame from `master` if the RTV/ref provided was invalid.
-    const targetRef = (await queryRef(ref)) || (await queryRef('master'));
+    // Use blame from the main branch if the RTV/ref provided was invalid.
+    const targetRef = (await queryRef(ref)) || (await queryRef(mainBranch));
     if (!targetRef) {
       // TODO(rcebulko): fix this if/when GitHub addresses the timeout issue.
       console.warn(`GitHub API timeout; skipping blame for ${path}`);

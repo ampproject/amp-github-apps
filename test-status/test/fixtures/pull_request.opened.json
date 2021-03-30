@@ -33,7 +33,7 @@
       "type": "User",
       "site_admin": false
     },
-    "body": "Semi-revert #19559, now that the bundle-size check doesn't fail if the master build hasn't produced a bundle-size file in `ampproject/amphtml-build-artifacts` yet. (see https://github.com/ampproject/amp-github-apps/pull/13)",
+    "body": "Semi-revert #19559, now that the bundle-size check doesn't fail if the main branch build hasn't produced a bundle-size file in `ampproject/amphtml-build-artifacts` yet. (see https://github.com/ampproject/amp-github-apps/pull/13)",
     "created_at": "2018-12-04T16:44:48Z",
     "updated_at": "2018-12-04T16:44:48Z",
     "closed_at": null,
@@ -179,12 +179,12 @@
         "forks": 0,
         "open_issues": 0,
         "watchers": 0,
-        "default_branch": "master"
+        "default_branch": "main"
       }
     },
     "base": {
-      "label": "ampproject:master",
-      "ref": "master",
+      "label": "ampproject:main",
+      "ref": "main",
       "sha": "263a7fa1188b65d850e6742a63c38a216091d8b2",
       "user": {
         "login": "ampproject",
@@ -303,7 +303,7 @@
         "forks": 2721,
         "open_issues": 1559,
         "watchers": 12224,
-        "default_branch": "master"
+        "default_branch": "main"
       }
     },
     "_links": {
@@ -443,7 +443,7 @@
     "forks": 2721,
     "open_issues": 1559,
     "watchers": 12224,
-    "default_branch": "master"
+    "default_branch": "main"
   },
   "organization": {
     "login": "ampproject",

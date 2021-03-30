@@ -173,12 +173,12 @@
         "forks": 4,
         "open_issues": 30,
         "watchers": 0,
-        "default_branch": "master"
+        "default_branch": "main"
       }
     },
     "base": {
-      "label": "githubuser:master",
-      "ref": "master",
+      "label": "githubuser:main",
+      "ref": "main",
       "sha": "a84eaffa317f205856b2b315daf4a03f93f9ddad",
       "user": {
         "login": "githubuser",
@@ -291,7 +291,7 @@
         "forks": 4,
         "open_issues": 30,
         "watchers": 0,
-        "default_branch": "master"
+        "default_branch": "main"
       }
     },
     "_links": {
@@ -425,7 +425,7 @@
     "forks": 4,
     "open_issues": 30,
     "watchers": 0,
-    "default_branch": "master"
+    "default_branch": "main"
   },
   "sender": {
     "login": "githubuser",

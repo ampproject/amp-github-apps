@@ -295,7 +295,7 @@ describe('bundle-size api', () => {
                 '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
                 '## Bundle sizes missing from this PR\n' +
                 '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
-                '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`'
+                '* `dist/amp4ads-v0.js`: (11.22 KB) missing on the main branch'
             ),
           }),
         })
@@ -347,9 +347,9 @@ describe('bundle-size api', () => {
           '## Bundle size changes that require approval\n' +
           '* `dist/v0.js`: Δ +0.34KB\n' +
           '## Bundle sizes missing from this PR\n' +
-          '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
-          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
-          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
+          '* `dist/amp4ads-v0.js`: (11.22 KB) missing on the main branch\n' +
+          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing on the main branch\n' +
+          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing on the main branch',
       });
 
       expect(github.checks.update).toHaveBeenCalledWith(
@@ -493,9 +493,9 @@ describe('bundle-size api', () => {
           '## Bundle size changes that require approval\n' +
           '* `dist/v0.js`: Δ +0.34KB\n' +
           '## Bundle sizes missing from this PR\n' +
-          '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
-          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
-          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
+          '* `dist/amp4ads-v0.js`: (11.22 KB) missing on the main branch\n' +
+          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing on the main branch\n' +
+          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing on the main branch',
       });
 
       expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
@@ -632,9 +632,9 @@ describe('bundle-size api', () => {
           '## Bundle size changes that require approval\n' +
           '* `dist/v0.js`: Δ +0.11KB\n' +
           '## Bundle sizes missing from this PR\n' +
-          '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
-          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
-          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
+          '* `dist/amp4ads-v0.js`: (11.22 KB) missing on the main branch\n' +
+          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing on the main branch\n' +
+          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing on the main branch',
       });
 
       expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
@@ -714,9 +714,9 @@ describe('bundle-size api', () => {
           '## Bundle size changes that require approval\n' +
           '* `dist/v0.js`: Δ +0.11KB\n' +
           '## Bundle sizes missing from this PR\n' +
-          '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`\n' +
-          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing in `master`\n' +
-          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing in `master`',
+          '* `dist/amp4ads-v0.js`: (11.22 KB) missing on the main branch\n' +
+          '* `dist/v0/amp-accordion-0.1.js`: (1.11 KB) missing on the main branch\n' +
+          '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing on the main branch',
       });
 
       expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
