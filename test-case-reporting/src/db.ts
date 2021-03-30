@@ -18,11 +18,20 @@ import Knex from 'knex';
 
 export type Database = Knex;
 
+function getConnectionHost(): string {
+  const {DB_SOCKET_PATH, DB_INSTANCE_CONNECTION_NAME} = process.env;
+  if (DB_SOCKET_PATH && DB_INSTANCE_CONNECTION_NAME) {
+    return `${DB_SOCKET_PATH}/${DB_INSTANCE_CONNECTION_NAME}`
+  }
+
+  return '127.0.0.1';
+}
+
 export function dbConnect(): Database {
   return Knex({
     client: 'pg',
     connection: {
-      host: `${process.env.DB_SOCKET_PATH}/${process.env.DB_INSTANCE_CONNECTION_NAME}`,
+      host: getConnectionHost(),
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,

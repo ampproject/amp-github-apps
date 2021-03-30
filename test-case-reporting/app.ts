@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Build, PageInfo, TestRun, Travis} from 'test-case-reporting';
+import {PageInfo, TestCaseStat, TestRun, Travis} from 'test-case-reporting';
 import {TestCaseStats} from './src/test_case_stats';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
@@ -87,7 +87,65 @@ function lowerCaseStatus({status, ...rest}: TestRun): any {
 
 app.use(express.static('static/css'));
 
-app.get(['/', '/builds'], async (req, res) => {
+app.get('/', async (req, res) => {
+  const {json} = req.query;
+
+  try {
+    const pageInfo: PageInfo = {limit: 10, offset: 0};
+    const builds = await record.getRecentBuilds(pageInfo);
+
+    if (json) {
+      // Leaving this in the base path in case there is some automation using this.
+      res.json({builds});
+    } else {
+      const testCases = await record.getRecentTestCaseStats(
+        10,
+        pageInfo
+      );
+      const testCasesWithStats = testCases.map((testCase: any) => {
+        const total =
+          testCase.stats.pass +
+          testCase.stats.fail +
+          testCase.stats.skip +
+          testCase.stats.error;
+        const statPercent = (stat: number): string =>
+          ((100 * stat) / total).toFixed(0);
+
+        testCase.nameParts = testCase.name.split(' | ').filter((s: string) => s.trim());
+
+        testCase.stats = {
+          ...testCase.stats,
+          total,
+          passPercent: statPercent(testCase.stats.pass),
+          failPercent: statPercent(testCase.stats.fail),
+          skipPercent: statPercent(testCase.stats.skip),
+          errorPercent: statPercent(testCase.stats.error),
+        };
+        return testCase;
+      });
+
+      const statTitles: Record<TestCaseStat, string> = {
+        pass: 'Pass',
+        fail: 'Fail',
+        skip: 'Skip',
+        error: 'Error',
+      };
+
+      res.send(
+        render('index', {
+          title: 'Test Case Reporting',
+          builds,
+          statTitles,
+          testCasesWithStats,
+        })
+      );
+    }
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+app.get('/builds', async (req, res) => {
   const {json} = req.query;
 
   try {

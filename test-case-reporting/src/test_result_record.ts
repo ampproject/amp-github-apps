@@ -83,7 +83,7 @@ function getTestRunFromRow({
 /* eslint-enable camelcase */
 
 export class TestResultRecord {
-  constructor(private db: Database) {}
+  constructor(private db: Database) { }
 
   /**
    * Gets a DB.Build from the database by its build number.
@@ -366,5 +366,41 @@ export class TestResultRecord {
       })
     );
     /* eslint-enable camelcase */
+  }
+
+  /**
+   * Returns a list of recent test-cases with stats about each.
+   *
+   * @param {number} sampleSize
+   * @param {PageInfo} param0
+   * @return {Promise<TestCase[]>}
+   */
+  async getRecentTestCaseStats(sampleSize: number, {limit, offset}: PageInfo): Promise<TestCase[]> {
+    const dbTestCases: Array<DB.TestCase & DB.TestCaseStats> = await this.db(
+      'test_case_stats'
+    )
+      .where('test_case_stats.sample_size', sampleSize)
+      .join('test_cases', 'test_cases.id', 'test_case_stats.test_case_id')
+      .select<Array<DB.TestCase & DB.TestCaseStats>>(
+        '*'
+      )
+      .orderBy('created_at', 'DESC')
+      .limit(limit)
+      .offset(offset);
+
+    return dbTestCases.map(
+      ({id, name, created_at, sample_size, pass, fail, skip, error}) => ({
+        id,
+        name,
+        createdAt: new Date(created_at),
+        stats: {
+          sampleSize: sample_size,
+          pass,
+          fail,
+          skip,
+          error,
+        },
+      })
+    );
   }
 }
