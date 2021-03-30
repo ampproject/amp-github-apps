@@ -251,7 +251,7 @@ describe('test-status/api', () => {
           output: expect.objectContaining({
             title,
             text: expect.stringContaining(
-              'Contact the weekly build cop (@ampproject/build-cop)'
+              'Contact the weekly build on-duty (@ampproject/build-on-duty)'
             ),
           }),
         })
@@ -298,7 +298,7 @@ describe('test-status/api', () => {
         output: expect.objectContaining({
           title: 'Tests have errored',
           text: expect.stringContaining(
-            'Contact the weekly build cop (@ampproject/build-cop)'
+            'Contact the weekly build on-duty (@ampproject/build-on-duty)'
           ),
         }),
       })
