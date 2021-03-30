@@ -90,7 +90,7 @@ describe('BlameFinder', () => {
       await blameFinder.blameForFile(rtv, path);
     });
 
-    // TODO(rsimha): Change 'master' to 'main'
+    // TODO(rsimha, ampproject/amphtml#32195): Change master to main.
     it('queries main branch if the ref is invalid', async () => {
       const path = 'src/log.js';
 
