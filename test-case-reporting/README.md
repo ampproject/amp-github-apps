@@ -1,22 +1,20 @@
-AMP Test Case Reporting Bot
-==============
+# AMP Test Case Reporting Bot
 
 A Google Cloud app that stores the results of tests run by Travis. Used to track flaky tests.
 
 This app runs as a [[something]].
 
-Interface
----------
+## Interface
+
 ### API for Travis
 
 The App has the following API endpoints, which are to be triggered from Travis CI
 runs.
 
-* `POST /report`
-  * Accepts a JSON object representing a test result report from Travis. Has 3 fields: `build`, `job`, and `results`, representing build information, job information, and test run information respectively. For the full structure of the object, see [the type declaration module](types/test-case-reporting.d.ts).
+- `POST /report`
+  - Accepts a JSON object representing a test result report from Travis. Has 3 fields: `build`, `job`, and `results`, representing build information, job information, and test run information respectively. For the full structure of the object, see [the type declaration module](types/test-case-reporting.d.ts).
 
-Setup
------
+## Setup
 
 Follow these setup instructions to start developing for this App locally:
 
@@ -27,32 +25,32 @@ Follow these setup instructions to start developing for this App locally:
 5. Initialize an App Engine app with `gcloud app create`.
 6. Run a local instance of PostgreSQL, or use the
    [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy)
-   * While other database engines might work, this is developed using pg
+   - While other database engines might work, this is developed using pg
 7. Run `npm run setup-db` to set up the database.
 8. Copy the `redacted.env` file to `.env` and modify the fields based on the username and password
    used for the database
    * Do not set DB_INSTANCE_CONNECTION_NAME or DB_SOCKET_PATH if using a local database instance.
 
-Local Development
------------------
+## Local Development
 
 To compile the TypeScript to JavaScript, run `npm run build`.
+
 > To automatically compile as files are changed, run `npm run build:watch`.
 
 To run the app locally, run `npm run start`.
+
 > To automatically reload as files are changed, run `npm run dev`.
 
 To run tests, run `npm test`.
 
 To generate fake build data run `npm run generate-build-data`
 
-Deployment
-----------
+## Deployment
 
 After setting up the app locally, use `gcloud` to deploy the app:
 
 1. Configure the project for the first time: `gcloud init`
 2. Deploy the app for the first time: `gcloud app deploy`
-3. To configure Cloud Build auto-deployment, follow [this guide](https://github.com/ampproject/amp-github-apps/blob/master/DEPLOYMENT.md)
+3. To configure Cloud Build auto-deployment, follow [this guide](https://github.com/ampproject/amp-github-apps/blob/main/DEPLOYMENT.md)
 
 This GitHub App is deployed at the endpoint: https://amp-test-cases.appspot.com/

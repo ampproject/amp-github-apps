@@ -71,13 +71,13 @@ describe('local repository', () => {
       done();
     });
 
-    it('defaults to master', async done => {
+    it('defaults to main', async done => {
       await repo.checkout();
 
       sandbox.assert.calledWith(
         repo._runCommands,
-        'git fetch origin master',
-        'git checkout -B master origin/master'
+        'git fetch origin main',
+        'git checkout -B main origin/main'
       );
       done();
     });

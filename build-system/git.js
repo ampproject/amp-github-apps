@@ -22,16 +22,11 @@
 const {getStdout} = require('./exec');
 
 /**
- * TODO(rsimha, ampproject/amphtml#32195): Change this to main.
- */
-const mainBranch = 'master';
-
-/**
  * Returns the merge base of the PR branch and the main branch.
  * @return {string}
  */
 function gitMergeBaseMain() {
-  return getStdout(`git merge-base ${mainBranch} HEAD`).trim();
+  return getStdout(`git merge-base main HEAD`).trim();
 }
 
 /**

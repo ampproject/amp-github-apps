@@ -2,10 +2,12 @@ name: GitHub Actions
 on:
   push:
     branches:
-      - master
+      - main
+      - master # TODO(rsimha, ampproject/amphtml#32195): Remove this line.
   pull_request:
     branches:
-      - master
+      - main
+      - master # TODO(rsimha, ampproject/amphtml#32195): Remove this line.
 
 jobs:
   pr_check:
