@@ -27,7 +27,7 @@ import {parseStacktrace} from './utils';
 /**
  * TODO(rsimha, ampproject/amphtml#32195): Change this to main.
  */
-export const mainBranch = 'master';
+const mainBranch = 'master';
 
 /**
  * Service for looking up Git blame info for lines in a stacktrace.
