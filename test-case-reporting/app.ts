@@ -98,45 +98,24 @@ app.get('/', async (req, res) => {
       // Leaving this in the base path in case there is some automation using this.
       res.json({builds});
     } else {
-      const testCases = await record.getRecentTestCaseStats(
-        10,
-        pageInfo
-      );
-      const testCasesWithStats = testCases.map((testCase: any) => {
-        const total =
-          testCase.stats.pass +
-          testCase.stats.fail +
-          testCase.stats.skip +
-          testCase.stats.error;
-        const statPercent = (stat: number): string =>
-          ((100 * stat) / total).toFixed(0);
-
-        testCase.nameParts = testCase.name.split(' | ').filter((s: string) => s.trim());
-
-        testCase.stats = {
-          ...testCase.stats,
-          total,
-          passPercent: statPercent(testCase.stats.pass),
-          failPercent: statPercent(testCase.stats.fail),
-          skipPercent: statPercent(testCase.stats.skip),
-          errorPercent: statPercent(testCase.stats.error),
-        };
-        return testCase;
-      });
-
+      // Using a record here ensures that any future stats that this must be
+      // updated if any stats are added in the future.
       const statTitles: Record<TestCaseStat, string> = {
         pass: 'Pass',
         fail: 'Fail',
         skip: 'Skip',
         error: 'Error',
       };
+      const stats = Object.entries(statTitles).map(([stat, title]) => ({
+        stat,
+        title
+      }));
 
       res.send(
         render('index', {
           title: 'Test Case Reporting',
           builds,
-          statTitles,
-          testCasesWithStats,
+          stats,
         })
       );
     }

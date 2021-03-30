@@ -12,6 +12,7 @@
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
     "setup-db": "node dist/src/setup_db.js",
+    "generate-build-data": "npx ts-node src/generate_build_data.ts",
     "start": "node dist/index.js",
     "dev": "nodemon",
     "test": "jest --reporters=jest-silent-reporter",
