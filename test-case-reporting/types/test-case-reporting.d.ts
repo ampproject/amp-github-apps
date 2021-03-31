@@ -124,9 +124,9 @@ declare module 'test-case-reporting' {
 
     export interface TestRunWithJobAndBuild
       extends Build,
-      Job,
-      TestCase,
-      TestRun {
+        Job,
+        TestCase,
+        TestRun {
       build_started_at: number;
       build_url: string;
       job_url: string;

@@ -83,7 +83,7 @@ function getTestRunFromRow({
 /* eslint-enable camelcase */
 
 export class TestResultRecord {
-  constructor(private db: Database) { }
+  constructor(private db: Database) {}
 
   /**
    * Gets a DB.Build from the database by its build number.

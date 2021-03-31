@@ -21,7 +21,7 @@ Setup
 Follow these setup instructions to start developing for this App locally:
 
 1. Clone this repository and cd into the `test-case-reporting` directory
-2. `npm install`****
+2. `npm install`
 3. Create a new Google Cloud project and switch to it with `gcloud config set project [PROJECT_NAME]`.
 4. Add an SQL database to the Google Cloud project. Choose a name for the database and store it in the `DB_NAME` field of .env.
 5. Initialize an App Engine app with `gcloud app create`.
