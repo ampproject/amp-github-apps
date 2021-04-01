@@ -54,12 +54,10 @@ declare module 'test-case-reporting' {
     stats?: TestCaseStats;
   }
 
-  export interface TestCaseStats {
+  export type TestCaseStat = 'pass' | 'fail' | 'skip' | 'error';
+
+  export interface TestCaseStats extends Record<TestCaseStat, number> {
     sampleSize: number;
-    pass: number;
-    fail: number;
-    skip: number;
-    error: number;
   }
 
   /** An instance of a test being run, with results. */

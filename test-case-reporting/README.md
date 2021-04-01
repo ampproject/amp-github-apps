@@ -31,6 +31,7 @@ Follow these setup instructions to start developing for this App locally:
 7. Run `npm run setup-db` to set up the database.
 8. Copy the `redacted.env` file to `.env` and modify the fields based on the username and password
    used for the database
+   * Do not set DB_INSTANCE_CONNECTION_NAME or DB_SOCKET_PATH if using a local database instance.
 
 Local Development
 -----------------
@@ -42,6 +43,8 @@ To run the app locally, run `npm run start`.
 > To automatically reload as files are changed, run `npm run dev`.
 
 To run tests, run `npm test`.
+
+To generate fake build data run `npm run generate-build-data`
 
 Deployment
 ----------

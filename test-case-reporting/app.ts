@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Build, PageInfo, TestRun, Travis} from 'test-case-reporting';
+import {PageInfo, TestCaseStat, TestRun, Travis} from 'test-case-reporting';
 import {TestCaseStats} from './src/test_case_stats';
 import {TestResultRecord} from './src/test_result_record';
 import {dbConnect} from './src/db';
@@ -87,7 +87,44 @@ function lowerCaseStatus({status, ...rest}: TestRun): any {
 
 app.use(express.static('static/css'));
 
-app.get(['/', '/builds'], async (req, res) => {
+app.get('/', async (req, res) => {
+  const {json} = req.query;
+
+  try {
+    const pageInfo: PageInfo = {limit: 10, offset: 0};
+    const builds = await record.getRecentBuilds(pageInfo);
+
+    if (json) {
+      // Leaving this in the base path in case there is some automation using this.
+      res.json({builds});
+    } else {
+      // Using a record here ensures that any future stats that this must be
+      // updated if any stats are added in the future.
+      const statTitles: Record<TestCaseStat, string> = {
+        pass: 'Pass',
+        fail: 'Fail',
+        skip: 'Skip',
+        error: 'Error',
+      };
+      const stats = Object.entries(statTitles).map(([stat, title]) => ({
+        stat,
+        title
+      }));
+
+      res.send(
+        render('index', {
+          title: 'Test Case Reporting',
+          builds,
+          stats,
+        })
+      );
+    }
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+app.get('/builds', async (req, res) => {
   const {json} = req.query;
 
   try {

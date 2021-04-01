@@ -34,3 +34,19 @@
 .test-run-name td {
   padding: 0.5em;
 }
+
+.navbar {
+  background-color: white;
+  border-bottom: 1px solid black;
+  display: flex;
+  height: 60px;
+  justify-content: space-around;
+  padding: 8px 16px;
+  position: sticky;
+  top: 0;
+  width: 100%;
+}
+
+.navbar .navbar-link {
+  margin: 8px;
+}
