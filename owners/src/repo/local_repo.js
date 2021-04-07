@@ -54,7 +54,7 @@ module.exports = class LocalRepository extends Repository {
   }
 
   /**
-   * Checks out the master branch.
+   * Checks out the main branch.
    */
   async sync() {
     await this.checkout();
@@ -75,7 +75,7 @@ module.exports = class LocalRepository extends Repository {
    *
    * @param {?string} branch git branch to checkout.
    */
-  async checkout(branch = 'master') {
+  async checkout(branch = 'main') {
     await this._runCommands(
       `git fetch ${this.remote} ${branch}`,
       `git checkout -B ${branch} ${this.remote}/${branch}`

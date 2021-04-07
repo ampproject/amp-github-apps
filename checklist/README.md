@@ -72,6 +72,6 @@ After setting up the app locally, use `gcloud` to deploy the app and cron tasks:
      --trigger-http
    ```
    - When deploying after the first time, the `--runtime` and `--trigger-http` flags may be omitted
-3. To configure Cloud Build auto-deployment, follow [this guide](https://github.com/ampproject/amp-github-apps/blob/master/DEPLOYMENT.md)
+3. To configure Cloud Build auto-deployment, follow [this guide](https://github.com/ampproject/amp-github-apps/blob/main/DEPLOYMENT.md)
 
 This GitHub App is deployed as a [Google Cloud Function](https://cloud.google.com/functions/docs/) at the endpoint: https://ampproject-checklist-bot.cloudfunctions.net/ (**TODO:** URL unavailable, this will be deployed)
