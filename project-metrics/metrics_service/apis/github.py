@@ -118,14 +118,14 @@ class GitHubGraphQL(object):
     }}""".format(owner=GITHUB_REPO_OWNER, name=GITHUB_REPO_NAME,
                  query=graphql))['repository']
 
-  def query_master_branch(self, graphql: GraphQL) -> JsonDict:
-    """Executes a non-mutation query on the repository's master branch.
+  def query_main_branch(self, graphql: GraphQL) -> JsonDict:
+    """Executes a non-mutation query on the repository's main branch.
 
     Args:
       graphql: GraphQL query body.
 
     Returns:
-      The unwrapped portion of the response within the master branch of the
+      The unwrapped portion of the response within the main branch of the
       repository.
     """
     return self.query_repo("""defaultBranchRef {{

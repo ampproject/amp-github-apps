@@ -90,7 +90,6 @@ describe('BlameFinder', () => {
       await blameFinder.blameForFile(rtv, path);
     });
 
-    // TODO(rsimha, ampproject/amphtml#32195): Change master to main.
     it('queries main branch if the ref is invalid', async () => {
       const path = 'src/log.js';
 
@@ -102,11 +101,11 @@ describe('BlameFinder', () => {
         })
         .reply(200, getGraphQLResponse('not-a-ref', path))
         .post('/graphql', ({query}) => {
-          expect(query).toContain(`ref(qualifiedName: "master")`);
+          expect(query).toContain(`ref(qualifiedName: "main")`);
           expect(query).toContain(`blame(path: "${path}"`);
           return true;
         })
-        .reply(200, getGraphQLResponse('master', path));
+        .reply(200, getGraphQLResponse('main', path));
 
       await blameFinder.blameForFile('not-a-ref', path);
     });

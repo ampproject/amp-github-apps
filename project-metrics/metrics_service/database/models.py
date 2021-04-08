@@ -159,7 +159,7 @@ class PullRequestStatus(enum.Enum):
 
 
 class Commit(Base):
-  """A commit on the master branch of the repo."""
+  """A commit on the main branch of the repo."""
 
   __tablename__ = 'commits'
 

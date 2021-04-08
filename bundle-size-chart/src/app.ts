@@ -64,7 +64,7 @@ app.get('/_cron', async (request, response) => {
   const options = github.repos.listCommits.endpoint.merge({
     owner: 'ampproject',
     repo: 'amphtml',
-    sha: 'master', // TODO(rsimha, ampproject/amphtml#32195): Change this to main.
+    sha: 'main',
   });
   for await (const commitsList of github.paginate.iterator(options)) {
     (commitsList.data as ReposListCommitsResponseData).forEach(commit => {

@@ -58,7 +58,7 @@ class CodecovApi(agithub_base.API):
     """
     endpoint = (
         self.repo.commits[commit_hash]
-        if commit_hash else self.repo.branch.master)
+        if commit_hash else self.repo.branch.main)
 
     status_code, response = endpoint.get(limit=1)
     if status_code == status.HTTP_200_OK:
