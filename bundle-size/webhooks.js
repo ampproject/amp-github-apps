@@ -162,7 +162,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
               'may safely ignore this bundle-size check.\n' +
               'To see the bundle-size at this commit, see ' +
               'https://github.com/ampproject/amphtml-build-artifacts/blob/' +
-              `master/bundle-size/${mergeCommitSha}`,
+              `main/bundle-size/${mergeCommitSha}`,
           },
         })
       );

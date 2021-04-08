@@ -36,7 +36,7 @@ export function parsePrNumber(message: string): number {
 
 /**
  * Parses the RTV, path, and line from a source URL:line string.
- * See https://github.com/ampproject/error-tracker/blob/master/utils/stacktrace/standardize-stack-trace.js
+ * See https://github.com/ampproject/error-tracker/blob/main/utils/stacktrace/standardize-stack-trace.js
  */
 export function parseSource(source: string): null | StackFrame {
   if (!source.startsWith(SOURCE_PREFIX)) {

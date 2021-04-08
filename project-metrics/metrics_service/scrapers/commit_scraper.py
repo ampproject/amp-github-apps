@@ -58,7 +58,7 @@ class CommitScraper(object):
       history_args += ', until: "%s"' % github.Timestamp(until).git_timestamp
     logging.info('Querying GitHub for commits with args: %s', history_args)
 
-    response = self.github.query_master_branch("""target {{ ... on Commit {{
+    response = self.github.query_main_branch("""target {{ ... on Commit {{
       history(first: {page_size}, {history_args}) {{
         pageInfo {{ endCursor }}
         nodes {{

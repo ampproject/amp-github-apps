@@ -35,7 +35,7 @@ class TestCodecovApi(unittest.TestCase):
 
     self.assertEqual(coverage, 13.37)
     self.mock_request.assert_called_once_with(
-        self.codecov_api.client, 'GET', '/__repo__/branch/master?limit=1',
+        self.codecov_api.client, 'GET', '/__repo__/branch/main?limit=1',
         mock.ANY, mock.ANY)
 
   def testGetAbsoluteCoverageForCommit(self):

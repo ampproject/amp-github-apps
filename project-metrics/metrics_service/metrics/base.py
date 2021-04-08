@@ -9,7 +9,7 @@ To create a new metric:
 5. Define the update frequency with a job in `cron.yaml`
 6. Once the metric has been computed at least once, add a corresponding badge to
    the metrics section of
-   https://github.com/ampproject/amphtml/blob/master/README.md
+   https://github.com/ampproject/amphtml/blob/main/README.md
 """
 
 import abc
