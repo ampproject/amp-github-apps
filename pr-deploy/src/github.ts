@@ -21,11 +21,13 @@ type ChecksGetResponseData = Types['checks']['get']['response']['data'];
 type ChecksListForRefParams = Types['checks']['listForRef']['parameters'];
 type ChecksUpdateParams = Types['checks']['update']['parameters'];
 
-const ACTIONS: ChecksUpdateParams['actions'] = [{
-  label: 'Create a test site',
-  description: 'Serves the minified output of this PR.',
-  identifier: 'deploy-me-action',
-}];
+const ACTIONS: ChecksUpdateParams['actions'] = [
+  {
+    label: 'Create a test site',
+    description: 'Serves the minified output of this PR.',
+    identifier: 'deploy-me-action',
+  },
+];
 
 const check_name = process.env.GH_CHECK;
 const owner = process.env.GH_OWNER;
@@ -129,13 +131,14 @@ export class PullRequest {
   /**
    * Set check to 'completed' to enable the 'Deploy Me' action.
    */
-  async buildCompleted() {
+  async buildCompleted(externalId: string) {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
       owner,
       repo,
       check_run_id: check.id,
+      external_id: externalId,
       status: 'completed',
       conclusion: 'neutral',
       output: {
@@ -228,8 +231,7 @@ export class PullRequest {
     if (check.status == 'completed' && check.conclusion == 'success') {
       output = {
         title: 'A new build is being compiled...',
-        summary:
-          'The current site will be overwritten.',
+        summary: 'The current site will be overwritten.',
       };
     }
 
