@@ -146,7 +146,8 @@ export class PullRequest {
         summary:
           'Please click the `Create a test site` button above to ' +
           'deploy the minified build of this PR along with examples from ' +
-          '`examples/` and `test/manual/`. It should only take a minute.',
+          '`examples/`, `test/manual/`, and `test/fixtures/e2e/`. It should ' +
+          'only take a minute.',
       },
       actions: ACTIONS,
     };
