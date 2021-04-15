@@ -257,7 +257,7 @@ describe('bundle-size api', () => {
       });
 
       baseBundleSizeFixture.content = Buffer.from(
-        '{"dist/v0.js":12.34,"dist/v0/amp-accordion-0.1.js":1.11,"dist/v0/amp-ad-0.1.js":4.53,"dist/v0/amp-anim-0.1.js":5.65}'
+        '{"dist/v0.js": 12.34,"dist/v0/amp-accordion-0.1.js":1.11,"dist/v0/amp-ad-0.1.js": 4.53,"dist/v0/amp-anim-0.1.js": 5.65}'
       ).toString('base64');
 
       await request(probot.server)
@@ -293,6 +293,68 @@ describe('bundle-size api', () => {
             summary: expect.stringContaining(
               '## Auto-approved bundle size changes\n' +
                 '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
+                '## Bundle sizes missing from this PR\n' +
+                '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
+                '* `dist/amp4ads-v0.js`: (11.22 KB) missing on the main branch'
+            ),
+          }),
+        })
+      );
+    });
+
+    test('sort files by bundle size delta in check update', async () => {
+      await db('checks').insert({
+        head_sha: '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa',
+        owner: 'ampproject',
+        repo: 'amphtml',
+        pull_request_id: 19603,
+        installation_id: 123456,
+        check_run_id: 555555,
+        approving_teams: null,
+        report_markdown: null,
+      });
+
+      jsonPayload = {
+        baseSha: '5f27002526a808c5c1ad5d0f1ab1cec471af0a33',
+        bundleSizes: {
+          'dist/v0.js': 12.34,
+          'dist/amp4ads-v0.js': 11.22,
+          'dist/v0/amp-accordion-0.1.js': 1.11,
+          'dist/v0/amp-ad-0.1.js': 4.56,
+          'dist/v0/amp-date-display-0.1.js': 7.32,
+          'dist/v0/amp-truncate-text-0.1.js': 2.4,
+        },
+      };
+
+      baseBundleSizeFixture.content = Buffer.from(
+        JSON.stringify({
+          'dist/v0.js': 12.34,
+          'dist/v0/amp-accordion-0.1.js': 1.11,
+          'dist/v0/amp-ad-0.1.js': 4.53,
+          'dist/v0/amp-anim-0.1.js': 5.65,
+          'dist/v0/amp-date-display-0.1.js': 8.99,
+          'dist/v0/amp-truncate-text-0.1.js': 2.12,
+        })
+      ).toString('base64');
+
+      await request(probot.server)
+        .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
+        .send(jsonPayload)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(200);
+
+      expect(github.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          check_run_id: 555555,
+          conclusion: 'success',
+          output: expect.objectContaining({
+            title: 'No approval necessary',
+            summary: expect.stringContaining(
+              '## Auto-approved bundle size changes\n' +
+                '* `dist/v0/amp-truncate-text-0.1.js`: Δ +0.28KB\n' +
+                '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
+                '* `dist/v0/amp-date-display-0.1.js`: Δ -1.67KB\n' +
                 '## Bundle sizes missing from this PR\n' +
                 '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
                 '* `dist/amp4ads-v0.js`: (11.22 KB) missing on the main branch'
