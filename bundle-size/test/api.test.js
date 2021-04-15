@@ -327,14 +327,14 @@ describe('bundle-size api', () => {
       };
 
       baseBundleSizeFixture.content = Buffer.from(
-        `{
-          "dist/v0.js": 12.34,
-          "dist/v0/amp-accordion-0.1.js":1.11,
-          "dist/v0/amp-ad-0.1.js": 4.53,
-          "dist/v0/amp-anim-0.1.js": 5.65,
-          "dist/v0/amp-date-display-0.1.js": 8.99,
-          "dist/v0/amp-truncate-text-0.1.js": 2.12
-        }`
+        JSON.stringify({
+          'dist/v0.js': 12.34,
+          'dist/v0/amp-accordion-0.1.js': 1.11,
+          'dist/v0/amp-ad-0.1.js': 4.53,
+          'dist/v0/amp-anim-0.1.js': 5.65,
+          'dist/v0/amp-date-display-0.1.js': 8.99,
+          'dist/v0/amp-truncate-text-0.1.js': 2.12,
+        })
       ).toString('base64');
 
       await request(probot.server)
@@ -357,7 +357,7 @@ describe('bundle-size api', () => {
                 '* `dist/v0/amp-date-display-0.1.js`: Δ -1.67KB\n' +
                 '## Bundle sizes missing from this PR\n' +
                 '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
-                '* `dist/amp4ads-v0.js`: (11.22 KB) missing in `master`'
+                '* `dist/amp4ads-v0.js`: (11.22 KB) missing on the main branch'
             ),
           }),
         })
