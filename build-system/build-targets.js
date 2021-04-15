@@ -26,7 +26,6 @@ const {log} = require('./log');
 
 const APPS_TO_TEST = [
   'bundle-size',
-  'checklist',
   'error-monitoring',
   'invite',
   'onduty',
