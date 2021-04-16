@@ -39,14 +39,6 @@
       "additionalBranchPrefix": "bundle-size-chart-"
     }
   }, {
-    "paths": ["checklist/**"],
-    "groupName": "checklist packages",
-    "reviewers": ["danielrozenberg", "estherkim", "rcebulko"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "checklist-"
-    }
-  }, {
     "paths": ["error-monitoring/**"],
     "labels": ["Category: Error Monitoring"],
     "groupName": "error-monitoring packages",
