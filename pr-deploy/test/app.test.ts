@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-// mock unzipAndMove dependency before importing '../src/app'
+// mock decompressAndMove dependency before importing '../src/app'
 jest.mock('../src/zipper', () => {
   return {
-    unzipAndMove: jest
+    decompressAndMove: jest
       .fn()
-      .mockReturnValue(
-        Promise.resolve('gs://serving-bucket/headSha')
-      ),
+      .mockReturnValue(Promise.resolve('gs://serving-bucket/headSha')),
   };
 });
 
@@ -59,9 +57,8 @@ describe('test pr deploy app', () => {
     nock.enableNetConnect();
   });
 
-  test('creates a check when a pull request is opened', async() => {
-    const prOpenedEvent: Webhooks.WebhookEvent<
-    Webhooks.EventPayloads.WebhookPayloadPullRequest> = {
+  test('creates a check when a pull request is opened', async () => {
+    const prOpenedEvent: Webhooks.WebhookEvent<Webhooks.EventPayloads.WebhookPayloadPullRequest> = {
       id: 'prId',
       name: 'pull_request.opened',
       payload: {
@@ -74,8 +71,10 @@ describe('test pr deploy app', () => {
     };
 
     nock(apiUrl)
-      .get('/repos/test-owner/test-repo/commits/' +
-      'abcde/check-runs?check_name=test-check')
+      .get(
+        '/repos/test-owner/test-repo/commits/' +
+          'abcde/check-runs?check_name=test-check'
+      )
       .reply(200, null) // make sure no checks already exist
       .post('/repos/test-owner/test-repo/check-runs', body => {
         expect(body).toMatchObject({
@@ -90,53 +89,54 @@ describe('test pr deploy app', () => {
     await probot.receive(prOpenedEvent);
   });
 
-  test('refreshes the check when a pull request is ' +
-  'synchronized or reopened', async() => {
+  test(
+    'refreshes the check when a pull request is ' + 'synchronized or reopened',
+    async () => {
+      nock(apiUrl)
+        .get(
+          '/repos/test-owner/test-repo/commits/' +
+            'abcde/check-runs?check_name=test-check'
+        )
+        .reply(200, {data: {total_count: 1, check_runs: [{id: 12345}]}}) // make sure a check already exists
+        .post('/repos/test-owner/test-repo/check-runs', body => {
+          expect(body).toMatchObject({
+            'head_sha': 'abcde',
+            'name': 'test-check',
+            'status': 'queued',
+          });
+          return true;
+        })
+        .reply(200);
+
+      const prSynchronizedEvent: Webhooks.WebhookEvent<Webhooks.EventPayloads.WebhookPayloadPullRequest> = {
+        id: 'prId',
+        name: 'pull_request.synchronize',
+        payload: {
+          pull_request: {head: {sha: 'abcde'}},
+          repository: {owner: {name: 'test-owner'}, name: 'test-repo'},
+        } as Webhooks.EventPayloads.WebhookPayloadPullRequest,
+      };
+
+      await probot.receive(prSynchronizedEvent);
+    }
+  );
+
+  test('deploys the PR check when action is triggered', async () => {
     nock(apiUrl)
-      .get('/repos/test-owner/test-repo/commits/' +
-      'abcde/check-runs?check_name=test-check')
-      .reply(200, {data: {total_count: 1, check_runs: [{id: 12345}]},
-      }) // make sure a check already exists
-      .post('/repos/test-owner/test-repo/check-runs', body => {
-        expect(body).toMatchObject({
-          'head_sha': 'abcde',
-          'name': 'test-check',
-          'status': 'queued',
-        });
-        return true;
-      })
-      .reply(200);
-
-    const prSynchronizedEvent: Webhooks.WebhookEvent<
-    Webhooks.EventPayloads.WebhookPayloadPullRequest> = {
-      id: 'prId',
-      name: 'pull_request.synchronize',
-      payload: {
-        pull_request: {head: {sha: 'abcde'}},
-        repository: {owner: {name: 'test-owner'}, name: 'test-repo'},
-      } as Webhooks.EventPayloads.WebhookPayloadPullRequest,
-    };
-
-    await probot.receive(prSynchronizedEvent);
-  });
-
-  test('deploys the PR check when action is triggered', async() => {
-    nock(apiUrl)
-      .get('/repos/test-owner/test-repo/commits/abcde/' +
-      'check-runs?check_name=test-check')
+      .get(
+        '/repos/test-owner/test-repo/commits/abcde/' +
+          'check-runs?check_name=test-check'
+      )
       .times(2)
       .reply(200, {
         total_count: 1,
-        check_runs: [
-          {id: 12345, head_sha: 'abcde'},
-        ],
+        check_runs: [{id: 12345, head_sha: 'abcde'}],
       }) // make sure a check already exists
       .patch('/repos/test-owner/test-repo/check-runs/12345')
       .times(2)
       .reply(201);
 
-    const requestedActionEvent: Webhooks.WebhookEvent<
-    Webhooks.EventPayloads.WebhookPayloadCheckRun> = {
+    const requestedActionEvent: Webhooks.WebhookEvent<Webhooks.EventPayloads.WebhookPayloadCheckRun> = {
       id: 'prId',
       name: 'check_run.requested_action',
       payload: {
@@ -144,7 +144,8 @@ describe('test pr deploy app', () => {
         check_run: {
           name: 'test-check',
           head_sha: 'abcde',
-          pull_requests: [{head: {sha: 'abcde'}}]},
+          pull_requests: [{head: {sha: 'abcde'}}],
+        },
         repository: {owner: {name: 'test-owner'}, name: 'test-repo'},
       } as Webhooks.EventPayloads.WebhookPayloadCheckRun,
     };

@@ -17,7 +17,7 @@
 import {Application} from 'probot';
 import express, {IRouter} from 'express';
 import {PullRequest} from './github';
-import {unzipAndMove} from './zipper';
+import {decompressAndMove} from './zipper';
 import {Octokit} from '@octokit/rest';
 
 const BASE_URL = `https://storage.googleapis.com/${process.env.SERVE_BUCKET}/`;
@@ -27,17 +27,20 @@ const BASE_URL = `https://storage.googleapis.com/${process.env.SERVE_BUCKET}/`;
  * when a pull request is opened or synchronized.
  */
 function initializeCheck(app: Application) {
-  app.on([
-    'pull_request.opened',
-    'pull_request.synchronize',
-    'pull_request.reopened',
-  ], async context => {
-    const pr = new PullRequest(
-      (context.github as unknown) as Octokit,
-      context.payload.pull_request.head.sha
-    );
-    return pr.createOrResetCheck();
-  });
+  app.on(
+    [
+      'pull_request.opened',
+      'pull_request.synchronize',
+      'pull_request.reopened',
+    ],
+    async context => {
+      const pr = new PullRequest(
+        (context.github as unknown) as Octokit,
+        context.payload.pull_request.head.sha
+      );
+      return pr.createOrResetCheck();
+    }
+  );
 }
 
 /**
@@ -49,15 +52,18 @@ function initializeRouter(app: Application) {
   const router: IRouter = app.route('/v0/pr-deploy');
   router.use(express.json());
 
-  const initialize = async(request, response) => {
-    const {headSha, result} = request.params;
+  const initialize = async (
+    request: express.Request,
+    response: express.Response
+  ) => {
+    const {headSha, result, externalId} = request.params;
     const github = ((await app.auth(
       Number(process.env.INSTALLATION_ID)
     )) as unknown) as Octokit;
     const pr = new PullRequest(github, headSha);
     switch (result) {
       case 'success':
-        await pr.buildCompleted();
+        await pr.buildCompleted(externalId);
         break;
       case 'errored':
         await pr.buildErrored();
@@ -70,7 +76,8 @@ function initializeRouter(app: Application) {
     response.send({status: 200});
   };
 
-  router.post('/headshas/:headSha/:result', initialize);
+  router.post('/headshas/:headSha/:result(success)/:externalId', initialize);
+  router.post('/headshas/:headSha/:result(errored|skipped)', initialize);
 }
 
 /**
@@ -88,15 +95,18 @@ function initializeDeployment(app: Application) {
       context.payload.check_run.head_sha
     );
     try {
-      await pr.deploymentInProgress();
-      const bucketUrl = await unzipAndMove(pr.headSha);
+      const {data: checkData} = await pr.deploymentInProgress();
+      const bucketUrl = await decompressAndMove(
+        pr.headSha,
+        checkData.external_id
+      );
       await pr.deploymentCompleted(
         bucketUrl,
         `${BASE_URL}amp_nomodule_${pr.headSha}/`
       );
     } catch (e) {
       await pr.deploymentErrored(e);
-    };
+    }
   });
 }
 

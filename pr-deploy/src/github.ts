@@ -21,11 +21,13 @@ type ChecksGetResponseData = Types['checks']['get']['response']['data'];
 type ChecksListForRefParams = Types['checks']['listForRef']['parameters'];
 type ChecksUpdateParams = Types['checks']['update']['parameters'];
 
-const ACTIONS: ChecksUpdateParams['actions'] = [{
-  label: 'Create a test site',
-  description: 'Serves the minified output of this PR.',
-  identifier: 'deploy-me-action',
-}];
+const ACTIONS: ChecksUpdateParams['actions'] = [
+  {
+    label: 'Create a test site',
+    description: 'Serves the nomodule minified output of this PR.',
+    identifier: 'deploy-me-action',
+  },
+];
 
 const check_name = process.env.GH_CHECK;
 const owner = process.env.GH_OWNER;
@@ -90,10 +92,10 @@ export class PullRequest {
         summary:
           `You can now access the [**website**](${serveUrl}` +
           'examples/article.amp.html) or browse the deployed ' +
-          `[**Google Cloud Platform Bucket**](${bucketUrl}).<br/>` +
+          `[**Google Cloud Platform Bucket**](${bucketUrl}).<br/><br/>` +
           'To browse examples or manual tests, append your specific ' +
           'example/test to the following URL:<br/>' +
-          `\`${serveUrl}examples/[YOUR_EXAMPLE_HERE]\`<br/>` +
+          `\`${serveUrl}examples/[YOUR_EXAMPLE_HERE]\`<br/><br/>` +
           '**For example:** You can access the sample [AMP article example]' +
           `(${serveUrl}examples/article.amp.html) at <br/>` +
           `\`${serveUrl}examples/article.amp.html\``,
@@ -129,13 +131,14 @@ export class PullRequest {
   /**
    * Set check to 'completed' to enable the 'Deploy Me' action.
    */
-  async buildCompleted() {
+  async buildCompleted(externalId: string) {
     const check = await this.getCheck_();
 
     const params: ChecksUpdateParams = {
       owner,
       repo,
       check_run_id: check.id,
+      external_id: externalId,
       status: 'completed',
       conclusion: 'neutral',
       output: {
@@ -143,7 +146,8 @@ export class PullRequest {
         summary:
           'Please click the `Create a test site` button above to ' +
           'deploy the minified build of this PR along with examples from ' +
-          '`examples/` and `test/manual/`. It should only take a minute.',
+          '`examples/`, `test/manual/`, and `test/fixtures/e2e/`. It should ' +
+          'only take a minute.',
       },
       actions: ACTIONS,
     };
@@ -228,8 +232,7 @@ export class PullRequest {
     if (check.status == 'completed' && check.conclusion == 'success') {
       output = {
         title: 'A new build is being compiled...',
-        summary:
-          'The current site will be overwritten.',
+        summary: 'The current site will be overwritten.',
       };
     }
 

@@ -14,42 +14,68 @@
  * limitations under the License.
  */
 
+import fetch from 'node-fetch';
+import gunzip from 'gunzip-maybe';
 import mime from 'mime-types';
-import unzip from 'unzip-stream';
+import tar from 'tar-stream';
 import {Storage} from '@google-cloud/storage';
 
 /**
  * Takes the minified build and test fixtures from the
- * AMP CI Build Storage bucket, unzips and writes to
+ * AMP CI Build Storage bucket, decompresses and writes to
  * a test website bucket that serves the files publicly.
  */
-export async function unzipAndMove(sha: string): Promise<string> {
+export async function decompressAndMove(
+  sha: string,
+  externalId?: string
+): Promise<string> {
   const storage = new Storage({projectId: process.env.PROJECT_ID});
   const serveBucket = storage.bucket(process.env.SERVE_BUCKET);
   const buildFileName = `amp_nomodule_${sha}`;
-  const buildFile =
-    storage.bucket(process.env.BUILD_BUCKET).file(`${buildFileName}.zip`);
 
-  return new Promise<string>((resolve, reject) => {
-    buildFile.createReadStream()
-      .on('error', reject)
-      .pipe(unzip.Parse())
-      .on('entry', entry => {
-        const serveFileName = entry.path;
-        const serveFile = serveBucket.file(`${buildFileName}/${serveFileName}`);
-        const contentType =
-          mime.lookup(serveFileName) || 'application/octet-stream';
-        entry.pipe(
-          serveFile.createWriteStream({metadata: {contentType}})
-            .on('error', reject));
-      })
-      .on('close', async() => {
-        return resolve(`https://console.cloud.google.com/storage/browser/${process.env.SERVE_BUCKET}/${buildFileName}`);
-      });
+  const buildArtifactJsonUrl = process.env.BUILD_ARTIFACTS_URL.replace(
+    '{externalId}',
+    externalId
+  );
+  const buildArtifactZipUrl = await fetch(buildArtifactJsonUrl)
+    .then(res => res.json())
+    .then((json: Array<{[key: string]: string}>) =>
+      json.find(item => item['path'].endsWith('/amp_nomodule_build.tar.gz'))
+    )
+    .then(item => item['url']);
+
+  return await new Promise(async (resolve, reject) => {
+    const res = await fetch(buildArtifactZipUrl);
+    res.body.pipe(gunzip()).pipe(
+      tar
+        .extract()
+        .on('entry', (header, stream, next) => {
+          if (header.type == 'directory') {
+            stream.resume();
+            return next();
+          }
+          const serveFileName = header.name;
+          const serveFile = serveBucket.file(
+            `${buildFileName}/${serveFileName}`
+          );
+          const contentType =
+            mime.lookup(serveFileName) || 'application/octet-stream';
+          stream.pipe(
+            serveFile
+              .createWriteStream({metadata: {contentType}})
+              .on('error', reject)
+          );
+          stream.on('end', next);
+        })
+        .on('finish', () => {
+          resolve(
+            `https://console.cloud.google.com/storage/browser/${process.env.SERVE_BUCKET}/${buildFileName}`
+          );
+        })
+    );
   });
-};
+}
 
 module.exports = {
-  unzipAndMove,
+  decompressAndMove,
 };
-
