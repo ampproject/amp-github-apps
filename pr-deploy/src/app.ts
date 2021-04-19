@@ -35,7 +35,7 @@ function initializeCheck(app: Application) {
     ],
     async context => {
       const pr = new PullRequest(
-        (context.github as unknown) as Octokit,
+        context.github,
         context.payload.pull_request.head.sha
       );
       return pr.createOrResetCheck();
@@ -49,35 +49,36 @@ function initializeCheck(app: Application) {
  * the check run action to deploy site is enabled.
  */
 function initializeRouter(app: Application) {
-  const router: IRouter = app.route('/v0/pr-deploy');
+  const router: IRouter = app.route('/v0/pr-deploy/headshas');
+  const github: Promise<Octokit> = app.auth(
+    Number(process.env.INSTALLATION_ID)
+  );
   router.use(express.json());
+  router.use(async (request, response, next) => {
+    response.locals.github = await github;
+    next();
+  });
 
-  const initialize = async (
-    request: express.Request,
-    response: express.Response
-  ) => {
-    const {headSha, result, externalId} = request.params;
-    const github = ((await app.auth(
-      Number(process.env.INSTALLATION_ID)
-    )) as unknown) as Octokit;
-    const pr = new PullRequest(github, headSha);
-    switch (result) {
-      case 'success':
-        await pr.buildCompleted(externalId);
-        break;
-      case 'errored':
-        await pr.buildErrored();
-        break;
-      case 'skipped':
-      default:
-        await pr.buildSkipped();
-        break;
-    }
-    response.send({status: 200});
-  };
+  router.post('/:headSha/success/:externalId', async (request, response) => {
+    const {headSha, externalId} = request.params;
+    const pr = new PullRequest(response.locals.github, headSha);
+    await pr.buildCompleted(externalId);
+    response.status(200).end();
+  });
 
-  router.post('/headshas/:headSha/:result(success)/:externalId', initialize);
-  router.post('/headshas/:headSha/:result(errored|skipped)', initialize);
+  router.post('/:headSha/errored', async (request, response) => {
+    const {headSha} = request.params;
+    const pr = new PullRequest(response.locals.github, headSha);
+    await pr.buildErrored();
+    response.status(200).end();
+  });
+
+  router.post('/:headSha/skipped', async (request, response) => {
+    const {headSha} = request.params;
+    const pr = new PullRequest(response.locals.github, headSha);
+    await pr.buildSkipped();
+    response.status(200).end();
+  });
 }
 
 /**
@@ -91,7 +92,7 @@ function initializeDeployment(app: Application) {
     }
 
     const pr = new PullRequest(
-      (context.github as unknown) as Octokit,
+      context.github,
       context.payload.check_run.head_sha
     );
     try {
