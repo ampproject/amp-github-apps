@@ -14,8 +14,8 @@
     "fix": "npm run lint -- --fix",
     "build": "tsc -p . --esModuleInterop",
     "dev": "nodemon",
+    "gcp-build": "npm run build",
     "start": "probot run ./dist/src/app.js",
-    "prestart": "npm run build",
     "pretest": "npm run build",
     "test": "jest dist/test/*.js --reporters=jest-silent-reporter",
     "deploy-tag": "git tag 'deploy-pr-deploy-'`date -u '+%Y%m%d%H%M%S'`"
