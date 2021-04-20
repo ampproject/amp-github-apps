@@ -24,7 +24,7 @@ type ChecksUpdateParams = Types['checks']['update']['parameters'];
 const ACTIONS: ChecksUpdateParams['actions'] = [
   {
     label: 'Create a test site',
-    description: 'Serves the nomodule minified output of this PR.',
+    description: 'Serves nomodule minified build from PR.',
     identifier: 'deploy-me-action',
   },
 ];
