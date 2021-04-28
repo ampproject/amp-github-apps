@@ -276,10 +276,10 @@ class OwnersParser {
    */
   async parseOwnersFile(ownersPath) {
     const errors = [];
-    const contents = await this.repo.readFile(ownersPath);
 
     let file;
     try {
+      const contents = await this.repo.readFile(ownersPath);
       file = JSON5.parse(contents);
     } catch (error) {
       errors.push(new OwnersParserError(ownersPath, error.toString()));
