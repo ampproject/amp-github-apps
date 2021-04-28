@@ -412,18 +412,18 @@ class GitHub {
   /**
    * Fetches the contents of a file from GitHub.
    *
-   * @param {!FileRef} file file ref to fetch.
+   * @param {string} file file ref to fetch.
    * @return {string} file contents as a string.
    */
-  async getFileContents(file) {
-    this.logger.info(
-      `Fetching contents of file ${file.filename} at ref ${file.sha}`
-    );
+  async getFileContents(filename) {
+    this.logger.info(`Fetching contents of file ${filename}`);
 
-    const response = await this.client.git.getBlob(
-      this.repo({'file_sha': file.sha})
-    );
-    this.logger.debug('[getFileContents]', file, response.data);
+    const response = await this.client.repos.getContent({
+      owner: this.owner,
+      repo: this.repository,
+      path: filename,
+    });
+    this.logger.debug('[getFileContents]', filename, response.data);
 
     return Buffer.from(response.data.content, 'base64').toString('utf8');
   }

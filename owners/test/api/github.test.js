@@ -519,13 +519,12 @@ describe('GitHub API', () => {
       expect.assertions(1);
       nock('https://api.github.com')
         .get(
-          '/repos/test_owner/test_repo/git/blobs/eeae1593f4ecbae3f4453c9ceee2940a0e98ddca'
+          '/repos/test_owner/test_repo/contents/third_party%2Fsubscriptions-project%2FOWNERS'
         )
         .reply(200, getFileResponse);
-      const contents = await github.getFileContents({
-        filename: 'third_party/subscriptions-project/OWNERS',
-        sha: 'eeae1593f4ecbae3f4453c9ceee2940a0e98ddca',
-      });
+      const contents = await github.getFileContents(
+        'third_party/subscriptions-project/OWNERS'
+      );
 
       expect(contents).toEqual(
         '- otherperson\n- auser\n- otheruser\n- programmer\n- someperson\n'

@@ -40,11 +40,13 @@ module.exports = class VirtualRepository extends Repository {
    */
   async sync() {
     let fileChanged = false;
+    const ownersFilesKnown = new Set(this._fileRefs.keys());
     const ownersFiles = await this.github.searchFilename('OWNERS');
 
     for (const {filename, sha} of ownersFiles) {
       const repoPath = this.repoPath(filename);
       const fileSha = this._fileRefs.get(repoPath);
+      ownersFilesKnown.delete(repoPath);
 
       if (!fileSha) {
         // File has never been fetched and should be added to the cache.
@@ -64,6 +66,20 @@ module.exports = class VirtualRepository extends Repository {
       } else {
         this.logger.debug(`Ignoring unchanged file "${repoPath}"`);
       }
+    }
+
+    // Force-invalidate any files that we know should exist but didn't come back
+    // in the GitHub search results.
+    for (const filename of ownersFilesKnown) {
+      const repoPath = this.repoPath(filename);
+      // File has been updated and needs to be re-fetched.
+      this.logger.info(
+        `Updating SHA and clearing cache for file "${repoPath}"`
+      );
+      fileChanged = true;
+
+      this._fileRefs.set(repoPath, 'UNKNOWN');
+      await this.cache.invalidate(repoPath);
     }
 
     if (fileChanged) {
@@ -126,10 +142,19 @@ module.exports = class VirtualRepository extends Repository {
     }
 
     return await this.cache.readFile(repoPath, async () => {
-      const contents = await this.github.getFileContents({
-        filename: relativePath,
-        sha: fileSha,
-      });
+      let contents = '';
+      try {
+        contents = await this.github.getFileContents(relativePath);
+        // If fetching a file that didn't come back in search results, refresh its
+        // recorded SHA.
+        if (fileSha == 'UNKNOWN') {
+          this._fileRefs.set(repoPath, contents.data.sha);
+        }
+      } catch (e) {
+        // If the file no longer exists, remove its cache entry.
+        this._fileRefs.delete(repoPath);
+        throw e;
+      }
 
       if (cacheMissCallback) {
         await cacheMissCallback();
