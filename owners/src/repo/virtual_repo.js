@@ -126,10 +126,7 @@ module.exports = class VirtualRepository extends Repository {
     }
 
     return await this.cache.readFile(repoPath, async () => {
-      const contents = await this.github.getFileContents({
-        filename: relativePath,
-        sha: fileSha,
-      });
+      const contents = await this.github.getFileContents(relativePath);
 
       if (cacheMissCallback) {
         await cacheMissCallback();

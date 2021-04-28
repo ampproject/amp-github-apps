@@ -158,14 +158,11 @@ describe('virtual repository', () => {
     it('fetches file refs from GitHub', async () => {
       await repo.warmCache();
 
-      sandbox.assert.calledWith(github.getFileContents.getCall(0), {
-        filename: 'OWNERS',
-        sha: 'sha_1',
-      });
-      sandbox.assert.calledWith(github.getFileContents.getCall(1), {
-        filename: 'foo/OWNERS',
-        sha: 'sha_2',
-      });
+      sandbox.assert.calledWith(github.getFileContents.getCall(0), 'OWNERS');
+      sandbox.assert.calledWith(
+        github.getFileContents.getCall(1),
+        'foo/OWNERS'
+      );
     });
 
     describe('when file refs are in the cache', () => {
@@ -239,10 +236,7 @@ describe('virtual repository', () => {
         await repo.sync();
         const contents = await repo.readFile('OWNERS');
 
-        sandbox.assert.calledWith(github.getFileContents, {
-          filename: 'OWNERS',
-          sha: 'sha_1',
-        });
+        sandbox.assert.calledWith(github.getFileContents, 'OWNERS');
         expect(contents).toEqual('contents');
       });
 
@@ -264,10 +258,7 @@ describe('virtual repository', () => {
 
         await repo.sync();
         await repo.readFile('OWNERS');
-        sandbox.assert.calledWith(github.getFileContents, {
-          filename: 'OWNERS',
-          sha: 'sha_1',
-        });
+        sandbox.assert.calledWith(github.getFileContents, 'OWNERS');
 
         await repo.cache.invalidate('test_repo/OWNERS');
         const contents = await repo.readFile('OWNERS');
