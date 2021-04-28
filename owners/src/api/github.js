@@ -412,7 +412,7 @@ class GitHub {
   /**
    * Fetches the contents of a file from GitHub.
    *
-   * @param {!FileRef} file file ref to fetch.
+   * @param {string} file file ref to fetch.
    * @return {string} file contents as a string.
    */
   async getFileContents(filename) {
