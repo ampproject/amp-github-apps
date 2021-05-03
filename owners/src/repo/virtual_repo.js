@@ -70,8 +70,7 @@ module.exports = class VirtualRepository extends Repository {
 
     // Force-invalidate any files that we know should exist but didn't come back
     // in the GitHub search results.
-    for (const filename of ownersFilesKnown) {
-      const repoPath = this.repoPath(filename);
+    for (const repoPath of ownersFilesKnown) {
       // File has been updated and needs to be re-fetched.
       this.logger.info(
         `Updating SHA and clearing cache for file "${repoPath}"`
