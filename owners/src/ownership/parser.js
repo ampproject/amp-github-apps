@@ -236,6 +236,9 @@ class OwnersParser {
       return {result: rules, errors};
     }
 
+    if (fileDef.reviewerTeam) {
+      fileDef.reviewerPool = [fileDef.reviewerTeam];
+    }
     if (fileDef.reviewerPool) {
       try {
         const reviewerPool = [];
