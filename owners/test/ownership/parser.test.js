@@ -441,7 +441,7 @@ describe('owners parser', () => {
 
         errors = fileParse.errors;
         Object.assign(rules, {
-          reviewerSet: fileParse.result[0],
+          reviewerPool: fileParse.result[0],
           basic: fileParse.result[1],
           filename: fileParse.result[2],
           pattern: fileParse.result[3],
@@ -450,10 +450,11 @@ describe('owners parser', () => {
         });
       });
 
-      it('parses the reviewer team', () => {
-        const rule = rules.reviewerSet;
+      it('parses the reviewer pool', () => {
+        const rule = rules.reviewerPool;
         expect(rule.owners.map(owner => owner.name)).toEqual([
           'ampproject/reviewers-amphtml',
+          'approver-bot',
         ]);
       });
 
@@ -535,15 +536,18 @@ describe('owners parser', () => {
       const rules = [{owners: [{name: 'someone'}]}];
 
       describe('in the repository root OWNERS file', () => {
-        it('records the reviewer set from "reviewerTeam', () => {
+        it('records the reviewer set from "reviewerPool', () => {
           const fileDef = {
             rules,
-            reviewerTeam: 'ampproject/reviewers-amphtml',
+            reviewerPool: ['ampproject/reviewers-amphtml', 'approver-bot'],
           };
           const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
 
           expect(result[0]).toEqual(
-            new ReviewerSetRule('OWNERS', [new TeamOwner(reviewerTeam)])
+            new ReviewerSetRule('OWNERS', [
+              new TeamOwner(reviewerTeam),
+              new UserOwner('approver-bot'),
+            ])
           );
         });
       });
@@ -551,7 +555,7 @@ describe('owners parser', () => {
       describe('specified outside the repository root OWNERS file', () => {
         const fileDef = {
           rules,
-          reviewerTeam: 'ampproject/reviewers-amphtml',
+          reviewerPool: ['ampproject/reviewers-amphtml'],
         };
 
         it('reports an error', () => {
@@ -573,16 +577,16 @@ describe('owners parser', () => {
         });
       });
 
-      describe('for a non-string "reviewerTeam" property', () => {
+      describe('for a non-array "reviewerPool" property', () => {
         const fileDef = {
           rules,
-          reviewerTeam: {name: 'ampproject/reviewers-amphtml'},
+          reviewerPool: {name: 'ampproject/reviewers-amphtml'},
         };
 
         it('reports an error', () => {
           const {errors} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
           expect(errors[0].message).toEqual(
-            '`OWNERS.reviewerTeam` should be string'
+            '`OWNERS.reviewerPool` should be array'
           );
         });
 
@@ -595,7 +599,7 @@ describe('owners parser', () => {
       describe('for an unknown team namyname', () => {
         const fileDef = {
           rules,
-          reviewerTeam: 'ampproject/unknown-team',
+          reviewerPool: ['ampproject/unknown-team'],
         };
 
         it('reports an error', () => {

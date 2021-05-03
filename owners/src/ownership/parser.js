@@ -236,24 +236,26 @@ class OwnersParser {
       return {result: rules, errors};
     }
 
-    if (fileDef.reviewerTeam) {
-      const reviewerTeam = this.teamMap[fileDef.reviewerTeam];
-
-      if (!reviewerTeam) {
-        errors.push(
-          new OwnersParserError(
-            ownersPath,
-            `Unrecognized team: '${fileDef.reviewerTeam}'`
-          )
-        );
-      } else {
-        try {
-          rules.push(
-            new ReviewerSetRule(ownersPath, [new TeamOwner(reviewerTeam)])
-          );
-        } catch (error) {
-          errors.push(new OwnersParserError(ownersPath, error.message));
+    if (fileDef.reviewerPool) {
+      try {
+        const reviewerPool = [];
+        // Try to parse each member of the reviewer pool
+        fileDef.reviewerPool.forEach(reviewer => {
+          const poolParse = this._parseOwnerDefinition(ownersPath, {
+            name: reviewer,
+          });
+          if (poolParse.result) {
+            reviewerPool.push(poolParse.result);
+          }
+          if (poolParse.errors) {
+            errors.push(...poolParse.errors);
+          }
+        });
+        if (reviewerPool.length) {
+          rules.push(new ReviewerSetRule(ownersPath, reviewerPool));
         }
+      } catch (error) {
+        errors.push(new OwnersParserError(ownersPath, error.message));
       }
     }
 

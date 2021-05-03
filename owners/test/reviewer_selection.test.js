@@ -240,9 +240,12 @@ describe('reviewer selection', () => {
     it('handles non-reviewers at leaf nodes', () => {
       fileTreeMap = ownersTree.buildFileTreeMap(['foo/bar/baz/other_file.js']);
       const reviewerTeam = new Team(42, 'ampproject', 'reviewer-set');
-      reviewerTeam.members = ['reviewer', 'child', 'someone'];
+      reviewerTeam.members = ['reviewer', 'someone'];
       ownersTree.addRule(
-        new ReviewerSetRule('OWNERS', [new TeamOwner(reviewerTeam)])
+        new ReviewerSetRule('OWNERS', [
+          new TeamOwner(reviewerTeam),
+          new UserOwner('child'),
+        ])
       );
 
       const reviewers = ReviewerSelection._findPotentialReviewers(fileTreeMap);
