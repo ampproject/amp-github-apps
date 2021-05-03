@@ -49,9 +49,16 @@ module.exports = class CompoundCache extends FileCache {
    * @return {string} file contents.
    */
   async readFile(filename, getContents) {
-    return await this.memoryCache.readFile(filename, async () => {
-      return await this.cloudStorageCache.readFile(filename, getContents);
-    });
+    try {
+      return await this.memoryCache.readFile(filename, () =>
+        this.cloudStorageCache.readFile(filename, getContents)
+      );
+    } catch (e) {
+      // Record errors without letting them blow up tree refreshing
+      this.logger.error(`ERROR: Failed to read contents of ${filename}`);
+      this.logger.error(e);
+      return '';
+    }
   }
 
   /**
@@ -60,7 +67,14 @@ module.exports = class CompoundCache extends FileCache {
    * @param {string} filename file to drop from the cache.
    */
   async invalidate(filename) {
-    await this.memoryCache.invalidate(filename);
-    await this.cloudStorageCache.invalidate(filename);
+    try {
+      await Promise.all([
+        this.memoryCache.invalidate(filename),
+        this.cloudStorageCache.invalidate(filename),
+      ]);
+    } catch (e) {
+      this.logger.error(`ERRROR: Failed to invalidate cache for ${filename}`);
+      this.logger.error(e);
+    }
   }
 };
