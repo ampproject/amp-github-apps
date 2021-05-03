@@ -135,7 +135,7 @@
   // users/teams. If present, the owners check will require that at least one
   // member of this team has given approval. It is possible that one reviewer
   // is both a member of this reviewer team and provides owners coverage.
-  reviewerPool: ["ampproject/reviewers-amphtml", "renovate-approve"]
+  reviewerPool: ["ampproject/reviewers-amphtml", "approver-bot"]
 }
 
 // The result of parsing this file would be a tree with these rules:
