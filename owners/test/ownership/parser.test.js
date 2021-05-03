@@ -450,7 +450,7 @@ describe('owners parser', () => {
         });
       });
 
-      it('parses the reviewer team', () => {
+      it('parses the reviewer pool', () => {
         const rule = rules.reviewerPool;
         expect(rule.owners.map(owner => owner.name)).toEqual([
           'ampproject/reviewers-amphtml',
