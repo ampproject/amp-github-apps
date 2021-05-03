@@ -454,7 +454,7 @@ describe('owners parser', () => {
         const rule = rules.reviewerPool;
         expect(rule.owners.map(owner => owner.name)).toEqual([
           'ampproject/reviewers-amphtml',
-          'renovate-approve',
+          'approver-bot',
         ]);
       });
 
@@ -539,14 +539,14 @@ describe('owners parser', () => {
         it('records the reviewer set from "reviewerPool', () => {
           const fileDef = {
             rules,
-            reviewerPool: ['ampproject/reviewers-amphtml', 'renovate-approve'],
+            reviewerPool: ['ampproject/reviewers-amphtml', 'approver-bot'],
           };
           const {result} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
 
           expect(result[0]).toEqual(
             new ReviewerSetRule('OWNERS', [
               new TeamOwner(reviewerTeam),
-              new UserOwner('renovate-approve'),
+              new UserOwner('approver-bot'),
             ])
           );
         });
