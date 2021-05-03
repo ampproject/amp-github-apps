@@ -65,8 +65,7 @@ function main() {
     log('Running all tests because this is a push build...');
     APPS_TO_TEST.forEach(runAppTests);
   } else {
-    const buildTargets = determineBuildTargets();
-    APPS_TO_TEST.filter(buildTargets.has, buildTargets).forEach(runAppTests);
+    determineBuildTargets().forEach(runAppTests);
   }
 }
 
