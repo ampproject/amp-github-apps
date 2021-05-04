@@ -146,7 +146,8 @@
 
 // The result of parsing this file would be a tree with these rules:
 //
-// Reviewers: ampproject/reviewers-amphtml [members...]
+// Reviewers: ampproject/reviewers-amphtml [members...], user-approver,
+//            bot-approver[bot]
 // **/*: someuser, dontdothis, ampproject/wg-cool-team [members...],
 //       dvoytenko (never notify), rcebulko (always notify), rando
 // ./{package.json}: packager
