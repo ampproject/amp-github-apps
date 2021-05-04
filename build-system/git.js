@@ -20,13 +20,16 @@
  */
 
 const {getStdout} = require('./exec');
+const {isCiBuild} = require('./ci');
 
 /**
- * Returns the merge base of the PR branch and the main branch.
+ * Returns the merge base of the PR branch and the main branch. During CI on
+ * GH actions, the main branch identifier is "origin/main".
  * @return {string}
  */
 function gitMergeBaseMain() {
-  return getStdout(`git merge-base main HEAD`).trim();
+  const mainBranch = isCiBuild() ? 'origin/main' : 'main';
+  return getStdout(`git merge-base ${mainBranch} HEAD`).trim();
 }
 
 /**
