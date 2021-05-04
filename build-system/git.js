@@ -26,7 +26,7 @@ const {getStdout} = require('./exec');
  * @return {string}
  */
 function gitMergeBaseMain() {
-  return getStdout(`git merge-base main HEAD`).trim();
+  return getStdout(`git merge-base origin/main HEAD`).trim();
 }
 
 /**
