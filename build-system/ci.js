@@ -32,6 +32,14 @@ function env(key) {
 }
 
 /**
+ * Returns true if this is a CI build.
+ * @return {boolean}
+ */
+function isCiBuild() {
+  return !!env('CI');
+}
+
+/**
  * Returns true if this is a PR build.
  * @return {boolean}
  */
@@ -48,6 +56,7 @@ function isPushBuild() {
 }
 
 module.exports = {
+  isCiBuild,
   isPullRequestBuild,
   isPushBuild,
 };
