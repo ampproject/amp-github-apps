@@ -13,6 +13,7 @@
       "minItems": 1,
       "items": {
         "oneOf": [
+          {"$ref": "#/definitions/Bot"},
           {"$ref": "#/definitions/User"},
           {"$ref": "#/definitions/Team"}
         ]
@@ -26,6 +27,10 @@
   },
 
   "definitions": {
+    "Bot": {
+      "type": "string",
+      "pattern": "^[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]\\[bot\\]$"
+    },
     "User": {
       "type": "string",
       "pattern": "^[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]$"

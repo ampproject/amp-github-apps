@@ -25,13 +25,13 @@
  * the directory containing the OWNERS file.
  *
  * Example OWNERS file definition for a directory owned by the team
- * `ampproject/wg-ui-and-a11y` and `rcebulko`, who should always be notified of
+ * `ampproject/wg-components` and `rcebulko`, who should always be notified of
  * changes:
  *
  * {
  *   rules: [{
  *     owners: [
- *       { name: 'ampproject/wg-ui-and-a11y' },
+ *       { name: 'ampproject/wg-components' },
  *       {
  *         name: 'rcebulko',
  *         notify: true,
@@ -41,8 +41,8 @@
  * }
  */
 
-// All owners files must contain a single `rules` key containing a list of owners
-// rules.
+// All owners files must contain a single `rules` key containing a list of
+// owners rules.
 {
   rules: [
     {
@@ -101,19 +101,20 @@
     },
 
     {
-      // To apply a filename or pattern to all subdirectories as well, prefix the
-      // pattern with `**/`. The pattern `**/.eslintrc` applies to `./.eslintrc`
-      // as well as `./foo/.eslintrc`. The pattern `**/*.protoascii` applies to
-      // `./test.protoascii` as well as `./foo/example.protoascii`.
+      // To apply a filename or pattern to all subdirectories as well, prefix
+      // the pattern with `**/`. The pattern `**/.eslintrc` applies to
+      // `./.eslintrc` as well as `./foo/.eslintrc`. The pattern
+      // `**/*.protoascii` applies to `./test.protoascii` as well as
+      // `./foo/example.protoascii`.
       pattern: "**/*.protoascii",
       owners: [{ name: "ampproject/wg-caching" }],
     },
 
     {
       // Any other use of `/` in a pattern is forbidden (ie. no directory
-      // traversal). Patterns using `/` will be ignored. If rules are needed in a
-      // subdirectory, the appropriate OWNERS file should be created/updated in
-      // that subdirectory. This rule will be ignored since the pattern is
+      // traversal). Patterns using `/` will be ignored. If rules are needed in
+      // a subdirectory, the appropriate OWNERS file should be created/updated
+      // in that subdirectory. This rule will be ignored since the pattern is
       // illegal.
       pattern: "foo*/*.js",
       owners: [{ name: "doesntmatter" }],
@@ -132,15 +133,21 @@
 
   // The root-level owners file--and ONLY the root-level owners file--may
   // specify an optional `reviewerPool` property, providing a list of GitHub
-  // users/teams. If present, the owners check will require that at least one
-  // member of this team has given approval. It is possible that one reviewer
-  // is both a member of this reviewer team and provides owners coverage.
-  reviewerPool: ["ampproject/reviewers-amphtml", "approver-bot"]
+  // teams/users/bots. If present, the owners check will require that at least
+  // one member of this pool has given approval. It is possible that a given
+  // reviewer is both a member of this reviewer pool and provides owners
+  // coverage.
+  reviewerPool: [
+    "ampproject/reviewers-amphtml",
+    "user-approver",
+    "bot-approver[bot]",
+  ]
 }
 
 // The result of parsing this file would be a tree with these rules:
 //
-// Reviewers: ampproject/reviewers-amphtml [members...]
+// Reviewers: ampproject/reviewers-amphtml [members...], user-approver,
+//            bot-approver[bot]
 // **/*: someuser, dontdothis, ampproject/wg-cool-team [members...],
 //       dvoytenko (never notify), rcebulko (always notify), rando
 // ./{package.json}: packager
