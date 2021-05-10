@@ -28,8 +28,8 @@
     "probot": "9.15.1"
   },
   "devDependencies": {
-    "@types/jest": "26.0.22",
-    "@types/node": "13.13.50",
+    "@types/jest": "26.0.23",
+    "@types/node": "13.13.51",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "4.10.0",
     "eslint": "7.15.0",
