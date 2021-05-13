@@ -15,19 +15,8 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:
-          fetch-depth: 50
-      - name: Setup Node
-        uses: actions/setup-node@v2
-      - name: Cache NPM Directory
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: node-
+          fetch-depth: 0
       - name: Install Dependencies
-        run: npm ci
+        run: bash ./.github/workflows/install_dependencies.sh
       - name: Run PR Check
         run: node build-system/pr-check.js
-        env:
-          LOG_LEVEL: warn
-          FORCE_COLOR: 1

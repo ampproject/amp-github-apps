@@ -16,47 +16,47 @@
 'use strict';
 
 /**
- * @file Provides functions for executing tasks in a child process.
+ * @fileoverview Provides functions for executing tasks in a child process.
  */
 
 const childProcess = require('child_process');
 
-const shellCmd = process.platform == 'win32' ? 'cmd' : '/bin/sh';
-const shellFlag = process.platform == 'win32' ? '/C' : '-c';
+const shellCmd = process.platform == 'win32' ? 'cmd' : '/bin/bash';
 
 /**
  * Spawns the given command in a child process with the given options.
+ * Special-cases the AMP task runner so that it is correctly spawned on all
+ * platforms (node shebangs do not work on Windows).
  *
  * @param {string} cmd
- * @param {object} options
- * @return {object} Process info.
+ * @param {?Object} options
+ * @return {!Object}
  */
 function spawnProcess(cmd, options) {
-  return childProcess.spawnSync(shellCmd, [shellFlag, cmd], options);
+  return childProcess.spawnSync(cmd, {shell: shellCmd, ...options});
 }
 
 /**
  * Executes the provided command with the given options, returning the process
  * object.
  *
- * @param {string} cmd Command line to execute.
- * @param {object} options
- * @return {object} Process info.
+ * @param {string} cmd
+ * @param {?Object=} options
+ * @return {!Object}
  */
-function exec(cmd, options) {
-  options = options || {'stdio': 'inherit'};
+function exec(cmd, options = {'stdio': 'inherit'}) {
   return spawnProcess(cmd, options);
 }
 
 /**
  * Executes the provided command, and terminates the program in case of failure.
  *
- * @param {string} cmd Command line to execute.
- * @param {object} options Extra options to send to the process.
+ * @param {string} cmd
+ * @param {?Object=} options
  */
 function execOrDie(cmd, options) {
   const p = exec(cmd, options);
-  if (p.status != 0) {
+  if (p.status && p.status != 0) {
     process.exit(p.status);
   }
 }
@@ -64,22 +64,23 @@ function execOrDie(cmd, options) {
 /**
  * Executes the provided command, returning the process object.
  * @param {string} cmd
- * @param {?Object} options
+ * @param {?Object=} options
  * @return {!Object}
  */
 function getOutput(cmd, options = {}) {
-  return spawnProcess(cmd, {
+  const p = spawnProcess(cmd, {
     'cwd': options.cwd || process.cwd(),
     'env': options.env || process.env,
     'stdio': options.stdio || 'pipe',
     'encoding': options.encoding || 'utf-8',
   });
+  return p;
 }
 
 /**
  * Executes the provided command, returning its stdout.
  * @param {string} cmd
- * @param {?Object} options
+ * @param {?Object=} options
  * @return {string}
  */
 function getStdout(cmd, options) {
@@ -89,7 +90,7 @@ function getStdout(cmd, options) {
 /**
  * Executes the provided command, returning its stderr.
  * @param {string} cmd
- * @param {?Object} options
+ * @param {?Object=} options
  * @return {string}
  */
 function getStderr(cmd, options) {

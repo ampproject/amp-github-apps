@@ -15,17 +15,28 @@
  */
 'use strict';
 
-const fancyLog = require('fancy-log');
-const {bold, yellow} = require('kleur/colors');
+const {bold, yellow, gray} = require('kleur/colors');
 
 /**
- * Logs the given messages with an easy to spot prefix.
+ * Logs messages with a timestamp and an easy to spot prefix.
+ * @param  {...string} messages
  */
 function log(...messages) {
   const loggingPrefix = bold(yellow('pr-check'));
-  fancyLog(loggingPrefix, ...messages);
+  const now = new Date().toTimeString().split(' ')[0]; // Drop timezone suffix
+  const timestamp = `[${gray(now)}]`;
+  console.log(timestamp, loggingPrefix, ...messages);
+}
+
+/**
+ * Logs messages without a timestamp
+ * @param {...string} messages
+ */
+function logWithoutTimestamp(...messages) {
+  console.log(...messages);
 }
 
 module.exports = {
   log,
+  logWithoutTimestamp,
 };
