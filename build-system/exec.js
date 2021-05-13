@@ -68,12 +68,13 @@ function execOrDie(cmd, options) {
  * @return {!Object}
  */
 function getOutput(cmd, options = {}) {
-  return spawnProcess(cmd, {
+  const p = spawnProcess(cmd, {
     'cwd': options.cwd || process.cwd(),
     'env': options.env || process.env,
     'stdio': options.stdio || 'pipe',
     'encoding': options.encoding || 'utf-8',
   });
+  return p;
 }
 
 /**
