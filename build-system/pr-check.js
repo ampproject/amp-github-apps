@@ -16,33 +16,10 @@
 'use strict';
 
 const {APPS_TO_TEST, determineBuildTargets} = require('./build-targets');
-const {cyan, green} = require('kleur/colors');
-const {execOrDie} = require('./exec');
+const {cyan} = require('kleur/colors');
 const {isPushBuild} = require('./ci');
 const {log} = require('./log');
-
-/**
- * Execute a command and prints the time it took to run.
- *
- * @param {string} cmd command to execute.
- */
-function timedExecOrDie(cmd) {
-  log('Running', cyan(cmd) + '...');
-  const startTime = Date.now();
-  console.log(`::group::${cmd}`);
-  execOrDie(cmd);
-  console.log('::endgroup::');
-  const endTime = Date.now();
-  const executionTime = endTime - startTime;
-  const mins = Math.floor(executionTime / 60000);
-  const secs = Math.floor((executionTime % 60000) / 1000);
-  log(
-    'Done running',
-    cyan(cmd),
-    'Total time:',
-    green(mins + 'm ' + secs + 's')
-  );
-}
+const {printChangeSummary, timedExecOrDie} = require('./utils');
 
 /**
  * Set up and execute tests for an app.
@@ -65,6 +42,7 @@ function main() {
     log('Running all tests because this is a push build...');
     APPS_TO_TEST.forEach(runAppTests);
   } else {
+    printChangeSummary();
     determineBuildTargets().forEach(runAppTests);
   }
 }

@@ -61,7 +61,7 @@ function determineBuildTargets() {
     .forEach(buildTargets.add, buildTargets);
 
   if (buildTargets.size === 0) {
-    // Default to running all test targets if no other targets are matched.
+    log('Testing all apps because this PR affects common infrastructure...');
     APPS_TO_TEST.forEach(buildTargets.add, buildTargets);
   }
 

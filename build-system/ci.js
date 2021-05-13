@@ -55,7 +55,24 @@ function isPushBuild() {
   return env('GITHUB_EVENT_NAME') === 'push';
 }
 
+/**
+ * Returns the name of the PR branch.
+ * @return {string}
+ */
+function ciPullRequestBranch() {
+  return env('GITHUB_HEAD_REF');
+}
+/**
+ * Returns the commit SHA being tested by a PR build.
+ * @return {string}
+ */
+function ciPullRequestSha() {
+  return require(env('GITHUB_EVENT_PATH')).pull_request.head.sha;
+}
+
 module.exports = {
+  ciPullRequestBranch,
+  ciPullRequestSha,
   isCiBuild,
   isPullRequestBuild,
   isPushBuild,
