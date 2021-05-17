@@ -36,7 +36,7 @@
     "@types/express": "4.17.11",
     "@types/jest": "26.0.23",
     "@types/mustache": "4.1.1",
-    "@types/node": "13.13.51",
+    "@types/node": "13.13.52",
     "@types/node-fetch": "2.5.10",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "4.10.0",
