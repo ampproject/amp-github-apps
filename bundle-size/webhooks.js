@@ -35,9 +35,8 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       output: {
         title: 'Calculating new bundle size for this PR…',
         summary:
-          'The bundle size (brotli compressed size of `v0.js`) ' +
-          'of this pull request is being calculated. Look for the ' +
-          'shard that contains "Bundle Size" in its title.',
+          'Calculating bundle sizes (brotli compressed) with the changes from this pull request. ' +
+          'Look for the shard that contains "Bundle Size" in its title.',
       },
     });
     const check = await context.octokit.checks.create(params);
