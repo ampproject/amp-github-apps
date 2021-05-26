@@ -1,0 +1,62 @@
+steps:
+  # The first two steps are required to identify and inject un-redacted secrets.
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - install
+      - yaml
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - run
+      - replace-secrets
+      - --
+      - webhook-pubsub-publisher
+    secretEnv:
+      - WEBHOOK_SECRET
+      - GITHUB_CLIENT_SECRET
+      - PRIVATE_KEY
+
+  # Install app dependencies
+  - name: gcr.io/cloud-builders/npm
+    dir: webhook-pubsub-publisher
+    args:
+      - install
+
+  # Compile the app from Typescript into dist/.
+  - name: gcr.io/cloud-builders/npm
+    dir: webhook-pubsub-publisher
+    args:
+      - run
+      - build
+
+  # Copy over the environment and package file.
+  - name: ubuntu
+    dir: webhook-pubsub-publisher
+    args:
+      - cp
+      - .env
+      - package.json
+      - dist/
+
+  # Deploy the app.
+  - name: gcr.io/cloud-builders/gcloud
+    dir: webhook-pubsub-publisher
+    args:
+      - functions
+      - deploy
+      - webhook
+      - --source
+      - dist/
+      - --entry-point
+      - probot
+
+# Overall cloud build timeout
+timeout: 1800s
+
+# These secrets are the base64-encoded form of encrypted secret values. They are
+# automatically decrypted and added to the `.env` environment at build time.
+secrets:
+  - kmsKeyName: projects/amp-webhook-pubsub-publisher/locations/global/keyRings/amp-github-apps-keyring/cryptoKeys/app-env-key
+    secretEnv:
+      WEBHOOK_SECRET: CiQACI6USGEhYTRVwsz43kfZNUC2GRXvaozMIn+FiZunw/0AUjMSVQCKstHDdvlEC2jzBdvdWauy/CcqwKGaFzTLCJrOt7cLCJ4P9c0Xhwwx2ZDXejJvbWNMC3uK+5T7kAoOUFlHcDJafg/M6nhDKvRS6OLjOpRkNbvSY+c=
+      GITHUB_CLIENT_SECRET: CiQACI6USGv2K13bIy/RDkqzxQPYOQL8xPmPlShPsor03n0WRTkSUACKstHDx4I8OB/t31b7QSGeZg+39WXxyD8k8fiuXpaLm/BgdCY0d0Bxb8q3L71BxRv/J02JU30EIM4jXIkqWIsGFHE7yP62TB1o5zvtNS2n
+      PRIVATE_KEY: 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

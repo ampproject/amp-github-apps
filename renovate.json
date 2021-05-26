@@ -94,5 +94,12 @@
     "reviewers": ["danielrozenberg"],
     "rebaseWhen": "never",
     "automerge": true
+  }, {
+    "matchPaths": ["webhook-pubsub-publisher/**"],
+    "labels": ["Category: Webhook Pub/Sub Publisher"],
+    "groupName": "webhook-pubsub-publisher packages",
+    "reviewers": ["danielrozenberg"],
+    "rebaseWhen": "never",
+    "automerge": true
   }]
 }
