@@ -14,109 +14,89 @@
   "prBodyColumns": ["Package", "Update", "Type", "Change", "Package file"],
   "reviewersSampleSize": 1,
   "prBodyNotes": [
-    "See all other Renovate PRs on the [Dependency Dashboard](https://github.com/ampproject/amp-github-apps/issues/1019)"
+    "See all other Renovate PRs on the [Dependency Dashboard](https://github.com/ampproject/amp-github-apps/issues/1338)"
   ],
 
   "packageRules": [{
-    "packagePatterns": [".*"],
-    "groupName": "core packages"
+    "matchFiles": ["package.json"],
+    "groupName": "core packages",
+    "automerge": true,
+    "assignAutomerge": true
   }, {
-    "paths": ["bundle-size/**"],
+    "matchPaths": ["bundle-size/**"],
     "labels": ["Category: Bundle Size"],
     "groupName": "bundle-size packages",
     "reviewers": ["danielrozenberg"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "bundle-size-"
-    }
-  }, {
-    "paths": ["bundle-size-chart/**"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["bundle-size-chart/**"],
     "labels": ["Category: Bundle Size Chart"],
     "groupName": "bundle-size-chart packages",
     "reviewers": ["danielrozenberg"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "bundle-size-chart-"
-    }
-  }, {
-    "paths": ["error-monitoring/**"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["error-monitoring/**"],
     "labels": ["Category: Error Monitoring"],
     "groupName": "error-monitoring packages",
     "reviewers": ["rcebulko"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "error-monitoring-"
-    }
-  }, {
-    "paths": ["invite/**"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["invite/**"],
     "labels": ["Category: Invite"],
     "groupName": "invite packages",
-    "reviewers": ["rcebulko"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "invite-"
-    }
-  }, {
-    "paths": ["onduty/**"],
+    "reviewers": ["rileyajones"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["onduty/**"],
     "groupName": "onduty packages",
     "reviewers": ["rcebulko"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "onduty-"
-    }
-  }, {
-    "paths": ["owners/**"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["owners/**"],
     "labels": ["Category: Owners"],
     "groupName": "owners packages",
     "reviewers": ["rcebulko"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "owners-"
-    }
-  }, {
-    "paths": ["pr-deploy/**"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["pr-deploy/**"],
     "labels": ["Category: PR Deploy"],
     "groupName": "pr-deploy packages",
     "reviewers": ["estherkim"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "pr-deploy-"
-    }
-  }, {
-    "paths": ["project-metrics/**"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["project-metrics/**"],
     "labels": ["Category: Project Metrics"],
     "groupName": "project-metrics packages",
-    "reviewers": ["rcebulko"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "project-metrics-"
-    }
-  }, {
-    "paths": ["release-calendar/**"],
+    "reviewers": ["rileyajones"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["release-calendar/**"],
     "labels": ["Category: Release Calendar"],
     "groupName": "release-calendar packages",
     "reviewers": ["estherkim"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "release-calendar-"
-    }
-  }, {
-    "paths": ["test-case-reporting/**"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["test-case-reporting/**"],
     "labels": ["Category: Test Cases"],
     "groupName": "test-case-reporting packages",
-    "reviewers": ["rcebulko"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "test-case-reporting-"
-    }
-  }, {
-    "paths": ["test-status/**"],
+    "reviewers": ["rileyajones"],
+    "automerge": true,
+    "assignAutomerge": true
+}, {
+    "matchPaths": ["test-status/**"],
     "labels": ["Category: Test Status"],
     "groupName": "test-status packages",
     "reviewers": ["danielrozenberg"],
-    "major": {
-      "groupName": null,
-      "additionalBranchPrefix": "test-status-"
-    }
-  }]
+    "automerge": true,
+    "assignAutomerge": true
+}]
 }
