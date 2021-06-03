@@ -71,6 +71,7 @@
       "properties": {
         "name": {
           "oneOf": [
+            {"$ref": "#/definitions/Bot"},
             {"$ref": "#/definitions/User"},
             {"$ref": "#/definitions/Team"},
             {"$ref": "#/definitions/Wildcard"}
