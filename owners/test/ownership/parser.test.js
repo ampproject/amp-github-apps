@@ -210,6 +210,15 @@ describe('owners parser', () => {
       });
     });
 
+    describe('bot owner declarations', () => {
+      it('returns a bot owner', () => {
+        const {owner} = parseOwnerDefinition({
+          name: 'botowner[bot]',
+        });
+        expect(owner).toEqual(new UserOwner('botowner[bot]'));
+      });
+    });
+
     describe('team owner declarations', () => {
       it('returns a team owner', () => {
         const {owner} = parseOwnerDefinition({
