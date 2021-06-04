@@ -6,13 +6,10 @@
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "A web service that suggests approvers for a GitHub pull request based on OWNERS files and enforces reviews by OWNERS as a GitHub status check.",
   "scripts": {
-    "lint": "eslint .",
-    "fix": "npm run lint -- --fix",
     "init": "node scripts/warm_cache.js",
     "dev": "node info_server.js",
     "start": "probot run ./index.js",
     "deploy-tag": "git tag 'deploy-owners-'`date -u '+%Y%m%d%H%M%S'`",
-    "pretest": "npm run lint",
     "test": "jest --reporters=jest-silent-reporter",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
@@ -30,7 +27,6 @@
     "sleep-promise": "9.1.0"
   },
   "devDependencies": {
-    "eslint": "7.27.0",
     "jest": "26.6.3",
     "jest-silent-reporter": "0.5.0",
     "nock": "13.1.0",

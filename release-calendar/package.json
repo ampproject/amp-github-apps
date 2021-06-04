@@ -11,11 +11,8 @@
   },
   "scripts": {
     "deploy-tag": "git tag 'deploy-release-calendar-'`date -u '+%Y%m%d%H%M%S'`",
-    "lint": "eslint . --quiet --ext .ts,.tsx ",
-    "fix": "npm lint -- --fix",
     "client": "webpack serve --mode development --open --hot --config webpack.client.dev.config.js",
     "client-build-prod": "webpack --config webpack.client.prod.config.js",
-    "pretest": "npm run lint",
     "server": "npm run server-build && npm run server-serve",
     "server-build": "webpack --config webpack.server.config.js",
     "server-serve": "node -r dotenv/config dist/bundle-server.js",
@@ -43,8 +40,6 @@
     "@types/react": "16.9.56",
     "@types/react-dom": "16.9.13",
     "@types/webpack-dev-server": "3.11.4",
-    "@typescript-eslint/eslint-plugin": "4.7.0",
-    "@typescript-eslint/parser": "4.7.0",
     "body-parser": "1.19.0",
     "css-loader": "5.0.2",
     "dotenv": "8.2.0",
@@ -76,15 +71,8 @@
     "webpack-node-externals": "2.5.2"
   },
   "devDependencies": {
-    "eslint": "7.13.0",
-    "eslint-config-prettier": "6.15.0",
-    "eslint-plugin-notice": "0.9.10",
-    "eslint-plugin-prettier": "3.1.4",
-    "eslint-plugin-react": "7.21.5",
-    "eslint-plugin-sort-imports-es6-autofix": "0.5.0",
     "jest": "26.6.3",
     "jest-silent-reporter": "0.5.0",
-    "prettier": "2.1.2",
     "ts-jest": "26.4.4"
   },
   "jest": {

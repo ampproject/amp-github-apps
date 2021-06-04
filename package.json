@@ -10,9 +10,9 @@
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
   "scripts": {
-    "start": "node build-system/pr-check.js",
-    "lint": "eslint . --ext .ts,.tsx",
-    "fix": "eslint . --ext .ts,.tsx --fix",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "fix": "npm run lint -- --fix",
+    "test": "npm run lint",
     "replace-secrets": "node bin/replace-secrets.js",
     "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },
@@ -30,6 +30,7 @@
     "eslint-plugin-sort-requires": "2.1.0",
     "kleur": "4.1.4",
     "prettier": "2.3.0",
+    "react": "17.0.2",
     "typescript": "4.3.2",
     "yaml": "1.10.2"
   }

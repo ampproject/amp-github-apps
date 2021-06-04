@@ -24,7 +24,6 @@ module.exports = {
   'parser': '@typescript-eslint/parser',
   'extends': [
     'plugin:@typescript-eslint/recommended',
-    'prettier/@typescript-eslint',
     './.eslintrc-es6.js'
   ],
   "ignorePatterns": [
