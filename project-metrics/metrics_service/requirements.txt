@@ -5,7 +5,7 @@ attrs==21.2.0
 cachetools==4.2.2
 certifi==2021.5.30
 chardet==4.0.0
-Click==8.0.1
+Click==10.0.1
 cycler==0.10.0
 decorator==5.0.9
 Flask==2.0.1
@@ -29,7 +29,7 @@ MarkupSafe==2.0.1
 matplotlib==3.4.2
 more-itertools==8.8.0
 networkx==2.5.1
-ninja==1.10.0.post2
+ninja==2.00.0.post2
 numpy==1.20.3
 packaging==20.9
 pluggy==0.13.1
