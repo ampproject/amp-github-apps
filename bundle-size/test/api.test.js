@@ -376,9 +376,8 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
-        'base64'
-      );
+      baseBundleSizeFixture.content =
+        Buffer.from('{"dist/v0.js":12}').toString('base64');
 
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -468,9 +467,8 @@ describe('bundle-size api', () => {
 
       modify(pullRequestFixture);
 
-      baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
-        'base64'
-      );
+      baseBundleSizeFixture.content =
+        Buffer.from('{"dist/v0.js":12}').toString('base64');
 
       await request(probot.server)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -519,9 +517,8 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
-        'base64'
-      );
+      baseBundleSizeFixture.content =
+        Buffer.from('{"dist/v0.js":12}').toString('base64');
       const reviews = getFixture('reviews');
       reviews[0].user.login = 'choumx';
       github.pulls.listReviews.mockResolvedValue({data: reviews});
@@ -866,9 +863,8 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content = Buffer.from('{"dist/v0.js":12}').toString(
-        'base64'
-      );
+      baseBundleSizeFixture.content =
+        Buffer.from('{"dist/v0.js":12}').toString('base64');
 
       github.repos.getContent.returnValue = {
         'dist/v0.*': {approvers: ['ampproject/wg-performance'], threshold: 0.1},

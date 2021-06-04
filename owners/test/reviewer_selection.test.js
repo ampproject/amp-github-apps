@@ -335,9 +335,8 @@ describe('reviewer selection', () => {
     });
 
     it('picks one of the reviewers with the most files', () => {
-      const [bestReviewer, filesCovered] = ReviewerSelection._pickBestReview(
-        fileTreeMap
-      );
+      const [bestReviewer, filesCovered] =
+        ReviewerSelection._pickBestReview(fileTreeMap);
 
       expect(['child', 'thirdChild']).toContain(bestReviewer);
       expect(filesCovered.length).toEqual(2);
