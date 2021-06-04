@@ -126,9 +126,8 @@ class ReviewerSelection {
     let deepestRules;
     do {
       deepestRules = this._deepestOwnersRules(fileTreeMap, backoff++);
-      potentialReviewers = this._reviewersForRules(deepestRules).filter(
-        isAllowedReviewer
-      );
+      potentialReviewers =
+        this._reviewersForRules(deepestRules).filter(isAllowedReviewer);
 
       if (potentialReviewers.length) {
         return potentialReviewers;
