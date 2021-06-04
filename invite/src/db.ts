@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 import Knex from 'knex';
 

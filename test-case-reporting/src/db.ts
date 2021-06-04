@@ -21,7 +21,7 @@ export type Database = Knex;
 function getConnectionHost(): string {
   const {DB_SOCKET_PATH, DB_INSTANCE_CONNECTION_NAME} = process.env;
   if (DB_SOCKET_PATH && DB_INSTANCE_CONNECTION_NAME) {
-    return `${DB_SOCKET_PATH}/${DB_INSTANCE_CONNECTION_NAME}`
+    return `${DB_SOCKET_PATH}/${DB_INSTANCE_CONNECTION_NAME}`;
   }
 
   // localhost is used if host is not provided.

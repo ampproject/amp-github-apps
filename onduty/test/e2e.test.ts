@@ -34,11 +34,11 @@ describe('On-Duty Bot', () => {
 
   beforeEach(() => {
     nock.cleanAll();
-    response = ({
+    response = {
       send: jest.fn(),
       sendStatus: jest.fn(),
       status: jest.fn(),
-    } as unknown) as Response;
+    } as unknown as Response;
   });
 
   afterEach(() => {

@@ -54,26 +54,26 @@ function initializeRouter(app: Application) {
     Number(process.env.INSTALLATION_ID)
   );
   router.use(express.json());
-  router.use(async (request, response, next) => {
+  router.use(async(request, response, next) => {
     response.locals.github = await github;
     next();
   });
 
-  router.post('/:headSha/success/:externalId', async (request, response) => {
+  router.post('/:headSha/success/:externalId', async(request, response) => {
     const {headSha, externalId} = request.params;
     const pr = new PullRequest(response.locals.github, headSha);
     await pr.buildCompleted(externalId);
     response.status(200).end();
   });
 
-  router.post('/:headSha/errored', async (request, response) => {
+  router.post('/:headSha/errored', async(request, response) => {
     const {headSha} = request.params;
     const pr = new PullRequest(response.locals.github, headSha);
     await pr.buildErrored();
     response.status(200).end();
   });
 
-  router.post('/:headSha/skipped', async (request, response) => {
+  router.post('/:headSha/skipped', async(request, response) => {
     const {headSha} = request.params;
     const pr = new PullRequest(response.locals.github, headSha);
     await pr.buildSkipped();

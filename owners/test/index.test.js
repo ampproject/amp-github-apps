@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/* eslint max-len: 0 */
 const fs = require('fs');
 const nock = require('nock');
 const owners = require('..');

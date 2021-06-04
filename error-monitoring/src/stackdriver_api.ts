@@ -88,9 +88,8 @@ export class StackdriverApi {
     const serviceKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
     const groupKey = opts.groupId || 'NO_GROUP';
     const cacheKey = `${serviceKey}-${groupKey}`;
-    let errorGroups:
-      | undefined
-      | Array<Stackdriver.ErrorGroupStats> = this.cache.get(cacheKey);
+    let errorGroups: undefined | Array<Stackdriver.ErrorGroupStats> =
+      this.cache.get(cacheKey);
 
     if (!errorGroups) {
       const {errorGroupStats = []} = (await this.request('groupStats', 'GET', {

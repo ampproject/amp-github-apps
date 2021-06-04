@@ -17,6 +17,7 @@
 import {Application, Context} from 'probot';
 import {Octokit} from '@octokit/rest';
 import Webhooks from '@octokit/webhooks';
+import dotenv from 'dotenv';
 
 import {InviteBot} from './src/invite_bot';
 
@@ -29,7 +30,7 @@ type CommentWebhookPayload =
 
 export default (app: Application): void => {
   if (process.env.NODE_ENV !== 'test') {
-    require('dotenv').config();
+    dotenv.config();
   }
 
   const helpUserToTag = process.env.HELP_USER_TO_TAG || null;
@@ -42,7 +43,7 @@ export default (app: Application): void => {
     return new InviteBot(
       // This type-cast is required because Probot exports a separate GitHubAPI
       // class, even though it's in Octokit instance.
-      (github as unknown) as Octokit,
+      github as unknown as Octokit,
       payload.repository.owner.login,
       process.env.ALLOW_TEAM_SLUG,
       helpUserToTag,
@@ -120,7 +121,7 @@ export default (app: Application): void => {
       log,
     }: Context<Webhooks.WebhookPayloadOrganization>) => {
       const inviteBot = new InviteBot(
-        (github as unknown) as Octokit,
+        github as unknown as Octokit,
         payload.organization.login,
         process.env.ALLOW_TEAM_SLUG,
         helpUserToTag,

@@ -37,7 +37,7 @@ declare module 'invite-bot' {
     username: string;
     repo: string;
     issue_number: number;
-    action: InviteAction;
+    action: InviteActionType;
     archived?: boolean;
     created_at?: Date;
   }

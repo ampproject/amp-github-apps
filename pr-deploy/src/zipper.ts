@@ -38,13 +38,13 @@ export async function decompressAndMove(
     externalId
   );
   const buildArtifactZipUrl = await fetch(buildArtifactJsonUrl)
-    .then(res => res.json())
+    .then(async res => res.json())
     .then((json: Array<{[key: string]: string}>) =>
       json.find(item => item['path'].endsWith('/amp_nomodule_build.tar.gz'))
     )
     .then(item => item['url']);
 
-  return await new Promise(async (resolve, reject) => {
+  return await new Promise(async(resolve, reject) => {
     const res = await fetch(buildArtifactZipUrl);
     res.body.pipe(gunzip()).pipe(
       tar

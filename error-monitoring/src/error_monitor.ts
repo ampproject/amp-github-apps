@@ -48,10 +48,8 @@ const SERVICE_GROUPS: Record<ServiceName, ServiceGroup> = {
  * what it would be in production traffic.
  */
 function scaleFactor(serviceName: ServiceName): number {
-  const {
-    diversionPercent: prodPercent,
-    throttleRate: prodThrottle,
-  } = SERVICE_GROUPS[ServiceName.PRODUCTION];
+  const {diversionPercent: prodPercent, throttleRate: prodThrottle} =
+    SERVICE_GROUPS[ServiceName.PRODUCTION];
   const {diversionPercent, throttleRate} = SERVICE_GROUPS[serviceName];
   return (prodPercent * prodThrottle) / (diversionPercent * throttleRate);
 }

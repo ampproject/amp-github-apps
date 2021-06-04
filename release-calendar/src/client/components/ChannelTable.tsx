@@ -60,7 +60,8 @@ export class ChannelTable extends React.Component<
   }
 
   async componentDidMount(): Promise<void> {
-    const currentReleases: CurrentReleases = await this.apiService.getCurrentPromotions();
+    const currentReleases: CurrentReleases =
+      await this.apiService.getCurrentPromotions();
     this.setState({currentReleases: currentReleases.map});
   }
 

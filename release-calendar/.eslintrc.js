@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-const path = require('path');
-
 module.exports = {
   'root': true,
   'plugins': [
@@ -36,26 +34,24 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
-    'prettier/@typescript-eslint',
   ],
   'parserOptions': {
     'ecmaVersion': 6,
     'sourceType': 'module',
     'ecmaFeatures': {
-      'jsx': true
+      'jsx': true,
     },
-    'project': path.resolve(__dirname, './tsconfig.json')
+    'project': 'release-calendar/tsconfig.json',
+    'createDefaultProgram': true,
   },
   'settings': {
     'react': {
-      'version': 'detect'
+      'version': 'detect',
     },
   },
   'rules': {
     '@typescript-eslint/await-thenable': 'error',
-    '@typescript-eslint/type-annotation-spacing': 'error',
     '@typescript-eslint/no-unused-vars': 'error',
-    '@typescript-eslint/semi': 'error',
     'camel-case': 'off', //off for @typescript-eslint rule
     'indent': 'off', //off for @typescript-eslint rule
     'no-dupe-keys': 'error',
@@ -76,33 +72,33 @@ module.exports = {
       'error',
       {
         'mustMatch': 'Copyright 20\\d{2} The AMP HTML Authors\\.',
-        'templateFile': path.resolve(__dirname, '../build-system/LICENSE-TEMPLATE.txt'),
+        'templateFile': 'build-system/LICENSE-TEMPLATE.txt',
         'messages': {
-          'whenFailedToMatch': 'Missing or incorrect license header'
-        }
-      }
+          'whenFailedToMatch': 'Missing or incorrect license header',
+        },
+      },
     ],
     'object-shorthand': 'error',
     'prettier/prettier': 'error',
     'prefer-const': 'error',
     'react/jsx-uses-react': 'off',
-    'react/react-in-jsx-scope': 'off',    
+    'react/react-in-jsx-scope': 'off',
     'semi': 'off', //off for @typescript-eslint rule
     'sort-imports-es6-autofix/sort-imports-es6': [
       'error',
       {
         'ignoreCase': false,
         'ignoreMemberSort': false,
-        'memberSyntaxSortOrder': ['none', 'all', 'multiple', 'single']
-      }
+        'memberSyntaxSortOrder': ['none', 'all', 'multiple', 'single'],
+      },
     ],
   },
   'overrides': [
     {
       'files': ['server.js', 'webpack.*.config.js'],
       'rules': {
-        '@typescript-eslint/no-var-requires': 'off'
+        '@typescript-eslint/no-var-requires': 'off',
       },
-    }
+    },
   ],
-}
+};

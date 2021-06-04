@@ -57,7 +57,7 @@ describe('test pr deploy app', () => {
     nock.enableNetConnect();
   });
 
-  test('creates a check when a pull request is opened', async () => {
+  test('creates a check when a pull request is opened', async() => {
     const prOpenedEvent: Webhooks.WebhookEvent<Webhooks.EventPayloads.WebhookPayloadPullRequest> = {
       id: 'prId',
       name: 'pull_request.opened',
@@ -90,8 +90,8 @@ describe('test pr deploy app', () => {
   });
 
   test(
-    'refreshes the check when a pull request is ' + 'synchronized or reopened',
-    async () => {
+    'refreshes the check when a pull request is synchronized or reopened',
+    async() => {
       nock(apiUrl)
         .get(
           '/repos/test-owner/test-repo/commits/' +
@@ -121,7 +121,7 @@ describe('test pr deploy app', () => {
     }
   );
 
-  test('deploys the PR check when action is triggered', async () => {
+  test('deploys the PR check when action is triggered', async() => {
     nock(apiUrl)
       .get(
         '/repos/test-owner/test-repo/commits/abcde/' +

@@ -60,8 +60,8 @@ function handleError(error: Error, res: express.Response): void {
 function extractPageInfo(req: express.Request): PageInfo {
   const {limit = DEFAULT_PAGE_SIZE, offset = 0} = req.query;
 
-  const limitNum = Math.min(parseInt(limit.toString()), MAX_PAGE_SIZE);
-  const offsetNum = parseInt(offset.toString());
+  const limitNum = Math.min(parseInt(limit.toString(), 10), MAX_PAGE_SIZE);
+  const offsetNum = parseInt(offset.toString(), 10);
 
   return {
     limit: limitNum,
@@ -78,7 +78,7 @@ function enumerateTestRun(
   return {testRun, index};
 }
 
-function lowerCaseStatus({status, ...rest}: TestRun): any {
+function lowerCaseStatus({status, ...rest}: TestRun): {status: string} {
   return {
     status: status.toLowerCase(),
     ...rest,
@@ -108,7 +108,7 @@ app.get('/', async (req, res) => {
       };
       const stats = Object.entries(statTitles).map(([stat, title]) => ({
         stat,
-        title
+        title,
       }));
 
       res.send(

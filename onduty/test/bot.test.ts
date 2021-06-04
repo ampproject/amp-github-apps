@@ -46,7 +46,7 @@ describe('OndutyBot', () => {
   };
 
   beforeEach(() => {
-    github = new GitHub(({} as unknown) as Octokit, 'test_org', fakeConsole);
+    github = new GitHub({} as unknown as Octokit, 'test_org', fakeConsole);
     jest.spyOn(github, 'getTeamMembers');
     jest.spyOn(github, 'addToTeam').mockResolvedValue(undefined);
     jest.spyOn(github, 'removeFromTeam').mockResolvedValue(undefined);

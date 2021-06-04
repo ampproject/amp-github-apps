@@ -24,7 +24,6 @@ module.exports = {
   'parser': '@typescript-eslint/parser',
   'extends': [
     'plugin:@typescript-eslint/recommended',
-    'prettier/@typescript-eslint',
     './.eslintrc-es6.js'
   ],
   "ignorePatterns": [
@@ -41,9 +40,7 @@ module.exports = {
   'rules': {
     '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/promise-function-async': 'error',
-    '@typescript-eslint/type-annotation-spacing': 'error',
     '@typescript-eslint/no-unused-vars': 'error',
-    '@typescript-eslint/semi': 'error',
 
     // TODO(#1103): Migrate to @typescript-eslint/naming-convention option
     '@typescript-eslint/camelcase': 'off',

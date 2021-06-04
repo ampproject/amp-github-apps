@@ -17,7 +17,8 @@
 import {StackFrame} from 'error-monitoring';
 
 const SOURCE_PREFIX = 'https://raw.githubusercontent.com/ampproject/amphtml/';
-const SOURCE_PATTERN = /^(?<rtv>\d+)\/(?<path>[^:]+):(?<line>\d+)(?<column>:\d+)?$/;
+const SOURCE_PATTERN =
+  /^(?<rtv>\d+)\/(?<path>[^:]+):(?<line>\d+)(?<column>:\d+)?$/;
 
 /** Formats a date for display in a GitHub issue. */
 export function formatDate(date: Date): string {

@@ -10,8 +10,6 @@
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
   "scripts": {
-    "lint": "eslint . --ext .ts",
-    "fix": "npm run lint -- --fix",
     "build": "tsc -p . --esModuleInterop",
     "dev": "nodemon",
     "gcp-build": "npm run build",
@@ -43,9 +41,6 @@
     "@types/node-fetch": "1.6.9",
     "@types/supertest": "2.0.10",
     "@types/tar-stream": "2.2.0",
-    "@typescript-eslint/eslint-plugin": "4.6.1",
-    "@typescript-eslint/parser": "4.6.1",
-    "eslint": "7.12.1",
     "jest": "26.6.3",
     "jest-silent-reporter": "0.5.0",
     "nodemon": "2.0.7",

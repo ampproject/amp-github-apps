@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-const path = require('path');
-
 module.exports = {
   extends: ['../.eslintrc-ts.js'],
-  "parserOptions": {
-    "project": path.resolve(__dirname, './tsconfig.json')
+  parserOptions: {
+    project: 'invite/tsconfig.json',
+    createDefaultProgram: true,
   },
   // Because of interactions with the GitHub API and the names of database
   // columns, it is cleanest to use `issue_number` throughout the codebase
   // instead of the camel-case equivalent. Snake-case is also required for
   // object parameters passed to Octokit invocations.
-  "rules": {
-    "camelcase": "off"
-  }
+  rules: {
+    camelcase: 'off',
+  },
 };

@@ -10,19 +10,19 @@
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
   "scripts": {
-    "start": "node build-system/pr-check.js",
-    "lint": "eslint . --ext .ts,.tsx",
-    "fix": "eslint . --ext .ts,.tsx --fix",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "fix": "npm run lint -- --fix",
+    "test": "npm run lint",
     "replace-secrets": "node bin/replace-secrets.js",
     "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "2.34.0",
-    "@typescript-eslint/parser": "2.34.0",
+    "@typescript-eslint/eslint-plugin": "4.26.0",
+    "@typescript-eslint/parser": "4.26.0",
     "babel-eslint": "10.1.0",
-    "eslint": "6.8.0",
+    "eslint": "7.27.0",
     "eslint-config-google": "0.14.0",
-    "eslint-config-prettier": "6.15.0",
+    "eslint-config-prettier": "8.3.0",
     "eslint-plugin-notice": "0.9.10",
     "eslint-plugin-prettier": "3.4.0",
     "eslint-plugin-react": "7.24.0",
@@ -30,7 +30,8 @@
     "eslint-plugin-sort-requires": "2.1.0",
     "kleur": "4.1.4",
     "prettier": "2.3.0",
-    "typescript": "3.9.9",
+    "react": "17.0.2",
+    "typescript": "4.3.2",
     "yaml": "1.10.2"
   }
 }
