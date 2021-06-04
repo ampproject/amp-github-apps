@@ -58,9 +58,8 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
   async componentDidUpdate(prevProps: CalendarProps): Promise<void> {
     if (prevProps.singleRelease != this.props.singleRelease) {
       if (this.props.singleRelease) {
-        const promotionsOfSingleRelease = await this.apiService.getSinglePromotions(
-          this.props.singleRelease,
-        );
+        const promotionsOfSingleRelease =
+          await this.apiService.getSinglePromotions(this.props.singleRelease);
         this.setState((prevState: CalendarState) => ({
           singleEvents: getSingleReleaseEvents(
             promotionsOfSingleRelease,

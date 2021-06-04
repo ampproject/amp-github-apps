@@ -27,10 +27,10 @@ import nock from 'nock';
 
 describe('ErrorMonitor', () => {
   let monitor: ErrorMonitor;
-  const stackdriver = ({
+  const stackdriver = {
     listGroups: jest.fn(),
     setGroupIssue: jest.fn(),
-  } as unknown) as StackdriverApi;
+  } as unknown as StackdriverApi;
 
   const prodStableService: Stackdriver.ServiceContext = {
     service: 'CDN Production',
@@ -232,9 +232,9 @@ describe('ErrorMonitor', () => {
 
 describe('ServiceErrorMonitor', () => {
   let monitor: ServiceErrorMonitor;
-  const stackdriver = ({
+  const stackdriver = {
     listServiceGroups: jest.fn(),
-  } as unknown) as StackdriverApi;
+  } as unknown as StackdriverApi;
 
   const prodStableService: Stackdriver.ServiceContext = {
     service: 'CDN Production',

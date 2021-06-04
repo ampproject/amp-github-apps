@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 import {
   ERROR_ISSUE_ENDPOINT,
@@ -215,16 +216,15 @@ function viewData({
   normalizedThreshold,
   errorReports,
 }: ErrorList.JsonResponse): ErrorList.ViewData {
-  const serviceTypeList: Array<ErrorList.ServiceTypeView> = VALID_SERVICE_TYPES.map(
-    name => ({
+  const serviceTypeList: Array<ErrorList.ServiceTypeView> =
+    VALID_SERVICE_TYPES.map(name => ({
       name,
       formattedName:
         name === 'DEVELOPMENT'
           ? '1% / Opt-In'
           : name.charAt(0).toUpperCase() + name.substr(1).toLowerCase(),
       selected: name === serviceType,
-    })
-  );
+    }));
 
   return {
     serviceType,

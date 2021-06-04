@@ -29,7 +29,7 @@ describe('GitHub', () => {
   };
 
   beforeEach(() => {
-    octokit = ({
+    octokit = {
       teams: {
         listMembersInOrg: jest.fn().mockResolvedValue({
           data: [{login: 'aUser'}, {login: 'someone'}],
@@ -39,7 +39,7 @@ describe('GitHub', () => {
           .mockResolvedValue(undefined),
         removeMembershipForUserInOrg: jest.fn().mockResolvedValue(undefined),
       },
-    } as unknown) as Octokit;
+    } as unknown as Octokit;
     github = new GitHub(octokit, 'test_org', fakeConsole);
   });
 

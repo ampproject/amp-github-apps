@@ -15,9 +15,7 @@
  */
 
 import {
-  Build,
   DB,
-  Job,
   KarmaReporter,
   PageInfo,
   TestRun,
@@ -64,13 +62,13 @@ describe('TestResultRecord', () => {
     url: 'http://travis.org/job/413413.6',
   };
 
-  const sampleKarmaReport: KarmaReporter.TestResultReport = (getFixture(
+  const sampleKarmaReport: KarmaReporter.TestResultReport = getFixture(
     'sample-karma-report'
-  ) as unknown) as KarmaReporter.TestResultReport;
+  ) as unknown as KarmaReporter.TestResultReport;
 
-  const smallerSampleKarmaReport: KarmaReporter.TestResultReport = (getFixture(
+  const smallerSampleKarmaReport: KarmaReporter.TestResultReport = getFixture(
     'sample-karma-report-smaller'
-  ) as unknown) as KarmaReporter.TestResultReport;
+  ) as unknown as KarmaReporter.TestResultReport;
 
   const sampleTravisReport: Travis.Report = {
     job: sampleJob,
@@ -253,8 +251,7 @@ describe('TestResultRecord', () => {
           },
           {
             id: 'e3c1257d76c0b4d0f0c1307161ab5424',
-            name:
-              'when the moon hits your eye | when i was a young boy | when the fires come | it skips',
+            name: 'when the moon hits your eye | when i was a young boy | when the fires come | it skips',
           },
         ]);
       });
@@ -324,10 +321,11 @@ describe('TestResultRecord', () => {
 
     describe('getTestRunsOfBuild', () => {
       it('only gets the test runs of one build', async () => {
-        let testRuns: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
-          '12123434',
-          defaultPageInfo
-        );
+        let testRuns: Array<TestRun> =
+          await testResultRecord.getTestRunsOfBuild(
+            '12123434',
+            defaultPageInfo
+          );
         expect(testRuns).toHaveLength(18);
 
         testRuns = await testResultRecord.getTestRunsOfBuild(
@@ -339,15 +337,17 @@ describe('TestResultRecord', () => {
       });
 
       it('gets correct items with pagination', async () => {
-        const testRunsPage1: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
-          '12123434',
-          {offset: 0, limit: 3}
-        );
+        const testRunsPage1: Array<TestRun> =
+          await testResultRecord.getTestRunsOfBuild('12123434', {
+            offset: 0,
+            limit: 3,
+          });
 
-        const testRunsPage3: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
-          '12123434',
-          {offset: 6, limit: 3}
-        );
+        const testRunsPage3: Array<TestRun> =
+          await testResultRecord.getTestRunsOfBuild('12123434', {
+            offset: 6,
+            limit: 3,
+          });
         expect(testRunsPage1).toHaveLength(3);
         expect(testRunsPage3).toHaveLength(3);
 
@@ -356,10 +356,8 @@ describe('TestResultRecord', () => {
       });
 
       it('gets an empty list if build is not in the database', async () => {
-        const testRuns: Array<TestRun> = await testResultRecord.getTestRunsOfBuild(
-          '404',
-          defaultPageInfo
-        );
+        const testRuns: Array<TestRun> =
+          await testResultRecord.getTestRunsOfBuild('404', defaultPageInfo);
 
         expect(testRuns).toEqual([]);
       });
@@ -367,10 +365,11 @@ describe('TestResultRecord', () => {
 
     describe('getTestCaseHistory', () => {
       it('gets the test case history in reverse chronological order (most recent first)', async () => {
-        const testRuns: Array<TestRun> = await testResultRecord.getTestCaseHistory(
-          md5('case | 1'),
-          defaultPageInfo
-        );
+        const testRuns: Array<TestRun> =
+          await testResultRecord.getTestCaseHistory(
+            md5('case | 1'),
+            defaultPageInfo
+          );
 
         expect(testRuns).toHaveLength(7);
 
@@ -380,10 +379,11 @@ describe('TestResultRecord', () => {
       });
 
       it('gets an empty list if test case is not in the database', async () => {
-        const testRuns: Array<TestRun> = await testResultRecord.getTestCaseHistory(
-          md5('404 | I do not exist'),
-          defaultPageInfo
-        );
+        const testRuns: Array<TestRun> =
+          await testResultRecord.getTestCaseHistory(
+            md5('404 | I do not exist'),
+            defaultPageInfo
+          );
 
         expect(testRuns).toEqual([]);
       });

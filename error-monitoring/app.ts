@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 import {errorIssue, errorList, errorMonitor, linkIssue, topIssueList} from '.';
 import {json, urlencoded} from 'body-parser';

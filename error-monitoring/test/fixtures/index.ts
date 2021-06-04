@@ -31,5 +31,5 @@ export function getFixture(name: string): Record<string, unknown> {
 
 export function getGraphQLResponse(ref: string, path: string): GraphQLResponse {
   const basename = path.replace(/\./g, '_').replace(/\//g, '-');
-  return (getFixture(`${ref}/${basename}`) as unknown) as GraphQLResponse;
+  return getFixture(`${ref}/${basename}`) as unknown as GraphQLResponse;
 }
