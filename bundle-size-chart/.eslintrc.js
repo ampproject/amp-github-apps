@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-const path = require('path');
-
 module.exports = {
   extends: ['../.eslintrc-ts.js'],
-  "parserOptions": {
-    "project": path.resolve(__dirname, './tsconfig.json')
+  parserOptions: {
+    project: 'bundle-size-chart/tsconfig.json',
+    createDefaultProgram: true,
   },
 };
