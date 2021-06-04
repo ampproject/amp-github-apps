@@ -16,21 +16,21 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@octokit/graphql": "4.5.9",
+    "@octokit/graphql": "4.6.2",
     "@octokit/rest": "16.43.2",
     "body-parser": "1.19.0",
-    "dotenv": "8.2.0",
+    "dotenv": "8.6.0",
     "express": "4.17.1",
     "google-auth-library": "6.1.6",
     "http-status-codes": "2.1.4",
-    "mustache": "4.1.0",
+    "mustache": "4.2.0",
     "node-cache": "5.1.2",
     "node-fetch": "2.6.1",
     "querystring": "0.2.1"
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "1.7.1",
-    "@types/express": "4.17.11",
+    "@types/express": "4.17.12",
     "@types/jest": "26.0.23",
     "@types/mustache": "4.1.1",
     "@types/node": "13.13.52",
@@ -39,7 +39,7 @@
     "jest-silent-reporter": "0.5.0",
     "nock": "11.9.1",
     "nodemon": "2.0.7",
-    "ts-jest": "26.4.4",
+    "ts-jest": "26.5.6",
     "ts-node": "9.1.1"
   },
   "standard": {
