@@ -25,10 +25,10 @@ import {
   Travis,
 } from 'test-case-reporting';
 import {Database} from './db';
-import {QueryBuilder} from 'knex';
+import {Knex} from 'knex';
 import md5 from 'md5';
 
-type QueryFunction = (q: QueryBuilder) => QueryBuilder;
+type QueryFunction = (q: Knex.QueryBuilder) => Knex.QueryBuilder;
 
 /* eslint-disable camelcase */
 /**
@@ -306,7 +306,7 @@ export class TestResultRecord {
       .offset(offset);
 
     /* eslint-disable camelcase */
-    return dbBuilds.map(({commit_sha, build_number, started_at}) => ({
+    return dbBuilds.map(({commit_sha, build_number, started_at}: DB.Build) => ({
       commitSha: commit_sha,
       buildNumber: build_number,
       startedAt: new Date(started_at),

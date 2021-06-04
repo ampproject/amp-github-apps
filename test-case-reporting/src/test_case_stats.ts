@@ -15,8 +15,8 @@
  */
 
 import {Database} from './db';
+import {Knex} from 'knex';
 import {TestStatus} from 'test-case-reporting';
-import Knex from 'knex';
 
 const TEST_STATUSES: Array<TestStatus> = ['PASS', 'FAIL', 'SKIP', 'ERROR'];
 

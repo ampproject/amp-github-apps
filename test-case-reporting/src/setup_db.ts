@@ -17,13 +17,14 @@
 require('dotenv').config();
 
 import {Database, dbConnect} from './db';
+import {Knex} from 'knex';
 
 const TIMESTAMP_PRECISION = 3;
 
 /** Set up the database table. */
 export async function setupDb(db: Database): Promise<unknown> {
   return db.schema
-    .createTable('builds', table => {
+    .createTable('builds', (table: Knex.CreateTableBuilder) => {
       table.increments('id').primary();
       table.string('commit_sha', 40);
       table.string('build_number');
@@ -33,7 +34,7 @@ export async function setupDb(db: Database): Promise<unknown> {
         .defaultTo(db.fn.now())
         .notNullable();
     })
-    .createTable('jobs', table => {
+    .createTable('jobs', (table: Knex.CreateTableBuilder) => {
       table.increments('id').primary();
       table.integer('build_id').unsigned().notNullable();
       table.string('job_number');
@@ -46,7 +47,7 @@ export async function setupDb(db: Database): Promise<unknown> {
 
       table.foreign('build_id').references('id').inTable('builds');
     })
-    .createTable('test_cases', table => {
+    .createTable('test_cases', (table: Knex.CreateTableBuilder) => {
       table
         // MD5 hash of the name
         // table.string('id', 32) makes a varchar, which has poor performance when indexing.
@@ -62,7 +63,7 @@ export async function setupDb(db: Database): Promise<unknown> {
         .defaultTo(db.fn.now())
         .notNullable();
     })
-    .createTable('test_runs', table => {
+    .createTable('test_runs', (table: Knex.CreateTableBuilder) => {
       table.increments('id').primary();
       table.integer('job_id').unsigned().notNullable();
       table.specificType('test_case_id', 'char(32)').notNullable();
@@ -80,7 +81,7 @@ export async function setupDb(db: Database): Promise<unknown> {
       table.foreign('job_id').references('id').inTable('jobs');
     })
 
-    .createTable('test_case_stats', table => {
+    .createTable('test_case_stats', (table: Knex.CreateTableBuilder) => {
       table.increments('id').primary();
       table.specificType('test_case_id', 'char(32)').notNullable();
       table.integer('sample_size').unsigned().notNullable();
