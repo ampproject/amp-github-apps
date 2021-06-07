@@ -29,26 +29,28 @@ process.env.GH_REPO = 'test-repo';
 
 import nock from 'nock';
 import prDeployAppFn from '../src/app';
-import Webhooks from '@octokit/webhooks';
-import {Probot, ProbotOctokit} from 'probot';
+import {WebhookEvent} from '@octokit/webhooks';
+import {CheckRunRequestedActionEvent, PullRequestEvent} from '@octokit/webhooks-types';
+import {Probot, ProbotOctokit, Server} from 'probot';
 
 const apiUrl = 'https://api.github.com';
 
 describe('test pr deploy app', () => {
-  let probot: Probot;
+  let server: Server;
 
   beforeEach(() => {
     nock.disableNetConnect();
-    probot = new Probot({
-      id: 1,
-      githubToken: 'test',
+    server = new Server({
+      Probot: Probot.defaults({
+        githubToken: 'test',
       // Disable throttling & retrying requests for easier testing
-      Octokit: ProbotOctokit.defaults({
-        retry: {enabled: false},
-        throttle: {enabled: false},
+        Octokit: ProbotOctokit.defaults({
+          retry: {enabled: false},
+          throttle: {enabled: false},
+        }),
       }),
     });
-    probot.load(prDeployAppFn);
+    server.load(prDeployAppFn); 
   });
 
   afterEach(() => {
@@ -58,7 +60,7 @@ describe('test pr deploy app', () => {
   });
 
   test('creates a check when a pull request is opened', async() => {
-    const prOpenedEvent: Webhooks.WebhookEvent<Webhooks.EventPayloads.WebhookPayloadPullRequest> = {
+    const prOpenedEvent: WebhookEvent<PullRequestEvent> = {
       id: 'prId',
       name: 'pull_request.opened',
       payload: {
@@ -67,7 +69,7 @@ describe('test pr deploy app', () => {
           owner: {name: 'test-owner'},
           name: 'test-repo',
         },
-      } as Webhooks.EventPayloads.WebhookPayloadPullRequest,
+      } as PullRequestEvent
     };
 
     nock(apiUrl)
@@ -86,7 +88,7 @@ describe('test pr deploy app', () => {
       })
       .reply(200);
 
-    await probot.receive(prOpenedEvent);
+    await server.probotApp.receive(prOpenedEvent);
   });
 
   test(
@@ -108,16 +110,16 @@ describe('test pr deploy app', () => {
         })
         .reply(200);
 
-      const prSynchronizedEvent: Webhooks.WebhookEvent<Webhooks.EventPayloads.WebhookPayloadPullRequest> = {
+      const prSynchronizedEvent: WebhookEvent<PullRequestEvent> = {
         id: 'prId',
         name: 'pull_request.synchronize',
         payload: {
           pull_request: {head: {sha: 'abcde'}},
           repository: {owner: {name: 'test-owner'}, name: 'test-repo'},
-        } as Webhooks.EventPayloads.WebhookPayloadPullRequest,
+        } as PullRequestEvent
       };
 
-      await probot.receive(prSynchronizedEvent);
+      await server.probotApp.receive(prSynchronizedEvent);
     }
   );
 
@@ -136,20 +138,22 @@ describe('test pr deploy app', () => {
       .times(2)
       .reply(201);
 
-    const requestedActionEvent: Webhooks.WebhookEvent<Webhooks.EventPayloads.WebhookPayloadCheckRun> = {
+    const requestedActionEvent: WebhookEvent<CheckRunRequestedActionEvent> = {
       id: 'prId',
       name: 'check_run.requested_action',
       payload: {
-        action: 'deploy-me-action',
         check_run: {
+          id: 1,
           name: 'test-check',
           head_sha: 'abcde',
           pull_requests: [{head: {sha: 'abcde'}}],
         },
         repository: {owner: {name: 'test-owner'}, name: 'test-repo'},
-      } as Webhooks.EventPayloads.WebhookPayloadCheckRun,
+        requested_action: {},
+        sender: {},
+      } as CheckRunRequestedActionEvent
     };
 
-    await probot.receive(requestedActionEvent);
+    await server.probotApp.receive(requestedActionEvent);
   });
 });
