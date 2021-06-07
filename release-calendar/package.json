@@ -32,7 +32,7 @@
     "@material-ui/icons": "4.11.2",
     "@material-ui/lab": "4.0.0-alpha.58",
     "@popperjs/core": "2.9.2",
-    "@types/express-rate-limit": "5.1.1",
+    "@types/express-rate-limit": "5.1.2",
     "@types/jest": "26.0.23",
     "@types/moment-timezone": "0.5.30",
     "@types/node": "14.17.2",
