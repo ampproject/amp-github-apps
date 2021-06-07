@@ -35,7 +35,6 @@ const {log, logWithoutTimestamp} = require('./log');
  * @param {string} cmd command to execute.
  */
 function timedExecOrDie(cmd) {
-  log('Running', cyan(cmd) + '...');
   const startTime = Date.now();
   console.log(`::group::${cmd}`);
   execOrDie(cmd);
