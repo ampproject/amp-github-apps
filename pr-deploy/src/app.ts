@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {Application} from 'probot';
-import express, {IRouter} from 'express';
+import {Probot, ApplicationFunctionOptions} from 'probot';
+import express from 'express';
 import {PullRequest} from './github';
 import {decompressAndMove} from './zipper';
 import {Octokit} from '@octokit/rest';
@@ -26,7 +26,7 @@ const BASE_URL = `https://storage.googleapis.com/${process.env.SERVE_BUCKET}/`;
  * Creates or resets the GitHub PR Deploy check
  * when a pull request is opened or synchronized.
  */
-function initializeCheck(app: Application) {
+function initializeCheck(app: Probot) {
   app.on(
     [
       'pull_request.opened',
@@ -35,7 +35,7 @@ function initializeCheck(app: Application) {
     ],
     async context => {
       const pr = new PullRequest(
-        context.github,
+        context.octokit,
         context.payload.pull_request.head.sha
       );
       return pr.createOrResetCheck();
@@ -48,8 +48,7 @@ function initializeCheck(app: Application) {
  * complete. When received, updates the PR check status to 'complete' so that
  * the check run action to deploy site is enabled.
  */
-function initializeRouter(app: Application) {
-  const router: IRouter = app.route('/v0/pr-deploy/headshas');
+function initializeRouter(app: Probot, router: express.Router) {
   const github: Promise<Octokit> = app.auth(
     Number(process.env.INSTALLATION_ID)
   );
@@ -85,14 +84,14 @@ function initializeRouter(app: Application) {
  * Creates a listener that deploys the PR branch to gs://amp-test-website-1/<pull_request_id>
  * when the 'Deploy me!' button is clicked.
  */
-function initializeDeployment(app: Application) {
+function initializeDeployment(app: Probot) {
   app.on('check_run.requested_action', async context => {
     if (context.payload.check_run.name != process.env.GH_CHECK) {
       return;
     }
 
     const pr = new PullRequest(
-      context.github,
+      context.octokit,
       context.payload.check_run.head_sha
     );
     try {
@@ -111,10 +110,10 @@ function initializeDeployment(app: Application) {
   });
 }
 
-const prDeployAppFn = (app: Application) => {
+const prDeployAppFn = (app: Probot, {getRouter}: ApplicationFunctionOptions) => {
   initializeCheck(app);
-  initializeRouter(app);
-  initializeDeployment(app);
+  initializeRouter(app, getRouter('/v0/pr-deploy/headshas'));
+  initializeDeployment(app);  
 };
 
 export default prDeployAppFn;

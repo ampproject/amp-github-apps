@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import {Octokit, RestEndpointMethodTypes as Types} from '@octokit/rest';
+import {Octokit} from '@octokit/rest';
+import {RestEndpointMethodTypes as Types} from '@octokit/plugin-rest-endpoint-methods';
 
 type ChecksCreateParams = Types['checks']['create']['parameters'];
 type ChecksGetResponseData = Types['checks']['get']['response']['data'];
@@ -35,11 +36,11 @@ const repo = process.env.GH_REPO;
 
 export class PullRequest {
   public headSha: string;
-  private github: Octokit;
+  private octokit: Octokit;
 
-  constructor(github: Octokit, headSha: string) {
+  constructor(octokit: Octokit, headSha: string) {
     this.headSha = headSha;
-    this.github = github;
+    this.octokit = octokit;
   }
 
   /**
@@ -69,7 +70,7 @@ export class PullRequest {
       },
     };
 
-    return this.github.checks.update(params);
+    return this.octokit.checks.update(params);
   }
 
   /**
@@ -102,7 +103,7 @@ export class PullRequest {
       },
     };
 
-    return this.github.checks.update(params);
+    return this.octokit.checks.update(params);
   }
 
   /**
@@ -125,7 +126,7 @@ export class PullRequest {
       actions: ACTIONS,
     };
 
-    return this.github.checks.update(params);
+    return this.octokit.checks.update(params);
   }
 
   /**
@@ -152,7 +153,7 @@ export class PullRequest {
       actions: ACTIONS,
     };
 
-    return this.github.checks.update(params);
+    return this.octokit.checks.update(params);
   }
 
   /**
@@ -175,7 +176,7 @@ export class PullRequest {
       },
     };
 
-    return this.github.checks.update(params);
+    return this.octokit.checks.update(params);
   }
 
   /**
@@ -200,7 +201,7 @@ export class PullRequest {
       },
     };
 
-    return this.github.checks.update(params);
+    return this.octokit.checks.update(params);
   }
 
   /**
@@ -221,7 +222,7 @@ export class PullRequest {
       },
     };
 
-    return this.github.checks.create(params);
+    return this.octokit.checks.create(params);
   }
 
   /**
@@ -243,7 +244,7 @@ export class PullRequest {
       status: 'queued',
       output,
     };
-    return this.github.checks.update(params);
+    return this.octokit.checks.update(params);
   }
 
   /**
@@ -257,7 +258,7 @@ export class PullRequest {
       check_name,
     };
 
-    const checks = await this.github.checks.listForRef(params);
+    const checks = await this.octokit.checks.listForRef(params);
     if (!checks || !checks.data || checks.data.total_count != 1) {
       return null;
     }
