@@ -36,9 +36,15 @@ const {log, logWithoutTimestamp} = require('./log');
  */
 function timedExecOrDie(cmd) {
   const startTime = Date.now();
-  console.log(`::group::${cmd}`);
+  if (isCiBuild()) {
+    logWithoutTimestamp(`::group::${cmd}`);
+  } else {
+    log('Running', cyan(cmd) + '...');
+  }
   execOrDie(cmd);
-  console.log('::endgroup::');
+  if (isCiBuild()) {
+    logWithoutTimestamp('::endgroup::');
+  }
   const endTime = Date.now();
   const executionTime = endTime - startTime;
   const mins = Math.floor(executionTime / 60000);
