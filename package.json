@@ -12,7 +12,6 @@
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "fix": "npm run lint -- --fix",
-    "test": "npm run lint",
     "replace-secrets": "node bin/replace-secrets.js",
     "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },
