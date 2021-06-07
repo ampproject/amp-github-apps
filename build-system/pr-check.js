@@ -39,7 +39,7 @@ function runAppTests(appName) {
  */
 function runRootTests() {
   log('Running root-level tests...');
-  timedExecOrDie(`npm test -u`);
+  timedExecOrDie(`npm run lint`);
   log('Done running root-level tests\n\n');
 }
 
