@@ -21,7 +21,7 @@ const {dbConnect} = require('../db');
 const {getFixture} = require('./_test_helper');
 const {GitHubUtils} = require('../github-utils');
 const {installApiRouter} = require('../api');
-const {Probot} = require('probot');
+const {Probot, Server, ProbotOctokit} = require('probot');
 const {setupDb} = require('../setup-db');
 
 nock.disableNetConnect();
@@ -31,11 +31,11 @@ jest.mock('sleep-promise', () => () => Promise.resolve());
 
 describe('bundle-size api', () => {
   let github;
-  let probot;
-  let app;
+  let server;
   const db = dbConnect();
   const nodeCache = new NodeCache();
   let logWarnSpy;
+  let logErrorSpy;
 
   beforeAll(async () => {
     await setupDb(db);
@@ -69,15 +69,25 @@ describe('bundle-size api', () => {
       },
     };
 
-    probot = new Probot({});
-    app = probot.load((app, {getRouter}) => {
+    server = new Server({
+      Probot: Probot.defaults({
+        githubToken: 'test',
+        // Disable throttling & retrying requests for easier testing
+        Octokit: ProbotOctokit.defaults({
+          retry: {enabled: false},
+          throttle: {enabled: false},
+        }),
+      }),
+    });
+    server.load((app, {getRouter}) => {
       const githubUtils = new GitHubUtils(github, app.log, nodeCache);
       installApiRouter(app, getRouter('/v0'), db, githubUtils);
-    });
-    app.auth = () => github;
 
-    // Stub app.log.warn to silence test log noise
-    logWarnSpy = jest.spyOn(app.log, 'warn').mockImplementation();
+      app.auth = () => github;
+      // Stub app.log.warn/error to silence test log noise.
+      logWarnSpy = jest.spyOn(app.log, 'warn').mockImplementation();
+      logErrorSpy = jest.spyOn(app.log, 'error').mockImplementation();
+    });
 
     nodeCache.flushAll();
 
@@ -90,13 +100,13 @@ describe('bundle-size api', () => {
   });
 
   afterEach(async () => {
+    logWarnSpy.mockRestore();
+    logErrorSpy.mockRestore();
     await db('checks').truncate();
   });
 
-  afterAll(async done => {
-    logWarnSpy.mockRestore();
+  afterAll(async () => {
     await db.destroy();
-    done();
   });
 
   describe('/commit/:headSha/skip', () => {
@@ -112,7 +122,7 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
         .expect(200);
 
@@ -145,7 +155,7 @@ describe('bundle-size api', () => {
     });
 
     test('ignore marking a check "skipped" for a missing head SHA', async () => {
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
         .expect(404);
 
@@ -208,7 +218,7 @@ describe('bundle-size api', () => {
           `{"dist/v0.js":${baseSize}}`
         ).toString('base64');
 
-        await request(probot.server)
+        await request(server.expressApp)
           .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
@@ -260,7 +270,7 @@ describe('bundle-size api', () => {
         '{"dist/v0.js": 12.34,"dist/v0/amp-accordion-0.1.js":1.11,"dist/v0/amp-ad-0.1.js": 4.53,"dist/v0/amp-anim-0.1.js": 5.65}'
       ).toString('base64');
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -337,7 +347,7 @@ describe('bundle-size api', () => {
         })
       ).toString('base64');
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -379,7 +389,7 @@ describe('bundle-size api', () => {
       baseBundleSizeFixture.content =
         Buffer.from('{"dist/v0.js":12}').toString('base64');
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -470,7 +480,7 @@ describe('bundle-size api', () => {
       baseBundleSizeFixture.content =
         Buffer.from('{"dist/v0.js":12}').toString('base64');
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -523,7 +533,7 @@ describe('bundle-size api', () => {
       reviews[0].user.login = 'choumx';
       github.pulls.listReviews.mockResolvedValue({data: reviews});
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -594,7 +604,7 @@ describe('bundle-size api', () => {
         return Promise.resolve({data: getFixture(fixture)});
       });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -662,7 +672,7 @@ describe('bundle-size api', () => {
         return Promise.resolve({data: getFixture(fixture)});
       });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -741,7 +751,7 @@ describe('bundle-size api', () => {
         return Promise.resolve({data: getFixture(fixture)});
       });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send({
           ...jsonPayload,
@@ -814,7 +824,7 @@ describe('bundle-size api', () => {
         return Promise.resolve({data: getFixture(fixture)});
       });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -870,7 +880,7 @@ describe('bundle-size api', () => {
         'dist/v0.*': {approvers: ['ampproject/wg-performance'], threshold: 0.1},
       };
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -896,7 +906,7 @@ describe('bundle-size api', () => {
     });
 
     test('ignore bundle-size report for a missing head SHA', async () => {
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -942,7 +952,7 @@ describe('bundle-size api', () => {
         },
       },
     ])('ignore bundle-size report with incorrect input: %p', async data => {
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(data)
         .set('Content-Type', 'application/json')
@@ -967,7 +977,7 @@ describe('bundle-size api', () => {
     test('store new bundle-size', async () => {
       github.repos.getContent.mockRejectedValue({status: 404});
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -986,7 +996,7 @@ describe('bundle-size api', () => {
     });
 
     test('ignore already existing bundle-size when called to store', async () => {
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -1003,10 +1013,7 @@ describe('bundle-size api', () => {
         new Error('I am a tea pot')
       );
 
-      // Stub app.log.error to silence test log noise for expected errors
-      const logErrorSpy = jest.spyOn(app.log, 'error').mockImplementation();
-
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -1026,7 +1033,7 @@ describe('bundle-size api', () => {
     test('fail on non-numeric values when called to store bundle-size', async () => {
       jsonPayload.bundleSizes['dist/shadow-v0.js'] = '23.45KB';
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -1040,7 +1047,7 @@ describe('bundle-size api', () => {
     test('fail on missing values when called to store bundle-size', async () => {
       delete jsonPayload.bundleSizes;
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -1054,7 +1061,7 @@ describe('bundle-size api', () => {
     test('rejects calls to store without the CI token', async () => {
       jsonPayload.token = 'wrong token';
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
