@@ -17,94 +17,82 @@
     "matchFiles": ["package.json"],
     "groupName": "core packages",
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["bundle-size/**"],
     "labels": ["Category: Bundle Size"],
     "groupName": "bundle-size packages",
     "reviewers": ["danielrozenberg"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["bundle-size-chart/**"],
     "labels": ["Category: Bundle Size Chart"],
     "groupName": "bundle-size-chart packages",
     "reviewers": ["danielrozenberg"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["error-monitoring/**"],
     "labels": ["Category: Error Monitoring"],
     "groupName": "error-monitoring packages",
     "reviewers": ["rcebulko"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["invite/**"],
     "labels": ["Category: Invite"],
     "groupName": "invite packages",
     "reviewers": ["rileyajones"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["onduty/**"],
     "groupName": "onduty packages",
     "reviewers": ["rcebulko"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["owners/**"],
     "labels": ["Category: Owners"],
     "groupName": "owners packages",
     "reviewers": ["rcebulko"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["pr-deploy/**"],
     "labels": ["Category: PR Deploy"],
     "groupName": "pr-deploy packages",
     "reviewers": ["estherkim"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["project-metrics/**"],
     "labels": ["Category: Project Metrics"],
     "groupName": "project-metrics packages",
     "reviewers": ["rileyajones"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["release-calendar/**"],
     "labels": ["Category: Release Calendar"],
     "groupName": "release-calendar packages",
     "reviewers": ["estherkim"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["test-case-reporting/**"],
     "labels": ["Category: Test Cases"],
     "groupName": "test-case-reporting packages",
     "reviewers": ["rileyajones"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }, {
     "matchPaths": ["test-status/**"],
     "labels": ["Category: Test Status"],
     "groupName": "test-status packages",
     "reviewers": ["danielrozenberg"],
     "rebaseWhen": "never",
-    "automerge": true,
-    "assignAutomerge": true
+    "automerge": true
   }]
 }
