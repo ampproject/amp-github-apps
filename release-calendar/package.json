@@ -35,7 +35,7 @@
     "@types/express-rate-limit": "5.1.2",
     "@types/jest": "26.0.23",
     "@types/moment-timezone": "0.5.30",
-    "@types/node": "14.17.2",
+    "@types/node": "14.17.3",
     "@types/node-fetch": "2.5.10",
     "@types/react": "17.0.9",
     "@types/react-dom": "17.0.6",
