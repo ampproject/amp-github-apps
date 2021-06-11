@@ -18,6 +18,7 @@ import {ReleaseCard} from './ReleaseCard';
 import {usePopper} from 'react-popper';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {viewport} from '@popperjs/core';
 
 const TOOLTIP_HEIGHT = 300;
 
