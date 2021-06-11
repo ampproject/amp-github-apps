@@ -22,7 +22,7 @@
   "dependencies": {
     "@google-cloud/storage": "5.8.5",
     "@octokit/rest": "18.5.6",
-    "@octokit/types": "6.16.3",
+    "@octokit/types": "6.16.4",
     "@types/express": "4.17.12",
     "@types/node": "14.17.3",
     "csv-writer": "1.6.0",
