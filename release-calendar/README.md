@@ -19,10 +19,10 @@ To build the client for production: `npn run client-build-prod`
 * Make sure to set `ENV.NODE_ENV` to `production`
 * This uses React's production build
 
-To generate test data: `npm run setup`  
-To build the server: `npm run server-build`  
-To serve the server: `npm run server-serve`  
-To build and serve the server: `npm run server`  
+To generate test data: `npm run setup`
+To build the server: `npm run server-build`
+To serve the server: `npm run server-serve`
+To build and serve the server: `npm run server`
 
 To run tests: `npm run test`
 To lint: `npm run lint`
@@ -34,5 +34,5 @@ To lint: `npm run lint`
 4. In a different terminal, run `npm run client` to start the client.
 
 #### Deploy to production
-1. Create a tag: `git tag release-calendar-<date>` where `<date>` is in YYMMDDHHmmss
-2. Push the tag to remote: `git tag <remote> release-calendar-<date>` where `<remote>` is `git@github.com:ampproject/amp-github-apps.git` or an alias, likely `upstream`
+1. Create a tag: `git tag deploy-release-calendar-<date>` where `<date>` is in YYMMDDHHmmss. This can be done easily with `npm run deploy-tag`.
+2. Push the tag to remote: `git tag <remote> deploy-release-calendar-<date>` where `<remote>` is `git@github.com:ampproject/amp-github-apps.git` or an alias, likely `upstream`
