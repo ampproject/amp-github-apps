@@ -28,13 +28,13 @@ const APPS_TO_TEST = [
   'bundle-size',
   'error-monitoring',
   'invite',
-  'webhook-pubsub-publisher',
   'onduty',
   'owners',
   'pr-deploy',
   'release-calendar',
   'test-case-reporting',
   'test-status',
+  'webhook-pubsub-publisher',
 ];
 
 /**
