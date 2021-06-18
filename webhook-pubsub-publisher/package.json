@@ -9,7 +9,7 @@
     "clean": "rm -r dist/",
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
-    "start": "probot run ./dist/app.js",
+    "start": "probot run ./dist/src/app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-webhook-pubsub-publisher-'`date -u '+%Y%m%d%H%M%S'`",
     "test": "jest --reporters=jest-silent-reporter",
