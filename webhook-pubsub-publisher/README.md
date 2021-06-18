@@ -50,3 +50,7 @@ This app is a straight-forward [Probot](https://probot.github.io/) application t
 
 If there are no errors after running the last command then the app is running
 locally on your machine.
+
+## Deployment
+
+This GitHub App is deployed as a [Google Cloud Function](https://cloud.google.com/functions/docs/) at the endpoint: https://us-central1-amp-webhook-pubsub-publisher.cloudfunctions.net/webhook
