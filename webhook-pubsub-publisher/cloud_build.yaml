@@ -34,6 +34,11 @@ steps:
     args:
       - cp
       - .env
+      - dist/
+  - name: ubuntu
+    dir: webhook-pubsub-publisher
+    args:
+      - cp
       - package.json
       - dist/
 
