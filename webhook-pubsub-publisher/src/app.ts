@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-import * as dotenv from 'dotenv';
 import {PubSub} from '@google-cloud/pubsub';
 import type {Context, Probot} from 'probot';
 
 export default (app: Probot): void => {
-  if (process.env.NODE_ENV !== 'test') {
-    dotenv.config();
-  }
-
   app.onAny(async (context: Context): Promise<void> => {
     context.log(`Received "${context.name}" event with ID ${context.id}`);
 
