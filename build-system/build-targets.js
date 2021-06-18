@@ -34,6 +34,7 @@ const APPS_TO_TEST = [
   'release-calendar',
   'test-case-reporting',
   'test-status',
+  'webhook-pubsub-publisher',
 ];
 
 /**
