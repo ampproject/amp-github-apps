@@ -28,26 +28,12 @@ steps:
       - run
       - build
 
-  # Copy over the environment and package file.
-  - name: ubuntu
-    dir: webhook-pubsub-publisher
-    args:
-      - cp
-      - .env
-      - package.json
-      - dist/
-
   # Deploy the app.
   - name: gcr.io/cloud-builders/gcloud
     dir: webhook-pubsub-publisher
     args:
-      - functions
+      - app
       - deploy
-      - webhook
-      - --source
-      - dist/
-      - --entry-point
-      - probot
 
 # Overall cloud build timeout
 timeout: 1800s

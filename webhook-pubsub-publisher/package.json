@@ -9,7 +9,7 @@
     "clean": "rm -r dist/",
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
-    "start": "probot run ./dist/app.js",
+    "start": "probot run ./dist/src/app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-webhook-pubsub-publisher-'`date -u '+%Y%m%d%H%M%S'`",
     "test": "jest --reporters=jest-silent-reporter",
@@ -18,8 +18,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@google-cloud/pubsub": "2.12.0",
-    "@probot/serverless-gcf": "0.2.0",
-    "dotenv": "10.0.0",
     "probot": "11.3.0"
   },
   "devDependencies": {
