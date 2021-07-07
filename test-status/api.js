@@ -191,15 +191,14 @@ function createErroredCheckParams(
   };
 }
 
-exports.installApiRouter = (app, db) => {
-  const tests = app.route('/v0/tests');
-  tests.use(require('express').json());
-  tests.use((request, response, next) => {
+exports.installApiRouter = (app, router, db) => {
+  router.use(require('express').json());
+  router.use((request, response, next) => {
     request.app.set('trust proxy', true);
     next();
   });
 
-  tests.post(
+  router.post(
     '/:headSha/:type/:subType/:status(queued|started|skipped)',
     async (request, response) => {
       const {headSha, type, subType, status} = request.params;
@@ -252,7 +251,7 @@ exports.installApiRouter = (app, db) => {
     }
   );
 
-  tests.post(
+  router.post(
     '/:headSha/:type/:subType/report/:passed/:failed',
     async (request, response) => {
       const {headSha, type, subType, passed, failed} = request.params;
@@ -300,7 +299,7 @@ exports.installApiRouter = (app, db) => {
     }
   );
 
-  tests.post(
+  router.post(
     '/:headSha/:type/:subType/report/errored',
     async (request, response) => {
       const {headSha, type, subType} = request.params;
