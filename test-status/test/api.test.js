@@ -18,7 +18,7 @@ const nock = require('nock');
 const request = require('supertest');
 const {dbConnect} = require('../db-connect');
 const {installApiRouter} = require('../api');
-const {Probot} = require('probot');
+const {Probot, Server, ProbotOctokit} = require('probot');
 const {setupDb} = require('../setup-db');
 
 const HEAD_SHA = '26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa';
@@ -32,8 +32,7 @@ nock.enableNetConnect('127.0.0.1');
 
 describe('test-status/api', () => {
   let github;
-  let probot;
-  let app;
+  let server;
   const db = dbConnect();
 
   beforeAll(async () => {
@@ -48,23 +47,21 @@ describe('test-status/api', () => {
       },
     };
 
-    class Octokit {
-      constructor() {}
-
-      static defaults() {
-        return this;
-      }
-
-      get checks() {
-        return github.checks;
-      }
-    }
-
-    probot = new Probot({Octokit});
-    app = probot.load(app => {
-      installApiRouter(app, db);
+    server = new Server({
+      Probot: Probot.defaults({
+        githubToken: 'test',
+        // Disable throttling & retrying requests for easier testing
+        Octokit: ProbotOctokit.defaults({
+          retry: {enabled: false},
+          throttle: {enabled: false},
+        }),
+      }),
     });
-    app.auth = () => github;
+    server.load((app, {getRouter}) => {
+      installApiRouter(app, getRouter('/v0/tests'), db);
+
+      app.auth = () => github;
+    });
   });
 
   afterEach(async () => {
@@ -90,7 +87,7 @@ describe('test-status/api', () => {
 
     github.checks.create.mockResolvedValue({data: {id: 555555}});
 
-    await request(probot.server)
+    await request(server.expressApp)
       .post(`/v0/tests/${HEAD_SHA}/unit/local/${action}`)
       .expect(200);
 
@@ -133,7 +130,7 @@ describe('test-status/api', () => {
       checkRunId: 555555,
     });
 
-    await request(probot.server)
+    await request(server.expressApp)
       .post(`/v0/tests/${HEAD_SHA}/unit/local/started`)
       .expect(200);
 
@@ -168,7 +165,7 @@ describe('test-status/api', () => {
         checkRunId: 555555,
       });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post(`/v0/tests/${HEAD_SHA}/unit/local/report/${passed}/${failed}`)
         .send({ciJobUrl})
         .expect(200);
@@ -227,7 +224,7 @@ describe('test-status/api', () => {
         checkRunId: 555555,
       });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post(`/v0/tests/${HEAD_SHA}/unit/local/report/${passed}/${failed}`)
         .send({ciJobUrl})
         .expect(200);
@@ -274,7 +271,7 @@ describe('test-status/api', () => {
       checkRunId: 555555,
     });
 
-    await request(probot.server)
+    await request(server.expressApp)
       .post(`/v0/tests/${HEAD_SHA}/unit/local/report/errored`)
       .send({ciJobUrl})
       .expect(200);
@@ -306,7 +303,7 @@ describe('test-status/api', () => {
   });
 
   test('404 for /queued action when pull request was not created', async () => {
-    await request(probot.server)
+    await request(server.expressApp)
       .post(`/v0/tests/${HEAD_SHA}/unit/local/queued`)
       .expect(404, new RegExp(HEAD_SHA));
   });
@@ -314,7 +311,7 @@ describe('test-status/api', () => {
   test.each(['started', 'skipped', 'report/5/0', 'report/errored'])(
     '404 for /%s action when pull request was not created',
     async action => {
-      await request(probot.server)
+      await request(server.expressApp)
         .post(`/v0/tests/${HEAD_SHA}/unit/local/${action}`)
         .send({ciJobUrl})
         .expect(404, new RegExp(HEAD_SHA));
