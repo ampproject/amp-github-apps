@@ -15,7 +15,6 @@
  */
 
 import {Octokit} from '@octokit/rest';
-import {ReposListCommitsResponseData} from '@octokit/types';
 import {Storage} from '@google-cloud/storage';
 import {createObjectCsvStringifier} from 'csv-writer';
 import dotenv from 'dotenv';
@@ -61,13 +60,15 @@ app.get('/_cron', async (request, response) => {
   });
 
   const mainCommits: Array<{sha: string; message: string; date: string}> = [];
-  const options = github.repos.listCommits.endpoint.merge({
-    owner: 'ampproject',
-    repo: 'amphtml',
-    sha: 'main',
-  });
-  for await (const commitsList of github.paginate.iterator(options)) {
-    (commitsList.data as ReposListCommitsResponseData).forEach(commit => {
+  for await (const commitsList of github.paginate.iterator(
+    github.repos.listCommits,
+    {
+      owner: 'ampproject',
+      repo: 'amphtml',
+      sha: 'main',
+    }
+  )) {
+    commitsList.data.forEach(commit => {
       mainCommits.push({
         sha: commit.sha,
         message: commit.commit.message.split('\n')[0],
@@ -95,6 +96,10 @@ app.get('/_cron', async (request, response) => {
         repo: 'amphtml-build-artifacts',
         path: `bundle-size/${mainCommit.sha}.json`,
       });
+      if (!('content' in contents.data)) {
+        console.error(`File for SHA ${mainCommit.sha} has no content`);
+        continue;
+      }
       const bundleSizes = JSON.parse(
         Buffer.from(contents.data.content, 'base64').toString()
       );
