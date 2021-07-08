@@ -20,7 +20,7 @@ const {installGitHubWebhooks} = require('./webhooks');
 
 const db = dbConnect();
 
-module.exports = app => {
+module.exports = (app, {getRouter}) => {
   installGitHubWebhooks(app, db);
-  installApiRouter(app, db);
+  installApiRouter(app, getRouter('/v0/tests'), db);
 };

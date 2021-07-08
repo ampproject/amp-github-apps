@@ -40,7 +40,6 @@ function getFixture(name) {
 
 describe('test-status/webhooks', () => {
   let probot;
-  let app;
   const db = dbConnect();
 
   beforeAll(async () => {
@@ -56,13 +55,16 @@ describe('test-status/webhooks', () => {
       static defaults() {
         return this;
       }
+
+      auth() {
+        return jest.fn();
+      }
     }
 
     probot = new Probot({Octokit});
-    app = probot.load(app => {
+    probot.load(app => {
       installGitHubWebhooks(app, db);
     });
-    app.auth = () => undefined;
   });
 
   afterEach(async () => {
