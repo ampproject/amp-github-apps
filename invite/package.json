@@ -19,9 +19,9 @@
   "dependencies": {
     "@octokit/rest": "16.43.2",
     "@probot/serverless-gcf": "0.2.0",
-    "dotenv": "8.2.0",
-    "knex": "0.21.19",
-    "pg": "8.5.1",
+    "dotenv": "8.6.0",
+    "knex": "0.95.6",
+    "pg": "8.6.0",
     "probot": "9.15.1"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "nock": "12.0.3",
     "nodemon": "2.0.7",
     "sqlite3": "5.0.2",
-    "ts-jest": "26.4.4",
+    "ts-jest": "26.5.6",
     "ts-node": "9.1.1"
   },
   "standard": {
