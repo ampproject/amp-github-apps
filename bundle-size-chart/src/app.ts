@@ -22,7 +22,7 @@ import express from 'express';
 import process from 'process';
 
 const CRON_TIMEOUT_MS = 600000; // 10 minutes, the GAE cron timeout limit.
-const MAX_COMMIT_DAYS = 365;
+const MAX_COMMIT_DAYS = 183;
 const GCLOUD_STORAGE_BUCKET = 'amp-bundle-size-chart';
 
 dotenv.config();
