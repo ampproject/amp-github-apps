@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@octokit/webhooks": "9.6.2",
-    "@octokit/webhooks-types": "3.75.2",
+    "@octokit/webhooks-types": "4.0.2",
     "@types/jest": "26.0.23",
     "@types/node": "14.17.1",
     "jest": "27.0.1",
