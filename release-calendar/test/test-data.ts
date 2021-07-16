@@ -32,8 +32,8 @@ export default async function addTestData(
   const releases = [
     new Release('2004252135000'), // lts
     new Release('2234567890123'), // stable
-    new Release('3234567890123'), // perc-beta and perc-experimental
-    new Release('4234567890123'), // opt-in-beta and opt-in-experimental
+    new Release('3234567890123'), // perc-beta
+    new Release('4234567890123'), // opt-in-beta
     new Release('5234567890123'), // nightly
   ];
 
@@ -47,11 +47,6 @@ export default async function addTestData(
     Channel.PERCENT_BETA,
     Channel.STABLE,
     Channel.LTS,
-  ];
-  const channelsForExperimental = [
-    Channel.NIGHTLY,
-    Channel.OPT_IN_EXPERIMENTAL,
-    Channel.PERCENT_EXPERIMENTAL,
   ];
 
   for (let i = 0; i < releases.length; i++) {
@@ -69,16 +64,6 @@ export default async function addTestData(
         promoteDate,
       );
       promotePromises.push(repositoryService.savePromotions(betaPromotions));
-      if (j < channelsForExperimental.length - 1) {
-        const experimentalPromotions = promoteRelease(
-          releases[i],
-          channelsForExperimental[j + 1],
-          promoteDate,
-        );
-        promotePromises.push(
-          repositoryService.savePromotions(experimentalPromotions),
-        );
-      }
     }
   }
 

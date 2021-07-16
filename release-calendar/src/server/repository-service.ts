@@ -57,9 +57,7 @@ export class RepositoryService {
         Channel.LTS,
         Channel.NIGHTLY,
         Channel.OPT_IN_BETA,
-        Channel.OPT_IN_EXPERIMENTAL,
         Channel.PERCENT_BETA,
-        Channel.PERCENT_EXPERIMENTAL,
         Channel.STABLE,
       ].map((channel) => {
         return this.promotionRepository

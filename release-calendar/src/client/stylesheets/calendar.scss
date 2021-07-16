@@ -79,16 +79,9 @@
   @include color(base.$perc-beta)
 }
 
-.perc-experimental {
-  @include color(base.$perc-experimental)
-}
 
 .opt-in-beta {
   @include color(base.$opt-in-beta);
-}
-
-.opt-in-experimental {
-  @include color(base.$opt-in-experimental);
 }
 
 .nightly {
