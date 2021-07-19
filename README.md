@@ -47,12 +47,6 @@ A ReactJS, Express and MySQL web app that displays AMPHTML release activity on a
 
 The app runs on an instance of [Google AppEngine](https://amp-release-calendar.appspot.com).
 
-### [Test Status Bot](test-status/README.md)
-
-This GitHub App reports the status of different test types on the AMPHTML repository, and allows the build on-duty to skip flaky tests.
-
-The app runs on an instance of Google AppEngine and is installed exclusively on the [`ampproject/amphtml`](https://github.com/ampproject/amphtml) repository.
-
 ### [Webhook Pub/Sub Publisher](webhook-pubsub-publisher/README.md)
 
 Publishes received [webhooks from GitHub](https://docs.github.com/en/developers/webhooks-and-events/webhooks) to a [Google Cloud Pub/Sub](https://cloud.google.com/pubsub) topic.
