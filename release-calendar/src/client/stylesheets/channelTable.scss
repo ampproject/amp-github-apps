@@ -64,14 +64,8 @@ $grey-border:rgb(216, 216, 216)
     .perc-beta{
         @include square(base.$perc-beta);
     }
-    .perc-experimental {
-        @include square(base.$perc-experimental);
-    }
     .opt-in-beta {
         @include square(base.$opt-in-beta);
-    }
-    .opt-in-experimental {
-        @include square(base.$opt-in-experimental);
     }
     .nightly {
         @include square(base.$nightly);
