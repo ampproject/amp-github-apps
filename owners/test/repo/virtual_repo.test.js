@@ -36,7 +36,10 @@ describe('virtual repository', () => {
     sandbox.stub(CloudStorage.prototype, 'delete');
     sandbox.stub(console);
 
-    sandbox.stub(GitHub.prototype, 'getFileContents').resolves('contents');
+    sandbox.stub(GitHub.prototype, 'getFileContents').resolves({
+      contents: 'contents',
+      sha: 'sha',
+    });
     sandbox
       .stub(GitHub.prototype, 'searchFilename')
       .withArgs('OWNERS')
