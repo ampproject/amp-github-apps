@@ -418,14 +418,18 @@ class GitHub {
   async getFileContents(filename) {
     this.logger.info(`Fetching contents of file ${filename}`);
 
-    const response = await this.client.repos.getContent({
+    const {data} = await this.client.repos.getContent({
       owner: this.owner,
       repo: this.repository,
       path: filename,
     });
-    this.logger.debug('[getFileContents]', filename, response.data);
+    this.logger.debug('[getFileContents]', filename, data);
 
-    return Buffer.from(response.data.content, 'base64').toString('utf8');
+    const {content, sha} = data;
+    return {
+      contents: Buffer.from(content, 'base64').toString('utf8'),
+      sha,
+    };
   }
 
   /**
