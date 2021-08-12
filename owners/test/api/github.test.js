@@ -233,8 +233,7 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?per_page=100')
         .reply(200, Array(30).fill([{slug: 'my_team'}]), {
-          link:
-            '<https://api.github.com/orgs/test_owner/teams?page=2&per_page=100>; rel="next"',
+          link: '<https://api.github.com/orgs/test_owner/teams?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams?page=2&per_page=100')
@@ -262,8 +261,7 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams/my_team/members?per_page=100')
         .reply(200, manyTeamsResponsePage1, {
-          link:
-            '<https://api.github.com/orgs/test_owner/teams/my_team/members?page=2&per_page=100>; rel="next"',
+          link: '<https://api.github.com/orgs/test_owner/teams/my_team/members?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get('/orgs/test_owner/teams/my_team/members?page=2&per_page=100')
@@ -307,8 +305,7 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/pulls/23928/reviews?per_page=100')
         .reply(200, manyReviewsPage1Response, {
-          link:
-            '<https://api.github.com/repos/test_owner/test_repo/pulls/23928/reviews?page=2&per_page=100>; rel="next"',
+          link: '<https://api.github.com/repos/test_owner/test_repo/pulls/23928/reviews?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get(
@@ -454,8 +451,7 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/issues/24574/comments?per_page=100')
         .reply(200, issueCommentsResponse, {
-          link:
-            '<https://api.github.com/repos/test_owner/test_repo/issues/24574/comments?page=2&per_page=100>; rel="next"',
+          link: '<https://api.github.com/repos/test_owner/test_repo/issues/24574/comments?page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get(
@@ -549,8 +545,7 @@ describe('GitHub API', () => {
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100')
         .reply(200, listFilesResponsePage1, {
-          link:
-            '<https://api.github.com/repos/test_owner/test_repo/pulls/35/files?per_page=100&page=2>; rel="next"',
+          link: '<https://api.github.com/repos/test_owner/test_repo/pulls/35/files?per_page=100&page=2>; rel="next"',
         });
       nock('https://api.github.com')
         .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100&page=2')
@@ -580,8 +575,7 @@ describe('GitHub API', () => {
           '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&per_page=100'
         )
         .reply(200, searchOwnersPage1Response, {
-          link:
-            '</search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100>; rel="next"',
+          link: '</search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100>; rel="next"',
         });
       nock('https://api.github.com')
         .get(
