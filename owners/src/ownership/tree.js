@@ -206,8 +206,10 @@ module.exports = class OwnersTree {
 
     filenames.forEach(filename => {
       let subtree = this.atPath(filename);
+      this.logger.debug('[buildFileTreeMap]', filename);
       // Walk up the tree until reaching a node with at least one matching rule.
       while (!subtree.rules.some(rule => rule.matchesFile(filename))) {
+        this.logger.debug('[buildFileTreeMap]', filename, subtree.dirPath);
         subtree = subtree.parent;
       }
       fileTreeMap[filename] = subtree;
