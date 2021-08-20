@@ -75,13 +75,8 @@
   @include color(base.$stable);
 }
 
-.perc-beta {
-  @include color(base.$perc-beta)
-}
-
-
-.opt-in-beta {
-  @include color(base.$opt-in-beta);
+.beta {
+  @include color(base.$beta)
 }
 
 .nightly {

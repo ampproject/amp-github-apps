@@ -59,13 +59,8 @@ export class ReleaseCard extends React.Component<
       emoji: '🌙',
       emojiName: 'moon',
     },
-    [Channel.OPT_IN_BETA]: {
-      title: channelTitles[Channel.OPT_IN_BETA].title,
-      emoji: '✋',
-      emojiName: 'hand',
-    },
-    [Channel.PERCENT_BETA]: {
-      title: channelTitles[Channel.PERCENT_BETA].title,
+    [Channel.BETA]: {
+      title: channelTitles[Channel.BETA].title,
       emoji: '🧪',
       emojiName: 'experiment',
     },
