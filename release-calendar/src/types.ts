@@ -17,7 +17,7 @@
 export enum Channel {
   LTS = 'lts',
   STABLE = 'stable',
-  BETA = 'beta',  
+  BETA = 'beta',
   NIGHTLY = 'nightly',
 }
 

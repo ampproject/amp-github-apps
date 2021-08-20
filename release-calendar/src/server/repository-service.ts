@@ -53,20 +53,17 @@ export class RepositoryService {
 
   getCurrentPromotions(): Promise<Promotion[]> {
     return Promise.all(
-      [
-        Channel.LTS,
-        Channel.NIGHTLY,
-        Channel.BETA,        
-        Channel.STABLE,
-      ].map((channel) => {
-        return this.promotionRepository
-          .createQueryBuilder('promotion')
-          .select('promotion.releaseName')
-          .addSelect('promotion.channel')
-          .where('promotion.channel = :channel', {channel})
-          .orderBy('promotion.date', 'DESC')
-          .getOne();
-      }),
+      [Channel.LTS, Channel.NIGHTLY, Channel.BETA, Channel.STABLE].map(
+        (channel) => {
+          return this.promotionRepository
+            .createQueryBuilder('promotion')
+            .select('promotion.releaseName')
+            .addSelect('promotion.channel')
+            .where('promotion.channel = :channel', {channel})
+            .orderBy('promotion.date', 'DESC')
+            .getOne();
+        },
+      ),
     );
   }
 

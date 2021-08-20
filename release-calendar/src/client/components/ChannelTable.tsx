@@ -36,7 +36,7 @@ interface ChannelTableProps {
 
 export const channelTitles: Titles = {
   [Channel.STABLE]: {title: 'Stable'},
-  [Channel.BETA]: {title: 'Beta'},  
+  [Channel.BETA]: {title: 'Beta'},
   [Channel.NIGHTLY]: {title: 'Nightly'},
   [Channel.LTS]: {title: 'Long Term Stable'},
 };

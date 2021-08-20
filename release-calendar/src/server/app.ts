@@ -95,8 +95,8 @@ async function main(): Promise<void> {
         });
       }
 
-      if (promotion) {                
-        promotion.date = moment(promotion.time).toDate();       
+      if (promotion) {
+        promotion.date = moment(promotion.time).toDate();
         await repositoryService.createPromotion(promotion).catch((error) => {
           errors.push(error);
         });

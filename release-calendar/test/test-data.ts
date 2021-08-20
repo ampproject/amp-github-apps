@@ -40,12 +40,7 @@ export default async function addTestData(
   const startDate = new Date(today.setDate(today.getDate() - 20));
   const promotePromises = [];
   const createPromises = [];
-  const channels = [
-    Channel.NIGHTLY,
-    Channel.BETA,
-    Channel.STABLE,
-    Channel.LTS,
-  ];
+  const channels = [Channel.NIGHTLY, Channel.BETA, Channel.STABLE, Channel.LTS];
 
   for (let i = 0; i < releases.length; i++) {
     const newDate = new Date(startDate);
