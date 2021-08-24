@@ -32,8 +32,7 @@ export default async function addTestData(
   const releases = [
     new Release('2004252135000'), // lts
     new Release('2234567890123'), // stable
-    new Release('3234567890123'), // perc-beta
-    new Release('4234567890123'), // opt-in-beta
+    new Release('3234567890123'), // beta
     new Release('5234567890123'), // nightly
   ];
 
@@ -41,13 +40,7 @@ export default async function addTestData(
   const startDate = new Date(today.setDate(today.getDate() - 20));
   const promotePromises = [];
   const createPromises = [];
-  const channelsForBeta = [
-    Channel.NIGHTLY,
-    Channel.OPT_IN_BETA,
-    Channel.PERCENT_BETA,
-    Channel.STABLE,
-    Channel.LTS,
-  ];
+  const channels = [Channel.NIGHTLY, Channel.BETA, Channel.STABLE, Channel.LTS];
 
   for (let i = 0; i < releases.length; i++) {
     const newDate = new Date(startDate);
@@ -55,15 +48,15 @@ export default async function addTestData(
     createPromises.push(
       await repositoryService.createRelease(releases[i], newDate),
     );
-    for (let j = 0; j < channelsForBeta.length - 1 - i; j++) {
+    for (let j = 0; j < channels.length - 1 - i; j++) {
       const promoteDate = new Date(newDate);
       promoteDate.setDate(newDate.getDate() + j + 1);
-      const betaPromotions = promoteRelease(
+      const promotions = promoteRelease(
         releases[i],
-        channelsForBeta[j + 1],
+        channels[j + 1],
         promoteDate,
       );
-      promotePromises.push(repositoryService.savePromotions(betaPromotions));
+      promotePromises.push(repositoryService.savePromotions(promotions));
     }
   }
 
