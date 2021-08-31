@@ -35,4 +35,5 @@ class AbsoluteCoverageMetric(base.PercentageMetric):
     return codecov.CodecovApi().get_absolute_coverage(head_commit.hash) / 100
 
 
+# DO_NOT_SUBMIT commenting out for local development due to credential issue.
 # base.Metric.register(AbsoluteCoverageMetric)

@@ -30,6 +30,15 @@ def _is_last_n_days(
   return (timestamp_column >= n_days_ago) & (timestamp_column <= base_time)
 
 
+class CircleReportingWindow(enum.Enum):
+  """The reporting windows supported by the CircleCI insights api"""
+  LAST_24_HOURS = 'last-24-hours'
+  LAST_7_DAYS = 'last-7-days'
+  LAST_30_DAYS = 'last-30-days'
+  LAST_60_DAYS = 'last-60-days'
+  LAST_90_DAYS = 'last-90-days'
+
+
 class MetricScore(enum.Enum):
   """The computed score of a metric."""
   UNKNOWN = 0
