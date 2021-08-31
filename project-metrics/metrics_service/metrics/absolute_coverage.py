@@ -35,4 +35,4 @@ class AbsoluteCoverageMetric(base.PercentageMetric):
     return codecov.CodecovApi().get_absolute_coverage(head_commit.hash) / 100
 
 
-base.Metric.register(AbsoluteCoverageMetric)
+# base.Metric.register(AbsoluteCoverageMetric)

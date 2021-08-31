@@ -14,13 +14,15 @@ def get_engine() -> sqlalchemy.engine.Engine:
           username=env.get('DB_USER'),
           password=env.get('DB_PASS'),
           database=env.get('DB_NAME'),
-          query={
-              'unix_socket':
-                  '%s/%s' % (env.get('CLOUD_SQL_SOCKET'),
-                             env.get('CLOUD_SQL_INSTANCE_NAME')),
-              'charset':
-                  'utf8mb4',
-          }),
+        #   DO_NOT_SUBMIT this should not occur when using a local database.
+        #   query={
+        #       'unix_socket':
+        #           '%s/%s' % (env.get('CLOUD_SQL_SOCKET'),
+        #                      env.get('CLOUD_SQL_INSTANCE_NAME')),
+        #       'charset':
+        #           'utf8mb4',
+        #   }
+          ),
       echo=False)
 
 

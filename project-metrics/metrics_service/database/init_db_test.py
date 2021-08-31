@@ -23,7 +23,7 @@ class TestInitDb(unittest.TestCase):
   def testMainNoDropFlag(self):
     init_db.init_db(self.engine)
     self.assertCountEqual(self.engine.table_names(),
-                          ['metric_results', 'travis_builds'])
+                          ['metric_results'])
 
   @mock.patch.object(models.Base, 'metadata', autospec=True)
   @flagsaver.flagsaver(drop_schema=True)
