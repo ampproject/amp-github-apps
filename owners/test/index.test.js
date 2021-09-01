@@ -153,12 +153,12 @@ describe('GitHub app', () => {
             });
             expect(body.output.text).toContain(
               '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt'
+                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`'
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
                 'Reviewer: _githubuser_\n' +
-                '- dir2/dir1/dir1/file.txt'
+                '- `dir2/dir1/dir1/file.txt`'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -210,12 +210,12 @@ describe('GitHub app', () => {
             });
             expect(body.output.text).toContain(
               '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt'
+                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`'
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
                 'Reviewer: _githubuser_\n' +
-                '- dir2/dir1/dir1/file.txt'
+                '- `dir2/dir1/dir1/file.txt`'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -263,12 +263,12 @@ describe('GitHub app', () => {
             });
             expect(body.output.text).toContain(
               '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt'
+                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`'
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
                 'Reviewer: _githubuser_\n' +
-                '- dir2/dir1/dir1/file.txt'
+                '- `dir2/dir1/dir1/file.txt`'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -314,14 +314,14 @@ describe('GitHub app', () => {
             });
             expect(body.output.text).toContain(
               '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt\n' +
-                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file-2.txt'
+                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`\n' +
+                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file-2.txt`'
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
                 'Reviewer: _githubuser_\n' +
-                '- dir2/dir1/dir1/file.txt\n' +
-                '- dir2/dir1/dir1/file-2.txt'
+                '- `dir2/dir1/dir1/file.txt`\n' +
+                '- `dir2/dir1/dir1/file-2.txt`'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -376,12 +376,12 @@ describe('GitHub app', () => {
             });
             expect(body.output.text).toContain(
               '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** dir2/dir1/dir1/file.txt'
+                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`'
             );
             expect(body.output.text).toContain(
               '### Suggested Reviewers\n\n' +
                 'Reviewer: _githubuser_\n' +
-                '- dir2/dir1/dir1/file.txt'
+                '- `dir2/dir1/dir1/file.txt`'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -431,7 +431,7 @@ describe('GitHub app', () => {
             });
             expect(body.output.text).toContain(
               '### Current Coverage\n\n' +
-                '- dir2/dir1/dir1/file.txt _(githubuser)_'
+                '- `dir2/dir1/dir1/file.txt` _(githubuser)_'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -478,7 +478,7 @@ describe('GitHub app', () => {
               },
             });
             expect(body.output.text).toContain(
-              '### Current Coverage\n\n- dir2/new-file.txt _(githubuser)_'
+              '### Current Coverage\n\n- `dir2/new-file.txt` _(githubuser)_'
             );
             expect(body.output.text).toContain('HELP TEXT');
 
@@ -530,7 +530,7 @@ describe('GitHub app', () => {
             });
             expect(body.output.text).toContain(
               '### Current Coverage\n\n' +
-                '- dir2/dir1/dir1/file.txt _(githubuser)_'
+                '- `dir2/dir1/dir1/file.txt` _(githubuser)_'
             );
             expect(body.output.text).toContain('HELP TEXT');
 

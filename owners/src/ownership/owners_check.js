@@ -33,6 +33,17 @@ const CheckRunState = {
 };
 
 /**
+ * Wraps filename in backticks to render as inline code.
+ * This prevents accidentally formatting a filename that may contain Markdown,
+ * like _accidental-italics_ or __accidental-bold__
+ * @param {string} filename
+ * @return {string}
+ */
+function getMarkdownPrintableFilename(filename) {
+  return `\`${filename}\``;
+}
+
+/**
  * A GitHub presubmit check-run.
  */
 class CheckRun {
@@ -316,24 +327,25 @@ class OwnersCheck {
           owner => owner.name
         );
 
+        const printableFilename = getMarkdownPrintableFilename(filename);
+
         if (approving.length && !missing.length) {
-          return `- ${filename} _(${approving.join(', ')})_`;
-        } else {
-          let line = `- **[NEEDS APPROVAL]** ${filename}`;
-
-          const names = [];
-          if (pending.length) {
-            names.push(`requested: ${pending.join(', ')}`);
-          }
-          if (missing.length) {
-            names.push(`required: ${missing.join(', ')}`);
-          }
-
-          if (names.length) {
-            line += ` _(${names.join('; ')})_`;
-          }
-          return line;
+          return `- ${printableFilename} _(${approving.join(', ')})_`;
         }
+        let line = `- **[NEEDS APPROVAL]** ${printableFilename}`;
+
+        const names = [];
+        if (pending.length) {
+          names.push(`requested: ${pending.join(', ')}`);
+        }
+        if (missing.length) {
+          names.push(`required: ${missing.join(', ')}`);
+        }
+
+        if (names.length) {
+          line += ` _(${names.join('; ')})_`;
+        }
+        return line;
       })
       .join('\n');
 
@@ -350,7 +362,9 @@ class OwnersCheck {
     const suggestionsText = reviewSuggestions.map(
       ([reviewer, coveredFiles]) => {
         const header = `Reviewer: _${reviewer}_`;
-        const files = coveredFiles.map(filename => `- ${filename}`);
+        const files = coveredFiles.map(
+          filename => `- ${getMarkdownPrintableFilename(filename)}`
+        );
         return [header, ...files].join('\n');
       }
     );
