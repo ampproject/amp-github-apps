@@ -43,5 +43,4 @@ class CherrypickIssueCountMetric(base.Metric):
     session.close()
     return result
 
-# DO_NOT_SUBMIT uncomment this
-# base.Metric.register(CherrypickIssueCountMetric)
+base.Metric.register(CherrypickIssueCountMetric)

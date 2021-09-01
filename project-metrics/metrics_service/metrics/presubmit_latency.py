@@ -20,9 +20,7 @@ class PresubmitLatency(Metric):
 
   def _compute_value(self) -> models.MetricResult:
     workflow_stats = CircleCiAPI().get_workflow_stats()
-    metrics = workflow_stats['metrics']
-    duration_metrics = metrics['duration_metrics']
-    return duration_metrics['mean']
+    return workflow_stats.metrics.duration_metrics.mean
 
   def _format_value(self, avg_seconds: float) -> Text:
     return '%dm' % (avg_seconds // 60)

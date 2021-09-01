@@ -30,13 +30,79 @@ def _is_last_n_days(
   return (timestamp_column >= n_days_ago) & (timestamp_column <= base_time)
 
 
-class CircleReportingWindow(enum.Enum):
+class CircleCiReportingWindow(enum.Enum):
   """The reporting windows supported by the CircleCI insights api"""
   LAST_24_HOURS = 'last-24-hours'
   LAST_7_DAYS = 'last-7-days'
   LAST_30_DAYS = 'last-30-days'
   LAST_60_DAYS = 'last-60-days'
   LAST_90_DAYS = 'last-90-days'
+
+
+class CircleCiWorkflowDurationMetrics():
+  min: int
+  mean: int
+  median: int
+  p95: int
+  max: int
+  standard_deviation: float
+  total_duration: int
+
+  def from_json(dict):
+    metrics = CircleCiWorkflowDurationMetrics()
+    metrics.min = dict['min']
+    metrics.mean = dict['mean']
+    metrics.median = dict['median']
+    metrics.p95 = dict['p95']
+    metrics.max = dict['max']
+    metrics.standard_deviation = dict['standard_deviation']
+    metrics.total_duration = dict['total_duration']
+    return metrics
+
+
+class CircleCiWorkflowMetrics():
+  duration_metrics: CircleCiWorkflowDurationMetrics
+  total_runs: int
+  successful_runs: int
+  mttr: int
+  total_credits_used: int
+  failed_runs: int
+  median_credits_used: int
+  success_rate: float
+  total_recoveries: int
+  throughput: float
+
+  def from_json(dict):
+    metrics = CircleCiWorkflowMetrics()
+    metrics.duration_metrics = CircleCiWorkflowDurationMetrics.from_json(dict['duration_metrics'])
+    metrics.total_runs = dict['total_runs']
+    metrics.successful_runs = dict['successful_runs']
+    metrics.mttr = dict['mttr']
+    metrics.total_credits_used = dict['total_credits_used']
+    metrics.failed_runs = dict['failed_runs']
+    metrics.median_credits_used = dict['median_credits_used']
+    metrics.success_rate = dict['success_rate']
+    metrics.total_recoveries = dict['total_recoveries']
+    metrics.throughput = dict['throughput']
+    return metrics
+
+
+class CircleCiWorkflowStats():
+  project_id: str
+  name: str
+  metrics: CircleCiWorkflowMetrics
+  window_start: datetime.datetime
+  window_end: datetime.datetime
+
+  def from_json(dict):
+    stats = CircleCiWorkflowStats
+    stats.project_id = dict['project_id']
+    stats.name = dict['name']
+    stats.metrics = CircleCiWorkflowMetrics.from_json(dict['metrics'])
+    date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+    stats.window_start = datetime.datetime.strptime(dict['window_start'], date_format)
+    stats.window_end = datetime.datetime.strptime(dict['window_end'], date_format)
+    return stats
 
 
 class MetricScore(enum.Enum):

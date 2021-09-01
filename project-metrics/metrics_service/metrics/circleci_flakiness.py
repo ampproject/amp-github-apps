@@ -19,7 +19,6 @@ class CircleCiFlakiness(PercentageMetric):
 
   def _compute_value(self) -> models.MetricResult:
     workflow_stats = CircleCiAPI().get_workflow_stats()
-    metrics = workflow_stats['metrics']
-    return metrics['failed_runs'] / metrics['total_runs']
+    return workflow_stats.metrics.failed_runs / workflow_stats.metrics.total_runs
   
 base.Metric.register(CircleCiFlakiness)

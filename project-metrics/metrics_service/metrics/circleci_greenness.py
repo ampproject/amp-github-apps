@@ -19,7 +19,6 @@ class CircleCiGreenness(PercentageMetric):
 
   def _compute_value(self) -> models.MetricResult:
     workflow_stats = CircleCiAPI().get_workflow_stats()
-    metrics = workflow_stats['metrics']
-    return metrics['successful_runs'] / metrics['total_runs']
+    return workflow_stats.metrics.success_rate
   
 base.Metric.register(CircleCiGreenness)

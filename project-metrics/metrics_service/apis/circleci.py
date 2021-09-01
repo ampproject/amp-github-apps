@@ -2,10 +2,11 @@
 
 For an overview of the API https://circleci.com/docs/api/v2/
 """
-import datetime
 import json
 from typing import Dict
+from types import SimpleNamespace
 from absl import logging
+import logging
 import requests
 from database import db
 from database import models
@@ -35,20 +36,18 @@ class CircleCiAPI(object):
       return '?' + param_string
     return param_string
 
-  def _fetch_get_workflow_stats(self, reporting_window = models.CircleReportingWindow.LAST_90_DAYS):
+  def get_workflow_stats(self, reporting_window = models.CircleCiReportingWindow.LAST_90_DAYS) -> models.CircleCiWorkflowStats:
     params = {
       'reporting-window': reporting_window.value
     }
     endpoint = '%s/%s' % (INSIGHTS_API, 'workflows')
-    print(endpoint + self._dict_to_params(params))
-    response = requests.get(endpoint + self._dict_to_params(params))
+    logging.info(endpoint + self._dict_to_params(params))
+    headers = { 'authorization': "Basic %s" % env.get('CIRCLECI_API_ACCESS_TOKEN') }
+    response = requests.get(endpoint + self._dict_to_params(params), headers=headers)
     parsed = json.loads(response.text)
     if response.status_code != 200:
       raise CircleCiError(response.status_code, parsed['message'])
-    # DO_NOT_SUBMIT write to the db here
-    print(parsed)
-    return parsed['items'][0]
-  
-  def get_workflow_stats(self, reporting_window = models.CircleReportingWindow.LAST_90_DAYS):
-    return self._fetch_get_workflow_stats(reporting_window)
+    stats = models.CircleCiWorkflowStats.from_json(parsed['items'][0])
+    
+    return stats
 

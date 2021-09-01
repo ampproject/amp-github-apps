@@ -9,10 +9,11 @@ from scrapers.cherrypick_issue_scraper import CherrypickIssueScraper
 NINETY_DAYS = datetime.timedelta(days=90)
 ONE_YEAR = datetime.timedelta(days=365)
 SCRAPER_MAP = {
-    'commits': CommitScraper,
-    'releases': ReleaseScraper,
-    'cherrypicks': CherrypickScraper,
-    'cherrypick_issues': CherrypickIssueScraper,
+  # DO_NOT_SUBMIT
+    # 'commits': CommitScraper,
+    # 'releases': ReleaseScraper,
+    # 'cherrypicks': CherrypickScraper,
+    # 'cherrypick_issues': CherrypickIssueScraper,
 }
 
 

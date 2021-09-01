@@ -2,27 +2,28 @@
 
 import sqlalchemy
 from sqlalchemy import orm
+import logging
 import functools
 import env
 
 
 @functools.lru_cache()
 def get_engine() -> sqlalchemy.engine.Engine:
+  query = {
+      'charset': 'utf8mb4',
+  }
+  try:
+    query['unix_socket'] = '%s/%s' % (env.get('CLOUD_SQL_SOCKET'), env.get('CLOUD_SQL_INSTANCE_NAME'))
+  except:
+    logging.debug('Using local database')
+
   return sqlalchemy.create_engine(
       sqlalchemy.engine.url.URL(
           drivername=env.get('SQL_DRIVER'),
           username=env.get('DB_USER'),
           password=env.get('DB_PASS'),
           database=env.get('DB_NAME'),
-        #   DO_NOT_SUBMIT this should not occur when using a local database.
-        #   query={
-        #       'unix_socket':
-        #           '%s/%s' % (env.get('CLOUD_SQL_SOCKET'),
-        #                      env.get('CLOUD_SQL_INSTANCE_NAME')),
-        #       'charset':
-        #           'utf8mb4',
-        #   }
-          ),
+          query=query),
       echo=False)
 
 
