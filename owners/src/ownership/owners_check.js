@@ -362,8 +362,8 @@ class OwnersCheck {
     const suggestionsText = reviewSuggestions.map(
       ([reviewer, coveredFiles]) => {
         const header = `Reviewer: _${reviewer}_`;
-        const files = coveredFiles.map(filename =>
-          `- ${getMarkdownPrintableFilename(filename)}`
+        const files = coveredFiles.map(
+          filename => `- ${getMarkdownPrintableFilename(filename)}`
         );
         return [header, ...files].join('\n');
       }
