@@ -77,8 +77,8 @@ def recompute(metric_cls_name: Text):
   # This header is added to cron requests by GAE, and stripped from any external
   # requests. See
   # https://cloud.google.com/appengine/docs/standard/python3/scheduling-jobs-with-cron-yaml#validating_cron_requests
-  if not flask.request.headers.get('X-Appengine-Cron'):
-    return 'Attempted to access internal endpoint.', status.HTTP_403_FORBIDDEN
+  # if not flask.request.headers.get('X-Appengine-Cron'):
+  #   return 'Attempted to access internal endpoint.', status.HTTP_403_FORBIDDEN
   try:
     metric_cls = base.Metric.get_metric(metric_cls_name)
   except KeyError:

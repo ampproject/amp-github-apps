@@ -23,13 +23,20 @@ cron:
   url: /_cron/plot_metric_history/730
   schedule: 1st saturday of month 02:00
 
-
 - description: "Update absolute-coverage metric."
   url: /_cron/recompute/AbsoluteCoverageMetric
   schedule: every 4 hours from 8:00 to 19:00
 
 - description: "Update presubmit-latency metric."
-  url: /_cron/recompute/PresubmitLatencyMetric
+  url: /_cron/recompute/PresubmitLatency
+  schedule: every 24 hours
+
+- description: "Update circleci-greenness metric."
+  url: /_cron/recompute/CircleCiGreenness
+  schedule: every 24 hours
+
+- description: "Update circleci-flakiness metric."
+  url: /_cron/recompute/CircleCiFlakiness
   schedule: every 24 hours
 
 - description: "Update cherrypick-issue-count metric."
