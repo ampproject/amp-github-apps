@@ -301,7 +301,12 @@ class OwnersCheck {
    */
   buildCurrentCoverageText(fileTreeMap) {
     const allFilesText = Object.entries(fileTreeMap)
-      .map(([filename, subtree]) => {
+      .map(([filenameRaw, subtree]) => {
+        // Wrap filename in backticks to render as inline code.
+        // This prevents accidentally formatting a filename that may contain
+        // Markdown, like _accidental-italics_ or __accidental_bold__
+        const filename = '`' + filenameRaw + '`';
+
         const reviewers = Object.entries(this.reviewers).filter(([username]) =>
           this.tree.fileHasOwner(filename, username)
         );
