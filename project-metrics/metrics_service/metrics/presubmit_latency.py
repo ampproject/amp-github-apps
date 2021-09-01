@@ -3,7 +3,6 @@
 from typing import Text
 from metrics.base import Metric
 from metrics import base
-from database import db
 from database import models
 from apis.circleci import CircleCiAPI
 

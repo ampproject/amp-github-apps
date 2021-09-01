@@ -2,7 +2,6 @@
 
 from metrics.base import PercentageMetric
 from metrics import base
-from database import db
 from database import models
 from apis.circleci import CircleCiAPI
 
@@ -13,6 +12,7 @@ class CircleCiFlakiness(PercentageMetric):
     elif percentage < 0.75:
       return models.MetricScore.MODERATE
     elif percentage < 0.9:
+      
       return models.MetricScore.GOOD
     else:
       return models.MetricScore.EXCELLENT

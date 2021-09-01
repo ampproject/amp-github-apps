@@ -14,8 +14,8 @@ def get_engine() -> sqlalchemy.engine.Engine:
   }
   try:
     query['unix_socket'] = '%s/%s' % (env.get('CLOUD_SQL_SOCKET'), env.get('CLOUD_SQL_INSTANCE_NAME'))
-  except:
-    logging.debug('Using local database')
+  except KeyError:
+    logging.info('Using local database')
 
   return sqlalchemy.create_engine(
       sqlalchemy.engine.url.URL(

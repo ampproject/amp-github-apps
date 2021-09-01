@@ -2,7 +2,6 @@
 
 from metrics.base import PercentageMetric
 from metrics import base
-from database import db
 from database import models
 from apis.circleci import CircleCiAPI
 

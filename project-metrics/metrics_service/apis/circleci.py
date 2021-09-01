@@ -4,11 +4,9 @@ For an overview of the API https://circleci.com/docs/api/v2/
 """
 import json
 from typing import Dict
-from types import SimpleNamespace
 from absl import logging
 import logging
 import requests
-from database import db
 from database import models
 
 import env

@@ -48,6 +48,7 @@ class CircleCiWorkflowDurationMetrics():
   standard_deviation: float
   total_duration: int
 
+  @staticmethod
   def from_json(dict):
     metrics = CircleCiWorkflowDurationMetrics()
     metrics.min = dict['min']
@@ -72,6 +73,7 @@ class CircleCiWorkflowMetrics():
   total_recoveries: int
   throughput: float
 
+  @staticmethod
   def from_json(dict):
     metrics = CircleCiWorkflowMetrics()
     metrics.duration_metrics = CircleCiWorkflowDurationMetrics.from_json(dict['duration_metrics'])
@@ -94,6 +96,7 @@ class CircleCiWorkflowStats():
   window_start: datetime.datetime
   window_end: datetime.datetime
 
+  @staticmethod
   def from_json(dict):
     stats = CircleCiWorkflowStats
     stats.project_id = dict['project_id']
