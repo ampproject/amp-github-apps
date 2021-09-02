@@ -28,7 +28,8 @@ class CircleCiAPI(object):
   def __init__(self, token = env.get('CIRCLECI_API_ACCESS_TOKEN')):
     self._token = token
 
-  def _dict_to_params(self, params: Dict):
+  @staticmethod
+  def _dict_to_params(params: Dict):
     param_string = '&'.join(['%s=%s' % (key, params[key]) for key in params.keys()])
     if len(param_string):
       return '?' + param_string

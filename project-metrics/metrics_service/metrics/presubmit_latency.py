@@ -7,12 +7,14 @@ from database import models
 from apis.circleci import CircleCiAPI
 
 class PresubmitLatency(Metric):
-  def _score_value(self, percentage: float) -> models.MetricScore:
-    if percentage < 0.6:
+  def _score_value(self, presubmit_latency: float) -> models.MetricScore:
+    if presubmit_latency > 1800:
+      return models.MetricScore.CRITICAL
+    elif presubmit_latency > 1500:
       return models.MetricScore.POOR
-    elif percentage < 0.75:
+    elif presubmit_latency > 1200:
       return models.MetricScore.MODERATE
-    elif percentage < 0.9:
+    elif presubmit_latency > 900:
       return models.MetricScore.GOOD
     else:
       return models.MetricScore.EXCELLENT
