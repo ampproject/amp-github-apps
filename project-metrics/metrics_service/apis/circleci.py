@@ -30,7 +30,7 @@ class CircleCiAPI(object):
 
   @staticmethod
   def _dict_to_params(params: Dict):
-    param_string = '&'.join(['%s=%s' % (key, params[key]) for key in params.keys()])
+    param_string = '&'.join([f'{key}={value}' for (key, value) in params.items()])
     if param_string:
       return '?' + param_string
     return param_string
