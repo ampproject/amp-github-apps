@@ -12,7 +12,6 @@ class CircleCiFlakiness(PercentageMetric):
     elif percentage < 0.75:
       return models.MetricScore.MODERATE
     elif percentage < 0.9:
-      
       return models.MetricScore.GOOD
     else:
       return models.MetricScore.EXCELLENT
