@@ -4,6 +4,7 @@ For an overview of the API https://circleci.com/docs/api/v2/
 """
 import json
 from typing import Dict
+from http import HTTPStatus
 from absl import logging
 import logging
 import requests
@@ -14,7 +15,7 @@ import env
 CIRCLECI_API = 'https://circleci.com/api/v2'
 VCS_STAB = 'github'
 PROJECT = env.get('GITHUB_REPO')
-INSIGHTS_API = '%s/insights/%s/%s' % (CIRCLECI_API, VCS_STAB, PROJECT)
+INSIGHTS_API = f'{CIRCLECI_API}/insights/{VCS_STAB}/{PROJECT}'
 
 
 class CircleCiError(Exception):
@@ -39,12 +40,12 @@ class CircleCiAPI(object):
     params = {
       'reporting-window': reporting_window.value
     }
-    endpoint = '%s/%s' % (INSIGHTS_API, 'workflows')
+    endpoint = f'{INSIGHTS_API}/workflows'
     logging.info(endpoint + self._dict_to_params(params))
-    headers = { 'authorization': "Basic %s" % env.get('CIRCLECI_API_ACCESS_TOKEN') }
+    headers = { 'authorization': 'Basic %s' % env.get('CIRCLECI_API_ACCESS_TOKEN') }
     response = requests.get(endpoint + self._dict_to_params(params), headers=headers)
     parsed = json.loads(response.text)
-    if response.status_code != 200:
+    if response.status_code != HTTPStatus.OK:
       raise CircleCiError(response.status_code, parsed['message'])
     stats = models.CircleCiWorkflowStats.from_json(parsed['items'][0])
     

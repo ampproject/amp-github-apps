@@ -74,18 +74,18 @@ class CircleCiWorkflowMetrics():
   throughput: float
 
   @staticmethod
-  def from_json(dict):
+  def from_json(stats):
     metrics = CircleCiWorkflowMetrics()
-    metrics.duration_metrics = CircleCiWorkflowDurationMetrics.from_json(dict['duration_metrics'])
-    metrics.total_runs = dict['total_runs']
-    metrics.successful_runs = dict['successful_runs']
-    metrics.mttr = dict['mttr']
-    metrics.total_credits_used = dict['total_credits_used']
-    metrics.failed_runs = dict['failed_runs']
-    metrics.median_credits_used = dict['median_credits_used']
-    metrics.success_rate = dict['success_rate']
-    metrics.total_recoveries = dict['total_recoveries']
-    metrics.throughput = dict['throughput']
+    metrics.duration_metrics = CircleCiWorkflowDurationMetrics.from_json(stats['duration_metrics'])
+    metrics.total_runs = stats['total_runs']
+    metrics.successful_runs = stats['successful_runs']
+    metrics.mttr = stats['mttr']
+    metrics.total_credits_used = stats['total_credits_used']
+    metrics.failed_runs = stats['failed_runs']
+    metrics.median_credits_used = stats['median_credits_used']
+    metrics.success_rate = stats['success_rate']
+    metrics.total_recoveries = stats['total_recoveries']
+    metrics.throughput = stats['throughput']
     return metrics
 
 
@@ -97,14 +97,14 @@ class CircleCiWorkflowStats():
   window_end: datetime.datetime
 
   @staticmethod
-  def from_json(dict):
+  def from_json(raw_stats):
     stats = CircleCiWorkflowStats
-    stats.project_id = dict['project_id']
-    stats.name = dict['name']
-    stats.metrics = CircleCiWorkflowMetrics.from_json(dict['metrics'])
+    stats.project_id = raw_stats['project_id']
+    stats.name = raw_stats['name']
+    stats.metrics = CircleCiWorkflowMetrics.from_json(raw_stats['metrics'])
     date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-    stats.window_start = datetime.datetime.strptime(dict['window_start'], date_format)
-    stats.window_end = datetime.datetime.strptime(dict['window_end'], date_format)
+    stats.window_start = datetime.datetime.strptime(raw_stats['window_start'], date_format)
+    stats.window_end = datetime.datetime.strptime(raw_stats['window_end'], date_format)
     return stats
 
 
