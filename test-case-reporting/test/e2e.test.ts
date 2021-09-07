@@ -15,10 +15,10 @@
  */
 
 import {TestRun} from 'test-case-reporting';
-import Knex from 'knex';
+import knex from 'knex';
 import request from 'supertest';
 
-const sqliteDb = Knex({
+const sqliteDb = knex({
   client: 'sqlite3',
   connection: ':memory:',
   useNullAsDefault: true,
