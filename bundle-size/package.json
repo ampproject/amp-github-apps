@@ -23,7 +23,7 @@
     "minimatch": "3.0.4",
     "node-cache": "5.1.2",
     "pg": "8.6.0",
-    "probot": "11.4.1",
+    "probot": "12.1.1",
     "sleep-promise": "9.1.0"
   },
   "devDependencies": {
