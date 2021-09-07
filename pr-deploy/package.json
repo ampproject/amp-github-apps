@@ -10,7 +10,7 @@
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
   "scripts": {
-    "build": "tsc -p . --esModuleInterop",
+    "build": "tsc",
     "dev": "nodemon",
     "gcp-build": "npm run build",
     "start": "probot run ./dist/src/app.js",
