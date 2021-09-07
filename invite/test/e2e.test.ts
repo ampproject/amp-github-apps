@@ -15,7 +15,7 @@
  */
 
 import {Probot} from 'probot';
-import Knex from 'knex';
+import knex, {Knex} from 'knex';
 import nock from 'nock';
 
 import {Database, dbConnect} from '../src/db';
@@ -26,7 +26,7 @@ import {setupDb} from '../src/setup_db';
 import app from '../app';
 
 jest.mock('../src/db', () => {
-  const testDb = Knex({
+  const testDb = knex({
     client: 'sqlite3',
     connection: ':memory:',
     useNullAsDefault: true,

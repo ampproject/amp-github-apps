@@ -15,7 +15,7 @@
  */
 
 import {mocked} from 'ts-jest/utils';
-import Knex from 'knex';
+import knex, {Knex} from 'knex';
 
 import {GitHub} from '../src/github';
 import {InvitationRecord, InviteAction} from '../src/invitation_record';
@@ -25,7 +25,7 @@ import {dbConnect} from '../src/db';
 import {setupDb} from '../src/setup_db';
 
 jest.mock('../src/db', () => {
-  const testDb = Knex({
+  const testDb = knex({
     client: 'sqlite3',
     connection: ':memory:',
     useNullAsDefault: true,
