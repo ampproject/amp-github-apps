@@ -37,7 +37,7 @@ class CircleCiAPI(object):
       'reporting-window': reporting_window.value
     }
     endpoint = f'{INSIGHTS_API}/workflows{_dict_to_params(params)}'
-    logging.info('Called {endpoint}')
+    logging.info(f'Called {endpoint}')
     headers = { 'authorization': 'Basic %s' % env.get('CIRCLECI_API_ACCESS_TOKEN') }
     response = requests.get(endpoint, headers=headers)
     parsed = response.json()
