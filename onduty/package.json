@@ -25,7 +25,7 @@
   "devDependencies": {
     "@google-cloud/functions-framework": "1.8.0",
     "@types/express": "4.17.12",
-    "@types/jest": "26.0.23",
+    "@types/jest": "27.0.1",
     "@types/node": "14.17.4",
     "jest": "27.0.5",
     "jest-silent-reporter": "0.5.0",
