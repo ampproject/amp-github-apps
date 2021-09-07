@@ -15,11 +15,11 @@
  */
 
 import {PubSub} from '@google-cloud/pubsub';
-import type {Context, Probot} from 'probot';
+import type {Probot} from 'probot';
 
 export default (app: Probot): void => {
-  app.onAny(async (context: Context): Promise<void> => {
-    context.log(`Received "${context.name}" event with ID ${context.id}`);
+  app.onAny(async event => {
+    app.log(`Received "${event.name}" event with ID ${event.id}`);
 
     const pubsub = new PubSub({
       projectId: process.env.PROJECT_ID,
@@ -27,15 +27,15 @@ export default (app: Probot): void => {
     const topic = pubsub.topic(process.env.TOPIC_NAME);
     await topic.publishMessage({
       json: {
-        name: context.name,
-        id: context.id,
-        payload: context.payload,
+        name: event.name,
+        id: event.id,
+        payload: event.payload,
       },
       attributes: {
-        name: context.name,
-        action: context.payload.action ?? '',
+        name: event.name,
+        action: 'action' in event.payload ? event.payload.action : '',
       },
-      messageId: context.id,
+      messageId: event.id,
     });
   });
 };
