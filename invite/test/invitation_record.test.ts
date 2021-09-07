@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import Knex from 'knex';
+import knex from 'knex';
 
 import {Database} from '../src/db';
 import {InvitationRecord, InviteAction} from '../src/invitation_record';
@@ -22,7 +22,7 @@ import {Invite} from 'invite-bot';
 import {setupDb} from '../src/setup_db';
 
 describe('invitation record', () => {
-  const db: Database = Knex({
+  const db: Database = knex({
     client: 'sqlite3',
     connection: ':memory:',
     useNullAsDefault: true,
