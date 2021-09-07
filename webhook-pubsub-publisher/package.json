@@ -18,12 +18,12 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@google-cloud/pubsub": "2.15.1",
-    "probot": "11.4.1"
+    "probot": "12.1.1"
   },
   "devDependencies": {
     "@octokit/webhooks": "9.8.4",
-    "@octokit/webhooks-types": "3.77.1",
-    "@types/jest": "26.0.23",
+    "@octokit/webhooks-types": "4.4.0",
+    "@types/jest": "27.0.1",
     "@types/node": "14.17.4",
     "jest": "27.0.5",
     "jest-silent-reporter": "0.5.0",
