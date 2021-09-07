@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import Knex from 'knex';
+import knex, {Knex} from 'knex';
 
 export type Database = Knex;
 
@@ -29,7 +29,7 @@ function getConnectionHost(): string {
 }
 
 export function dbConnect(): Database {
-  return Knex({
+  return knex({
     client: 'pg',
     connection: {
       host: getConnectionHost(),

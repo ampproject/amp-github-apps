@@ -25,10 +25,10 @@ import {
   Travis,
 } from 'test-case-reporting';
 import {Database} from './db';
-import {QueryBuilder} from 'knex';
+import {Knex} from 'knex';
 import md5 from 'md5';
 
-type QueryFunction = (q: QueryBuilder) => QueryBuilder;
+type QueryFunction = (q: Knex.QueryBuilder) => Knex.QueryBuilder;
 
 /* eslint-disable camelcase */
 /**
