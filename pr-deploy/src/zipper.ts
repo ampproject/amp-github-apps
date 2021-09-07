@@ -44,7 +44,7 @@ export async function decompressAndMove(
     )
     .then(item => item['url']);
 
-  return await new Promise(async(resolve, reject) => {
+  return await new Promise(async (resolve, reject) => {
     const res = await fetch(buildArtifactZipUrl);
     res.body.pipe(gunzip()).pipe(
       tar

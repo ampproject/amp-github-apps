@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Octokit} from '@octokit/rest';
+import {ProbotOctokit} from 'probot';
 import {RestEndpointMethodTypes as Types} from '@octokit/plugin-rest-endpoint-methods';
 
 type ChecksCreateParams = Types['checks']['create']['parameters'];
@@ -36,9 +36,9 @@ const repo = process.env.GH_REPO;
 
 export class PullRequest {
   public headSha: string;
-  private octokit: Octokit;
+  private octokit: InstanceType<typeof ProbotOctokit>;
 
-  constructor(octokit: Octokit, headSha: string) {
+  constructor(octokit: InstanceType<typeof ProbotOctokit>, headSha: string) {
     this.headSha = headSha;
     this.octokit = octokit;
   }
