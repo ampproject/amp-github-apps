@@ -29,15 +29,15 @@
   "definitions": {
     "Bot": {
       "type": "string",
-      "pattern": "^[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]\\[bot\\]$"
+      "pattern": "^[a-zA-Z\\d][a-zA-Z\\d_.-]{2,37}[a-zA-Z\\d]\\[bot\\]$"
     },
     "User": {
       "type": "string",
-      "pattern": "^[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]$"
+      "pattern": "^[a-zA-Z\\d][a-zA-Z\\d_.-]{2,37}[a-zA-Z\\d]$"
     },
     "Team": {
       "type": "string",
-      "pattern": "^[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]/[a-zA-Z\\d][a-zA-Z\\d-_.]{2,37}[a-zA-Z\\d]$"
+      "pattern": "^[a-zA-Z\\d][a-zA-Z\\d_.-]{2,37}[a-zA-Z\\d]/[a-zA-Z\\d][a-zA-Z\\d_.-]{2,37}[a-zA-Z\\d]$"
     },
     "Wildcard": {
       "type": "string",
