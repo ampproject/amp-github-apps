@@ -25,7 +25,7 @@
     "http-status-codes": "2.1.4",
     "mustache": "4.2.0",
     "node-cache": "5.1.2",
-    "node-fetch": "2.6.2"
+    "node-fetch": "3.0.0"
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "1.9.0",
@@ -33,7 +33,7 @@
     "@types/jest": "27.0.1",
     "@types/mustache": "4.1.2",
     "@types/node": "14.17.15",
-    "@types/node-fetch": "2.5.12",
+    "@types/node-fetch": "3.0.2",
     "jest": "27.1.1",
     "jest-silent-reporter": "0.5.0",
     "nock": "13.1.3",
