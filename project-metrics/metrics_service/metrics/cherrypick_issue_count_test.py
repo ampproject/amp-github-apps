@@ -1,8 +1,6 @@
 """Tests for cherrypick-issue-count metric."""
 
 import datetime
-import random
-import uuid
 
 from database import models
 from metrics import cherrypick_issue_count
@@ -20,8 +18,6 @@ class TestCherrypickIssueCountMetric(metric_test_case.MetricTestCase):
         created_at=datetime.datetime.now() - datetime.timedelta(days=days))
 
   def testRecompute(self):
-    now = datetime.datetime.now()
-
     session = self.Session()
     session.add_all([
         self._cherrypick_issue_n_days_ago(12, 95),  # Older than 90 days.
