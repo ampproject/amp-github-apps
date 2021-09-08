@@ -130,7 +130,7 @@ def list_metrics():
 @app.route('/api/plot/<history_days>/<metric_cls_name>.png')
 def metric_history_plot(history_days: Text, metric_cls_name: Text):
   try:
-    metric_cls = base.Metric.get_metric(metric_cls_name)
+    base.Metric.get_metric(metric_cls_name)
   except KeyError:
     logging.error('No active metric found for %s.', metric_cls_name)
     return ('No active metric found for %s.' %

@@ -1,9 +1,9 @@
 """Base interface for metrics to implement.
 
 To create a new metric:
-1. Subclass `Metric` or `PercentMetric`
+1. Subclass `Metric` or `PercentageMetric`
 2. Implement `_score_value`, `_compute_value`, and (unless you're using
-   `PercentMetric`) `_format_value` and define the UNIT (for history plots)
+   `PercentageMetric`) `_format_value` and define the UNIT (for history plots)
 3. Call `metrics.base.Metric.register(YourNewMetric)`
 4. Import the metric in __init__.py so it can register itself
 5. Define the update frequency with a job in `cron.yaml`
@@ -17,7 +17,7 @@ import datetime
 import logging
 import sqlalchemy
 import stringcase
-from typing import Any, Dict, Iterable, Optional, Sequence, Text, Type, TypeVar
+from typing import Any, Dict, Optional, Sequence, Text, Type, TypeVar
 
 from database import db
 from database import models
