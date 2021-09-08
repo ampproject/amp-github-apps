@@ -23,7 +23,7 @@
     "eslint-config-google": "0.14.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-notice": "0.9.10",
-    "eslint-plugin-prettier": "3.4.0",
+    "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-react": "7.24.0",
     "eslint-plugin-sort-imports-es6-autofix": "0.6.0",
     "eslint-plugin-sort-requires": "2.1.0",
