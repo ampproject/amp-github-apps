@@ -28,7 +28,7 @@ Follow these setup instructions to start developing for the GAE backend locally:
 4. `pip install -r requirements.txt` to install Python dependencies
 5. `pip install -r requirements.txt -t third_party/` to install Python
    dependencies into the `third_party` directory for App Engine deployment
-6. Run a local SQL instance, or use the [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy)
+6. Run a local MySQL instance, or use the [Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/sql-proxy)
 7. Copy the `env.example.yaml` file to `env.yaml` and modify the fields based on
    the instructions in that file and the values from your GAE/CloudSQL instance
 8. `python server.py` will start the development server locally
