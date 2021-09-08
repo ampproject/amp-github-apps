@@ -76,14 +76,6 @@ describe('ErrorIssueBot', () => {
       },
     ]);
 
-    afterEach(() => {
-      // Fail the test if there were unused nocks.
-      if (!nock.isDone()) {
-        throw new Error('Not all nock interceptors were used!');
-      }
-      nock.cleanAll();
-    });
-
     jest
       .spyOn(IssueBuilder.prototype, 'title', 'get')
       .mockReturnValue('issue title');
@@ -93,6 +85,14 @@ describe('ErrorIssueBot', () => {
     jest
       .spyOn(IssueBuilder.prototype, 'body', 'get')
       .mockReturnValue('issue body');
+  });
+
+  afterEach(() => {
+    // Fail the test if there were unused nocks.
+    if (!nock.isDone()) {
+      throw new Error('Not all nock interceptors were used!');
+    }
+    nock.cleanAll();
   });
 
   describe('buildErrorIssue', () => {
