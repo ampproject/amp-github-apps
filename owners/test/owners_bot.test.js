@@ -80,12 +80,11 @@ describe('owners bot', () => {
       expect(ownersBot.teams['ampproject/other_team']).toBe(otherTeam);
     });
 
-    it('fetches members for each team', async done => {
+    it('fetches members for each team', async () => {
       await ownersBot.initTeams(github);
 
       sandbox.assert.calledWith(github.getTeamMembers, myTeam);
       sandbox.assert.calledWith(github.getTeamMembers, otherTeam);
-      done();
     });
   });
 
@@ -97,10 +96,9 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'getTeamMembers').returns(['coder']);
     });
 
-    it('fetches members for the team', async done => {
+    it('fetches members for the team', async () => {
       await ownersBot.syncTeam(myTeam, github);
       sandbox.assert.calledWith(github.getTeamMembers, myTeam);
-      done();
     });
 
     it('updates the owners bot team map', async () => {
@@ -115,11 +113,10 @@ describe('owners bot', () => {
   });
 
   describe('refreshTree', () => {
-    it('refreshes the repository', async done => {
+    it('refreshes the repository', async () => {
       sandbox.stub(console);
       await ownersBot.refreshTree();
       sandbox.assert.calledOnce(repo.sync);
-      done();
     });
 
     it('parses the owners tree', async () => {
@@ -208,33 +205,27 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'createBotComment');
     });
 
-    it.each([['closed'], ['merged']])(
-      'does not run on %p PRs',
-      async (state, done) => {
-        sandbox.stub(ownersBot, 'initPr').callThrough();
-        const pr = new PullRequest(0, '', '', '', state);
-        await ownersBot.runOwnersCheck(github, pr);
-        sandbox.assert.notCalled(ownersBot.initPr);
-        done();
-      }
-    );
+    it.each([['closed'], ['merged']])('does not run on %p PRs', async state => {
+      sandbox.stub(ownersBot, 'initPr').callThrough();
+      const pr = new PullRequest(0, '', '', '', state);
+      await ownersBot.runOwnersCheck(github, pr);
+      sandbox.assert.notCalled(ownersBot.initPr);
+    });
 
-    it('attempts to fetch the existing check-run ID', async done => {
+    it('attempts to fetch the existing check-run ID', async () => {
       await ownersBot.runOwnersCheck(github, pr);
 
       sandbox.assert.calledWith(github.getCheckRunIds, '_test_hash_');
-      done();
     });
 
-    it('runs the owners check', async done => {
+    it('runs the owners check', async () => {
       await ownersBot.runOwnersCheck(github, pr);
 
       sandbox.assert.calledOnce(OwnersCheck.prototype.run);
-      done();
     });
 
     describe('when a check-run exists', () => {
-      it('updates the existing check-run', async done => {
+      it('updates the existing check-run', async () => {
         getCheckRunIdsStub.returns({'owners-check': 42});
         await ownersBot.runOwnersCheck(github, pr);
 
@@ -243,12 +234,11 @@ describe('owners bot', () => {
           42,
           checkRun
         );
-        done();
       });
     });
 
     describe('when no check-run exists yet', () => {
-      it('creates a new check-run', async done => {
+      it('creates a new check-run', async () => {
         await ownersBot.runOwnersCheck(github, pr);
 
         sandbox.assert.calledWith(
@@ -256,11 +246,10 @@ describe('owners bot', () => {
           '_test_hash_',
           checkRun
         );
-        done();
       });
     });
 
-    it('requests reviewers if flag is set', async done => {
+    it('requests reviewers if flag is set', async () => {
       sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
       await ownersBot.runOwnersCheck(github, pr, true);
 
@@ -269,18 +258,16 @@ describe('owners bot', () => {
         github,
         ['root_owner']
       );
-      done();
     });
 
-    it('requests no reviewers by default', async done => {
+    it('requests no reviewers by default', async () => {
       sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
       await ownersBot.runOwnersCheck(github, pr);
 
       sandbox.assert.notCalled(OwnersNotifier.prototype.requestReviews);
-      done();
     });
 
-    it('creates a notification comment', async done => {
+    it('creates a notification comment', async () => {
       sandbox.stub(OwnersNotifier.prototype, 'createNotificationComment');
       await ownersBot.runOwnersCheck(github, pr);
 
@@ -288,7 +275,6 @@ describe('owners bot', () => {
         OwnersNotifier.prototype.createNotificationComment,
         github
       );
-      done();
     });
   });
 
@@ -298,18 +284,16 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'getPullRequest').returns(pr);
     });
 
-    it('fetches the PR from GitHub', async done => {
+    it('fetches the PR from GitHub', async () => {
       await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
 
       sandbox.assert.calledWith(github.getPullRequest, 1337);
-      done();
     });
 
-    it('runs the owners check on the retrieved PR', async done => {
+    it('runs the owners check on the retrieved PR', async () => {
       await ownersBot.runOwnersCheckOnPrNumber(github, 1337);
 
       sandbox.assert.calledWith(ownersBot.runOwnersCheck, github, pr);
-      done();
     });
   });
 

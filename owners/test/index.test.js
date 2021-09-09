@@ -19,7 +19,7 @@ const nock = require('nock');
 const owners = require('..');
 const path = require('path');
 const sinon = require('sinon');
-const {Probot} = require('probot');
+const {Probot, Server, ProbotOctokit} = require('probot');
 
 const VirtualRepository = require('../src/repo/virtual_repo');
 const {CheckRun} = require('../src/ownership/owners_check');
@@ -107,11 +107,18 @@ describe('GitHub app', () => {
       .post('/app/installations/588033/access_tokens')
       .reply(200, {token: 'test'});
 
-    probot = new Probot({
-      githubToken: 'test',
-      appId: 1,
+    const server = new Server({
+      Probot: Probot.defaults({
+        githubToken: 'test',
+        // Disable throttling & retrying requests for easier testing
+        Octokit: ProbotOctokit.defaults({
+          retry: {enabled: false},
+          throttle: {enabled: false},
+        }),
+      }),
     });
-    probot.load(owners);
+    server.load(owners);
+    probot = server.probotApp;
   });
 
   afterEach(() => {
@@ -554,7 +561,7 @@ describe('GitHub app', () => {
       ['team.edited'],
       ['membership.added'],
       ['membership.removed'],
-    ])('updates the team members on event %p', async (name, done) => {
+    ])('updates the team members on event %p', async name => {
       nock('https://api.github.com')
         .get('/teams/42/members?per_page=100')
         .reply(200, [{login: 'coder'}]);
@@ -566,7 +573,6 @@ describe('GitHub app', () => {
         },
       });
       sandbox.assert.calledOnce(Team.prototype.fetchMembers);
-      done();
     });
   });
 
@@ -575,14 +581,13 @@ describe('GitHub app', () => {
       sandbox.stub(OwnersBot.prototype, 'runOwnersCheck').callThrough();
     });
 
-    it('does not run the check on for draft PRs', async done => {
+    it('does not run the check on for draft PRs', async () => {
       await probot.receive({
         name: 'pull_request.opened',
         payload: openedDraft25408,
       });
 
       sandbox.assert.notCalled(OwnersBot.prototype.runOwnersCheck);
-      done();
     });
 
     it('does assign reviewers for draft PRs once they are ready', async () => {
@@ -689,12 +694,11 @@ describe('GitHub app', () => {
       payload = {'pull_request': pullRequest};
     });
 
-    it('does nothing for a non-merged PR', async done => {
+    it('does nothing for a non-merged PR', async () => {
       pullRequest.merged = false;
       await probot.receive({name: 'pull_request.closed', payload});
 
       sandbox.assert.notCalled(OwnersBot.prototype.refreshTree);
-      done();
     });
 
     describe('merged PRs', () => {
@@ -702,7 +706,7 @@ describe('GitHub app', () => {
         pullRequest.merged = true;
       });
 
-      it('does nothing for a PR without owners files', async done => {
+      it('does nothing for a PR without owners files', async () => {
         nock('https://api.github.com')
           .get(
             '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
@@ -711,10 +715,9 @@ describe('GitHub app', () => {
         await probot.receive({name: 'pull_request.closed', payload});
 
         sandbox.assert.notCalled(OwnersBot.prototype.refreshTree);
-        done();
       });
 
-      it('refreshes the owners tree for a PR with owners files', async done => {
+      it('refreshes the owners tree for a PR with owners files', async () => {
         nock('https://api.github.com')
           .get(
             '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
@@ -723,7 +726,6 @@ describe('GitHub app', () => {
         await probot.receive({name: 'pull_request.closed', payload});
 
         sandbox.assert.calledOnce(OwnersBot.prototype.refreshTree);
-        done();
       });
     });
   });

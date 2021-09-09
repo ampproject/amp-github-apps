@@ -23,7 +23,7 @@ const {OwnersCheck} = require('./src/ownership/owners_check');
 const NO_REQUEST_OWNERS_REGEX =
   /\b(WIP|work in progress|DO NOT (MERGE|SUBMIT|REVIEW))\b/i;
 
-module.exports = ({app, getRouter}) => {
+module.exports = (app, {getRouter}) => {
   const {github, ownersBot, initialized} = bootstrap();
 
   /**

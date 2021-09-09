@@ -47,10 +47,9 @@ describe('compound cache', () => {
         expect(contents).toEqual('OWNERS file contents');
       });
 
-      it('does not get the contents from the provided method', async done => {
+      it('does not get the contents from the provided method', async () => {
         await cache.readFile('foo/OWNERS', getContents);
         sandbox.assert.notCalled(getContents);
-        done();
       });
     });
 
@@ -67,10 +66,9 @@ describe('compound cache', () => {
           expect(contents).toEqual('OWNERS file contents');
         });
 
-        it('does not get the contents from the provided method', async done => {
+        it('does not get the contents from the provided method', async () => {
           await cache.readFile('foo/OWNERS', getContents);
           sandbox.assert.notCalled(getContents);
-          done();
         });
 
         it('saves the contents to the memory cache', async () => {
@@ -96,10 +94,9 @@ describe('compound cache', () => {
           expect(contents).toEqual('OWNERS file contents');
         });
 
-        it('calls the provided method to get the file contents', async done => {
+        it('calls the provided method to get the file contents', async () => {
           await cache.readFile('foo/OWNERS', getContents);
           sandbox.assert.calledOnce(getContents);
-          done();
         });
 
         it('saves the contents to the memory cache', async () => {
@@ -111,7 +108,7 @@ describe('compound cache', () => {
           );
         });
 
-        it('saves the contents to the Cloud Storage cache', async done => {
+        it('saves the contents to the Cloud Storage cache', async () => {
           await cache.readFile('foo/OWNERS', getContents);
 
           sandbox.assert.calledWith(
@@ -119,7 +116,6 @@ describe('compound cache', () => {
             'foo/OWNERS',
             'OWNERS file contents'
           );
-          done();
         });
       });
     });
@@ -131,19 +127,17 @@ describe('compound cache', () => {
       sandbox.stub(CloudStorageCache.prototype, 'invalidate');
     });
 
-    it('invalidates the memory cache', async done => {
+    it('invalidates the memory cache', async () => {
       await cache.invalidate('foo/OWNERS');
       sandbox.assert.calledWith(MemoryCache.prototype.invalidate, 'foo/OWNERS');
-      done();
     });
 
-    it('invalidates the Cloud Storage cache', async done => {
+    it('invalidates the Cloud Storage cache', async () => {
       await cache.invalidate('foo/OWNERS');
       sandbox.assert.calledWith(
         CloudStorageCache.prototype.invalidate,
         'foo/OWNERS'
       );
-      done();
     });
   });
 });

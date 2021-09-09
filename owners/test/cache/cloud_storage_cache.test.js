@@ -49,10 +49,9 @@ describe('Cloud Storage file cache', () => {
         sandbox.assert.calledWith(cache.storage.download, 'foo/OWNERS');
       });
 
-      it('does not get the contents from the provided method', async done => {
+      it('does not get the contents from the provided method', async () => {
         await cache.readFile('foo/OWNERS', getContents);
         sandbox.assert.notCalled(getContents);
-        done();
       });
     });
 
@@ -74,7 +73,7 @@ describe('Cloud Storage file cache', () => {
         sandbox.assert.calledOnce(getContents);
       });
 
-      it('saves the contents to the cache', async done => {
+      it('saves the contents to the cache', async () => {
         sandbox.stub(CloudStorage.prototype, 'upload').resolves();
         await cache.readFile('foo/OWNERS', getContents);
 
@@ -83,10 +82,9 @@ describe('Cloud Storage file cache', () => {
           'foo/OWNERS',
           'OWNERS file contents'
         );
-        done();
       });
 
-      it('reports errors uploading to the cache', async done => {
+      it('reports errors uploading to the cache', async () => {
         sandbox.stub(cache.storage, 'upload').rejects(new Error('Not found'));
         await cache.readFile('foo/OWNERS', getContents);
 
@@ -94,18 +92,16 @@ describe('Cloud Storage file cache', () => {
           console.error,
           'Error uploading "foo/OWNERS": Not found'
         );
-        done();
       });
     });
   });
 
   describe('invalidate', () => {
-    it('deletes the invalidated file cache from storage', async done => {
+    it('deletes the invalidated file cache from storage', async () => {
       sinon.stub(CloudStorage.prototype, 'delete');
       await cache.invalidate('foo/OWNERS');
 
       sandbox.assert.calledWith(cache.storage.delete, 'foo/OWNERS');
-      done();
     });
   });
 });

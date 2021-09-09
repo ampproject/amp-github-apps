@@ -43,10 +43,9 @@ describe('in-memory file cache', () => {
         expect(contents).toEqual('OWNERS file contents');
       });
 
-      it('does not get the contents from the provided method', async done => {
+      it('does not get the contents from the provided method', async () => {
         await cache.readFile('foo/OWNERS', getContents);
         sandbox.assert.notCalled(getContents);
-        done();
       });
     });
 
