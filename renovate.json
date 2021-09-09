@@ -94,5 +94,8 @@
     "reviewers": ["danielrozenberg"],
     "rebaseWhen": "never",
     "automerge": true
+  }, {
+    "matchPackageNames": ["node-fetch", "@types/node-fetch"],
+    "allowedVersions": ["<3.0.0"]
   }]
 }
