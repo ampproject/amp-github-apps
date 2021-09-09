@@ -62,24 +62,22 @@ describe('cloud storage', () => {
     });
 
     describe('upload', () => {
-      it('saves the file contents', async done => {
+      it('saves the file contents', async () => {
         await storage.upload('foo/OWNERS', 'OWNERS file contents');
 
         sandbox.assert.calledWith(storage.file, 'foo/OWNERS');
         sandbox.assert.calledWith(fileStub.save, 'OWNERS file contents', {
           resumable: false,
         });
-        done();
       });
     });
 
     describe('delete', () => {
-      it('deletes the requested file', async done => {
+      it('deletes the requested file', async () => {
         await storage.delete('foo/OWNERS');
 
         sandbox.assert.calledWith(storage.file, 'foo/OWNERS');
         sandbox.assert.calledOnce(fileStub.delete);
-        done();
       });
     });
   });

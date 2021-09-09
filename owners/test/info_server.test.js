@@ -91,7 +91,7 @@ describe('server', () => {
       expect.assertions(1);
       const response = await checkFile({});
       expect(response.fileErrors[0]).toContain(
-        "`OWNERS` should have required property 'rules'"
+        "`OWNERS` must have required property 'rules'"
       );
     });
 

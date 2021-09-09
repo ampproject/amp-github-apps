@@ -404,11 +404,9 @@ describe('GitHub API', () => {
       await github.createReviewRequests(24574, ['reviewer']);
     });
 
-    it('skips the API call if no usernames are provided', async done => {
+    it('skips the API call if no usernames are provided', async () => {
       // This will fail if it attempts to make an un-nocked network request.
       await github.createReviewRequests(24574, []);
-
-      done();
     });
   });
 

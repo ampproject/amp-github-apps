@@ -46,12 +46,11 @@ describe('local repository', () => {
   });
 
   describe('sync', () => {
-    it('checks out the local repository', async done => {
+    it('checks out the local repository', async () => {
       sandbox.stub(LocalRepository.prototype, 'checkout');
       await repo.sync();
 
       sandbox.assert.calledOnce(repo.checkout);
-      done();
     });
   });
 
@@ -60,7 +59,7 @@ describe('local repository', () => {
       sandbox.stub(repo, '_runCommands').returns('');
     });
 
-    it('fetches and checks out the requested branch', async done => {
+    it('fetches and checks out the requested branch', async () => {
       await repo.checkout('my_branch');
 
       sandbox.assert.calledWith(
@@ -68,10 +67,9 @@ describe('local repository', () => {
         'git fetch origin my_branch',
         'git checkout -B my_branch origin/my_branch'
       );
-      done();
     });
 
-    it('defaults to main', async done => {
+    it('defaults to main', async () => {
       await repo.checkout();
 
       sandbox.assert.calledWith(
@@ -79,7 +77,6 @@ describe('local repository', () => {
         'git fetch origin main',
         'git checkout -B main origin/main'
       );
-      done();
     });
   });
 
@@ -107,7 +104,7 @@ describe('local repository', () => {
       repo = new LocalRepository('path/to/repo');
     }
 
-    it('executes the provided commands in the repo directory', async done => {
+    it('executes the provided commands in the repo directory', async () => {
       stubExecAndSetRepo(false, '', '');
       await repo._runCommands('git status');
 
@@ -115,7 +112,6 @@ describe('local repository', () => {
         childProcess.exec,
         `cd path/to/repo && git status`
       );
-      done();
     });
 
     it('returns the contents of stdout', async () => {
@@ -150,13 +146,12 @@ describe('local repository', () => {
       sandbox.stub(fs, 'readFileSync').returns(FAKE_OWNERS_CONTENTS);
     });
 
-    it('reads from the absolute file path', async done => {
+    it('reads from the absolute file path', async () => {
       await repo.readFile('my/file.txt');
 
       sandbox.assert.calledWith(fs.readFileSync, 'path/to/repo/my/file.txt', {
         encoding: 'utf8',
       });
-      done();
     });
 
     it('returns the contents of the file', async () => {
