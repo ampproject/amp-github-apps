@@ -84,7 +84,7 @@ describe('end-to-end', () => {
 
   describe('when a comment includes "/invite @someone"', () => {
     describe('when @someone is a member of the org', () => {
-      it("comments, doesn't record", async done => {
+      it("comments, doesn't record", async () => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
@@ -102,7 +102,6 @@ describe('end-to-end', () => {
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
         expect(record.getInvites('someone')).resolves.toEqual([]);
-        done();
       });
     });
 
@@ -115,7 +114,7 @@ describe('end-to-end', () => {
         archived: false,
       };
 
-      it('invites, records, comments', async done => {
+      it('invites, records, comments', async () => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
@@ -137,13 +136,12 @@ describe('end-to-end', () => {
         expect(record.getInvites('someone')).resolves.toEqual([
           expect.objectContaining(recordedInvite),
         ]);
-        done();
       });
 
       describe('once the invite is accepted', () => {
         beforeEach(async () => record.recordInvite(recordedInvite));
 
-        it('comments, archives', async done => {
+        it('comments, archives', async () => {
           nock('https://api.github.com')
             .post('/repos/test_org/test_repo/issues/1337/comments', body => {
               expect(body).toEqual({
@@ -155,7 +153,6 @@ describe('end-to-end', () => {
 
           await triggerWebhook(probot, 'organization.member_added');
           expect(record.getInvites('someone')).resolves.toEqual([]);
-          done();
         });
       });
     });
@@ -163,7 +160,7 @@ describe('end-to-end', () => {
 
   describe('when a comment includes "/tryassign @someone"', () => {
     describe('when @someone is a member of the org', () => {
-      it("assigns, comments, doesn't record", async done => {
+      it("assigns, comments, doesn't record", async () => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
@@ -184,7 +181,6 @@ describe('end-to-end', () => {
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
         expect(record.getInvites('someone')).resolves.toEqual([]);
-        done();
       });
     });
 
@@ -197,7 +193,7 @@ describe('end-to-end', () => {
         archived: false,
       };
 
-      it('invites, records, comments', async done => {
+      it('invites, records, comments', async () => {
         nock('https://api.github.com')
           .get('/orgs/test_org/teams/wg-inviters/memberships/author')
           .reply(200, getFixture('team_membership.active'))
@@ -219,16 +215,14 @@ describe('end-to-end', () => {
         expect(record.getInvites('someone')).resolves.toEqual([
           expect.objectContaining(recordedInvite),
         ]);
-        done();
       });
 
       describe('once the invite is accepted', () => {
-        beforeEach(async done => {
+        beforeEach(async () => {
           await db('invites').insert(recordedInvite);
-          done();
         });
 
-        it('assigns, comments, archives', async done => {
+        it('assigns, comments, archives', async () => {
           nock('https://api.github.com')
             .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
               expect(body).toEqual({assignees: ['someone']});
@@ -247,25 +241,23 @@ describe('end-to-end', () => {
 
           await triggerWebhook(probot, 'organization.member_added');
           expect(record.getInvites('someone')).resolves.toEqual([]);
-          done();
         });
       });
     });
   });
 
   describe('when a comment includes no macros', () => {
-    it('ignores it', async done => {
+    it('ignores it', async () => {
       jest.spyOn(InviteBot.prototype, 'tryInvite');
       await triggerWebhook(probot, 'issue_comment.created');
 
       expect(InviteBot.prototype.tryInvite).not.toBeCalled();
       // The test will fail if any unexpected network requests occur.
-      done();
     });
   });
 
   describe('when the author is not a member of the allow team', () => {
-    it('ignores it', async done => {
+    it('ignores it', async () => {
       jest.spyOn(InviteBot.prototype, 'tryInvite');
       nock('https://api.github.com')
         .get('/orgs/test_org/teams/wg-inviters/memberships/author')
@@ -274,16 +266,14 @@ describe('end-to-end', () => {
 
       expect(InviteBot.prototype.tryInvite).not.toBeCalled();
       // The test will fail if any unexpected network requests occur.
-      done();
     });
   });
 
   describe('when someone joins without a recorded invitation', () => {
-    it('ignores it', async done => {
+    it('ignores it', async () => {
       await triggerWebhook(probot, 'organization.member_added');
 
       // The test will fail if any unexpected network requests occur.
-      done();
     });
   });
 });
