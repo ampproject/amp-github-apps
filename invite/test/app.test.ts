@@ -33,12 +33,8 @@ describe('Probot webhooks', () => {
       NODE_ENV: 'test',
     };
 
-    probot = new Probot({});
-    const probotApp = probot.load(app);
-    probotApp.app = {
-      getInstallationAccessToken: async (): Promise<string> => 'test',
-      getSignedJsonWebToken: (): string => 'test',
-    };
+    probot = new Probot({appId: 1, githubToken: 'test'});
+    probot.load(app);
   });
 
   afterAll(() => {

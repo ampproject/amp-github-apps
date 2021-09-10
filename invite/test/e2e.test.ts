@@ -57,12 +57,8 @@ describe('end-to-end', () => {
     await setupDb(db);
     record = new InvitationRecord(db);
 
-    probot = new Probot({});
-    const probotApp = probot.load(app);
-    probotApp.app = {
-      getInstallationAccessToken: async (): Promise<string> => 'test',
-      getSignedJsonWebToken: (): string => 'test',
-    };
+    probot = new Probot({appId: 1, githubToken: 'test'});
+    probot.load(app);
   });
 
   afterAll(async () => {
@@ -101,7 +97,7 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
-        expect(record.getInvites('someone')).resolves.toEqual([]);
+        await expect(record.getInvites('someone')).resolves.toEqual([]);
       });
     });
 
@@ -133,7 +129,7 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
-        expect(record.getInvites('someone')).resolves.toEqual([
+        await expect(record.getInvites('someone')).resolves.toEqual([
           expect.objectContaining(recordedInvite),
         ]);
       });
@@ -152,7 +148,7 @@ describe('end-to-end', () => {
             .reply(200);
 
           await triggerWebhook(probot, 'organization.member_added');
-          expect(record.getInvites('someone')).resolves.toEqual([]);
+          await expect(record.getInvites('someone')).resolves.toEqual([]);
         });
       });
     });
@@ -180,7 +176,7 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
-        expect(record.getInvites('someone')).resolves.toEqual([]);
+        await expect(record.getInvites('someone')).resolves.toEqual([]);
       });
     });
 
@@ -212,7 +208,7 @@ describe('end-to-end', () => {
           .reply(200);
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
-        expect(record.getInvites('someone')).resolves.toEqual([
+        await expect(record.getInvites('someone')).resolves.toEqual([
           expect.objectContaining(recordedInvite),
         ]);
       });
@@ -240,7 +236,7 @@ describe('end-to-end', () => {
             .reply(200);
 
           await triggerWebhook(probot, 'organization.member_added');
-          expect(record.getInvites('someone')).resolves.toEqual([]);
+          await expect(record.getInvites('someone')).resolves.toEqual([]);
         });
       });
     });

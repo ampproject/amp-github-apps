@@ -59,7 +59,7 @@ describe('GitHub interface', () => {
         .put('/orgs/test_org/memberships/someone')
         .reply(200, getFixture('add_member.invited'));
 
-      expect(github.inviteUser('someone')).resolves.toBe(true);
+      await expect(github.inviteUser('someone')).resolves.toBe(true);
     });
 
     it('returns false when the user is already a member', async () => {
@@ -67,7 +67,7 @@ describe('GitHub interface', () => {
         .put('/orgs/test_org/memberships/someone')
         .reply(200, getFixture('add_member.exists'));
 
-      expect(github.inviteUser('someone')).resolves.toBe(false);
+      await expect(github.inviteUser('someone')).resolves.toBe(false);
     });
   });
 
@@ -111,7 +111,7 @@ describe('GitHub interface', () => {
         .get('/orgs/test_org/teams/test-team/memberships/someone')
         .reply(200, getFixture('team_membership.active'));
 
-      expect(
+      await expect(
         github.userIsTeamMember('someone', 'test_org/test-team')
       ).resolves.toBe(true);
     });
@@ -121,7 +121,7 @@ describe('GitHub interface', () => {
         .get('/orgs/test_org/teams/test-team/memberships/someone')
         .reply(200, getFixture('team_membership.pending'));
 
-      expect(
+      await expect(
         github.userIsTeamMember('someone', 'test_org/test-team')
       ).resolves.toBe(false);
     });
@@ -131,7 +131,7 @@ describe('GitHub interface', () => {
         .get('/orgs/test_org/teams/test-team/memberships/someone')
         .reply(404, getFixture('team_membership.not_found'));
 
-      expect(
+      await expect(
         github.userIsTeamMember('someone', 'test_org/test-team')
       ).resolves.toBe(false);
     });

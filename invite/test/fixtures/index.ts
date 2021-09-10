@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
+import {EmitterWebhookEvent} from '@octokit/webhooks';
 import {Probot} from 'probot';
-import {WebhookEvent} from '@octokit/webhooks';
+import {WebhookEventMap, WebhookEventName} from '@octokit/webhooks-types';
 import fs from 'fs';
 import path from 'path';
 
-type SampleWebhookEvent = {event: string; payload: WebhookEvent<unknown>};
+type SampleWebhookEvent = {
+  event: WebhookEventName;
+  payload: WebhookEventMap[WebhookEventName];
+};
 
 /**
  * Get a JSON test fixture object.
@@ -42,5 +46,5 @@ export async function triggerWebhook(
     name: event,
     id: '', // required by type definition.
     payload,
-  });
+  } as EmitterWebhookEvent);
 }

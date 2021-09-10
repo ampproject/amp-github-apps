@@ -21,6 +21,7 @@ import {GitHub} from '../src/github';
 import {InvitationRecord, InviteAction} from '../src/invitation_record';
 import {Invite} from 'invite-bot';
 import {InviteBot} from '../src/invite_bot';
+import {Octokit} from '@octokit/rest';
 import {dbConnect} from '../src/db';
 import {setupDb} from '../src/setup_db';
 
@@ -61,7 +62,7 @@ describe('Invite Bot', () => {
     jest.spyOn(InvitationRecord.prototype, 'recordInvite');
 
     inviteBot = new InviteBot(
-      /*client=*/ null,
+      /*client=*/ {} as Octokit,
       'test_org',
       'test_org/wg-example',
       /*helpUsernameToTag=*/ 'test_org/wg-helpme'
@@ -75,13 +76,17 @@ describe('Invite Bot', () => {
 
   describe('constructor', () => {
     it('defaults helpUserTag to "someone"', () => {
-      inviteBot = new InviteBot(/*client=*/ null, 'test_org', 'wg-example');
+      inviteBot = new InviteBot(
+        /*client=*/ {} as Octokit,
+        'test_org',
+        'wg-example'
+      );
       expect(inviteBot.helpUserTag).toEqual('someone in your organization');
     });
 
     it('prepends the help username with @ if set', () => {
       inviteBot = new InviteBot(
-        /*client=*/ null,
+        /*client=*/ {} as Octokit,
         'test_org',
         'wg-example',
         /*helpUsernameToTag=*/ 'test_org/wg-helpme'
@@ -102,7 +107,7 @@ describe('Invite Bot', () => {
     });
 
     it('ignores empty comments', async () => {
-      await inviteBot.processComment('test_repo', 1337, null, 'author');
+      await inviteBot.processComment('test_repo', 1337, '', 'author');
 
       expect(inviteBot.parseMacros).not.toBeCalled();
     });
@@ -316,11 +321,13 @@ describe('Invite Bot', () => {
     });
 
     it('returns true if user is a member of allow team', async () => {
-      expect(inviteBot.userCanTrigger('a-member')).resolves.toBe(true);
+      await expect(inviteBot.userCanTrigger('a-member')).resolves.toBe(true);
     });
 
     it('returns false if user is not a member of allow team', async () => {
-      expect(inviteBot.userCanTrigger('not-a-member')).resolves.toBe(false);
+      await expect(inviteBot.userCanTrigger('not-a-member')).resolves.toBe(
+        false
+      );
     });
   });
 
