@@ -32,6 +32,18 @@ cron:
   url: /_cron/recompute/AbsoluteCoverageMetric
   schedule: every 4 hours from 8:00 to 19:00
 
+- description: "Update circleci-presubmit-latency metric."
+  url: /_cron/recompute/CircleCiPresubmitLatency
+  schedule: every 24 hours
+
+- description: "Update circleci-greenness metric."
+  url: /_cron/recompute/CircleCiGreenness
+  schedule: every 24 hours
+
+- description: "Update circleci-flakiness metric."
+  url: /_cron/recompute/CircleCiFlakiness
+  schedule: every 24 hours
+
 - description: "Update presubmit-latency metric."
   url: /_cron/recompute/PresubmitLatencyMetric
   schedule: every 24 hours
