@@ -46,36 +46,33 @@ describe('GitHub interface', () => {
   });
 
   describe('inviteUser', () => {
-    it('PUTs to /orgs/:org/memberships/:username', async done => {
+    it('PUTs to /orgs/:org/memberships/:username', async () => {
       nock('https://api.github.com')
         .put('/orgs/test_org/memberships/someone')
         .reply(200, getFixture('add_member.exists'));
 
       await github.inviteUser('someone');
-      done();
     });
 
-    it('returns true when the user is invited', async done => {
+    it('returns true when the user is invited', async () => {
       nock('https://api.github.com')
         .put('/orgs/test_org/memberships/someone')
         .reply(200, getFixture('add_member.invited'));
 
-      expect(github.inviteUser('someone')).resolves.toBe(true);
-      done();
+      await expect(github.inviteUser('someone')).resolves.toBe(true);
     });
 
-    it('returns false when the user is already a member', async done => {
+    it('returns false when the user is already a member', async () => {
       nock('https://api.github.com')
         .put('/orgs/test_org/memberships/someone')
         .reply(200, getFixture('add_member.exists'));
 
-      expect(github.inviteUser('someone')).resolves.toBe(false);
-      done();
+      await expect(github.inviteUser('someone')).resolves.toBe(false);
     });
   });
 
   describe('addComment', () => {
-    it('POSTs comment to /repos/:owner/:repo/issues/:issue_number/comments', async done => {
+    it('POSTs comment to /repos/:owner/:repo/issues/:issue_number/comments', async () => {
       nock('https://api.github.com')
         .post('/repos/test_org/test_repo/issues/1337/comments', body => {
           expect(body).toEqual({body: 'Test comment'});
@@ -84,12 +81,11 @@ describe('GitHub interface', () => {
         .reply(200);
 
       await github.addComment('test_repo', 1337, 'Test comment');
-      done();
     });
   });
 
   describe('assignIssue', () => {
-    it('POSTs assignee to /repos/:owner/:repo/issues/:issue_number/assignees', async done => {
+    it('POSTs assignee to /repos/:owner/:repo/issues/:issue_number/assignees', async () => {
       nock('https://api.github.com')
         .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
           expect(body).toEqual({assignees: ['someone']});
@@ -98,51 +94,46 @@ describe('GitHub interface', () => {
         .reply(200);
 
       await github.assignIssue('test_repo', 1337, 'someone');
-      done();
     });
   });
 
   describe('userIsTeamMember', () => {
-    it('GETs /orgs/:org/teams/:team_slug/memberships/:username', async done => {
+    it('GETs /orgs/:org/teams/:team_slug/memberships/:username', async () => {
       nock('https://api.github.com')
         .get('/orgs/test_org/teams/test-team/memberships/someone')
         .reply(200, getFixture('team_membership.active'));
 
       await github.userIsTeamMember('someone', 'test_org/test-team');
-      done();
     });
 
-    it('returns true for "active" membership state', async done => {
+    it('returns true for "active" membership state', async () => {
       nock('https://api.github.com')
         .get('/orgs/test_org/teams/test-team/memberships/someone')
         .reply(200, getFixture('team_membership.active'));
 
-      expect(
+      await expect(
         github.userIsTeamMember('someone', 'test_org/test-team')
       ).resolves.toBe(true);
-      done();
     });
 
-    it('returns false for "pending" membership state', async done => {
+    it('returns false for "pending" membership state', async () => {
       nock('https://api.github.com')
         .get('/orgs/test_org/teams/test-team/memberships/someone')
         .reply(200, getFixture('team_membership.pending'));
 
-      expect(
+      await expect(
         github.userIsTeamMember('someone', 'test_org/test-team')
       ).resolves.toBe(false);
-      done();
     });
 
-    it('returns false for 404: Not Found', async done => {
+    it('returns false for 404: Not Found', async () => {
       nock('https://api.github.com')
         .get('/orgs/test_org/teams/test-team/memberships/someone')
         .reply(404, getFixture('team_membership.not_found'));
 
-      expect(
+      await expect(
         github.userIsTeamMember('someone', 'test_org/test-team')
       ).resolves.toBe(false);
-      done();
     });
   });
 });

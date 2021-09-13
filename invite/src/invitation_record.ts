@@ -17,6 +17,11 @@
 import {Database} from './db';
 import {Invite, InviteActionType, Logger} from 'invite-bot';
 
+type InviteDatabaseRow = Omit<Invite, 'created_at' | 'archived'> & {
+  archived: number;
+  created_at: string;
+};
+
 export const InviteAction: Record<string, InviteActionType> = {
   INVITE: 'invite',
   INVITE_AND_ASSIGN: 'invite_and_assign',
@@ -49,13 +54,16 @@ export class InvitationRecord {
     this.logger.info(`getInvites: Looking up recorded invites to @${username}`);
     return (
       await this.db('invites').select().where({username, archived: false})
-    ).map((invite: Invite) => {
+    ).map((inviteRow: InviteDatabaseRow) => ({
+      action: inviteRow.action,
+      issue_number: inviteRow.issue_number,
+      repo: inviteRow.repo,
+      username: inviteRow.username,
       // PostgresQL stores booleans as TINYINT, so we cast it to boolean.
-      invite.archived = !!invite.archived;
+      archived: !!inviteRow.archived,
       // PostgresQL returns timestamps as strings, so we wrap in a Date.
-      invite.created_at = new Date(invite.created_at);
-      return invite;
-    });
+      created_at: new Date(inviteRow.created_at),
+    }));
   }
 
   /**

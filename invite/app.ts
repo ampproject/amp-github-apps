@@ -14,120 +14,95 @@
  * limitations under the License.
  */
 
-import {Application, Context} from 'probot';
 import {Octokit} from '@octokit/rest';
-import Webhooks from '@octokit/webhooks';
+import {Probot} from 'probot';
+import {WebhookEventMap} from '@octokit/webhooks-types';
 import dotenv from 'dotenv';
 
+import {DeprecatedLogger} from 'probot/lib/types';
 import {InviteBot} from './src/invite_bot';
 
-type CommentWebhookPayload =
-  | Webhooks.WebhookPayloadIssueComment
-  | Webhooks.WebhookPayloadIssues
-  | Webhooks.WebhookPayloadPullRequest
-  | Webhooks.WebhookPayloadPullRequestReview
-  | Webhooks.WebhookPayloadPullRequestReviewComment;
+type PartialContext = {
+  octokit: Octokit;
+  payload: WebhookEventMap[
+    | 'issue_comment'
+    | 'issues'
+    | 'pull_request'
+    | 'pull_request_review'
+    | 'pull_request_review_comment'];
+  log: DeprecatedLogger;
+};
 
-export default (app: Application): void => {
+export default (app: Probot): void => {
   if (process.env.NODE_ENV !== 'test') {
     dotenv.config();
   }
 
   const helpUserToTag = process.env.HELP_USER_TO_TAG || null;
 
-  function botFromContext({
-    github,
-    payload,
-    log,
-  }: Context<CommentWebhookPayload>): InviteBot {
+  function botFromContext({octokit, payload, log}: PartialContext): InviteBot {
     return new InviteBot(
-      // This type-cast is required because Probot exports a separate GitHubAPI
-      // class, even though it's in Octokit instance.
-      github as unknown as Octokit,
+      octokit,
       payload.repository.owner.login,
-      process.env.ALLOW_TEAM_SLUG,
+      process.env.ALLOW_TEAM_SLUG ?? '',
       helpUserToTag,
       log
     );
   }
 
-  app.on(
-    'issue_comment.created',
-    async (context: Context<Webhooks.WebhookPayloadIssueComment>) => {
-      await botFromContext(context).processComment(
-        context.payload.repository.name,
-        context.payload.issue.number,
-        context.payload.comment.body,
-        context.payload.comment.user.login
-      );
-    }
-  );
+  app.on('issue_comment.created', async context => {
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.issue.number,
+      context.payload.comment.body,
+      context.payload.comment.user.login
+    );
+  });
 
-  app.on(
-    'issues.opened',
-    async (context: Context<Webhooks.WebhookPayloadIssues>) => {
-      await botFromContext(context).processComment(
-        context.payload.repository.name,
-        context.payload.issue.number,
-        context.payload.issue.body,
-        context.payload.issue.user.login
-      );
-    }
-  );
+  app.on('issues.opened', async context => {
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.issue.number,
+      context.payload.issue.body ?? '',
+      context.payload.issue.user.login
+    );
+  });
 
-  app.on(
-    'pull_request.opened',
-    async (context: Context<Webhooks.WebhookPayloadPullRequest>) => {
-      await botFromContext(context).processComment(
-        context.payload.repository.name,
-        context.payload.pull_request.number,
-        context.payload.pull_request.body,
-        context.payload.pull_request.user.login
-      );
-    }
-  );
+  app.on('pull_request.opened', async context => {
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.pull_request.number,
+      context.payload.pull_request.body ?? '',
+      context.payload.pull_request.user.login
+    );
+  });
 
-  app.on(
-    'pull_request_review.submitted',
-    async (context: Context<Webhooks.WebhookPayloadPullRequestReview>) => {
-      await botFromContext(context).processComment(
-        context.payload.repository.name,
-        context.payload.pull_request.number,
-        context.payload.review.body,
-        context.payload.review.user.login
-      );
-    }
-  );
+  app.on('pull_request_review.submitted', async context => {
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.pull_request.number,
+      context.payload.review.body ?? '',
+      context.payload.review.user.login
+    );
+  });
 
-  app.on(
-    'pull_request_review_comment.created',
-    async (
-      context: Context<Webhooks.WebhookPayloadPullRequestReviewComment>
-    ) => {
-      await botFromContext(context).processComment(
-        context.payload.repository.name,
-        context.payload.pull_request.number,
-        context.payload.comment.body,
-        context.payload.comment.user.login
-      );
-    }
-  );
+  app.on('pull_request_review_comment.created', async context => {
+    await botFromContext(context).processComment(
+      context.payload.repository.name,
+      context.payload.pull_request.number,
+      context.payload.comment.body,
+      context.payload.comment.user.login
+    );
+  });
 
-  app.on(
-    'organization.member_added',
-    async ({
-      github,
-      payload,
-      log,
-    }: Context<Webhooks.WebhookPayloadOrganization>) => {
-      const inviteBot = new InviteBot(
-        github as unknown as Octokit,
-        payload.organization.login,
-        process.env.ALLOW_TEAM_SLUG,
-        helpUserToTag,
-        log
-      );
-      await inviteBot.processAcceptedInvite(payload.membership.user.login);
-    }
-  );
+  app.on('organization.member_added', async ({octokit, payload, log}) => {
+    const inviteBot = new InviteBot(
+      octokit,
+      payload.organization.login,
+      process.env.ALLOW_TEAM_SLUG ?? '',
+      helpUserToTag,
+      log
+    );
+    await inviteBot.processAcceptedInvite(payload.membership.user.login);
+  });
 };

@@ -169,7 +169,7 @@ export class InviteBot {
     const existingInvites = await this.record.getInvites(invite.username);
     const expiration = expirationDate();
     const pendingInvites = existingInvites.filter(
-      ({created_at}) => created_at > expiration
+      ({created_at}) => created_at && created_at > expiration
     );
 
     if (pendingInvites.length) {
