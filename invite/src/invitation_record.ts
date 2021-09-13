@@ -54,18 +54,16 @@ export class InvitationRecord {
     this.logger.info(`getInvites: Looking up recorded invites to @${username}`);
     return (
       await this.db('invites').select().where({username, archived: false})
-    ).map((inviteRow: InviteDatabaseRow) => {
-      return {
-        action: inviteRow.action,
-        issue_number: inviteRow.issue_number,
-        repo: inviteRow.repo,
-        username: inviteRow.username,
-        // PostgresQL stores booleans as TINYINT, so we cast it to boolean.
-        archived: !!inviteRow.archived,
-        // PostgresQL returns timestamps as strings, so we wrap in a Date.
-        created_at: new Date(inviteRow.created_at),
-      };
-    });
+    ).map((inviteRow: InviteDatabaseRow) => ({
+      action: inviteRow.action,
+      issue_number: inviteRow.issue_number,
+      repo: inviteRow.repo,
+      username: inviteRow.username,
+      // PostgresQL stores booleans as TINYINT, so we cast it to boolean.
+      archived: !!inviteRow.archived,
+      // PostgresQL returns timestamps as strings, so we wrap in a Date.
+      created_at: new Date(inviteRow.created_at),
+    }));
   }
 
   /**
