@@ -9,7 +9,6 @@
     "build": "tsc",
     "build:watch": "tsc -w --p tsconfig.json",
     "setup-db": "node dist/src/setup_db.js",
-    "start": "probot run dist/app.js",
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-invite-'`date -u '+%Y%m%d%H%M%S'`",
     "test": "jest --reporters=jest-silent-reporter",
@@ -18,13 +17,13 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@octokit/rest": "18.10.0",
-    "@probot/serverless-gcf": "0.2.0",
     "dotenv": "10.0.0",
     "knex": "0.95.11",
     "pg": "8.7.1",
     "probot": "12.1.1"
   },
   "devDependencies": {
+    "@google-cloud/functions-framework": "1.9.0",
     "@octokit/webhooks-types": "4.6.0",
     "@types/jest": "27.0.1",
     "@types/node": "14.17.15",
@@ -43,10 +42,14 @@
     ]
   },
   "nodemonConfig": {
-    "exec": "npm start",
+    "exec": "npm run build && cd dist && npx functions-framework --target=probot",
+    "ext": "js,json,ts",
     "watch": [
       ".env",
-      "."
+      "*.*"
+    ],
+    "ignore": [
+      "dist/"
     ]
   },
   "jest": {
