@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "1.9.0",
-    "@octokit/webhooks-types": "4.6.1",
+    "@octokit/webhooks-types": "4.7.0",
     "@types/jest": "27.0.1",
     "@types/node": "14.17.16",
     "jest": "27.2.0",
