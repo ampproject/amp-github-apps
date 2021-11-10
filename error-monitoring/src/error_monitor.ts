@@ -17,13 +17,6 @@
 import {ErrorReport, ServiceGroup, Stackdriver} from 'error-monitoring';
 import {StackdriverApi} from './stackdriver_api';
 
-import fetch from 'node-fetch';
-import statusCodes from 'http-status-codes';
-
-export const ERROR_ISSUE_ENDPOINT =
-  process.env.ERROR_ISSUE_ENDPOINT ||
-  'https://amp-error-monitoring.uc.r.appspot.com/error-issue';
-
 export enum ServiceName {
   PRODUCTION = 'CDN Production',
   DEVELOPMENT = 'CDN 1%',
@@ -143,48 +136,6 @@ export class ErrorMonitor {
     return (await this.topUntrackedErrors())
       .filter(groupStats => this.hasHighFrequency(groupStats))
       .map(groupStats => this.reportFromGroupStats(groupStats));
-  }
-
-  /** Reports an error to the bot endpoint, returning the created issue URL. */
-  async reportError(errorReport: ErrorReport): Promise<string> {
-    const {errorId} = errorReport;
-    console.info(`Reporting error group ${errorId} to error issue bot`);
-    const {status, statusText, headers} = await fetch(ERROR_ISSUE_ENDPOINT, {
-      method: 'POST',
-      redirect: 'manual',
-      body: JSON.stringify(errorReport),
-      headers: {'Content-Type': 'application/json'},
-    });
-
-    if (status !== statusCodes.MOVED_TEMPORARILY) {
-      throw new Error(
-        `HTTP ${status} (${statusText}): ` +
-          `Failed to file GitHub issue for "${errorId}`
-      );
-    }
-
-    const issueUrl = headers.get('Location');
-    console.info(`Successfully created error report issue: ${issueUrl}`);
-    return issueUrl;
-  }
-
-  /** Identifies new, frequent errors and reports GitHub issues. */
-  async monitorAndReport(): Promise<Array<string>> {
-    const errors = await this.newErrorsToReport();
-    console.info(`Found ${errors.length} new error groups to report`);
-    const urls: Array<string> = [];
-
-    for (const error of errors) {
-      try {
-        const url = await this.reportError(error);
-        urls.push(url);
-        await this.client.setGroupIssue(error.errorId, url);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    return urls;
   }
 }
 
