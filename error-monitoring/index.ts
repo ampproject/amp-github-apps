@@ -17,10 +17,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {
-  ErrorMonitor,
-  ServiceName,
-} from './src/error_monitor';
 import {ErrorIssueBot} from './src/bot';
 import {
   ErrorList,
@@ -28,6 +24,7 @@ import {
   ServiceGroupType,
   TopIssueView,
 } from 'error-monitoring';
+import {ErrorMonitor, ServiceName} from './src/error_monitor';
 import {StackdriverApi} from './src/stackdriver_api';
 import {URLSearchParams} from 'url';
 import {formatDate, linkifySource} from './src/utils';
@@ -36,7 +33,9 @@ import express from 'express';
 import fs from 'fs';
 import statusCodes from 'http-status-codes';
 
-const ERROR_ISSUE_ENDPOINT = process.env.ERROR_ISSUE_ENDPOINT || 'https://amp-error-monitoring.uc.r.appspot.com/error-issue';
+const ERROR_ISSUE_ENDPOINT =
+  process.env.ERROR_ISSUE_ENDPOINT ||
+  'https://amp-error-monitoring.uc.r.appspot.com/error-issue';
 const GITHUB_SLUG = process.env.GITHUB_SLUG || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_SLUG.split('/');
 const ISSUE_REPO_NAME = process.env.ISSUE_REPO_NAME || 'error-reporting';

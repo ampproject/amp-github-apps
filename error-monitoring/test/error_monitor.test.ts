@@ -94,13 +94,6 @@ describe('ErrorMonitor', () => {
   };
 
   const errorGroups = [infrequentGroup, acknowledgedGroup, newGroup];
-  const newReport = {
-    errorId: 'new_id',
-    firstSeen: new Date('Feb 20, 2020'),
-    dailyOccurrences: 6000,
-    stacktrace: 'Error: New error',
-    seenInVersions: ['04-24 Stable (1234)', '+1 more'],
-  };
 
   beforeAll(() => {
     nock.disableNetConnect();
