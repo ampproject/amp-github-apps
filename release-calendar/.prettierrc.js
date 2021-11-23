@@ -16,7 +16,7 @@
 
 module.exports = {
   bracketSpacing: false,
-  jsxBracketSameLine: true,
+  bracketSameLine: true,
   jsxSingleQuote: true,
   parser: 'typescript',
   printWidth: 80,
