@@ -17,12 +17,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import Knex from 'knex';
+import knex, {Knex} from 'knex';
 
 export type Database = Knex;
 /** Connect to a database instance. */
 export function dbConnect(): Database {
-  return Knex({
+  return knex({
     client: 'pg',
     connection: {
       host: process.env.DB_UNIX_SOCKET,

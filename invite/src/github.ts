@@ -33,7 +33,7 @@ export class GitHub {
    */
   async inviteUser(username: string): Promise<boolean> {
     this.logger.info(`inviteUser: Sending an invite to @${username}`);
-    const response = await this.client.orgs.addOrUpdateMembership({
+    const response = await this.client.orgs.setMembershipForUser({
       org: this.org,
       username,
     });
@@ -84,7 +84,7 @@ export class GitHub {
     // just forwards along the response.
     const [org, teamName] = teamSlug.split('/');
     const response = await this.client.teams
-      .getMembershipInOrg({
+      .getMembershipForUserInOrg({
         org,
         team_slug: teamName,
         username,

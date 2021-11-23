@@ -53,33 +53,29 @@ export class RepositoryService {
 
   getCurrentPromotions(): Promise<Promotion[]> {
     return Promise.all(
-      [
-        Channel.LTS,
-        Channel.NIGHTLY,
-        Channel.OPT_IN_BETA,
-        Channel.PERCENT_BETA,
-        Channel.STABLE,
-      ].map((channel) => {
-        return this.promotionRepository
-          .createQueryBuilder('promotion')
-          .select('promotion.releaseName')
-          .addSelect('promotion.channel')
-          .where('promotion.channel = :channel', {channel})
-          .orderBy('promotion.date', 'DESC')
-          .getOne();
-      }),
+      [Channel.LTS, Channel.NIGHTLY, Channel.BETA, Channel.STABLE].map(
+        (channel) => {
+          return this.promotionRepository
+            .createQueryBuilder('promotion')
+            .select('promotion.releaseName')
+            .addSelect('promotion.channel')
+            .where('promotion.channel = :channel', {channel})
+            .orderBy('promotion.date', 'DESC')
+            .getOne();
+        },
+      ),
     );
   }
 
-  async createReleases(release: Release): Promise<void> {
+  async createRelease(release: Release): Promise<void> {
     await this.releaseRepository.save(release).catch((error) => {
       // a throw is required here due to bug typeorm/typeorm#5057
       throw error;
     });
   }
 
-  async createPromotions(promotions: Promotion[]): Promise<void> {
-    await this.promotionRepository.save(promotions).catch((error) => {
+  async createPromotion(promotion: Promotion): Promise<void> {
+    await this.promotionRepository.save(promotion).catch((error) => {
       // a throw is required here due to bug typeorm/typeorm#5057
       throw error;
     });

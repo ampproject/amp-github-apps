@@ -620,27 +620,27 @@ describe('owners check', () => {
 
     it('lists files with their owners approvers', () => {
       expect(coverageText).toContain('### Current Coverage');
-      expect(coverageText).toContain('- foo/test.js _(approver)_');
-      expect(coverageText).toContain('- bar/baz/file.txt _(other_approver)_');
-      expect(coverageText).toContain('- buzz/README.md _(the_author)_');
+      expect(coverageText).toContain('- `foo/test.js` _(approver)_');
+      expect(coverageText).toContain('- `bar/baz/file.txt` _(other_approver)_');
+      expect(coverageText).toContain('- `buzz/README.md` _(the_author)_');
     });
 
     it('lists files needing approval', () => {
       expect(coverageText).toContain('### Current Coverage');
-      expect(coverageText).toContain('- **[NEEDS APPROVAL]** main.js');
+      expect(coverageText).toContain('- **[NEEDS APPROVAL]** `main.js`');
     });
 
     it('shows existing reviewers that could approve files', () => {
       expect(coverageText).toContain('### Current Coverage');
       expect(coverageText).toContain(
-        '- **[NEEDS APPROVAL]** extra/script.js _(requested: extra_reviewer)_'
+        '- **[NEEDS APPROVAL]** `extra/script.js` _(requested: extra_reviewer)_'
       );
     });
 
     it('shows missing required', () => {
       expect(coverageText).toContain('### Current Coverage');
       expect(coverageText).toContain(
-        '- **[NEEDS APPROVAL]** foo/required/info.html ' +
+        '- **[NEEDS APPROVAL]** `foo/required/info.html` ' +
           '_(required: required_reviewer)_'
       );
     });
@@ -656,11 +656,11 @@ describe('owners check', () => {
       expect(ownersCheck.buildReviewSuggestionsText(reviewSuggestions)).toEqual(
         '### Suggested Reviewers\n\n' +
           'Reviewer: _alice_\n' +
-          '- alice_file1.js\n' +
-          '- foo/alice_file2.js\n\n' +
+          '- `alice_file1.js`\n' +
+          '- `foo/alice_file2.js`\n\n' +
           'Reviewer: _bob_\n' +
-          '- bob_file1.js\n' +
-          '- bar/bob_file2.js'
+          '- `bob_file1.js`\n' +
+          '- `bar/bob_file2.js`'
       );
     });
   });

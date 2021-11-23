@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
+import {Endpoints} from '@octokit/types';
 import {Octokit} from '@octokit/rest';
 
 import {BlameFinder} from './blame_finder';
 import {ErrorReport} from 'error-monitoring';
 import {IssueBuilder} from './issue_builder';
 import {RateLimitedGraphQL} from './rate_limited_graphql';
+
+type IssuesCreateParams =
+  Endpoints['POST /repos/{owner}/{repo}/issues']['parameters'];
 
 const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
 const RELEASE_ONDUTY =
@@ -45,9 +49,7 @@ export class ErrorIssueBot {
   }
 
   /** Builds the issue to create. */
-  async buildErrorIssue(
-    errorReport: ErrorReport
-  ): Promise<Octokit.IssuesCreateParams> {
+  async buildErrorIssue(errorReport: ErrorReport): Promise<IssuesCreateParams> {
     const {stacktrace} = errorReport;
     const blameRanges = await this.blameFinder.blameForStacktrace(stacktrace);
     const builder = new IssueBuilder(

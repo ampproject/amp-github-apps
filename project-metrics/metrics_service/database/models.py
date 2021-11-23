@@ -30,6 +30,83 @@ def _is_last_n_days(
   return (timestamp_column >= n_days_ago) & (timestamp_column <= base_time)
 
 
+class CircleCiReportingWindow(enum.Enum):
+  """The reporting windows supported by the CircleCI insights api"""
+  LAST_24_HOURS = 'last-24-hours'
+  LAST_7_DAYS = 'last-7-days'
+  LAST_30_DAYS = 'last-30-days'
+  LAST_60_DAYS = 'last-60-days'
+  LAST_90_DAYS = 'last-90-days'
+
+
+class CircleCiWorkflowDurationMetrics():
+  min: int
+  mean: int
+  median: int
+  p95: int
+  max: int
+  standard_deviation: float
+  total_duration: int
+
+  @staticmethod
+  def from_json(dict):
+    metrics = CircleCiWorkflowDurationMetrics()
+    metrics.min = dict['min']
+    metrics.mean = dict['mean']
+    metrics.median = dict['median']
+    metrics.p95 = dict['p95']
+    metrics.max = dict['max']
+    metrics.standard_deviation = dict['standard_deviation']
+    metrics.total_duration = dict['total_duration']
+    return metrics
+
+
+class CircleCiWorkflowMetrics():
+  duration_metrics: CircleCiWorkflowDurationMetrics
+  total_runs: int
+  successful_runs: int
+  mttr: int
+  total_credits_used: int
+  failed_runs: int
+  median_credits_used: int
+  success_rate: float
+  total_recoveries: int
+  throughput: float
+
+  @staticmethod
+  def from_json(stats):
+    metrics = CircleCiWorkflowMetrics()
+    metrics.duration_metrics = CircleCiWorkflowDurationMetrics.from_json(stats['duration_metrics'])
+    metrics.total_runs = stats['total_runs']
+    metrics.successful_runs = stats['successful_runs']
+    metrics.mttr = stats['mttr']
+    metrics.total_credits_used = stats['total_credits_used']
+    metrics.failed_runs = stats['failed_runs']
+    metrics.median_credits_used = stats['median_credits_used']
+    metrics.success_rate = stats['success_rate']
+    metrics.total_recoveries = stats['total_recoveries']
+    metrics.throughput = stats['throughput']
+    return metrics
+
+
+class CircleCiWorkflowStats():
+  project_id: str
+  name: str
+  metrics: CircleCiWorkflowMetrics
+  window_start: datetime.datetime
+  window_end: datetime.datetime
+
+  @staticmethod
+  def from_json(raw_stats):
+    stats = CircleCiWorkflowStats
+    stats.project_id = raw_stats['project_id']
+    stats.name = raw_stats['name']
+    stats.metrics = CircleCiWorkflowMetrics.from_json(raw_stats['metrics'])
+    date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+    stats.window_start = datetime.datetime.strptime(raw_stats['window_start'], date_format)
+    stats.window_end = datetime.datetime.strptime(raw_stats['window_end'], date_format)
+    return stats
+
 class MetricScore(enum.Enum):
   """The computed score of a metric."""
   UNKNOWN = 0
@@ -64,85 +141,6 @@ class MetricResult(Base):
   def __repr__(self) -> Text:
     return "<Metric(name='%s', value='%.3g', computed_at='%s')>" % (
         self.name, self.value, self.computed_at)
-
-
-class TravisState(enum.Enum):
-  """A state of a Travis build or job.
-
-  Based on
-  https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/build/states.rb#L25
-  """
-  CREATED = 'created'
-  RECEIVED = 'received'
-  STARTED = 'started'
-  PASSED = 'passed'
-  FAILED = 'failed'
-  ERRORED = 'errored'
-  CANCELED = 'canceled'
-
-
-class Build(Base):
-  """A Travis build."""
-
-  __tablename__ = 'travis_builds'
-
-  @classmethod
-  def in_commit_order(cls, base_query):
-    """Orders builds by commit time."""
-    return base_query.join(Commit, Commit.hash == cls.commit_hash).order_by(
-        Commit.committed_at.desc())
-
-  @classmethod
-  def is_last_90_days(cls, base_time=None):
-    return _is_last_n_days(
-        timestamp_column=cls.started_at, days=90, base_time=base_time)
-
-  @classmethod
-  def last_90_days(cls,
-                   base_query,
-                   negate=False,
-                   base_time=None) -> sqlalchemy.orm.query.Query:
-    """To query builds younger than 90 days.
-
-     Args:
-      base_query: Query to filter.
-      negate: if true, returns builds older than 90 days
-
-     Returns:
-      Build query with filter applied.
-    """
-    filter_test = cls.is_last_90_days(base_time=base_time)
-    if negate:
-      filter_test = sqlalchemy.not_(filter_test)
-    return base_query.filter(filter_test)
-
-  @classmethod
-  def scope(cls, session, base_time=None):
-    """Default scoped query.
-
-    Args:
-      session: SQL Alchemy database session.
-
-    Returns:
-      The last build from each PR from the last 90 days in commit order.
-    """
-    return cls.in_commit_order(
-        cls.last_90_days(session.query(cls), base_time=base_time))
-
-  id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-  number = sqlalchemy.Column(sqlalchemy.Integer)
-  duration = sqlalchemy.Column(sqlalchemy.Integer)
-  state = sqlalchemy.Column(sqlalchemy.Enum(TravisState))
-  started_at = sqlalchemy.Column(sqlalchemy.DateTime)
-  commit_hash = sqlalchemy.Column(
-      sqlalchemy.Unicode(40), sqlalchemy.ForeignKey('commits.hash'))
-  commit = sqlalchemy.orm.relationship('Commit', backref='builds')
-
-  def __repr__(self) -> Text:
-    return ('<Build(number=%d, duration=%ss, state=%s, started_at=%s, '
-            'commit_hash=%s)>') % (self.number, self.duration or
-                                   '?', self.state.name, self.started_at,
-                                   self.commit_hash)
 
 
 class PullRequestStatus(enum.Enum):

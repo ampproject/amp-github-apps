@@ -143,11 +143,12 @@ module.exports = class VirtualRepository extends Repository {
     return await this.cache.readFile(repoPath, async () => {
       let contents = '';
       try {
-        contents = await this.github.getFileContents(relativePath);
+        const result = await this.github.getFileContents(relativePath);
+        contents = result.contents;
         // If fetching a file that didn't come back in search results, refresh its
         // recorded SHA.
         if (fileSha == 'UNKNOWN') {
-          this._fileRefs.set(repoPath, contents.data.sha);
+          this._fileRefs.set(repoPath, result.sha);
         }
       } catch (e) {
         // If the file no longer exists, remove its cache entry.

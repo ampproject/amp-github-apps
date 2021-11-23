@@ -58,12 +58,11 @@ describe('notifier', () => {
       sandbox.stub(OwnersNotifier.prototype, 'createNotificationComment');
     });
 
-    it('requests reviews for the suggested reviewers', async done => {
+    it('requests reviews for the suggested reviewers', async () => {
       sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
       await notifier.notify(github, ['auser']);
 
       sandbox.assert.calledWith(notifier.requestReviews, github, ['auser']);
-      done();
     });
 
     it('adds requested reviews to the current reviewer set', async () => {
@@ -74,11 +73,10 @@ describe('notifier', () => {
       expect(notifier.currentReviewers['auser']).toBe(false);
     });
 
-    it('creates a notification comment', async done => {
+    it('creates a notification comment', async () => {
       await notifier.notify(github, ['auser']);
 
       sandbox.assert.calledWith(notifier.createNotificationComment, github);
-      done();
     });
   });
 
@@ -98,11 +96,10 @@ describe('notifier', () => {
         sandbox.stub(process, 'env').value({ADD_REVIEWERS_OPT_OUT: false});
       });
 
-      it('does not create review requests', async done => {
+      it('does not create review requests', async () => {
         await notifier.requestReviews(github, ['auser']);
 
         sandbox.assert.notCalled(github.createReviewRequests);
-        done();
       });
 
       it('returns an empty list', async () => {
@@ -117,7 +114,7 @@ describe('notifier', () => {
           pr.description = 'Assign reviewers please #addowners';
         });
 
-        it('requests reviewers', async done => {
+        it('requests reviewers', async () => {
           await notifier.requestReviews(github, ['auser', 'anotheruser']);
 
           sandbox.assert.calledWith(notifier.getReviewersToRequest, [
@@ -127,7 +124,6 @@ describe('notifier', () => {
           sandbox.assert.calledWith(github.createReviewRequests, 1337, [
             'auser',
           ]);
-          done();
         });
 
         it('returns the requested reviewers', async () => {
@@ -147,7 +143,7 @@ describe('notifier', () => {
         sandbox.stub(process, 'env').value({ADD_REVIEWERS_OPT_OUT: true});
       });
 
-      it('requests reviewers', async done => {
+      it('requests reviewers', async () => {
         await notifier.requestReviews(github, ['auser', 'anotheruser']);
 
         sandbox.assert.calledWith(notifier.getReviewersToRequest, [
@@ -155,7 +151,6 @@ describe('notifier', () => {
           'anotheruser',
         ]);
         sandbox.assert.calledWith(github.createReviewRequests, 1337, ['auser']);
-        done();
       });
 
       it('returns the requested reviewers', async () => {
@@ -173,11 +168,10 @@ describe('notifier', () => {
           pr.description = 'Please do not assign reviewers #noaddowners';
         });
 
-        it('does not create review requests', async done => {
+        it('does not create review requests', async () => {
           await notifier.requestReviews(github, ['auser']);
 
           sandbox.assert.notCalled(github.createReviewRequests);
-          done();
         });
 
         it('returns an empty list', async () => {
@@ -206,12 +200,11 @@ describe('notifier', () => {
       notifier = new OwnersNotifier(pr, {}, tree, ['main.js']);
     });
 
-    it('gets users and teams to notify', async done => {
+    it('gets users and teams to notify', async () => {
       sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns([]);
       await notifier.createNotificationComment(github);
 
       sandbox.assert.calledOnce(notifier.getOwnersToNotify);
-      done();
     });
 
     describe('when there are users or teams to notify', () => {
@@ -227,11 +220,10 @@ describe('notifier', () => {
           getCommentsStub.returns([{id: 42, body: 'a comment'}]);
         });
 
-        it('does not create a comment', async done => {
+        it('does not create a comment', async () => {
           await notifier.createNotificationComment(github);
 
           sandbox.assert.notCalled(github.createBotComment);
-          done();
         });
 
         it('updates the existing comment', async () => {
@@ -281,7 +273,7 @@ describe('notifier', () => {
           expect(comment).toContain('<!-- Edited to fix team @ mention -->');
         });
 
-        it('does not update if no team is mentioned', async done => {
+        it('does not update if no team is mentioned', async () => {
           OwnersNotifier.prototype.getOwnersToNotify.restore();
           sandbox.stub(OwnersNotifier.prototype, 'getOwnersToNotify').returns({
             'a_subscriber': ['foo/main.js'],
@@ -289,18 +281,16 @@ describe('notifier', () => {
           await notifier.createNotificationComment(github);
 
           sandbox.assert.notCalled(github.updateComment);
-          done();
         });
       });
     });
 
     describe('when there are no users or teams to notify', () => {
-      it('does not create or update a comment', async done => {
+      it('does not create or update a comment', async () => {
         await notifier.createNotificationComment(github);
 
         sandbox.assert.notCalled(github.createBotComment);
         sandbox.assert.notCalled(github.updateComment);
-        done();
       });
     });
 
@@ -328,7 +318,7 @@ describe('notifier', () => {
         });
       });
 
-      it('truncates long file lists', async done => {
+      it('truncates long file lists', async () => {
         await notifier.createNotificationComment(github);
 
         sandbox.assert.calledOnce(github.createBotComment);
@@ -342,7 +332,6 @@ describe('notifier', () => {
         expect(comment).toContain(
           'Hey @minor_owner! These files were changed:\n```\nfile1\nfile2\n```'
         );
-        done();
       });
     });
   });

@@ -225,11 +225,11 @@ class OwnersParser {
 
     validate(fileDef);
     if (validate.errors) {
-      validate.errors.forEach(({dataPath, message}) =>
+      validate.errors.forEach(({instancePath, message}) =>
         errors.push(
           new OwnersParserError(
             ownersPath,
-            `\`${ownersPath}${dataPath}\` ${message}`
+            `\`${ownersPath}${instancePath}\` ${message}`
           )
         )
       );

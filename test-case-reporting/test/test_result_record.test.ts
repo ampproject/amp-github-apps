@@ -26,12 +26,12 @@ import {TestResultRecord} from '../src/test_result_record';
 import {fillDatabase, truncateAll} from './testing_utils';
 import {getFixture} from './fixtures';
 import {setupDb} from '../src/setup_db';
-import Knex from 'knex';
+import knex from 'knex';
 import md5 from 'md5';
 
 jest.mock('../src/db', () => ({
   dbConnect: (): Database =>
-    Knex({
+    knex({
       client: 'sqlite3',
       connection: ':memory:',
       useNullAsDefault: true,

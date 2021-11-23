@@ -99,7 +99,7 @@ describe('owners parser', () => {
       it('reports an error', () => {
         const {errors} = parseOwnerDefinition('HELLO!');
         expect(errors[0].message).toEqual(
-          '`OWNERS.rules[0].owners[0]` should be object'
+          '`OWNERS/rules/0/owners/0` must be object'
         );
       });
 
@@ -116,7 +116,7 @@ describe('owners parser', () => {
           pattern: 'something.js', // This should be in the rule, not the owner
         });
         expect(errors[0].message).toEqual(
-          '`OWNERS.rules[0].owners[0]` should NOT have additional properties'
+          '`OWNERS/rules/0/owners/0` must NOT have additional properties'
         );
       });
 
@@ -133,7 +133,7 @@ describe('owners parser', () => {
       it('reports an error', () => {
         const {errors} = parseOwnerDefinition({name: {}});
         expect(errors[0].message).toEqual(
-          '`OWNERS.rules[0].owners[0].name` should be string'
+          '`OWNERS/rules/0/owners/0/name` must be string'
         );
       });
 
@@ -147,7 +147,7 @@ describe('owners parser', () => {
       it('reports an error', () => {
         const {errors} = parseOwnerDefinition({name: '@myname'});
         expect(errors[0].message).toContain(
-          '`OWNERS.rules[0].owners[0].name` should match pattern'
+          '`OWNERS/rules/0/owners/0/name` must match pattern'
         );
       });
 
@@ -166,7 +166,7 @@ describe('owners parser', () => {
             requestReviews: false,
           });
           expect(errors[0].message).toContain(
-            '`OWNERS.rules[0].owners[0]` should NOT have more than 2 properties'
+            '`OWNERS/rules/0/owners/0` must NOT have more than 2 items'
           );
         });
 
@@ -269,7 +269,7 @@ describe('owners parser', () => {
     describe('when given something not a rule definition', () => {
       it('reports an error', () => {
         const {errors} = parseRuleDefinition('NOT A RULE DEF');
-        expect(errors[0].message).toEqual('`OWNERS.rules[0]` should be object');
+        expect(errors[0].message).toEqual('`OWNERS/rules/0` must be object');
       });
 
       it('returns no result', () => {
@@ -285,7 +285,7 @@ describe('owners parser', () => {
           notify: true, // This should be in the owner, not the rule
         });
         expect(errors[0].message).toEqual(
-          '`OWNERS.rules[0]` should NOT have additional properties'
+          '`OWNERS/rules/0` must NOT have additional properties'
         );
       });
 
@@ -302,7 +302,7 @@ describe('owners parser', () => {
       it('reports an error', () => {
         const {errors} = parseRuleDefinition({owners: 1337});
         expect(errors[0].message).toEqual(
-          '`OWNERS.rules[0].owners` should be array'
+          '`OWNERS/rules/0/owners` must be array'
         );
       });
 
@@ -320,8 +320,8 @@ describe('owners parser', () => {
         const errorMessages = errors.map(({message}) => message);
 
         expect(errorMessages).toEqual([
-          '`OWNERS.rules[0].owners[0]` should be object',
-          '`OWNERS.rules[0].owners[1]` should be object',
+          '`OWNERS/rules/0/owners/0` must be object',
+          '`OWNERS/rules/0/owners/1` must be object',
         ]);
       });
 
@@ -348,7 +348,7 @@ describe('owners parser', () => {
             owners: [{name: 'coder'}],
           });
           expect(errors[0].message).toEqual(
-            '`OWNERS.rules[0].pattern` should be string'
+            '`OWNERS/rules/0/pattern` must be string'
           );
         });
 
@@ -433,7 +433,7 @@ describe('owners parser', () => {
 
       expect(result).toEqual([]);
       expect(errors[0].message).toEqual(
-        "`OWNERS` should have required property 'rules'"
+        "`OWNERS` must have required property 'rules'"
       );
     });
 
@@ -601,7 +601,7 @@ describe('owners parser', () => {
         it('reports an error', () => {
           const {errors} = parser.parseOwnersFileDefinition('OWNERS', fileDef);
           expect(errors[0].message).toEqual(
-            '`OWNERS.reviewerPool` should be array'
+            '`OWNERS/reviewerPool` must be array'
           );
         });
 
@@ -633,12 +633,11 @@ describe('owners parser', () => {
   });
 
   describe('parseOwnersFile', () => {
-    it('reads the file from the local repository', async done => {
+    it('reads the file from the local repository', async () => {
       sandbox.stub(repo, 'readFile').returns('{rules: []}');
       await parser.parseOwnersFile('foo/OWNERS');
 
       sandbox.assert.calledWith(repo.readFile, 'foo/OWNERS');
-      done();
     });
 
     it('assigns the OWNERS directory path', async () => {
@@ -661,7 +660,7 @@ describe('owners parser', () => {
       expect(errors[0].message).toContain('SyntaxError:');
     });
 
-    it('parses the owners file definition', async done => {
+    it('parses the owners file definition', async () => {
       sandbox.stub(repo, 'readFile').returns('{rules: []}');
       sandbox.stub(parser, 'parseOwnersFileDefinition').callThrough();
       await parser.parseOwnersFile('foo/OWNERS');
@@ -671,7 +670,6 @@ describe('owners parser', () => {
         'foo/OWNERS',
         {rules: []}
       );
-      done();
     });
   });
 

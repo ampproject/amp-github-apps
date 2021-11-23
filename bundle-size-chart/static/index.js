@@ -97,12 +97,12 @@ d3.csv(CSV_FILE_NAME).then(data_ => {
 /**
  * Updates the y axis based on the filter.
  *
- * @param {string} filter text that should be in the file name
+ * @param {!RegExp} filter text that should be in the file name
  */
 function updateYAxis(filter) {
   let yMax = 0;
   for (const key of data.columns) {
-    if (key.startsWith('dist/') && key.includes(filter)) {
+    if (key.startsWith('dist/') && filter.test(key)) {
       yMax = Math.max(yMax, filesMax[key]);
     }
   }
@@ -114,12 +114,12 @@ function updateYAxis(filter) {
  * Draws all bundle-size lines based on the filter.
  */
 function updateFilter() {
-  const filter = document.querySelector('#filter').value;
+  const filter = new RegExp(document.querySelector('#filter').value);
   svg.selectAll('.line').remove(); // Remove any previously added lines.
   updateYAxis(filter);
 
   for (const key of data.columns) {
-    if (key.startsWith('dist/') && key.includes(filter)) {
+    if (key.startsWith('dist/') && filter.test(key)) {
       const valueline = d3
         .line()
         .x(d => x(d.date))
@@ -139,8 +139,8 @@ function updateFilter() {
  * Event handler for when the mouse moves over the chart.
  */
 function moved() {
-  const filter = document.querySelector('#filter').value;
-  if (!data || !data.columns.some(key => key.includes(filter))) {
+  const filter = new RegExp(document.querySelector('#filter').value);
+  if (!data || !data.columns.some(key => filter.test(key))) {
     // Ignore while still loading the data or if the filter results in an empty
     // set.
     return;
@@ -160,7 +160,7 @@ function moved() {
 
   // Find the closest data column (file name) to the pointer.
   const closestDataFile = data.columns
-    .filter(key => key.includes(filter))
+    .filter(key => filter.test(key))
     .reduce((a, b) =>
       Math.abs(closestDataRow[a] - y0) < Math.abs(closestDataRow[b] - y0)
         ? a

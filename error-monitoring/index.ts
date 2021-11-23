@@ -30,11 +30,11 @@ import {
   TopIssueView,
 } from 'error-monitoring';
 import {StackdriverApi} from './src/stackdriver_api';
+import {URLSearchParams} from 'url';
 import {formatDate, linkifySource} from './src/utils';
 import Mustache from 'mustache';
 import express from 'express';
 import fs from 'fs';
-import querystring from 'querystring';
 import statusCodes from 'http-status-codes';
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
@@ -167,7 +167,7 @@ export async function errorIssue(
 }
 
 function createErrorReportUrl({errorId}: ErrorReport): string {
-  const params = querystring.stringify({errorId, linkIssue: 1});
+  const params = new URLSearchParams({errorId, linkIssue: '1'});
   return `${ERROR_ISSUE_ENDPOINT}?${params}`;
 }
 

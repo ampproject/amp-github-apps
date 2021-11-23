@@ -36,7 +36,10 @@ describe('virtual repository', () => {
     sandbox.stub(CloudStorage.prototype, 'delete');
     sandbox.stub(console);
 
-    sandbox.stub(GitHub.prototype, 'getFileContents').resolves('contents');
+    sandbox.stub(GitHub.prototype, 'getFileContents').resolves({
+      contents: 'contents',
+      sha: 'sha',
+    });
     sandbox
       .stub(GitHub.prototype, 'searchFilename')
       .withArgs('OWNERS')
@@ -83,17 +86,16 @@ describe('virtual repository', () => {
       expect(repo._fileRefs.get('test_repo/foo/OWNERS')).toEqual('sha_2');
     });
 
-    it('invalidates the cache for changed owners files', async done => {
+    it('invalidates the cache for changed owners files', async () => {
       sandbox.stub(CompoundCache.prototype, 'invalidate');
       await repo.sync();
       sandbox.assert.neverCalledWith(repo.cache.invalidate, 'test_repo/OWNERS');
 
       await repo.sync();
       sandbox.assert.calledWith(repo.cache.invalidate, 'test_repo/OWNERS');
-      done();
     });
 
-    it('invalidates the file ref cache for new owners files', async done => {
+    it('invalidates the file ref cache for new owners files', async () => {
       sandbox.stub(CompoundCache.prototype, 'invalidate').resolves();
       sandbox.stub(CompoundCache.prototype, 'readFile').resolves();
       await repo.sync();
@@ -107,10 +109,9 @@ describe('virtual repository', () => {
         'test_repo/__fileRefs__',
         sinon.match.any
       );
-      done();
     });
 
-    it('invalidates the file ref cache for updated owners files', async done => {
+    it('invalidates the file ref cache for updated owners files', async () => {
       sandbox.stub(CompoundCache.prototype, 'invalidate').resolves();
       sandbox.stub(CompoundCache.prototype, 'readFile').resolves();
       await repo.sync();
@@ -128,10 +129,9 @@ describe('virtual repository', () => {
         'test_repo/__fileRefs__',
         sinon.match.any
       );
-      done();
     });
 
-    it('does not touch the file ref cache for unchanged owners files', async done => {
+    it('does not touch the file ref cache for unchanged owners files', async () => {
       sandbox.stub(CompoundCache.prototype, 'invalidate').resolves();
       sandbox.stub(CompoundCache.prototype, 'readFile').resolves();
       await repo.sync();
@@ -150,7 +150,6 @@ describe('virtual repository', () => {
         'test_repo/__fileRefs__',
         sinon.match.any
       );
-      done();
     });
   });
 
@@ -182,14 +181,13 @@ describe('virtual repository', () => {
           );
       });
 
-      it('reads file refs from the cache', async done => {
+      it('reads file refs from the cache', async () => {
         await repo.warmCache();
         sandbox.assert.calledWith(
           repo.cache.readFile,
           'test_repo/__fileRefs__',
           sinon.match.any
         );
-        done();
       });
 
       it('builds a map of file refs', async () => {
@@ -200,7 +198,7 @@ describe('virtual repository', () => {
         expect(repo._fileRefs.get('test_repo/foo/OWNERS')).toEqual('sha_2');
       });
 
-      it('reads all owners files through the cache', async done => {
+      it('reads all owners files through the cache', async () => {
         await repo.warmCache();
 
         sandbox.assert.calledWith(
@@ -218,7 +216,6 @@ describe('virtual repository', () => {
           'test_repo/foo/OWNERS',
           sinon.match.any
         );
-        done();
       });
     });
   });

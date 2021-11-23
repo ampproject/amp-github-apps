@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-import {serverless} from '@probot/serverless-gcf';
+import {createNodeMiddleware, createProbot} from 'probot';
 import appFn from './app';
-module.exports.probot = serverless(appFn);
+
+module.exports.probot = createNodeMiddleware(appFn, {probot: createProbot()});

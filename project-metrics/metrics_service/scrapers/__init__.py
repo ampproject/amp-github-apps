@@ -2,7 +2,6 @@ import datetime
 from typing import Optional, Text
 
 from scrapers.commit_scraper import CommitScraper
-from scrapers.build_scraper import BuildScraper
 from scrapers.release_scraper import ReleaseScraper
 from scrapers.cherrypick_scraper import CherrypickScraper
 from scrapers.cherrypick_issue_scraper import CherrypickIssueScraper
@@ -11,7 +10,6 @@ NINETY_DAYS = datetime.timedelta(days=90)
 ONE_YEAR = datetime.timedelta(days=365)
 SCRAPER_MAP = {
     'commits': CommitScraper,
-    'builds': BuildScraper,
     'releases': ReleaseScraper,
     'cherrypicks': CherrypickScraper,
     'cherrypick_issues': CherrypickIssueScraper,

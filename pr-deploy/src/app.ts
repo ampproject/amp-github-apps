@@ -18,7 +18,6 @@ import {Probot, ApplicationFunctionOptions} from 'probot';
 import express from 'express';
 import {PullRequest} from './github';
 import {decompressAndMove} from './zipper';
-import {Octokit} from '@octokit/rest';
 
 const BASE_URL = `https://storage.googleapis.com/${process.env.SERVE_BUCKET}/`;
 
@@ -49,30 +48,28 @@ function initializeCheck(app: Probot) {
  * the check run action to deploy site is enabled.
  */
 function initializeRouter(app: Probot, router: express.Router) {
-  const github: Promise<Octokit> = app.auth(
-    Number(process.env.INSTALLATION_ID)
-  );
+  const github = app.auth(Number(process.env.INSTALLATION_ID));
   router.use(express.json());
-  router.use(async(request, response, next) => {
+  router.use(async (request, response, next) => {
     response.locals.github = await github;
     next();
   });
 
-  router.post('/:headSha/success/:externalId', async(request, response) => {
+  router.post('/:headSha/success/:externalId', async (request, response) => {
     const {headSha, externalId} = request.params;
     const pr = new PullRequest(response.locals.github, headSha);
     await pr.buildCompleted(externalId);
     response.status(200).end();
   });
 
-  router.post('/:headSha/errored', async(request, response) => {
+  router.post('/:headSha/errored', async (request, response) => {
     const {headSha} = request.params;
     const pr = new PullRequest(response.locals.github, headSha);
     await pr.buildErrored();
     response.status(200).end();
   });
 
-  router.post('/:headSha/skipped', async(request, response) => {
+  router.post('/:headSha/skipped', async (request, response) => {
     const {headSha} = request.params;
     const pr = new PullRequest(response.locals.github, headSha);
     await pr.buildSkipped();
@@ -110,10 +107,13 @@ function initializeDeployment(app: Probot) {
   });
 }
 
-const prDeployAppFn = (app: Probot, {getRouter}: ApplicationFunctionOptions) => {
+const prDeployAppFn = (
+  app: Probot,
+  {getRouter}: ApplicationFunctionOptions
+) => {
   initializeCheck(app);
   initializeRouter(app, getRouter('/v0/pr-deploy/headshas'));
-  initializeDeployment(app);  
+  initializeDeployment(app);
 };
 
 export default prDeployAppFn;
