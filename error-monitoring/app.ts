@@ -17,7 +17,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {errorIssue, errorList, errorMonitor, linkIssue, topIssueList} from '.';
+import {errorIssue, errorList, linkIssue, topIssueList} from '.';
 import {json, urlencoded} from 'body-parser';
 import express from 'express';
 
@@ -30,7 +30,6 @@ express()
   .get(['/', '/error-list'], errorList)
   .get('/top-issues', topIssueList)
   .get('/link-issue', linkIssue)
-  .get('/_cron/monitor', errorMonitor)
   .listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
   });

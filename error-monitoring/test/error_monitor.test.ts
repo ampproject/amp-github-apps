@@ -94,13 +94,6 @@ describe('ErrorMonitor', () => {
   };
 
   const errorGroups = [infrequentGroup, acknowledgedGroup, newGroup];
-  const newReport = {
-    errorId: 'new_id',
-    firstSeen: new Date('Feb 20, 2020'),
-    dailyOccurrences: 6000,
-    stacktrace: 'Error: New error',
-    seenInVersions: ['04-24 Stable (1234)', '+1 more'],
-  };
 
   beforeAll(() => {
     nock.disableNetConnect();
@@ -129,87 +122,6 @@ describe('ErrorMonitor', () => {
       const newErrors = await monitor.newErrorsToReport();
       const newErrorIds = newErrors.map(({errorId}) => errorId);
       expect(newErrorIds).toEqual(['new_id']);
-    });
-  });
-
-  describe('reportError', () => {
-    it('reports the error to the error-issue endpoint', async () => {
-      nock('https://amp-error-monitoring.uc.r.appspot.com')
-        .post('/error-issue', body => {
-          expect(body).toMatchObject({
-            errorId: 'new_id',
-            firstSeen: expect.stringMatching(/^2020-02-20T/),
-            dailyOccurrences: 6000,
-            stacktrace: 'Error: New error',
-          });
-          return true;
-        })
-        .reply(302);
-
-      await monitor.reportError(newReport);
-    });
-
-    it('returns the URL of the created issue', async () => {
-      nock('https://amp-error-monitoring.uc.r.appspot.com')
-        .post('/error-issue')
-        .reply(302, null, {Location: 'http://github.com.com/blah/blah'});
-
-      await expect(monitor.reportError(newReport)).resolves.toEqual(
-        'http://github.com.com/blah/blah'
-      );
-    });
-
-    it('throws an error when error creation fails', async () => {
-      nock('https://amp-error-monitoring.uc.r.appspot.com')
-        .post('/error-issue')
-        .reply(400);
-
-      await expect(monitor.reportError(newReport)).rejects.toThrow(
-        'HTTP 400 (Bad Request)'
-      );
-    });
-  });
-
-  describe('monitorAndReport', () => {
-    beforeEach(() => {
-      monitor.reportError = jest
-        .fn()
-        .mockReturnValue('https://github.com/blah/blah');
-    });
-
-    it('reports new errors', async () => {
-      await monitor.monitorAndReport();
-
-      expect(monitor.reportError).toHaveBeenCalledTimes(1);
-      expect(monitor.reportError).toHaveBeenCalledWith(newReport);
-    });
-
-    it('returns created URLs', async () => {
-      await expect(monitor.monitorAndReport()).resolves.toEqual([
-        'https://github.com/blah/blah',
-      ]);
-    });
-
-    it('sets tracking issues for new errors', async () => {
-      await monitor.monitorAndReport();
-
-      expect(stackdriver.setGroupIssue).toHaveBeenCalledWith(
-        'new_id',
-        'https://github.com/blah/blah'
-      );
-    });
-
-    it('handles failed attempts to report errors', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => {
-        // Do nothing
-      });
-      monitor.reportError = jest.fn().mockImplementation(async () => {
-        throw new Error('Oops!');
-      });
-
-      await expect(monitor.monitorAndReport()).resolves.toEqual([]);
-      expect(console.error).toHaveBeenCalled();
-      mocked(console.error).mockRestore();
     });
   });
 

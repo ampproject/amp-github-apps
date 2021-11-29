@@ -17,11 +17,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {
-  ERROR_ISSUE_ENDPOINT,
-  ErrorMonitor,
-  ServiceName,
-} from './src/error_monitor';
 import {ErrorIssueBot} from './src/bot';
 import {
   ErrorList,
@@ -29,6 +24,7 @@ import {
   ServiceGroupType,
   TopIssueView,
 } from 'error-monitoring';
+import {ErrorMonitor, ServiceName} from './src/error_monitor';
 import {StackdriverApi} from './src/stackdriver_api';
 import {URLSearchParams} from 'url';
 import {formatDate, linkifySource} from './src/utils';
@@ -37,8 +33,11 @@ import express from 'express';
 import fs from 'fs';
 import statusCodes from 'http-status-codes';
 
-const GITHUB_REPO = process.env.GITHUB_REPO || 'ampproject/amphtml';
-const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_REPO.split('/');
+const ERROR_ISSUE_ENDPOINT =
+  process.env.ERROR_ISSUE_ENDPOINT ||
+  'https://amp-error-monitoring.uc.r.appspot.com/error-issue';
+const GITHUB_SLUG = process.env.GITHUB_SLUG || 'ampproject/amphtml';
+const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_SLUG.split('/');
 const ISSUE_REPO_NAME = process.env.ISSUE_REPO_NAME || GITHUB_REPO_NAME;
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
@@ -194,20 +193,6 @@ function getLister(
   }
 
   return optThreshold ? lister.threshold(optThreshold) : lister;
-}
-
-/** Endpoint to trigger a scan for new frequent errors. */
-export async function errorMonitor(
-  req: express.Request,
-  res: express.Response
-): Promise<void> {
-  try {
-    const serviceType = (req.query.serviceType || '').toString().toUpperCase();
-    res.json({issueUrls: await getLister(serviceType).monitorAndReport()});
-  } catch (error) {
-    res.status(statusCodes.INTERNAL_SERVER_ERROR);
-    res.json({error: error.toString()});
-  }
 }
 
 function viewData({
