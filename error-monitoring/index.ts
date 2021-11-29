@@ -38,7 +38,7 @@ const ERROR_ISSUE_ENDPOINT =
   'https://amp-error-monitoring.uc.r.appspot.com/error-issue';
 const GITHUB_SLUG = process.env.GITHUB_SLUG || 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_SLUG.split('/');
-const ISSUE_REPO_NAME = process.env.ISSUE_REPO_NAME || 'error-reporting';
+const ISSUE_REPO_NAME = process.env.ISSUE_REPO_NAME || GITHUB_REPO_NAME;
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
 const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
