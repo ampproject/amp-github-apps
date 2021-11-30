@@ -44,7 +44,7 @@
     "@types/node-fetch": "2.5.12",
     "@types/supertest": "2.0.11",
     "@types/tar-stream": "2.2.2",
-    "jest": "27.3.1",
+    "jest": "27.4.0",
     "jest-silent-reporter": "0.5.0",
     "nodemon": "2.0.15",
     "smee-client": "1.2.2",
