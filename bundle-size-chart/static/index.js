@@ -1,5 +1,3 @@
-// Before this date only dist/v0.js was collected.
-const MIN_DATE = new Date('2019-10-23T18:00:00Z');
 const CSV_FILE_NAME =
   'https://storage.googleapis.com/amp-bundle-size-chart/bundle-sizes.csv';
 const IGNORE_FILES = new Set([
