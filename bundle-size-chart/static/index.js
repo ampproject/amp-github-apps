@@ -352,7 +352,7 @@ function setStateFromHash() {
     rangeStart = deserializeDatetime(s);
   }
   if (e) {
-    rangeEnd = deserializeDatetime(e);
+    rangeEnd = deserializeDatetime(e, /* ceil */ true);
   }
 }
 
@@ -360,7 +360,7 @@ function serializeHashState(filter) {
   return (
     `#${encodeURIComponent(filter)}` +
     (rangeStart ? `&${serializeDatetime(rangeStart)}` : '') +
-    (rangeEnd ? `&${serializeDatetime(rangeEnd, true)}` : '')
+    (rangeEnd ? `&${serializeDatetime(rangeEnd)}` : '')
   );
 }
 
