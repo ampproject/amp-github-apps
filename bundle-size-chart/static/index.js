@@ -6,28 +6,37 @@ const IGNORE_FILES = new Set([
   'dist/v0/amp-viz-vega-0.1.mjs',
 ]);
 
-const margin = { left: 60, top: 36, right: 24, bottom: 48 };
+const margin = {left: 60, top: 36, right: 24, bottom: 48};
 
+/**
+ * @param {function(...*)} fn
+ * @param {number} wait
+ * @return {function(...*)}
+ */
 function debounce(fn, wait) {
   let timeout = null;
-  return function () {
+  return (...args) => {
     if (timeout) {
       clearTimeout(timeout);
     }
     timeout = setTimeout(() => {
       timeout = null;
-      fn(...arguments);
+      fn(...args);
     }, wait);
   };
 }
 
-function cancelNext(element, event) {
-  const capture = (e) => {
+/**
+ * @param {!Element} element
+ * @param {string} eventType
+ */
+function cancelNext(element, eventType) {
+  const capture = e => {
     e.preventDefault();
     e.stopPropagation();
-    element.removeEventListener(event, capture, true);
+    element.removeEventListener(eventType, capture, true);
   };
-  element.addEventListener(event, capture, true);
+  element.addEventListener(eventType, capture, true);
 }
 
 const max = {};
@@ -96,6 +105,8 @@ chart
 // viewport.
 d3.select(window).on('pointerup', applySelection);
 
+/**
+ */
 function redraw() {
   const rect = container.getBoundingClientRect();
 
@@ -112,8 +123,8 @@ function redraw() {
   for (const key of filteredData.columns) {
     const valueline = d3
       .line()
-      .x((d) => x(d.date))
-      .y((d) => y(d[key]))
+      .x(d => x(d.date))
+      .y(d => y(d[key]))
       .curve(d3.curveLinear);
     svg
       .insert('path', '.dot')
@@ -124,6 +135,8 @@ function redraw() {
   }
 }
 
+/**
+ */
 function updateAxes() {
   if (!filteredData.length) {
     svg.selectAll('.axis').attr('display', 'none');
@@ -138,7 +151,7 @@ function updateAxes() {
   const xMax = filteredData[filteredData.length - 1].date;
   x.domain([xMin, xMax]);
 
-  let yMax = Math.max(0, ...filteredData.columns.map((k) => max[k]));
+  let yMax = Math.max(0, ...filteredData.columns.map(k => max[k]));
   const yTickFactor = yMax <= 15 ? 1 : yMax <= 36 ? 2 : 5;
   yMax = Math.ceil(yMax / yTickFactor) * yTickFactor;
 
@@ -157,15 +170,18 @@ function updateAxes() {
     .attr('transform', `translate(0,${height})`)
     .call(d3.axisBottom(x).tickFormat(xTickFormat).ticks(xTickUnit));
 
-  function customYAxis(g) {
+  axisY.call(g => {
     const ticks = Math.ceil(yMax / yTickFactor);
     g.call(d3.axisRight(y).ticks(ticks).tickSize(width));
     g.selectAll('.tick text').attr('x', -36).attr('dy', 2);
-  }
-
-  axisY.call(customYAxis);
+  });
 }
 
+/**
+ * @param {number} offsetX
+ * @param {number} offsetY
+ * @return {{x: number, y: number, row: Object<string, *>, column: string}}
+ */
 function getClosestByPoint(offsetX, offsetY) {
   const filter = queryInput.value;
   if (!filteredData || !filteredData.length) {
@@ -178,7 +194,7 @@ function getClosestByPoint(offsetX, offsetY) {
 
   // Find the closest data row to the pointer.
   const dataIndex = d3
-    .bisector((d) => d.date)
+    .bisector(d => d.date)
     .left(filteredData, x0, 1, filteredData.length - 1);
   const left = filteredData[dataIndex - 1];
   const right = filteredData[dataIndex];
@@ -186,22 +202,26 @@ function getClosestByPoint(offsetX, offsetY) {
 
   // Find the closest data column (file name) to the pointer.
   const column = filteredData.columns
-    .filter((key) => key.includes(filter))
+    .filter(key => key.includes(filter))
     .reduce((a, b) => (Math.abs(row[a] - y0) < Math.abs(row[b] - y0) ? a : b));
 
-  return { x: x(row.date), y: y(row[column]), row, column };
+  return {x: x(row.date), y: y(row[column]), row, column};
 }
 
 let isSelecting = false;
 let selectionStart;
 let selectionEnd;
 
+/**
+ */
 function startSelection() {
   isSelecting = true;
   selectionEnd = null;
   selectionStart = getClosestByPoint(d3.event.offsetX, d3.event.offsetY);
 }
 
+/**
+ */
 function restartSelection() {
   if (!selectionEnd) {
     return;
@@ -211,6 +231,8 @@ function restartSelection() {
   selectionEnd = null;
 }
 
+/**
+ */
 function applySelection() {
   if (!isSelecting) {
     return;
@@ -232,6 +254,10 @@ function applySelection() {
   selectionStart = null;
 }
 
+/**
+ * @param {Date} startDate
+ * @param {Date} endDate
+ */
 function setRange(startDate, endDate) {
   const daysAgoChecked = document.querySelector('[name=days-ago]:checked');
   if (daysAgoChecked) {
@@ -242,6 +268,8 @@ function setRange(startDate, endDate) {
   updateOnChange();
 }
 
+/**
+ */
 function updateRangeChip() {
   const chip = document.querySelector('.range-chip');
   const label = document.querySelector('.range-chip > span');
@@ -256,8 +284,12 @@ function updateRangeChip() {
   chip.removeAttribute('hidden');
 }
 
+/**
+ * @param {Date} date
+ * @return {string}
+ */
 function shortDateLabel(date) {
-  return date.toLocaleDateString('en-us', { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString('en-us', {month: 'short', day: 'numeric'});
 }
 
 /**
@@ -273,7 +305,7 @@ function moved() {
     return;
   }
 
-  const { row, column } = closest;
+  const {row, column} = closest;
 
   let dragDelta = 0;
   if (isSelecting) {
@@ -312,6 +344,10 @@ function moved() {
   nudgeFromCenter(dotX, dotMessageText);
 }
 
+/**
+ * @param {number} center
+ * @param {Object} text d3 node
+ */
 function nudgeFromCenter(center, text) {
   const half = text.node().getComputedTextLength() / 2;
   const padding = 12;
@@ -322,9 +358,12 @@ function nudgeFromCenter(center, text) {
       ? width - center - padding - half
       : 0;
   text.attr('x', offset);
-  return text;
 }
 
+/**
+ * @param {number} x
+ * @param {number} width
+ */
 function setIndicator(x, width) {
   indicator
     .classed('range', width > 1)
@@ -335,6 +374,8 @@ function setIndicator(x, width) {
     .attr('height', height);
 }
 
+/**
+ */
 function setStateFromHash() {
   const parts = window.location.hash
     .substr(1)
@@ -354,19 +395,32 @@ function setStateFromHash() {
   }
 }
 
-function serializeHashState(filter) {
+/**
+ * @param {string} query
+ * @return {string}
+ */
+function serializeHashState(query) {
   return (
-    `#${encodeURIComponent(filter)}` +
+    `#${encodeURIComponent(query)}` +
     (rangeStart ? `&${serializeDatetime(rangeStart)}` : '') +
     (rangeEnd ? `&${serializeDatetime(rangeEnd)}` : '')
   );
 }
 
+/**
+ * @param {Date} date
+ * @return {string}
+ */
 function serializeDatetime(date) {
   const isoString = date.toISOString();
   return isoString.substr(0, isoString.length - ':00.000Z'.length);
 }
 
+/**
+ * @param {string} string
+ * @param {boolean=} ceil
+ * @return {Date}
+ */
 function deserializeDatetime(string, ceil) {
   return new Date(`${string}:${ceil ? '59' : '00'}.000Z`);
 }
@@ -377,8 +431,12 @@ document.querySelector('main').removeAttribute('hidden');
 let data;
 let filteredData;
 
+/**
+ * @param {Object[]} data
+ * @return {Object[]}
+ */
 function initializeData(data) {
-  data.forEach((d) => {
+  data.forEach(d => {
     d.date = d3.isoParse(d.date);
     for (const key of Object.keys(d)) {
       if (key.startsWith('dist/')) {
@@ -394,28 +452,34 @@ function initializeData(data) {
     }
   });
   data.sort((a, b) => a.date - b.date);
-  data.columns = data.columns.filter((key) => !IGNORE_FILES.has(key));
+  data.columns = data.columns.filter(key => !IGNORE_FILES.has(key));
   return data;
 }
 
+/**
+ */
 function updateFilteredData() {
   const query = queryInput.value.trim();
   filteredData =
     rangeStart && rangeEnd
-      ? data.filter((d) => d.date >= rangeStart && d.date <= rangeEnd)
+      ? data.filter(d => d.date >= rangeStart && d.date <= rangeEnd)
       : [...data];
   filteredData.columns = data.columns.filter(
-    (key) => key.startsWith('dist/') && key.includes(query)
+    key => key.startsWith('dist/') && key.includes(query)
   );
   setHashState(query);
 }
 
+/**
+ */
 function clearRange() {
   rangeStart = null;
   rangeEnd = null;
   updateOnChange();
 }
 
+/**
+ */
 function updateOnChange() {
   updateRangeChip();
   updateFilteredData();
@@ -424,6 +488,10 @@ function updateOnChange() {
 }
 
 let prevHash = window.location.hash;
+
+/**
+ * @param {string} query
+ */
 function setHashState(query) {
   const hash = serializeHashState(query);
   if (prevHash !== hash) {
@@ -431,6 +499,9 @@ function setHashState(query) {
     prevHash = hash;
   }
 }
+
+/**
+ */
 function onHashChange() {
   if (prevHash !== window.location.hash) {
     prevHash = window.location.hash;
@@ -440,7 +511,7 @@ function onHashChange() {
 
 window.addEventListener('hashchange', onHashChange, false);
 window.addEventListener('resize', redraw);
-window.addEventListener('keyup', (e) => {
+window.addEventListener('keyup', e => {
   if (e.key === 'Escape') {
     restartSelection();
   }
@@ -451,7 +522,7 @@ clearRangeButton.addEventListener('click', clearRange);
 const updateOnQueryInput = debounce(updateOnChange);
 queryInput.addEventListener('input', updateOnQueryInput);
 
-d3.csv(CSV_FILE_NAME).then((data_) => {
+d3.csv(CSV_FILE_NAME).then(data_ => {
   data = initializeData(data_);
   updateOnChange();
 });
