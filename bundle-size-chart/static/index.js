@@ -413,7 +413,7 @@ function serializeHashState(query) {
  */
 function serializeDatetime(date) {
   const isoString = date.toISOString();
-  return isoString.substr(0, isoString.length - ':00.000Z'.length);
+  return isoString.substring(0, isoString.length - ':00.000Z'.length);
 }
 
 /**
