@@ -1,37 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>AMPHTML bundle-size history</title>
-  <style>
-    .line {
-      fill: none;
-      stroke: lightsteelblue;
-      stroke-width: 1.5px;
-    }
-    .line.hover {
-      stroke: steelblue;
-      stroke-width: 3px;
-    }
-    .hover-line {
-      stroke: silver;
-      stroke-width: .5px;
-    }
-    .dot {
-      font-family: sans-serif;
-      text-anchor: middle;
-      text-decoration: underline;
-    }
-    .dot a:hover text {
-      fill: blue;
-    }
-  </style>
-</head>
-<body>
-  <h1><a href="https://github.com/ampproject/amphtml">AMPHTML</a> bundle-size history</h1>
-  <div id="chart"></div>
-  <label for="filter">Filter</label> <input type="text" id="filter" value="v0.js">
-  <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
-  <script src="/index.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1" />
+    <title>AMPHTML bundle-size history</title>
+    <style>
+      html {
+        --bg: white;
+        --fg: #222;
+        --live: rgb(33, 82, 218);
+        --fg-faint: #888;
+        --overlay-shadow: rgba(40, 40, 60, 0.08);
+        --overlay-bg: rgba(255, 255, 255, 0.6);
+        --overlay-live: rgba(96, 122, 192, 0.1);
+        --line: rgb(176, 197, 255);
+        --line-active: rgb(21, 70, 207);
+        --border-passive: #aaa;
+      }
+      @media (prefers-color-scheme: dark) {
+        html {
+          --bg: #181818;
+          --fg: #ccc;
+          --live: rgb(83, 146, 228);
+          --fg-faint: #999;
+          --overlay-live: rgba(109, 158, 221, 0.1);
+          --overlay-bg: rgba(23, 23, 23, 0.6);
+          --line: rgb(40, 74, 117);
+          --line-active: rgb(89, 155, 240);
+          --border-passive: #555;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      .hidden {
+        visibility: hidden;
+      }
+      svg {
+        user-select: none;
+      }
+      a:link,
+      a:visited {
+        color: var(--live);
+        text-decoration: none;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        margin: 0;
+        font-family: sans-serif;
+        font-size: 15px;
+      }
+      h1 {
+        margin: 0 auto 0 0;
+        font-size: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      input[type="text"] {
+        background: var(--bg);
+        color: var(--fg);
+        font: inherit;
+        font-weight: normal;
+        padding: 8px 16px;
+        min-width: 220px;
+        border: 1px solid var(--border-passive);
+        border-radius: 18px;
+        font-weight: bold;
+        width: 100%;
+      }
+      input[type="text"]:focus {
+        border-color: var(--live);
+        outline: none;
+        box-shadow: 0 0 0 1px var(--live);
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        box-sizing: border-box;
+      }
+      header {
+        flex: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 18px 24px 0;
+        gap: 12px;
+      }
+      .range-chip-container {
+        display: flex;
+        width: 220px;
+        justify-content: right;
+        margin-left: auto;
+      }
+      .range-chip {
+        display: block;
+        background: var(--live);
+        color: var(--bg);
+        border-radius: 20px;
+        padding: 2px 2px 2px 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .close {
+        background: transparent;
+        color: inherit;
+        border: none;
+        font-size: 20px;
+        line-height: 0.5;
+        width: 28px;
+        height: 28px;
+        text-align: center;
+        border-radius: 14px;
+      }
+      .range-chip .close:hover {
+        border: 2px solid var(--bg);
+      }
+      .range-chip .close:active {
+        background: var(--bg);
+        color: var(--live);
+      }
+      [for="query"] {
+        display: flex;
+        align-items: center;
+        min-width: 300px;
+        max-width: 520px;
+        gap: 8px;
+        flex: 1;
+      }
+      #chart {
+        flex: 1;
+        overflow: hidden;
+      }
+      .indicator {
+        fill: var(--border-passive);
+      }
+      .range {
+        fill: var(--overlay-live);
+      }
+      .line {
+        fill: none;
+        stroke: var(--line);
+        stroke-width: 2px;
+        stroke-linejoin: round;
+      }
+      .line.hover {
+        stroke: var(--line-active);
+        stroke-width: 3px;
+        z-index: 100000;
+      }
+      .hover-line {
+        stroke: var(--border-passive);
+        stroke-width: 0.5px;
+      }
+      .dot {
+        font-family: sans-serif;
+        text-decoration: none;
+        text-anchor: middle;
+      }
+      .dot circle {
+        fill: var(--bg);
+        stroke: var(--line-active);
+        stroke-width: 3px;
+      }
+      .dot a {
+        fill: var(--fg);
+        paint-order: stroke;
+        stroke: var(--overlay-bg);
+        stroke-width: 5px;
+        stroke-linecap: butt;
+        stroke-linejoin: miter;
+      }
+      .dot a:hover text {
+        fill: var(--live);
+      }
+      .tick text {
+        fill: var(--fg-faint);
+      }
+      .tick line {
+        stroke: #666;
+      }
+      .axis-x {
+        font-size: 0.8em;
+      }
+      .axis-y {
+        font-size: 0.9em;
+      }
+      .axis-y .tick:not(:first-of-type) line {
+        stroke: var(--border-passive);
+        stroke-dasharray: 2, 2;
+      }
+      .domain {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="hidden">
+      <header>
+        <h1>
+          <a href="https://github.com/ampproject/amphtml">AMPHTML</a>
+          bundle-size history
+        </h1>
+        <label for="query">
+          Filter
+          <input type="text" id="query" value="v0.js" />
+        </label>
+        <div class="range-chip-container">
+          <div class="range-chip hidden">
+            <span></span>
+            <button class="close" id="clear-range">&times;</button>
+          </div>
+        </div>
+      </header>
+      <div id="chart"></div>
+    </main>
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+    <script src="./index.js"></script>
+  </body>
 </html>
