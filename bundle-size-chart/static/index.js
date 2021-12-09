@@ -275,13 +275,13 @@ function updateRangeChip() {
   const label = document.querySelector('.range-chip > span');
   if (!rangeStart || !rangeEnd) {
     label.textContent = '';
-    chip.setAttribute('hidden', '');
+    chip.classList.add('hidden');
     return;
   }
   const left = shortDateLabel(rangeStart);
   const right = shortDateLabel(rangeEnd);
   label.textContent = left === right ? left : `${left}—${right}`;
-  chip.removeAttribute('hidden');
+  chip.classList.remove('hidden');
 }
 
 /**
@@ -426,7 +426,7 @@ function deserializeDatetime(string, ceil) {
 }
 
 setStateFromHash();
-document.querySelector('main').removeAttribute('hidden');
+document.querySelector('main').classList.remove('hidden');
 
 let data;
 let filteredData;

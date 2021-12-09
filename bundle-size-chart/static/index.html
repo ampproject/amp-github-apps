@@ -33,8 +33,8 @@
       * {
         box-sizing: border-box;
       }
-      [hidden] {
-        display: none !important;
+      .hidden {
+        visibility: hidden;
       }
       svg {
         user-select: none;
@@ -202,7 +202,7 @@
     </style>
   </head>
   <body>
-    <main hidden>
+    <main class="hidden">
       <header>
         <h1>
           <a href="https://github.com/ampproject/amphtml">AMPHTML</a>
@@ -213,7 +213,7 @@
           <input type="text" id="query" value="v0.js" />
         </label>
         <div class="range-chip-container">
-          <div class="range-chip" hidden>
+          <div class="range-chip hidden">
             <span></span>
             <button class="close" id="clear-range">&times;</button>
           </div>
