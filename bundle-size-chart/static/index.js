@@ -73,10 +73,10 @@ const dotAnchor = dot.append('a').attr('target', '_blank');
 dotAnchor
   .append('rect')
   .attr('width', 20)
-  .attr('height', 75)
+  .attr('height', 70)
   .attr('opacity', 0)
   .attr('y', -30)
-  .attr('x', -5);
+  .attr('x', -10);
 
 const dotSizeText = dotAnchor
   .append('text')
