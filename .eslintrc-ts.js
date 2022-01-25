@@ -42,6 +42,10 @@ module.exports = {
     '@typescript-eslint/promise-function-async': 'error',
     '@typescript-eslint/no-unused-vars': 'error',
 
+    // Allow function overloading
+    'no-redeclare': 'off',
+    '@typescript-eslint/no-redeclare': ['error'],
+
     // TODO(#1103): Migrate to @typescript-eslint/naming-convention option
     '@typescript-eslint/camelcase': 'off',
 
