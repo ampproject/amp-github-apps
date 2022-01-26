@@ -63,6 +63,15 @@ export async function handleBuildFinished(
     const prSnapshots = await percy.getSnapshots(percyPullBuildId);
     const mainSnapshots = await percy.getSnapshots(percyMainBuildId);
 
+    if (prSnapshots.size === 1 && prSnapshots.has('Blank page')) {
+      console.log(
+        'Pull request',
+        githubPullNumber,
+        'was a docs-only change. Skipping...'
+      );
+      return;
+    }
+
     // We ignore the Blank page.
     mainSnapshots.delete('Blank page');
 
