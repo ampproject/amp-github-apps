@@ -200,7 +200,7 @@ describe('server', () => {
 
       await handleBuildFinished(included);
 
-      expect(mockPostErrorComment).toHaveBeenCalledWith(5678);
+      expect(mockPostErrorComment).toHaveBeenCalledWith(5678, 1234567, 1234566);
     });
 
     it('rejects a build when snapshot in PR has a diff, but not in main', async () => {
@@ -217,7 +217,7 @@ describe('server', () => {
 
       await handleBuildFinished(included);
 
-      expect(mockPostErrorComment).toHaveBeenCalledWith(5678);
+      expect(mockPostErrorComment).toHaveBeenCalledWith(5678, 1234567, 1234566);
     });
 
     it('rejects a build when snapshot exists in main but not in PR', async () => {
@@ -235,7 +235,7 @@ describe('server', () => {
 
       await handleBuildFinished(included);
 
-      expect(mockPostErrorComment).toHaveBeenCalledWith(5678);
+      expect(mockPostErrorComment).toHaveBeenCalledWith(5678, 1234567, 1234566);
     });
 
     it('rejects a build when snapshot exists in PR but not in main', async () => {
@@ -255,7 +255,7 @@ describe('server', () => {
 
       await handleBuildFinished(included);
 
-      expect(mockPostErrorComment).toHaveBeenCalledWith(5678);
+      expect(mockPostErrorComment).toHaveBeenCalledWith(5678, 1234567, 1234566);
     });
 
     it('rejects a build when snapshot names do not match', async () => {
@@ -272,7 +272,7 @@ describe('server', () => {
 
       await handleBuildFinished(included);
 
-      expect(mockPostErrorComment).toHaveBeenCalledWith(5678);
+      expect(mockPostErrorComment).toHaveBeenCalledWith(5678, 1234567, 1234566);
     });
 
     it('rejects a build when any snapshots are not approved', async () => {
@@ -289,7 +289,7 @@ describe('server', () => {
 
       await handleBuildFinished(included);
 
-      expect(mockPostErrorComment).toHaveBeenCalledWith(5678);
+      expect(mockPostErrorComment).toHaveBeenCalledWith(5678, 1234567, 1234566);
     });
 
     it('does nothing for non-main builds', async () => {
