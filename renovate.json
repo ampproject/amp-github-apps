@@ -60,7 +60,14 @@
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["pr-deploy/**"],
+    "matchPaths": ["percy-mirror-verifier/**"],
+    "labels": ["Category: Percy Mirror Verifier"],
+    "groupName": "percy-mirror-verifier packages",
+    "reviewers": ["danielrozenberg"],
+    "rebaseWhen": "never",
+    "automerge": true
+  }, {
+      "matchPaths": ["pr-deploy/**"],
     "labels": ["Category: PR Deploy"],
     "groupName": "pr-deploy packages",
     "reviewers": ["estherkim"],

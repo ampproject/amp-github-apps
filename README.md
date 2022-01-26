@@ -27,6 +27,10 @@ A web service that suggests approvers for a GitHub pull request based on OWNERS 
 
 The app runs on an instance of [Google AppEngine](https://ampproject-owners-bot.appspot.com) and is installed exclusively on the [`ampproject/amphtml`](https://github.com/ampproject/amphtml) repository. It can be trivially deployed to other organizations and repositories.
 
+### [Percy Mirror Verifier](percy-mirror-verifier/README.md)
+
+Verifies that the Percy build for all commits on the `main` branch mirror the Percy build for the pull requests that were merged into those commits.
+
 ### [PR Deploy Bot](pr-deploy/README.md)
 
 A GitHub App which deploys a PR branch to a static website when you ask it to.

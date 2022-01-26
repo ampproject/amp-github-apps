@@ -30,6 +30,7 @@ const APPS_TO_TEST = [
   'invite',
   'onduty',
   'owners',
+  'percy-mirror-verifier',
   'pr-deploy',
   'release-calendar',
   'test-case-reporting',
