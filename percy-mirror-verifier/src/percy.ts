@@ -35,7 +35,7 @@ export type PercySnapshot = {
   };
 };
 
-export type PercySnapshots = {
+export type PercySnapshotsResponse = {
   data: PercySnapshot[];
 };
 
@@ -55,7 +55,7 @@ export async function getSnapshots(buildId: number): Promise<PercySnapshotMap> {
     throw new Error(`Failed to fetch snapshots for build #${buildId}`);
   }
 
-  const response: PercySnapshots = await body.json();
+  const response: PercySnapshotsResponse = await body.json();
   return new Map(
     response.data.map(percySnapshot => [
       percySnapshot.attributes.name,
