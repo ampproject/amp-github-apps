@@ -30,6 +30,9 @@ import {RestEndpointMethodTypes} from '@octokit/rest';
 
 import {getPercyBuildId} from '../src/github';
 
+type OctokitPullsGetResponse =
+  RestEndpointMethodTypes['pulls']['get']['response'];
+
 describe('github', () => {
   beforeEach(() => {
     jest.resetAllMocks();
@@ -39,7 +42,7 @@ describe('github', () => {
     it('gets Percy build id', async () => {
       mockOctokit.pulls.get.mockResolvedValue({
         data: {head: {sha: '6f91e57c4ec735bda983f253304b46058518f62a'}},
-      } as RestEndpointMethodTypes['pulls']['get']['response']);
+      } as OctokitPullsGetResponse);
       mockOctokit.repos.listCommitStatusesForRef.mockResolvedValue({
         data: [
           {context: 'github_actions'},
@@ -58,7 +61,7 @@ describe('github', () => {
     it('rejects when not Percy status', async () => {
       mockOctokit.pulls.get.mockResolvedValue({
         data: {head: {sha: '6f91e57c4ec735bda983f253304b46058518f62a'}},
-      } as RestEndpointMethodTypes['pulls']['get']['response']);
+      } as OctokitPullsGetResponse);
       mockOctokit.repos.listCommitStatusesForRef.mockResolvedValue({
         data: [{context: 'github_actions'}],
       });
@@ -71,7 +74,7 @@ describe('github', () => {
     it('rejects when Percy status is malformed', async () => {
       mockOctokit.pulls.get.mockResolvedValue({
         data: {head: {sha: '6f91e57c4ec735bda983f253304b46058518f62a'}},
-      } as RestEndpointMethodTypes['pulls']['get']['response']);
+      } as OctokitPullsGetResponse);
       mockOctokit.repos.listCommitStatusesForRef.mockResolvedValue({
         data: [{context: 'percy/amphtml', 'target_url': 'https://not.percy/'}],
       });
