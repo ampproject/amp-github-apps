@@ -21,16 +21,12 @@ export type PercySnapshot = {
   id: string;
   attributes: {
     name: string;
+    fingerprint: string | null;
     'review-state':
       | 'approved'
       | 'unreviewed'
       | 'changes_requested'
       | 'failed'
-      | null;
-    'review-state-reason':
-      | 'no_diffs'
-      | 'auto_approved_branch'
-      | 'user_approved'
       | null;
   };
 };

@@ -106,19 +106,12 @@ export async function handleBuildFinished(
     for (const [name, prSnapshot] of prSnapshots) {
       const mainSnapshot = mainSnapshots.get(name);
 
-      const prApprovalReason = prSnapshot.attributes['review-state-reason'];
-      const mainApprovalReason = mainSnapshot.attributes['review-state-reason'];
-
       if (
-        !(
-          (prApprovalReason === 'no_diffs' &&
-            mainApprovalReason === 'no_diffs') ||
-          (prApprovalReason === 'user_approved' &&
-            mainApprovalReason === 'auto_approved_branch')
-        )
+        prSnapshot.attributes.fingerprint !==
+        mainSnapshot.attributes.fingerprint
       ) {
         console.error(
-          'PR/main disparity: not all snapshots have the same approval reason'
+          'PR/main disparity: not all snapshots have the same fingerprint'
         );
         return await github.postErrorComment(githubPullNumber);
       }
