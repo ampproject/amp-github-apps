@@ -92,20 +92,20 @@ function sortBundleSizeItems(items, sizeOrder = 'desc') {
   };
   // group by filename without extension, so that '.mjs' is always next to its
   // equivalent '.js'
-  const grouped = {};
+  const groups = {};
   for (const item of items) {
     const name = noExtension(item.file);
-    const entry = (grouped[name] = grouped[name] || {
+    const group = (groups[name] = groups[name] || {
       items: [],
       bundleSizeDelta: item.bundleSizeDelta,
     });
-    entry.items.push(item);
-    entry.bundleSizeDelta =
+    group.items.push(item);
+    group.bundleSizeDelta =
       sizeOrder === 'desc'
-        ? Math.max(entry.bundleSizeDelta, item.bundleSizeDelta)
-        : Math.min(entry.bundleSizeDelta, item.bundleSizeDelta);
+        ? Math.max(group.bundleSizeDelta, item.bundleSizeDelta)
+        : Math.min(group.bundleSizeDelta, item.bundleSizeDelta);
   }
-  return Object.values(grouped)
+  return Object.values(groups)
     .sort(bySize)
     .map(({items}) => items.sort(bySize))
     .flat();
