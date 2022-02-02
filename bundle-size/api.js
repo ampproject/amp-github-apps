@@ -354,13 +354,7 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     const missingBundleSizes = [];
     const allPotentialApproverTeams = new Set();
 
-    // When examining bundle-size check output for a PR, it's helpful to see
-    // sizes at the extremes, so we sort from largest increase to largest
-    // decrease. This ordering is reflected in the ordering of each subsection.
-    const sortedBundleSizes = Object.entries(mainBundleSizes).sort(
-      (a, b) => a[1] - b[1]
-    );
-    for (const [file, baseBundleSize] of sortedBundleSizes) {
+    for (const [file, baseBundleSize] of Object.entries(mainBundleSizes)) {
       if (!(file in prBundleSizes)) {
         missingBundleSizes.push(
           formatFileItem(file, `missing in pull request`)
