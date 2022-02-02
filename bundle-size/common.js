@@ -99,11 +99,11 @@ function sortBundleSizeItems(items, sizeOrder = 'desc') {
       items: [],
       bundleSizeDelta: item.bundleSizeDelta,
     });
+    entry.items.push(item);
     entry.bundleSizeDelta =
       sizeOrder === 'desc'
         ? Math.max(entry.bundleSizeDelta, item.bundleSizeDelta)
         : Math.min(entry.bundleSizeDelta, item.bundleSizeDelta);
-    entry.items.push(item);
   }
   return Object.values(grouped)
     .sort(bySize)
