@@ -49,6 +49,66 @@ exports.getCheckFromDatabase = async (db, headSha) => {
  * @param {number} delta the bundle size delta in KB.
  * @return {string} formatted bundle size delta.
  */
-exports.formatBundleSizeDelta = delta => {
+const formatBundleSizeDelta = delta => {
   return 'Δ ' + (delta >= 0 ? '+' : '') + delta.toFixed(2) + 'KB';
 };
+
+/**
+ * @param {string} file
+ * @param {string} description
+ * @return {string}
+ */
+const formatFileItem = (file, description) => `* \`${file}\`: ${description}`;
+
+exports.formatFileItem = formatFileItem;
+
+/**
+ * @param {{file: string, bundleSizeDelta: number}} item
+ * @return {string}
+ */
+exports.formatBundleSizeItem = ({file, bundleSizeDelta}) => {
+  return formatFileItem(file, formatBundleSizeDelta(bundleSizeDelta));
+};
+
+/**
+ * @param {string} file
+ * @return {string}
+ */
+const noExtension = file => {
+  const parts = file.split('.');
+  parts.pop();
+  return parts.join('.');
+};
+
+/**
+ * @param {{file: string, bundleSizeDelta: number}[]} items
+ * @param {'asc'|'desc'} sizeOrder
+ * @return {{file: string, bundleSizeDelta: number}[]}
+ */
+function sortBundleSizeItems(items, sizeOrder = 'desc') {
+  const bySize = (a, b) => {
+    const factor = sizeOrder === 'desc' ? -1 : 1;
+    return factor * (a.bundleSizeDelta - b.bundleSizeDelta);
+  };
+  // group by filename without extension, so that '.mjs' is always next to its
+  // equivalent '.js'
+  const grouped = {};
+  for (const item of items) {
+    const name = noExtension(item.file);
+    const entry = (grouped[name] = grouped[name] || {
+      items: [],
+      bundleSizeDelta: item.bundleSizeDelta,
+    });
+    entry.bundleSizeDelta =
+      sizeOrder === 'desc'
+        ? Math.max(entry.bundleSizeDelta, item.bundleSizeDelta)
+        : Math.min(entry.bundleSizeDelta, item.bundleSizeDelta);
+    entry.items.push(item);
+  }
+  return Object.values(grouped)
+    .sort(bySize)
+    .map(({items}) => items.sort(bySize))
+    .flat();
+}
+
+exports.sortBundleSizeItems = sortBundleSizeItems;
