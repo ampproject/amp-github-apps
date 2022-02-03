@@ -82,8 +82,8 @@ describe('server', () => {
       id: '832098704',
       attributes: {
         name: 'Blank page',
+        fingerprint: null,
         'review-state': 'approved',
-        'review-state-reason': 'no_diffs',
       },
     };
     const snapshotA: PercySnapshot = {
@@ -91,8 +91,8 @@ describe('server', () => {
       id: '832098742',
       attributes: {
         name: 'Snapshot A',
+        fingerprint: null,
         'review-state': 'approved',
-        'review-state-reason': 'no_diffs',
       },
     };
     const snapshotB: PercySnapshot = {
@@ -100,25 +100,26 @@ describe('server', () => {
       id: '832098753',
       attributes: {
         name: 'Snapshot B',
+        fingerprint: null,
         'review-state': 'approved',
-        'review-state-reason': 'no_diffs',
       },
     };
 
     const notApproved: DeepPartial<PercySnapshot> = {
       attributes: {
         'review-state': 'unreviewed',
-        'review-state-reason': null,
       },
     };
-    const userApproved: DeepPartial<PercySnapshot> = {
+    const approvedFingerprint1: DeepPartial<PercySnapshot> = {
       attributes: {
-        'review-state-reason': 'user_approved',
+        fingerprint: 'af2da54e2a5cc0e4afe8a9eefdbf862249e654d2',
+        'review-state': 'approved',
       },
     };
-    const autoApproved: DeepPartial<PercySnapshot> = {
+    const approvedFingerprint2: DeepPartial<PercySnapshot> = {
       attributes: {
-        'review-state-reason': 'auto_approved_branch',
+        fingerprint: '68e037a2fb2be29de4ef6feba095f31d110e1d2b',
+        'review-state': 'approved',
       },
     };
 
@@ -169,21 +170,38 @@ describe('server', () => {
       expect(mockPostErrorComment).not.toHaveBeenCalled();
     });
 
-    it('verifies mirrored PR/main builds with approved diffs', async () => {
+    it('verifies mirrored PR/main builds with approved diffs with the same fingerprint', async () => {
       mockGetPercyBuildId.mockResolvedValue(1234566);
       mockGetSnapshots.mockResolvedValueOnce(
-        new Map([['Snapshot A', deepmerge(snapshotA, userApproved)]])
+        new Map([['Snapshot A', deepmerge(snapshotA, approvedFingerprint1)]])
       );
       mockGetSnapshots.mockResolvedValueOnce(
         new Map([
           ['Blank page', snapshotBlankPage],
-          ['Snapshot A', deepmerge(snapshotA, autoApproved)],
+          ['Snapshot A', deepmerge(snapshotA, approvedFingerprint1)],
         ])
       );
 
       await handleBuildFinished(included);
 
       expect(mockPostErrorComment).not.toHaveBeenCalled();
+    });
+
+    it('rejects a build when a snapshot has different fingerprints in PR/main', async () => {
+      mockGetPercyBuildId.mockResolvedValue(1234566);
+      mockGetSnapshots.mockResolvedValueOnce(
+        new Map([['Snapshot A', deepmerge(snapshotA, approvedFingerprint1)]])
+      );
+      mockGetSnapshots.mockResolvedValueOnce(
+        new Map([
+          ['Blank page', snapshotBlankPage],
+          ['Snapshot A', deepmerge(snapshotA, approvedFingerprint2)],
+        ])
+      );
+
+      await handleBuildFinished(included);
+
+      expect(mockPostErrorComment).toHaveBeenCalledWith(5678);
     });
 
     it('rejects a build when snapshot in main has a diff, but not in PR', async () => {
@@ -194,7 +212,7 @@ describe('server', () => {
       mockGetSnapshots.mockResolvedValueOnce(
         new Map([
           ['Blank page', snapshotBlankPage],
-          ['Snapshot A', deepmerge(snapshotA, autoApproved)],
+          ['Snapshot A', deepmerge(snapshotA, approvedFingerprint1)],
         ])
       );
 
@@ -206,7 +224,7 @@ describe('server', () => {
     it('rejects a build when snapshot in PR has a diff, but not in main', async () => {
       mockGetPercyBuildId.mockResolvedValue(1234566);
       mockGetSnapshots.mockResolvedValueOnce(
-        new Map([['Snapshot A', deepmerge(snapshotA, userApproved)]])
+        new Map([['Snapshot A', deepmerge(snapshotA, approvedFingerprint1)]])
       );
       mockGetSnapshots.mockResolvedValueOnce(
         new Map([
