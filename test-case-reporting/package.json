@@ -26,7 +26,7 @@
     "knex": "0.95.11",
     "md5": "2.3.0",
     "mustache": "4.2.0",
-    "node-fetch": "2.6.2",
+    "node-fetch": "2.6.7",
     "pg": "8.7.1"
   },
   "devDependencies": {
