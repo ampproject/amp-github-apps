@@ -22,6 +22,8 @@ const {formatBundleSizeDelta, getCheckFromDatabase} = require('./common');
 const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
 
+const SUMMARY_MAX_CHARACTERS = 48 * 1024;
+
 const DRAFT_TITLE_REGEX =
   /\b(wip|work in progress|do not (merge|submit|review))\b/i;
 
@@ -105,7 +107,7 @@ function erroredCheckOutput(partialBaseSha) {
  *   changes.
  * @param {!Array<string>} missingBundleSizes text description of bundle
  *   sizes missing from the main branch.
- * @return {string} formatted extra changes;
+ * @return {string} formatted extra changes; truncated after 48 KB.
  */
 function extraBundleSizesSummary(
   headSha,
@@ -147,6 +149,10 @@ function extraBundleSizesSummary(
     0
   ) {
     output += '\n**No bundle size changes were reported for this PR**';
+  }
+
+  if (output.length > SUMMARY_MAX_CHARACTERS) {
+    output = output.slice(0, SUMMARY_MAX_CHARACTERS - 1) + '…';
   }
 
   return output;
