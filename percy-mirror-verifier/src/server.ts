@@ -91,7 +91,11 @@ export async function handleBuildFinished(
     ) {
       // TODO(danielrozenberg): write a comment on the PR (here and below).
       console.error('PR/main disparity: not all snapshots exist in both');
-      return await github.postErrorComment(githubPullNumber);
+      return await github.postErrorComment(
+        githubPullNumber,
+        percyMainBuildId,
+        percyPullBuildId
+      );
     }
 
     if (
@@ -100,7 +104,11 @@ export async function handleBuildFinished(
       )
     ) {
       console.error('PR/main disparity: not all snapshots are marked approved');
-      return await github.postErrorComment(githubPullNumber);
+      return await github.postErrorComment(
+        githubPullNumber,
+        percyMainBuildId,
+        percyPullBuildId
+      );
     }
 
     for (const [name, prSnapshot] of prSnapshots) {
@@ -113,7 +121,11 @@ export async function handleBuildFinished(
         console.error(
           'PR/main disparity: not all snapshots have the same fingerprint'
         );
-        return await github.postErrorComment(githubPullNumber);
+        return await github.postErrorComment(
+          githubPullNumber,
+          percyMainBuildId,
+          percyPullBuildId
+        );
       }
     }
 

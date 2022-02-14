@@ -15,6 +15,9 @@
  */
 
 const mockOctokit = {
+  issues: {
+    createComment: jest.fn(),
+  },
   pulls: {
     get: jest.fn(),
   },
@@ -28,7 +31,7 @@ jest.doMock('@octokit/rest', () => ({
 
 import {RestEndpointMethodTypes} from '@octokit/rest';
 
-import {getPercyBuildId} from '../src/github';
+import {getPercyBuildId, postErrorComment} from '../src/github';
 
 type OctokitPullsGetResponse =
   RestEndpointMethodTypes['pulls']['get']['response'];
@@ -85,7 +88,20 @@ describe('github', () => {
     });
   });
 
-  describe.skip('postErrorComment', () => {
-    // TODO(danielrozenberg): write tests.
+  describe('postErrorComment', () => {
+    it('posts a comment', async () => {
+      await postErrorComment(1234, 5678901, 2345678);
+
+      expect(mockOctokit.issues.createComment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          owner: 'ampproject',
+          repo: 'amphtml',
+          'issue_number': 1234,
+          body: expect.stringContaining(
+            'disparity between this PR Percy build and its `main` build'
+          ),
+        })
+      );
+    });
   });
 });
