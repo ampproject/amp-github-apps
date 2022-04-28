@@ -201,7 +201,7 @@ describe('server', () => {
 
       await handleBuildFinished(included);
 
-      expect(mockPostErrorComment).toHaveBeenCalledWith(5678);
+      expect(mockPostErrorComment).toHaveBeenCalledWith(5678, 1234567, 1234566);
     });
 
     it('rejects a build when snapshot in main has a diff, but not in PR', async () => {
