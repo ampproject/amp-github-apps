@@ -31,14 +31,6 @@ The app runs on an instance of [Google AppEngine](https://ampproject-owners-bot.
 
 Verifies that the Percy build for all commits on the `main` branch mirror the Percy build for the pull requests that were merged into those commits.
 
-### [PR Deploy Bot](pr-deploy/README.md)
-
-A GitHub App which deploys a PR branch to a static website when you ask it to.
-
-Websites are served by a Google Cloud Storage bucket.
-
-The app runs on an instance of [Google AppEngine](https://amp-pr-deploy-bot.appspot.com) and is installed exclusively on the [`ampproject/amphtml`](https://github.com/ampproject/amphtml) repository.
-
 ### [Project Metrics](project-metrics/README.md)
 
 This GitHub App reports metrics for the repository and scores each metric on a common scale.

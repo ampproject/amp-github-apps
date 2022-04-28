@@ -31,7 +31,6 @@ const APPS_TO_TEST = [
   'onduty',
   'owners',
   'percy-mirror-verifier',
-  'pr-deploy',
   'release-calendar',
   'test-case-reporting',
   'webhook-pubsub-publisher',
