@@ -20,7 +20,7 @@
     "dotenv": "10.0.0",
     "knex": "0.95.11",
     "pg": "8.7.1",
-    "probot": "12.1.1"
+    "probot": "12.2.3"
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "2.0.0",
