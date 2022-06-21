@@ -30,7 +30,7 @@ matplotlib==3.4.2
 more-itertools==8.8.0
 networkx==2.5.1
 ninja==1.10.0.post2
-numpy==1.21.0
+numpy==1.22.0
 packaging==20.9
 pluggy==0.13.1
 protobuf==3.17.3
