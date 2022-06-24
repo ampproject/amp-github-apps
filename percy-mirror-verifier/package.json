@@ -35,7 +35,7 @@
     "jest": "27.4.7",
     "jest-mock": "27.4.6",
     "jest-silent-reporter": "0.5.0",
-    "nodemon": "2.0.15",
+    "nodemon": "2.0.17",
     "prettier": "2.5.1",
     "smee-client": "1.2.3",
     "ts-jest": "27.1.3"
