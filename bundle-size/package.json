@@ -23,7 +23,7 @@
     "minimatch": "3.0.4",
     "node-cache": "5.1.2",
     "pg": "8.7.1",
-    "probot": "12.1.1",
+    "probot": "12.2.5",
     "sleep-promise": "9.1.0"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "jest": "27.4.0",
     "jest-silent-reporter": "0.5.0",
     "nock": "13.2.1",
-    "nodemon": "2.0.15",
+    "nodemon": "2.0.17",
     "smee-client": "1.2.3",
     "sqlite3": "5.0.3",
     "supertest": "6.1.6"
