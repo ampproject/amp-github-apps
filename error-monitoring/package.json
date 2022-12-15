@@ -20,7 +20,7 @@
     "@octokit/rest": "18.10.0",
     "body-parser": "1.19.0",
     "dotenv": "10.0.0",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "google-auth-library": "7.9.1",
     "http-status-codes": "2.1.4",
     "mustache": "4.2.0",

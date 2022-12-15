@@ -18,7 +18,7 @@
     "@google-cloud/storage": "5.16.0",
     "@octokit/rest": "18.12.0",
     "ajv": "8.8.2",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "highlight": "0.2.4",
     "json5": "2.2.0",
     "lodash": "4.17.21",
