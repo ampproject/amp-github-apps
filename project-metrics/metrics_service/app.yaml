@@ -1,6 +1,0 @@
-runtime: python37
-entrypoint: python server.py
-
-handlers:
-- url: /.*
-  script: auto
