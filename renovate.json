@@ -74,13 +74,6 @@
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["project-metrics/**"],
-    "labels": ["Category: Project Metrics"],
-    "groupName": "project-metrics packages",
-    "reviewers": ["rileyajones"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
     "matchPaths": ["release-calendar/**"],
     "labels": ["Category: Release Calendar"],
     "groupName": "release-calendar packages",
