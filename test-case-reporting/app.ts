@@ -46,7 +46,7 @@ function render(templateName: string, data: Record<string, unknown>): string {
 }
 
 function handleError(error: Error, res: express.Response): void {
-  console.warn(error);
+  console.warn(error.toString().replace(/\n|\r/g, ''));
   if (error instanceof TypeError) {
     // Request params are undefined or the wrong type
     res.status(statusCodes.BAD_REQUEST);
@@ -299,7 +299,7 @@ app.get('/_cron/compute-stats', async (req, res) => {
     await testCaseStats.updateStats(sampleSize);
 
     res.sendStatus(statusCodes.OK);
-    console.log(`Computed pass/fail % for past ${count} runs`);
+    console.log(`Computed pass/fail % for past ${sampleSize} runs`);
   } catch (error) {
     handleError(error, res);
   }
