@@ -117,12 +117,13 @@ export async function errorIssue(
   res: express.Response
 ): Promise<unknown> {
   const errorReport = req.method === 'POST' ? req.body : req.query;
-  const {errorId, linkIssue, preview} = errorReport;
+  const {errorId: errorIdRaw, linkIssue, preview} = errorReport;
 
-  if (!errorId) {
+  if (!errorIdRaw || typeof errorIdRaw !== 'string') {
     res.status(statusCodes.BAD_REQUEST);
     return res.send('Missing error ID param');
   }
+  const errorId = errorIdRaw.replace(/\n|\r/g, '');
 
   console.debug(`Processing http://go/ampe/${errorId}`);
   const shouldLinkIssue = linkIssue === '1';
@@ -285,7 +286,7 @@ export async function errorList(
       res.send(renderErrorList(viewData(errorList)));
     }
   } catch (error) {
-    console.error(error);
+    console.error(error.toString().replace(/\n|\r/g, ''));
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
     res.json({error: error.toString()});
   }
@@ -327,7 +328,8 @@ export async function linkIssue(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
-  const {errorId, serviceType, normalizedThreshold} = req.query;
+  const {errorId: errorIdRaw, serviceType, normalizedThreshold} = req.query;
+  const errorId = errorIdRaw.toString().replace(/\n|\r/g, '');
   let issueNumberStr = req.query.issueNumber.toString();
 
   if (issueNumberStr.startsWith('#')) {

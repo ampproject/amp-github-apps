@@ -87,7 +87,7 @@ export class StackdriverApi {
   }): Promise<Array<Stackdriver.ErrorGroupStats>> {
     const serviceKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
     const groupKey = opts.groupId || 'NO_GROUP';
-    const cacheKey = `${serviceKey}-${groupKey}`;
+    const cacheKey = `${serviceKey}-${groupKey}`.replace(/\n|\r/g, '');
     let errorGroups: undefined | Array<Stackdriver.ErrorGroupStats> =
       this.cache.get(cacheKey);
 
