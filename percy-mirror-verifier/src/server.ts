@@ -146,7 +146,7 @@ app.post('/', async ({body}, res) => {
   const {data, included} = body as PercyWebhook;
   try {
     console.group(data.id);
-    console.log(data.attributes.event, 'webhook received from Percy');
+    console.log('webhook %O received from Percy', data.attributes.event);
 
     if (data.attributes.event !== 'build_finished') {
       return;
