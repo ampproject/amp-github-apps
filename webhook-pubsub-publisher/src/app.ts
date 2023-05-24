@@ -19,7 +19,7 @@ import type {Probot} from 'probot';
 
 export default (app: Probot): void => {
   app.onAny(async event => {
-    app.log(`Received "${event.name}" event with ID ${event.id}`);
+    app.log('Received event: %O', event);
 
     const pubsub = new PubSub({
       projectId: process.env.PROJECT_ID,
