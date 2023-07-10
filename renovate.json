@@ -1,10 +1,5 @@
 {
-  "extends": [
-    "config:base"
-  ],
-  "node": {
-    "supportPolicy": ["lts_latest"]
-  },
+  "extends": ["config:recommended"],
   "commitMessagePrefix": "📦",
   "timezone": "America/Los_Angeles",
   "schedule": "after 12am every weekday",
@@ -14,81 +9,81 @@
     "See all other Renovate PRs on the [Dependency Dashboard](https://github.com/ampproject/amp-github-apps/issues/1338)"
   ],
   "packageRules": [{
-    "matchFiles": ["package.json"],
+    "matchFileNames": ["package.json"],
     "groupName": "core packages",
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["bundle-size/**"],
+    "matchFileNames": ["bundle-size/**"],
     "labels": ["Category: Bundle Size"],
     "groupName": "bundle-size packages",
     "reviewers": ["danielrozenberg"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["bundle-size-chart/**"],
+    "matchFileNames": ["bundle-size-chart/**"],
     "labels": ["Category: Bundle Size Chart"],
     "groupName": "bundle-size-chart packages",
     "reviewers": ["danielrozenberg"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["error-monitoring/**"],
+    "matchFileNames": ["error-monitoring/**"],
     "labels": ["Category: Error Monitoring"],
     "groupName": "error-monitoring packages",
     "reviewers": ["rcebulko"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["invite/**"],
+    "matchFileNames": ["invite/**"],
     "labels": ["Category: Invite"],
     "groupName": "invite packages",
     "reviewers": ["rileyajones"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["onduty/**"],
+    "matchFileNames": ["onduty/**"],
     "groupName": "onduty packages",
     "reviewers": ["rcebulko"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["owners/**"],
+    "matchFileNames": ["owners/**"],
     "labels": ["Category: Owners"],
     "groupName": "owners packages",
     "reviewers": ["rcebulko"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["percy-mirror-verifier/**"],
+    "matchFileNames": ["percy-mirror-verifier/**"],
     "labels": ["Category: Percy Mirror Verifier"],
     "groupName": "percy-mirror-verifier packages",
     "reviewers": ["danielrozenberg"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-      "matchPaths": ["pr-deploy/**"],
+    "matchFileNames": ["pr-deploy/**"],
     "labels": ["Category: PR Deploy"],
     "groupName": "pr-deploy packages",
     "reviewers": ["estherkim"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["release-calendar/**"],
+    "matchFileNames": ["release-calendar/**"],
     "labels": ["Category: Release Calendar"],
     "groupName": "release-calendar packages",
     "reviewers": ["estherkim"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["test-case-reporting/**"],
+    "matchFileNames": ["test-case-reporting/**"],
     "labels": ["Category: Test Cases"],
     "groupName": "test-case-reporting packages",
     "reviewers": ["rileyajones"],
     "rebaseWhen": "never",
     "automerge": true
   }, {
-    "matchPaths": ["webhook-pubsub-publisher/**"],
+    "matchFileNames": ["webhook-pubsub-publisher/**"],
     "labels": ["Category: Webhook Pub/Sub Publisher"],
     "groupName": "webhook-pubsub-publisher packages",
     "reviewers": ["danielrozenberg"],
@@ -96,6 +91,6 @@
     "automerge": true
   }, {
     "matchPackageNames": ["node-fetch", "@types/node-fetch"],
-    "allowedVersions": ["<3.0.0"]
+    "allowedVersions": "<3.0.0"
   }]
 }
