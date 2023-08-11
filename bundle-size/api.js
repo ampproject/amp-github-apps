@@ -17,7 +17,12 @@
 
 const minimatch = require('minimatch');
 const sleep = require('sleep-promise');
-const {formatBundleSizeDelta, getCheckFromDatabase} = require('./common');
+const {
+  getCheckFromDatabase,
+  formatBundleSizeItem,
+  formatFileItem,
+  sortBundleSizeItems,
+} = require('./common');
 
 const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
@@ -129,12 +134,20 @@ function extraBundleSizesSummary(
   if (bundleSizeDeltasRequireApproval.length) {
     output +=
       '\n## Bundle size changes that require approval\n' +
-      bundleSizeDeltasRequireApproval.join('\n');
+      // If files require approval, we're firstly interested in the largest
+      // delta, so we sort desc
+      sortBundleSizeItems(bundleSizeDeltasRequireApproval, 'desc')
+        .map(formatBundleSizeItem)
+        .join('\n');
   }
   if (bundleSizeDeltasAutoApproved.length) {
     output +=
       '\n## Auto-approved bundle size changes\n' +
-      bundleSizeDeltasAutoApproved.join('\n');
+      // If files don't require approval, we're firstly interested in the
+      // smallest delta, so we sort asc
+      sortBundleSizeItems(bundleSizeDeltasAutoApproved, 'asc')
+        .map(formatBundleSizeItem)
+        .join('\n');
   }
   if (missingBundleSizes.length) {
     output +=
@@ -347,15 +360,11 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     const missingBundleSizes = [];
     const allPotentialApproverTeams = new Set();
 
-    // When examining bundle-size check output for a PR, it's helpful to see
-    // sizes at the extremes, so we sort from largest increase to largest
-    // decrease. This ordering is reflected in the ordering of each subsection.
-    const sortedBundleSizes = Object.entries(mainBundleSizes).sort(
-      (a, b) => a[1] - b[1]
-    );
-    for (const [file, baseBundleSize] of sortedBundleSizes) {
+    for (const [file, baseBundleSize] of Object.entries(mainBundleSizes)) {
       if (!(file in prBundleSizes)) {
-        missingBundleSizes.push(`* \`${file}\`: missing in pull request`);
+        missingBundleSizes.push(
+          formatFileItem(file, `missing in pull request`)
+        );
         continue;
       }
 
@@ -366,9 +375,7 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
       const bundleSizeDelta = prBundleSizes[file] - baseBundleSize;
       if (bundleSizeDelta !== 0) {
         if (fileGlob && bundleSizeDelta >= fileApprovers[fileGlob].threshold) {
-          bundleSizeDeltasRequireApproval.push(
-            `* \`${file}\`: ${formatBundleSizeDelta(bundleSizeDelta)}`
-          );
+          bundleSizeDeltasRequireApproval.push({file, bundleSizeDelta});
 
           // Since `.approvers` is an array, it must be stringified to maintain
           // the Set uniqueness property.
@@ -376,9 +383,7 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
             JSON.stringify(fileApprovers[fileGlob].approvers)
           );
         } else {
-          bundleSizeDeltasAutoApproved.push(
-            `* \`${file}\`: ${formatBundleSizeDelta(bundleSizeDelta)}`
-          );
+          bundleSizeDeltasAutoApproved.push({file, bundleSizeDelta});
         }
       }
     }
@@ -386,7 +391,10 @@ exports.installApiRouter = (app, router, db, githubUtils) => {
     for (const [file, prBundleSize] of Object.entries(prBundleSizes)) {
       if (!(file in mainBundleSizes)) {
         missingBundleSizes.push(
-          `* \`${file}\`: (${prBundleSize} KB) missing on the main branch`
+          formatFileItem(
+            file,
+            `(${prBundleSize} KB) missing on the main branch`
+          )
         );
       }
     }

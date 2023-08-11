@@ -362,9 +362,9 @@ describe('bundle-size api', () => {
             title: 'No approval necessary',
             summary: expect.stringContaining(
               '## Auto-approved bundle size changes\n' +
-                '* `dist/v0/amp-truncate-text-0.1.js`: Δ +0.28KB\n' +
-                '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
                 '* `dist/v0/amp-date-display-0.1.js`: Δ -1.67KB\n' +
+                '* `dist/v0/amp-ad-0.1.js`: Δ +0.03KB\n' +
+                '* `dist/v0/amp-truncate-text-0.1.js`: Δ +0.28KB\n' +
                 '## Bundle sizes missing from this PR\n' +
                 '* `dist/v0/amp-anim-0.1.js`: missing in pull request\n' +
                 '* `dist/amp4ads-v0.js`: (11.22 KB) missing on the main branch'
