@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import {request} from 'undici';
-
 export type PercySnapshot = {
   type: 'snapshots';
   id: string;
@@ -38,7 +36,7 @@ export type PercySnapshotsResponse = {
 export type PercySnapshotMap = Map<string, PercySnapshot>;
 
 export async function getSnapshots(buildId: number): Promise<PercySnapshotMap> {
-  const {statusCode, body} = await request(
+  const {status, json} = await fetch(
     `https://percy.io/api/v1/builds/${buildId}/snapshots`,
     {
       method: 'GET',
@@ -46,12 +44,12 @@ export async function getSnapshots(buildId: number): Promise<PercySnapshotMap> {
     }
   );
 
-  if (statusCode != 200) {
-    console.error('Response from Percy was:', statusCode, await body.json());
+  if (status != 200) {
+    console.error('Response from Percy was:', status, await json());
     throw new Error(`Failed to fetch snapshots for build #${buildId}`);
   }
 
-  const {data} = (await body.json()) as PercySnapshotsResponse;
+  const {data} = (await json()) as PercySnapshotsResponse;
   return new Map(
     data.map(percySnapshot => [percySnapshot.attributes.name, percySnapshot])
   );
