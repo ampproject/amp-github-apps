@@ -32,7 +32,6 @@ const APPS_TO_TEST = [
   'owners',
   'percy-mirror-verifier',
   'release-calendar',
-  'test-case-reporting',
   'webhook-pubsub-publisher',
 ];
 
