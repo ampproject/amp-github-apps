@@ -8,89 +8,95 @@
   "prBodyNotes": [
     "See all other Renovate PRs on the [Dependency Dashboard](https://github.com/ampproject/amp-github-apps/issues/1338)"
   ],
-  "packageRules": [{
-    "matchFileNames": ["package.json"],
-    "groupName": "core packages",
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["bundle-size/**"],
-    "labels": ["Category: Bundle Size"],
-    "groupName": "bundle-size packages",
-    "reviewers": ["danielrozenberg"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["bundle-size-chart/**"],
-    "labels": ["Category: Bundle Size Chart"],
-    "groupName": "bundle-size-chart packages",
-    "reviewers": ["danielrozenberg"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["error-monitoring/**"],
-    "labels": ["Category: Error Monitoring"],
-    "groupName": "error-monitoring packages",
-    "reviewers": ["rcebulko"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["invite/**"],
-    "labels": ["Category: Invite"],
-    "groupName": "invite packages",
-    "reviewers": ["rileyajones"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["onduty/**"],
-    "groupName": "onduty packages",
-    "reviewers": ["rcebulko"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["owners/**"],
-    "labels": ["Category: Owners"],
-    "groupName": "owners packages",
-    "reviewers": ["rcebulko"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["percy-mirror-verifier/**"],
-    "labels": ["Category: Percy Mirror Verifier"],
-    "groupName": "percy-mirror-verifier packages",
-    "reviewers": ["danielrozenberg"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["pr-deploy/**"],
-    "labels": ["Category: PR Deploy"],
-    "groupName": "pr-deploy packages",
-    "reviewers": ["estherkim"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["release-calendar/**"],
-    "labels": ["Category: Release Calendar"],
-    "groupName": "release-calendar packages",
-    "reviewers": ["estherkim"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["test-case-reporting/**"],
-    "labels": ["Category: Test Cases"],
-    "groupName": "test-case-reporting packages",
-    "reviewers": ["rileyajones"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchFileNames": ["webhook-pubsub-publisher/**"],
-    "labels": ["Category: Webhook Pub/Sub Publisher"],
-    "groupName": "webhook-pubsub-publisher packages",
-    "reviewers": ["danielrozenberg"],
-    "rebaseWhen": "never",
-    "automerge": true
-  }, {
-    "matchPackageNames": ["node-fetch", "@types/node-fetch"],
-    "allowedVersions": "<3.0.0"
-  }]
+  "packageRules": [
+    {
+      "matchFileNames": ["package.json"],
+      "groupName": "core packages",
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["bundle-size/**"],
+      "labels": ["Category: Bundle Size"],
+      "groupName": "bundle-size packages",
+      "reviewers": ["danielrozenberg"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["bundle-size-chart/**"],
+      "labels": ["Category: Bundle Size Chart"],
+      "groupName": "bundle-size-chart packages",
+      "reviewers": ["danielrozenberg"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["error-monitoring/**"],
+      "labels": ["Category: Error Monitoring"],
+      "groupName": "error-monitoring packages",
+      "reviewers": ["rcebulko"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["invite/**"],
+      "labels": ["Category: Invite"],
+      "groupName": "invite packages",
+      "reviewers": ["rileyajones"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["onduty/**"],
+      "groupName": "onduty packages",
+      "reviewers": ["rcebulko"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["owners/**"],
+      "labels": ["Category: Owners"],
+      "groupName": "owners packages",
+      "reviewers": ["rcebulko"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["percy-mirror-verifier/**"],
+      "labels": ["Category: Percy Mirror Verifier"],
+      "groupName": "percy-mirror-verifier packages",
+      "reviewers": ["danielrozenberg"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["pr-deploy/**"],
+      "labels": ["Category: PR Deploy"],
+      "groupName": "pr-deploy packages",
+      "reviewers": ["estherkim"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["release-calendar/**"],
+      "labels": ["Category: Release Calendar"],
+      "groupName": "release-calendar packages",
+      "reviewers": ["estherkim"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchFileNames": ["webhook-pubsub-publisher/**"],
+      "labels": ["Category: Webhook Pub/Sub Publisher"],
+      "groupName": "webhook-pubsub-publisher packages",
+      "reviewers": ["danielrozenberg"],
+      "rebaseWhen": "never",
+      "automerge": true
+    },
+    {
+      "matchPackageNames": ["node-fetch", "@types/node-fetch"],
+      "allowedVersions": "<3.0.0"
+    }
+  ]
 }
