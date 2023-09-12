@@ -54,6 +54,8 @@ steps:
       - dist/
       - --entry-point
       - refreshRotation
+      - --runtime
+      - nodejs18
 
 # Overall cloud build timeout
 timeout: 1800s
