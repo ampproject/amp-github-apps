@@ -22,7 +22,7 @@ import nock from 'nock';
 describe('On-Duty Bot', () => {
   let response: Response;
   const request = (body: RotationReporterPayload): Request =>
-    ({body, query: {}} as Request);
+    ({body, query: {}}) as Request;
 
   beforeAll(() => {
     nock.disableNetConnect();

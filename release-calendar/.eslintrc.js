@@ -14,88 +14,30 @@
  * limitations under the License.
  */
 
+const fs = require('node:fs');
+const path = require('node:path');
+
+const packageJson = JSON.parse(
+  fs.readFileSync(path.join(__dirname, './package.json'), {encoding: 'utf8'}),
+);
+
 module.exports = {
-  'root': true,
-  'plugins': [
-    '@typescript-eslint',
-    'notice',
-    'prettier',
-    'react',
-    'sort-imports-es6-autofix',
-  ],
-  'env': {
-    'es6': true,
-    'jest': true,
-    'node': true,
-    'browser': true,
-  },
-  'parser': '@typescript-eslint/parser',
-  'extends': [
-    'plugin:react/recommended',
-    'plugin:@typescript-eslint/recommended',
-    'prettier',
-  ],
+  'extends': ['../.eslintrc-ts.js', 'plugin:react/recommended'],
   'parserOptions': {
-    'ecmaVersion': 6,
-    'sourceType': 'module',
-    'ecmaFeatures': {
-      'jsx': true,
-    },
-    'project': 'release-calendar/tsconfig.json',
-    'createDefaultProgram': true,
+    'project': ['release-calendar/tsconfig.json', 'tsconfig.dev.json'],
   },
   'settings': {
     'react': {
-      'version': 'detect',
+      'version': packageJson.dependencies.react,
     },
   },
   'rules': {
-    '@typescript-eslint/await-thenable': 'error',
-    '@typescript-eslint/no-unused-vars': 'error',
-    'camel-case': 'off', //off for @typescript-eslint rule
-    'indent': 'off', //off for @typescript-eslint rule
-    'no-dupe-keys': 'error',
-    'no-extra-bind': 'error',
-    'no-implied-eval': 'error',
-    'no-global-assign': 'error',
-    'no-script-url': 'error',
-    'no-sequences': 'error',
-    'no-self-compare': 'error',
-    'no-throw-literal': 'error',
-    'no-useless-call': 'error',
-    'no-useless-concat': 'error',
-    'no-unused-expressions': 'error',
-    'no-unused-vars': 'off', //off for @typescript-eslint rule
     'no-undef': 'off', // covered by TS
-    'no-var': 'error',
-    'notice/notice': [
-      'error',
-      {
-        'mustMatch': 'Copyright 20\\d{2} The AMP HTML Authors\\.',
-        'templateFile': 'build-system/LICENSE-TEMPLATE.txt',
-        'messages': {
-          'whenFailedToMatch': 'Missing or incorrect license header',
-        },
-      },
-    ],
-    'object-shorthand': 'error',
-    'prettier/prettier': 'error',
-    'prefer-const': 'error',
-    'react/jsx-uses-react': 'off',
-    'react/react-in-jsx-scope': 'off',
-    'semi': 'off', //off for @typescript-eslint rule
-    'sort-imports-es6-autofix/sort-imports-es6': [
-      'error',
-      {
-        'ignoreCase': false,
-        'ignoreMemberSort': false,
-        'memberSyntaxSortOrder': ['none', 'all', 'multiple', 'single'],
-      },
-    ],
   },
+
   'overrides': [
     {
-      'files': ['server.js', 'webpack.*.config.js'],
+      'files': ['.eslintrc.js', '**/webpack.*.config.js'],
       'rules': {
         '@typescript-eslint/no-var-requires': 'off',
       },

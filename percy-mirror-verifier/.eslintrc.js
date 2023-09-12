@@ -17,7 +17,6 @@
 module.exports = {
   extends: ['../.eslintrc-ts.js'],
   parserOptions: {
-    project: 'percy-mirror-verifier/tsconfig.json',
-    createDefaultProgram: true,
+    project: ['percy-mirror-verifier/tsconfig.json', 'tsconfig.dev.json'],
   },
 };

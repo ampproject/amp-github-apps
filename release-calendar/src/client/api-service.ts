@@ -20,15 +20,15 @@ import fetch from 'node-fetch';
 const endpoint = process.env.SERVER_ENDPOINT;
 
 export class ApiService {
-  private getPromotionsRequest(url: string): Promise<Promotion[]> {
-    return fetch(`${endpoint}/${url}`).then((result) => result.json());
+  private async getPromotionsRequest(url: string): Promise<Promotion[]> {
+    return fetch(`${endpoint}/${url}`).then(async (result) => result.json());
   }
 
-  private getReleaseRequest(url: string): Promise<Release> {
-    return fetch(`${endpoint}/${url}`).then((result) => result.json());
+  private async getReleaseRequest(url: string): Promise<Release> {
+    return fetch(`${endpoint}/${url}`).then(async (result) => result.json());
   }
-  private getReleasesRequest(url: string): Promise<Release[]> {
-    return fetch(`${endpoint}/${url}`).then((result) => result.json());
+  private async getReleasesRequest(url: string): Promise<Release[]> {
+    return fetch(`${endpoint}/${url}`).then(async (result) => result.json());
   }
 
   async getSinglePromotions(requestedRelease: string): Promise<Promotion[]> {
@@ -56,9 +56,8 @@ export class ApiService {
   }
 
   async getCurrentPromotions(): Promise<CurrentReleases> {
-    const currentReleases = await this.getPromotionsRequest(
-      `current-promotions`,
-    );
+    const currentReleases =
+      await this.getPromotionsRequest(`current-promotions`);
     return new CurrentReleases(currentReleases);
   }
 

@@ -17,7 +17,6 @@
 module.exports = {
   extends: ['../.eslintrc-ts.js'],
   parserOptions: {
-    project: 'bundle-size-chart/tsconfig.json',
-    createDefaultProgram: true,
+    project: ['bundle-size-chart/tsconfig.json', 'tsconfig.dev.json'],
   },
 };

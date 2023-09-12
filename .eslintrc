@@ -1,3 +1,0 @@
-{
-  extends: ['./.eslintrc-es6.js']
-}
