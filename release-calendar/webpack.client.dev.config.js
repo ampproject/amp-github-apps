@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-const path = require('path');
-const HtmlWebPackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin');
+const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {

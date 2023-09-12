@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-const path = require('path');
 const nodeExternals = require('webpack-node-externals');
+const path = require('path');
 
 module.exports = {
   mode: 'production',

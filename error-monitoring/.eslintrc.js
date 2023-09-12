@@ -17,7 +17,6 @@
 module.exports = {
   extends: ['../.eslintrc-ts.js'],
   parserOptions: {
-    project: 'error-monitoring/tsconfig.json',
-    createDefaultProgram: true,
+    project: ['error-monitoring/tsconfig.json', 'tsconfig.dev.json'],
   },
 };

@@ -31,7 +31,10 @@ export class RateLimitedGraphQL {
   private ready: Promise<void> = Promise.resolve();
   private execute: (query: string) => Promise<GraphQLResponse>;
 
-  constructor(token: string, private frequencyMs: number = GRAPHQL_FREQ_MS) {
+  constructor(
+    token: string,
+    private frequencyMs: number = GRAPHQL_FREQ_MS
+  ) {
     this.execute = async (query: string): Promise<GraphQLResponse> =>
       graphql(query, {
         headers: {authorization: `token ${token}`},

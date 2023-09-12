@@ -22,19 +22,12 @@ module.exports = {
     'sort-imports-es6-autofix',
   ],
   'parser': '@typescript-eslint/parser',
-  'extends': [
-    'plugin:@typescript-eslint/recommended',
-    './.eslintrc-es6.js'
-  ],
-  "ignorePatterns": [
-    "node_modules/",
-    "dist/"
-  ],
+  'extends': ['plugin:@typescript-eslint/recommended', './.eslintrc-es6.js'],
   'parserOptions': {
     'ecmaVersion': 6,
     'sourceType': 'module',
-    "ecmaFeatures": {
-      "modules": true
+    'ecmaFeatures': {
+      'modules': true,
     },
   },
   'rules': {
@@ -53,4 +46,13 @@ module.exports = {
     'no-unused-vars': 'off',
     'semi': 'off',
   },
+
+  'overrides': [
+    {
+      'files': ['**/webpack.*.config.js'],
+      'rules': {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+  ],
 };

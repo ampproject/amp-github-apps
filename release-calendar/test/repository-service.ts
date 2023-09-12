@@ -28,14 +28,14 @@ export class RepositoryService {
     this.promotionRepository = connection.getRepository(PromotionEntity);
   }
 
-  getRelease(name: string): Promise<Release> {
+  async getRelease(name: string): Promise<Release> {
     return this.releaseRepository.findOne({
       where: {name},
       relations: ['promotions'],
     });
   }
 
-  getReleases(): Promise<Release[]> {
+  async getReleases(): Promise<Release[]> {
     const releaseQuery = this.releaseRepository
       .createQueryBuilder('release')
       .leftJoinAndSelect('release.promotions', 'promotion')
@@ -52,11 +52,11 @@ export class RepositoryService {
     return this.getRelease(entity.name);
   }
 
-  savePromotion(promotion: Promotion): Promise<Promotion> {
+  async savePromotion(promotion: Promotion): Promise<Promotion> {
     return this.promotionRepository.save(promotion);
   }
 
-  savePromotions(promotions: Promotion[]): Promise<Promotion[]> {
+  async savePromotions(promotions: Promotion[]): Promise<Promotion[]> {
     return this.promotionRepository.save(promotions);
   }
 }

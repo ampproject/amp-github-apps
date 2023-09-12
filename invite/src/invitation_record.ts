@@ -34,7 +34,10 @@ export class InvitationRecord {
   /**
    * Constructor.
    */
-  constructor(private db: Database, private logger: Logger = console) {}
+  constructor(
+    private db: Database,
+    private logger: Logger = console
+  ) {}
 
   /**
    * Records an invite created by the bot.

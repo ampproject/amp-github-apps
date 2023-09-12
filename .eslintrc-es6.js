@@ -22,16 +22,14 @@ module.exports = {
     'notice',
     'prettier',
     'sort-imports-es6-autofix',
-    'sort-requires'
+    'sort-requires',
   ],
   'env': {
     'es6': true,
     'jest': true,
     'node': true,
   },
-  'extends': [
-    'prettier',
-  ],
+  'extends': ['prettier'],
   'parserOptions': {
     'ecmaVersion': 2018,
     'sourceType': 'module',
@@ -47,7 +45,7 @@ module.exports = {
     'no-extend-native': 'error',
     'no-extra-bind': 'error',
     'no-global-assign': 'error',
-    'no-implicit-coercion': ['error', { 'boolean': false }],
+    'no-implicit-coercion': ['error', {'boolean': false}],
     'no-implied-eval': 'error',
     'no-iterator': 'error',
     'no-lone-blocks': 'error',
@@ -59,22 +57,28 @@ module.exports = {
     'no-throw-literal': 'error',
     'no-undef': 'error',
     'no-unused-expressions': 'error',
-    'no-unused-vars': ['error', { 'argsIgnorePattern': "^(_$|unused)"}],
+    'no-unused-vars': ['error', {'argsIgnorePattern': '^(_$|unused)'}],
     'no-useless-call': 'error',
     'no-useless-concat': 'error',
     'no-var': 'error',
-    'no-warning-comments': ['error', { 'terms': ['do not submit'], 'location': 'anywhere' }],
+    'no-warning-comments': [
+      'error',
+      {'terms': ['do not submit'], 'location': 'anywhere'},
+    ],
     'notice/notice': [
       'error',
       {
         'mustMatch': 'Copyright 20\\d{2} The AMP HTML Authors\\.',
-        'templateFile': path.resolve(__dirname, 'build-system/LICENSE-TEMPLATE.txt'),
+        'templateFile': path.resolve(
+          __dirname,
+          'build-system/LICENSE-TEMPLATE.txt'
+        ),
         'messages': {
-          'whenFailedToMatch': 'Missing or incorrect license header'
-        }
-      }
+          'whenFailedToMatch': 'Missing or incorrect license header',
+        },
+      },
     ],
-    'object-shorthand': ['error', 'properties', { 'avoidQuotes': true }],
+    'object-shorthand': ['error', 'properties', {'avoidQuotes': true}],
     'prefer-const': 'error',
     'prettier/prettier': 'error',
     'radix': 'error',
@@ -83,8 +87,8 @@ module.exports = {
       {
         'ignoreCase': false,
         'ignoreMemberSort': false,
-        'memberSyntaxSortOrder': ['none', 'all', 'multiple', 'single']
-      }
+        'memberSyntaxSortOrder': ['none', 'all', 'multiple', 'single'],
+      },
     ],
     'sort-requires/sort-requires': 'error',
   },

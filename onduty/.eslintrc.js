@@ -17,7 +17,6 @@
 module.exports = {
   extends: ['../.eslintrc-ts.js'],
   parserOptions: {
-    project: 'onduty/tsconfig.json',
-    createDefaultProgram: true,
+    project: ['onduty/tsconfig.json', 'tsconfig.dev.json'],
   },
 };

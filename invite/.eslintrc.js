@@ -17,8 +17,7 @@
 module.exports = {
   extends: ['../.eslintrc-ts.js'],
   parserOptions: {
-    project: 'invite/tsconfig.json',
-    createDefaultProgram: true,
+    project: ['invite/tsconfig.json', 'tsconfig.dev.json'],
   },
   // Because of interactions with the GitHub API and the names of database
   // columns, it is cleanest to use `issue_number` throughout the codebase
