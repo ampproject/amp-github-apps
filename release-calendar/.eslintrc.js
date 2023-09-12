@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+const fs = require('node:fs');
+const path = require('node:path');
+
+const packageJson = JSON.parse(
+  fs.readFileSync(path.join(__dirname, './package.json'), {encoding: 'utf8'}),
+);
+
 module.exports = {
   'extends': ['../.eslintrc-ts.js', 'plugin:react/recommended'],
   'parserOptions': {
@@ -21,10 +28,19 @@ module.exports = {
   },
   'settings': {
     'react': {
-      'version': 'detect',
+      'version': packageJson.dependencies.react,
     },
   },
   'rules': {
     'no-undef': 'off', // covered by TS
   },
+
+  'overrides': [
+    {
+      'files': ['.eslintrc.js', '**/webpack.*.config.js'],
+      'rules': {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+  ],
 };

@@ -46,13 +46,4 @@ module.exports = {
     'no-unused-vars': 'off',
     'semi': 'off',
   },
-
-  'overrides': [
-    {
-      'files': ['**/webpack.*.config.js'],
-      'rules': {
-        '@typescript-eslint/no-var-requires': 'off',
-      },
-    },
-  ],
 };
