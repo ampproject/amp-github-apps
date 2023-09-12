@@ -1,5 +1,10 @@
 steps:
-  # The first two steps are required to identify and inject un-redacted secrets.
+  # Display the current versions of Node and npm.
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - run
+      - print-system-versions
+  # These steps are required to identify and inject un-redacted secrets.
   - name: gcr.io/cloud-builders/npm
     args:
       - install
