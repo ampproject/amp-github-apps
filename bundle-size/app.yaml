@@ -1,4 +1,9 @@
 runtime: nodejs
 env: flex
+
+runtime_config:
+  operating_system: "ubuntu22"
+  runtime_version: 18
+
 beta_settings:
   cloud_sql_instances: amp-bundle-size-bot:us-central1:amp-bundle-size-bot
