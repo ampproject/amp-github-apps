@@ -51,11 +51,8 @@ export async function getSnapshots(buildId: number): Promise<PercySnapshotMap> {
     throw new Error(`Failed to fetch snapshots for build #${buildId}`);
   }
 
-  const response: PercySnapshotsResponse = await body.json();
+  const {data} = (await body.json()) as PercySnapshotsResponse;
   return new Map(
-    response.data.map(percySnapshot => [
-      percySnapshot.attributes.name,
-      percySnapshot,
-    ])
+    data.map(percySnapshot => [percySnapshot.attributes.name, percySnapshot])
   );
 }
