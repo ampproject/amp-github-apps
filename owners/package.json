@@ -15,24 +15,24 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@google-cloud/storage": "5.16.0",
+    "@google-cloud/storage": "5.20.5",
     "@octokit/rest": "18.12.0",
-    "ajv": "8.8.2",
-    "express": "4.17.2",
+    "ajv": "8.12.0",
+    "express": "4.18.2",
     "highlight": "0.2.4",
-    "json5": "2.2.2",
+    "json5": "2.2.3",
     "lodash": "4.17.21",
-    "minimatch": "3.0.5",
-    "probot": "12.2.5",
+    "minimatch": "3.1.2",
+    "probot": "12.3.1",
     "sleep-promise": "9.1.0"
   },
   "devDependencies": {
-    "jest": "27.4.0",
+    "jest": "27.5.1",
     "jest-silent-reporter": "0.5.0",
-    "nock": "13.2.1",
+    "nock": "13.3.3",
     "sinon": "12.0.1",
     "smee-client": "1.2.3",
-    "supertest": "6.1.6"
+    "supertest": "6.3.3"
   },
   "standard": {
     "env": [

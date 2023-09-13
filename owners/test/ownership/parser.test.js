@@ -166,7 +166,7 @@ describe('owners parser', () => {
             requestReviews: false,
           });
           expect(errors[0].message).toContain(
-            '`OWNERS/rules/0/owners/0` must NOT have more than 2 items'
+            '`OWNERS/rules/0/owners/0` must NOT have more than 2 properties'
           );
         });
 
