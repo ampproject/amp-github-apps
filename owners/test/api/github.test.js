@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-const nock = require('nock');
 const sinon = require('sinon');
-const {Octokit} = require('@octokit/rest');
 
 const {CheckRun, CheckRunState} = require('../../src/ownership/owners_check');
 const {GitHub, PullRequest, Review, Team} = require('../../src/api/github');
@@ -26,17 +24,10 @@ const checkRunsListResponse = require('../fixtures/check-runs/check-runs.get.35.
 const commentReviewsResponse = require('../fixtures/reviews/comment_reviews.24686.json');
 const getFileResponse = require('../fixtures/files/file_blob.24523.json');
 const issueCommentsResponse = require('../fixtures/comments/issue_comments.438.json');
-const listFilesResponsePage1 = require('../fixtures/files/files.35.json');
-const listFilesResponsePage2 = require('../fixtures/files/files.35.json');
-const manyReviewsPage1Response = require('../fixtures/reviews/many_reviews.23928.page_1.json');
-const manyReviewsPage2Response = require('../fixtures/reviews/many_reviews.23928.page_2.json');
-const manyTeamsResponsePage1 = require('../fixtures/teams/many_members.page_1.json');
-const manyTeamsResponsePage2 = require('../fixtures/teams/many_members.page_2.json');
+const listFilesResponse = require('../fixtures/files/files.35.json');
 const pullRequestResponse = require('../fixtures/pulls/pull_request.35.json');
 const requestedReviewsResponse = require('../fixtures/reviews/requested_reviewers.24574.json');
 const reviewsApprovedResponse = require('../fixtures/reviews/reviews.35.approved.json');
-const searchOwnersPage1Response = require('../fixtures/files/search.owners.page_1.json');
-const searchOwnersPage2Response = require('../fixtures/files/search.owners.page_2.json');
 const searchReadmeResponse = require('../fixtures/files/search.readme.json');
 
 describe('pull request', () => {
@@ -113,25 +104,50 @@ describe('team', () => {
 
 describe('GitHub API', () => {
   const sandbox = sinon.createSandbox();
-  let githubClient;
+  let mockGithubClient;
   let github;
-
-  beforeAll(() => {
-    nock.disableNetConnect();
-  });
-
-  afterAll(() => {
-    nock.enableNetConnect();
-  });
 
   beforeEach(() => {
     sandbox.stub(console);
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
 
-    githubClient = new Octokit({
-      auth: '_TOKEN_',
-    });
-    github = new GitHub(githubClient, 'test_owner', 'test_repo', console);
+    mockGithubClient = {
+      checks: {
+        create: jest.fn(),
+        listForRef: jest.fn(),
+        update: jest.fn(),
+      },
+      issues: {
+        listComments: jest.fn(),
+      },
+      pulls: {
+        get: jest.fn(),
+        listFiles: jest.fn(),
+        listRequestedReviewers: jest.fn(),
+        listReviews: jest.fn(),
+        requestReviewers: jest.fn(),
+      },
+      repos: {
+        getContent: jest.fn(),
+      },
+      request: jest.fn(),
+      search: {
+        code: jest.fn(),
+      },
+      teams: {
+        list: jest.fn(),
+        listMembersInOrg: jest.fn(),
+      },
+    };
+    github = new GitHub(mockGithubClient, 'test_owner', 'test_repo', console);
+    // To mock pagination we simply call through to the (also mocked) method.
+    // Mocking an internal method of the unit-under-test is an anti-pattern, but
+    // this is part of the migration to using Jest mocks instead of Nock.
+    // TODO(@danielrozenberg): fix this!
+    github._paginate = async (method, ...args) => {
+      const response = await method(...args);
+      return response.items || response.data;
+    };
   });
 
   afterEach(() => {
@@ -145,11 +161,11 @@ describe('GitHub API', () => {
         repo: () => {
           return {repo: 'test_repo', owner: 'test_owner'};
         },
-        octokit: githubClient,
+        octokit: mockGithubClient,
         log: logStub,
       });
 
-      expect(github.client).toBe(githubClient);
+      expect(github.client).toBe(mockGithubClient);
       expect(github.owner).toEqual('test_owner');
       expect(github.repository).toEqual('test_repo');
       expect(github.logger).toBe(logStub);
@@ -180,107 +196,94 @@ describe('GitHub API', () => {
     });
 
     it('returns the response', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com').get('/api/endpoint').reply(200, '_DATA_');
+      mockGithubClient.request.mockResolvedValue({data: '_DATA_'});
 
       const response = await github._customRequest('GET', '/api/endpoint');
+
+      expect(mockGithubClient.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'GET',
+          url: '/api/endpoint',
+        })
+      );
       expect(response.data).toEqual('_DATA_');
     });
 
     it('includes POST data', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .post('/api/endpoint', body => {
-          expect(body).toEqual({body: 'BODY'});
-          return true;
-        })
-        .reply(200);
+      mockGithubClient.request.mockResolvedValue({data: null});
 
       await github._customRequest('POST', '/api/endpoint', {body: 'BODY'});
+
+      expect(mockGithubClient.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          url: '/api/endpoint',
+          body: 'BODY',
+        })
+      );
     });
 
     it('adds the preview header', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/api/endpoint')
-        .reply(200, function () {
-          // Note: it is important this use `function` syntax (instead of arrow
-          // syntax `() => {}` because it needs to access `this`.
-          // eslint-disable-next-line no-invalid-this
-          expect(this.req.headers.accept[0]).toContain(
-            'application/vnd.github.hellcat-preview+json'
-          );
-        });
+      mockGithubClient.request.mockResolvedValue({data: null});
 
       await github._customRequest('GET', '/api/endpoint');
+
+      expect(mockGithubClient.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            accept: 'application/vnd.github.hellcat-preview+json',
+          }),
+        })
+      );
     });
   });
 
   describe('getTeams', () => {
     it('returns a list of team objects', async () => {
-      expect.assertions(2);
-      nock('https://api.github.com')
-        .get('/orgs/test_owner/teams?per_page=100')
-        .reply(200, [{slug: 'my_team'}]);
+      mockGithubClient.teams.list.mockResolvedValue({
+        data: [{slug: 'my_team'}],
+      });
+
       const teams = await github.getTeams();
 
+      expect(mockGithubClient.teams.list).toHaveBeenCalledWith({
+        org: 'test_owner',
+      });
       expect(teams[0].org).toEqual('test_owner');
       expect(teams[0].slug).toEqual('my_team');
-    });
-
-    it('pages automatically', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/orgs/test_owner/teams?per_page=100')
-        .reply(200, Array(30).fill([{slug: 'my_team'}]), {
-          link: '<https://api.github.com/orgs/test_owner/teams?page=2&per_page=100>; rel="next"',
-        });
-      nock('https://api.github.com')
-        .get('/orgs/test_owner/teams?page=2&per_page=100')
-        .reply(200, Array(10).fill([{slug: 'my_team'}]));
-      const teams = await github.getTeams();
-
-      expect(teams.length).toEqual(40);
     });
   });
 
   describe('getTeamMembers', () => {
     it('returns a list of team objects', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/orgs/test_owner/teams/my_team/members?per_page=100')
-        .reply(200, [{login: 'coder'}, {login: 'githubuser'}]);
+      mockGithubClient.teams.listMembersInOrg.mockResolvedValue({
+        data: [{login: 'coder'}, {login: 'githubuser'}],
+      });
+
       const team = new Team('test_owner', 'my_team');
       const members = await github.getTeamMembers(team);
 
+      expect(mockGithubClient.teams.listMembersInOrg).toHaveBeenCalledWith({
+        org: 'test_owner',
+        'team_slug': 'my_team',
+      });
       expect(members).toEqual(['coder', 'githubuser']);
-    });
-
-    it('pages automatically', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/orgs/test_owner/teams/my_team/members?per_page=100')
-        .reply(200, manyTeamsResponsePage1, {
-          link: '<https://api.github.com/orgs/test_owner/teams/my_team/members?page=2&per_page=100>; rel="next"',
-        });
-      nock('https://api.github.com')
-        .get('/orgs/test_owner/teams/my_team/members?page=2&per_page=100')
-        .reply(200, manyTeamsResponsePage2);
-      const team = new Team('test_owner', 'my_team');
-      const members = await github.getTeamMembers(team);
-
-      expect(members.length).toEqual(40);
     });
   });
 
   describe('getPullRequest', () => {
     it('fetches a pull request', async () => {
-      expect.assertions(2);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/35')
-        .reply(200, pullRequestResponse);
+      mockGithubClient.pulls.get.mockResolvedValue({
+        data: pullRequestResponse,
+      });
+
       const pr = await github.getPullRequest(35);
 
+      expect(mockGithubClient.pulls.get).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        'pull_number': 35,
+      });
       // Author pulled from pull_request.35.json
       expect(pr.author).toEqual('ampprojectbot');
       expect(pr.number).toEqual(35);
@@ -289,39 +292,27 @@ describe('GitHub API', () => {
 
   describe('getReviews', () => {
     it('fetches a list of reviews', async () => {
-      expect.assertions(3);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/35/reviews?per_page=100')
-        .reply(200, reviewsApprovedResponse);
+      mockGithubClient.pulls.listReviews.mockResolvedValue({
+        data: reviewsApprovedResponse,
+      });
+
       const [review] = await github.getReviews(35);
 
+      expect(mockGithubClient.pulls.listReviews).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        'pull_number': 35,
+      });
       expect(review.reviewer).toEqual('githubuser');
       expect(review.isApproved).toBe(true);
       expect(review.submittedAt).toEqual(new Date('2019-02-26T20:39:13Z'));
     });
 
-    it('pages automatically', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/23928/reviews?per_page=100')
-        .reply(200, manyReviewsPage1Response, {
-          link: '<https://api.github.com/repos/test_owner/test_repo/pulls/23928/reviews?page=2&per_page=100>; rel="next"',
-        });
-      nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/pulls/23928/reviews?page=2&per_page=100'
-        )
-        .reply(200, manyReviewsPage2Response);
-      const reviews = await github.getReviews(23928);
-
-      expect(reviews.length).toEqual(42);
-    });
-
     it('returns approvals', async () => {
-      expect.assertions(2);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
-        .reply(200, commentReviewsResponse);
+      mockGithubClient.pulls.listReviews.mockResolvedValue({
+        data: commentReviewsResponse,
+      });
+
       const reviews = await github.getReviews(24686);
       const review = reviews[0];
 
@@ -330,10 +321,10 @@ describe('GitHub API', () => {
     });
 
     it('returns post-review comments', async () => {
-      expect.assertions(2);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
-        .reply(200, commentReviewsResponse);
+      mockGithubClient.pulls.listReviews.mockResolvedValue({
+        data: commentReviewsResponse,
+      });
+
       const reviews = await github.getReviews(24686);
       const review = reviews[1];
 
@@ -342,10 +333,10 @@ describe('GitHub API', () => {
     });
 
     it('returns pre-review comments', async () => {
-      expect.assertions(2);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
-        .reply(200, commentReviewsResponse);
+      mockGithubClient.pulls.listReviews.mockResolvedValue({
+        data: commentReviewsResponse,
+      });
+
       const reviews = await github.getReviews(24686);
       const review = reviews[2];
 
@@ -354,10 +345,10 @@ describe('GitHub API', () => {
     });
 
     it('returns rejections', async () => {
-      expect.assertions(2);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
-        .reply(200, commentReviewsResponse);
+      mockGithubClient.pulls.listReviews.mockResolvedValue({
+        data: commentReviewsResponse,
+      });
+
       const reviews = await github.getReviews(24686);
       const review = reviews[3];
 
@@ -366,10 +357,10 @@ describe('GitHub API', () => {
     });
 
     it('returns comment-only reviews', async () => {
-      expect.assertions(2);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
-        .reply(200, commentReviewsResponse);
+      mockGithubClient.pulls.listReviews.mockResolvedValue({
+        data: commentReviewsResponse,
+      });
+
       const reviews = await github.getReviews(24686);
       const review = reviews[4];
 
@@ -378,10 +369,10 @@ describe('GitHub API', () => {
     });
 
     it('ignores irrelevant review states', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24686/reviews?per_page=100')
-        .reply(200, commentReviewsResponse);
+      mockGithubClient.pulls.listReviews.mockResolvedValue({
+        data: commentReviewsResponse,
+      });
+
       const reviews = await github.getReviews(24686);
       const review = reviews[5];
 
@@ -391,48 +382,60 @@ describe('GitHub API', () => {
 
   describe('createReviewRequests', () => {
     it('requests reviews from GitHub users', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .post(
-          '/repos/test_owner/test_repo/pulls/24574/requested_reviewers',
-          body => {
-            expect(body).toMatchObject({reviewers: ['reviewer']});
-            return true;
-          }
-        )
-        .reply(200);
+      mockGithubClient.pulls.requestReviewers.mockResolvedValue();
+
       await github.createReviewRequests(24574, ['reviewer']);
+
+      expect(mockGithubClient.pulls.requestReviewers).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        'pull_number': 24574,
+        reviewers: ['reviewer'],
+      });
     });
 
     it('skips the API call if no usernames are provided', async () => {
-      // This will fail if it attempts to make an un-nocked network request.
       await github.createReviewRequests(24574, []);
+
+      expect(mockGithubClient.pulls.requestReviewers).not.toHaveBeenCalled();
     });
   });
 
   describe('getReviewRequests', () => {
     it('fetches a list of review requests', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/24574/requested_reviewers')
-        .reply(200, requestedReviewsResponse);
+      mockGithubClient.pulls.listRequestedReviewers.mockResolvedValue({
+        data: requestedReviewsResponse,
+      });
+
       const reviewers = await github.getReviewRequests(24574);
 
+      expect(
+        mockGithubClient.pulls.listRequestedReviewers
+      ).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        'pull_number': 24574,
+      });
       expect(reviewers).toEqual(['scripter', 'someperson', 'birdperson']);
     });
   });
 
   describe('getBotComments', () => {
     it('fetches a list of comments by the bot user', async () => {
-      expect.assertions(1);
+      mockGithubClient.issues.listComments.mockResolvedValue({
+        data: issueCommentsResponse,
+      });
       sandbox.stub(process, 'env').value({
         GITHUB_BOT_USERNAME: 'amp-owners-bot',
       });
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/issues/24574/comments?per_page=100')
-        .reply(200, issueCommentsResponse);
+
       const comments = await github.getBotComments(24574);
 
+      expect(mockGithubClient.issues.listComments).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        'issue_number': 24574,
+      });
       expect(comments).toEqual([
         {
           id: 532484354,
@@ -440,86 +443,57 @@ describe('GitHub API', () => {
         },
       ]);
     });
-
-    it('pages automatically', async () => {
-      expect.assertions(1);
-      sandbox.stub(process, 'env').value({
-        GITHUB_BOT_USERNAME: 'amp-owners-bot',
-      });
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/issues/24574/comments?per_page=100')
-        .reply(200, issueCommentsResponse, {
-          link: '<https://api.github.com/repos/test_owner/test_repo/issues/24574/comments?page=2&per_page=100>; rel="next"',
-        });
-      nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/issues/24574/comments?page=2&per_page=100'
-        )
-        .reply(200, issueCommentsResponse);
-      const comments = await github.getBotComments(24574);
-
-      expect(comments.length).toBe(2);
-    });
   });
 
   describe('createBotComment', () => {
-    it('adds a comment to the pull request', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .post('/repos/test_owner/test_repo/issues/24574/comments', body => {
-          expect(body).toMatchObject({body: 'test comment'});
-          return true;
-        })
-        .reply(200);
-      await github.createBotComment(24574, 'test comment');
-    });
-
     it('returns the created comment', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .post('/repos/test_owner/test_repo/issues/24574/comments')
-        .reply(200, {id: 1337});
+      mockGithubClient.request.mockResolvedValue({data: {id: 1337}});
 
       const {id} = await github.createBotComment(24574, 'test comment');
+
+      expect(mockGithubClient.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          url: '/repos/test_owner/test_repo/issues/24574/comments',
+          body: 'test comment',
+        })
+      );
       expect(id).toEqual(1337);
     });
   });
 
   describe('updateComment', () => {
-    it('updates a PR comment', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .patch('/repos/test_owner/test_repo/issues/comments/24574', body => {
-          expect(body).toMatchObject({body: 'updated comment'});
-          return true;
-        })
-        .reply(200);
-      await github.updateComment(24574, 'updated comment');
-    });
-
     it('returns the updated comment', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .patch('/repos/test_owner/test_repo/issues/comments/24574')
-        .reply(200, {id: 1337});
+      mockGithubClient.request.mockResolvedValue({data: {id: 1337}});
 
       const {id} = await github.updateComment(24574, 'updated comment');
+
+      expect(mockGithubClient.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PATCH',
+          url: '/repos/test_owner/test_repo/issues/comments/24574',
+          body: 'updated comment',
+        })
+      );
       expect(id).toEqual(1337);
     });
   });
 
   describe('getFileContents', () => {
     it('fetches the contents of a file', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get(
-          '/repos/test_owner/test_repo/contents/third_party%2Fsubscriptions-project%2FOWNERS'
-        )
-        .reply(200, getFileResponse);
+      mockGithubClient.repos.getContent.mockResolvedValue({
+        data: getFileResponse,
+      });
+
       const {contents} = await github.getFileContents(
         'third_party/subscriptions-project/OWNERS'
       );
 
+      expect(mockGithubClient.repos.getContent).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        path: 'third_party/subscriptions-project/OWNERS',
+      });
       expect(contents).toEqual(
         '- otherperson\n- auser\n- otheruser\n- programmer\n- someperson\n'
       );
@@ -528,79 +502,50 @@ describe('GitHub API', () => {
 
   describe('listFiles', () => {
     it('fetches the list of changed files', async () => {
-      expect.assertions(2);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100')
-        .reply(200, listFilesResponsePage1);
+      mockGithubClient.pulls.listFiles.mockResolvedValue({
+        data: listFilesResponse,
+      });
+
       const files = await github.listFiles(35);
 
+      expect(mockGithubClient.pulls.listFiles).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        'pull_number': 35,
+      });
       expect(files.length).toBe(1);
       expect(files[0]).toEqual('dir2/dir1/dir1/file.txt');
-    });
-
-    it('pages automatically', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100')
-        .reply(200, listFilesResponsePage1, {
-          link: '<https://api.github.com/repos/test_owner/test_repo/pulls/35/files?per_page=100&page=2>; rel="next"',
-        });
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/pulls/35/files?per_page=100&page=2')
-        .reply(200, listFilesResponsePage2);
-      const files = await github.listFiles(35);
-
-      expect(files.length).toBe(2);
     });
   });
 
   describe('searchCode', () => {
     it('fetches the list of matching files', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get(
-          '/search/code?q=filename%3AREADME.md%20repo%3Atest_owner%2Ftest_repo&per_page=100'
-        )
-        .reply(200, searchReadmeResponse);
+      mockGithubClient.search.code.mockResolvedValue(searchReadmeResponse);
+
       const files = await github.searchFilename('README.md');
+
+      expect(mockGithubClient.search.code).toHaveBeenCalledWith({
+        q: 'filename:README.md repo:test_owner/test_repo',
+      });
       expect(files.length).toEqual(23);
     });
 
-    it('pages automatically', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get(
-          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&per_page=100'
-        )
-        .reply(200, searchOwnersPage1Response, {
-          link: '</search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100>; rel="next"',
-        });
-      nock('https://api.github.com')
-        .get(
-          '/search/code?q=filename%3AOWNERS%20repo%3Atest_owner%2Ftest_repo&page=2&per_page=100'
-        )
-        .reply(200, searchOwnersPage2Response);
-      const files = await github.searchFilename('OWNERS');
-      expect(files.length).toEqual(168);
-    });
-
     it('only includes exact file matches', async () => {
-      expect.assertions(3);
-      nock('https://api.github.com')
-        .get(
-          '/search/code?q=filename%3Aexact-match%20repo%3Atest_owner%2Ftest_repo&per_page=100'
-        )
-        .reply(200, {
-          'total_count': 3,
-          items: [
-            {name: 'not-exact-match', path: 'foo/not-exact-match', sha: ''},
-            {name: 'exact-match', path: 'foo/exact-match', sha: ''},
-            {name: 'exact-match', path: 'exact-match', sha: ''},
-          ],
-        });
+      mockGithubClient.search.code.mockResolvedValue({
+        'total_count': 3,
+        items: [
+          {name: 'not-exact-match', path: 'foo/not-exact-match', sha: ''},
+          {name: 'exact-match', path: 'foo/exact-match', sha: ''},
+          {name: 'exact-match', path: 'exact-match', sha: ''},
+        ],
+      });
+
       const files = await github.searchFilename('exact-match');
       const filenames = files.map(({filename}) => filename);
 
+      expect(mockGithubClient.search.code).toHaveBeenCalledWith({
+        q: 'filename:exact-match repo:test_owner/test_repo',
+      });
       expect(filenames).not.toContainEqual('foo/not-exact-match');
       expect(filenames).toContainEqual('foo/exact-match');
       expect(filenames).toContainEqual('exact-match');
@@ -609,40 +554,46 @@ describe('GitHub API', () => {
 
   describe('createCheckRun', () => {
     it('creates a check-run for the commit', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .post('/repos/test_owner/test_repo/check-runs', body => {
-          expect(body).toMatchObject({
-            'head_sha': '_test_hash_',
-            name: 'ampproject/owners-check',
-            status: 'completed',
-            conclusion: 'neutral',
-            output: {
-              title: 'Test summary',
-              summary: 'Test summary',
-              text: 'Test text\n\nHELP TEXT',
-            },
-          });
-          return true;
-        })
-        .reply(200);
+      mockGithubClient.checks.create.mockResolvedValue();
+
       const checkRun = new CheckRun(
         CheckRunState.NEUTRAL,
         'Test summary',
         'Test text'
       );
       await github.createCheckRun('_test_hash_', checkRun);
+
+      expect(mockGithubClient.checks.create).toHaveBeenCalledWith({
+        'head_sha': '_test_hash_',
+        'completed_at': expect.any(Date),
+        owner: 'test_owner',
+        repo: 'test_repo',
+        name: 'ampproject/owners-check',
+        status: 'completed',
+        conclusion: 'neutral',
+        output: {
+          title: 'Test summary',
+          summary: 'Test summary',
+          text: 'Test text\n\nHELP TEXT',
+        },
+      });
     });
   });
 
   describe('getCheckRunIds', () => {
     it('fetches the first matching check-run from the list', async () => {
-      expect.assertions(2);
+      mockGithubClient.checks.listForRef.mockResolvedValue({
+        data: checkRunsListResponse,
+      });
+
       const sha = '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d';
-      nock('https://api.github.com')
-        .get(`/repos/test_owner/test_repo/commits/${sha}/check-runs`)
-        .reply(200, checkRunsListResponse);
       const checkRunIds = await github.getCheckRunIds(sha);
+
+      expect(mockGithubClient.checks.listForRef).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        ref: sha,
+      });
 
       // ID pulled from check-runs.get.35.multiple
       expect(checkRunIds['owners-check']).toEqual(53472315);
@@ -650,63 +601,75 @@ describe('GitHub API', () => {
     });
 
     it('returns null if the list has no matching check-run', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/commits/_missing_hash_/check-runs')
-        .reply(200, checkRunsListResponse);
+      mockGithubClient.checks.listForRef.mockResolvedValue({
+        data: checkRunsListResponse,
+      });
+
       const checkRunIds = await github.getCheckRunIds('_missing_hash_');
 
+      expect(mockGithubClient.checks.listForRef).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        ref: '_missing_hash_',
+      });
       expect(checkRunIds['owners-check']).toBeUndefined();
     });
 
     it('returns null if the list is empty', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/commits/_test_hash_/check-runs')
-        .reply(200, checkRunsEmptyResponse);
+      mockGithubClient.checks.listForRef.mockResolvedValue({
+        data: checkRunsEmptyResponse,
+      });
+
       const checkRunIds = await github.getCheckRunIds('_test_hash_');
 
+      expect(mockGithubClient.checks.listForRef).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        ref: '_test_hash_',
+      });
       expect(checkRunIds['owners-check']).toBeUndefined();
     });
 
     it('returns null if there is an error querying GitHub', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .get('/repos/test_owner/test_repo/commits/_test_hash_/check-runs')
-        .replyWithError({
-          message: 'Not found',
-          code: 404,
-        });
+      mockGithubClient.checks.listForRef.mockRejectedValue(
+        new Error('RequestError', '404 Not Found')
+      );
+
       const checkRunIds = await github.getCheckRunIds('_test_hash_');
 
+      expect(mockGithubClient.checks.listForRef).toHaveBeenCalledWith({
+        owner: 'test_owner',
+        repo: 'test_repo',
+        ref: '_test_hash_',
+      });
       expect(checkRunIds['owners-check']).toBeUndefined();
     });
   });
 
   describe('updateCheckRun', () => {
     it('updates a check-run by ID', async () => {
-      expect.assertions(1);
-      nock('https://api.github.com')
-        .patch('/repos/test_owner/test_repo/check-runs/1337', body => {
-          expect(body).toMatchObject({
-            name: 'ampproject/owners-check',
-            status: 'completed',
-            conclusion: 'neutral',
-            output: {
-              title: 'Test summary',
-              summary: 'Test summary',
-              text: 'Test text\n\nHELP TEXT',
-            },
-          });
-          return true;
-        })
-        .reply(200);
+      mockGithubClient.checks.update.mockResolvedValue({});
       const checkRun = new CheckRun(
         CheckRunState.NEUTRAL,
         'Test summary',
         'Test text'
       );
       await github.updateCheckRun(1337, checkRun);
+
+      expect(mockGithubClient.checks.update).toHaveBeenCalledWith({
+        'check_run_id': 1337,
+        'completed_at': expect.any(Date),
+        owner: 'test_owner',
+        repo: 'test_repo',
+        name: 'ampproject/owners-check',
+        status: 'completed',
+        conclusion: 'neutral',
+        output: {
+          title: 'Test summary',
+          summary: 'Test summary',
+          text: 'Test text\n\nHELP TEXT',
+        },
+      });
     });
   });
 });

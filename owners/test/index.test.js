@@ -15,15 +15,14 @@
  */
 
 const fs = require('fs');
-const nock = require('nock');
 const owners = require('..');
 const path = require('path');
 const sinon = require('sinon');
 const {Probot, Server, ProbotOctokit} = require('probot');
 
 const VirtualRepository = require('../src/repo/virtual_repo');
-const {CheckRun} = require('../src/ownership/owners_check');
-const {GitHub, Team} = require('../src/api/github');
+const {CheckRun, CheckRunState} = require('../src/ownership/owners_check');
+const {GitHub, Team, Review, PullRequest} = require('../src/api/github');
 const {OwnersBot} = require('../src/owners_bot');
 const {OwnersParser} = require('../src/ownership/parser');
 const {OwnersRule} = require('../src/ownership/rules');
@@ -34,19 +33,6 @@ const opened36 = require('./fixtures/actions/opened.36.author-is-owner');
 const openedDraft25408 = require('./fixtures/actions/opened.draft.25408');
 const rerequest35 = require('./fixtures/actions/rerequested.35');
 const review35 = require('./fixtures/actions/pull_request_review.35.submitted');
-
-const files35 = require('./fixtures/files/files.35');
-const files35Multiple = require('./fixtures/files/files.35.multiple');
-const files36 = require('./fixtures/files/files.36');
-
-const reviews35 = require('./fixtures/reviews/reviews.35');
-const reviews35Approved = require('./fixtures/reviews/reviews.35.approved');
-
-const checkruns35 = require('./fixtures/check-runs/check-runs.get.35');
-const checkruns35Empty = require('./fixtures/check-runs/check-runs.get.35.empty');
-const checkruns35Multiple = require('./fixtures/check-runs/check-runs.get.35.multiple');
-
-const pullRequest35 = require('./fixtures/pulls/pull_request.35');
 
 jest.setTimeout(30000);
 
@@ -75,14 +61,6 @@ describe('GitHub app', () => {
   let probot;
   let sandbox;
 
-  beforeAll(() => {
-    nock.disableNetConnect();
-  });
-
-  afterAll(() => {
-    nock.enableNetConnect();
-  });
-
   beforeEach(() => {
     process.env = {
       DISABLE_WEBHOOK_EVENT_CHECK: 'true',
@@ -96,16 +74,15 @@ describe('GitHub app', () => {
     sandbox.stub(VirtualRepository.prototype, 'sync');
     sandbox.stub(VirtualRepository.prototype, 'warmCache').resolves();
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
-    sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
-    sandbox.stub(GitHub.prototype, 'getReviewRequests').returns([]);
-    sandbox.stub(GitHub.prototype, 'createReviewRequests').returns([]);
+    sandbox.stub(OwnersBot.prototype, 'refreshTree').resolves();
+    sandbox.stub(GitHub.prototype);
+    GitHub.prototype.getBotComments.returns([]);
+    GitHub.prototype.getReviewRequests.returns([]);
+    GitHub.prototype.createReviewRequests.returns([]);
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
       .returns({result: ownersRules, errors: []});
-    nock('https://api.github.com')
-      .post('/app/installations/588033/access_tokens')
-      .reply(200, {token: 'test'});
 
     const server = new Server({
       Probot: Probot.defaults({
@@ -127,426 +104,237 @@ describe('GitHub app', () => {
 
   describe('when there are more than 1 checks on a PR', () => {
     test('it should update amp owners bot check when there is one', async () => {
-      expect.assertions(4);
-      nock('https://api.github.com')
-        // We need the list of files on a pull request to evaluate the required
-        // reviewers.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
-        )
-        .reply(200, files35)
-        // We need the reviews to check if a pull request has been approved or
-        // not.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
-        )
-        .reply(200, reviews35)
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35Multiple)
-        // Test that a check-run is created
-        .patch(
-          '/repos/githubuser/github-owners-bot-test-repo/check-runs/53472315',
-          body => {
-            expect(body).toMatchObject({
-              conclusion: 'action_required',
-              output: {
-                title:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-                summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-              },
-            });
-            expect(body.output.text).toContain(
-              '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`'
-            );
-            expect(body.output.text).toContain(
-              '### Suggested Reviewers\n\n' +
-                'Reviewer: _githubuser_\n' +
-                '- `dir2/dir1/dir1/file.txt`'
-            );
-            expect(body.output.text).toContain('HELP TEXT');
-
-            return true;
-          }
-        )
-        .reply(200);
+      GitHub.prototype.listFiles.resolves(['dir2/dir1/dir1/file.txt']);
+      GitHub.prototype.getReviews.resolves([]);
+      GitHub.prototype.getCheckRunIds.resolves({
+        'owners-check': 53472315,
+        'another-check': 53472313,
+      });
+      GitHub.prototype.updateCheckRun.resolves();
 
       await probot.receive({name: 'pull_request', payload: opened35});
+
+      sandbox.assert.calledOnce(GitHub.prototype.listFiles);
+      sandbox.assert.calledOnce(GitHub.prototype.getReviews);
+      sandbox.assert.calledOnce(GitHub.prototype.getCheckRunIds);
+      sandbox.assert.calledOnceWithExactly(
+        GitHub.prototype.updateCheckRun,
+        53472315,
+        new CheckRun(
+          CheckRunState.ACTION_REQUIRED,
+          'Missing required OWNERS approvals! Suggested reviewers: githubuser',
+          '### Current Coverage\n' +
+            '\n' +
+            '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`\n' +
+            '\n' +
+            '### Suggested Reviewers\n' +
+            '\n' +
+            'Reviewer: _githubuser_\n' +
+            '- `dir2/dir1/dir1/file.txt`'
+        )
+      );
     });
   });
 
   describe('create check run', () => {
     test('with failure check when there are 0 reviews on a pull request', async () => {
-      expect.assertions(4);
-      nock('https://api.github.com')
-        // We need the list of files on a pull request to evaluate the required
-        // reviewers.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
-        )
-        .reply(200, files35)
-        // We need the reviews to check if a pull request has been approved or
-        // not.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
-        )
-        .reply(200, reviews35)
-        // Get check runs for a specific commit
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35Empty)
-        // Test that a check-run is created
-        .post(
-          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
-          body => {
-            expect(body).toMatchObject({
-              name: 'ampproject/owners-check',
-              'head_sha': opened35.pull_request.head.sha,
-              status: 'completed',
-              conclusion: 'action_required',
-              output: {
-                title:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-                summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-              },
-            });
-            expect(body.output.text).toContain(
-              '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`'
-            );
-            expect(body.output.text).toContain(
-              '### Suggested Reviewers\n\n' +
-                'Reviewer: _githubuser_\n' +
-                '- `dir2/dir1/dir1/file.txt`'
-            );
-            expect(body.output.text).toContain('HELP TEXT');
-
-            return true;
-          }
-        )
-        .reply(200);
+      GitHub.prototype.listFiles.resolves(['dir2/dir1/dir1/file.txt']);
+      GitHub.prototype.getReviews.resolves([]);
+      GitHub.prototype.getCheckRunIds.resolves({});
+      GitHub.prototype.createCheckRun.resolves();
 
       await probot.receive({name: 'pull_request', payload: opened35});
+
+      sandbox.assert.calledOnce(GitHub.prototype.listFiles);
+      sandbox.assert.calledOnce(GitHub.prototype.getReviews);
+      sandbox.assert.calledOnce(GitHub.prototype.getCheckRunIds);
+      sandbox.assert.calledOnceWithExactly(
+        GitHub.prototype.createCheckRun,
+        '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d',
+        new CheckRun(
+          CheckRunState.ACTION_REQUIRED,
+          'Missing required OWNERS approvals! Suggested reviewers: githubuser',
+          '### Current Coverage\n' +
+            '\n' +
+            '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`\n' +
+            '\n' +
+            '### Suggested Reviewers\n' +
+            '\n' +
+            'Reviewer: _githubuser_\n' +
+            '- `dir2/dir1/dir1/file.txt`'
+        )
+      );
     });
   });
 
   describe('update check run', () => {
     test('with failure check when there are 0 reviews on a pull request', async () => {
-      expect.assertions(4);
-      nock('https://api.github.com')
-        // We need the list of files on a pull request to evaluate the required
-        // reviewers.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
-        )
-        .reply(200, files35)
-        // We need the reviews to check if a pull request has been approved or
-        // not.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
-        )
-        .reply(200, reviews35)
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35)
-        // Test that a check-run is created
-        .patch(
-          '/repos/githubuser/github-owners-bot-test-repo/check-runs/53472313',
-          body => {
-            expect(body).toMatchObject({
-              conclusion: 'action_required',
-              output: {
-                title:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-                summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-              },
-            });
-            expect(body.output.text).toContain(
-              '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`'
-            );
-            expect(body.output.text).toContain(
-              '### Suggested Reviewers\n\n' +
-                'Reviewer: _githubuser_\n' +
-                '- `dir2/dir1/dir1/file.txt`'
-            );
-            expect(body.output.text).toContain('HELP TEXT');
-
-            return true;
-          }
-        )
-        .reply(200);
+      GitHub.prototype.listFiles.resolves(['dir2/dir1/dir1/file.txt']);
+      GitHub.prototype.getReviews.resolves([]);
+      GitHub.prototype.getCheckRunIds.resolves({
+        'owners-check': 53472313,
+      });
+      GitHub.prototype.updateCheckRun.resolves();
 
       await probot.receive({name: 'pull_request', payload: opened35});
+
+      sandbox.assert.calledOnce(GitHub.prototype.listFiles);
+      sandbox.assert.calledOnce(GitHub.prototype.getReviews);
+      sandbox.assert.calledOnce(GitHub.prototype.getCheckRunIds);
+      sandbox.assert.calledOnceWithExactly(
+        GitHub.prototype.updateCheckRun,
+        53472313,
+        new CheckRun(
+          CheckRunState.ACTION_REQUIRED,
+          'Missing required OWNERS approvals! Suggested reviewers: githubuser',
+          '### Current Coverage\n' +
+            '\n' +
+            '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`\n' +
+            '\n' +
+            '### Suggested Reviewers\n' +
+            '\n' +
+            'Reviewer: _githubuser_\n' +
+            '- `dir2/dir1/dir1/file.txt`'
+        )
+      );
     });
 
     test('with failure check when there are 0 reviews on a pull request and multiple files', async () => {
-      expect.assertions(4);
-      nock('https://api.github.com')
-        // We need the list of files on a pull request to evaluate the required
-        // reviewers.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
-        )
-        .reply(200, files35Multiple)
-        // We need the reviews to check if a pull request has been approved or
-        // not.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
-        )
-        .reply(200, reviews35)
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35)
-        // Test that a check-run is created
-        .patch(
-          '/repos/githubuser/github-owners-bot-test-repo/check-runs/53472313',
-          body => {
-            expect(body).toMatchObject({
-              conclusion: 'action_required',
-              output: {
-                title:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-                summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-              },
-            });
-            expect(body.output.text).toContain(
-              '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`\n' +
-                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file-2.txt`'
-            );
-            expect(body.output.text).toContain(
-              '### Suggested Reviewers\n\n' +
-                'Reviewer: _githubuser_\n' +
-                '- `dir2/dir1/dir1/file.txt`\n' +
-                '- `dir2/dir1/dir1/file-2.txt`'
-            );
-            expect(body.output.text).toContain('HELP TEXT');
-
-            return true;
-          }
-        )
-        .reply(200);
+      GitHub.prototype.listFiles.resolves([
+        'dir2/dir1/dir1/file.txt',
+        'dir2/dir1/dir1/file-2.txt',
+      ]);
+      GitHub.prototype.getReviews.resolves([]);
+      GitHub.prototype.getCheckRunIds.resolves({
+        'owners-check': 53472313,
+      });
+      GitHub.prototype.updateCheckRun.resolves();
 
       await probot.receive({name: 'pull_request', payload: opened35});
+
+      sandbox.assert.calledOnce(GitHub.prototype.listFiles);
+      sandbox.assert.calledOnce(GitHub.prototype.getReviews);
+      sandbox.assert.calledOnce(GitHub.prototype.getCheckRunIds);
+      sandbox.assert.calledOnce(GitHub.prototype.updateCheckRun);
     });
   });
 
   describe('rerequest check run', () => {
     test('should re-evaluate pull request', async () => {
-      expect.assertions(4);
-      nock('https://api.github.com')
-        // We need the list of files on a pull request to evaluate the required
-        // reviewers.
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35')
-        .reply(200, pullRequest35)
-        // We need the list of files on a pull request to evaluate the required
-        // reviewers.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+      GitHub.prototype.getPullRequest.resolves(
+        new PullRequest(
+          35,
+          'ampprojectbot',
+          '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d',
+          'Pull request description',
+          'open'
         )
-        .reply(200, files35)
-        // We need the reviews to check if a pull request has been approved or
-        // not.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
-        )
-        .reply(200, reviews35)
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35Empty)
-        // Test that a check-run is created
-        .post(
-          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
-          body => {
-            expect(body).toMatchObject({
-              name: 'ampproject/owners-check',
-              'head_sha': opened35.pull_request.head.sha,
-              status: 'completed',
-              conclusion: 'action_required',
-              output: {
-                title:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-                summary:
-                  'Missing required OWNERS approvals! Suggested reviewers: githubuser',
-              },
-            });
-            expect(body.output.text).toContain(
-              '### Current Coverage\n\n' +
-                '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`'
-            );
-            expect(body.output.text).toContain(
-              '### Suggested Reviewers\n\n' +
-                'Reviewer: _githubuser_\n' +
-                '- `dir2/dir1/dir1/file.txt`'
-            );
-            expect(body.output.text).toContain('HELP TEXT');
-
-            return true;
-          }
-        )
-        .reply(200);
+      );
+      GitHub.prototype.listFiles.resolves(['dir2/dir1/dir1/file.txt']);
+      GitHub.prototype.getReviews.resolves([]);
+      GitHub.prototype.getCheckRunIds.resolves({});
+      GitHub.prototype.updateCheckRun.resolves();
 
       await probot.receive({name: 'check_run', payload: rerequest35});
+
+      sandbox.assert.calledOnceWithExactly(GitHub.prototype.getPullRequest, 35);
+      sandbox.assert.calledOnceWithExactly(
+        GitHub.prototype.createCheckRun,
+        '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d',
+        new CheckRun(
+          CheckRunState.ACTION_REQUIRED,
+          'Missing required OWNERS approvals! Suggested reviewers: githubuser',
+          '### Current Coverage\n' +
+            '\n' +
+            '- **[NEEDS APPROVAL]** `dir2/dir1/dir1/file.txt`\n' +
+            '\n' +
+            '### Suggested Reviewers\n' +
+            '\n' +
+            'Reviewer: _githubuser_\n' +
+            '- `dir2/dir1/dir1/file.txt`'
+        )
+      );
     });
   });
 
   describe('has approvals met', () => {
     test('with passing check when there is 1 approver on a pull request', async () => {
-      expect.assertions(3);
-      nock('https://api.github.com')
-        // We need the list of files on a pull request to evaluate the required
-        // reviewers.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
-        )
-        .reply(200, files35)
-        // We need the reviews to check if a pull request has been approved or
-        // not.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
-        )
-        .reply(200, reviews35Approved)
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
-            '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35Empty)
-        // Test that a check-run is created
-        .post(
-          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
-          body => {
-            expect(body).toMatchObject({
-              name: 'ampproject/owners-check',
-              'head_sha': opened35.pull_request.head.sha,
-              status: 'completed',
-              conclusion: 'success',
-              output: {
-                title: 'All files in this PR have OWNERS approval',
-                summary: 'All files in this PR have OWNERS approval',
-              },
-            });
-            expect(body.output.text).toContain(
-              '### Current Coverage\n\n' +
-                '- `dir2/dir1/dir1/file.txt` _(githubuser)_'
-            );
-            expect(body.output.text).toContain('HELP TEXT');
-
-            return true;
-          }
-        )
-        .reply(200);
+      GitHub.prototype.listFiles.resolves(['dir2/dir1/dir1/file.txt']);
+      GitHub.prototype.getReviews.resolves([
+        new Review('githubuser', 'approved', new Date()),
+      ]);
+      GitHub.prototype.getCheckRunIds.resolves({});
+      GitHub.prototype.createCheckRun.resolves();
 
       await probot.receive({name: 'pull_request', payload: opened35});
+
+      sandbox.assert.calledOnceWithExactly(
+        GitHub.prototype.createCheckRun,
+        '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d',
+        new CheckRun(
+          CheckRunState.SUCCESS,
+          'All files in this PR have OWNERS approval',
+          '### Current Coverage\n' +
+            '\n' +
+            '- `dir2/dir1/dir1/file.txt` _(githubuser)_'
+        )
+      );
     });
 
     test('with passing check when author themselves are owners', async () => {
-      expect.assertions(3);
-      nock('https://api.github.com')
-        // We need the list of files on a pull request to evaluate the required
-        // reviewers.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/36/files?per_page=100'
-        )
-        .reply(200, files36)
-        // We need the reviews to check if a pull request has been approved or
-        // not.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/36/reviews?per_page=100'
-        )
-        .reply(200, reviews35)
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
-            'c7fdbd7f947fca608b20006da8535af5384ab699/check-runs'
-        )
-        .reply(200, checkruns35Empty)
-        // Test that a check-run is created
-        .post(
-          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
-          body => {
-            expect(body).toMatchObject({
-              name: 'ampproject/owners-check',
-              'head_sha': opened36.pull_request.head.sha,
-              status: 'completed',
-              conclusion: 'success',
-              output: {
-                title: 'All files in this PR have OWNERS approval',
-                summary: 'All files in this PR have OWNERS approval',
-              },
-            });
-            expect(body.output.text).toContain(
-              '### Current Coverage\n\n- `dir2/new-file.txt` _(githubuser)_'
-            );
-            expect(body.output.text).toContain('HELP TEXT');
-
-            return true;
-          }
-        )
-        .reply(200);
+      GitHub.prototype.listFiles.resolves(['dir2/new-file.txt']);
+      GitHub.prototype.getReviews.resolves([]);
+      GitHub.prototype.getCheckRunIds.resolves({});
+      GitHub.prototype.createCheckRun.resolves();
 
       await probot.receive({name: 'pull_request', payload: opened36});
+
+      sandbox.assert.calledOnceWithExactly(
+        GitHub.prototype.createCheckRun,
+        'c7fdbd7f947fca608b20006da8535af5384ab699',
+        new CheckRun(
+          CheckRunState.SUCCESS,
+          'All files in this PR have OWNERS approval',
+          '### Current Coverage\n' +
+            '\n' +
+            '- `dir2/new-file.txt` _(githubuser)_'
+        )
+      );
     });
   });
 
   describe('pull request review', () => {
     test('triggers pull request re-evaluation', async () => {
-      expect.assertions(3);
-      nock('https://api.github.com')
-        .get('/repos/githubuser/github-owners-bot-test-repo/pulls/35')
-        .reply(200, pullRequest35)
-        // We need the list of files on a pull request to evaluate the required
-        // reviewers.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
+      GitHub.prototype.getPullRequest.resolves(
+        new PullRequest(
+          35,
+          'ampprojectbot',
+          '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d',
+          'Pull request description',
+          'open'
         )
-        .reply(200, files35)
-        // We need the reviews to check if a pull request has been approved or
-        // not.
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
-        )
-        .reply(200, reviews35Approved)
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
-            '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35Empty)
-        // Test that a check-run is created
-        .post(
-          '/repos/githubuser/github-owners-bot-test-repo/check-runs',
-          body => {
-            expect(body).toMatchObject({
-              name: 'ampproject/owners-check',
-              'head_sha': opened35.pull_request.head.sha,
-              status: 'completed',
-              conclusion: 'success',
-              output: {
-                title: 'All files in this PR have OWNERS approval',
-                summary: 'All files in this PR have OWNERS approval',
-              },
-            });
-            expect(body.output.text).toContain(
-              '### Current Coverage\n\n' +
-                '- `dir2/dir1/dir1/file.txt` _(githubuser)_'
-            );
-            expect(body.output.text).toContain('HELP TEXT');
-
-            return true;
-          }
-        )
-        .reply(200);
+      );
+      GitHub.prototype.listFiles.resolves(['dir2/dir1/dir1/file.txt']);
+      GitHub.prototype.getReviews.resolves([
+        new Review('githubuser', 'approved', new Date()),
+      ]);
+      GitHub.prototype.getCheckRunIds.resolves({});
+      GitHub.prototype.createCheckRun.resolves();
 
       await probot.receive({name: 'pull_request_review', payload: review35});
+
+      sandbox.assert.calledOnceWithExactly(GitHub.prototype.getPullRequest, 35);
+      sandbox.assert.calledOnceWithExactly(
+        GitHub.prototype.createCheckRun,
+        '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d',
+        new CheckRun(
+          CheckRunState.SUCCESS,
+          'All files in this PR have OWNERS approval',
+          '### Current Coverage\n' +
+            '\n' +
+            '- `dir2/dir1/dir1/file.txt` _(githubuser)_'
+        )
+      );
     });
   });
 
@@ -562,9 +350,7 @@ describe('GitHub app', () => {
       ['membership.added'],
       ['membership.removed'],
     ])('updates the team members on event %p', async name => {
-      nock('https://api.github.com')
-        .get('/teams/42/members?per_page=100')
-        .reply(200, [{login: 'coder'}]);
+      Team.prototype.fetchMembers.resolves(['coder']);
 
       await probot.receive({
         name,
@@ -572,6 +358,7 @@ describe('GitHub app', () => {
           team: {id: 42, slug: 'my-team'},
         },
       });
+
       sandbox.assert.calledOnce(Team.prototype.fetchMembers);
     });
   });
@@ -591,24 +378,10 @@ describe('GitHub app', () => {
     });
 
     it('does assign reviewers for draft PRs once they are ready', async () => {
-      expect.assertions(1);
-
-      nock('https://api.github.com')
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/25408/files?per_page=100'
-        )
-        .reply(200, [])
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/25408/reviews?per_page=100'
-        )
-        .reply(200, [])
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
-            '85c9482fb0e92d0e7b0c4765308a6a1a37eeb708/check-runs'
-        )
-        .reply(200, checkruns35Empty)
-        .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
-        .reply(200);
+      GitHub.prototype.listFiles.resolves([]);
+      GitHub.prototype.getReviews.resolves([]);
+      GitHub.prototype.getCheckRunIds.resolves({});
+      GitHub.prototype.createCheckRun.resolves();
 
       const payload = getFixture('actions/ready_for_review.25408');
       payload.pull_request.title = 'I am ready now!';
@@ -621,67 +394,27 @@ describe('GitHub app', () => {
       expect(OwnersBot.prototype.runOwnersCheck.getCall(0).args[2]).toBe(true);
     });
 
-    it('does not assign reviewers when the title contains DO NOT SUBMIT', async () => {
-      expect.assertions(1);
+    it.each([['DO NOT SUBMIT'], ['WIP']])(
+      'does not assign reviewers when the title contains "%s"',
+      async phrase => {
+        GitHub.prototype.listFiles.resolves([]);
+        GitHub.prototype.getReviews.resolves([]);
+        GitHub.prototype.getCheckRunIds.resolves({});
+        GitHub.prototype.createCheckRun.resolves();
 
-      nock('https://api.github.com')
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
-        )
-        .reply(200, [])
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
-        )
-        .reply(200, [])
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
-            '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35Empty)
-        .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
-        .reply(200);
+        const payload = getFixture('actions/opened.35');
+        payload.pull_request.title = `DO NOT SUBMIT: ${phrase}`;
+        await probot.receive({
+          name: 'pull_request.opened',
+          payload,
+        });
 
-      const payload = getFixture('actions/opened.35');
-      payload.pull_request.title = 'DO NOT SUBMIT: test';
-      await probot.receive({
-        name: 'pull_request.opened',
-        payload,
-      });
-
-      sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
-      expect(OwnersBot.prototype.runOwnersCheck.getCall(0).args[2]).toBe(false);
-    });
-
-    it('does not assign reviewers when the title contains WIP', async () => {
-      expect.assertions(1);
-
-      nock('https://api.github.com')
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
-        )
-        .reply(200, [])
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/pulls/35/reviews?per_page=100'
-        )
-        .reply(200, [])
-        .get(
-          '/repos/githubuser/github-owners-bot-test-repo/commits/' +
-            '9272f18514cbd3fa935b3ced62ae1c2bf6efa76d/check-runs'
-        )
-        .reply(200, checkruns35Empty)
-        .post('/repos/githubuser/github-owners-bot-test-repo/check-runs')
-        .reply(200);
-
-      const payload = getFixture('actions/opened.35');
-      payload.pull_request.title = 'WIP: test';
-      await probot.receive({
-        name: 'pull_request.opened',
-        payload,
-      });
-
-      sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
-      expect(OwnersBot.prototype.runOwnersCheck.getCall(0).args[2]).toBe(false);
-    });
+        sandbox.assert.calledOnce(OwnersBot.prototype.runOwnersCheck);
+        expect(OwnersBot.prototype.runOwnersCheck.getCall(0).args[2]).toBe(
+          false
+        );
+      }
+    );
   });
 
   describe('closed PRs', () => {
@@ -689,7 +422,6 @@ describe('GitHub app', () => {
     let payload;
 
     beforeEach(() => {
-      sandbox.stub(OwnersBot.prototype, 'refreshTree');
       pullRequest = require('./fixtures/pulls/pull_request.35');
       payload = {'pull_request': pullRequest};
     });
@@ -707,22 +439,16 @@ describe('GitHub app', () => {
       });
 
       it('does nothing for a PR without owners files', async () => {
-        nock('https://api.github.com')
-          .get(
-            '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
-          )
-          .reply(200, [{filename: 'foo.txt', sha: ''}]);
+        GitHub.prototype.listFiles.resolves(['foo.txt']);
+
         await probot.receive({name: 'pull_request.closed', payload});
 
         sandbox.assert.notCalled(OwnersBot.prototype.refreshTree);
       });
 
       it('refreshes the owners tree for a PR with owners files', async () => {
-        nock('https://api.github.com')
-          .get(
-            '/repos/githubuser/github-owners-bot-test-repo/pulls/35/files?per_page=100'
-          )
-          .reply(200, [{filename: 'OWNERS', sha: ''}]);
+        GitHub.prototype.listFiles.resolves(['OWNERS']);
+
         await probot.receive({name: 'pull_request.closed', payload});
 
         sandbox.assert.calledOnce(OwnersBot.prototype.refreshTree);
