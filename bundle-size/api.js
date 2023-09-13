@@ -15,9 +15,9 @@
  */
 'use strict';
 
-const minimatch = require('minimatch');
 const sleep = require('sleep-promise');
 const {formatBundleSizeDelta, getCheckFromDatabase} = require('./common');
+const {minimatch} = require('minimatch');
 
 const RETRY_MILLIS = 60000;
 const RETRY_TIMES = 60;
