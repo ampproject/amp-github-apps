@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-const mockRequest = jest.fn();
-jest.doMock('undici', () => ({
-  request: mockRequest,
-}));
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
 
 import {getSnapshots} from '../src/percy';
 
@@ -27,32 +25,30 @@ describe('percy', () => {
   });
 
   it('gets snapshots', async () => {
-    mockRequest.mockResolvedValue({
-      statusCode: 200,
-      body: {
-        json: async () => ({
-          data: [
-            {
-              type: 'snapshots',
-              id: '34fbdb1d-67ee-4030-bba9-c190dd729644',
-              attributes: {
-                name: 'Snapshot A',
-                'review-state': 'approved',
-                'review-state-reason': 'no_diffs',
-              },
+    mockFetch.mockResolvedValue({
+      status: 200,
+      json: async () => ({
+        data: [
+          {
+            type: 'snapshots',
+            id: '34fbdb1d-67ee-4030-bba9-c190dd729644',
+            attributes: {
+              name: 'Snapshot A',
+              'review-state': 'approved',
+              'review-state-reason': 'no_diffs',
             },
-            {
-              type: 'snapshots',
-              id: 'a4a85051-d30c-4334-a99e-b865b09065bc',
-              attributes: {
-                name: 'Snapshot B',
-                'review-state': 'approved',
-                'review-state-reason': 'no_diffs',
-              },
+          },
+          {
+            type: 'snapshots',
+            id: 'a4a85051-d30c-4334-a99e-b865b09065bc',
+            attributes: {
+              name: 'Snapshot B',
+              'review-state': 'approved',
+              'review-state-reason': 'no_diffs',
             },
-          ],
-        }),
-      },
+          },
+        ],
+      }),
     });
 
     const snapshots = await getSnapshots(1234);
@@ -88,11 +84,9 @@ describe('percy', () => {
   });
 
   it('rejects when build not found', async () => {
-    mockRequest.mockResolvedValue({
-      statusCode: 404,
-      body: {
-        json: async () => ({'errors': [{'status': 'not_found'}]}),
-      },
+    mockFetch.mockResolvedValue({
+      status: 404,
+      json: async () => ({'errors': [{'status': 'not_found'}]}),
     });
 
     await expect(getSnapshots(1234)).rejects.toThrow(
