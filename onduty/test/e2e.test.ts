@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
+import {GitHub} from '../src/github';
 import {Request, Response} from 'express';
 import {RotationReporterPayload} from 'onduty';
 import {refreshRotation} from '..';
-import nock from 'nock';
+
+jest.mock('../src/github');
+const mockGitHub = GitHub.prototype as jest.Mocked<GitHub>;
 
 describe('On-Duty Bot', () => {
   let response: Response;
@@ -25,15 +28,12 @@ describe('On-Duty Bot', () => {
     ({body, query: {}}) as Request;
 
   beforeAll(() => {
-    nock.disableNetConnect();
     console.debug = jest.fn();
     console.info = jest.fn();
     console.error = jest.fn();
   });
-  afterAll(() => nock.enableNetConnect());
 
   beforeEach(() => {
-    nock.cleanAll();
     response = {
       send: jest.fn(),
       sendStatus: jest.fn(),
@@ -43,29 +43,17 @@ describe('On-Duty Bot', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-
-    // Fail the test if there were unused nocks.
-    if (!nock.isDone()) {
-      throw new Error('Not all nock interceptors were used!');
-    }
   });
 
   it('refreshes GitHub teams with new rotations', async () => {
-    nock('https://api.github.com')
-      .get('/orgs/test_org/teams/build-team/members')
-      .reply(200, [{login: 'old-builder-primary'}, {login: 'builder-primary'}])
-      .put('/orgs/test_org/teams/build-team/memberships/builder-secondary')
-      .reply(200)
-      .delete('/orgs/test_org/teams/build-team/memberships/old-builder-primary')
-      .reply(204)
-      .get('/orgs/test_org/teams/release-team/members')
-      .reply(200, [{login: 'old-onduty-primary'}, {login: 'onduty-primary'}])
-      .put('/orgs/test_org/teams/release-team/memberships/onduty-secondary')
-      .reply(200)
-      .delete(
-        '/orgs/test_org/teams/release-team/memberships/old-onduty-primary'
-      )
-      .reply(204);
+    mockGitHub.getTeamMembers.mockResolvedValueOnce([
+      'old-builder-primary',
+      'builder-primary',
+    ]);
+    mockGitHub.getTeamMembers.mockResolvedValueOnce([
+      'old-onduty-primary',
+      'onduty-primary',
+    ]);
 
     await refreshRotation(
       request({
@@ -83,6 +71,16 @@ describe('On-Duty Bot', () => {
     );
 
     expect(response.sendStatus).toHaveBeenCalledWith(200);
+    expect(mockGitHub.getTeamMembers).toHaveBeenCalledWith('build-team');
+    expect(mockGitHub.getTeamMembers).toHaveBeenCalledWith('release-team');
+    expect(mockGitHub.removeFromTeam).toHaveBeenCalledWith(
+      'build-team',
+      'old-builder-primary'
+    );
+    expect(mockGitHub.removeFromTeam).toHaveBeenCalledWith(
+      'release-team',
+      'old-onduty-primary'
+    );
   });
 
   it('returns 401 Unauthorized for an invalid token', async () => {
@@ -105,9 +103,9 @@ describe('On-Duty Bot', () => {
   });
 
   it('returns 500 Internal Server Error if something goes wrong', async () => {
-    nock('https://api.github.com')
-      .get('/orgs/test_org/teams/build-team/members')
-      .reply(401, 'Bad authentication token');
+    mockGitHub.getTeamMembers.mockRejectedValue(
+      new Error('Splines have not been reticulated')
+    );
 
     await refreshRotation(
       request({
@@ -126,7 +124,7 @@ describe('On-Duty Bot', () => {
 
     expect(response.status).toHaveBeenCalledWith(500);
     expect(response.send).toHaveBeenCalledWith(
-      'HttpError: Bad authentication token'
+      'Error: Splines have not been reticulated'
     );
   });
 });
