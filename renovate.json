@@ -71,14 +71,6 @@
       "automerge": true
     },
     {
-      "matchFileNames": ["pr-deploy/**"],
-      "labels": ["Category: PR Deploy"],
-      "groupName": "pr-deploy packages",
-      "reviewers": ["estherkim"],
-      "rebaseWhen": "never",
-      "automerge": true
-    },
-    {
       "matchFileNames": ["release-calendar/**"],
       "labels": ["Category: Release Calendar"],
       "groupName": "release-calendar packages",
