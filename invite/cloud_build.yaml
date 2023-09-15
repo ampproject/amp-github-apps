@@ -59,6 +59,8 @@ steps:
       - invite-bot
       - --entry-point
       - probot
+      - --runtime
+      - nodejs18
 
 # Overall cloud build timeout
 timeout: 1800s
