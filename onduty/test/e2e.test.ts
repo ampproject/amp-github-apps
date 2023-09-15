@@ -46,14 +46,9 @@ describe('On-Duty Bot', () => {
   });
 
   it('refreshes GitHub teams with new rotations', async () => {
-    mockGitHub.getTeamMembers.mockResolvedValueOnce([
-      'old-builder-primary',
-      'builder-primary',
-    ]);
-    mockGitHub.getTeamMembers.mockResolvedValueOnce([
-      'old-onduty-primary',
-      'onduty-primary',
-    ]);
+    mockGitHub.getTeamMembers
+      .mockResolvedValueOnce(['old-builder-primary', 'builder-primary'])
+      .mockResolvedValueOnce(['old-onduty-primary', 'onduty-primary']);
 
     await refreshRotation(
       request({
