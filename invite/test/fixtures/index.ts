@@ -28,10 +28,20 @@ type SampleWebhookEvent = {
 /**
  * Get a JSON test fixture object.
  */
-export function getFixture(name: string): SampleWebhookEvent {
+export function getFixture<T>(name: string): T {
   return JSON.parse(
     fs.readFileSync(path.join(__dirname, `${name}.json`)).toString('utf8')
-  );
+  ) as T;
+}
+
+export function getOctokitResponse<T, R>(
+  name: string,
+  status: number = 200
+): T {
+  return {
+    data: getFixture<R>(name),
+    status,
+  } as T;
 }
 
 /**
@@ -41,7 +51,7 @@ export async function triggerWebhook(
   probot: Probot,
   eventName: string
 ): Promise<void> {
-  const {event, payload} = getFixture(eventName);
+  const {event, payload} = getFixture<SampleWebhookEvent>(eventName);
   await probot.receive({
     name: event,
     id: '', // required by type definition.

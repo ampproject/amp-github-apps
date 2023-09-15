@@ -16,13 +16,12 @@
 
 import {Probot} from 'probot';
 import knex, {Knex} from 'knex';
-import nock from 'nock';
 
 import {Database, dbConnect} from '../src/db';
+import {GitHub} from '../src/github';
 import {InvitationRecord, InviteAction} from '../src/invitation_record';
-import {InviteBot} from '../src/invite_bot';
-import {getFixture, triggerWebhook} from './fixtures';
 import {setupDb} from '../src/setup_db';
+import {triggerWebhook} from './fixtures';
 import app from '../app';
 
 jest.mock('../src/db', () => {
@@ -38,13 +37,15 @@ jest.mock('../src/db', () => {
   };
 });
 
+jest.mock('../src/github');
+const mockGithub = GitHub.prototype as jest.Mocked<GitHub>;
+
 describe('end-to-end', () => {
   let probot: Probot;
   let db: Database;
   let record: InvitationRecord;
 
   beforeAll(async () => {
-    nock.disableNetConnect();
     process.env = {
       DISABLE_WEBHOOK_EVENT_CHECK: 'true',
       GITHUB_ORG: 'test_org',
@@ -62,42 +63,34 @@ describe('end-to-end', () => {
   });
 
   afterAll(async () => {
-    nock.enableNetConnect();
     await db.destroy();
   });
 
-  beforeEach(() => nock.cleanAll());
-
   afterEach(async () => {
-    jest.restoreAllMocks();
+    jest.resetAllMocks();
     await db('invites').truncate();
-
-    // Fail the test if there were unused nocks.
-    if (!nock.isDone()) {
-      throw new Error('Not all nock interceptors were used!');
-    }
   });
 
   describe('when a comment includes "/invite @someone"', () => {
     describe('when @someone is a member of the org', () => {
       it("comments, doesn't record", async () => {
-        nock('https://api.github.com')
-          .get('/orgs/test_org/teams/wg-inviters/memberships/author')
-          .reply(200, getFixture('team_membership.active'))
-          .put('/orgs/test_org/memberships/someone')
-          .reply(200, getFixture('add_member.exists'))
-          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
-            expect(body).toEqual({
-              body:
-                'You asked me to invite `@someone`, but they are already' +
-                ' a member of `test_org`!',
-            });
-            return true;
-          })
-          .reply(200);
+        mockGithub.userIsTeamMember.mockResolvedValue(true);
+        mockGithub.inviteUser.mockResolvedValue(false);
+        mockGithub.addComment.mockResolvedValue();
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
         await expect(record.getInvites('someone')).resolves.toEqual([]);
+
+        expect(mockGithub.userIsTeamMember).toHaveBeenCalledWith(
+          'author',
+          'test_org/wg-inviters'
+        );
+        expect(mockGithub.inviteUser).toHaveBeenCalledWith('someone');
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
+          'test_repo',
+          1337,
+          expect.stringContaining('already a member of `test_org`')
+        );
       });
     });
 
@@ -111,44 +104,43 @@ describe('end-to-end', () => {
       };
 
       it('invites, records, comments', async () => {
-        nock('https://api.github.com')
-          .get('/orgs/test_org/teams/wg-inviters/memberships/author')
-          .reply(200, getFixture('team_membership.active'))
-          .put('/orgs/test_org/memberships/someone')
-          .reply(200, getFixture('add_member.invited'))
-          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
-            expect(body).toEqual({
-              body:
-                'An invitation to join `test_org` has been sent to ' +
-                '`@someone`. They can accept this invitation ' +
-                '[here](https://github.com/orgs/test_org/invitation). I ' +
-                'will update this thread when the invitation is accepted.',
-            });
-            return true;
-          })
-          .reply(200);
+        mockGithub.userIsTeamMember.mockResolvedValue(true);
+        mockGithub.inviteUser.mockResolvedValue(true);
+        mockGithub.addComment.mockResolvedValue();
 
         await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
         await expect(record.getInvites('someone')).resolves.toEqual([
           expect.objectContaining(recordedInvite),
         ]);
+
+        expect(mockGithub.userIsTeamMember).toHaveBeenCalledWith(
+          'author',
+          'test_org/wg-inviters'
+        );
+        expect(mockGithub.inviteUser).toHaveBeenCalledWith('someone');
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
+          'test_repo',
+          1337,
+          expect.stringContaining(
+            'An invitation to join `test_org` has been sent to `@someone`'
+          )
+        );
       });
 
       describe('once the invite is accepted', () => {
         beforeEach(async () => record.recordInvite(recordedInvite));
 
         it('comments, archives', async () => {
-          nock('https://api.github.com')
-            .post('/repos/test_org/test_repo/issues/1337/comments', body => {
-              expect(body).toEqual({
-                body: 'The invitation to `@someone` was accepted!',
-              });
-              return true;
-            })
-            .reply(200);
+          mockGithub.addComment.mockResolvedValue();
 
           await triggerWebhook(probot, 'organization.member_added');
           await expect(record.getInvites('someone')).resolves.toEqual([]);
+
+          expect(mockGithub.addComment).toHaveBeenCalledWith(
+            'test_repo',
+            1337,
+            'The invitation to `@someone` was accepted!'
+          );
         });
       });
     });
@@ -157,26 +149,29 @@ describe('end-to-end', () => {
   describe('when a comment includes "/tryassign @someone"', () => {
     describe('when @someone is a member of the org', () => {
       it("assigns, comments, doesn't record", async () => {
-        nock('https://api.github.com')
-          .get('/orgs/test_org/teams/wg-inviters/memberships/author')
-          .reply(200, getFixture('team_membership.active'))
-          .put('/orgs/test_org/memberships/someone')
-          .reply(200, getFixture('add_member.exists'))
-          .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
-            expect(body).toEqual({assignees: ['someone']});
-            return true;
-          })
-          .reply(200)
-          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
-            expect(body).toEqual({
-              body: "I've assigned this issue to `@someone`.",
-            });
-            return true;
-          })
-          .reply(200);
+        mockGithub.userIsTeamMember.mockResolvedValue(true);
+        mockGithub.inviteUser.mockResolvedValue(false);
+        mockGithub.assignIssue.mockResolvedValue();
+        mockGithub.addComment.mockResolvedValue();
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
         await expect(record.getInvites('someone')).resolves.toEqual([]);
+
+        expect(mockGithub.userIsTeamMember).toHaveBeenCalledWith(
+          'author',
+          'test_org/wg-inviters'
+        );
+        expect(mockGithub.inviteUser).toHaveBeenCalledWith('someone');
+        expect(mockGithub.assignIssue).toHaveBeenCalledWith(
+          'test_repo',
+          1337,
+          'someone'
+        );
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
+          'test_repo',
+          1337,
+          expect.stringContaining('assigned this issue to `@someone`')
+        );
       });
     });
 
@@ -190,27 +185,23 @@ describe('end-to-end', () => {
       };
 
       it('invites, records, comments', async () => {
-        nock('https://api.github.com')
-          .get('/orgs/test_org/teams/wg-inviters/memberships/author')
-          .reply(200, getFixture('team_membership.active'))
-          .put('/orgs/test_org/memberships/someone')
-          .reply(200, getFixture('add_member.invited'))
-          .post('/repos/test_org/test_repo/issues/1337/comments', body => {
-            expect(body).toEqual({
-              body:
-                'An invitation to join `test_org` has been sent to ' +
-                '`@someone`. They can accept this invitation ' +
-                '[here](https://github.com/orgs/test_org/invitation). I ' +
-                'will update this thread when the invitation is accepted.',
-            });
-            return true;
-          })
-          .reply(200);
+        mockGithub.userIsTeamMember.mockResolvedValue(true);
+        mockGithub.inviteUser.mockResolvedValue(true);
+        mockGithub.assignIssue.mockResolvedValue();
+        mockGithub.addComment.mockResolvedValue();
 
         await triggerWebhook(probot, 'trigger_tryassign.issue_comment.created');
         await expect(record.getInvites('someone')).resolves.toEqual([
           expect.objectContaining(recordedInvite),
         ]);
+
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
+          'test_repo',
+          1337,
+          expect.stringContaining(
+            'An invitation to join `test_org` has been sent to `@someone`'
+          )
+        );
       });
 
       describe('once the invite is accepted', () => {
@@ -219,24 +210,21 @@ describe('end-to-end', () => {
         });
 
         it('assigns, comments, archives', async () => {
-          nock('https://api.github.com')
-            .post('/repos/test_org/test_repo/issues/1337/assignees', body => {
-              expect(body).toEqual({assignees: ['someone']});
-              return true;
-            })
-            .reply(200)
-            .post('/repos/test_org/test_repo/issues/1337/comments', body => {
-              expect(body).toEqual({
-                body:
-                  "The invitation to `@someone` was accepted! I've " +
-                  'assigned them to this issue.',
-              });
-              return true;
-            })
-            .reply(200);
-
           await triggerWebhook(probot, 'organization.member_added');
           await expect(record.getInvites('someone')).resolves.toEqual([]);
+
+          expect(mockGithub.assignIssue).toHaveBeenCalledWith(
+            'test_repo',
+            1337,
+            'someone'
+          );
+          expect(mockGithub.addComment).toHaveBeenCalledWith(
+            'test_repo',
+            1337,
+            expect.stringContaining(
+              'The invitation to `@someone` was accepted!'
+            )
+          );
         });
       });
     });
@@ -244,24 +232,28 @@ describe('end-to-end', () => {
 
   describe('when a comment includes no macros', () => {
     it('ignores it', async () => {
-      jest.spyOn(InviteBot.prototype, 'tryInvite');
       await triggerWebhook(probot, 'issue_comment.created');
 
-      expect(InviteBot.prototype.tryInvite).not.toBeCalled();
-      // The test will fail if any unexpected network requests occur.
+      expect(mockGithub.userIsTeamMember).not.toHaveBeenCalled();
+      expect(mockGithub.inviteUser).not.toHaveBeenCalled();
+      expect(mockGithub.assignIssue).not.toHaveBeenCalled();
+      expect(mockGithub.addComment).not.toHaveBeenCalled();
     });
   });
 
   describe('when the author is not a member of the allow team', () => {
     it('ignores it', async () => {
-      jest.spyOn(InviteBot.prototype, 'tryInvite');
-      nock('https://api.github.com')
-        .get('/orgs/test_org/teams/wg-inviters/memberships/author')
-        .reply(404, getFixture('team_membership.not_found'));
+      mockGithub.userIsTeamMember.mockResolvedValue(false);
+
       await triggerWebhook(probot, 'trigger_invite.issue_comment.created');
 
-      expect(InviteBot.prototype.tryInvite).not.toBeCalled();
-      // The test will fail if any unexpected network requests occur.
+      expect(mockGithub.userIsTeamMember).toHaveBeenCalledWith(
+        'author',
+        'test_org/wg-inviters'
+      );
+      expect(mockGithub.inviteUser).not.toHaveBeenCalled();
+      expect(mockGithub.assignIssue).not.toHaveBeenCalled();
+      expect(mockGithub.addComment).not.toHaveBeenCalled();
     });
   });
 
@@ -269,7 +261,10 @@ describe('end-to-end', () => {
     it('ignores it', async () => {
       await triggerWebhook(probot, 'organization.member_added');
 
-      // The test will fail if any unexpected network requests occur.
+      expect(mockGithub.userIsTeamMember).not.toHaveBeenCalled();
+      expect(mockGithub.inviteUser).not.toHaveBeenCalled();
+      expect(mockGithub.assignIssue).not.toHaveBeenCalled();
+      expect(mockGithub.addComment).not.toHaveBeenCalled();
     });
   });
 });
