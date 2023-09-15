@@ -16,12 +16,12 @@
 
 import {GitHub} from '../src/github';
 import {Logger, RotationTeamMap, RotationUpdate} from 'onduty';
-import {Octokit} from '@octokit/rest';
 import {OndutyBot} from '../src/bot';
-import {mocked} from 'ts-jest/utils';
+
+jest.mock('../src/github');
+const mockGithub = GitHub.prototype as jest.Mocked<GitHub>;
 
 describe('OndutyBot', () => {
-  let github: GitHub;
   const fakeConsole: Logger = {
     debug: jest.fn(),
     warn: jest.fn(),
@@ -46,17 +46,12 @@ describe('OndutyBot', () => {
   };
 
   beforeEach(() => {
-    github = new GitHub({} as unknown as Octokit, 'test_org', fakeConsole);
-    jest.spyOn(github, 'getTeamMembers');
-    jest.spyOn(github, 'addToTeam').mockResolvedValue(undefined);
-    jest.spyOn(github, 'removeFromTeam').mockResolvedValue(undefined);
-
-    bot = new OndutyBot(github, rotationTeams, fakeConsole);
+    bot = new OndutyBot(mockGithub, rotationTeams, fakeConsole);
   });
 
   describe('updateRotation', () => {
     beforeEach(() => {
-      mocked(github.getTeamMembers).mockResolvedValue([
+      mockGithub.getTeamMembers.mockResolvedValue([
         'builder-old-primary',
         'builder-primary',
       ]);
@@ -64,12 +59,12 @@ describe('OndutyBot', () => {
 
     it('fetches current team members', async () => {
       await bot.updateRotation('build-on-duty', rotations['build-on-duty']);
-      expect(github.getTeamMembers).toHaveBeenCalledWith('build-team');
+      expect(mockGithub.getTeamMembers).toHaveBeenCalledWith('build-team');
     });
 
     it('adds new team members', async () => {
       await bot.updateRotation('build-on-duty', rotations['build-on-duty']);
-      expect(github.addToTeam).toHaveBeenCalledWith(
+      expect(mockGithub.addToTeam).toHaveBeenCalledWith(
         'build-team',
         'builder-secondary'
       );
@@ -77,7 +72,7 @@ describe('OndutyBot', () => {
 
     it('removes old team members', async () => {
       await bot.updateRotation('build-on-duty', rotations['build-on-duty']);
-      expect(github.removeFromTeam).toHaveBeenCalledWith(
+      expect(mockGithub.removeFromTeam).toHaveBeenCalledWith(
         'build-team',
         'builder-old-primary'
       );
@@ -85,7 +80,7 @@ describe('OndutyBot', () => {
 
     it('ignores the bot user', async () => {
       await bot.updateRotation('build-on-duty', rotations['build-on-duty']);
-      expect(github.removeFromTeam).not.toHaveBeenCalledWith(
+      expect(mockGithub.removeFromTeam).not.toHaveBeenCalledWith(
         'build-team',
         'bot-user'
       );
@@ -94,7 +89,7 @@ describe('OndutyBot', () => {
 
   describe('handleUpdates', () => {
     beforeEach(() => {
-      mocked(github.getTeamMembers)
+      mockGithub.getTeamMembers
         .mockResolvedValueOnce(['builder-old-primary', 'builder-primary'])
         .mockResolvedValueOnce(['releaser-old-primary', 'releaser-primary']);
     });
