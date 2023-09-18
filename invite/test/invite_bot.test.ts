@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import {mocked} from 'ts-jest/utils';
 import knex, {Knex} from 'knex';
 
 import {GitHub} from '../src/github';
@@ -38,6 +37,9 @@ jest.mock('../src/db', () => {
   };
 });
 
+jest.mock('../src/github');
+const mockGithub = GitHub.prototype as jest.Mocked<GitHub>;
+
 function _daysAgo(days: number): Date {
   const d = new Date();
   d.setSeconds(d.getSeconds() - days * 24 * 60 * 60);
@@ -52,13 +54,6 @@ describe('Invite Bot', () => {
   afterAll(async () => db.destroy());
 
   beforeEach(() => {
-    jest.spyOn(GitHub.prototype, 'inviteUser');
-    jest.spyOn(GitHub.prototype, 'addComment').mockImplementation(async () => {
-      // Do nothing
-    });
-    jest.spyOn(GitHub.prototype, 'assignIssue').mockImplementation(async () => {
-      // Do nothing
-    });
     jest.spyOn(InvitationRecord.prototype, 'recordInvite');
 
     inviteBot = new InviteBot(
@@ -71,6 +66,7 @@ describe('Invite Bot', () => {
 
   afterEach(async () => {
     jest.restoreAllMocks();
+    jest.resetAllMocks();
     await db('invites').truncate();
   });
 
@@ -97,7 +93,6 @@ describe('Invite Bot', () => {
 
   describe('processComment', () => {
     beforeEach(() => {
-      jest.spyOn(GitHub.prototype, 'userIsTeamMember');
       jest.spyOn(inviteBot, 'userCanTrigger');
       jest.spyOn(inviteBot, 'parseMacros');
       jest.spyOn(inviteBot, 'tryInvite');
@@ -115,18 +110,16 @@ describe('Invite Bot', () => {
     it('parses the comment for macros', async () => {
       await inviteBot.processComment('test_repo', 1337, 'My comment', 'author');
 
-      expect(inviteBot.parseMacros).toBeCalledWith('My comment');
+      expect(inviteBot.parseMacros).toHaveBeenCalledWith('My comment');
     });
 
     describe('when macros are present', () => {
       const comment = '/invite @someone and /tryassign @someoneelse';
 
       beforeEach(() => {
-        mocked(inviteBot.tryInvite).mockClear();
-        mocked(GitHub.prototype.inviteUser).mockImplementation(
-          async () => false
-        );
-        mocked(GitHub.prototype.userIsTeamMember).mockImplementation(
+        jest.mocked(inviteBot.tryInvite).mockClear();
+        mockGithub.inviteUser.mockImplementation(async () => false);
+        mockGithub.userIsTeamMember.mockImplementation(
           async (username: string) => username === 'member-author'
         );
       });
@@ -147,13 +140,13 @@ describe('Invite Bot', () => {
         it('tries to send invites', async () => {
           await inviteBot.processComment('test_repo', 1337, comment, author);
 
-          expect(inviteBot.tryInvite).toBeCalledWith({
+          expect(inviteBot.tryInvite).toHaveBeenCalledWith({
             username: 'someone',
             repo: 'test_repo',
             issue_number: 1337,
             action: InviteAction.INVITE,
           });
-          expect(inviteBot.tryInvite).toBeCalledWith({
+          expect(inviteBot.tryInvite).toHaveBeenCalledWith({
             username: 'someoneelse',
             repo: 'test_repo',
             issue_number: 1337,
@@ -165,7 +158,7 @@ describe('Invite Bot', () => {
           it('tries to assign the issue', async () => {
             await inviteBot.processComment('test_repo', 1337, comment, author);
 
-            expect(inviteBot.tryAssign).toBeCalledWith(
+            expect(inviteBot.tryAssign).toHaveBeenCalledWith(
               {
                 username: 'someoneelse',
                 repo: 'test_repo',
@@ -198,11 +191,6 @@ describe('Invite Bot', () => {
 
   describe('processAcceptedInvite', () => {
     beforeEach(() => {
-      jest
-        .spyOn(GitHub.prototype, 'addComment')
-        .mockImplementation(async () => {
-          //Do nothing
-        });
       jest.spyOn(inviteBot, 'tryAssign').mockImplementation(async () => {
         // Do nothing
       });
@@ -212,7 +200,7 @@ describe('Invite Bot', () => {
       jest.spyOn(inviteBot.record, 'getInvites');
       await inviteBot.processAcceptedInvite('someone');
 
-      expect(inviteBot.record.getInvites).toBeCalledWith('someone');
+      expect(inviteBot.record.getInvites).toHaveBeenCalledWith('someone');
     });
 
     describe('when there are recorded invites', () => {
@@ -241,13 +229,13 @@ describe('Invite Bot', () => {
         it('comments on the issues that the invite was accepted', async () => {
           await inviteBot.processAcceptedInvite('someone');
 
-          expect(inviteBot.github.addComment).toBeCalledWith(
+          expect(mockGithub.addComment).toHaveBeenCalledWith(
             'test_repo',
             1337,
             `The invitation to \`@someone\` was accepted!`
           );
 
-          expect(inviteBot.github.addComment).toBeCalledWith(
+          expect(mockGithub.addComment).toHaveBeenCalledWith(
             'test_repo',
             42,
             `The invitation to \`@someone\` was accepted!`
@@ -274,7 +262,7 @@ describe('Invite Bot', () => {
         it('tries to assign the issues', async () => {
           await inviteBot.processAcceptedInvite('someone');
 
-          expect(inviteBot.tryAssign).toBeCalledWith(
+          expect(inviteBot.tryAssign).toHaveBeenCalledWith(
             expect.objectContaining({
               username: 'someone',
               repo: 'test_repo',
@@ -283,7 +271,7 @@ describe('Invite Bot', () => {
             }),
             /*accepted=*/ true
           );
-          expect(inviteBot.tryAssign).toBeCalledWith(
+          expect(inviteBot.tryAssign).toHaveBeenCalledWith(
             expect.objectContaining({
               username: 'someone',
               repo: 'test_repo',
@@ -305,7 +293,7 @@ describe('Invite Bot', () => {
       it('does not comment on any issues', async () => {
         inviteBot.processAcceptedInvite('someone');
 
-        expect(inviteBot.github.addComment).not.toBeCalled();
+        expect(mockGithub.addComment).not.toBeCalled();
       });
     });
   });
@@ -313,11 +301,9 @@ describe('Invite Bot', () => {
   describe('userCanTrigger', () => {
     beforeEach(() => {
       const members = ['a-member'];
-      jest
-        .spyOn(GitHub.prototype, 'userIsTeamMember')
-        .mockImplementation(async (username: string) =>
-          members.includes(username)
-        );
+      mockGithub.userIsTeamMember.mockImplementation(async (username: string) =>
+        members.includes(username)
+      );
     });
 
     it('returns true if user is a member of allow team', async () => {
@@ -428,9 +414,7 @@ describe('Invite Bot', () => {
                 created_at: _daysAgo(8),
               },
             ]);
-          mocked(GitHub.prototype.inviteUser).mockImplementation(
-            async () => false
-          );
+          mockGithub.inviteUser.mockResolvedValue(false);
         });
 
         it('retries inviting the user', async () => {
@@ -440,23 +424,23 @@ describe('Invite Bot', () => {
             issue_number: 1337,
             action: InviteAction.INVITE,
           });
-          expect(inviteBot.github.inviteUser).toBeCalledWith('oldInvitee');
+          expect(mockGithub.inviteUser).toHaveBeenCalledWith('oldInvitee');
         });
       });
 
       it('it does not attempt to send an invite', async () => {
         await inviteBot.tryInvite(newInvite);
-        expect(inviteBot.github.inviteUser).not.toBeCalled();
+        expect(mockGithub.inviteUser).not.toBeCalled();
       });
 
       it('records the requested invite', async () => {
         await inviteBot.tryInvite(newInvite);
-        expect(inviteBot.record.recordInvite).toBeCalledWith(newInvite);
+        expect(inviteBot.record.recordInvite).toHaveBeenCalledWith(newInvite);
       });
 
       it('comments that there is already an invite pending', async () => {
         await inviteBot.tryInvite(newInvite);
-        expect(inviteBot.github.addComment).toBeCalledWith(
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
           'test_repo',
           1337,
           'You asked me to invite `@someone` to `test_org`, but they already ' +
@@ -469,14 +453,12 @@ describe('Invite Bot', () => {
 
     describe('when the user is a member', () => {
       beforeEach(() => {
-        mocked(GitHub.prototype.inviteUser).mockImplementation(
-          async () => false
-        );
+        mockGithub.inviteUser.mockResolvedValue(false);
       });
 
       it('attempts to send an invite', async () => {
         await inviteBot.tryInvite(newInvite);
-        expect(inviteBot.github.inviteUser).toBeCalledWith('someone');
+        expect(mockGithub.inviteUser).toHaveBeenCalledWith('someone');
       });
 
       it('does not record the requested invite', async () => {
@@ -486,7 +468,7 @@ describe('Invite Bot', () => {
 
       it('comments that the user is already a member', async () => {
         await inviteBot.tryInvite(newInvite);
-        expect(inviteBot.github.addComment).toBeCalledWith(
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
           'test_repo',
           1337,
           'You asked me to invite `@someone`, but they are already a member ' +
@@ -497,24 +479,22 @@ describe('Invite Bot', () => {
 
     describe('when the user is not a member', () => {
       beforeEach(() => {
-        mocked(GitHub.prototype.inviteUser).mockImplementation(
-          async () => true
-        );
+        mockGithub.inviteUser.mockResolvedValue(true);
       });
 
       it('attempts to send an invite', async () => {
         await inviteBot.tryInvite(newInvite);
-        expect(inviteBot.github.inviteUser).toBeCalledWith('someone');
+        expect(mockGithub.inviteUser).toHaveBeenCalledWith('someone');
       });
 
       it('records the requested invite', async () => {
         await inviteBot.tryInvite(newInvite);
-        expect(inviteBot.record.recordInvite).toBeCalledWith(newInvite);
+        expect(inviteBot.record.recordInvite).toHaveBeenCalledWith(newInvite);
       });
 
       it('comments that the user was invited', async () => {
         await inviteBot.tryInvite(newInvite);
-        expect(inviteBot.github.addComment).toBeCalledWith(
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
           'test_repo',
           1337,
           'An invitation to join `test_org` has been sent to `@someone`. ' +
@@ -527,9 +507,7 @@ describe('Invite Bot', () => {
 
     describe('when the invite fails', () => {
       beforeEach(() => {
-        mocked(GitHub.prototype.inviteUser).mockRejectedValue(
-          new Error('Uh-oh!')
-        );
+        mockGithub.inviteUser.mockRejectedValue(new Error('Uh-oh!'));
         jest.spyOn(console, 'error').mockImplementation(() => {
           // Do nothing
         });
@@ -540,7 +518,7 @@ describe('Invite Bot', () => {
           await inviteBot.tryInvite(newInvite);
         } catch (e) {}
 
-        expect(console.error).toBeCalledWith(
+        expect(console.error).toHaveBeenCalledWith(
           'Failed to send an invite to `@someone`: Error: Uh-oh!'
         );
       });
@@ -550,7 +528,7 @@ describe('Invite Bot', () => {
           await inviteBot.tryInvite(newInvite);
         } catch (e) {}
 
-        expect(inviteBot.github.addComment).toBeCalledWith(
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
           'test_repo',
           1337,
           'You asked me to send an invite to `@someone`, but I ran into an ' +
@@ -580,7 +558,7 @@ describe('Invite Bot', () => {
 
     it('assigns the user to the issue', async () => {
       await inviteBot.tryAssign(newInvite, true);
-      expect(inviteBot.github.assignIssue).toBeCalledWith(
+      expect(mockGithub.assignIssue).toHaveBeenCalledWith(
         'test_repo',
         1337,
         'someone'
@@ -590,7 +568,7 @@ describe('Invite Bot', () => {
     describe('when @someone just accepted the invitation', () => {
       it('comments that the issue was assigned', async () => {
         await inviteBot.tryAssign(newInvite, true);
-        expect(inviteBot.github.addComment).toBeCalledWith(
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
           'test_repo',
           1337,
           "The invitation to `@someone` was accepted! I've assigned them to " +
@@ -602,7 +580,7 @@ describe('Invite Bot', () => {
     describe('when @someone was already a member of the org', () => {
       it('comments that the issue was assigned', async () => {
         await inviteBot.tryAssign(newInvite, false);
-        expect(inviteBot.github.addComment).toBeCalledWith(
+        expect(mockGithub.addComment).toHaveBeenCalledWith(
           'test_repo',
           1337,
           "I've assigned this issue to `@someone`."
