@@ -15,7 +15,6 @@
  */
 
 import {Probot} from 'probot';
-import nock from 'nock';
 
 import {InviteBot} from '../src/invite_bot';
 import {triggerWebhook} from './fixtures';
@@ -25,7 +24,6 @@ describe('Probot webhooks', () => {
   let probot: Probot;
 
   beforeAll(() => {
-    nock.disableNetConnect();
     process.env = {
       DISABLE_WEBHOOK_EVENT_CHECK: 'true',
       GITHUB_ORG: 'test_org',
@@ -35,10 +33,6 @@ describe('Probot webhooks', () => {
 
     probot = new Probot({appId: 1, githubToken: 'test'});
     probot.load(app);
-  });
-
-  afterAll(() => {
-    nock.enableNetConnect();
   });
 
   beforeEach(() => {
@@ -56,12 +50,6 @@ describe('Probot webhooks', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-
-    // Fail the test if there were unused nocks.
-    if (!nock.isDone()) {
-      nock.cleanAll();
-      throw new Error('Not all nock interceptors were used!');
-    }
   });
 
   describe.each([
