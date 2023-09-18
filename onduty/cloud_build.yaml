@@ -35,12 +35,8 @@ steps:
     args:
       - cp
       - .env
-      - dist/
-  - name: ubuntu
-    dir: onduty
-    args:
-      - cp
       - package.json
+      - package-lock.json
       - dist/
 
   # Deploy the app.
