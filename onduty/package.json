@@ -12,7 +12,8 @@
     "dev": "nodemon",
     "deploy-tag": "git tag 'deploy-onduty-'`date -u '+%Y%m%d%H%M%S'`",
     "test": "jest --reporters=jest-silent-reporter",
-    "test:watch": "jest --watch --notify --notifyMode=change"
+    "test:watch": "jest --watch --notify --notifyMode=change",
+    "gcp-build": "echo \"Skipping build step on GCP (See https://cloud.google.com/functions/docs/release-notes#April_11_2023)\""
   },
   "license": "Apache-2.0",
   "dependencies": {
