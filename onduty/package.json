@@ -20,7 +20,7 @@
     "@octokit/rest": "20.0.1",
     "@probot/serverless-gcf": "0.2.0",
     "dotenv": "16.3.1",
-    "http-status-codes": "2.2.0",
+    "http-status-codes": "2.3.0",
     "sleep-promise": "9.1.0"
   },
   "devDependencies": {
