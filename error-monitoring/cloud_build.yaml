@@ -34,7 +34,7 @@ steps:
     dir: error-monitoring
     args:
       - cp
-      - r
+      - -r
       - .env
       - package.json
       - package-lock.json
