@@ -34,19 +34,10 @@ steps:
     dir: error-monitoring
     args:
       - cp
-      - .env
-      - dist/
-  - name: ubuntu
-    dir: error-monitoring
-    args:
-      - cp
-      - package.json
-      - dist/
-  - name: ubuntu
-    dir: error-monitoring
-    args:
-      - cp
       - -r
+      - .env
+      - package.json
+      - package-lock.json
       - static/
       - dist/
 

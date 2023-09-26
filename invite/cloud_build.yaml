@@ -40,12 +40,8 @@ steps:
     args:
       - cp
       - .env
-      - dist/
-  - name: ubuntu
-    dir: invite
-    args:
-      - cp
       - package.json
+      - package-lock.json
       - dist/
 
   # Deploy the app.
