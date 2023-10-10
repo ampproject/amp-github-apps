@@ -6,7 +6,7 @@
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "A GitHub app that verifies Percy builds are mirrored between the main branch and its PRs.",
   "engines": {
-    "node": "18.18.0"
+    "node": "18.18.1"
   },
   "scripts": {
     "clean": "rm -r dist/",
