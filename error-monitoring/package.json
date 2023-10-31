@@ -32,7 +32,7 @@
     "@types/express": "4.17.20",
     "@types/jest": "27.5.2",
     "@types/mustache": "4.2.4",
-    "@types/node": "16.18.59",
+    "@types/node": "16.18.60",
     "@types/node-fetch": "2.6.8",
     "jest": "27.5.1",
     "jest-silent-reporter": "0.5.0",
