@@ -63,14 +63,6 @@
       "automerge": true
     },
     {
-      "matchFileNames": ["percy-mirror-verifier/**"],
-      "labels": ["Category: Percy Mirror Verifier"],
-      "groupName": "percy-mirror-verifier packages",
-      "reviewers": ["danielrozenberg"],
-      "rebaseWhen": "never",
-      "automerge": true
-    },
-    {
       "matchFileNames": ["release-calendar/**"],
       "labels": ["Category: Release Calendar"],
       "groupName": "release-calendar packages",

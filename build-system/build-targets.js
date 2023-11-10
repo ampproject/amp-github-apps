@@ -30,7 +30,6 @@ const APPS_TO_TEST = [
   'invite',
   'onduty',
   'owners',
-  'percy-mirror-verifier',
   'release-calendar',
   'webhook-pubsub-publisher',
 ];
