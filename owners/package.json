@@ -23,7 +23,7 @@
     "json5": "2.2.3",
     "lodash": "4.17.21",
     "minimatch": "9.0.3",
-    "probot": "12.3.2",
+    "probot": "12.3.3",
     "sleep-promise": "9.1.0"
   },
   "devDependencies": {
