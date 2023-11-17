@@ -30,7 +30,7 @@
     "jest": "29.7.0",
     "jest-silent-reporter": "0.5.0",
     "sinon": "17.0.1",
-    "smee-client": "1.2.3",
+    "smee-client": "1.2.5",
     "supertest": "6.3.3"
   },
   "standard": {
