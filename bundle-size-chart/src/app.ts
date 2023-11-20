@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-import {Octokit} from '@octokit/rest';
+import {Octokit} from '@octokit/core';
 import {Storage} from '@google-cloud/storage';
 import {createObjectCsvStringifier} from 'csv-writer';
+import {paginateRest} from '@octokit/plugin-paginate-rest';
+import {restEndpointMethods} from '@octokit/plugin-rest-endpoint-methods';
 import dotenv from 'dotenv';
 import express from 'express';
 import process from 'process';
@@ -55,13 +57,14 @@ app.get('/_cron', async (request, response) => {
   const earliestCommitDateString = earliestCommitDate.toISOString();
   console.log(`Finding bundle sizes until ${earliestCommitDateString}`);
 
-  const github = new Octokit({
+  const AppOctokit = Octokit.plugin(restEndpointMethods, paginateRest);
+  const github = new AppOctokit({
     auth: `token ${process.env.ACCESS_TOKEN}`,
   });
 
   const mainCommits: Array<{sha: string; message: string; date: string}> = [];
   for await (const commitsList of github.paginate.iterator(
-    github.repos.listCommits,
+    github.rest.repos.listCommits,
     {
       owner: 'ampproject',
       repo: 'amphtml',
@@ -91,7 +94,7 @@ app.get('/_cron', async (request, response) => {
   const skippedShas: Array<string> = [];
   for (const mainCommit of mainCommits) {
     try {
-      const contents = await github.repos.getContent({
+      const contents = await github.rest.repos.getContent({
         owner: 'ampproject',
         repo: 'amphtml-build-artifacts',
         path: `bundle-size/${mainCommit.sha}.json`,
