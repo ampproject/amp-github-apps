@@ -11,15 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-runtime: nodejs
-env: flex
-
-runtime_config:
-  operating_system: "ubuntu22"
-  runtime_version: 18
-
-handlers:
-  - url: /.*
-    secure: always
-    redirect_http_response_code: 301
-    script: auto
+runtime: nodejs20
