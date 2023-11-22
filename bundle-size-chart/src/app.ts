@@ -28,7 +28,9 @@ const MAX_COMMIT_DAYS = 183;
 const GCLOUD_STORAGE_BUCKET = 'amp-bundle-size-chart';
 
 dotenv.config();
+const PORT = process.env.PORT || 8080;
 
+console.log('⚙️ Configuring server');
 const app = express();
 app.use(express.static('static'));
 
@@ -146,4 +148,12 @@ app.get('/_cron', async (request, response) => {
   }
 });
 
-app.listen(Number(process.env.PORT || 8080));
+console.log(`⌛ Starting server on port ${PORT}`);
+app
+  .listen(Number(PORT))
+  .on('listening', () => {
+    console.log(`🏄 Server is listening on ${PORT}`);
+  })
+  .on('close', () => {
+    console.log('🛑 Server is closed');
+  });
