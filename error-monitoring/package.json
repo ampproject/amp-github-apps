@@ -6,41 +6,39 @@
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "A GitHub app which monitors errors reported in AMP pages and files associated GitHub issues.",
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc -w --p tsconfig.json",
-    "start": "node dist/app.js",
-    "dev": "functions-framework --target=app --source=dist",
+    "start": "ts-node src/app.ts",
+    "deploy": "gcloud --project amp-error-monitoring app deploy",
     "deploy-tag": "git tag 'deploy-error-monitoring-'`date -u '+%Y%m%d%H%M%S'`",
     "test": "jest --reporters=jest-silent-reporter",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@octokit/graphql": "4.8.0",
-    "@octokit/rest": "18.12.0",
+    "@octokit/core": "5.0.2",
+    "@octokit/graphql": "7.0.2",
+    "@octokit/plugin-rest-endpoint-methods": "10.1.5",
+    "@types/express": "4.17.21",
+    "@types/mustache": "4.2.5",
+    "@types/node-fetch": "2.6.9",
     "body-parser": "1.20.2",
-    "dotenv": "10.0.0",
+    "dotenv": "16.3.1",
     "express": "4.18.2",
-    "google-auth-library": "7.14.1",
+    "google-auth-library": "9.2.0",
     "http-status-codes": "2.3.0",
     "mustache": "4.2.0",
     "node-cache": "5.1.2",
-    "node-fetch": "2.7.0"
+    "node-fetch": "2.7.0",
+    "ts-node": "10.9.1",
+    "typescript": "5.3.2"
   },
   "devDependencies": {
-    "@google-cloud/functions-framework": "2.1.1",
-    "@types/express": "4.17.21",
-    "@types/jest": "27.5.2",
-    "@types/mustache": "4.2.5",
-    "@types/node": "16.18.65",
-    "@types/node-fetch": "2.6.9",
-    "jest": "27.5.1",
+    "@types/jest": "29.5.10",
+    "@types/node": "20.10.0",
+    "jest": "29.7.0",
     "jest-silent-reporter": "0.5.0",
     "nock": "13.4.0",
-    "nodemon": "2.0.22",
-    "ts-jest": "27.1.5",
-    "ts-node": "10.9.1",
-    "typescript": "4.9.5"
+    "nodemon": "3.0.1",
+    "ts-jest": "29.1.1"
   },
   "standard": {
     "env": [
@@ -51,21 +49,14 @@
     "exec": "npm start",
     "watch": [
       ".env",
-      "."
+      "src/"
     ]
   },
   "jest": {
-    "modulePathIgnorePatterns": [
-      "<rootDir>/build/"
-    ],
     "preset": "ts-jest",
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "<rootDir>/test/jest-preload.ts"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/dist/"
     ]
   }
 }

@@ -1,10 +1,1 @@
-runtime: nodejs
-env: flex
-
-runtime_config:
-  operating_system: "ubuntu22"
-  runtime_version: 18
-
-automatic_scaling:
-  min_num_instances: 1
-  max_num_instances: 1
+runtime: nodejs20

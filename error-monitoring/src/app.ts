@@ -17,19 +17,27 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {errorIssue, errorList, linkIssue, topIssueList} from '.';
+import {errorIssue, errorList, linkIssue, topIssueList} from './index';
 import {json, urlencoded} from 'body-parser';
 import express from 'express';
 
-const PORT = process.env.PORT || 8080;
+const PORT = Number(process.env.PORT || 8080);
 
-express()
+console.log('⚙️ Configuring server');
+const app = express()
   .use(json())
   .use(urlencoded({extended: false}))
   .get('/error-issue', errorIssue)
   .get(['/', '/error-list'], errorList)
   .get('/top-issues', topIssueList)
-  .get('/link-issue', linkIssue)
-  .listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
+  .get('/link-issue', linkIssue);
+
+console.log(`⌛ Starting server on port ${PORT}`);
+app
+  .listen(PORT)
+  .on('listening', () => {
+    console.log(`🏄 Server is listening on ${PORT}`);
+  })
+  .on('close', () => {
+    console.log('🛑 Server is closed');
   });

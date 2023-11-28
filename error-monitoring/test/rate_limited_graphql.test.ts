@@ -21,7 +21,7 @@ import {RateLimitedGraphQL} from '../src/rate_limited_graphql';
 // Jest 27 switches the default Fake Timer implementation which breaks some of
 // these tests. See: https://jestjs.io/blog/2020/05/05/jest-26#new-fake-timers
 // TODO(wg-infra): fix the tests to pass with the modern (default) impl.
-jest.useFakeTimers('legacy');
+jest.useFakeTimers({legacyFakeTimers: true});
 
 describe('RateLimitedGraphQL', () => {
   let client: RateLimitedGraphQL;
@@ -34,7 +34,6 @@ describe('RateLimitedGraphQL', () => {
 
   afterAll(() => {
     nock.enableNetConnect();
-    jest.unmock('@octokit/graphql');
   });
 
   beforeEach(() => {

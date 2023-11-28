@@ -16,6 +16,7 @@
 
 import {GraphQLResponse} from 'error-monitoring';
 import {graphql} from '@octokit/graphql';
+import {default as nodeFetch} from 'node-fetch';
 
 const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
 
@@ -38,6 +39,7 @@ export class RateLimitedGraphQL {
     this.execute = async (query: string): Promise<GraphQLResponse> =>
       graphql(query, {
         headers: {authorization: `token ${token}`},
+        request: {fetch: nodeFetch},
       }) as Promise<GraphQLResponse>;
   }
 
