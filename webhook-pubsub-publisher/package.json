@@ -6,23 +6,23 @@
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "A GitHub app that publishes all the webhooks it receives to a Google Cloud Pub/Sub topic.",
   "scripts": {
-    "clean": "rm -r dist/",
-    "build": "tsc",
-    "build:watch": "tsc -w --p tsconfig.json",
-    "start": "probot run ./dist/src/app.js",
+    "start": "ts-node ./src/index.ts",
     "dev": "nodemon",
+    "deploy": "gcloud --project amp-webhook-pubsub-publisher app deploy",
     "deploy-tag": "git tag 'deploy-webhook-pubsub-publisher-'`date -u '+%Y%m%d%H%M%S'`",
     "test": "jest --reporters=jest-silent-reporter",
     "test:watch": "jest --watch --notify --notifyMode=change"
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@google-cloud/pubsub": "4.0.7",
-    "probot": "12.3.3"
-  },
-  "devDependencies": {
     "@octokit/webhooks": "12.0.8",
     "@octokit/webhooks-types": "7.3.1",
+    "@google-cloud/pubsub": "4.0.7",
+    "probot": "12.3.3",
+    "ts-node": "10.9.1",
+    "typescript": "5.3.2"
+  },
+  "devDependencies": {
     "@types/jest": "29.5.10",
     "@types/node": "20.10.0",
     "jest": "29.7.0",
@@ -31,15 +31,13 @@
     "nodemon": "3.0.1",
     "prettier": "3.1.0",
     "smee-client": "2.0.0",
-    "ts-jest": "29.1.1",
-    "ts-node": "10.9.1",
-    "typescript": "5.3.2"
+    "ts-jest": "29.1.1"
   },
   "nodemonConfig": {
     "exec": "npm start",
     "watch": [
       ".env",
-      "."
+      "src/"
     ]
   },
   "jest": {
