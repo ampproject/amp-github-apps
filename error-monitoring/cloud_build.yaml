@@ -23,23 +23,6 @@ steps:
     dir: error-monitoring
     args:
       - install
-  - name: gcr.io/cloud-builders/npm
-    dir: error-monitoring
-    args:
-      - run
-      - build
-
-  # Copy over the environment and package file.
-  - name: ubuntu
-    dir: error-monitoring
-    args:
-      - cp
-      - -r
-      - .env
-      - package.json
-      - package-lock.json
-      - static/
-      - dist/
 
   # Deploy the apps.
   - name: gcr.io/cloud-builders/gcloud
