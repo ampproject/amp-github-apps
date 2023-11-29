@@ -17,17 +17,17 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {ErrorIssueBot} from './src/bot';
+import {ErrorIssueBot} from './bot';
 import {
   ErrorList,
   ErrorReport,
   ServiceGroupType,
   TopIssueView,
 } from 'error-monitoring';
-import {ErrorMonitor, ServiceName} from './src/error_monitor';
-import {StackdriverApi} from './src/stackdriver_api';
+import {ErrorMonitor, ServiceName} from './error_monitor';
+import {StackdriverApi} from './stackdriver_api';
 import {URLSearchParams} from 'url';
-import {formatDate, linkifySource} from './src/utils';
+import {formatDate, linkifySource} from './utils';
 import Mustache from 'mustache';
 import express from 'express';
 import fs from 'fs';

@@ -22,7 +22,6 @@ import {
 import {Stackdriver} from 'error-monitoring';
 import {StackdriverApi} from '../src/stackdriver_api';
 
-import {mocked} from 'ts-jest/utils';
 import nock from 'nock';
 
 describe('ErrorMonitor', () => {
@@ -30,7 +29,7 @@ describe('ErrorMonitor', () => {
   const stackdriver = {
     listGroups: jest.fn(),
     setGroupIssue: jest.fn(),
-  } as unknown as StackdriverApi;
+  } as unknown as jest.MockedObjectDeep<StackdriverApi>;
 
   const prodStableService: Stackdriver.ServiceContext = {
     service: 'CDN Production',
@@ -105,7 +104,7 @@ describe('ErrorMonitor', () => {
 
   beforeEach(() => {
     monitor = new ErrorMonitor(stackdriver, 5000);
-    mocked(stackdriver.listGroups).mockResolvedValue(errorGroups);
+    stackdriver.listGroups.mockResolvedValue(errorGroups);
     nock.cleanAll();
   });
 
@@ -146,7 +145,7 @@ describe('ServiceErrorMonitor', () => {
   let monitor: ServiceErrorMonitor;
   const stackdriver = {
     listServiceGroups: jest.fn(),
-  } as unknown as StackdriverApi;
+  } as unknown as jest.MockedObjectDeep<StackdriverApi>;
 
   const prodStableService: Stackdriver.ServiceContext = {
     service: 'CDN Production',
@@ -205,7 +204,7 @@ describe('ServiceErrorMonitor', () => {
       ServiceName.DEVELOPMENT,
       500
     );
-    mocked(stackdriver.listServiceGroups).mockResolvedValue(errorGroups);
+    stackdriver.listServiceGroups.mockResolvedValue(errorGroups);
   });
 
   describe('newErrorsToReport', () => {

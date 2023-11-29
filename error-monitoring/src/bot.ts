@@ -15,7 +15,9 @@
  */
 
 import {Endpoints} from '@octokit/types';
-import {Octokit} from '@octokit/rest';
+import {Octokit} from '@octokit/core';
+import {default as nodeFetch} from 'node-fetch';
+import {restEndpointMethods} from '@octokit/plugin-rest-endpoint-methods';
 
 import {BlameFinder} from './blame_finder';
 import {ErrorReport} from 'error-monitoring';
@@ -29,8 +31,10 @@ const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
 const RELEASE_ONDUTY =
   process.env.RELEASE_ONDUTY || 'ampproject/release-on-duty';
 
+const AppOctokit = Octokit.plugin(restEndpointMethods);
+
 export class ErrorIssueBot {
-  private octokit: Octokit;
+  private octokit: InstanceType<typeof AppOctokit>;
   private blameFinder: BlameFinder;
 
   constructor(
@@ -39,7 +43,10 @@ export class ErrorIssueBot {
     private repoName: string,
     private issueRepoName?: string
   ) {
-    this.octokit = new Octokit({auth: `token ${token}`});
+    this.octokit = new AppOctokit({
+      auth: `token ${token}`,
+      request: {fetch: nodeFetch},
+    });
     this.issueRepoName = issueRepoName || repoName;
     this.blameFinder = new BlameFinder(
       repoOwner,
@@ -69,7 +76,7 @@ export class ErrorIssueBot {
 
   /** Comments on an existing issue to link a duplicate error. */
   async commentWithDupe(errorId: string, issueNumber: number): Promise<void> {
-    await this.octokit.issues.createComment({
+    await this.octokit.rest.issues.createComment({
       owner: this.repoOwner,
       repo: this.issueRepoName,
       'issue_number': issueNumber,
@@ -82,7 +89,7 @@ export class ErrorIssueBot {
   /** Creates an error report issue and returns the issue URL. */
   async report(errorReport: ErrorReport): Promise<string> {
     const issue = await this.buildErrorIssue(errorReport);
-    const {data} = await this.octokit.issues.create(issue);
+    const {data} = await this.octokit.rest.issues.create(issue);
     return data.html_url;
   }
 }
