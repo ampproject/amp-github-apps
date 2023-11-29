@@ -15,6 +15,3 @@
 .gitignore
 
 node_modules
-
-# Ignore TypeScript files
-*.ts

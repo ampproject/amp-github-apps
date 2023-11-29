@@ -26,13 +26,6 @@ steps:
     args:
       - install
 
-  # Compile the app from Typescript into dist/.
-  - name: gcr.io/cloud-builders/npm
-    dir: webhook-pubsub-publisher
-    args:
-      - run
-      - build
-
   # Deploy the app.
   - name: gcr.io/cloud-builders/gcloud
     dir: webhook-pubsub-publisher

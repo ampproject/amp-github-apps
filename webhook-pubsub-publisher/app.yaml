@@ -11,9 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-runtime: nodejs
-env: flex
-
-runtime_config:
-  operating_system: "ubuntu22"
-  runtime_version: 18
+runtime: nodejs20

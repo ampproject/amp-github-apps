@@ -7,17 +7,10 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "sourceMap": true,
-    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "node_modules/*",
-        "node_modules/@types/*"
-      ]
+      "*": ["node_modules/*", "node_modules/@types/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "test/*"
-  ]
+  "include": ["src/**/*", "test/*"]
 }
