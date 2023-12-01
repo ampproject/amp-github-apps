@@ -32,7 +32,7 @@
     "typescript": "5.3.2"
   },
   "devDependencies": {
-    "nodemon": "3.0.1"
+    "nodemon": "3.0.2"
   },
   "nodemonConfig": {
     "exec": "node --inspect -r ts-node/register ./src/app.ts",
