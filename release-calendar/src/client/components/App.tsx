@@ -20,7 +20,6 @@ import {Calendar} from './Calendar';
 import {Channel} from '../../types';
 import {ChannelTable} from './ChannelTable';
 import {Header} from './Header';
-import {SearchBar} from './SearchBar';
 
 interface AppState {
   channels: Channel[];
@@ -47,30 +46,17 @@ export class App extends React.Component<unknown, AppState> {
       ? this.state.channels.concat(channel)
       : this.state.channels.filter((item) => channel !== item);
     this.setState({channels});
-    this.handleSearchInput(null);
     if (this.state.release) {
       this.setState({release: null});
     }
   };
 
-  handleSelectedRelease = (
-    selectedRelease: string,
-    clearSearchInput: boolean,
-  ): void => {
+  handleSelectedRelease = (selectedRelease: string): void => {
     const release =
       this.state.release != selectedRelease ? selectedRelease : null;
     this.setState({release});
     if (this.state.channels.length) {
       this.setState({channels: []});
-    }
-    if (clearSearchInput) {
-      this.handleSearchInput(null);
-    }
-  };
-
-  handleSearchInput = (input: string): void => {
-    if (this.state.input != input) {
-      this.setState({input});
     }
   };
 
@@ -80,13 +66,6 @@ export class App extends React.Component<unknown, AppState> {
         <Header title='AMP Release Calendar' />
         <div className='main-container'>
           <div className='col-channel-table'>
-            <div className='search-bar'>
-              <SearchBar
-                handleSelectedRelease={this.handleSelectedRelease}
-                input={this.state.input}
-                handleSearchInput={this.handleSearchInput}
-              />
-            </div>
             <div className='channel-table'>
               <ChannelTable
                 channels={this.state.channels}
