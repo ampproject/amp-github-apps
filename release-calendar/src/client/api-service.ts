@@ -16,7 +16,6 @@
 
 import {Channel, Promotion, Release} from '../types';
 import {CurrentReleases, ReleaseEventInput} from './models/view-models';
-import fetch from 'node-fetch';
 const endpoint = process.env.SERVER_ENDPOINT;
 
 export class ApiService {
