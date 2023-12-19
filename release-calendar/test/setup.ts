@@ -23,6 +23,7 @@ import addTestData from './test-data';
 async function main(): Promise<void> {
   const connection: Connection = await createConnection({
     type: 'mysql',
+    port: Number(process.env.DB_PORT),
     host: process.env.DB_HOST,
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
