@@ -53,7 +53,7 @@
     "react-dom": "18.2.0",
     "react-popper": "2.3.0",
     "sass": "1.69.5",
-    "sass-loader": "13.3.2",
+    "sass-loader": "13.3.3",
     "source-map-loader": "4.0.1",
     "style-loader": "3.3.3",
     "ts-loader": "9.5.1",
