@@ -29,7 +29,7 @@
     "jest-silent-reporter": "0.5.0",
     "node-notifier": "10.0.1",
     "nodemon": "3.0.2",
-    "prettier": "3.1.1",
+    "prettier": "3.2.0",
     "smee-client": "2.0.0",
     "ts-jest": "29.1.1"
   },
