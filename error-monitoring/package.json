@@ -19,7 +19,7 @@
     "@octokit/plugin-rest-endpoint-methods": "10.2.0",
     "@types/express": "4.17.21",
     "@types/mustache": "4.2.5",
-    "@types/node-fetch": "2.6.10",
+    "@types/node-fetch": "2.6.11",
     "body-parser": "1.20.2",
     "dotenv": "16.3.1",
     "express": "4.18.2",
@@ -33,11 +33,11 @@
   },
   "devDependencies": {
     "@types/jest": "29.5.11",
-    "@types/node": "20.11.4",
+    "@types/node": "20.11.5",
     "jest": "29.7.0",
     "jest-silent-reporter": "0.5.0",
     "nock": "13.5.0",
-    "nodemon": "3.0.2",
+    "nodemon": "3.0.3",
     "ts-jest": "29.1.1"
   },
   "standard": {
