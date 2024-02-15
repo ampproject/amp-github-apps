@@ -22,7 +22,7 @@
     "@google-cloud/storage": "7.7.0",
     "@octokit/core": "5.1.0",
     "@octokit/plugin-paginate-rest": "9.1.5",
-    "@octokit/plugin-rest-endpoint-methods": "10.2.0",
+    "@octokit/plugin-rest-endpoint-methods": "10.3.0",
     "@types/express": "4.17.21",
     "@types/node": "20.11.19",
     "csv-writer": "1.6.0",
