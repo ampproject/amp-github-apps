@@ -14,82 +14,109 @@
  * limitations under the License.
  */
 
-const nock = require('nock');
-const NodeCache = require('node-cache');
-const request = require('supertest');
-const {dbConnect} = require('../db');
-const {getFixture} = require('./_test_helper');
-const {GitHubUtils} = require('../github-utils');
-const {installApiRouter} = require('../api');
-const {Probot, Server, ProbotOctokit} = require('probot');
-const {setupDb} = require('../setup-db');
+import {Logger} from 'probot';
+import {mockDeep, mockReset} from 'jest-mock-extended';
+import NodeCache from 'node-cache';
+import express, {type Application} from 'express';
+import nock from 'nock';
+import request from 'supertest';
+
+import {GitHubUtils} from '../src/github-utils';
+import {StorePayload} from '../src/types/payload';
+import {inMemoryDbConnect} from './_test_helper';
+import {installApiRouter} from '../src/api';
+import {setupDb} from '../src/db';
+
+import type {RestEndpointMethodTypes} from '@octokit/plugin-rest-endpoint-methods';
+import type {RestfulOctokit} from '../src/types/rest-endpoint-methods';
+
+import baseApproversFixture from './fixtures/APPROVERS.json.json';
+import baseBundleSizeFixture from './fixtures/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json.json';
+import basePullRequestFixture from './fixtures/pulls.get.19603.json';
+import baseReviewsFixture from './fixtures/reviews.json';
+import listTeamMembersWgInfra from './fixtures/teams.listMembersInOrg.wg-infra.json';
+import listTeamMembersWgPerformance from './fixtures/teams.listMembersInOrg.wg-performance.json';
+import listTeamMembersWgRuntime from './fixtures/teams.listMembersInOrg.wg-runtime.json';
+import requestedReviewersFixture from './fixtures/requested_reviewers.json';
 
 nock.disableNetConnect();
 nock.enableNetConnect('127.0.0.1');
-jest.mock('../db');
-jest.mock('sleep-promise', () => () => Promise.resolve());
+jest.mock('sleep-promise', () => async () => Promise.resolve());
 
 describe('bundle-size api', () => {
-  let github;
-  let server;
-  const db = dbConnect();
+  const mockGithub = mockDeep<RestfulOctokit>();
+  const mockLog = mockDeep<Logger>();
+  const mockAuth = jest.fn().mockResolvedValue(mockGithub);
+
+  const db = inMemoryDbConnect();
   const nodeCache = new NodeCache();
-  let logWarnSpy;
-  let logErrorSpy;
+  const githubUtils = new GitHubUtils(mockGithub, mockLog, nodeCache);
+
+  let approversFixture: typeof baseApproversFixture;
+  let bundleSizeFixture: typeof baseBundleSizeFixture;
+  let pullRequestFixture: typeof basePullRequestFixture;
+  let reviewsFixture: typeof baseReviewsFixture;
+  let app: Application;
+
+  async function mockGetContentByFilePath_(
+    params: RestEndpointMethodTypes['repos']['getContent']['parameters']
+  ) {
+    expect(params.path).toMatch(/(1af0a33|APPROVERS).json$/);
+    return {
+      data: params.path.endsWith('1af0a33.json')
+        ? bundleSizeFixture
+        : params.path.endsWith('APPROVERS.json')
+          ? approversFixture
+          : undefined,
+    } as unknown as RestEndpointMethodTypes['repos']['getContent']['response'];
+  }
+
+  async function mockListMembersInOrgByTeamSlug_(
+    params: RestEndpointMethodTypes['teams']['listMembersInOrg']['parameters']
+  ) {
+    expect(params.team_slug).toMatch(/^wg-(infra|performance|runtime)$/);
+    return {
+      data:
+        params.team_slug === 'wg-infra'
+          ? listTeamMembersWgInfra
+          : params.team_slug === 'wg-performance'
+            ? listTeamMembersWgPerformance
+            : params.team_slug === 'wg-runtime'
+              ? listTeamMembersWgRuntime
+              : undefined,
+    } as unknown as RestEndpointMethodTypes['teams']['listMembersInOrg']['response'];
+  }
 
   beforeAll(async () => {
     await setupDb(db);
   });
 
-  beforeEach(() => {
-    github = {
-      checks: {
-        update: jest.fn(),
-      },
-      pulls: {
-        get: jest.fn(),
-        listRequestedReviewers: jest
-          .fn()
-          .mockResolvedValue({data: getFixture('requested_reviewers')}),
-        listReviews: jest.fn().mockResolvedValue({data: getFixture('reviews')}),
-        requestReviewers: jest.fn(),
-      },
-      repos: {
-        createOrUpdateFileContents: jest.fn(),
-        getContent: jest.fn().mockImplementation(params => {
-          const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
-          return Promise.resolve({data: getFixture(fixture)});
-        }),
-      },
-      teams: {
-        listMembersInOrg: jest.fn().mockImplementation(params => {
-          const fixture = `teams.listMembersInOrg.${params.team_slug}`;
-          return Promise.resolve({data: getFixture(fixture)});
-        }),
-      },
-    };
+  beforeEach(async () => {
+    approversFixture = structuredClone(baseApproversFixture);
+    pullRequestFixture = structuredClone(basePullRequestFixture);
+    bundleSizeFixture = structuredClone(baseBundleSizeFixture);
+    reviewsFixture = structuredClone(baseReviewsFixture);
 
-    server = new Server({
-      Probot: Probot.defaults({
-        githubToken: 'test',
-        // Disable throttling & retrying requests for easier testing
-        Octokit: ProbotOctokit.defaults({
-          retry: {enabled: false},
-          throttle: {enabled: false},
-        }),
-      }),
-    });
-    server.load((app, {getRouter}) => {
-      const githubUtils = new GitHubUtils(github, app.log, nodeCache);
-      installApiRouter(app, getRouter('/v0'), db, githubUtils);
+    mockGithub.rest.pulls.get.mockResolvedValue({
+      data: pullRequestFixture,
+    } as unknown as RestEndpointMethodTypes['pulls']['get']['response']);
+    mockGithub.rest.pulls.listRequestedReviewers.mockResolvedValue({
+      data: requestedReviewersFixture,
+    } as unknown as RestEndpointMethodTypes['pulls']['listRequestedReviewers']['response']);
+    mockGithub.rest.pulls.listReviews.mockResolvedValue({
+      data: reviewsFixture,
+    } as unknown as RestEndpointMethodTypes['pulls']['listReviews']['response']);
+    mockGithub.rest.repos.getContent.mockImplementation(
+      mockGetContentByFilePath_
+    );
+    mockGithub.rest.teams.listMembersInOrg.mockImplementation(
+      mockListMembersInOrgByTeamSlug_
+    );
 
-      app.auth = () => github;
-      // Stub app.log.warn/error to silence test log noise.
-      logWarnSpy = jest.spyOn(app.log, 'warn').mockImplementation();
-      logErrorSpy = jest.spyOn(app.log, 'error').mockImplementation();
-    });
-
-    nodeCache.flushAll();
+    app = express();
+    const router = express.Router();
+    installApiRouter(mockLog, mockAuth, router, db, githubUtils);
+    app.use('/v0', router);
 
     process.env = {
       CI_PUSH_BUILD_TOKEN: '0123456789abcdefghijklmnopqrstuvwxyz',
@@ -100,8 +127,11 @@ describe('bundle-size api', () => {
   });
 
   afterEach(async () => {
-    logWarnSpy.mockRestore();
-    logErrorSpy.mockRestore();
+    jest.restoreAllMocks();
+    // Deep mocks from 'jest-mock-extended' require an explicit reset.
+    mockReset(mockGithub);
+    mockReset(mockLog);
+    nodeCache.flushAll();
     await db('checks').truncate();
   });
 
@@ -122,7 +152,7 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
         .expect(200);
 
@@ -143,7 +173,7 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      expect(github.checks.update).toHaveBeenCalledWith(
+      expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           check_run_id: 555555,
           conclusion: 'neutral',
@@ -155,18 +185,16 @@ describe('bundle-size api', () => {
     });
 
     test('ignore marking a check "skipped" for a missing head SHA', async () => {
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/skip')
         .expect(404);
 
-      expect(github.checks.update).not.toHaveBeenCalled();
+      expect(mockGithub.rest.checks.update).not.toHaveBeenCalled();
     });
   });
 
   describe('/commit/:headSha/report', () => {
-    let jsonPayload;
-    let pullRequestFixture;
-    let baseBundleSizeFixture;
+    let jsonPayload: StorePayload;
 
     beforeEach(() => {
       jsonPayload = {
@@ -178,22 +206,6 @@ describe('bundle-size api', () => {
           'dist/v0/amp-ad-0.1.js': 4.56,
         },
       };
-
-      pullRequestFixture = getFixture('pulls.get.19603');
-      github.pulls.get.mockResolvedValue({data: pullRequestFixture});
-
-      baseBundleSizeFixture = getFixture(
-        '5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json'
-      );
-      github.repos.getContent.mockImplementation(params => {
-        if (
-          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
-        ) {
-          return Promise.resolve({data: baseBundleSizeFixture});
-        }
-        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
-        return Promise.resolve({data: getFixture(fixture)});
-      });
     });
 
     test.each([
@@ -214,11 +226,11 @@ describe('bundle-size api', () => {
           report_markdown: null,
         });
 
-        baseBundleSizeFixture.content = Buffer.from(
+        bundleSizeFixture.content = Buffer.from(
           `{"dist/v0.js":${baseSize}}`
         ).toString('base64');
 
-        await request(server.expressApp)
+        await request(app)
           .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
           .send(jsonPayload)
           .set('Content-Type', 'application/json')
@@ -242,7 +254,7 @@ describe('bundle-size api', () => {
           report_markdown: null,
         });
 
-        expect(github.checks.update).toHaveBeenCalledWith(
+        expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
           expect.objectContaining({
             check_run_id: 555555,
             conclusion: 'success',
@@ -266,11 +278,11 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content = Buffer.from(
+      bundleSizeFixture.content = Buffer.from(
         '{"dist/v0.js": 12.34,"dist/v0/amp-accordion-0.1.js":1.11,"dist/v0/amp-ad-0.1.js": 4.53,"dist/v0/amp-anim-0.1.js": 5.65}'
       ).toString('base64');
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -294,7 +306,7 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      expect(github.checks.update).toHaveBeenCalledWith(
+      expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           check_run_id: 555555,
           conclusion: 'success',
@@ -336,7 +348,7 @@ describe('bundle-size api', () => {
         },
       };
 
-      baseBundleSizeFixture.content = Buffer.from(
+      bundleSizeFixture.content = Buffer.from(
         JSON.stringify({
           'dist/v0.js': 12.34,
           'dist/v0/amp-accordion-0.1.js': 1.11,
@@ -347,14 +359,14 @@ describe('bundle-size api', () => {
         })
       ).toString('base64');
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
 
-      expect(github.checks.update).toHaveBeenCalledWith(
+      expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           check_run_id: 555555,
           conclusion: 'success',
@@ -386,10 +398,10 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content =
+      bundleSizeFixture.content =
         Buffer.from('{"dist/v0.js":12}').toString('base64');
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -423,7 +435,7 @@ describe('bundle-size api', () => {
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing on the main branch',
       });
 
-      expect(github.checks.update).toHaveBeenCalledWith(
+      expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           check_run_id: 555555,
           conclusion: 'action_required',
@@ -433,13 +445,13 @@ describe('bundle-size api', () => {
           }),
         })
       );
-      expect(github.pulls.listRequestedReviewers).toHaveBeenCalledWith(
+      expect(mockGithub.rest.pulls.listRequestedReviewers).toHaveBeenCalledWith(
         expect.objectContaining({pull_number: 19603})
       );
-      expect(github.pulls.listReviews).toHaveBeenCalledWith(
+      expect(mockGithub.rest.pulls.listReviews).toHaveBeenCalledWith(
         expect.objectContaining({pull_number: 19603})
       );
-      expect(github.pulls.requestReviewers).toHaveBeenCalledWith(
+      expect(mockGithub.rest.pulls.requestReviewers).toHaveBeenCalledWith(
         expect.objectContaining({
           pull_number: 19603,
           reviewers: [
@@ -454,13 +466,13 @@ describe('bundle-size api', () => {
     test.each([
       [
         'draft = true',
-        pullRequest => {
+        (pullRequest: typeof pullRequestFixture) => {
           pullRequest.draft = true;
         },
       ],
       [
         'title contains "WIP"',
-        pullRequest => {
+        (pullRequest: typeof pullRequestFixture) => {
           pullRequest.title = `[WIP] ${pullRequest.title}`;
         },
       ],
@@ -477,10 +489,10 @@ describe('bundle-size api', () => {
 
       modify(pullRequestFixture);
 
-      baseBundleSizeFixture.content =
+      bundleSizeFixture.content =
         Buffer.from('{"dist/v0.js":12}').toString('base64');
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -503,7 +515,7 @@ describe('bundle-size api', () => {
         approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
       });
 
-      expect(github.checks.update).toHaveBeenCalledWith(
+      expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           check_run_id: 555555,
           conclusion: 'action_required',
@@ -527,13 +539,11 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content =
+      bundleSizeFixture.content =
         Buffer.from('{"dist/v0.js":12}').toString('base64');
-      const reviews = getFixture('reviews');
-      reviews[0].user.login = 'choumx';
-      github.pulls.listReviews.mockResolvedValue({data: reviews});
+      reviewsFixture[0].user.login = 'choumx';
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -567,10 +577,10 @@ describe('bundle-size api', () => {
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing on the main branch',
       });
 
-      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
-      expect(github.pulls.listReviews).toHaveBeenCalled();
-      expect(github.pulls.requestReviewers).not.toHaveBeenCalled();
-      expect(github.checks.update).toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.listRequestedReviewers).toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.listReviews).toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.requestReviewers).not.toHaveBeenCalled();
+      expect(mockGithub.rest.checks.update).toHaveBeenCalled();
     });
 
     test('update check on bundle-size report (report/_delayed_-base = 12.34KB/12.34KB)', async () => {
@@ -585,26 +595,16 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content = Buffer.from(
-        '{"dist/v0.js":12.34}'
-      ).toString('base64');
+      bundleSizeFixture.content = Buffer.from('{"dist/v0.js":12.34}').toString(
+        'base64'
+      );
 
-      let notFoundCount = 2;
-      github.repos.getContent.mockImplementation(params => {
-        if (
-          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
-        ) {
-          if (notFoundCount > 0) {
-            notFoundCount--;
-            return Promise.reject({status: 404});
-          }
-          return Promise.resolve({data: baseBundleSizeFixture});
-        }
-        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
-        return Promise.resolve({data: getFixture(fixture)});
-      });
+      mockGithub.rest.repos.getContent
+        .mockRejectedValueOnce({status: 404})
+        .mockRejectedValueOnce({status: 404})
+        .mockImplementation(mockGetContentByFilePath_);
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -628,10 +628,12 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      expect(github.pulls.listRequestedReviewers).not.toHaveBeenCalled();
-      expect(github.pulls.listReviews).not.toHaveBeenCalled();
-      expect(github.pulls.requestReviewers).not.toHaveBeenCalled();
-      expect(github.checks.update).toHaveBeenCalledWith(
+      expect(
+        mockGithub.rest.pulls.listRequestedReviewers
+      ).not.toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.listReviews).not.toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.requestReviewers).not.toHaveBeenCalled();
+      expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'success',
           output: expect.objectContaining({
@@ -653,26 +655,16 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content = Buffer.from(
-        '{"dist/v0.js":12.23}'
-      ).toString('base64');
+      bundleSizeFixture.content = Buffer.from('{"dist/v0.js":12.23}').toString(
+        'base64'
+      );
 
-      let notFoundCount = 2;
-      github.repos.getContent.mockImplementation(params => {
-        if (
-          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
-        ) {
-          if (notFoundCount > 0) {
-            notFoundCount--;
-            return Promise.reject({status: 404});
-          }
-          return Promise.resolve({data: baseBundleSizeFixture});
-        }
-        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
-        return Promise.resolve({data: getFixture(fixture)});
-      });
+      mockGithub.rest.repos.getContent
+        .mockRejectedValueOnce({status: 404})
+        .mockRejectedValueOnce({status: 404})
+        .mockImplementation(mockGetContentByFilePath_);
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -706,10 +698,10 @@ describe('bundle-size api', () => {
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing on the main branch',
       });
 
-      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
-      expect(github.pulls.listReviews).toHaveBeenCalled();
-      expect(github.pulls.requestReviewers).toHaveBeenCalled();
-      expect(github.checks.update).toHaveBeenCalledWith(
+      expect(mockGithub.rest.pulls.listRequestedReviewers).toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.listReviews).toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.requestReviewers).toHaveBeenCalled();
+      expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'action_required',
           output: expect.objectContaining({
@@ -732,26 +724,16 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content = Buffer.from(
-        '{"dist/v0.js":12.23}'
-      ).toString('base64');
+      bundleSizeFixture.content = Buffer.from('{"dist/v0.js":12.23}').toString(
+        'base64'
+      );
 
-      let notFoundCount = 2;
-      github.repos.getContent.mockImplementation(params => {
-        if (
-          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
-        ) {
-          if (notFoundCount > 0) {
-            notFoundCount--;
-            return Promise.reject({status: 404});
-          }
-          return Promise.resolve({data: baseBundleSizeFixture});
-        }
-        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
-        return Promise.resolve({data: getFixture(fixture)});
-      });
+      mockGithub.rest.repos.getContent
+        .mockRejectedValueOnce({status: 404})
+        .mockRejectedValueOnce({status: 404})
+        .mockImplementation(mockGetContentByFilePath_);
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send({
           ...jsonPayload,
@@ -788,10 +770,10 @@ describe('bundle-size api', () => {
           '* `dist/v0/amp-ad-0.1.js`: (4.56 KB) missing on the main branch',
       });
 
-      expect(github.pulls.listRequestedReviewers).toHaveBeenCalled();
-      expect(github.pulls.listReviews).toHaveBeenCalled();
-      expect(github.pulls.requestReviewers).toHaveBeenCalled();
-      expect(github.checks.update).toHaveBeenCalledWith(
+      expect(mockGithub.rest.pulls.listRequestedReviewers).toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.listReviews).toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.requestReviewers).toHaveBeenCalled();
+      expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'action_required',
           output: expect.objectContaining({
@@ -814,17 +796,9 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      github.repos.getContent.mockImplementation(params => {
-        if (
-          params.path.endsWith('5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json')
-        ) {
-          return Promise.reject({status: 404});
-        }
-        const fixture = params.path.replace(/^.+\/(.+)$/, '$1');
-        return Promise.resolve({data: getFixture(fixture)});
-      });
+      mockGithub.rest.repos.getContent.mockRejectedValue({status: 404});
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -848,10 +822,12 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      expect(github.pulls.listRequestedReviewers).not.toHaveBeenCalled();
-      expect(github.pulls.listReviews).not.toHaveBeenCalled();
-      expect(github.pulls.requestReviewers).not.toHaveBeenCalled();
-      expect(github.checks.update).toHaveBeenCalledWith(
+      expect(
+        mockGithub.rest.pulls.listRequestedReviewers
+      ).not.toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.listReviews).not.toHaveBeenCalled();
+      expect(mockGithub.rest.pulls.requestReviewers).not.toHaveBeenCalled();
+      expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'action_required',
           output: expect.objectContaining({
@@ -873,14 +849,13 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      baseBundleSizeFixture.content =
+      bundleSizeFixture.content =
         Buffer.from('{"dist/v0.js":12}').toString('base64');
+      approversFixture.content = Buffer.from(
+        '{"dist/v0.*":{"approvers":["ampproject/wg-performance"],"threshold":0.1}}'
+      ).toString('base64');
 
-      github.repos.getContent.returnValue = {
-        'dist/v0.*': {approvers: ['ampproject/wg-performance'], threshold: 0.1},
-      };
-
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -900,13 +875,13 @@ describe('bundle-size api', () => {
         pull_request_id: 19603,
         installation_id: 123456,
         check_run_id: 555555,
-        approving_teams: 'ampproject/wg-performance,ampproject/wg-runtime',
+        approving_teams: 'ampproject/wg-performance',
         report_markdown: expect.stringContaining('* `dist/v0.js`: Δ +0.34KB'),
       });
     });
 
     test('ignore bundle-size report for a missing head SHA', async () => {
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
@@ -952,7 +927,7 @@ describe('bundle-size api', () => {
         },
       },
     ])('ignore bundle-size report with incorrect input: %p', async data => {
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
         .send(data)
         .set('Content-Type', 'application/json')
@@ -962,7 +937,7 @@ describe('bundle-size api', () => {
   });
 
   describe('/commit/:headSha/store', () => {
-    let jsonPayload;
+    let jsonPayload: StorePayload;
 
     beforeEach(() => {
       jsonPayload = {
@@ -975,17 +950,19 @@ describe('bundle-size api', () => {
     });
 
     test('store new bundle-size', async () => {
-      github.repos.getContent.mockRejectedValue({status: 404});
+      mockGithub.rest.repos.getContent.mockRejectedValue({status: 404});
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
 
-      expect(github.repos.getContent).toHaveBeenCalledTimes(1);
-      expect(github.repos.createOrUpdateFileContents).toHaveBeenCalledWith(
+      expect(mockGithub.rest.repos.getContent).toHaveBeenCalledTimes(1);
+      expect(
+        mockGithub.rest.repos.createOrUpdateFileContents
+      ).toHaveBeenCalledWith(
         expect.objectContaining({
           message: 'bundle-size: 5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json',
           content: Buffer.from(
@@ -996,72 +973,79 @@ describe('bundle-size api', () => {
     });
 
     test('ignore already existing bundle-size when called to store', async () => {
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(200);
 
-      expect(github.repos.getContent).toHaveBeenCalledTimes(1);
-      expect(github.repos.createOrUpdateFileContents).not.toHaveBeenCalled();
+      expect(mockGithub.rest.repos.getContent).toHaveBeenCalledTimes(1);
+      expect(
+        mockGithub.rest.repos.createOrUpdateFileContents
+      ).not.toHaveBeenCalled();
     });
 
     test('show error when failed to store bundle-size', async () => {
-      github.repos.getContent.mockRejectedValue({status: 404});
-      github.repos.createOrUpdateFileContents.mockRejectedValue(
+      mockGithub.rest.repos.getContent.mockRejectedValue({status: 404});
+      mockGithub.rest.repos.createOrUpdateFileContents.mockRejectedValue(
         new Error('I am a tea pot')
       );
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(500, /I am a tea pot/);
 
-      expect(logErrorSpy).toHaveBeenCalledWith(
+      expect(mockLog.error).toHaveBeenCalledWith(
         expect.stringContaining(
           'Failed to create the bundle-size/5f27002526a808c5c1ad5d0f1ab1cec471af0a33.json file'
         ),
         expect.any(Error)
       );
-      expect(github.repos.getContent).toHaveBeenCalledTimes(1);
-      expect(github.repos.createOrUpdateFileContents).toHaveBeenCalledTimes(1);
+      expect(mockGithub.rest.repos.getContent).toHaveBeenCalledTimes(1);
+      expect(
+        mockGithub.rest.repos.createOrUpdateFileContents
+      ).toHaveBeenCalledTimes(1);
     });
 
     test('fail on non-numeric values when called to store bundle-size', async () => {
+      /* @ts-expect-error Testing an incorrect API call. */
       jsonPayload.bundleSizes['dist/shadow-v0.js'] = '23.45KB';
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(
           400,
-          'POST request to /store must have a key/value object Map<string, number> field "bundleSizes"'
+          'POST request to /store must have a key/value object Record<string, number> field "bundleSizes"'
         );
     });
 
     test('fail on missing values when called to store bundle-size', async () => {
+      /* @ts-expect-error Testing an incorrect API call. */
       delete jsonPayload.bundleSizes;
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(
           400,
-          'POST request to /store must have a key/value object Map<string, number> field "bundleSizes"'
+          'POST request to /store must have a key/value object Record<string, number> field "bundleSizes"'
         );
     });
 
     test('rejects calls to store without the CI token', async () => {
+      /* @ts-expect-error Testing an incorrect API call. */
       jsonPayload.token = 'wrong token';
 
-      await request(server.expressApp)
+      await request(app)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
         .send(jsonPayload)
         .set('Content-Type', 'application/json')

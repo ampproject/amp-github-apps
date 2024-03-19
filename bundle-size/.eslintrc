@@ -1,5 +1,11 @@
 {
-  extends: ['../.eslintrc-es6.js'],
+  "extends": [
+    "../.eslintrc-ts.js",
+    "plugin:@typescript-eslint/stylistic-type-checked"
+  ],
+  "parserOptions": {
+    "project": ["bundle-size/tsconfig.json", "tsconfig.dev.json"]
+  },
   "rules": {
     "camelcase": "off"
   }

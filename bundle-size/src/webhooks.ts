@@ -13,20 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-const {getCheckFromDatabase} = require('./common');
+import {type StringCheckRow, getCheckFromDatabase} from './common';
+
+import type {GitHubUtils} from './github-utils';
+import type {Knex} from 'knex';
+import type {Probot} from 'probot';
 
 /**
  * Installs GitHub Webhooks on the Probot application.
  *
- * @param {!Probot.Application} app Probot application.
- * @param {!Knex} db database connection.
- * @param {!GitHubUtils} githubUtils GitHubUtils instance.
+ * @param app Probot application.
+ * @param db database connection.
+ * @param githubUtils GitHubUtils instance.
  */
-exports.installGitHubWebhooks = (app, db, githubUtils) => {
+export function installGitHubWebhooks(
+  app: Probot,
+  db: Knex,
+  githubUtils: GitHubUtils
+) {
   app.on(['pull_request.opened', 'pull_request.synchronize'], async context => {
-    context.log(`Pull request ${context.payload.number} created/updated`);
+    context.log.info(`Pull request ${context.payload.number} created/updated`);
 
     const headSha = context.payload.pull_request.head.sha;
     const params = context.repo({
@@ -39,44 +46,47 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
           'Look for the shard that contains "Bundle Size" in its title.',
       },
     });
-    const check = await context.octokit.checks.create(params);
+    const check = await context.octokit.rest.checks.create(params);
 
     const checkRunId = check.data.id;
-    await db.transaction(trx => {
-      return trx('checks')
-        .first('head_sha')
-        .where('head_sha', headSha)
-        .then(existingRow => {
-          if (existingRow === undefined) {
-            return trx('checks').insert({
-              head_sha: headSha,
-              pull_request_id: context.payload.number,
-              installation_id: context.payload.installation.id,
-              owner: params.owner,
-              repo: params.repo,
-              check_run_id: checkRunId,
-            });
-          } else {
-            return trx('checks')
-              .update({check_run_id: checkRunId})
-              .where({head_sha: headSha});
-          }
-        })
-        .then(trx.commit)
-        .catch(trx.rollback);
+    await db.transaction(async trx => {
+      try {
+        const existingRow = await trx('checks')
+          .first('head_sha')
+          .where('head_sha', headSha);
+
+        if (existingRow === undefined) {
+          await trx('checks').insert<StringCheckRow>({
+            head_sha: headSha,
+            pull_request_id: context.payload.number,
+            installation_id: context.payload.installation?.id,
+            owner: params.owner,
+            repo: params.repo,
+            check_run_id: checkRunId,
+          });
+        } else {
+          await trx('checks')
+            .update<StringCheckRow>({check_run_id: checkRunId})
+            .where({head_sha: headSha});
+        }
+        await trx.commit();
+      } catch (err) {
+        await trx.rollback();
+        app.log.error(err);
+      }
     });
   });
 
   app.on('pull_request.closed', async context => {
     if (context.payload.pull_request.merged_at !== null) {
-      await db('merges').insert({
+      await db('merges').insert<StringCheckRow>({
         merge_commit_sha: context.payload.pull_request.merge_commit_sha,
       });
     }
   });
 
   app.on('pull_request_review.submitted', async context => {
-    const approver = context.payload.review.user.login;
+    const approver = context.payload.review.user?.login ?? '';
     const pullRequestId = context.payload.pull_request.number;
     const headSha = context.payload.pull_request.head.sha;
 
@@ -86,7 +96,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
 
     const check = await getCheckFromDatabase(db, headSha);
     if (!check) {
-      context.log(
+      context.log.info(
         `Check ID for pull request ${pullRequestId} with head ` +
           `SHA ${headSha} was not found in the database`
       );
@@ -94,26 +104,24 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
     }
 
     const isSuperApprover = await githubUtils.isSuperApprover(approver);
-    context.log(
+    context.log.info(
       `Approving user ${approver} of pull request ${pullRequestId}`,
       isSuperApprover ? 'is' : 'is NOT',
       'a super approver'
     );
-    if (check.approval_teams === null && !isSuperApprover) {
-      context.log(
+    if (check.approving_teams === null && !isSuperApprover) {
+      context.log.info(
         'Pull requests can only be preemptively approved by members of',
         process.env.SUPER_USER_TEAMS
       );
       return;
     }
 
-    const approverTeams = check.approving_teams
-      ? check.approving_teams.split(',')
-      : [];
+    const {approving_teams: approverTeams} = check;
     const isApprover =
       isSuperApprover ||
       (await githubUtils.getTeamMembers(approverTeams)).includes(approver);
-    context.log(
+    context.log.info(
       `Approving user ${approver} of pull request ${pullRequestId}`,
       isApprover && !isSuperApprover ? 'is' : 'is NOT',
       'a member of',
@@ -126,7 +134,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
     }
 
     if (isApprover) {
-      await context.octokit.checks.update({
+      await context.octokit.rest.checks.update({
         owner: check.owner,
         repo: check.repo,
         check_run_id: check.check_run_id,
@@ -147,7 +155,7 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       .del()
       .where({merge_commit_sha: mergeCommitSha});
     if (numDeleted > 0) {
-      await context.octokit.checks.update(
+      await context.octokit.rest.checks.update(
         context.repo({
           check_run_id: context.payload.check_run.id,
           conclusion: 'neutral',
@@ -167,4 +175,4 @@ exports.installGitHubWebhooks = (app, db, githubUtils) => {
       );
     }
   });
-};
+}

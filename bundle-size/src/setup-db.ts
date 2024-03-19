@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 The AMP HTML Authors. All Rights Reserved.
+ * Copyright 2018 The AMP HTML Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-const fs = require('fs');
-const path = require('path');
+import log from 'fancy-log';
+
+import {dbConnect, setupDb} from './db';
 
 /**
- * Get a JSON test fixture object.
+ * This file creates the database tables that will be used by the GitHub App.
  *
- * @param {!string} name name of the JSON fixture file (without .json).
- * @return {!object} the named JSON test fixture file.
+ * Execute this file by running `npm run setup-db`. Make sure you set up the
+ * database connection first in your .env file. See the .env.example file for
+ * details.
  */
-exports.getFixture = name => {
-  return JSON.parse(
-    fs.readFileSync(path.join(__dirname, `fixtures/${name}.json`))
-  );
-};
+const db = dbConnect();
+void setupDb(db)
+  .then(() => {
+    log.info('Database tables created.');
+  })
+  .catch(error => {
+    log.error(error.message);
+  })
+  .then(() => {
+    db.destroy();
+  });
