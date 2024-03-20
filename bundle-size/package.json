@@ -5,39 +5,53 @@
   "private": true,
   "license": "Apache-2.0",
   "author": "The AMP HTML authors",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/ampproject/amp-github-apps.git"
   },
   "scripts": {
+    "start": "tsx ./src/index.ts",
     "dev": "nodemon",
     "deploy": "gcloud --project amp-bundle-size-bot app deploy",
     "deploy-tag": "git tag 'deploy-bundle-size-'`date -u '+%Y%m%d%H%M%S'`",
-    "setup-db": "node ./setup-db.js",
-    "start": "probot run ./app.js",
+    "setup-db": "tsx ./src/setup-db.ts",
     "test": "jest --reporters=jest-silent-reporter"
   },
   "dependencies": {
-    "@octokit/rest": "20.0.2",
+    "@octokit/core": "6.0.1",
+    "@octokit/plugin-rest-endpoint-methods": "11.0.1",
+    "@octokit/types": "12.6.0",
     "knex": "3.1.0",
     "minimatch": "9.0.3",
     "node-cache": "5.1.2",
     "pg": "8.11.3",
     "probot": "12.3.3",
-    "sleep-promise": "9.1.0"
+    "sleep-promise": "9.1.0",
+    "tsx": "4.7.1",
+    "typescript": "5.4.2"
   },
   "devDependencies": {
+    "@octokit/webhooks": "13.1.1",
+    "@types/express": "4.17.21",
+    "@types/fancy-log": "2.0.2",
+    "@types/jest": "29.5.12",
+    "@types/node": "20.11.28",
+    "@types/supertest": "6.0.2",
     "express": "4.19.0",
     "fancy-log": "2.0.0",
     "jest": "29.7.0",
+    "jest-mock-extended": "3.0.5",
     "jest-silent-reporter": "0.5.0",
     "nock": "13.5.4",
     "nodemon": "3.1.0",
     "smee-client": "2.0.1",
     "sqlite3": "5.1.7",
-    "supertest": "6.3.4"
+    "supertest": "6.3.4",
+    "ts-jest": "29.1.2"
   },
   "jest": {
+    "preset": "ts-jest",
     "testEnvironment": "node"
   },
   "nodemonConfig": {

@@ -13,18 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-const log = require('fancy-log');
-const {dbConnect} = require('./db');
+import knex, {type Knex} from 'knex';
+
+export function dbConnect() {
+  return knex({
+    client: 'pg',
+    // TODO(danielrozenberg): replace this with a database connection URL when
+    // https://github.com/iceddev/pg-connection-string/pull/34 is merged.
+    connection: JSON.parse(process.env.DATABASE_CONNECTION_JSON ?? 'null'),
+  });
+}
 
 /**
  * Setup up the database schema.
  *
- * @param {knex} db database handler.
- * @return {Promise<knex>} database handler.
+ * @param db database handler.
  */
-function setupDb(db) {
+export async function setupDb(db: Knex): Promise<void> {
   return db.schema
     .createTable('checks', table => {
       table.string('head_sha', 40).primary();
@@ -44,28 +50,5 @@ function setupDb(db) {
     })
     .createTable('merges', table => {
       table.string('merge_commit_sha', 40).primary();
-    });
-}
-
-module.exports = {setupDb};
-
-/**
- * This file creates the database tables that will be used by the GitHub App.
- *
- * Execute this file by running `npm run setup-db`. Make sure you set up the
- * database connection first in your .env file. See the .env.example file for
- * details.
- */
-if (require.main === module) {
-  const db = dbConnect();
-  setupDb(db)
-    .then(() => {
-      log.info('Database tables created.');
-    })
-    .catch(error => {
-      log.error(error.message);
-    })
-    .then(() => {
-      db.destroy();
     });
 }

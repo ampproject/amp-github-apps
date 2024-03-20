@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 The AMP HTML Authors. All Rights Reserved.
+ * Copyright 2019 The AMP HTML Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-const knex = require('knex');
+import knex from 'knex';
 
-exports.dbConnect = () => {
+export function inMemoryDbConnect() {
   return knex({
-    client: 'pg',
-    // TODO(danielrozenberg): replace this with a database connection URL when
-    // https://github.com/iceddev/pg-connection-string/pull/34 is merged.
-    connection: JSON.parse(process.env.DATABASE_CONNECTION_JSON),
+    client: 'sqlite3',
+    connection: ':memory:',
+    useNullAsDefault: true,
   });
-};
+}
