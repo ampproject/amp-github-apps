@@ -26,18 +26,21 @@ import {installGitHubWebhooks} from './webhooks';
 import type {ApplicationFunction} from 'probot';
 import type {RestfulOctokit as RestfulOctokitType} from './types/rest-endpoint-methods';
 
-const db = dbConnect();
-
 /**
  * Set up Probot application.
  *
  * @param app base Probot Application.
  * @param getRouter returns an Express Router.
  */
-const appFactory: ApplicationFunction = (app, {getRouter}): void => {
+const appFactory: ApplicationFunction = async (
+  app,
+  {getRouter}
+): Promise<void> => {
   if (!getRouter) {
     throw new Error('getRouter is not available');
   }
+
+  const db = await dbConnect();
 
   const RestfulOctokit = Octokit.plugin(restEndpointMethods);
   const userBasedGithub: RestfulOctokitType = new RestfulOctokit({

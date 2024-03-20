@@ -16,13 +16,25 @@
 
 import knex, {type Knex} from 'knex';
 
-export function dbConnect() {
-  return knex({
+export async function dbConnect(): Promise<Knex> {
+  const db = knex({
     client: 'pg',
-    // TODO(danielrozenberg): replace this with a database connection URL when
-    // https://github.com/iceddev/pg-connection-string/pull/34 is merged.
-    connection: JSON.parse(process.env.DATABASE_CONNECTION_JSON ?? 'null'),
+    connection: process.env.DATABASE_CONNECTION_STRING,
   });
+
+  // Database connections are not kept live, so it isn't until the first query
+  // that a connection is established. This block is a quick health-check to
+  // verify that the database connection string is valid. It throws a top-level
+  // error if it is not.
+  try {
+    await db.raw('SELECT 1;');
+    console.info('Database connection health-check successful');
+  } catch (err) {
+    console.error('Database health-check failed:', err);
+    throw err;
+  }
+
+  return db;
 }
 
 /**
