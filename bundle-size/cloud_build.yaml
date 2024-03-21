@@ -18,7 +18,7 @@ steps:
     secretEnv:
       - WEBHOOK_SECRET
       - PRIVATE_KEY
-      - DATABASE_CONNECTION_JSON
+      - DATABASE_CONNECTION_STRING
       - CI_PUSH_BUILD_TOKEN
       - ACCESS_TOKEN
 
