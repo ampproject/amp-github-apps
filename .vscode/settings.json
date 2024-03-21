@@ -1,4 +1,6 @@
 {
   // Auto-fix JS files with ESLint.
-  "editor.codeActionsOnSave": {"source.fixAll.eslint": true},
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
 }
