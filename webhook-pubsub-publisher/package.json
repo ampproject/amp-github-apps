@@ -15,7 +15,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@octokit/webhooks": "12.1.2",
+    "@octokit/webhooks": "12.2.0",
     "@octokit/webhooks-types": "7.4.0",
     "@google-cloud/pubsub": "4.3.3",
     "probot": "12.3.3",
