@@ -1,6 +1,6 @@
 {
-  "include": [
-    "**/.eslintrc.js",
-    "**/webpack.*.config.js"
-  ]
+  "compilerOptions": {
+    "strictNullChecks": true
+  },
+  "include": ["**/.eslintrc.js", "**/.eslintrc.cjs", "**/webpack.*.config.js"]
 }

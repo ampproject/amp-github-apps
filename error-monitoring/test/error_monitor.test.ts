@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
+import {Stackdriver} from 'error-monitoring';
+import nock from 'nock';
+
 import {
   ErrorMonitor,
   ServiceErrorMonitor,
   ServiceName,
 } from '../src/error_monitor';
-import {Stackdriver} from 'error-monitoring';
 import {StackdriverApi} from '../src/stackdriver_api';
-
-import nock from 'nock';
 
 describe('ErrorMonitor', () => {
   let monitor: ErrorMonitor;

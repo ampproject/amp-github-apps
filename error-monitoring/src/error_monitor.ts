@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {ErrorReport, ServiceGroup, Stackdriver} from 'error-monitoring';
-import {StackdriverApi} from './stackdriver_api';
+import type {ErrorReport, ServiceGroup, Stackdriver} from 'error-monitoring';
+import type {StackdriverApi} from './stackdriver_api';
 
 export enum ServiceName {
   PRODUCTION = 'CDN Production',
@@ -49,9 +49,9 @@ function scaleFactor(serviceName: ServiceName): number {
 
 export class ErrorMonitor {
   constructor(
-    protected client: StackdriverApi,
-    readonly minFrequency: number,
-    protected pageLimit: number = 25
+    protected readonly client: StackdriverApi,
+    protected readonly minFrequency: number,
+    protected readonly pageLimit = 25
   ) {}
 
   /** Creates a service monitor using the same settings as this monitor. */
@@ -113,26 +113,26 @@ export class ErrorMonitor {
   }
 
   /** Finds top occurring errors. */
-  protected async topErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  protected async topErrors(): Promise<Stackdriver.ErrorGroupStats[]> {
     return this.client.listGroups(this.pageLimit);
   }
 
   /** Finds top occurring errors with associated GitHub issues. */
-  async topTrackedErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  async topTrackedErrors(): Promise<Stackdriver.ErrorGroupStats[]> {
     return (await this.topErrors()).filter(({group}) =>
       this.hasTrackingIssue(group)
     );
   }
 
   /** Finds top occurring errors with associated GitHub issues. */
-  async topUntrackedErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  async topUntrackedErrors(): Promise<Stackdriver.ErrorGroupStats[]> {
     return (await this.topErrors()).filter(
       ({group}) => !this.hasTrackingIssue(group)
     );
   }
 
   /** Finds frequent errors to create tracking issues for. */
-  async newErrorsToReport(): Promise<Array<ErrorReport>> {
+  async newErrorsToReport(): Promise<ErrorReport[]> {
     return (await this.topUntrackedErrors())
       .filter(groupStats => this.hasHighFrequency(groupStats))
       .map(groupStats => this.reportFromGroupStats(groupStats));
@@ -143,10 +143,10 @@ export class ServiceErrorMonitor extends ErrorMonitor {
   // Note that minFrequency is relative to production traffic, and is scaled for
   // each diversion when thresholding.
   constructor(
-    client: StackdriverApi,
-    private serviceName: ServiceName,
-    minFrequency: number,
-    pageLimit = 25
+    protected readonly client: StackdriverApi,
+    protected readonly serviceName: ServiceName,
+    protected readonly minFrequency: number,
+    protected readonly pageLimit = 25
   ) {
     super(client, minFrequency, pageLimit);
   }
@@ -157,7 +157,7 @@ export class ServiceErrorMonitor extends ErrorMonitor {
   }
 
   /** Finds top occurring errors in the service group. */
-  protected async topErrors(): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  protected async topErrors(): Promise<Stackdriver.ErrorGroupStats[]> {
     return this.client.listServiceGroups(this.serviceName, this.pageLimit);
   }
 

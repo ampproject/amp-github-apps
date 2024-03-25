@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import {GraphQLResponse} from 'error-monitoring';
 import {graphql} from '@octokit/graphql';
-import {default as nodeFetch} from 'node-fetch';
+import nodeFetch from 'node-fetch';
 
-const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
+import type {GraphQLResponse} from 'error-monitoring';
+
+const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS ?? '100', 10);
 
 /** Returns a promise that resolves after a specified number of milliseconds. */
 async function sleep(ms: number): Promise<void> {
@@ -30,11 +31,11 @@ async function sleep(ms: number): Promise<void> {
  */
 export class RateLimitedGraphQL {
   private ready: Promise<void> = Promise.resolve();
-  private execute: (query: string) => Promise<GraphQLResponse>;
+  private readonly execute: (query: string) => Promise<GraphQLResponse>;
 
   constructor(
-    token: string,
-    private frequencyMs: number = GRAPHQL_FREQ_MS
+    readonly token: string,
+    private readonly frequencyMs: number = GRAPHQL_FREQ_MS
   ) {
     this.execute = async (query: string): Promise<GraphQLResponse> =>
       graphql(query, {

@@ -17,31 +17,35 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import {URLSearchParams} from 'node:url';
+import fs from 'node:fs';
+
+import {RequestError} from '@octokit/request-error';
+import Mustache from 'mustache';
+import express from 'express';
+import statusCodes from 'http-status-codes';
+
 import {ErrorIssueBot} from './bot';
-import {
+import {ErrorMonitor, ServiceName} from './error_monitor';
+import {StackdriverApi} from './stackdriver_api';
+import {formatDate, isNonNullable, linkifySource} from './utils';
+
+import type {
   ErrorList,
   ErrorReport,
   ServiceGroupType,
   TopIssueView,
 } from 'error-monitoring';
-import {ErrorMonitor, ServiceName} from './error_monitor';
-import {StackdriverApi} from './stackdriver_api';
-import {URLSearchParams} from 'url';
-import {formatDate, linkifySource} from './utils';
-import Mustache from 'mustache';
-import express from 'express';
-import fs from 'fs';
-import statusCodes from 'http-status-codes';
 
 const ERROR_ISSUE_ENDPOINT =
-  process.env.ERROR_ISSUE_ENDPOINT ||
+  process.env.ERROR_ISSUE_ENDPOINT ??
   'https://amp-error-monitoring.uc.r.appspot.com/error-issue';
-const GITHUB_SLUG = process.env.GITHUB_SLUG || 'ampproject/amphtml';
+const GITHUB_SLUG = process.env.GITHUB_SLUG ?? 'ampproject/amphtml';
 const [GITHUB_REPO_OWNER, GITHUB_REPO_NAME] = GITHUB_SLUG.split('/');
-const ISSUE_REPO_NAME = process.env.ISSUE_REPO_NAME || GITHUB_REPO_NAME;
-const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
-const PROJECT_ID = process.env.PROJECT_ID || 'amp-error-reporting';
-const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY || 2500);
+const ISSUE_REPO_NAME = process.env.ISSUE_REPO_NAME ?? GITHUB_REPO_NAME;
+const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN ?? '';
+const PROJECT_ID = process.env.PROJECT_ID ?? 'amp-error-reporting';
+const MIN_FREQUENCY = Number(process.env.MIN_FREQUENCY ?? 2500);
 const ALL_SERVICES = 'ALL SERVICES';
 const VALID_SERVICE_TYPES = [ALL_SERVICES].concat(Object.keys(ServiceName));
 const MAX_TITLE_LENGTH = 80;
@@ -64,7 +68,7 @@ function renderErrorList(viewData: ErrorList.ViewData): string {
 
 let topIssuesTemplate = '';
 /** Renders the top issue list. */
-function renderTopIssues(issues: Array<TopIssueView>): string {
+function renderTopIssues(issues: TopIssueView[]): string {
   if (!topIssuesTemplate) {
     topIssuesTemplate = fs.readFileSync('./static/top-issues.html').toString();
   }
@@ -94,7 +98,7 @@ function errorReportFromJson({
   firstSeen?: string;
   dailyOccurrences?: string | number;
   stacktrace?: string;
-  seenInVersions?: string | Array<string>;
+  seenInVersions?: string | string[];
 }): ErrorReport {
   if (firstSeen && dailyOccurrences && stacktrace && seenInVersions) {
     return {
@@ -161,7 +165,11 @@ export async function errorIssue(
     }
   } catch (errResp) {
     console.warn(errResp);
-    res.status(errResp.status || statusCodes.INTERNAL_SERVER_ERROR);
+    res.status(
+      errResp instanceof RequestError
+        ? errResp.status
+        : statusCodes.INTERNAL_SERVER_ERROR
+    );
     res.json(errResp);
   }
 }
@@ -202,15 +210,16 @@ function viewData({
   normalizedThreshold,
   errorReports,
 }: ErrorList.JsonResponse): ErrorList.ViewData {
-  const serviceTypeList: Array<ErrorList.ServiceTypeView> =
-    VALID_SERVICE_TYPES.map(name => ({
+  const serviceTypeList: ErrorList.ServiceTypeView[] = VALID_SERVICE_TYPES.map(
+    name => ({
       name,
       formattedName:
         name === 'DEVELOPMENT'
           ? '1% / Opt-In'
-          : name.charAt(0).toUpperCase() + name.substr(1).toLowerCase(),
+          : name.charAt(0).toUpperCase() + name.substring(1).toLowerCase(),
       selected: name === serviceType,
-    }));
+    })
+  );
 
   return {
     serviceType,
@@ -256,7 +265,7 @@ export async function errorList(
   const {json, threshold, normalizedThreshold} = req.query;
   // If a valid serviceType param is provided, such as "nightly" or
   // "production", filter to that service group.
-  const serviceType = (req.query.serviceType || ALL_SERVICES)
+  const serviceType = (req.query.serviceType ?? ALL_SERVICES)
     .toString()
     .toUpperCase();
 
@@ -286,9 +295,9 @@ export async function errorList(
       res.send(renderErrorList(viewData(errorList)));
     }
   } catch (error) {
-    console.error(error.toString().replace(/\n|\r/g, ''));
+    console.error(String(error).replace(/\n|\r/g, ''));
     res.status(statusCodes.INTERNAL_SERVER_ERROR);
-    res.json({error: error.toString()});
+    res.json({error: String(error)});
   }
 }
 
@@ -297,17 +306,17 @@ export async function topIssueList(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
-  const n = Number(req.query.n || 10);
+  const n = Number(req.query.n ?? 10);
   const seenIssues = new Set();
   const issues = (await monitor.topTrackedErrors())
     .filter(({group}) => !!group.trackingIssues)
     .map(({group: {groupId, trackingIssues}, representative: {message}}) => {
       let [title] = message.split('\n');
       if (title.length > MAX_TITLE_LENGTH) {
-        title = `${title.substr(0, MAX_TITLE_LENGTH - 1)}…`;
+        title = `${title.substring(0, MAX_TITLE_LENGTH - 1)}…`;
       }
-      const issueUrl = trackingIssues[0].url;
-      const [, issue] = issueUrl.split(/ampproject\/[\w-]+\/issues\//);
+      const issueUrl = trackingIssues?.[0].url ?? '';
+      const [, issue] = issueUrl?.split(/ampproject\/[\w-]+\/issues\//) ?? [];
       const issueNumber = Number(issue);
 
       if (!issueNumber || seenIssues.has(issueNumber)) {
@@ -317,7 +326,7 @@ export async function topIssueList(
 
       return {title, errorId: groupId, issueUrl, issueNumber};
     })
-    .filter(Boolean)
+    .filter(isNonNullable)
     .slice(0, n);
 
   res.send(renderTopIssues(issues));
@@ -329,11 +338,11 @@ export async function linkIssue(
   res: express.Response
 ): Promise<void> {
   const {errorId: errorIdRaw, serviceType, normalizedThreshold} = req.query;
-  const errorId = errorIdRaw.toString().replace(/\n|\r/g, '');
-  let issueNumberStr = req.query.issueNumber.toString();
+  const errorId = String(errorIdRaw).replace(/\n|\r/g, '');
+  let issueNumberStr = String(req.query.issueNumber).toString();
 
   if (issueNumberStr.startsWith('#')) {
-    issueNumberStr = issueNumberStr.substr(1);
+    issueNumberStr = issueNumberStr.substring(1);
   }
   const issueNumber = Number(issueNumberStr);
 

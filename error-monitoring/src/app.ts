@@ -17,11 +17,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {errorIssue, errorList, linkIssue, topIssueList} from './index';
 import {json, urlencoded} from 'body-parser';
 import express from 'express';
 
-const PORT = Number(process.env.PORT || 8080);
+import {errorIssue, errorList, linkIssue, topIssueList} from './index';
+
+const PORT = Number(process.env.PORT ?? 8080);
 
 console.log('⚙️ Configuring server');
 const app = express()

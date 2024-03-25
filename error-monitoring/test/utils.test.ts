@@ -45,7 +45,7 @@ describe('parseSource', () => {
     const source =
       'https://raw.githubusercontent.com/ampproject/amphtml/' +
       '2004030010070/extensions/amp-delight-player/0.1/amp-delight-player.js:421';
-    const {rtv, path, line} = parseSource(source);
+    const {rtv, path, line} = parseSource(source) ?? {};
 
     expect(rtv).toEqual('2004030010070');
     expect(path).toEqual(

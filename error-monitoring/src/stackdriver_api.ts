@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import {GaxiosOptions} from 'gaxios';
 import {GoogleAuth} from 'google-auth-library';
-import {Stackdriver} from 'error-monitoring';
 import NodeCache from 'node-cache';
+
+import type {GaxiosOptions} from 'gaxios';
+import type {Stackdriver} from 'error-monitoring';
 
 const SERVICE = 'https://clouderrorreporting.googleapis.com';
 const SECONDS_IN_HOUR = 60 * 60;
@@ -26,10 +27,10 @@ const CACHE_TTL = SECONDS_IN_HOUR;
 const GAUTH_SCOPE = 'https://www.googleapis.com/auth/cloud-platform';
 
 export class StackdriverApi {
-  private auth = new GoogleAuth({scopes: GAUTH_SCOPE});
-  private cache = new NodeCache({stdTTL: CACHE_TTL});
+  private readonly auth = new GoogleAuth({scopes: GAUTH_SCOPE});
+  private readonly cache = new NodeCache({stdTTL: CACHE_TTL});
 
-  constructor(private projectId: string) {}
+  constructor(private readonly projectId: string) {}
 
   /** Makes a request to the Cloud Error Reporting API. */
   private async request(
@@ -84,11 +85,11 @@ export class StackdriverApi {
     pageSize?: number;
     groupId?: string;
     'serviceFilter.service'?: string;
-  }): Promise<Array<Stackdriver.ErrorGroupStats>> {
-    const serviceKey = opts['serviceFilter.service'] || 'ALL_SERVICES';
-    const groupKey = opts.groupId || 'NO_GROUP';
+  }): Promise<Stackdriver.ErrorGroupStats[]> {
+    const serviceKey = opts['serviceFilter.service'] ?? 'ALL_SERVICES';
+    const groupKey = opts.groupId ?? 'NO_GROUP';
     const cacheKey = `${serviceKey}-${groupKey}`.replace(/\n|\r/g, '');
-    let errorGroups: undefined | Array<Stackdriver.ErrorGroupStats> =
+    let errorGroups: undefined | Stackdriver.ErrorGroupStats[] =
       this.cache.get(cacheKey);
 
     if (!errorGroups) {
@@ -96,7 +97,7 @@ export class StackdriverApi {
         'timeRange.period': 'PERIOD_1_DAY',
         timedCountDuration: `${SECONDS_IN_DAY}s`,
         ...opts,
-      })) as {errorGroupStats?: Array<Stackdriver.SerializedErrorGroupStats>};
+      })) as {errorGroupStats?: Stackdriver.SerializedErrorGroupStats[]};
 
       errorGroups = errorGroupStats.map(this.deserialize, this);
       this.cache.set(cacheKey, errorGroups);
@@ -110,7 +111,7 @@ export class StackdriverApi {
   }
 
   /** List groups of errors. */
-  async listGroups(pageSize = 20): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  async listGroups(pageSize = 20): Promise<Stackdriver.ErrorGroupStats[]> {
     console.info(`Fetching first ${pageSize} error groups`);
     return this.getGroups({pageSize});
   }
@@ -119,7 +120,7 @@ export class StackdriverApi {
   async listServiceGroups(
     serviceName: string,
     pageSize = 20
-  ): Promise<Array<Stackdriver.ErrorGroupStats>> {
+  ): Promise<Stackdriver.ErrorGroupStats[]> {
     console.info(`Fetching first ${pageSize} error groups for ${serviceName}`);
     return this.getGroups({
       pageSize,

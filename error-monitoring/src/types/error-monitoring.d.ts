@@ -33,9 +33,9 @@ declare module 'error-monitoring' {
   /** Service information to determine frequency scaling across diversions. */
   export interface ServiceGroup {
     // The percentage of traffic this diversion set sees.
-    diversionPercent: number;
+    readonly diversionPercent: number;
     // The base throttling rate of error reporting for this group.
-    throttleRate: number;
+    readonly throttleRate: number;
   }
 
   /**
@@ -43,55 +43,61 @@ declare module 'error-monitoring' {
    * See https://developer.github.com/v4/object/blamerange/
    */
   export interface BlameRange {
-    path: string;
-    startingLine: number;
-    endingLine: number;
+    readonly path: string;
+    readonly startingLine: number;
+    readonly endingLine: number;
 
-    author: string;
-    committedDate: Date;
-    prNumber: number;
-    changedFiles: number;
+    readonly author: string;
+    readonly committedDate: Date;
+    readonly prNumber: number;
+    readonly changedFiles: number;
   }
 
   /** A frame in a stacktrace. */
   export interface StackFrame {
-    rtv: string;
-    path: string;
-    line: number;
+    readonly rtv: string;
+    readonly path: string;
+    readonly line: number;
   }
 
   /** GraphQL query response structure. */
   namespace GraphQL {
     interface User {
-      login: string;
+      readonly login: string;
     }
 
     interface Commit {
-      changedFiles: number;
-      committedDate: string;
-      associatedPullRequests: {
-        nodes: Array<{number: number}>;
+      readonly changedFiles: number;
+      readonly committedDate: string;
+      readonly associatedPullRequests: {
+        readonly nodes: {
+          readonly number: number;
+        }[];
       };
-      author: {
-        name: string;
-        user: null | User;
+      readonly author: {
+        readonly name: string;
+        readonly user: User | null;
       };
     }
 
     interface Blame {
-      ranges: Array<{
-        commit: Commit;
-        startingLine: number;
-        endingLine: number;
-      }>;
+      readonly ranges: {
+        readonly commit: Commit;
+        readonly startingLine: number;
+        readonly endingLine: number;
+      }[];
     }
 
     export interface Ref {
-      target: {blame: Blame};
+      readonly target: {
+        readonly blame: Blame;
+      };
     }
 
     export interface QueryResponse {
-      repository: {ref: null | Ref};
+      readonly repository: {
+        readonly ref: Ref | null;
+      };
     }
   }
   export type GraphQLResponse = GraphQL.QueryResponse;
@@ -99,11 +105,11 @@ declare module 'error-monitoring' {
 
   /** Information about a Pantheon error report. */
   export interface ErrorReport {
-    errorId: string;
-    firstSeen: Date;
-    dailyOccurrences: number;
-    stacktrace: string;
-    seenInVersions: Array<string>;
+    readonly errorId: string;
+    readonly firstSeen: Date;
+    readonly dailyOccurrences: number;
+    readonly stacktrace: string;
+    readonly seenInVersions: string[];
   }
 
   /**
@@ -113,101 +119,101 @@ declare module 'error-monitoring' {
    */
   export namespace Stackdriver {
     interface SerializedTimedCount {
-      count: string;
-      startTime: string;
-      endTime: string;
+      readonly count: string;
+      readonly startTime: string;
+      readonly endTime: string;
     }
 
     interface TimedCount {
-      count: number;
-      startTime: Date;
-      endTime: Date;
+      readonly count: number;
+      readonly startTime: Date;
+      readonly endTime: Date;
     }
 
     interface ErrorEvent {
-      message: string;
+      readonly message: string;
     }
 
     export interface ErrorGroup {
-      name: string;
-      groupId: string;
-      trackingIssues?: Array<{
-        url: string;
-      }>;
+      readonly name: string;
+      readonly groupId: string;
+      readonly trackingIssues?: {
+        readonly url: string;
+      }[];
     }
 
     export interface ServiceContext {
-      service: string;
-      version: string;
+      readonly service: string;
+      readonly version: string;
     }
 
     export interface SerializedErrorGroupStats {
-      group: ErrorGroup;
-      count: string;
-      timedCounts: Array<SerializedTimedCount>;
-      firstSeenTime: string;
-      numAffectedServices: string;
-      affectedServices: Array<ServiceContext>;
-      representative: {
-        message: string;
+      readonly group: ErrorGroup;
+      readonly count: string;
+      readonly timedCounts: SerializedTimedCount[];
+      readonly firstSeenTime: string;
+      readonly numAffectedServices: string;
+      readonly affectedServices: ServiceContext[];
+      readonly representative: {
+        readonly message: string;
       };
     }
 
     export interface ErrorGroupStats {
-      group: ErrorGroup;
-      count: number;
-      timedCounts: Array<TimedCount>;
-      firstSeenTime: Date;
-      numAffectedServices: number;
-      affectedServices: Array<ServiceContext>;
-      representative: {
-        message: string;
+      readonly group: ErrorGroup;
+      readonly count: number;
+      readonly timedCounts: TimedCount[];
+      readonly firstSeenTime: Date;
+      readonly numAffectedServices: number;
+      readonly affectedServices: ServiceContext[];
+      readonly representative: {
+        readonly message: string;
       };
     }
   }
 
   namespace ErrorList {
     interface ErrorReportMeta {
-      createUrl: string;
-      message: string;
+      readonly createUrl: string;
+      readonly message: string;
     }
 
     type ErrorReportWithMeta = ErrorReport & ErrorReportMeta;
 
     interface ErrorReportView extends ErrorReportMeta {
-      errorId: string;
-      firstSeen: string;
-      dailyOccurrences: string;
-      stacktrace: string;
-      seenInVersions: Array<string>;
+      readonly errorId: string;
+      readonly firstSeen: string;
+      readonly dailyOccurrences: string;
+      readonly stacktrace: string;
+      readonly seenInVersions: string[];
     }
 
     interface JsonResponse {
-      serviceType: string;
-      serviceTypeThreshold: number;
-      normalizedThreshold: number;
-      errorReports: Array<ErrorReportWithMeta>;
+      readonly serviceType: string;
+      readonly serviceTypeThreshold: number;
+      readonly normalizedThreshold: number;
+      readonly errorReports: ErrorReportWithMeta[];
     }
 
     interface ServiceTypeView {
-      name: string;
-      formattedName: string;
-      selected: boolean;
+      readonly name: string;
+      readonly formattedName: string;
+      readonly selected: boolean;
     }
     interface ViewData {
-      currentServiceType: ServiceTypeView;
-      serviceType: string;
-      serviceTypeList: Array<ServiceTypeView>;
-      serviceTypeThreshold: number;
-      normalizedThreshold: number;
-      errorReports: Array<ErrorReportView>;
+      readonly currentServiceType: ServiceTypeView;
+      readonly serviceType: string;
+      readonly serviceTypeList: ServiceTypeView[];
+      readonly serviceTypeThreshold: number;
+      readonly normalizedThreshold: number;
+      readonly errorReports: ErrorReportView[];
     }
   }
 
   interface TopIssueView {
-    errorId: string;
-    title: string;
-    issueUrl: string;
-    issueNumber: number;
+    readonly errorId: string;
+    readonly title: string;
+    readonly issueUrl: string;
+    readonly issueNumber: number;
   }
 }

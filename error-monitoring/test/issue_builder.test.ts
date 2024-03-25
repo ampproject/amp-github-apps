@@ -15,6 +15,7 @@
  */
 
 import {BlameRange, ErrorReport} from 'error-monitoring';
+
 import {IssueBuilder} from '../src/issue_builder';
 import {getFixtureFile} from './fixtures';
 

@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
+import {jest} from '@jest/globals';
+
+global.jest = jest;
+
 global.console.log = jest.fn();
 global.console.info = jest.fn();
 global.console.debug = jest.fn();
 // Allow the environment to override if desired.
-process.env.LOG_LEVEL = process.env.LOG_LEVEL || 'warn';
+process.env.LOG_LEVEL = process.env.LOG_LEVEL ?? 'warn';
 process.env.PROJECT_ID = 'test-project-id';

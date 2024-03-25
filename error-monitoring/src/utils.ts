@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-import {StackFrame} from 'error-monitoring';
+import type {StackFrame} from 'error-monitoring';
 
 const SOURCE_PREFIX = 'https://raw.githubusercontent.com/ampproject/amphtml/';
 const SOURCE_PATTERN =
   /^(?<rtv>\d+)\/(?<path>[^:]+):(?<line>\d+)(?<column>:\d+)?$/;
+
+export function isNonNullable<T>(value: T): value is NonNullable<T> {
+  return value !== null && value !== undefined;
+}
 
 /** Formats a date for display in a GitHub issue. */
 export function formatDate(date: Date): string {
@@ -32,20 +36,20 @@ export function formatDate(date: Date): string {
 /** Parses a PR number from a commit message, or 0 if none is found. */
 export function parsePrNumber(message: string): number {
   const matches = message.match(/^.*\(#(?<prNumber>\d+)\)/);
-  return matches ? parseInt(matches.groups.prNumber, 10) : 0;
+  return parseInt(matches?.groups?.prNumber ?? '0', 10);
 }
 
 /**
  * Parses the RTV, path, and line from a source URL:line string.
  * See https://github.com/ampproject/error-tracker/blob/main/utils/stacktrace/standardize-stack-trace.js
  */
-export function parseSource(source: string): null | StackFrame {
+export function parseSource(source: string): StackFrame | null {
   if (!source.startsWith(SOURCE_PREFIX)) {
     return null;
   }
 
-  const matches = source.substr(SOURCE_PREFIX.length).match(SOURCE_PATTERN);
-  if (!matches) {
+  const matches = source.substring(SOURCE_PREFIX.length).match(SOURCE_PATTERN);
+  if (!matches?.groups) {
     return null;
   }
 
@@ -54,16 +58,19 @@ export function parseSource(source: string): null | StackFrame {
 }
 
 /** Parses stack frames from a standardized stacktrace. */
-export function parseStacktrace(stacktrace: string): Array<StackFrame> {
+export function parseStacktrace(stacktrace: string): StackFrame[] {
   return stacktrace
     .split('\n')
     .map(
       line =>
-        line.match(/^\s*at .*\((?<source>.+)\)$/) ||
-        line.match(/^\s*at (?<source>https:.+)$/)
+        (
+          line.match(/^\s*at .*\((?<source>.+)\)$/) ??
+          line.match(/^\s*at (?<source>https:.+)$/)
+        )?.groups
     )
-    .filter(Boolean)
-    .map(({groups}) => parseSource(groups.source));
+    .filter(isNonNullable)
+    .map(groups => parseSource(groups.source))
+    .filter(isNonNullable);
 }
 
 /** Creates links to GitHub view of source files in stacktrace. */
