@@ -1,16 +1,12 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ESNext",
     "esModuleInterop": true,
-    "target": "es6",
     "noImplicitAny": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "skipLibCheck": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*", "node_modules/@types/*", "src/types/*"]
-    }
+    "strict": true,
+    "baseUrl": "."
   },
   "include": ["src/**/*", "test/*"]
 }

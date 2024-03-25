@@ -14,43 +14,44 @@
  * limitations under the License.
  */
 
-import {
+import {RateLimitedGraphQL} from './rate_limited_graphql';
+import {parseStacktrace} from './utils';
+
+import type {
   BlameRange,
   GraphQLRef,
   GraphQLResponse,
   Logger,
   StackFrame,
 } from 'error-monitoring';
-import {RateLimitedGraphQL} from './rate_limited_graphql';
-import {parseStacktrace} from './utils';
 
 /**
  * Service for looking up Git blame info for lines in a stacktrace.
  */
 export class BlameFinder {
   // TODO(rcebulko): Use instance-level caching scheme.
-  private files: {[key: string]: Array<BlameRange>} = {};
-  private graphql: (query: string) => Promise<GraphQLResponse>;
+  private readonly files: Record<string, BlameRange[]> = {};
+  private readonly graphql: (query: string) => Promise<GraphQLResponse>;
 
   constructor(
-    private repoOwner: string,
-    private repoName: string,
-    client: RateLimitedGraphQL,
-    private logger: Logger = console
+    private readonly repoOwner: string,
+    private readonly repoName: string,
+    readonly client: RateLimitedGraphQL,
+    private readonly logger: Logger = console
   ) {
     this.graphql = async (query: string): Promise<GraphQLResponse> =>
       client.runQuery(query);
   }
 
   /** Fetches the blame info for a file. */
-  async blameForFile(ref: string, path: string): Promise<Array<BlameRange>> {
+  async blameForFile(ref: string, path: string): Promise<BlameRange[]> {
     const cacheKey = `${ref}:${path}`;
     if (cacheKey in this.files) {
       this.logger.info(`Returning blame for \`${cacheKey}\` from cache`);
       return this.files[cacheKey];
     }
 
-    const queryRef = async (ref: string): Promise<null | GraphQLRef> => {
+    const queryRef = async (ref: string): Promise<GraphQLRef | null> => {
       this.logger.info(`Running blame query for \`${ref}:${path}\``);
 
       return this.graphql(
@@ -88,7 +89,7 @@ export class BlameFinder {
     };
 
     // Use blame from the main branch if the RTV/ref provided was invalid.
-    const targetRef = (await queryRef(ref)) || (await queryRef('main'));
+    const targetRef = (await queryRef(ref)) ?? (await queryRef('main'));
     if (!targetRef) {
       // TODO(rcebulko): fix this if/when GitHub addresses the timeout issue.
       console.warn(`GitHub API timeout; skipping blame for ${path}`);
@@ -109,7 +110,7 @@ export class BlameFinder {
           : commit.author.name,
         committedDate: new Date(commit.committedDate),
         changedFiles: commit.changedFiles,
-        prNumber: (commit.associatedPullRequests.nodes[0] || {}).number,
+        prNumber: commit.associatedPullRequests.nodes[0]?.number,
       })
     ));
   }
@@ -127,7 +128,7 @@ export class BlameFinder {
   }
 
   /** Fetches the blame ranges for each line in a stacktrace. */
-  async blameForStacktrace(stacktrace: string): Promise<Array<BlameRange>> {
+  async blameForStacktrace(stacktrace: string): Promise<BlameRange[]> {
     const stackFrames = parseStacktrace(stacktrace);
     // Note: The GraphQL client wrapper will handle debouncing API requests.
     const blames = [];

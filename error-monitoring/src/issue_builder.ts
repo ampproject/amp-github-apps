@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import {BlameRange, ErrorReport} from 'error-monitoring';
 import {formatDate, linkifySource} from './utils';
+
+import type {BlameRange, ErrorReport} from 'error-monitoring';
 
 const MAX_CHANGED_FILES = 40;
 const MAX_POSSIBLE_ASSIGNEES = 2;
@@ -26,12 +27,12 @@ const ONE_YEAR_MS = 1000 * 60 * 60 * 24 * 365;
  * Builds a GitHub issue for a reported error.
  */
 export class IssueBuilder {
-  private errorId: string;
-  private firstSeen: Date;
-  private dailyOccurrences: number;
-  private message: string;
-  private stack: Array<string>;
-  private seenInVersions: Array<string>;
+  private readonly errorId: string;
+  private readonly firstSeen: Date;
+  private readonly dailyOccurrences: number;
+  private readonly message: string;
+  private readonly stack: string[];
+  private readonly seenInVersions: string[];
 
   constructor(
     {
@@ -41,26 +42,24 @@ export class IssueBuilder {
       stacktrace,
       seenInVersions,
     }: ErrorReport,
-    private sourceRepo: string,
-    private blames: Array<BlameRange>,
-    private releaseOnduty?: string
+    private readonly sourceRepo: string,
+    private readonly blames: BlameRange[],
+    private readonly releaseOnduty?: string
   ) {
     const [message, ...stack] = stacktrace.split('\n');
-    Object.assign(this, {
-      errorId,
-      firstSeen,
-      dailyOccurrences,
-      message,
-      stack,
-      seenInVersions,
-    });
+    this.errorId = errorId;
+    this.firstSeen = firstSeen;
+    this.dailyOccurrences = dailyOccurrences;
+    this.message = message;
+    this.stack = stack;
+    this.seenInVersions = seenInVersions;
   }
 
   get title(): string {
     return `🚨 ${this.message}`;
   }
 
-  get labels(): Array<string> {
+  get labels(): string[] {
     return ['Type: Error Report'];
   }
 
@@ -106,7 +105,7 @@ export class IssueBuilder {
     );
   }
 
-  possibleAssignees(limit: number = MAX_POSSIBLE_ASSIGNEES): Array<string> {
+  possibleAssignees(limit: number = MAX_POSSIBLE_ASSIGNEES): string[] {
     const timeSinceError = Date.now() - this.firstSeen.valueOf();
     if (timeSinceError > ONE_YEAR_MS) {
       // Don't try to guess at assignees for old errors.

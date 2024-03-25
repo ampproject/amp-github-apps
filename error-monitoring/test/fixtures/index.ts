@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
+import url from 'node:url';
+
 import {GraphQLResponse} from 'error-monitoring';
-import fs from 'fs';
-import path from 'path';
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export function getFixtureFile(filename: string): string {
   return fs.readFileSync(path.join(__dirname, filename)).toString('utf8');

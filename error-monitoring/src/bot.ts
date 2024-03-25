@@ -14,40 +14,41 @@
  * limitations under the License.
  */
 
-import {Endpoints} from '@octokit/types';
+import {ErrorReport} from 'error-monitoring';
 import {Octokit} from '@octokit/core';
-import {default as nodeFetch} from 'node-fetch';
-import {restEndpointMethods} from '@octokit/plugin-rest-endpoint-methods';
+import {
+  type RestEndpointMethodTypes,
+  restEndpointMethods,
+} from '@octokit/plugin-rest-endpoint-methods';
+import nodeFetch from 'node-fetch';
 
 import {BlameFinder} from './blame_finder';
-import {ErrorReport} from 'error-monitoring';
 import {IssueBuilder} from './issue_builder';
 import {RateLimitedGraphQL} from './rate_limited_graphql';
 
 type IssuesCreateParams =
-  Endpoints['POST /repos/{owner}/{repo}/issues']['parameters'];
+  RestEndpointMethodTypes['issues']['create']['parameters'];
 
-const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS, 10) || 100;
+const GRAPHQL_FREQ_MS = parseInt(process.env.GRAPHQL_FREQ_MS ?? '100', 10);
 const RELEASE_ONDUTY =
-  process.env.RELEASE_ONDUTY || 'ampproject/release-on-duty';
+  process.env.RELEASE_ONDUTY ?? 'ampproject/release-on-duty';
 
 const AppOctokit = Octokit.plugin(restEndpointMethods);
 
 export class ErrorIssueBot {
-  private octokit: InstanceType<typeof AppOctokit>;
-  private blameFinder: BlameFinder;
+  private readonly octokit: InstanceType<typeof AppOctokit>;
+  private readonly blameFinder: BlameFinder;
 
   constructor(
-    token: string,
-    private repoOwner: string,
-    private repoName: string,
-    private issueRepoName?: string
+    readonly token: string,
+    private readonly repoOwner: string,
+    private readonly repoName: string,
+    private readonly issueRepoName: string = repoName
   ) {
     this.octokit = new AppOctokit({
       auth: `token ${token}`,
       request: {fetch: nodeFetch},
     });
-    this.issueRepoName = issueRepoName || repoName;
     this.blameFinder = new BlameFinder(
       repoOwner,
       repoName,

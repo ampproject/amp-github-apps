@@ -15,7 +15,10 @@
  */
 
 module.exports = {
-  extends: ['../.eslintrc-ts.js'],
+  extends: [
+    '../.eslintrc-ts.js',
+    'plugin:@typescript-eslint/stylistic-type-checked',
+  ],
   parserOptions: {
     project: ['error-monitoring/tsconfig.json', 'tsconfig.dev.json'],
   },
