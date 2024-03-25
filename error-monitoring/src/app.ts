@@ -17,7 +17,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {json, urlencoded} from 'body-parser';
+import bodyParser from 'body-parser';
 import express from 'express';
 
 import {errorIssue, errorList, linkIssue, topIssueList} from './index';
@@ -26,8 +26,8 @@ const PORT = Number(process.env.PORT ?? 8080);
 
 console.log('⚙️ Configuring server');
 const app = express()
-  .use(json())
-  .use(urlencoded({extended: false}))
+  .use(bodyParser.json())
+  .use(bodyParser.urlencoded({extended: false}))
   .get('/error-issue', errorIssue)
   .get(['/', '/error-list'], errorList)
   .get('/top-issues', topIssueList)
