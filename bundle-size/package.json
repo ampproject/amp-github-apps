@@ -29,7 +29,7 @@
     "probot": "12.3.3",
     "sleep-promise": "9.1.0",
     "tsx": "4.7.2",
-    "typescript": "5.4.3"
+    "typescript": "5.4.4"
   },
   "devDependencies": {
     "@octokit/webhooks": "13.2.1",
