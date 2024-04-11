@@ -20,7 +20,7 @@
     "@google-cloud/pubsub": "4.3.3",
     "probot": "12.3.3",
     "ts-node": "10.9.2",
-    "typescript": "5.4.4"
+    "typescript": "5.4.5"
   },
   "devDependencies": {
     "@types/jest": "29.5.12",
