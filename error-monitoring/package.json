@@ -17,7 +17,7 @@
   "dependencies": {
     "@octokit/core": "6.1.2",
     "@octokit/graphql": "8.1.1",
-    "@octokit/plugin-rest-endpoint-methods": "13.0.1",
+    "@octokit/plugin-rest-endpoint-methods": "13.1.0",
     "@types/body-parser": "1.19.5",
     "@types/express": "4.17.21",
     "@types/mustache": "4.2.5",
