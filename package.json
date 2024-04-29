@@ -17,10 +17,10 @@
     "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },
   "devDependencies": {
-    "@babel/core": "7.24.4",
-    "@babel/eslint-parser": "7.24.1",
-    "@typescript-eslint/eslint-plugin": "7.7.1",
-    "@typescript-eslint/parser": "7.7.1",
+    "@babel/core": "7.24.5",
+    "@babel/eslint-parser": "7.24.5",
+    "@typescript-eslint/eslint-plugin": "7.8.0",
+    "@typescript-eslint/parser": "7.8.0",
     "eslint": "8.57.0",
     "eslint-config-google": "0.14.0",
     "eslint-config-prettier": "9.1.0",
