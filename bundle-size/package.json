@@ -26,9 +26,9 @@
     "minimatch": "9.0.4",
     "node-cache": "5.1.2",
     "pg": "8.11.5",
-    "probot": "12.3.3",
+    "probot": "12.3.4",
     "sleep-promise": "9.1.0",
-    "tsx": "4.7.3",
+    "tsx": "4.8.2",
     "typescript": "5.4.5"
   },
   "devDependencies": {
