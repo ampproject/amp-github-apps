@@ -73,13 +73,15 @@ app.get('/_cron', async (request, response) => {
       sha: 'main',
     }
   )) {
-    commitsList.data.forEach(commit => {
-      mainCommits.push({
-        sha: commit.sha,
-        message: commit.commit.message.split('\n')[0],
-        date: commit.commit.committer.date,
+    commitsList.data
+      .filter(commit => commit.commit.committer?.date)
+      .forEach(commit => {
+        mainCommits.push({
+          sha: commit.sha,
+          message: commit.commit.message.split('\n')[0],
+          date: commit.commit.committer!.date!,
+        });
       });
-    });
 
     const latestCommit = mainCommits[mainCommits.length - 1];
     if (latestCommit.date < earliestCommitDateString) {
