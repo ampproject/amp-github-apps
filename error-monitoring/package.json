@@ -17,19 +17,19 @@
   "dependencies": {
     "@octokit/core": "6.1.2",
     "@octokit/graphql": "8.1.1",
-    "@octokit/plugin-rest-endpoint-methods": "13.1.1",
+    "@octokit/plugin-rest-endpoint-methods": "13.2.1",
     "@types/body-parser": "1.19.5",
     "@types/express": "4.17.21",
     "@types/mustache": "4.2.5",
     "body-parser": "1.20.2",
     "dotenv": "16.4.5",
     "express": "4.19.2",
-    "google-auth-library": "9.8.0",
+    "google-auth-library": "9.9.0",
     "http-status-codes": "2.3.0",
     "mustache": "4.2.0",
     "node-cache": "5.1.2",
     "node-fetch": "3.3.2",
-    "tsx": "4.7.2",
+    "tsx": "4.8.2",
     "typescript": "5.4.5"
   },
   "devDependencies": {
