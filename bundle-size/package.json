@@ -28,7 +28,7 @@
     "pg": "8.11.5",
     "probot": "12.3.4",
     "sleep-promise": "9.1.0",
-    "tsx": "4.8.2",
+    "tsx": "4.9.0",
     "typescript": "5.4.5"
   },
   "devDependencies": {
