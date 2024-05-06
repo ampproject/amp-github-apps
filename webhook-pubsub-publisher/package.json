@@ -2,11 +2,12 @@
   "name": "webhook-pubsub-publisher",
   "author": "The AMP HTML Authors",
   "version": "0.0.1",
+  "type": "module",
   "private": true,
   "repository": "http://github.com/ampproject/amp-github-apps",
   "description": "A GitHub app that publishes all the webhooks it receives to a Google Cloud Pub/Sub topic.",
   "scripts": {
-    "start": "ts-node ./src/index.ts",
+    "start": "tsx ./src/index.ts",
     "dev": "nodemon",
     "deploy": "gcloud --project amp-webhook-pubsub-publisher app deploy",
     "deploy-tag": "git tag 'deploy-webhook-pubsub-publisher-'`date -u '+%Y%m%d%H%M%S'`",
@@ -17,7 +18,7 @@
   "dependencies": {
     "@google-cloud/pubsub": "4.4.0",
     "probot": "13.2.2",
-    "ts-node": "10.9.2",
+    "tsx": "4.9.3",
     "typescript": "5.4.5"
   },
   "devDependencies": {

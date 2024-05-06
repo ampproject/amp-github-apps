@@ -15,7 +15,10 @@
  */
 
 module.exports = {
-  extends: ['../.eslintrc-ts.js'],
+  extends: [
+    '../.eslintrc-ts.js',
+    'plugin:@typescript-eslint/stylistic-type-checked',
+  ],
   parserOptions: {
     project: ['webhook-pubsub-publisher/tsconfig.json', 'tsconfig.dev.json'],
   },
