@@ -17,7 +17,6 @@
 const OwnersTree = require('./ownership/tree');
 const sleep = require('sleep-promise');
 const {OwnersCheck} = require('./ownership/owners_check');
-const {OwnersNotifier} = require('./notifier');
 const {OwnersParser} = require('./ownership/parser');
 
 const GITHUB_CHECKRUN_DELAY = 2000;
@@ -123,9 +122,8 @@ class OwnersBot {
    *
    * @param {!GitHub} github GitHub API interface.
    * @param {!PullRequest} pr pull request to run owners check on.
-   * @param {?boolean} requestOwners request reviews from owners.
    */
-  async runOwnersCheck(github, pr, requestOwners = false) {
+  async runOwnersCheck(github, pr) {
     if (!pr.isOpen) {
       return;
     }
@@ -146,12 +144,6 @@ class OwnersBot {
       await sleep(this.GITHUB_CHECKRUN_DELAY);
       await github.createCheckRun(pr.headSha, ownersCheck.checkRun);
     }
-
-    const suggestedReviewers = requestOwners ? ownersCheck.reviewers : [];
-    await new OwnersNotifier(pr, reviewers, tree, changedFiles).notify(
-      github,
-      suggestedReviewers
-    );
   }
 
   /**

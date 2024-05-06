@@ -293,29 +293,6 @@ class GitHub {
   }
 
   /**
-   * Requests a review from GitHub users.
-   *
-   * @param {number} number PR number.
-   * @param {!Array<string>} reviewers the list of usernames to request reviews from.
-   */
-  async createReviewRequests(number, reviewers) {
-    if (!reviewers.length) {
-      this.logger.warn(
-        `Attempted to request reviews for PR ${number} ` +
-          'but provided an empty username list'
-      );
-      return;
-    }
-    this.logger.info(
-      `Requesting review for PR #${number} from: ${reviewers.join(', ')}`
-    );
-
-    await this.client.pulls.requestReviewers(
-      this.repo({'pull_number': number, reviewers})
-    );
-  }
-
-  /**
    * Retrieves code review requests for a PR from GitHub.
    *
    * @param {number} number PR number.
@@ -330,83 +307,6 @@ class GitHub {
     this.logger.debug('[getReviewRequests]', number, response.data);
 
     return response.data.users.map(({login}) => login.toLowerCase());
-  }
-
-  /**
-   * Retrieves PR comments by the bot user.
-   *
-   * Note that pull request comments fall under the Issues API, while comments
-   * created via the Pulls API require a file path/position.
-   *
-   * @param {number} number PR number.
-   * @return {!Array<{body: string, id: number}>} list of comments by the bot.
-   */
-  async getBotComments(number) {
-    this.logger.info(`Fetching bot comments for PR #${number}`);
-
-    const comments = await this._paginate(
-      this.client.issues.listComments,
-      this.repo({'issue_number': number})
-    );
-    this.logger.debug('[getBotComments]', number, comments);
-
-    // GitHub appears to respond with the bot's username suffixed by `[bot]`,
-    // though this doesn't appear to be documented anywhere. Since it's not
-    // documented, rather than testing for that suffix explicitly, we just test
-    // for the presence of the username and ignore whatever extras GitHub tacks
-    // on.
-    const regex = new RegExp(`\\b${process.env.GITHUB_BOT_USERNAME}\\b`);
-    return comments
-      .filter(({user}) => regex.test(user.login))
-      .map(({id, body}) => {
-        return {id, body};
-      });
-  }
-
-  /**
-   * Creates a comment on a PR.
-   *
-   * Note that pull request comments fall under the Issues API, while comments
-   * created via the Pulls API require a file path/position.
-   *
-   * @param {number} number PR number.
-   * @param {string} body comment body.
-   * @return {Object} API response
-   */
-  async createBotComment(number, body) {
-    this.logger.info(`Adding bot comment to PR #${number}`);
-    this.logger.debug('[createBotComment]', number, body);
-
-    const {data} = await this._customRequest(
-      'POST',
-      `/repos/${this.owner}/${this.repository}/issues/${number}/comments`,
-      {body}
-    );
-
-    return data;
-  }
-
-  /**
-   * Updates a comment on a PR.
-   *
-   * Note that pull request comments fall under the Issues API, while comments
-   * created via the Pulls API require a file path/position.
-   *
-   * @param {number} commentId ID of comment to update.
-   * @param {string} body comment body.
-   * @return {Object} API response
-   */
-  async updateComment(commentId, body) {
-    this.logger.info(`Replacing comment with ID ${commentId}`);
-    this.logger.debug('[updateComment]', commentId, body);
-
-    const {data} = await this._customRequest(
-      'PATCH',
-      `/repos/${this.owner}/${this.repository}/issues/comments/${commentId}`,
-      {body}
-    );
-
-    return data;
   }
 
   /**

@@ -76,9 +76,7 @@ describe('GitHub app', () => {
     sandbox.stub(OwnersBot.prototype, 'initTeams').resolves();
     sandbox.stub(OwnersBot.prototype, 'refreshTree').resolves();
     sandbox.stub(GitHub.prototype);
-    GitHub.prototype.getBotComments.returns([]);
     GitHub.prototype.getReviewRequests.returns([]);
-    GitHub.prototype.createReviewRequests.returns([]);
     sandbox.stub(CheckRun.prototype, 'helpText').value('HELP TEXT');
     sandbox
       .stub(OwnersParser.prototype, 'parseAllOwnersRules')
