@@ -20,13 +20,13 @@
   },
   "dependencies": {
     "@octokit/core": "6.1.2",
-    "@octokit/plugin-rest-endpoint-methods": "11.0.1",
-    "@octokit/types": "12.6.0",
+    "@octokit/plugin-rest-endpoint-methods": "13.2.1",
+    "@octokit/types": "13.5.0",
     "knex": "3.1.0",
     "minimatch": "9.0.4",
     "node-cache": "5.1.2",
     "pg": "8.11.5",
-    "probot": "12.3.4",
+    "probot": "13.2.1",
     "sleep-promise": "9.1.0",
     "tsx": "4.9.3",
     "typescript": "5.4.5"
@@ -47,7 +47,7 @@
     "nodemon": "3.1.0",
     "smee-client": "2.0.1",
     "sqlite3": "5.1.7",
-    "supertest": "6.3.4",
+    "supertest": "7.0.0",
     "ts-jest": "29.1.2"
   },
   "jest": {
