@@ -19,12 +19,12 @@
     "test": "echo No tests defined for this app"
   },
   "dependencies": {
-    "@google-cloud/storage": "7.10.2",
+    "@google-cloud/storage": "7.11.0",
     "@octokit/core": "6.1.2",
     "@octokit/plugin-paginate-rest": "11.3.0",
     "@octokit/plugin-rest-endpoint-methods": "13.2.1",
     "@types/express": "4.17.21",
-    "@types/node": "20.12.8",
+    "@types/node": "20.12.9",
     "csv-writer": "1.6.0",
     "dotenv": "16.4.5",
     "express": "4.19.2",
