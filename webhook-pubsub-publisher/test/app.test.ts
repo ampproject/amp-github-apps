@@ -16,7 +16,7 @@
 
 import {Probot} from 'probot';
 import {PubSub} from '@google-cloud/pubsub';
-import {PullRequestOpenedEvent} from '@octokit/webhooks-types';
+import {WebhookEventMap} from '@octokit/webhooks-types';
 import probotApplication from '../src/app';
 
 const mockTopic = {
@@ -55,7 +55,7 @@ describe('webhook-pubsub-publisher tests', () => {
           owner: {name: 'test-owner'},
           name: 'test-repo',
         },
-      } as PullRequestOpenedEvent,
+      } as WebhookEventMap['pull_request'],
     });
 
     expect(PubSub).toHaveBeenCalledWith({'projectId': 'cloud-project'});
