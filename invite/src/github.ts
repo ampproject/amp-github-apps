@@ -89,7 +89,7 @@ export class GitHub {
         team_slug: teamName,
         username,
       })
-      .catch(errorResponse => errorResponse);
+      .catch((errorResponse: unknown) => errorResponse);
 
     return response.status === 200 && response.data.state === 'active';
   }
