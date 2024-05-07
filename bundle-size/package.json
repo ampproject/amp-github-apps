@@ -29,7 +29,7 @@
     "minimatch": "9.0.4",
     "node-cache": "5.1.2",
     "pg": "8.11.5",
-    "probot": "13.2.1",
+    "probot": "13.2.2",
     "sleep-promise": "9.1.0",
     "tsx": "4.9.3",
     "typescript": "5.4.5"
