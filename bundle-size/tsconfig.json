@@ -1,18 +1,8 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "esModuleInterop": true,
-    "target": "ESNext",
-    "noImplicitAny": true,
-    "moduleResolution": "Node10",
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*", "node_modules/@types/*"]
-    },
-    "resolveJsonModule": true,
-    "strictNullChecks": true
+    "module": "Preserve",
+    "strict": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*", "test/*"]
 }

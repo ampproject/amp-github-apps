@@ -14,20 +14,34 @@
  * limitations under the License.
  */
 
+import {type DeepMockProxy, mockDeep} from 'vitest-mock-extended';
 import {Logger} from 'probot';
-import {mockDeep, mockReset} from 'jest-mock-extended';
+import {
+  type Mock,
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
+import {RequestError} from '@octokit/request-error';
 import NodeCache from 'node-cache';
 import express, {type Application} from 'express';
-import nock from 'nock';
 import request from 'supertest';
 
 import {GitHubUtils} from '../src/github-utils';
+import {
+  type OctokitParamsType,
+  type OctokitResponseType,
+  inMemoryDbConnect,
+} from './_test_helper';
 import {StorePayload} from '../src/types/payload';
-import {inMemoryDbConnect} from './_test_helper';
 import {installApiRouter} from '../src/api';
 import {setupDb} from '../src/db';
 
-import type {RestEndpointMethodTypes} from '@octokit/plugin-rest-endpoint-methods';
 import type {RestfulOctokit} from '../src/types/rest-endpoint-methods';
 
 import baseApproversFixture from './fixtures/APPROVERS.json.json';
@@ -39,18 +53,24 @@ import listTeamMembersWgPerformance from './fixtures/teams.listMembersInOrg.wg-p
 import listTeamMembersWgRuntime from './fixtures/teams.listMembersInOrg.wg-runtime.json';
 import requestedReviewersFixture from './fixtures/requested_reviewers.json';
 
-nock.disableNetConnect();
-nock.enableNetConnect('127.0.0.1');
-jest.mock('sleep-promise', () => async () => Promise.resolve());
+vi.mock('sleep-promise', () => ({
+  default: async () => Promise.resolve(),
+}));
+
+const requestError404 = new RequestError(
+  'Not Found',
+  404,
+  mockDeep({request: {url: ''} as RequestError['request']})
+);
 
 describe('bundle-size api', () => {
-  const mockGithub = mockDeep<RestfulOctokit>();
-  const mockLog = mockDeep<Logger>();
-  const mockAuth = jest.fn().mockResolvedValue(mockGithub);
-
   const db = inMemoryDbConnect();
   const nodeCache = new NodeCache();
-  const githubUtils = new GitHubUtils(mockGithub, mockLog, nodeCache);
+
+  let mockGithub: DeepMockProxy<RestfulOctokit>;
+  let mockLog: DeepMockProxy<Logger>;
+  let mockAuth: Mock;
+  let githubUtils: GitHubUtils;
 
   let approversFixture: typeof baseApproversFixture;
   let bundleSizeFixture: typeof baseBundleSizeFixture;
@@ -59,8 +79,11 @@ describe('bundle-size api', () => {
   let app: Application;
 
   async function mockGetContentByFilePath_(
-    params: RestEndpointMethodTypes['repos']['getContent']['parameters']
+    params: OctokitParamsType<'repos', 'getContent'>
   ) {
+    if (params === undefined) {
+      throw new Error('params is undefined');
+    }
     expect(params.path).toMatch(/(1af0a33|APPROVERS).json$/);
     return {
       data: params.path.endsWith('1af0a33.json')
@@ -68,12 +91,15 @@ describe('bundle-size api', () => {
         : params.path.endsWith('APPROVERS.json')
           ? approversFixture
           : undefined,
-    } as unknown as RestEndpointMethodTypes['repos']['getContent']['response'];
+    } as unknown as OctokitResponseType<'repos', 'getContent'>;
   }
 
   async function mockListMembersInOrgByTeamSlug_(
-    params: RestEndpointMethodTypes['teams']['listMembersInOrg']['parameters']
+    params: OctokitParamsType<'teams', 'listMembersInOrg'>
   ) {
+    if (params === undefined) {
+      throw new Error('params is undefined');
+    }
     expect(params.team_slug).toMatch(/^wg-(infra|performance|runtime)$/);
     return {
       data:
@@ -84,7 +110,7 @@ describe('bundle-size api', () => {
             : params.team_slug === 'wg-runtime'
               ? listTeamMembersWgRuntime
               : undefined,
-    } as unknown as RestEndpointMethodTypes['teams']['listMembersInOrg']['response'];
+    } as unknown as OctokitResponseType<'teams', 'listMembersInOrg'>;
   }
 
   beforeAll(async () => {
@@ -92,6 +118,11 @@ describe('bundle-size api', () => {
   });
 
   beforeEach(async () => {
+    mockGithub = mockDeep<RestfulOctokit>();
+    mockLog = mockDeep<Logger>();
+    mockAuth = vi.fn().mockResolvedValue(mockGithub);
+    githubUtils = new GitHubUtils(mockGithub, mockLog, nodeCache);
+
     approversFixture = structuredClone(baseApproversFixture);
     pullRequestFixture = structuredClone(basePullRequestFixture);
     bundleSizeFixture = structuredClone(baseBundleSizeFixture);
@@ -99,13 +130,13 @@ describe('bundle-size api', () => {
 
     mockGithub.rest.pulls.get.mockResolvedValue({
       data: pullRequestFixture,
-    } as unknown as RestEndpointMethodTypes['pulls']['get']['response']);
+    } as unknown as OctokitResponseType<'pulls', 'get'>);
     mockGithub.rest.pulls.listRequestedReviewers.mockResolvedValue({
       data: requestedReviewersFixture,
-    } as unknown as RestEndpointMethodTypes['pulls']['listRequestedReviewers']['response']);
+    } as unknown as OctokitResponseType<'pulls', 'listRequestedReviewers'>);
     mockGithub.rest.pulls.listReviews.mockResolvedValue({
       data: reviewsFixture,
-    } as unknown as RestEndpointMethodTypes['pulls']['listReviews']['response']);
+    } as unknown as OctokitResponseType<'pulls', 'listReviews'>);
     mockGithub.rest.repos.getContent.mockImplementation(
       mockGetContentByFilePath_
     );
@@ -127,10 +158,7 @@ describe('bundle-size api', () => {
   });
 
   afterEach(async () => {
-    jest.restoreAllMocks();
-    // Deep mocks from 'jest-mock-extended' require an explicit reset.
-    mockReset(mockGithub);
-    mockReset(mockLog);
+    vi.restoreAllMocks();
     nodeCache.flushAll();
     await db('checks').truncate();
   });
@@ -600,8 +628,8 @@ describe('bundle-size api', () => {
       );
 
       mockGithub.rest.repos.getContent
-        .mockRejectedValueOnce({status: 404})
-        .mockRejectedValueOnce({status: 404})
+        .mockRejectedValueOnce(requestError404)
+        .mockRejectedValueOnce(requestError404)
         .mockImplementation(mockGetContentByFilePath_);
 
       await request(app)
@@ -660,8 +688,8 @@ describe('bundle-size api', () => {
       );
 
       mockGithub.rest.repos.getContent
-        .mockRejectedValueOnce({status: 404})
-        .mockRejectedValueOnce({status: 404})
+        .mockRejectedValueOnce(requestError404)
+        .mockRejectedValueOnce(requestError404)
         .mockImplementation(mockGetContentByFilePath_);
 
       await request(app)
@@ -729,8 +757,8 @@ describe('bundle-size api', () => {
       );
 
       mockGithub.rest.repos.getContent
-        .mockRejectedValueOnce({status: 404})
-        .mockRejectedValueOnce({status: 404})
+        .mockRejectedValueOnce(requestError404)
+        .mockRejectedValueOnce(requestError404)
         .mockImplementation(mockGetContentByFilePath_);
 
       await request(app)
@@ -796,7 +824,7 @@ describe('bundle-size api', () => {
         report_markdown: null,
       });
 
-      mockGithub.rest.repos.getContent.mockRejectedValue({status: 404});
+      mockGithub.rest.repos.getContent.mockRejectedValue(requestError404);
 
       await request(app)
         .post('/v0/commit/26ddec3fbbd3c7bd94e05a701c8b8c3ea8826faa/report')
@@ -950,7 +978,7 @@ describe('bundle-size api', () => {
     });
 
     test('store new bundle-size', async () => {
-      mockGithub.rest.repos.getContent.mockRejectedValue({status: 404});
+      mockGithub.rest.repos.getContent.mockRejectedValue(requestError404);
 
       await request(app)
         .post('/v0/commit/5f27002526a808c5c1ad5d0f1ab1cec471af0a33/store')
@@ -987,7 +1015,7 @@ describe('bundle-size api', () => {
     });
 
     test('show error when failed to store bundle-size', async () => {
-      mockGithub.rest.repos.getContent.mockRejectedValue({status: 404});
+      mockGithub.rest.repos.getContent.mockRejectedValue(requestError404);
       mockGithub.rest.repos.createOrUpdateFileContents.mockRejectedValue(
         new Error('I am a tea pot')
       );

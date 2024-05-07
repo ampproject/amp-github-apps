@@ -16,6 +16,22 @@
 
 import knex from 'knex';
 
+import type {RestfulOctokit} from '../src/types/rest-endpoint-methods';
+
+type RestEndpointMethodTypes = RestfulOctokit['rest'];
+export type OctokitParamsType<
+  T extends keyof RestEndpointMethodTypes,
+  S extends keyof RestEndpointMethodTypes[T],
+> = RestEndpointMethodTypes[T][S] extends (...args: infer P) => unknown
+  ? P[0]
+  : never;
+export type OctokitResponseType<
+  T extends keyof RestEndpointMethodTypes,
+  S extends keyof RestEndpointMethodTypes[T],
+> = RestEndpointMethodTypes[T][S] extends (...args: infer P) => infer Q
+  ? Awaited<Q>
+  : never;
+
 export function inMemoryDbConnect() {
   return knex({
     client: 'sqlite3',

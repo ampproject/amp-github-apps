@@ -25,14 +25,14 @@ import {dbConnect, setupDb} from './db';
  * database connection first in your .env file. See the .env.example file for
  * details.
  */
-const db = dbConnect();
-void setupDb(db)
-  .then(() => {
+(async () => {
+  const db = await dbConnect();
+  try {
+    await setupDb(db);
     log.info('Database tables created.');
-  })
-  .catch(error => {
-    log.error(error.message);
-  })
-  .then(() => {
+  } catch (error) {
+    log.error(error instanceof Error ? error.message : error);
+  } finally {
     db.destroy();
-  });
+  }
+})();
