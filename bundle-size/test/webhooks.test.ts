@@ -14,17 +14,34 @@
  * limitations under the License.
  */
 
+import {type DeepMockProxy, mockDeep} from 'vitest-mock-extended';
 import {type Logger, Options, Probot} from 'probot';
-import {mockDeep, mockReset} from 'jest-mock-extended';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 import NodeCache from 'node-cache';
-import nock from 'nock';
 
 import {GitHubUtils} from '../src/github-utils';
-import {inMemoryDbConnect} from './_test_helper';
+import {
+  type OctokitParamsType,
+  type OctokitResponseType,
+  inMemoryDbConnect,
+} from './_test_helper';
 import {installGitHubWebhooks} from '../src/webhooks';
 import {setupDb} from '../src/db';
 
-import type {RestEndpointMethodTypes} from '@octokit/plugin-rest-endpoint-methods';
+import type {
+  CheckRunEvent,
+  PullRequestEvent,
+  PullRequestReviewEvent,
+} from '@octokit/webhooks-types';
 import type {RestfulOctokit} from '../src/types/rest-endpoint-methods';
 
 import baseCheckRunFixture from './fixtures/check_run.created.json';
@@ -34,32 +51,25 @@ import listTeamMembersWgInfra from './fixtures/teams.listMembersInOrg.wg-infra.j
 import listTeamMembersWgPerformance from './fixtures/teams.listMembersInOrg.wg-performance.json';
 import listTeamMembersWgRuntime from './fixtures/teams.listMembersInOrg.wg-runtime.json';
 
-import {EmitterWebhookEvent} from '@octokit/webhooks';
-
-declare type CheckRunEvent = EmitterWebhookEvent<'check_run'>;
-declare type PullRequestEvent = EmitterWebhookEvent<'pull_request'>;
-declare type PullRequestReviewEvent =
-  EmitterWebhookEvent<'pull_request_review'>;
-
-nock.disableNetConnect();
-nock.enableNetConnect('127.0.0.1');
-
 describe('bundle-size webhooks', () => {
-  const mockGithub = mockDeep<RestfulOctokit>();
-  const mockLog = mockDeep<Logger>();
+  let mockGithub: DeepMockProxy<RestfulOctokit>;
+  let mockLog: DeepMockProxy<Logger>;
+  let githubUtils: GitHubUtils;
 
   const db = inMemoryDbConnect();
   const nodeCache = new NodeCache();
-  const githubUtils = new GitHubUtils(mockGithub, mockLog, nodeCache);
 
-  let checkRunPayload: CheckRunEvent['payload'];
-  let pullRequestPayload: PullRequestEvent['payload'];
-  let pullRequestReviewPayload: PullRequestReviewEvent['payload'];
+  let checkRunPayload: CheckRunEvent;
+  let pullRequestPayload: PullRequestEvent;
+  let pullRequestReviewPayload: PullRequestReviewEvent;
   let probot: Probot;
 
   async function mockListMembersInOrgByTeamSlug_(
-    params: RestEndpointMethodTypes['teams']['listMembersInOrg']['parameters']
+    params: OctokitParamsType<'teams', 'listMembersInOrg'>
   ) {
+    if (params === undefined) {
+      throw new Error('params is undefined');
+    }
     expect(params.team_slug).toMatch(/^wg-(infra|performance|runtime)$/);
     return {
       data:
@@ -70,7 +80,7 @@ describe('bundle-size webhooks', () => {
             : params.team_slug === 'wg-runtime'
               ? listTeamMembersWgRuntime
               : undefined,
-    } as unknown as RestEndpointMethodTypes['teams']['listMembersInOrg']['response'];
+    } as unknown as OctokitResponseType<'teams', 'listMembersInOrg'>;
   }
 
   beforeAll(async () => {
@@ -78,19 +88,28 @@ describe('bundle-size webhooks', () => {
   });
 
   beforeEach(async () => {
+    mockGithub = mockDeep<RestfulOctokit>();
+    mockLog = mockDeep<Logger>();
+    githubUtils = new GitHubUtils(mockGithub, mockLog, nodeCache);
+
     checkRunPayload = structuredClone(
       baseCheckRunFixture
-    ) as unknown as CheckRunEvent['payload'];
+    ) as unknown as CheckRunEvent;
     pullRequestPayload = structuredClone(
       basePullRequestOpenedFixture
-    ) as unknown as PullRequestEvent['payload'];
+    ) as unknown as PullRequestEvent;
     pullRequestReviewPayload = structuredClone(
       basePullRequestReviewSubmittedFixture
-    ) as unknown as PullRequestReviewEvent['payload'];
+    ) as unknown as PullRequestReviewEvent;
 
     mockGithub.rest.checks.create.mockResolvedValue({
-      data: {id: 555555},
-    } as unknown as RestEndpointMethodTypes['checks']['create']['response']);
+      data: {
+        id: 555555,
+        status: 'completed',
+      },
+    } as OctokitResponseType<'checks', 'create'> & {
+      data: {status: 'completed'};
+    });
     mockGithub.rest.teams.listMembersInOrg.mockImplementation(
       mockListMembersInOrgByTeamSlug_
     );
@@ -119,10 +138,7 @@ describe('bundle-size webhooks', () => {
   });
 
   afterEach(async () => {
-    jest.restoreAllMocks();
-    // Deep mocks from 'jest-mock-extended' require an explicit reset.
-    mockReset(mockGithub);
-    mockReset(mockLog);
+    vi.restoreAllMocks();
     nodeCache.flushAll();
     await db('checks').truncate();
   });
@@ -134,9 +150,10 @@ describe('bundle-size webhooks', () => {
   describe('pull_request', () => {
     test('create a new pending check when a pull request is opened', async () => {
       await probot.receive({
+        id: '1',
         name: 'pull_request',
         payload: pullRequestPayload,
-      } as PullRequestEvent);
+      });
 
       await expect(db('checks').select('*')).resolves.toEqual([
         {
@@ -175,9 +192,10 @@ describe('bundle-size webhooks', () => {
       });
 
       await probot.receive({
+        id: '1',
         name: 'pull_request',
         payload: pullRequestPayload,
-      } as PullRequestEvent);
+      });
 
       await expect(db('checks').select('*')).resolves.toEqual([
         {
@@ -207,15 +225,17 @@ describe('bundle-size webhooks', () => {
       pullRequestPayload.action = 'closed';
 
       await probot.receive({
+        id: '1',
         name: 'pull_request',
         payload: pullRequestPayload,
-      } as PullRequestEvent);
+      });
       await expect(db('merges').select('*')).resolves.toEqual([]);
 
       await probot.receive({
+        id: '1',
         name: 'check_run',
         payload: checkRunPayload,
-      } as CheckRunEvent);
+      });
 
       expect(mockGithub.rest.checks.create).not.toHaveBeenCalled();
     });
@@ -230,17 +250,19 @@ describe('bundle-size webhooks', () => {
       });
 
       await probot.receive({
+        id: '1',
         name: 'pull_request',
         payload: pullRequestPayload,
-      } as PullRequestEvent);
+      });
       await expect(db('merges').select('*')).resolves.toEqual([
         {merge_commit_sha: '4ba02c691d1a3014f70a7521c07d775dc6a1e355'},
       ]);
 
       await probot.receive({
+        id: '1',
         name: 'check_run',
         payload: checkRunPayload,
-      } as CheckRunEvent);
+      });
       await expect(db('merges').select('*')).resolves.toEqual([]);
 
       expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
@@ -264,17 +286,19 @@ describe('bundle-size webhooks', () => {
       });
 
       await probot.receive({
+        id: '1',
         name: 'pull_request',
         payload: pullRequestPayload,
-      } as PullRequestEvent);
+      });
 
       try {
         await probot.receive({
+          id: '1',
           name: 'pull_request',
           payload: pullRequestPayload,
-        } as PullRequestEvent);
+        });
       } catch (e) {
-        expect(e.message).toContain('UNIQUE constraint failed');
+        expect(String(e)).toContain('UNIQUE constraint failed');
       }
     });
   });
@@ -298,9 +322,10 @@ describe('bundle-size webhooks', () => {
         });
 
         await probot.receive({
+          id: '1',
           name: 'pull_request_review',
           payload: pullRequestReviewPayload,
-        } as PullRequestReviewEvent);
+        });
 
         expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -338,9 +363,10 @@ describe('bundle-size webhooks', () => {
       });
 
       await probot.receive({
+        id: '1',
         name: 'pull_request_review',
         payload: pullRequestReviewPayload,
-      } as PullRequestReviewEvent);
+      });
 
       expect(mockGithub.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -365,18 +391,20 @@ describe('bundle-size webhooks', () => {
       });
 
       await probot.receive({
+        id: '1',
         name: 'pull_request_review',
         payload: pullRequestReviewPayload,
-      } as PullRequestReviewEvent);
+      });
 
       expect(mockGithub.rest.checks.update).not.toHaveBeenCalled();
     });
 
     test('ignore an approved review by a non-capable reviewer', async () => {
       await probot.receive({
+        id: '1',
         name: 'pull_request_review',
         payload: pullRequestReviewPayload,
-      } as PullRequestReviewEvent);
+      });
 
       expect(mockGithub.rest.checks.update).not.toHaveBeenCalled();
     });
@@ -385,9 +413,10 @@ describe('bundle-size webhooks', () => {
       pullRequestReviewPayload.review.state = 'changes_requested';
 
       await probot.receive({
+        id: '1',
         name: 'pull_request_review',
         payload: pullRequestReviewPayload,
-      } as PullRequestReviewEvent);
+      });
 
       expect(mockGithub.rest.checks.update).not.toHaveBeenCalled();
     });
@@ -405,18 +434,20 @@ describe('bundle-size webhooks', () => {
       });
 
       await probot.receive({
+        id: '1',
         name: 'pull_request_review',
         payload: pullRequestReviewPayload,
-      } as PullRequestReviewEvent);
+      });
 
       expect(mockGithub.rest.checks.update).not.toHaveBeenCalled();
     });
 
     test('ignore an approved review by a capable reviewer for unknown PRs', async () => {
       await probot.receive({
+        id: '1',
         name: 'pull_request_review',
         payload: pullRequestReviewPayload,
-      } as PullRequestReviewEvent);
+      });
 
       expect(mockGithub.rest.checks.update).not.toHaveBeenCalled();
     });

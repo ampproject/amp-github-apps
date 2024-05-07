@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import {RequestError} from '@octokit/request-error';
 import {type Router, json} from 'express';
 import {minimatch} from 'minimatch';
 import sleep from 'sleep-promise';
@@ -332,7 +333,8 @@ export function installApiRouter(
         `${baseSha}.json`
       );
     } catch (error) {
-      const fileNotFound = 'status' in error && error.status === 404;
+      const fileNotFound =
+        error instanceof RequestError && error.status === 404;
 
       if (fileNotFound) {
         log.warn(

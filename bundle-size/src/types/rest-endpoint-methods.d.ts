@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-import {Api} from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
+import {Api} from '@octokit/plugin-rest-endpoint-methods';
 import {Octokit} from '@octokit/core';
+import {Probot} from 'probot';
 
-export declare type RestfulOctokit = Octokit & Api;
+export declare type RestfulOctokit =
+  | (Octokit & Api)
+  | Awaited<ReturnType<Probot['auth']>>;
 
 export type ApproversJsonContent = Readonly<
   Record<
