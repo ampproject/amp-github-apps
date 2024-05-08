@@ -20,6 +20,9 @@ import type {Probot} from 'probot';
 export default (app: Probot): void => {
   app.onAny(async event => {
     app.log.info('Received event: %O', event);
+    if (!process.env.TOPIC_NAME) {
+      throw new Error('Missing required environment variable TOPIC_NAME');
+    }
 
     const pubsub = new PubSub({
       projectId: process.env.PROJECT_ID,
