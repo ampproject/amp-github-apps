@@ -24,7 +24,6 @@ const {
 } = require('../src/ownership/owners_check');
 const {GitHub, PullRequest, Review, Team} = require('../src/api/github');
 const {OwnersBot} = require('../src/owners_bot');
-const {OwnersNotifier} = require('../src/notifier');
 
 describe('owners bot', () => {
   const silentLogger = {
@@ -200,9 +199,6 @@ describe('owners bot', () => {
       sandbox.stub(GitHub.prototype, 'getReviews').returns([]);
       sandbox.stub(GitHub.prototype, 'listFiles').returns([]);
       sandbox.stub(GitHub.prototype, 'getReviewRequests').returns([]);
-      sandbox.stub(GitHub.prototype, 'createReviewRequests');
-      sandbox.stub(GitHub.prototype, 'getBotComments').returns([]);
-      sandbox.stub(GitHub.prototype, 'createBotComment');
     });
 
     it.each([['closed'], ['merged']])('does not run on %p PRs', async state => {
@@ -247,34 +243,6 @@ describe('owners bot', () => {
           checkRun
         );
       });
-    });
-
-    it('requests reviewers if flag is set', async () => {
-      sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
-      await ownersBot.runOwnersCheck(github, pr, true);
-
-      sandbox.assert.calledWith(
-        OwnersNotifier.prototype.requestReviews,
-        github,
-        ['root_owner']
-      );
-    });
-
-    it('requests no reviewers by default', async () => {
-      sandbox.stub(OwnersNotifier.prototype, 'requestReviews').callThrough();
-      await ownersBot.runOwnersCheck(github, pr);
-
-      sandbox.assert.notCalled(OwnersNotifier.prototype.requestReviews);
-    });
-
-    it('creates a notification comment', async () => {
-      sandbox.stub(OwnersNotifier.prototype, 'createNotificationComment');
-      await ownersBot.runOwnersCheck(github, pr);
-
-      sandbox.assert.calledWith(
-        OwnersNotifier.prototype.createNotificationComment,
-        github
-      );
     });
   });
 

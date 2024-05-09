@@ -23,7 +23,6 @@ const checkRunsEmptyResponse = require('../fixtures/check-runs/check-runs.get.35
 const checkRunsListResponse = require('../fixtures/check-runs/check-runs.get.35.multiple');
 const commentReviewsResponse = require('../fixtures/reviews/comment_reviews.24686.json');
 const getFileResponse = require('../fixtures/files/file_blob.24523.json');
-const issueCommentsResponse = require('../fixtures/comments/issue_comments.438.json');
 const listFilesResponse = require('../fixtures/files/files.35.json');
 const pullRequestResponse = require('../fixtures/pulls/pull_request.35.json');
 const requestedReviewsResponse = require('../fixtures/reviews/requested_reviewers.24574.json');
@@ -380,27 +379,6 @@ describe('GitHub API', () => {
     });
   });
 
-  describe('createReviewRequests', () => {
-    it('requests reviews from GitHub users', async () => {
-      mockGithubClient.pulls.requestReviewers.mockResolvedValue();
-
-      await github.createReviewRequests(24574, ['reviewer']);
-
-      expect(mockGithubClient.pulls.requestReviewers).toHaveBeenCalledWith({
-        owner: 'test_owner',
-        repo: 'test_repo',
-        'pull_number': 24574,
-        reviewers: ['reviewer'],
-      });
-    });
-
-    it('skips the API call if no usernames are provided', async () => {
-      await github.createReviewRequests(24574, []);
-
-      expect(mockGithubClient.pulls.requestReviewers).not.toHaveBeenCalled();
-    });
-  });
-
   describe('getReviewRequests', () => {
     it('fetches a list of review requests', async () => {
       mockGithubClient.pulls.listRequestedReviewers.mockResolvedValue({
@@ -417,65 +395,6 @@ describe('GitHub API', () => {
         'pull_number': 24574,
       });
       expect(reviewers).toEqual(['scripter', 'someperson', 'birdperson']);
-    });
-  });
-
-  describe('getBotComments', () => {
-    it('fetches a list of comments by the bot user', async () => {
-      mockGithubClient.issues.listComments.mockResolvedValue({
-        data: issueCommentsResponse,
-      });
-      sandbox.stub(process, 'env').value({
-        GITHUB_BOT_USERNAME: 'amp-owners-bot',
-      });
-
-      const comments = await github.getBotComments(24574);
-
-      expect(mockGithubClient.issues.listComments).toHaveBeenCalledWith({
-        owner: 'test_owner',
-        repo: 'test_repo',
-        'issue_number': 24574,
-      });
-      expect(comments).toEqual([
-        {
-          id: 532484354,
-          body: 'Test comment by ampprojectbot',
-        },
-      ]);
-    });
-  });
-
-  describe('createBotComment', () => {
-    it('returns the created comment', async () => {
-      mockGithubClient.request.mockResolvedValue({data: {id: 1337}});
-
-      const {id} = await github.createBotComment(24574, 'test comment');
-
-      expect(mockGithubClient.request).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'POST',
-          url: '/repos/test_owner/test_repo/issues/24574/comments',
-          body: 'test comment',
-        })
-      );
-      expect(id).toEqual(1337);
-    });
-  });
-
-  describe('updateComment', () => {
-    it('returns the updated comment', async () => {
-      mockGithubClient.request.mockResolvedValue({data: {id: 1337}});
-
-      const {id} = await github.updateComment(24574, 'updated comment');
-
-      expect(mockGithubClient.request).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'PATCH',
-          url: '/repos/test_owner/test_repo/issues/comments/24574',
-          body: 'updated comment',
-        })
-      );
-      expect(id).toEqual(1337);
     });
   });
 
