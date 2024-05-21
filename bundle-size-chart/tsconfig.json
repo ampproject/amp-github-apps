@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "target": "ESNext",
-    "moduleResolution": "NodeNext",
+    "module": "Preserve",
     "strict": true
   },
   "include": ["src/**/*.ts"]
