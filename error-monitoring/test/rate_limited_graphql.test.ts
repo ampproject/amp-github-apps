@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import nock from 'nock';
 
 import {RateLimitedGraphQL} from '../src/rate_limited_graphql';
 
-// Jest 27 switches the default Fake Timer implementation which breaks some of
-// these tests. See: https://jestjs.io/blog/2020/05/05/jest-26#new-fake-timers
-// TODO(wg-infra): fix the tests to pass with the modern (default) impl.
-jest.useFakeTimers({legacyFakeTimers: true});
+vi.useFakeTimers();
 
 describe('RateLimitedGraphQL', () => {
   let client: RateLimitedGraphQL;
@@ -66,11 +73,11 @@ describe('RateLimitedGraphQL', () => {
     await expect(firstQuery).resolves.toEqual(response.data);
 
     nock('https://api.github.com').post('/graphql').reply(200, response);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     await expect(secondQuery).resolves.toEqual(response.data);
 
     nock('https://api.github.com').post('/graphql').reply(200, response);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     await expect(thirdQuery).resolves.toEqual(response.data);
   });
 });

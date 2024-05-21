@@ -15,6 +15,7 @@
  */
 
 import {BlameRange, ErrorReport} from 'error-monitoring';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {IssueBuilder} from '../src/issue_builder';
 import {getFixtureFile} from './fixtures';
@@ -62,7 +63,7 @@ describe('IssueBuilder', () => {
   ];
 
   beforeEach(() => {
-    jest.spyOn(Date, 'now').mockReturnValue(now.valueOf());
+    vi.spyOn(Date, 'now').mockReturnValue(now.valueOf());
     builder = new IssueBuilder(
       report,
       sourceRepo,

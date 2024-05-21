@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from 'vitest';
 import nock from 'nock';
 
 import {BlameFinder} from '../src/blame_finder';

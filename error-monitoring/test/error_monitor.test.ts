@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
+import {
+  MockedObject,
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import {Stackdriver} from 'error-monitoring';
 import nock from 'nock';
 
@@ -27,9 +38,9 @@ import {StackdriverApi} from '../src/stackdriver_api';
 describe('ErrorMonitor', () => {
   let monitor: ErrorMonitor;
   const stackdriver = {
-    listGroups: jest.fn(),
-    setGroupIssue: jest.fn(),
-  } as unknown as jest.MockedObjectDeep<StackdriverApi>;
+    listGroups: vi.fn(),
+    setGroupIssue: vi.fn(),
+  } as unknown as MockedObject<StackdriverApi>;
 
   const prodStableService: Stackdriver.ServiceContext = {
     service: 'CDN Production',
@@ -144,8 +155,8 @@ describe('ErrorMonitor', () => {
 describe('ServiceErrorMonitor', () => {
   let monitor: ServiceErrorMonitor;
   const stackdriver = {
-    listServiceGroups: jest.fn(),
-  } as unknown as jest.MockedObjectDeep<StackdriverApi>;
+    listServiceGroups: vi.fn(),
+  } as unknown as MockedObject<StackdriverApi>;
 
   const prodStableService: Stackdriver.ServiceContext = {
     service: 'CDN Production',
