@@ -20,7 +20,7 @@
     "test": "echo No tests defined for this app"
   },
   "dependencies": {
-    "@google-cloud/storage": "7.11.0",
+    "@google-cloud/storage": "7.11.1",
     "@octokit/core": "6.1.2",
     "@octokit/plugin-paginate-rest": "11.3.0",
     "@octokit/plugin-rest-endpoint-methods": "13.2.1",
