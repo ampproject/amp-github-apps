@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import nock from 'nock';
 
 import {BlameFinder} from '../src/blame_finder';
@@ -45,6 +55,8 @@ describe('ErrorIssueBot', () => {
 
   beforeAll(() => {
     nock.disableNetConnect();
+
+    process.env.PROJECT_ID = 'test-project-id';
   });
 
   afterAll(() => {
@@ -55,7 +67,7 @@ describe('ErrorIssueBot', () => {
     bot = new ErrorIssueBot('__TOKEN__', 'test_org', 'test_repo', 'issue_repo');
     nock.cleanAll();
 
-    jest.spyOn(BlameFinder.prototype, 'blameForStacktrace').mockResolvedValue([
+    vi.spyOn(BlameFinder.prototype, 'blameForStacktrace').mockResolvedValue([
       {
         path: 'extensions/amp-delight-player/0.1/amp-delight-player.js',
         startingLine: 396,
@@ -76,15 +88,15 @@ describe('ErrorIssueBot', () => {
       },
     ]);
 
-    jest
-      .spyOn(IssueBuilder.prototype, 'title', 'get')
-      .mockReturnValue('issue title');
-    jest
-      .spyOn(IssueBuilder.prototype, 'labels', 'get')
-      .mockReturnValue(['label']);
-    jest
-      .spyOn(IssueBuilder.prototype, 'body', 'get')
-      .mockReturnValue('issue body');
+    vi.spyOn(IssueBuilder.prototype, 'title', 'get').mockReturnValue(
+      'issue title'
+    );
+    vi.spyOn(IssueBuilder.prototype, 'labels', 'get').mockReturnValue([
+      'label',
+    ]);
+    vi.spyOn(IssueBuilder.prototype, 'body', 'get').mockReturnValue(
+      'issue body'
+    );
   });
 
   afterEach(() => {
