@@ -16,17 +16,19 @@
 
 import {Probot} from 'probot';
 import {PubSub} from '@google-cloud/pubsub';
-import {WebhookEventMap} from '@octokit/webhooks-types';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import probotApplication from '../src/app';
 
+import type {WebhookEventMap} from '@octokit/webhooks-types';
+
 const mockTopic = {
-  publishMessage: jest.fn().mockResolvedValue(''),
+  publishMessage: vi.fn().mockResolvedValue(''),
 };
 const mockPubSub = {
-  topic: jest.fn().mockImplementation(() => mockTopic),
+  topic: vi.fn().mockImplementation(() => mockTopic),
 };
-jest.mock('@google-cloud/pubsub', () => ({
-  PubSub: jest.fn().mockImplementation(() => mockPubSub),
+vi.mock('@google-cloud/pubsub', () => ({
+  PubSub: vi.fn().mockImplementation(() => mockPubSub),
 }));
 
 describe('webhook-pubsub-publisher tests', () => {
