@@ -15,7 +15,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@google-cloud/pubsub": "4.4.0",
+    "@google-cloud/pubsub": "4.4.1",
     "probot": "13.2.2",
     "tsx": "4.11.0",
     "typescript": "5.4.5"
