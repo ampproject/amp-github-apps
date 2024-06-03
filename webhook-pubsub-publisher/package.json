@@ -17,12 +17,12 @@
   "dependencies": {
     "@google-cloud/pubsub": "4.4.1",
     "probot": "13.2.2",
-    "tsx": "4.11.0",
+    "tsx": "4.11.2",
     "typescript": "5.4.5"
   },
   "devDependencies": {
     "@octokit/webhooks-types": "7.5.1",
-    "@types/node": "20.13.0",
+    "@types/node": "20.14.0",
     "nodemon": "3.1.2",
     "smee-client": "2.0.1",
     "vitest": "1.6.0"
