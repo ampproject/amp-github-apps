@@ -23,11 +23,11 @@
     "test": "jest --reporters=jest-silent-reporter"
   },
   "dependencies": {
-    "@fullcalendar/core": "6.1.13",
-    "@fullcalendar/daygrid": "6.1.13",
-    "@fullcalendar/interaction": "6.1.13",
-    "@fullcalendar/react": "6.1.13",
-    "@fullcalendar/timegrid": "6.1.13",
+    "@fullcalendar/core": "6.1.14",
+    "@fullcalendar/daygrid": "6.1.14",
+    "@fullcalendar/interaction": "6.1.14",
+    "@fullcalendar/react": "6.1.14",
+    "@fullcalendar/timegrid": "6.1.14",
     "@popperjs/core": "2.11.8",
     "@types/express-rate-limit": "6.0.0",
     "@types/jest": "29.5.12",
