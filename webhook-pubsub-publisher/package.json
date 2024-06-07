@@ -17,7 +17,7 @@
   "dependencies": {
     "@google-cloud/pubsub": "4.4.1",
     "probot": "13.3.0",
-    "tsx": "4.12.0",
+    "tsx": "4.13.0",
     "typescript": "5.4.5"
   },
   "devDependencies": {
