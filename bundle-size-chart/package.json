@@ -20,7 +20,7 @@
     "test": "echo No tests defined for this app"
   },
   "dependencies": {
-    "@google-cloud/storage": "7.11.1",
+    "@google-cloud/storage": "7.11.2",
     "@octokit/core": "6.1.2",
     "@octokit/plugin-paginate-rest": "11.3.0",
     "@octokit/plugin-rest-endpoint-methods": "13.2.1",
@@ -29,7 +29,7 @@
     "csv-writer": "1.6.0",
     "dotenv": "16.4.5",
     "express": "4.19.2",
-    "tsx": "4.12.1",
+    "tsx": "4.15.2",
     "typescript": "5.4.5"
   },
   "devDependencies": {
