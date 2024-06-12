@@ -23,7 +23,7 @@
     "body-parser": "1.20.2",
     "dotenv": "16.4.5",
     "express": "4.19.2",
-    "google-auth-library": "9.10.0",
+    "google-auth-library": "9.11.0",
     "http-status-codes": "2.3.0",
     "mustache": "4.2.0",
     "node-cache": "5.1.2",
