@@ -28,7 +28,7 @@
     "mustache": "4.2.0",
     "node-cache": "5.1.2",
     "node-fetch": "3.3.2",
-    "tsx": "4.15.2",
+    "tsx": "4.15.3",
     "typescript": "5.4.5"
   },
   "devDependencies": {
