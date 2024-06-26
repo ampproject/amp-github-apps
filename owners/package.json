@@ -22,7 +22,7 @@
     "highlight": "0.2.4",
     "json5": "2.2.3",
     "lodash": "4.17.21",
-    "minimatch": "9.0.4",
+    "minimatch": "9.0.5",
     "probot": "13.3.0",
     "sleep-promise": "9.1.0"
   },
