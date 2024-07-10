@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@types/node": "20.14.10",
-    "vitest": "2.0.1",
+    "vitest": "2.0.2",
     "nock": "13.5.4"
   }
 }
