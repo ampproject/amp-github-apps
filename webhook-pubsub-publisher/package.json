@@ -25,7 +25,7 @@
     "@types/node": "20.14.11",
     "nodemon": "3.1.4",
     "smee-client": "2.0.1",
-    "vitest": "2.0.3"
+    "vitest": "2.0.4"
   },
   "nodemonConfig": {
     "exec": "npm start",
