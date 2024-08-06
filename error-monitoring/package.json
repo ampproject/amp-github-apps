@@ -23,17 +23,17 @@
     "body-parser": "1.20.2",
     "dotenv": "16.4.5",
     "express": "4.19.2",
-    "google-auth-library": "9.11.0",
+    "google-auth-library": "9.13.0",
     "http-status-codes": "2.3.0",
     "mustache": "4.2.0",
     "node-cache": "5.1.2",
     "node-fetch": "3.3.2",
-    "tsx": "4.16.2",
-    "typescript": "5.5.3"
+    "tsx": "4.16.5",
+    "typescript": "5.5.4"
   },
   "devDependencies": {
-    "@types/node": "20.14.11",
-    "vitest": "2.0.4",
+    "@types/node": "20.14.14",
+    "vitest": "2.0.5",
     "nock": "13.5.4"
   }
 }
