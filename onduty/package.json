@@ -24,15 +24,15 @@
     "sleep-promise": "9.1.0"
   },
   "devDependencies": {
-    "@google-cloud/functions-framework": "3.4.1",
+    "@google-cloud/functions-framework": "3.4.2",
     "@types/express": "4.17.21",
     "@types/jest": "29.5.12",
-    "@types/node": "20.14.11",
+    "@types/node": "20.14.14",
     "jest": "29.7.0",
     "jest-silent-reporter": "0.6.0",
     "nodemon": "3.1.4",
-    "ts-jest": "29.2.3",
-    "typescript": "5.5.3"
+    "ts-jest": "29.2.4",
+    "typescript": "5.5.4"
   },
   "standard": {
     "env": [
