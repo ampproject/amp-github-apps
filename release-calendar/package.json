@@ -31,7 +31,7 @@
     "@popperjs/core": "2.11.8",
     "@types/express-rate-limit": "6.0.0",
     "@types/jest": "29.5.12",
-    "@types/node": "20.14.14",
+    "@types/node": "20.14.15",
     "@types/node-fetch": "2.6.11",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
