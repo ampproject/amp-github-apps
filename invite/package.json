@@ -32,7 +32,7 @@
     "jest-silent-reporter": "0.6.0",
     "nodemon": "3.1.4",
     "sqlite3": "5.1.7",
-    "ts-jest": "29.2.4",
+    "ts-jest": "29.2.5",
     "typescript": "5.5.4"
   },
   "standard": {
