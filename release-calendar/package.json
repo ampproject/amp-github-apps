@@ -67,7 +67,7 @@
   "devDependencies": {
     "jest": "29.7.0",
     "jest-silent-reporter": "0.6.0",
-    "ts-jest": "29.2.4"
+    "ts-jest": "29.2.5"
   },
   "jest": {
     "preset": "ts-jest"
