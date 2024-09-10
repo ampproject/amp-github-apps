@@ -29,7 +29,7 @@
   "devDependencies": {
     "jest": "29.7.0",
     "jest-silent-reporter": "0.6.0",
-    "sinon": "18.0.0",
+    "sinon": "18.0.1",
     "smee-client": "2.0.3",
     "supertest": "7.0.0"
   },
