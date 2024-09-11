@@ -40,7 +40,7 @@
     "@types/fancy-log": "2.0.2",
     "@types/node": "20.16.5",
     "@types/supertest": "6.0.2",
-    "express": "4.20.0",
+    "express": "4.21.0",
     "fancy-log": "2.0.0",
     "vitest-mock-extended": "2.0.2",
     "nodemon": "3.1.4",
