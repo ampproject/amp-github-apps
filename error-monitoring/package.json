@@ -20,7 +20,7 @@
     "@types/body-parser": "1.19.5",
     "@types/express": "4.17.21",
     "@types/mustache": "4.2.5",
-    "body-parser": "1.20.2",
+    "body-parser": "1.20.3",
     "dotenv": "16.4.5",
     "express": "4.19.2",
     "google-auth-library": "9.14.1",
