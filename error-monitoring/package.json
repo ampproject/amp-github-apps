@@ -22,7 +22,7 @@
     "@types/mustache": "4.2.5",
     "body-parser": "1.20.3",
     "dotenv": "16.4.5",
-    "express": "4.20.0",
+    "express": "4.21.0",
     "google-auth-library": "9.14.1",
     "http-status-codes": "2.3.0",
     "mustache": "4.2.0",
