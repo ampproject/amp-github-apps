@@ -21,7 +21,7 @@
   "dependencies": {
     "@octokit/core": "6.1.2",
     "@octokit/plugin-rest-endpoint-methods": "13.2.4",
-    "@octokit/plugin-retry": "7.1.1",
+    "@octokit/plugin-retry": "7.1.2",
     "@octokit/request-error": "6.1.4",
     "@octokit/types": "13.5.0",
     "@probot/octokit-plugin-config": "3.0.2",
@@ -29,7 +29,7 @@
     "minimatch": "10.0.1",
     "node-cache": "5.1.2",
     "pg": "8.13.0",
-    "probot": "13.3.7",
+    "probot": "13.3.8",
     "sleep-promise": "9.1.0",
     "tsx": "4.19.1",
     "typescript": "5.6.2"
