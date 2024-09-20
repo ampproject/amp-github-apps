@@ -43,7 +43,7 @@
     "express": "4.21.0",
     "fancy-log": "2.0.0",
     "vitest-mock-extended": "2.0.2",
-    "nodemon": "3.1.6",
+    "nodemon": "3.1.7",
     "smee-client": "2.0.3",
     "sqlite3": "5.1.7",
     "supertest": "7.0.0",
