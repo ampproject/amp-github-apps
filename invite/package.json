@@ -20,7 +20,7 @@
     "@octokit/rest": "20.1.1",
     "dotenv": "16.4.5",
     "knex": "3.1.0",
-    "pg": "8.13.0",
+    "pg": "8.13.1",
     "probot": "12.4.0"
   },
   "devDependencies": {
