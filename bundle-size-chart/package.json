@@ -25,7 +25,7 @@
     "@octokit/plugin-paginate-rest": "11.3.5",
     "@octokit/plugin-rest-endpoint-methods": "13.2.6",
     "@types/express": "5.0.0",
-    "@types/node": "20.16.11",
+    "@types/node": "22.8.2",
     "csv-writer": "1.6.0",
     "dotenv": "16.4.5",
     "express": "4.21.0",
