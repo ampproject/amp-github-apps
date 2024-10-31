@@ -16,13 +16,13 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@google-cloud/pubsub": "4.8.0",
-    "probot": "13.3.8",
+    "probot": "13.3.9",
     "tsx": "4.19.2",
     "typescript": "5.6.3"
   },
   "devDependencies": {
     "@octokit/webhooks-types": "7.6.1",
-    "@types/node": "22.8.5",
+    "@types/node": "22.8.6",
     "nodemon": "3.1.7",
     "smee-client": "2.0.4",
     "vitest": "2.1.4"
