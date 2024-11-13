@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@types/node": "22.9.0",
-    "vitest": "2.1.4",
+    "vitest": "2.1.5",
     "nock": "13.5.6"
   }
 }
