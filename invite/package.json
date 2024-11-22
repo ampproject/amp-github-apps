@@ -33,7 +33,7 @@
     "nodemon": "3.1.7",
     "sqlite3": "5.1.7",
     "ts-jest": "29.2.5",
-    "typescript": "5.6.3"
+    "typescript": "5.7.2"
   },
   "standard": {
     "env": [
