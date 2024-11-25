@@ -32,7 +32,7 @@
     "typescript": "5.7.2"
   },
   "devDependencies": {
-    "@types/node": "22.9.2",
+    "@types/node": "22.9.3",
     "vitest": "2.1.5",
     "nock": "13.5.6"
   }
