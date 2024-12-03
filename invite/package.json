@@ -18,7 +18,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@octokit/rest": "20.1.1",
-    "dotenv": "16.4.6",
+    "dotenv": "16.4.7",
     "knex": "3.1.0",
     "pg": "8.13.1",
     "probot": "12.4.0"
