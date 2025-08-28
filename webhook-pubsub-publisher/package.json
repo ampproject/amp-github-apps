@@ -15,8 +15,8 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@google-cloud/pubsub": "4.9.0",
-    "probot": "13.4.0",
+    "@google-cloud/pubsub": "5.2.0",
+    "probot": "14.0.2",
     "tsx": "4.19.2",
     "typescript": "5.7.2"
   },
@@ -24,8 +24,8 @@
     "@octokit/webhooks-types": "7.6.1",
     "@types/node": "22.9.3",
     "nodemon": "3.1.7",
-    "smee-client": "2.0.4",
-    "vitest": "2.1.9"
+    "smee-client": "4.3.1",
+    "vitest": "3.2.4"
   },
   "nodemonConfig": {
     "exec": "npm start",
