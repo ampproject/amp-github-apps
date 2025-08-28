@@ -17,22 +17,22 @@
     "unredact-env": "read -p \"This will overwrite existing .env file. Press enter to continue.\n\" && node bin/unredact-env.js"
   },
   "devDependencies": {
-    "@babel/core": "7.26.0",
-    "@babel/eslint-parser": "7.25.9",
+    "@babel/core": "7.28.3",
+    "@babel/eslint-parser": "7.28.0",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
     "eslint": "8.57.1",
     "eslint-config-google": "0.14.0",
-    "eslint-config-prettier": "9.1.0",
+    "eslint-config-prettier": "9.1.2",
     "eslint-plugin-notice": "0.9.10",
-    "eslint-plugin-prettier": "5.2.1",
-    "eslint-plugin-react": "7.37.2",
+    "eslint-plugin-prettier": "5.5.4",
+    "eslint-plugin-react": "7.37.5",
     "eslint-plugin-sort-imports-es6-autofix": "0.6.0",
     "eslint-plugin-sort-requires": "2.1.0",
     "kleur": "4.1.5",
-    "prettier": "3.4.2",
+    "prettier": "3.6.2",
     "react": "18.3.1",
-    "typescript": "5.7.2",
-    "yaml": "2.6.1"
+    "typescript": "5.9.2",
+    "yaml": "2.8.1"
   }
 }
