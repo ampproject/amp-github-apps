@@ -15,15 +15,15 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@google-cloud/pubsub": "4.9.0",
-    "probot": "13.4.0",
-    "tsx": "4.19.2",
-    "typescript": "5.7.2"
+    "@google-cloud/pubsub": "4.11.0",
+    "probot": "13.4.7",
+    "tsx": "4.20.5",
+    "typescript": "5.9.2"
   },
   "devDependencies": {
     "@octokit/webhooks-types": "7.6.1",
-    "@types/node": "22.9.3",
-    "nodemon": "3.1.7",
+    "@types/node": "22.18.0",
+    "nodemon": "3.1.10",
     "smee-client": "2.0.4",
     "vitest": "2.1.9"
   },
