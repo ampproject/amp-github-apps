@@ -15,15 +15,15 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@google-cloud/storage": "7.14.0",
-    "@octokit/rest": "20.1.1",
+    "@google-cloud/storage": "7.17.0",
+    "@octokit/rest": "20.1.2",
     "ajv": "8.17.1",
     "express": "4.21.2",
     "highlight": "0.2.4",
     "json5": "2.2.3",
     "lodash": "4.17.21",
     "minimatch": "9.0.5",
-    "probot": "13.4.0",
+    "probot": "13.4.7",
     "sleep-promise": "9.1.0"
   },
   "devDependencies": {
@@ -31,7 +31,7 @@
     "jest-silent-reporter": "0.6.0",
     "sinon": "18.0.1",
     "smee-client": "2.0.4",
-    "supertest": "7.0.0"
+    "supertest": "7.1.4"
   },
   "standard": {
     "env": [
