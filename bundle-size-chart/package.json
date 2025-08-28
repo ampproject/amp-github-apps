@@ -20,20 +20,20 @@
     "test": "echo No tests defined for this app"
   },
   "dependencies": {
-    "@google-cloud/storage": "7.13.0",
-    "@octokit/core": "6.1.2",
-    "@octokit/plugin-paginate-rest": "11.4.1",
-    "@octokit/plugin-rest-endpoint-methods": "13.2.6",
-    "@types/express": "5.0.0",
-    "@types/node": "22.8.2",
+    "@google-cloud/storage": "7.17.0",
+    "@octokit/core": "6.1.6",
+    "@octokit/plugin-paginate-rest": "11.6.0",
+    "@octokit/plugin-rest-endpoint-methods": "13.5.0",
+    "@types/express": "5.0.3",
+    "@types/node": "22.18.0",
     "csv-writer": "1.6.0",
-    "dotenv": "16.4.5",
-    "express": "4.21.1",
-    "tsx": "4.19.1",
-    "typescript": "5.6.3"
+    "dotenv": "16.6.1",
+    "express": "4.21.2",
+    "tsx": "4.20.5",
+    "typescript": "5.9.2"
   },
   "devDependencies": {
-    "nodemon": "3.1.7"
+    "nodemon": "3.1.10"
   },
   "nodemonConfig": {
     "exec": "node --inspect -r ts-node/register ./src/app.ts",
